@@ -9,8 +9,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const SizedBox(
-      child: Text(
-          "dfaffdsfsdddddddddddfjafajfa;jf;fj;alfjl;fjl;afja;lfjl;ajf;sdjfa;fj;afja;"),
+      child: Text("Hello Icebr8k"),
     );
   }
 }
