@@ -1,4 +1,4 @@
-package com.icebr8k.icebr8k
+package com.icebr8k.android
 
 import io.flutter.embedding.android.FlutterActivity
 
