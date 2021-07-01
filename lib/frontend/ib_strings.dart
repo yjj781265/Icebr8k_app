@@ -19,7 +19,17 @@ class IbStrings extends Translations {
           'new_here': 'New here? ',
           'sign_up': 'Sign up',
           'name': 'Name',
-          'name_hint': 'Please enter name'
+          'name_hint': 'Please enter name',
+          'birthdate': 'Birthdate',
+          'birthdate_hint': 'Please enter your birthdate',
+          'confirm': 'Confirm',
+          'cancel': 'Cancel',
+          'email_not_valid': 'email is not valid',
+          'birthdate_instruction': 'Please pick a date',
+          'field_is_empty': 'field is empty',
+          '8_characters_error': 'at least 8 characters',
+          'password_match_error': 'password does not match',
+          'age_limit_msg': 'user needs to be at least age of 13',
         }
       };
 }

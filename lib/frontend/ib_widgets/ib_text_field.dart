@@ -6,23 +6,53 @@ import '../ib_config.dart';
 
 class IbTextField extends StatelessWidget {
   final Icon titleIcon;
-  final Icon suffixIcon;
+  final TextEditingController? controller;
+  final Widget suffixIcon;
   final String titleTrKey;
   final String hintTrKey;
   final String errorTrKey;
+  final String prefixText;
   final Color borderColor;
-  const IbTextField(
-      {Key? key,
-      required this.titleIcon,
-      required this.titleTrKey,
-      required this.hintTrKey,
-      this.suffixIcon = const Icon(null),
-      required this.errorTrKey,
-      this.borderColor = IbColors.lightGrey})
-      : super(key: key);
+  final bool obscureText;
+  final Iterable<String> autofillHints;
+  final TextInputType textInputType;
+  final Function(String) onChanged;
+  final bool enabled;
+  const IbTextField({
+    Key? key,
+    required this.titleIcon,
+    required this.titleTrKey,
+    required this.hintTrKey,
+    this.suffixIcon = const Icon(null),
+    this.errorTrKey = '',
+    this.borderColor = IbColors.lightGrey,
+    this.enabled = true,
+    required this.onChanged,
+    this.textInputType = TextInputType.text,
+    this.obscureText = false,
+    this.autofillHints = const [],
+    this.prefixText = '',
+    this.controller,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final textField = TextField(
+      autofillHints: enabled ? autofillHints : null,
+      keyboardType: textInputType,
+      obscureText: obscureText,
+      onChanged: (text) {
+        onChanged(text);
+      },
+      controller: controller,
+      decoration: InputDecoration(
+          prefixText: prefixText,
+          enabled: enabled,
+          hintStyle: const TextStyle(color: IbColors.lightGrey),
+          hintText: hintTrKey.tr,
+          border: InputBorder.none,
+          suffixIcon: suffixIcon),
+    );
     return Column(
       children: [
         Padding(
@@ -48,22 +78,14 @@ class IbTextField extends StatelessWidget {
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.only(left: 16),
-              child: TextField(
-                decoration: InputDecoration(
-                    hintStyle: const TextStyle(color: IbColors.lightGrey),
-                    hintText: hintTrKey.tr,
-                    border: InputBorder.none,
-                    suffixIcon: suffixIcon),
-              ),
-            ),
+                padding: const EdgeInsets.only(left: 16), child: textField),
           ),
         ),
         /******* error text ****/
         SizedBox(
           width: Get.width * 0.9,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(30, 0, 16, 16),
+            padding: const EdgeInsets.fromLTRB(30, 0, 16, 0),
             child: Text(
               errorTrKey.tr,
               maxLines: 1,
