@@ -9,6 +9,8 @@ import 'package:icebr8k/median/controllers/sign_up_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
+import '../ib_utiis.dart';
+
 class SignUpPage extends GetView<SignUpController> {
   SignUpPage({Key? key}) : super(key: key);
   final TextEditingController _birthdateTeController = TextEditingController();
@@ -18,168 +20,174 @@ class SignUpPage extends GetView<SignUpController> {
     Get.put(SignUpController());
     return Scaffold(
       backgroundColor: IbColors.primaryColor,
-      body: Center(
-        child: IbCard(
-          child: SizedBox(
-            width: Get.width * 0.95,
-            height: Get.height * 0.8,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 16, bottom: 16, right: 8),
-              child: Scrollbar(
-                radius: const Radius.circular(IbConfig.kScrollbarCornerRadius),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              Get.back();
-                            },
-                            icon: const Icon(Icons.arrow_back_outlined),
-                          ),
-                          Text(
-                            'sign_up'.tr,
-                            style: const TextStyle(
-                                fontSize: IbConfig.kPageTitleSize,
-                                fontWeight: FontWeight.bold),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 16,
-                      ),
-                      Obx(
-                        () => IbTextField(
-                          titleIcon: const Icon(
-                            Icons.person_outline,
-                            color: IbColors.primaryColor,
-                          ),
-                          titleTrKey: 'name',
-                          hintTrKey: 'name_hint',
-                          textInputType: TextInputType.name,
-                          errorTrKey: controller.nameErrorTrKey.value,
-                          borderColor: controller.isNameFirstTime.value
-                              ? IbColors.lightGrey
-                              : (controller.isNameValid.value
-                                  ? IbColors.accentColor
-                                  : IbColors.errorRed),
-                          onChanged: (name) {
-                            controller.name.value = name;
-                          },
+      body: GestureDetector(
+        onTap: () => IbUtils.hideKeyboard(),
+        child: Center(
+          child: IbCard(
+            child: SizedBox(
+              width: Get.width * 0.95,
+              height: Get.height * 0.8,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 16, bottom: 16, right: 8),
+                child: Scrollbar(
+                  radius:
+                      const Radius.circular(IbConfig.kScrollbarCornerRadius),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                //hide keyboard
+                                IbUtils.hideKeyboard();
+                                Get.back();
+                              },
+                              icon: const Icon(Icons.arrow_back_outlined),
+                            ),
+                            Text(
+                              'sign_up'.tr,
+                              style: const TextStyle(
+                                  fontSize: IbConfig.kPageTitleSize,
+                                  fontWeight: FontWeight.bold),
+                            )
+                          ],
                         ),
-                      ),
-                      Obx(
-                        () => InkWell(
-                          onTap: () => showDialog(
-                              context: context,
-                              builder: (context) => _getDatePicker()),
-                          child: IbTextField(
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        Obx(
+                          () => IbTextField(
                             titleIcon: const Icon(
-                              Icons.cake_outlined,
+                              Icons.person_outline,
                               color: IbColors.primaryColor,
                             ),
-                            borderColor: controller.isBirthDateFirstTime.value
+                            titleTrKey: 'name',
+                            hintTrKey: 'name_hint',
+                            textInputType: TextInputType.name,
+                            errorTrKey: controller.nameErrorTrKey.value,
+                            borderColor: controller.isNameFirstTime.value
                                 ? IbColors.lightGrey
-                                : (controller.isBirthdateValid.value
+                                : (controller.isNameValid.value
                                     ? IbColors.accentColor
                                     : IbColors.errorRed),
-                            errorTrKey: controller.birthdateErrorTrKey.value,
-                            controller: _birthdateTeController,
-                            suffixIcon:
-                                const Icon(Icons.calendar_today_outlined),
-                            titleTrKey: 'birthdate',
-                            hintTrKey: 'birthdate_hint',
-                            enabled: false,
-                            onChanged: (birthdate) {},
+                            onChanged: (name) {
+                              controller.name.value = name;
+                            },
                           ),
                         ),
-                      ),
-                      Obx(
-                        () => IbTextField(
-                          titleIcon: const Icon(
-                            Icons.email_outlined,
-                            color: IbColors.primaryColor,
+                        Obx(
+                          () => InkWell(
+                            onTap: () => showDialog(
+                                context: context,
+                                builder: (context) => _getDatePicker()),
+                            child: IbTextField(
+                              titleIcon: const Icon(
+                                Icons.cake_outlined,
+                                color: IbColors.primaryColor,
+                              ),
+                              borderColor: controller.isBirthDateFirstTime.value
+                                  ? IbColors.lightGrey
+                                  : (controller.isBirthdateValid.value
+                                      ? IbColors.accentColor
+                                      : IbColors.errorRed),
+                              errorTrKey: controller.birthdateErrorTrKey.value,
+                              controller: _birthdateTeController,
+                              suffixIcon:
+                                  const Icon(Icons.calendar_today_outlined),
+                              titleTrKey: 'birthdate',
+                              hintTrKey: 'birthdate_hint',
+                              enabled: false,
+                              onChanged: (birthdate) {},
+                            ),
                           ),
-                          textInputType: TextInputType.emailAddress,
-                          titleTrKey: 'email_address',
-                          hintTrKey: 'email_address_hint',
-                          borderColor: controller.isEmailFirstTime.value
-                              ? IbColors.lightGrey
-                              : (controller.isEmailValid.value
-                                  ? IbColors.accentColor
-                                  : IbColors.errorRed),
-                          errorTrKey: controller.emailErrorTrKey.value,
-                          onChanged: (email) {
-                            controller.email.value = email.trim();
-                          },
                         ),
-                      ),
-                      Obx(
-                        () => IbTextField(
+                        Obx(
+                          () => IbTextField(
+                            titleIcon: const Icon(
+                              Icons.email_outlined,
+                              color: IbColors.primaryColor,
+                            ),
+                            textInputType: TextInputType.emailAddress,
+                            titleTrKey: 'email_address',
+                            hintTrKey: 'email_address_hint',
+                            borderColor: controller.isEmailFirstTime.value
+                                ? IbColors.lightGrey
+                                : (controller.isEmailValid.value
+                                    ? IbColors.accentColor
+                                    : IbColors.errorRed),
+                            errorTrKey: controller.emailErrorTrKey.value,
+                            onChanged: (email) {
+                              controller.email.value = email.trim();
+                            },
+                          ),
+                        ),
+                        Obx(
+                          () => IbTextField(
+                              titleIcon: const Icon(
+                                Icons.lock_outline,
+                                color: IbColors.primaryColor,
+                              ),
+                              textInputType: TextInputType.visiblePassword,
+                              titleTrKey: 'password',
+                              hintTrKey: 'password_hint',
+                              borderColor: controller.isPwdFirstTime.value
+                                  ? IbColors.lightGrey
+                                  : (controller.isPasswordValid.value
+                                      ? IbColors.accentColor
+                                      : IbColors.errorRed),
+                              errorTrKey: controller.pwdErrorTrKey.value,
+                              onChanged: (password) {
+                                controller.password.value = password;
+                              },
+                              obscureText: controller.isPwdObscured.value,
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  final bool isObscured =
+                                      controller.isPwdObscured.value;
+                                  controller.isPwdObscured.value = !isObscured;
+                                },
+                                icon: Icon(controller.isPwdObscured.value
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined),
+                              )),
+                        ),
+                        Obx(
+                          () => IbTextField(
                             titleIcon: const Icon(
                               Icons.lock_outline,
                               color: IbColors.primaryColor,
                             ),
                             textInputType: TextInputType.visiblePassword,
-                            titleTrKey: 'password',
-                            hintTrKey: 'password_hint',
-                            borderColor: controller.isPwdFirstTime.value
-                                ? IbColors.lightGrey
-                                : (controller.isPasswordValid.value
-                                    ? IbColors.accentColor
-                                    : IbColors.errorRed),
-                            errorTrKey: controller.pwdErrorTrKey.value,
-                            onChanged: (password) {
-                              controller.password.value = password;
-                            },
-                            obscureText: controller.isPwdObscured.value,
+                            obscureText: controller.isCfPwdObscured.value,
                             suffixIcon: IconButton(
                               onPressed: () {
                                 final bool isObscured =
-                                    controller.isPwdObscured.value;
+                                    controller.isCfPwdObscured.value;
                                 controller.isPwdObscured.value = !isObscured;
                               },
-                              icon: Icon(controller.isPwdObscured.value
+                              icon: Icon(controller.isCfPwdObscured.value
                                   ? Icons.visibility_off_outlined
                                   : Icons.visibility_outlined),
-                            )),
-                      ),
-                      Obx(
-                        () => IbTextField(
-                          titleIcon: const Icon(
-                            Icons.lock_outline,
-                            color: IbColors.primaryColor,
-                          ),
-                          textInputType: TextInputType.visiblePassword,
-                          obscureText: controller.isCfPwdObscured.value,
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              final bool isObscured =
-                                  controller.isCfPwdObscured.value;
-                              controller.isPwdObscured.value = !isObscured;
+                            ),
+                            borderColor: controller.isCfPwdFirstTime.value
+                                ? IbColors.lightGrey
+                                : (controller.isCfPwdValid.value
+                                    ? IbColors.accentColor
+                                    : IbColors.errorRed),
+                            titleTrKey: 'confirm_password',
+                            hintTrKey: 'confirm_password_hint',
+                            errorTrKey: controller.confirmPwdErrorTrKey.value,
+                            onChanged: (cfPwd) {
+                              controller.confirmPassword.value = cfPwd;
                             },
-                            icon: Icon(controller.isCfPwdObscured.value
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined),
                           ),
-                          borderColor: controller.isCfPwdFirstTime.value
-                              ? IbColors.lightGrey
-                              : (controller.isCfPwdValid.value
-                                  ? IbColors.accentColor
-                                  : IbColors.errorRed),
-                          titleTrKey: 'confirm_password',
-                          hintTrKey: 'confirm_password_hint',
-                          errorTrKey: controller.confirmPwdErrorTrKey.value,
-                          onChanged: (cfPwd) {
-                            controller.confirmPassword.value = cfPwd;
-                          },
                         ),
-                      ),
-                      IbElevatedButton(
-                          textTrKey: 'sign_up',
-                          onPressed: () => print("to home page")),
-                    ],
+                        IbElevatedButton(
+                            textTrKey: 'sign_up',
+                            onPressed: () => print("to home page")),
+                      ],
+                    ),
                   ),
                 ),
               ),
