@@ -14,17 +14,17 @@ class SignInController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    debounce(password, (_) => _validatePassword(),
+    debounce(password, (_) => validatePassword(),
         time:
             const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis));
     debounce(
       email,
-      (_) => _validateEmail(),
+      (_) => validateEmail(),
       time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
     );
   }
 
-  void _validatePassword() {
+  void validatePassword() {
     isPasswordFirstTime.value = false;
     isPasswordValid.value =
         password.value.isNotEmpty && password.value.length >= 8;
@@ -41,7 +41,7 @@ class SignInController extends GetxController {
     passwordErrorTrKey.value = '';
   }
 
-  void _validateEmail() {
+  void validateEmail() {
     isEmailFirstTime.value = false;
     email.value = email.value.trim();
     isEmailValid.value = GetUtils.isEmail(email.value.trim());

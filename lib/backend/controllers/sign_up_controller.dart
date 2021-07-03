@@ -72,7 +72,7 @@ class SignUpController extends GetxController {
     final date = DateTime.fromMillisecondsSinceEpoch(birthdateInMillis.value);
     final now = DateTime.now();
     // 13 years is roughly 4745 days
-    final bool isOver13 = now.difference(date).inDays > 4745;
+    final bool isOver13 = now.difference(date).inDays > IbConfig.ageLimitInDays;
     isBirthDateFirstTime.value = false;
     isBirthdateValid.value = readableBirthdate.value.isNotEmpty && isOver13;
     print('validating birthdate ${isBirthdateValid.value}');
@@ -144,5 +144,27 @@ class SignUpController extends GetxController {
       return;
     }
     emailErrorTrKey.value = '';
+  }
+
+  void validateAllFields() {
+    _validateCfPassword();
+    _validateName();
+    _validateEmail();
+    _validatePassword();
+    _validateBirthdate();
+  }
+
+  bool isEverythingValid() {
+    return isNameValid.isTrue &&
+        isBirthdateValid.isTrue &&
+        isEmailValid.isTrue &&
+        isCfPwdValid.isTrue &&
+        isPasswordValid.isTrue;
+  }
+
+  @override
+  String toString() {
+    return 'SignUpController{name: $name, birthdateInMillis: $birthdateInMillis, '
+        'email: $email, password: $password, confirmPassword: $confirmPassword}';
   }
 }
