@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/auth_controller.dart';
+import 'package:icebr8k/backend/controllers/sign_up_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_single_date_picker.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
-import 'package:icebr8k/median/controllers/sign_up_controller.dart';
 import 'package:intl/intl.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
-import '../ib_utiis.dart';
+import '../ib_utils.dart';
 
 class SignUpPage extends GetView<SignUpController> {
   SignUpPage({Key? key}) : super(key: key);
@@ -80,7 +81,8 @@ class SignUpPage extends GetView<SignUpController> {
                           () => InkWell(
                             onTap: () => showDialog(
                                 context: context,
-                                builder: (context) => _getDatePicker()),
+                                builder: (context) => _getDatePicker(),
+                                barrierDismissible: false),
                             child: IbTextField(
                               titleIcon: const Icon(
                                 Icons.cake_outlined,
@@ -164,7 +166,7 @@ class SignUpPage extends GetView<SignUpController> {
                               onPressed: () {
                                 final bool isObscured =
                                     controller.isCfPwdObscured.value;
-                                controller.isPwdObscured.value = !isObscured;
+                                controller.isCfPwdObscured.value = !isObscured;
                               },
                               icon: Icon(controller.isCfPwdObscured.value
                                   ? Icons.visibility_off_outlined
@@ -183,9 +185,21 @@ class SignUpPage extends GetView<SignUpController> {
                             },
                           ),
                         ),
-                        IbElevatedButton(
-                            textTrKey: 'sign_up',
-                            onPressed: () => print("to home page")),
+                        Obx(
+                          () => IbElevatedButton(
+                              textTrKey:
+                                  Get.find<AuthController>().isSigningUp.isTrue
+                                      ? 'signing_up'
+                                      : 'sign_up',
+                              onPressed: () {
+                                controller.validateAllFields();
+                                if (controller.isEverythingValid()) {
+                                  Get.find<AuthController>().signUpViaEmail(
+                                      controller.email.value,
+                                      controller.password.value);
+                                }
+                              }),
+                        ),
                       ],
                     ),
                   ),
@@ -199,65 +213,35 @@ class SignUpPage extends GetView<SignUpController> {
   }
 
   Widget _getDatePicker() {
-    controller.birthdatePickerInstructionKey.value = 'birthdate_instruction';
+    controller.birthdatePickerInstructionKey.value = 'date_picker_instruction';
     return Obx(
-      () => Center(
-        child: SizedBox(
-          width: Get.width * 0.95,
-          height: 400,
-          child: IbCard(
-              child: Column(
-            children: [
-              SfDateRangePicker(
-                initialDisplayDate: DateTime(1990),
-                showNavigationArrow: true,
-                maxDate: DateTime.now(),
-                view: DateRangePickerView.decade,
-                headerStyle: const DateRangePickerHeaderStyle(
-                    textAlign: TextAlign.center),
-                onSelectionChanged: (arg) {
-                  print(arg.value as DateTime);
-                  controller.birthdateInMillis.value =
-                      (arg.value as DateTime).millisecondsSinceEpoch;
-                  controller.birthdatePickerInstructionKey.value = '';
-                },
-                monthViewSettings:
-                    const DateRangePickerMonthViewSettings(firstDayOfWeek: 1),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                      onPressed: () => Get.back(), child: Text('cancel'.tr)),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: TextButton(
-                        onPressed: () {
-                          if (controller
-                              .birthdatePickerInstructionKey.value.isNotEmpty) {
-                            return;
-                          }
+      () => IbSingleDatePicker(
+        onSelectionChanged: (arg) {
+          print(arg.value as DateTime);
+          controller.birthdateInMs.value =
+              (arg.value as DateTime).millisecondsSinceEpoch;
+          controller.birthdatePickerInstructionKey.value = '';
+        },
+        titleTrKey: controller.birthdatePickerInstructionKey.value,
+        buttons: [
+          TextButton(onPressed: () => Get.back(), child: Text('cancel'.tr)),
+          TextButton(
+              onPressed: () {
+                if (controller.birthdatePickerInstructionKey.value.isNotEmpty) {
+                  return;
+                }
 
-                          final _dateTime = DateTime.fromMillisecondsSinceEpoch(
-                              controller.birthdateInMillis.value);
-                          controller.readableBirthdate.value =
-                              _readableDateTime(_dateTime);
-                          _birthdateTeController.text =
-                              controller.readableBirthdate.value;
-                          print(_readableDateTime(_dateTime));
-                          Get.back();
-                        },
-                        child: Text('confirm'.tr)),
-                  ),
-                ],
-              ),
-              Text(
-                controller.birthdatePickerInstructionKey.value.tr,
-                style: const TextStyle(color: IbColors.errorRed),
-              ),
-            ],
-          )),
-        ),
+                final _dateTime = DateTime.fromMillisecondsSinceEpoch(
+                    controller.birthdateInMs.value);
+                controller.readableBirthdate.value =
+                    _readableDateTime(_dateTime);
+                _birthdateTeController.text =
+                    controller.readableBirthdate.value;
+                print(_readableDateTime(_dateTime));
+                Get.back();
+              },
+              child: Text('confirm'.tr)),
+        ],
       ),
     );
   }

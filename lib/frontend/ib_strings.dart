@@ -9,12 +9,14 @@ class IbStrings extends Translations {
           'email_address': 'Email Address',
           'email_address_hint': 'Please enter email address',
           'password': 'Password',
+          'reset_pwd': 'Reset password',
           'password_hint': 'Please enter password',
           'confirm_password': 'Confirm Password',
           'confirm_password_hint': 'Please confirm password',
           'forget_pwd': "Forgot Password?",
           'sign_in_google': 'Sign in with Google',
           'or': 'OR',
+          'ok': 'Okay',
           'login': 'Login',
           'new_here': 'New here? ',
           'sign_up': 'Sign up',
@@ -25,11 +27,25 @@ class IbStrings extends Translations {
           'confirm': 'Confirm',
           'cancel': 'Cancel',
           'email_not_valid': 'email is not valid',
-          'birthdate_instruction': 'Please pick a date',
+          'date_picker_instruction': 'Please pick your birthdate',
           'field_is_empty': 'field is empty',
           '8_characters_error': 'at least 8 characters',
           'password_match_error': 'password does not match',
           'age_limit_msg': 'user needs to be at least age of 13',
+          'loading': 'Loading...',
+          'signing_in': 'Signing in...',
+          'signing_up': 'Signing up...',
+          'resend_verification_email': 'Resend email',
+          'verification_email_sent': 'Verification email from Icebr8k is sent.',
+          'reset_email_intro':
+              'Please enter the email you want to reset the password for in below',
+          'reset_email_msg': "Password reset email has been sent to @email.",
+          'sign_up_email_verification':
+              'Sign up success! Please check your email inbox for verification from Icebr8k.',
+          'sign_in_email_verification':
+              'This email address is not verified, please check your inbox for verification email from Icebr8k.',
+          'sign_out': "Sign out",
+          'signing_out': 'Signing out...',
         }
       };
 }

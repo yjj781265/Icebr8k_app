@@ -1,28 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/home_page.dart';
+import 'package:icebr8k/frontend/ib_pages/sign_in_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
-import 'sign_in_page.dart';
-
-class SplashPage extends StatelessWidget {
+class SplashPage extends GetView<AuthController> {
   const SplashPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final task = Future.delayed(
-        const Duration(seconds: 2),
-        () => Get.offAll(const SignInPage(),
-            transition: Transition.fadeIn,
-            duration: const Duration(microseconds: 500)));
-    task.then((value) => print("Go to sign in page"));
-
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(statusBarColor: IbColors.lightBlue),
-    );
-
+    Future.delayed(
+            const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
+            () => navigateToCorrectPage())
+        .then((_) => print('leaving splash page'));
     return Scaffold(
       backgroundColor: IbColors.lightBlue,
       body: Center(
@@ -39,5 +32,20 @@ class SplashPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void navigateToCorrectPage() {
+    if (controller.isSignedIn.value) {
+      print('to home page');
+      Get.offAll(
+        HomePage(),
+        transition: Transition.fadeIn,
+      );
+    } else {
+      Get.offAll(SignInPage(),
+          transition: Transition.fadeIn,
+          duration: const Duration(
+              milliseconds: IbConfig.kEventTriggerDelayInMillis));
+    }
   }
 }

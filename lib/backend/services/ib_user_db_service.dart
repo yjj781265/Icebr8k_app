@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 
-class IbUserService {
-  static final _ibUserService = IbUserService._();
+class IbUserDbService {
+  static final _ibUserService = IbUserDbService._();
   static final _db = FirebaseFirestore.instance;
   static const _kUserCollection = 'IbUsers';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
 
-  factory IbUserService() => _ibUserService;
-  IbUserService._() {
+  factory IbUserDbService() => _ibUserService;
+  IbUserDbService._() {
     _collectionRef = _db.collection(_kUserCollection);
   }
 

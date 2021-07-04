@@ -1,10 +1,11 @@
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 
 class SignUpController extends GetxController {
   final name = ''.obs;
   final nameErrorTrKey = ''.obs;
-  final birthdateInMillis = 0.obs;
+  final birthdateInMs = 0.obs;
   final readableBirthdate = ''.obs;
   final birthdatePickerInstructionKey = 'birthdate_instruction'.obs;
   final birthdateErrorTrKey = ''.obs;
@@ -69,10 +70,9 @@ class SignUpController extends GetxController {
   }
 
   void _validateBirthdate() {
-    final date = DateTime.fromMillisecondsSinceEpoch(birthdateInMillis.value);
-    final now = DateTime.now();
+    final date = DateTime.fromMillisecondsSinceEpoch(birthdateInMs.value);
     // 13 years is roughly 4745 days
-    final bool isOver13 = now.difference(date).inDays > IbConfig.ageLimitInDays;
+    final bool isOver13 = IbUtils.isOver13(date);
     isBirthDateFirstTime.value = false;
     isBirthdateValid.value = readableBirthdate.value.isNotEmpty && isOver13;
     print('validating birthdate ${isBirthdateValid.value}');
@@ -164,7 +164,7 @@ class SignUpController extends GetxController {
 
   @override
   String toString() {
-    return 'SignUpController{name: $name, birthdateInMillis: $birthdateInMillis, '
+    return 'SignUpController{name: $name, birthdateInMillis: $birthdateInMs, '
         'email: $email, password: $password, confirmPassword: $confirmPassword}';
   }
 }

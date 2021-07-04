@@ -108,4 +108,9 @@ class IbAuthService {
     }
     return _firebaseAuth.signOut();
   }
+
+  Future<void> resetPassword(String email) async {
+    print('reset password');
+    return _firebaseAuth.sendPasswordResetEmail(email: email);
+  }
 }

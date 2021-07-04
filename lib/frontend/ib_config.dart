@@ -10,6 +10,7 @@ class IbConfig {
   static const double kDescriptionTextSize = 14;
   static const double kNormalTextSize = 16;
   static const int kEventTriggerDelayInMillis = 800;
+  static const int ageLimitInDays = 4745;
 
   IbConfig._();
 }

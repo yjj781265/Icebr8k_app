@@ -8,6 +8,8 @@ class SignInController extends GetxController {
   final isEmailValid = true.obs;
   final isPasswordValid = true.obs;
   final isPwdObscured = true.obs;
+  final birthdateInMs = 0.obs;
+  final birthdatePickerInstructionKey = ''.obs;
   final password = ''.obs;
   final emailErrorTrKey = ''.obs;
   final passwordErrorTrKey = ''.obs;

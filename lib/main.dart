@@ -2,14 +2,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:lottie/lottie.dart';
 
-import 'ib_config.dart';
-import 'ib_pages/splash_page.dart';
-import 'ib_strings.dart';
-import 'ib_themes.dart';
-import 'ib_widgets/ib_progress_indicator.dart';
+import 'frontend/ib_config.dart';
+import 'frontend/ib_pages/splash_page.dart';
+import 'frontend/ib_strings.dart';
+import 'frontend/ib_themes.dart';
+import 'frontend/ib_widgets/ib_progress_indicator.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +41,7 @@ class _MyAppState extends State<MyApp> {
         if (snapshot.connectionState == ConnectionState.done) {
           print('Firebase init success');
           return GetMaterialApp(
+            initialBinding: BindingsBuilder(() => {Get.put(AuthController())}),
             defaultTransition: Transition.cupertino,
             enableLog: false,
             debugShowCheckedModeBanner: false,

@@ -3,7 +3,14 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/ib_auth_service.dart';
+import 'package:icebr8k/backend/controllers/sign_in_controller.dart';
+import 'package:icebr8k/backend/controllers/sign_up_controller.dart';
+import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/ib_auth_service.dart';
+import 'package:icebr8k/backend/services/ib_user_db_service.dart';
+import 'package:icebr8k/frontend/ib_pages/home_page.dart';
+import 'package:icebr8k/frontend/ib_pages/sign_in_page.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
 
 class AuthController extends GetxController {
@@ -12,6 +19,7 @@ class AuthController extends GetxController {
   final isSigningIn = false.obs;
   final isSigningInViaThirdParty = false.obs;
   final isSigningUp = false.obs;
+  User? firebaseUser;
   final _ibAuthService = IbAuthService();
 
   @override
@@ -19,9 +27,11 @@ class AuthController extends GetxController {
     super.onReady();
     _fbAuthSub = _ibAuthService.listenToAuthStateChanges().listen((user) {
       if (user == null) {
+        firebaseUser = null;
         isSignedIn.value = false;
         print('User is signed out!');
       } else {
+        firebaseUser = user;
         isSignedIn.value = true;
         print('User is signed in!');
       }
@@ -35,6 +45,8 @@ class AuthController extends GetxController {
   }
 
   Future signInViaEmail(String email, String password) async {
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_in'),
+        barrierDismissible: false);
     try {
       isSigningIn.value = true;
       final UserCredential userCredential =
@@ -42,6 +54,7 @@ class AuthController extends GetxController {
       final user = userCredential.user;
 
       if (user != null && !user.emailVerified) {
+        Get.back();
         Get.dialog(
             IbSimpleDialog(
               message: 'sign_in_email_verification'.tr,
@@ -64,14 +77,26 @@ class AuthController extends GetxController {
               ],
             ),
             barrierDismissible: false);
-      } else {
-        print('to Home Page');
+      } else if (user != null && user.emailVerified) {
+        final isIbUserExist = await IbUserDbService().isIbUserExist(user.uid);
+        if (isIbUserExist) {
+          await IbUserDbService().loginIbUser(
+            uid: user.uid,
+            loginTimeInMs: DateTime.now().millisecondsSinceEpoch,
+          );
+          Get.offAll(HomePage());
+        } else {
+          throw UnimplementedError('this should not happen !!');
+        }
+        Get.back();
       }
     } on FirebaseAuthException catch (e) {
+      Get.back();
       print(e.message);
       Get.dialog(IbSimpleDialog(
           message: e.message.toString(), positiveBtnTrKey: 'ok'));
     } catch (e) {
+      Get.back();
       Get.dialog(IbSimpleDialog(message: e.toString(), positiveBtnTrKey: 'ok'));
     } finally {
       isSigningIn.value = false;
@@ -79,14 +104,38 @@ class AuthController extends GetxController {
   }
 
   Future signUpViaEmail(String email, String password) async {
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_up'),
+        barrierDismissible: false);
     try {
       isSigningUp.value = true;
       final UserCredential userCredential =
-          await _ibAuthService.signUpViaEmail(email, password);
+          await _ibAuthService.signUpViaEmail(email.trim(), password);
       final user = userCredential.user;
+
+      if (user != null) {
+        final isIbUserExist = await IbUserDbService().isIbUserExist(user.uid);
+        final _controller = Get.find<SignUpController>();
+
+        if (isIbUserExist) {
+          Get.back();
+          throw UnimplementedError('this should not happen !!');
+        } else {
+          await IbUserDbService().loginNewIbUser(
+            IbUser(
+              id: user.uid,
+              birthdateInMs: _controller.birthdateInMs.value,
+              joinTimeInMs: DateTime.now().millisecondsSinceEpoch,
+              name: _controller.name.value,
+              email: _controller.email.value.trim(),
+            ),
+          );
+        }
+      }
+
       if (user != null && !user.emailVerified) {
         await user.sendEmailVerification();
         _ibAuthService.signOut();
+        Get.back();
         Get.dialog(
             IbSimpleDialog(
               message: 'sign_up_email_verification'.tr,
@@ -97,12 +146,14 @@ class AuthController extends GetxController {
             ),
             barrierDismissible: false);
       } else {
-        print('to Home Page');
+        throw UnimplementedError('this should not happen !!');
       }
     } on FirebaseAuthException catch (e) {
+      Get.back();
       Get.dialog(IbSimpleDialog(
           message: e.message.toString(), positiveBtnTrKey: 'ok'));
     } catch (e) {
+      Get.back();
       Get.dialog(IbSimpleDialog(message: e.toString(), positiveBtnTrKey: 'ok'));
     } finally {
       isSigningUp.value = false;
@@ -110,10 +161,32 @@ class AuthController extends GetxController {
   }
 
   Future<void> signInViaGoogle() async {
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_in'));
     final credential = await _ibAuthService.signInWithGoogle();
-    if (credential.user != null) {
-      print(credential.user!.email);
-      print(credential.user?.displayName);
+    if (credential == null) {
+      Get.back();
+      return;
+    }
+    final user = credential.user;
+    if (user != null) {
+      final _controller = Get.find<SignInController>();
+      if (await IbUserDbService().isIbUserExist(user.uid)) {
+        await IbUserDbService().loginIbUser(
+          uid: user.uid,
+          loginTimeInMs: DateTime.now().millisecondsSinceEpoch,
+        );
+      } else {
+        await IbUserDbService().loginNewIbUser(IbUser(
+          id: user.uid,
+          birthdateInMs: _controller.birthdateInMs.value,
+          joinTimeInMs: DateTime.now().millisecondsSinceEpoch,
+          loginTimeInMs: DateTime.now().millisecondsSinceEpoch,
+          name: user.displayName ?? '',
+          email: user.email ?? '',
+        ));
+      }
+      Get.back();
+      Get.offAll(HomePage());
     }
   }
 
@@ -125,7 +198,27 @@ class AuthController extends GetxController {
     }
   }
 
+  Future<void> resetPassword(String email) async {
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));
+    try {
+      await _ibAuthService.resetPassword(email);
+      Get.back();
+      final String msg = 'reset_email_msg'.trParams({'email': email}) ?? '';
+      Get.dialog(IbSimpleDialog(message: msg, positiveBtnTrKey: 'ok'));
+    } on FirebaseAuthException catch (e) {
+      Get.back();
+      Get.dialog(IbSimpleDialog(
+          message: e.message ?? 'error', positiveBtnTrKey: 'ok'));
+    }
+  }
+
   Future<void> signOut() async {
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_out'));
+    if (firebaseUser != null) {
+      await IbUserDbService().signOutIbUser(firebaseUser!.uid);
+    }
     await _ibAuthService.signOut();
+    Get.back();
+    Get.offAll(SignInPage(), transition: Transition.fadeIn);
   }
 }

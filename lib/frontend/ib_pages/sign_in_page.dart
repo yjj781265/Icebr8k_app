@@ -2,24 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/auth_controller.dart';
+import 'package:icebr8k/backend/controllers/reset_pwd_controller.dart';
+import 'package:icebr8k/backend/controllers/sign_in_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/sign_up_page.dart';
-import 'package:icebr8k/frontend/ib_utiis.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_single_date_picker.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
-import 'package:icebr8k/median/controllers/sign_in_controller.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_text_field_dialog.dart';
 
-class SignInPage extends GetView<SignInController> {
-  const SignInPage({Key? key}) : super(key: key);
-
+class SignInPage extends StatelessWidget {
+  SignInPage({Key? key}) : super(key: key);
+  final TextEditingController _emailTxtC = TextEditingController();
+  final TextEditingController _passwordTxtC = TextEditingController();
+  final ResetPwdController _resetPwdController = Get.put(ResetPwdController());
+  final SignInController _controller = Get.put(SignInController());
+  final AuthController _authController = Get.find();
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: IbColors.primaryColor),
     );
-    Get.put(SignInController());
     return Scaffold(
       backgroundColor: IbColors.primaryColor,
       body: GestureDetector(
@@ -47,7 +55,7 @@ class SignInPage extends GetView<SignInController> {
                             child: Text(
                               "welcome_msg".tr,
                               style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w700,
                                   fontSize: IbConfig.kPageTitleSize),
                             ),
                           ),
@@ -72,17 +80,18 @@ class SignInPage extends GetView<SignInController> {
                                 AutofillHints.email,
                                 AutofillHints.username
                               ],
+                              controller: _emailTxtC,
                               onChanged: (text) {
-                                controller.email.value = text;
+                                _controller.email.value = text;
                               },
-                              borderColor: controller.isEmailFirstTime.value
+                              borderColor: _controller.isEmailFirstTime.value
                                   ? IbColors.lightGrey
-                                  : (controller.isEmailValid.value
+                                  : (_controller.isEmailValid.value
                                       ? IbColors.accentColor
                                       : IbColors.errorRed),
                               titleTrKey: 'email_address',
                               hintTrKey: 'email_address_hint',
-                              errorTrKey: controller.emailErrorTrKey.value)),
+                              errorTrKey: _controller.emailErrorTrKey.value)),
 
                           /********* password textInputBox **********/
                           Obx(() => IbTextField(
@@ -90,29 +99,31 @@ class SignInPage extends GetView<SignInController> {
                                 Icons.lock_outline,
                                 color: IbColors.primaryColor,
                               ),
+                              controller: _passwordTxtC,
                               autofillHints: const [AutofillHints.password],
-                              obscureText: controller.isPwdObscured.value,
+                              obscureText: _controller.isPwdObscured.value,
                               onChanged: (text) {
-                                controller.password.value = text;
+                                _controller.password.value = text;
                               },
-                              borderColor: controller.isPasswordFirstTime.value
+                              borderColor: _controller.isPasswordFirstTime.value
                                   ? IbColors.lightGrey
-                                  : (controller.isPasswordValid.value
+                                  : (_controller.isPasswordValid.value
                                       ? IbColors.accentColor
                                       : IbColors.errorRed),
                               suffixIcon: IconButton(
                                 onPressed: () {
                                   final bool isObscured =
-                                      controller.isPwdObscured.value;
-                                  controller.isPwdObscured.value = !isObscured;
+                                      _controller.isPwdObscured.value;
+                                  _controller.isPwdObscured.value = !isObscured;
                                 },
-                                icon: Icon(controller.isPwdObscured.value
+                                icon: Icon(_controller.isPwdObscured.value
                                     ? Icons.visibility_off_outlined
                                     : Icons.visibility_outlined),
                               ),
                               titleTrKey: 'password',
                               hintTrKey: 'password_hint',
-                              errorTrKey: controller.passwordErrorTrKey.value)),
+                              errorTrKey:
+                                  _controller.passwordErrorTrKey.value)),
 
                           /**** forgot password ****/
                           Padding(
@@ -120,31 +131,86 @@ class SignInPage extends GetView<SignInController> {
                             child: Row(
                               children: [
                                 TextButton(
-                                    style: TextButton.styleFrom(
-                                        padding: EdgeInsets.zero),
-                                    onPressed: () => print('pressed'),
-                                    child: Text(
-                                      'forget_pwd'.tr,
-                                      style: const TextStyle(
-                                          color: IbColors.lightGrey,
-                                          fontSize:
-                                              IbConfig.kSecondaryTextSize),
-                                    )),
+                                  style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero),
+                                  onPressed: () {
+                                    _resetPwdController.reset();
+                                    Get.dialog(
+                                      Obx(
+                                        () => IbTextFieldDialog(
+                                          buttons: [
+                                            TextButton(
+                                                onPressed: _resetPassword,
+                                                child: Text('reset_pwd'.tr))
+                                          ],
+                                          borderColor: _resetPwdController
+                                                  .isFirstTime.value
+                                              ? IbColors.lightGrey
+                                              : (_resetPwdController
+                                                      .isEmailValid.value
+                                                  ? IbColors.accentColor
+                                                  : IbColors.errorRed),
+                                          introTrKey: 'reset_email_intro',
+                                          titleIcon: const Icon(
+                                            Icons.email_outlined,
+                                            color: IbColors.primaryColor,
+                                          ),
+                                          errorTrKey: _resetPwdController
+                                              .emailErrorTrKey.value,
+                                          titleTrKey: 'email_address',
+                                          hintTrKey: 'email_address_hint',
+                                          onChanged: (text) {
+                                            _resetPwdController.email.value =
+                                                text.trim();
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    'forget_pwd'.tr,
+                                    style: const TextStyle(
+                                        color: IbColors.lightGrey,
+                                        fontSize: IbConfig.kSecondaryTextSize),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                          IbElevatedButton(
-                            textTrKey: 'login',
-                            onPressed: () {
-                              print(
-                                  "${controller.email.value.trim()} , ${controller.password.value}");
-                            },
+                          /**** Login Button ****/
+                          Obx(
+                            () => IbElevatedButton(
+                              textTrKey: _authController.isSigningIn.isTrue
+                                  ? 'signing_in'
+                                  : 'login',
+                              onPressed: () async {
+                                IbUtils.hideKeyboard();
+                                _controller.validateEmail();
+                                _controller.validatePassword();
+                                if (_controller.isPasswordValid.isTrue &&
+                                    _controller.isEmailValid.isTrue) {
+                                  await _authController.signInViaEmail(
+                                      _controller.email.value,
+                                      _controller.password.value);
+                                }
+                              },
+                            ),
                           ),
+                          /**** Signup Button ****/
                           InkWell(
-                            onTap: () {
+                            onTap: () async {
                               //hide keyboard
                               IbUtils.hideKeyboard();
-                              Get.to(SignUpPage());
+                              //result from SignUp Page
+                              final result = await Get.to(SignUpPage());
+                              if (result != null) {
+                                final List<String> _list =
+                                    result as List<String>;
+                                _emailTxtC.text = _list.first;
+                                _passwordTxtC.text = _list[1];
+                                _controller.email.value = _list.first;
+                                _controller.password.value = _list[1];
+                              }
                             },
                             child: Padding(
                               padding: const EdgeInsets.only(bottom: 16),
@@ -156,11 +222,12 @@ class SignInPage extends GetView<SignInController> {
                                       color: IbColors.primaryColor),
                                   children: <TextSpan>[
                                     TextSpan(
-                                        text: 'sign_up'.tr,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          decoration: TextDecoration.underline,
-                                        )),
+                                      text: 'sign_up'.tr,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
                                     // can add more TextSpans here...
                                   ],
                                 ),
@@ -193,12 +260,13 @@ class SignInPage extends GetView<SignInController> {
                       ),
                       Expanded(
                         child: Container(
-                            margin:
-                                const EdgeInsets.only(left: 20.0, right: 50.0),
-                            child: const Divider(
-                              color: IbColors.white,
-                              thickness: 1,
-                            )),
+                          margin:
+                              const EdgeInsets.only(left: 20.0, right: 50.0),
+                          child: const Divider(
+                            color: IbColors.white,
+                            thickness: 1,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -213,12 +281,20 @@ class SignInPage extends GetView<SignInController> {
                       children: [
                         SignInButton(
                           Buttons.Google,
-                          onPressed: () {},
+                          onPressed: () {
+                            checkThirdPartyLoginAge(
+                                _authController.signInViaGoogle);
+                          },
                         ),
-                        SignInButton(
-                          Buttons.Apple,
-                          onPressed: () {},
-                        ),
+
+                        //Todo currently Apple auth is not supported in Android
+                        /*  if (GetPlatform.isIOS)
+                          SignInButton(
+                            Buttons.Apple,
+                            onPressed: () {
+                              _authController.signInViaApple();
+                            },
+                          ),*/
                       ],
                     ),
                   )
@@ -229,5 +305,55 @@ class SignInPage extends GetView<SignInController> {
         ),
       ),
     );
+  }
+
+  void _resetPassword() {
+    _resetPwdController.validateEmail();
+    if (_resetPwdController.isEmailValid.isTrue) {
+      Get.back();
+      _authController.resetPassword(_resetPwdController.email.value.trim());
+    }
+  }
+
+  void checkThirdPartyLoginAge(Function _isOver13Func) {
+    _controller.birthdatePickerInstructionKey.value = 'date_picker_instruction';
+    _controller.birthdateInMs.value = 0;
+    Get.dialog(
+        Obx(
+          () => IbSingleDatePicker(
+            onSelectionChanged: (arg) {
+              print(arg.value as DateTime);
+              _controller.birthdateInMs.value =
+                  (arg.value as DateTime).millisecondsSinceEpoch;
+              _controller.birthdatePickerInstructionKey.value = '';
+            },
+            titleTrKey: _controller.birthdatePickerInstructionKey.value,
+            buttons: [
+              TextButton(onPressed: () => Get.back(), child: Text('cancel'.tr)),
+              TextButton(
+                  onPressed: () async {
+                    if (_controller
+                        .birthdatePickerInstructionKey.value.isNotEmpty) {
+                      return;
+                    }
+
+                    Get.back();
+
+                    if (IbUtils.isOver13(
+                      DateTime.fromMillisecondsSinceEpoch(
+                          _controller.birthdateInMs.value),
+                    )) {
+                      _isOver13Func();
+                    } else {
+                      Get.dialog(IbSimpleDialog(
+                          message: 'age_limit_msg'.tr,
+                          positiveBtnTrKey: 'ok'.tr));
+                    }
+                  },
+                  child: Text('confirm'.tr))
+            ],
+          ),
+        ),
+        barrierDismissible: false);
   }
 }
