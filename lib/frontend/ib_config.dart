@@ -11,6 +11,7 @@ class IbConfig {
   static const double kNormalTextSize = 16;
   static const int kEventTriggerDelayInMillis = 800;
   static const int ageLimitInDays = 4745;
+  static const int passwordMinLength = 6;
 
   IbConfig._();
 }

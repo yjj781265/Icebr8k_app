@@ -8,14 +8,13 @@ import 'package:icebr8k/backend/controllers/sign_up_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_auth_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
-import 'package:icebr8k/frontend/ib_pages/home_page.dart';
+import 'package:icebr8k/frontend/ib_pages/set_up_page.dart';
 import 'package:icebr8k/frontend/ib_pages/sign_in_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
 
 class AuthController extends GetxController {
   late StreamSubscription _fbAuthSub;
-  final isSignedIn = false.obs;
   final isSigningIn = false.obs;
   final isSigningInViaThirdParty = false.obs;
   final isSigningUp = false.obs;
@@ -28,12 +27,10 @@ class AuthController extends GetxController {
     _fbAuthSub = _ibAuthService.listenToAuthStateChanges().listen((user) {
       if (user == null) {
         firebaseUser = null;
-        isSignedIn.value = false;
         print('User is signed out!');
       } else {
         firebaseUser = user;
-        isSignedIn.value = true;
-        print('User is signed in!');
+        print('User is signed in! ${firebaseUser!.uid}');
       }
     });
   }
@@ -42,6 +39,7 @@ class AuthController extends GetxController {
   void onClose() {
     super.onClose();
     _fbAuthSub.cancel();
+    print('auth controller onClose');
   }
 
   Future signInViaEmail(String email, String password) async {
@@ -65,13 +63,19 @@ class AuthController extends GetxController {
               actionButtons: [
                 TextButton(
                     onPressed: () async {
-                      await user.sendEmailVerification();
-                      _ibAuthService.signOut();
-                      Get.back();
-                      Get.dialog(IbSimpleDialog(
-                        message: 'verification_email_sent'.tr,
-                        positiveBtnTrKey: 'ok',
-                      ));
+                      try {
+                        await user.sendEmailVerification();
+                        _ibAuthService.signOut();
+                        Get.back();
+                        Get.dialog(IbSimpleDialog(
+                          message: 'verification_email_sent'.tr,
+                          positiveBtnTrKey: 'ok',
+                        ));
+                      } on FirebaseException catch (e) {
+                        Get.back();
+                        Get.dialog(IbSimpleDialog(
+                            message: e.message!, positiveBtnTrKey: 'ok'));
+                      }
                     },
                     child: Text('resend_verification_email'.tr))
               ],
@@ -84,9 +88,10 @@ class AuthController extends GetxController {
             uid: user.uid,
             loginTimeInMs: DateTime.now().millisecondsSinceEpoch,
           );
-          Get.offAll(HomePage());
+          Get.offAll(SetupPage());
         } else {
-          throw UnimplementedError('this should not happen !!');
+          Get.dialog(const IbSimpleDialog(
+              message: 'User does not exist', positiveBtnTrKey: 'ok'));
         }
         Get.back();
       }
@@ -118,14 +123,14 @@ class AuthController extends GetxController {
 
         if (isIbUserExist) {
           Get.back();
-          throw UnimplementedError('this should not happen !!');
+          Get.dialog(const IbSimpleDialog(
+              message: 'User already registered', positiveBtnTrKey: 'ok'));
         } else {
           await IbUserDbService().loginNewIbUser(
             IbUser(
               id: user.uid,
               birthdateInMs: _controller.birthdateInMs.value,
               joinTimeInMs: DateTime.now().millisecondsSinceEpoch,
-              name: _controller.name.value,
               email: _controller.email.value.trim(),
             ),
           );
@@ -133,18 +138,22 @@ class AuthController extends GetxController {
       }
 
       if (user != null && !user.emailVerified) {
-        await user.sendEmailVerification();
-        _ibAuthService.signOut();
-        Get.back();
-        Get.dialog(
-            IbSimpleDialog(
-              message: 'sign_up_email_verification'.tr,
-              positiveBtnTrKey: 'ok',
-              positiveBtnEvent: () {
-                Get.back(result: [email, password]);
-              },
-            ),
-            barrierDismissible: false);
+        try {
+          await user.sendEmailVerification();
+          _ibAuthService.signOut();
+          Get.back();
+          Get.dialog(
+              IbSimpleDialog(
+                message: 'sign_up_email_verification'.tr,
+                positiveBtnTrKey: 'ok',
+                positiveBtnEvent: () {
+                  Get.back(result: [email, password]);
+                },
+              ),
+              barrierDismissible: false);
+        } on FirebaseException catch (e) {
+          print(e.message);
+        }
       } else {
         throw UnimplementedError('this should not happen !!');
       }
@@ -167,7 +176,22 @@ class AuthController extends GetxController {
       Get.back();
       return;
     }
-    final user = credential.user;
+    _handleUserCredential(credential);
+  }
+
+  Future<void> signInViaApple() async {
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_in'));
+    final credential = await _ibAuthService.signInWithApple();
+    if (credential == null) {
+      Get.back();
+      return;
+    }
+
+    _handleUserCredential(credential);
+  }
+
+  Future<void> _handleUserCredential(UserCredential _credential) async {
+    final user = _credential.user;
     if (user != null) {
       final _controller = Get.find<SignInController>();
       if (await IbUserDbService().isIbUserExist(user.uid)) {
@@ -178,23 +202,14 @@ class AuthController extends GetxController {
       } else {
         await IbUserDbService().loginNewIbUser(IbUser(
           id: user.uid,
+          email: _credential.user!.email ?? '',
           birthdateInMs: _controller.birthdateInMs.value,
           joinTimeInMs: DateTime.now().millisecondsSinceEpoch,
           loginTimeInMs: DateTime.now().millisecondsSinceEpoch,
-          name: user.displayName ?? '',
-          email: user.email ?? '',
         ));
       }
       Get.back();
-      Get.offAll(HomePage());
-    }
-  }
-
-  Future<void> signInViaApple() async {
-    final credential = await _ibAuthService.signInWithApple();
-    if (credential.user != null) {
-      print(credential.user!.email);
-      print(credential.user?.displayName);
+      Get.offAll(SetupPage());
     }
   }
 
@@ -215,7 +230,7 @@ class AuthController extends GetxController {
   Future<void> signOut() async {
     Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_out'));
     if (firebaseUser != null) {
-      await IbUserDbService().signOutIbUser(firebaseUser!.uid);
+      //await IbUserDbService().signOutIbUser(firebaseUser!.uid);
     }
     await _ibAuthService.signOut();
     Get.back();

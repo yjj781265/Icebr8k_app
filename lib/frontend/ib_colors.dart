@@ -6,6 +6,7 @@ class IbColors {
   static const Color accentColor = Color(0xff23e4b0);
   static const Color lightBlue = Color(0xffd5edff);
   static const Color errorRed = Colors.redAccent;
+  static const Color lightGreen = Color(0xffcbf7c7);
   static const Color white = Colors.white;
   static const Color lightGrey = Colors.grey;
 

@@ -23,7 +23,7 @@ class IbUser {
     this.isOnline = false,
     this.description = '',
     this.name = '',
-    required this.email,
+    this.email = '',
     required this.id,
     this.username = '',
   });

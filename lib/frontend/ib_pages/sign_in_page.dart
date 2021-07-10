@@ -288,13 +288,14 @@ class SignInPage extends StatelessWidget {
                         ),
 
                         //Todo currently Apple auth is not supported in Android
-                        /*  if (GetPlatform.isIOS)
+                        if (GetPlatform.isIOS)
                           SignInButton(
                             Buttons.Apple,
                             onPressed: () {
-                              _authController.signInViaApple();
+                              checkThirdPartyLoginAge(
+                                  _authController.signInViaApple);
                             },
-                          ),*/
+                          ),
                       ],
                     ),
                   )

@@ -29,7 +29,7 @@ class IbStrings extends Translations {
           'email_not_valid': 'email is not valid',
           'date_picker_instruction': 'Please pick your birthdate',
           'field_is_empty': 'field is empty',
-          '8_characters_error': 'at least 8 characters',
+          '6_characters_error': 'at least 6 characters',
           'password_match_error': 'password does not match',
           'age_limit_msg': 'user needs to be at least age of 13',
           'loading': 'Loading...',
@@ -46,6 +46,22 @@ class IbStrings extends Translations {
               'This email address is not verified, please check your inbox for verification email from Icebr8k.',
           'sign_out': "Sign out",
           'signing_out': 'Signing out...',
+          'next': 'Next',
+          'selfie_time': 'Time to take a selfie',
+          'slogan_one': "Let's start to connect better",
+          'camera': 'Camera',
+          'gallery': 'Gallery',
+          'username': 'Username',
+          'username_hint': 'Create your unique username',
+          'username_exist_error': 'username already exists',
+          'username_not_valid':
+              'username is not valid, make sure it has at least 2 characters without spacing',
+          'username_empty':
+              "Oops, looks like you forgot to create your username.",
+          'avatar_empty':
+              'Oops, looks like you forgot to pick your selfie picture.',
+          'fail_try_again': 'failed, please try again',
+          'to_previous_page': 'To previous page',
         }
       };
 }

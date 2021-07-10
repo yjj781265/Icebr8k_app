@@ -58,26 +58,6 @@ class SignUpPage extends GetView<SignUpController> {
                           height: 16,
                         ),
                         Obx(
-                          () => IbTextField(
-                            titleIcon: const Icon(
-                              Icons.person_outline,
-                              color: IbColors.primaryColor,
-                            ),
-                            titleTrKey: 'name',
-                            hintTrKey: 'name_hint',
-                            textInputType: TextInputType.name,
-                            errorTrKey: controller.nameErrorTrKey.value,
-                            borderColor: controller.isNameFirstTime.value
-                                ? IbColors.lightGrey
-                                : (controller.isNameValid.value
-                                    ? IbColors.accentColor
-                                    : IbColors.errorRed),
-                            onChanged: (name) {
-                              controller.name.value = name;
-                            },
-                          ),
-                        ),
-                        Obx(
                           () => InkWell(
                             onTap: () => showDialog(
                                 context: context,

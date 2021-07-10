@@ -56,5 +56,15 @@
     	</dict>
     </array>
     <!-- End of the Google Sign-in Section -->
+
+    <!-- Image Picker Section -->
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Allow access to photo library</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Allow access to camera to capture photos</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Allow access to microphone</string>
+    <!-- End of the Image Picker Section -->
+
 </dict>
 </plist>

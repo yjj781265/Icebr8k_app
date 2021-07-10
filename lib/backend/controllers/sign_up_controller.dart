@@ -3,8 +3,6 @@ import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 class SignUpController extends GetxController {
-  final name = ''.obs;
-  final nameErrorTrKey = ''.obs;
   final birthdateInMs = 0.obs;
   final readableBirthdate = ''.obs;
   final birthdatePickerInstructionKey = 'birthdate_instruction'.obs;
@@ -39,11 +37,7 @@ class SignUpController extends GetxController {
       (_) => _validateEmail(),
       time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
     );
-    debounce(
-      name,
-      (_) => _validateName(),
-      time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
-    );
+
     debounce(
       readableBirthdate,
       (_) => _validateBirthdate(),
@@ -54,19 +48,6 @@ class SignUpController extends GetxController {
       (_) => _validateCfPassword(),
       time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
     );
-  }
-
-  void _validateName() {
-    isNameFirstTime.value = false;
-    isNameValid.value = name.value.isNotEmpty;
-    print('validating name ${isNameValid.value}');
-
-    if (name.value.isEmpty) {
-      nameErrorTrKey.value = 'field_is_empty';
-      return;
-    }
-
-    nameErrorTrKey.value = '';
   }
 
   void _validateBirthdate() {
@@ -92,8 +73,8 @@ class SignUpController extends GetxController {
 
   void _validatePassword() {
     isPwdFirstTime.value = false;
-    isPasswordValid.value =
-        password.value.isNotEmpty && password.value.length >= 8;
+    isPasswordValid.value = password.value.isNotEmpty &&
+        password.value.length >= IbConfig.passwordMinLength;
     print('validating password $isPasswordValid');
 
     if (password.value.isEmpty) {
@@ -101,8 +82,8 @@ class SignUpController extends GetxController {
       return;
     }
 
-    if (password.value.length < 8) {
-      pwdErrorTrKey.value = '8_characters_error';
+    if (password.value.length < IbConfig.passwordMinLength) {
+      pwdErrorTrKey.value = '6_characters_error';
       return;
     }
     pwdErrorTrKey.value = '';
@@ -111,7 +92,7 @@ class SignUpController extends GetxController {
   void _validateCfPassword() {
     isCfPwdFirstTime.value = false;
     isCfPwdValid.value = confirmPassword.value.isNotEmpty &&
-        confirmPassword.value.length >= 8 &&
+        confirmPassword.value.length >= IbConfig.passwordMinLength &&
         confirmPassword.value == password.value;
     print('validating confirmPassword $isCfPwdValid');
     if (confirmPassword.value.isEmpty) {
@@ -119,8 +100,8 @@ class SignUpController extends GetxController {
       return;
     }
 
-    if (confirmPassword.value.length < 8) {
-      confirmPwdErrorTrKey.value = '8_characters_error';
+    if (confirmPassword.value.length < IbConfig.passwordMinLength) {
+      confirmPwdErrorTrKey.value = '6_characters_error';
       return;
     }
     if (confirmPassword.value != password.value) {
@@ -148,15 +129,13 @@ class SignUpController extends GetxController {
 
   void validateAllFields() {
     _validateCfPassword();
-    _validateName();
     _validateEmail();
     _validatePassword();
     _validateBirthdate();
   }
 
   bool isEverythingValid() {
-    return isNameValid.isTrue &&
-        isBirthdateValid.isTrue &&
+    return isBirthdateValid.isTrue &&
         isEmailValid.isTrue &&
         isCfPwdValid.isTrue &&
         isPasswordValid.isTrue;
@@ -164,7 +143,7 @@ class SignUpController extends GetxController {
 
   @override
   String toString() {
-    return 'SignUpController{name: $name, birthdateInMillis: $birthdateInMs, '
+    return 'SignUpController{ birthdateInMillis: $birthdateInMs, '
         'email: $email, password: $password, confirmPassword: $confirmPassword}';
   }
 }

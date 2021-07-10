@@ -88,7 +88,7 @@ class IbTextField extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(30, 0, 16, 0),
             child: Text(
               errorTrKey.tr,
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               softWrap: false,
               style: const TextStyle(
