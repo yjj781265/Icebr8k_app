@@ -1,6 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 
 class IbUserDbService {
@@ -8,7 +6,6 @@ class IbUserDbService {
   static final _db = FirebaseFirestore.instance;
   static const _kUserCollection = 'IbUsers';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
-  final AuthController _authController = Get.put(AuthController());
 
   factory IbUserDbService() => _ibUserService;
   IbUserDbService._() {
@@ -70,5 +67,15 @@ class IbUserDbService {
 
   Future<void> updateName({required String name, required String uid}) {
     return _collectionRef.doc(uid).update({'name': name});
+  }
+
+  Stream<IbUser?> listenToIbUserChanges(String uid) {
+    return _collectionRef.doc(uid).snapshots().map((event) {
+      if (event.data() == null) {
+        return null;
+      } else {
+        return IbUser.fromJson(event.data()!);
+      }
+    });
   }
 }

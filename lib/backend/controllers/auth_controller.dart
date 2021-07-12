@@ -8,12 +8,13 @@ import 'package:icebr8k/backend/controllers/sign_up_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_auth_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
+import 'package:icebr8k/frontend/ib_pages/home_page.dart';
 import 'package:icebr8k/frontend/ib_pages/set_up_page.dart';
 import 'package:icebr8k/frontend/ib_pages/sign_in_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
 
-class AuthController extends GetxController {
+class AuthController extends GetxService {
   late StreamSubscription _fbAuthSub;
   final isSigningIn = false.obs;
   final isSigningInViaThirdParty = false.obs;
@@ -88,7 +89,13 @@ class AuthController extends GetxController {
             uid: user.uid,
             loginTimeInMs: DateTime.now().millisecondsSinceEpoch,
           );
-          Get.offAll(SetupPage());
+          final bool isSetupNeeded =
+              await IbUserDbService().isUsernameMissing(firebaseUser!.uid);
+          if (isSetupNeeded) {
+            Get.offAll(SetupPage());
+          } else {
+            Get.offAll(HomePage());
+          }
         } else {
           Get.dialog(const IbSimpleDialog(
               message: 'User does not exist', positiveBtnTrKey: 'ok'));
@@ -209,7 +216,14 @@ class AuthController extends GetxController {
         ));
       }
       Get.back();
-      Get.offAll(SetupPage());
+
+      final bool isSetupNeeded =
+          await IbUserDbService().isUsernameMissing(firebaseUser!.uid);
+      if (isSetupNeeded) {
+        Get.offAll(SetupPage());
+      } else {
+        Get.offAll(HomePage());
+      }
     }
   }
 

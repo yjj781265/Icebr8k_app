@@ -55,7 +55,7 @@ class IbAnimatedBottomBar extends StatelessWidget {
             mainAxisAlignment: mainAxisAlignment,
             children: items.map((item) {
               final index = items.indexOf(item);
-              return GestureDetector(
+              return InkWell(
                 onTap: () => onItemSelected(index),
                 child: _ItemWidget(
                   item: item,
@@ -97,26 +97,23 @@ class _ItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      container: true,
-      selected: isSelected,
-      child: AnimatedContainer(
-        width: isSelected ? 130 : 50,
-        height: double.maxFinite,
-        duration: animationDuration,
-        curve: curve,
-        decoration: BoxDecoration(
-          color:
-              isSelected ? item.activeColor.withOpacity(0.2) : backgroundColor,
-          borderRadius: BorderRadius.circular(itemCornerRadius),
-        ),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const NeverScrollableScrollPhysics(),
-          child: Container(
-            width: isSelected ? 130 : 50,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
+    return AnimatedContainer(
+      width: isSelected ? 130 : 60,
+      height: double.maxFinite,
+      duration: animationDuration,
+      curve: curve,
+      decoration: BoxDecoration(
+        color: isSelected ? item.activeColor.withOpacity(0.2) : backgroundColor,
+        borderRadius: BorderRadius.circular(itemCornerRadius),
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
+        child: Container(
+          width: isSelected ? 130 : 60,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Stack(alignment: AlignmentDirectional.center, children: [
+            Row(
               children: <Widget>[
                 IconTheme(
                   data: IconThemeData(
@@ -144,7 +141,27 @@ class _ItemWidget extends StatelessWidget {
                   ),
               ],
             ),
-          ),
+            if (item.notification > 0)
+              Positioned(
+                top: 2,
+                right: 0,
+                child: CircleAvatar(
+                  backgroundColor: IbColors.errorRed,
+                  radius: 11,
+                  child: Text(
+                    item.notification >= 99
+                        ? '99+'
+                        : item.notification.toString(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: IbColors.white,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+              )
+          ]),
         ),
       ),
     );
@@ -155,6 +172,7 @@ class BottomNavyBarItem {
   BottomNavyBarItem({
     required this.icon,
     required this.title,
+    this.notification = -1,
     this.activeColor = IbColors.primaryColor,
     this.textAlign,
     this.inactiveColor,
@@ -165,4 +183,5 @@ class BottomNavyBarItem {
   final Color activeColor;
   final Color? inactiveColor;
   final TextAlign? textAlign;
+  final int notification;
 }

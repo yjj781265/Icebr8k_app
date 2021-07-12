@@ -30,4 +30,12 @@ class IbUser {
 
   factory IbUser.fromJson(Map<String, dynamic> json) => _$IbUserFromJson(json);
   Map<String, dynamic> toJson() => _$IbUserToJson(this);
+
+  @override
+  String toString() {
+    return 'IbUser{id: $id, name: $name, email: $email, username: $username, '
+        'avatarUrl: $avatarUrl, loginTimeInMs: $loginTimeInMs, joinTimeInMs: '
+        '$joinTimeInMs, birthdateInMs: $birthdateInMs, isOnline: $isOnline, '
+        'description: $description}';
+  }
 }

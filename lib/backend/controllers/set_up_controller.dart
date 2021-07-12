@@ -6,6 +6,7 @@ import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/home_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
 import 'package:liquid_swipe/liquid_swipe.dart';
@@ -178,7 +179,7 @@ class SetUpController extends GetxController {
               IbSimpleDialog(message: e.message!, positiveBtnTrKey: 'ok'));
         }
         Get.back();
-        print('to home page');
+        Get.offAll(HomePage());
       } else {
         Get.back();
         Get.dialog(const IbSimpleDialog(
