@@ -43,17 +43,17 @@ class SplashPage extends GetView<AuthController> {
           .isUsernameMissing(controller.firebaseUser!.uid);
       if (isSetupNeeded) {
         Get.offAll(
-          SetupPage(),
+          () => SetupPage(),
           transition: Transition.fadeIn,
         );
       } else {
         Get.offAll(
-          HomePage(),
+          () => HomePage(),
           transition: Transition.fadeIn,
         );
       }
     } else {
-      Get.offAll(SignInPage(),
+      Get.offAll(() => SignInPage(),
           transition: Transition.fadeIn,
           duration: const Duration(
               milliseconds: IbConfig.kEventTriggerDelayInMillis));

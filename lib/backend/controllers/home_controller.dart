@@ -5,7 +5,7 @@ import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 
-class HomeController extends GetxService {
+class HomeController extends GetxController {
   final currentIndex = 0.obs;
   final currentTabTitle = ''.obs;
   final isIbUserOnline = false.obs;
@@ -38,6 +38,7 @@ class HomeController extends GetxService {
 
   @override
   void onClose() {
+    print('HomeController closed');
     super.onClose();
     _currentIbUserStream.cancel();
   }

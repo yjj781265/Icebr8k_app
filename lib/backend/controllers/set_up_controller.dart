@@ -179,7 +179,7 @@ class SetUpController extends GetxController {
               IbSimpleDialog(message: e.message!, positiveBtnTrKey: 'ok'));
         }
         Get.back();
-        Get.offAll(HomePage());
+        Get.offAll(() => HomePage());
       } else {
         Get.back();
         Get.dialog(const IbSimpleDialog(

@@ -14,7 +14,7 @@ import 'package:icebr8k/frontend/ib_pages/sign_in_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
 
-class AuthController extends GetxService {
+class AuthController extends GetxController {
   late StreamSubscription _fbAuthSub;
   final isSigningIn = false.obs;
   final isSigningInViaThirdParty = false.obs;
@@ -92,9 +92,9 @@ class AuthController extends GetxService {
           final bool isSetupNeeded =
               await IbUserDbService().isUsernameMissing(firebaseUser!.uid);
           if (isSetupNeeded) {
-            Get.offAll(SetupPage());
+            Get.offAll(() => SetupPage());
           } else {
-            Get.offAll(HomePage());
+            Get.offAll(() => HomePage());
           }
         } else {
           Get.dialog(const IbSimpleDialog(
@@ -220,9 +220,9 @@ class AuthController extends GetxService {
       final bool isSetupNeeded =
           await IbUserDbService().isUsernameMissing(firebaseUser!.uid);
       if (isSetupNeeded) {
-        Get.offAll(SetupPage());
+        Get.offAll(() => SetupPage());
       } else {
-        Get.offAll(HomePage());
+        Get.offAll(() => HomePage());
       }
     }
   }
@@ -248,6 +248,6 @@ class AuthController extends GetxService {
     }
     await _ibAuthService.signOut();
     Get.back();
-    Get.offAll(SignInPage(), transition: Transition.fadeIn);
+    Get.offAll(() => SignInPage(), transition: Transition.fadeIn);
   }
 }
