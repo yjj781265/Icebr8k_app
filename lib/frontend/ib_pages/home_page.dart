@@ -6,6 +6,7 @@ import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_icon.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_question_card.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
@@ -19,6 +20,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance!.addPostFrameCallback((_) {
+      if (_drawerController.stateNotifier == null) {
+        return;
+      }
       _drawerController.stateNotifier!.addListener(() {
         if (_drawerController.stateNotifier!.value == DrawerState.open) {
           _iconKey.currentState!.forward();
@@ -28,7 +32,7 @@ class HomePage extends StatelessWidget {
       });
     });
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(statusBarColor: IbColors.darkPrimaryColor),
+      const SystemUiOverlayStyle(statusBarColor: IbColors.primaryColor),
     );
     return Scaffold(
         appBar: AppBar(
@@ -70,9 +74,8 @@ class HomePage extends StatelessWidget {
       Container(
         color: IbColors.lightBlue,
         alignment: Alignment.center,
-        child: const Text(
-          "Poll",
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+        child: Center(
+          child: IbQuestionCard(),
         ),
       ),
       Container(
@@ -124,7 +127,7 @@ class HomePage extends StatelessWidget {
         items: <BottomNavyBarItem>[
           BottomNavyBarItem(
             icon: const Icon(Icons.poll_outlined),
-            title: Text('poll'.tr),
+            title: Text('question'.tr),
             inactiveColor: _inactiveColor,
             textAlign: TextAlign.center,
           ),

@@ -62,9 +62,9 @@ class IbStrings extends Translations {
               'Oops, looks like you forgot to pick your selfie picture.',
           'fail_try_again': 'failed, please try again',
           'to_previous_page': 'To previous page',
-          'poll': 'Poll',
           'chat': 'Chat',
           'score': 'Score',
+          'question': 'Question',
           'profile': 'Profile',
         }
       };

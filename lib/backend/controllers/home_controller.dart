@@ -38,8 +38,8 @@ class HomeController extends GetxController {
 
   @override
   void onClose() {
-    print('HomeController closed');
-    super.onClose();
-    _currentIbUserStream.cancel();
+    _currentIbUserStream
+        .cancel()
+        .then((value) => print('HomeController closed'));
   }
 }

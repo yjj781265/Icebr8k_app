@@ -6,7 +6,7 @@ import '../ib_config.dart';
 
 class IbElevatedButton extends StatelessWidget {
   final String textTrKey;
-  final Function onPressed;
+  final Function? onPressed;
   final Color color;
   final Widget? icon;
   const IbElevatedButton(
@@ -31,13 +31,19 @@ class IbElevatedButton extends StatelessWidget {
   Widget _regularButton() {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(8),
           shape: RoundedRectangleBorder(
             //to set border radius to button
             borderRadius: BorderRadius.circular(IbConfig.kButtonCornerRadius),
           ),
-          primary: color),
-      onPressed: () => onPressed(),
+          primary: onPressed != null ? color : IbColors.lightGrey),
+      onPressed: () {
+        if (onPressed != null) {
+          onPressed!();
+        } else {
+          return;
+        }
+      },
       child: Text(
         textTrKey.tr,
         style: const TextStyle(
@@ -56,8 +62,14 @@ class IbElevatedButton extends StatelessWidget {
             //to set border radius to button
             borderRadius: BorderRadius.circular(IbConfig.kButtonCornerRadius),
           ),
-          primary: color),
-      onPressed: () => onPressed(),
+          primary: onPressed != null ? color : IbColors.lightGrey),
+      onPressed: () {
+        if (onPressed != null) {
+          onPressed!();
+        } else {
+          return;
+        }
+      },
       icon: icon!,
       label: Text(
         textTrKey.tr,

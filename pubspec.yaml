@@ -29,6 +29,7 @@ dependencies:
   firebase_storage: ^9.0.0
   flutter:
     sdk: flutter
+  flutter_card_swipper: ^0.4.0
   flutter_keyboard_visibility: ^5.0.2
   flutter_launcher_icons: ^0.9.0
   flutter_signin_button: ^2.0.0

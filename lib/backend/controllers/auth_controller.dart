@@ -14,7 +14,7 @@ import 'package:icebr8k/frontend/ib_pages/sign_in_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
 
-class AuthController extends GetxController {
+class AuthController extends GetxService {
   late StreamSubscription _fbAuthSub;
   final isSigningIn = false.obs;
   final isSigningInViaThirdParty = false.obs;
@@ -244,7 +244,7 @@ class AuthController extends GetxController {
   Future<void> signOut() async {
     Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_out'));
     if (firebaseUser != null) {
-      //await IbUserDbService().signOutIbUser(firebaseUser!.uid);
+      await IbUserDbService().signOutIbUser(firebaseUser!.uid);
     }
     await _ibAuthService.signOut();
     Get.back();
