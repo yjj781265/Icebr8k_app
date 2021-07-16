@@ -29,14 +29,14 @@ class SignInController extends GetxController {
   void validatePassword() {
     isPasswordFirstTime.value = false;
     isPasswordValid.value = password.value.isNotEmpty &&
-        password.value.length >= IbConfig.passwordMinLength;
+        password.value.length >= IbConfig.kPasswordMinLength;
     print('validating password $isPasswordValid');
     if (password.value.isEmpty) {
       passwordErrorTrKey.value = 'field_is_empty';
       return;
     }
 
-    if (password.value.length < IbConfig.passwordMinLength) {
+    if (password.value.length < IbConfig.kPasswordMinLength) {
       passwordErrorTrKey.value = '6_characters_error';
       return;
     }

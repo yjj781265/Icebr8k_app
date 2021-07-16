@@ -78,4 +78,12 @@ class IbUserDbService {
       }
     });
   }
+
+  Future<IbUser?> queryIbUser(String uid) async {
+    final snapshot = await _collectionRef.doc(uid).get();
+    if (!snapshot.exists || snapshot.data() == null) {
+      return null;
+    }
+    return IbUser.fromJson(snapshot.data()!);
+  }
 }

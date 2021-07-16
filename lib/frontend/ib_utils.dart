@@ -12,7 +12,7 @@ class IbUtils {
   static void hideKeyboard() => FocusManager.instance.primaryFocus?.unfocus();
   static bool isOver13(DateTime dateTime) {
     final bool isOver13 =
-        DateTime.now().difference(dateTime).inDays > IbConfig.ageLimitInDays;
+        DateTime.now().difference(dateTime).inDays > IbConfig.kAgeLimitInDays;
     return isOver13;
   }
 
@@ -40,5 +40,37 @@ class IbUtils {
 
   static String getUniqueName() {
     return const Uuid().v4();
+  }
+
+  static String getAgoDateTimeString(DateTime _dateTime) {
+    final Duration diffDt = DateTime.now().difference(_dateTime);
+    if (diffDt.inSeconds < 60) {
+      return '${diffDt.inSeconds} sec ago';
+    }
+
+    if (diffDt.inMinutes >= 1 && diffDt.inMinutes < 60) {
+      return '${diffDt.inMinutes} min ago';
+    }
+
+    if (diffDt.inHours >= 1 && diffDt.inHours < 24) {
+      return '${diffDt.inHours} hr ago';
+    }
+
+    if (diffDt.inDays >= 1 && diffDt.inDays < 30) {
+      return '${diffDt.inDays} days ago';
+    }
+
+    if (diffDt.inDays >= 30 && diffDt.inDays < 365) {
+      return '${diffDt.inDays / 12} mo ago';
+    }
+
+    if (diffDt.inDays == 365) {
+      return '1 yr ago';
+    }
+
+    if (diffDt.inDays > 365) {
+      return '${diffDt.inDays ~/ 365} yr ago';
+    }
+    return '${diffDt.inDays} days ago';
   }
 }

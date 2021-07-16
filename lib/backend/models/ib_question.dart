@@ -5,25 +5,25 @@ part 'ib_question.g.dart';
 @JsonSerializable()
 class IbQuestion {
   static const String kMultipleChoice = "mc";
-  static const String kScaleChoice = "sc";
+  static const String kScale = "sc";
   String question;
   String description;
   String id;
   String creatorId;
-  int createdTime;
-  int endTime;
-  List<String> answers;
+  int createdTimeInMs;
+  int endTimeInMs;
+  List<String> choices;
   String questionType;
 
   IbQuestion(
       {required this.question,
       required this.id,
       required this.creatorId,
-      required this.answers,
+      required this.choices,
       required this.questionType,
       this.description = '',
-      this.createdTime = 0,
-      this.endTime = 0});
+      required this.createdTimeInMs,
+      this.endTimeInMs = 0});
 
   factory IbQuestion.fromJson(Map<String, dynamic> json) =>
       _$IbQuestionFromJson(json);

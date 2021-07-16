@@ -74,7 +74,7 @@ class SignUpController extends GetxController {
   void _validatePassword() {
     isPwdFirstTime.value = false;
     isPasswordValid.value = password.value.isNotEmpty &&
-        password.value.length >= IbConfig.passwordMinLength;
+        password.value.length >= IbConfig.kPasswordMinLength;
     print('validating password $isPasswordValid');
 
     if (password.value.isEmpty) {
@@ -82,7 +82,7 @@ class SignUpController extends GetxController {
       return;
     }
 
-    if (password.value.length < IbConfig.passwordMinLength) {
+    if (password.value.length < IbConfig.kPasswordMinLength) {
       pwdErrorTrKey.value = '6_characters_error';
       return;
     }
@@ -92,7 +92,7 @@ class SignUpController extends GetxController {
   void _validateCfPassword() {
     isCfPwdFirstTime.value = false;
     isCfPwdValid.value = confirmPassword.value.isNotEmpty &&
-        confirmPassword.value.length >= IbConfig.passwordMinLength &&
+        confirmPassword.value.length >= IbConfig.kPasswordMinLength &&
         confirmPassword.value == password.value;
     print('validating confirmPassword $isCfPwdValid');
     if (confirmPassword.value.isEmpty) {
@@ -100,7 +100,7 @@ class SignUpController extends GetxController {
       return;
     }
 
-    if (confirmPassword.value.length < IbConfig.passwordMinLength) {
+    if (confirmPassword.value.length < IbConfig.kPasswordMinLength) {
       confirmPwdErrorTrKey.value = '6_characters_error';
       return;
     }

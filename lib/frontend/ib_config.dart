@@ -5,14 +5,18 @@ class IbConfig {
   static const double kScrollbarCornerRadius = 32;
   static const double kTextBoxCornerRadius = 32;
   static const double kButtonCornerRadius = 32;
-  static const double kPageTitleSize = 20;
-  static const double kCardTitleSize = 18;
+  static const double kPageTitleSize = 22;
   static const double kSecondaryTextSize = 14;
   static const double kDescriptionTextSize = 12;
   static const double kNormalTextSize = 16;
   static const int kEventTriggerDelayInMillis = 800;
-  static const int ageLimitInDays = 4745;
-  static const int passwordMinLength = 6;
+  static const int kUpdateResultMinCadenceInMillis = 8000;
+  static const int kAgeLimitInDays = 4745;
+  static const int kPasswordMinLength = 6;
+  static const int kQuestionTitleMaxLength = 30; //characters
+  static const int kQuestionDescMaxLength = 100; //characters
+  static const int kAnswerMaxLength = 30; // characters
+  static const int kScAnswerMaxLength = 20; // characters
 
   IbConfig._();
 }

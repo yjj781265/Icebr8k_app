@@ -8,7 +8,7 @@ class IbColors {
   static const Color errorRed = Colors.redAccent;
   static const Color lightGreen = Color(0xffcbf7c7);
   static const Color white = Colors.white;
-  static const Color lightGrey = Colors.grey;
+  static const Color lightGrey = Color(0xFFCCCCCC);
 
   IbColors._();
 }

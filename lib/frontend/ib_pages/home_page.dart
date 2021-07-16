@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_card_swipper/flutter_card_swiper.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
+import 'package:icebr8k/backend/controllers/ib_question_controller.dart';
+import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_icon.dart';
@@ -70,12 +73,24 @@ class HomePage extends StatelessWidget {
   }
 
   Widget getBody() {
+    /// Question tab
+    final _ibQuestionController = Get.put(IbQuestionController());
     final List<Widget> pages = [
       Container(
-        color: IbColors.lightBlue,
         alignment: Alignment.center,
-        child: Center(
-          child: IbQuestionCard(),
+        color: IbColors.lightBlue,
+        child: Swiper(
+          physics: const BouncingScrollPhysics(),
+          controller: SwiperController(),
+          itemBuilder: (BuildContext context, int index) {
+            final _ibQuestion = _ibQuestionController.ibQuestions[index];
+            return IbQuestionCard(Get.put(IbQuestionItemController(_ibQuestion),
+                tag: _ibQuestion.id));
+          },
+          loop: false,
+          itemCount: _ibQuestionController.ibQuestions.length,
+          viewportFraction: 0.9,
+          scale: 0.96,
         ),
       ),
       Container(
