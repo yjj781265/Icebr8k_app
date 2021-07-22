@@ -48,6 +48,7 @@ class IbCreateQuestionController extends GetxController {
       return;
     }
 
+    IbUtils.hideKeyboard();
     Get.to(() => ReviewQuestionPage(
         question: IbQuestion(
             question: question,

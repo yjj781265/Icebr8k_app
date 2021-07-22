@@ -229,6 +229,7 @@ class IbQuestionMcItem extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   choice,
+                  maxLines: 1,
                   style: const TextStyle(
                       fontSize: IbConfig.kNormalTextSize, color: Colors.black),
                 ),

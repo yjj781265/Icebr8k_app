@@ -147,39 +147,36 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          margin: const EdgeInsets.all(8),
-          padding: const EdgeInsets.all(8),
-          height: 46,
-          decoration: BoxDecoration(
-              color: IbColors.white, borderRadius: BorderRadius.circular(8)),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'tap_to_add'.tr,
-                style: const TextStyle(color: IbColors.lightGrey),
-              ),
-              IconButton(
-                onPressed: () {
-                  if (_controller.choiceList.length < IbConfig.kChoiceLimit) {
-                    _showTextFiledBottomSheet('add_choice');
-                  } else {
-                    Get.showSnackbar(GetBar(
-                      borderRadius: IbConfig.kCardCornerRadius,
-                      margin: const EdgeInsets.all(8),
-                      duration: const Duration(seconds: 3),
-                      backgroundColor: IbColors.errorRed,
-                      messageText: Text('choice_limit'.tr),
-                    ));
-                  }
-                },
-                icon: const Icon(
-                  Icons.add_outlined,
+        InkWell(
+          onTap: () {
+            if (_controller.choiceList.length < IbConfig.kChoiceLimit) {
+              _showTextFiledBottomSheet('add_choice');
+            } else {
+              Get.showSnackbar(GetBar(
+                borderRadius: IbConfig.kCardCornerRadius,
+                margin: const EdgeInsets.all(8),
+                duration: const Duration(seconds: 3),
+                backgroundColor: IbColors.errorRed,
+                messageText: Text('choice_limit'.tr),
+              ));
+            }
+          },
+          child: Container(
+            margin: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
+            height: 46,
+            decoration: BoxDecoration(
+                color: IbColors.white, borderRadius: BorderRadius.circular(8)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'tap_to_add'.tr,
+                  style: const TextStyle(color: IbColors.lightGrey),
                 ),
-                padding: EdgeInsets.zero,
-              )
-            ],
+                const Icon(Icons.add_outlined),
+              ],
+            ),
           ),
         ),
         Obx(
@@ -228,40 +225,36 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          margin: const EdgeInsets.all(8),
-          padding: const EdgeInsets.all(8),
-          height: 46,
-          decoration: BoxDecoration(
-              color: IbColors.white, borderRadius: BorderRadius.circular(8)),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'tap_to_add_sc'.tr,
-                style: const TextStyle(color: IbColors.lightGrey),
-              ),
-              IconButton(
-                onPressed: () {
-                  if (_controller.scaleChoiceList.length <
-                      IbConfig.kScChoiceLimit) {
-                    _showTextFiledBottomSheet('add_endpoint');
-                  } else {
-                    Get.showSnackbar(GetBar(
-                      borderRadius: IbConfig.kCardCornerRadius,
-                      margin: const EdgeInsets.all(8),
-                      duration: const Duration(seconds: 3),
-                      backgroundColor: IbColors.errorRed,
-                      messageText: Text('choice_limit_sc'.tr),
-                    ));
-                  }
-                },
-                icon: const Icon(
-                  Icons.add_outlined,
+        InkWell(
+          onTap: () {
+            if (_controller.scaleChoiceList.length < IbConfig.kScChoiceLimit) {
+              _showTextFiledBottomSheet('add_endpoint');
+            } else {
+              Get.showSnackbar(GetBar(
+                borderRadius: IbConfig.kCardCornerRadius,
+                margin: const EdgeInsets.all(8),
+                duration: const Duration(seconds: 3),
+                backgroundColor: IbColors.errorRed,
+                messageText: Text('choice_limit_sc'.tr),
+              ));
+            }
+          },
+          child: Container(
+            margin: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
+            height: 46,
+            decoration: BoxDecoration(
+                color: IbColors.white, borderRadius: BorderRadius.circular(8)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'tap_to_add_sc'.tr,
+                  style: const TextStyle(color: IbColors.lightGrey),
                 ),
-                padding: EdgeInsets.zero,
-              )
-            ],
+                const Icon(Icons.add_outlined),
+              ],
+            ),
           ),
         ),
         Obx(
@@ -332,7 +325,6 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                 ),
               ),
               TextField(
-                keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.done,
                 maxLength: _controller.questionType == IbQuestion.kScale
                     ? IbConfig.kScAnswerMaxLength
