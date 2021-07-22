@@ -1,19 +1,26 @@
 import 'dart:math';
 
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 
 class IbQuestionItemController extends GetxController {
   final selectedChoice = ''.obs;
   final isVoted = false.obs;
+  final voteBtnTrKey = 'vote'.obs;
+  final submitBtnTrKey = 'submit'.obs;
   final username = ''.obs;
   final avatarUrl = ''.obs;
   final IbQuestion ibQuestion;
+  final height = 300.0.obs;
+  final width = 300.0.obs;
   final _answeredList = <String>[];
   final resultMap = <String, double>{};
+  bool isSample = false;
   DateTime _lastResultUpdatedTime = DateTime.now();
 
   IbQuestionItemController(this.ibQuestion);
@@ -23,7 +30,7 @@ class IbQuestionItemController extends GetxController {
     print('IbQuestionItemController init');
     super.onInit();
     final IbUser? ibUser =
-        await IbUserDbService().queryIbUser('NvpFOtXWoiVdctRgVHRy2EFxs0O2');
+        await IbUserDbService().queryIbUser(ibQuestion.creatorId);
     if (ibUser != null) {
       username.value = ibUser.username;
       avatarUrl.value = ibUser.avatarUrl;
@@ -54,6 +61,11 @@ class IbQuestionItemController extends GetxController {
       return;
     }
 
+    if (selectedChoice.value == choice) {
+      selectedChoice.value = '';
+      return;
+    }
+
     selectedChoice.value = choice;
     _calculateResult(choice);
   }
@@ -71,13 +83,32 @@ class IbQuestionItemController extends GetxController {
     resultMap.putIfAbsent(answer, () => _result);
   }
 
-  void onVote() {
+  Future<void> onVote() async {
+    if (isVoted.value) {
+      return;
+    }
+    voteBtnTrKey.value = 'voting';
+    await IbQuestionDbService().answerQuestion(
+        answer: selectedChoice.value,
+        questionId: ibQuestion.id,
+        uid: Get.find<AuthController>().firebaseUser!.uid);
     isVoted.value = true;
+    voteBtnTrKey.value = 'voted';
   }
 
   void reset() {
     selectedChoice.value = '';
     isVoted.value = false;
+    voteBtnTrKey.value = 'vote';
+  }
+
+  Future<void> submit() async {
+    if (submitBtnTrKey.value == 'submitted') {
+      return;
+    }
+    submitBtnTrKey.value = 'submitting';
+    await IbQuestionDbService().uploadQuestion(ibQuestion);
+    submitBtnTrKey.value = 'submitted';
   }
 
   void _generateAnsweredList() {

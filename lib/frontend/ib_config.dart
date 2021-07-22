@@ -12,8 +12,10 @@ class IbConfig {
   static const int kEventTriggerDelayInMillis = 800;
   static const int kUpdateResultMinCadenceInMillis = 8000;
   static const int kAgeLimitInDays = 4745;
+  static const int kChoiceLimit = 4;
+  static const int kScChoiceLimit = 2;
   static const int kPasswordMinLength = 6;
-  static const int kQuestionTitleMaxLength = 30; //characters
+  static const int kQuestionTitleMaxLength = 50; //characters
   static const int kQuestionDescMaxLength = 100; //characters
   static const int kAnswerMaxLength = 30; // characters
   static const int kScAnswerMaxLength = 20; // characters

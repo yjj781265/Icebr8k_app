@@ -6,10 +6,14 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
+import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/frontend/ib_pages/create_question_page.dart';
 import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_icon.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_question_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
@@ -19,6 +23,12 @@ class HomePage extends StatelessWidget {
   final HomeController _homeController = Get.put(HomeController());
   final _drawerController = ZoomDrawerController();
   final GlobalKey<IbAnimatedIconState> _iconKey = GlobalKey();
+  final _actionsList = [
+    [
+      IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
+      IconButton(onPressed: () {}, icon: const Icon(Icons.notifications))
+    ]
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -35,12 +45,22 @@ class HomePage extends StatelessWidget {
       });
     });
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(statusBarColor: IbColors.primaryColor),
+      const SystemUiOverlayStyle(statusBarColor: IbColors.lightBlue),
     );
     return Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: IbColors.primaryColor,
+          titleSpacing: 0,
+          backgroundColor: IbColors.lightBlue,
+          automaticallyImplyLeading: false,
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Get.to(() => const CreateQuestionPage());
+                },
+                icon: const Icon(Icons.edit)),
+            IconButton(onPressed: () {}, icon: const Icon(Icons.notifications))
+          ],
           leading: IconButton(
               icon:
                   IbAnimatedIcon(key: _iconKey, icon: AnimatedIcons.menu_close),
@@ -54,10 +74,18 @@ class HomePage extends StatelessWidget {
                   _iconKey.currentState!.forward();
                 }
               }),
-          title: const Text('Home Page'),
+          title: Obx(
+            () => Text(
+              _homeController.tabTitleList[_homeController.currentIndex.value],
+              style: const TextStyle(
+                  fontSize: IbConfig.kPageTitleSize,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
         ),
         backgroundColor: IbColors.lightBlue,
         body: ZoomDrawer(
+          slideWidth: 200,
           controller: _drawerController,
           style: DrawerStyle.Style1,
           menuScreen: MenuPage(),
@@ -75,24 +103,38 @@ class HomePage extends StatelessWidget {
   Widget getBody() {
     /// Question tab
     final _ibQuestionController = Get.put(IbQuestionController());
+
     final List<Widget> pages = [
-      Container(
-        alignment: Alignment.center,
-        color: IbColors.lightBlue,
-        child: Swiper(
-          physics: const BouncingScrollPhysics(),
-          controller: SwiperController(),
-          itemBuilder: (BuildContext context, int index) {
-            final _ibQuestion = _ibQuestionController.ibQuestions[index];
-            return IbQuestionCard(Get.put(IbQuestionItemController(_ibQuestion),
-                tag: _ibQuestion.id));
-          },
-          loop: false,
-          itemCount: _ibQuestionController.ibQuestions.length,
-          viewportFraction: 0.9,
-          scale: 0.96,
-        ),
-      ),
+      Obx(() {
+        if (_ibQuestionController.isLoading.isTrue) {
+          return const Center(
+            child: IbProgressIndicator(),
+          );
+        }
+        return Container(
+          color: IbColors.lightBlue,
+          child: Swiper(
+            physics: const BouncingScrollPhysics(),
+            controller: SwiperController(),
+            itemBuilder: (BuildContext context, int index) {
+              final _ibQuestion = _ibQuestionController.ibQuestions[index];
+              if (_ibQuestion.questionType == IbQuestion.kScale) {
+                return IbScQuestionCard(Get.put(
+                    IbQuestionItemController(_ibQuestion),
+                    tag: _ibQuestion.id));
+              }
+
+              return IbMcQuestionCard(Get.put(
+                  IbQuestionItemController(_ibQuestion),
+                  tag: _ibQuestion.id));
+            },
+            loop: false,
+            itemCount: _ibQuestionController.ibQuestions.length,
+            viewportFraction: 0.9,
+            scale: 0.96,
+          ),
+        );
+      }),
       Container(
         alignment: Alignment.center,
         color: IbColors.lightBlue,

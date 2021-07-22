@@ -3,46 +3,53 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 
 class MenuPage extends StatelessWidget {
   MenuPage({Key? key}) : super(key: key);
 
-  final _homeController = Get.find<HomeController>();
+  final _homeController = Get.put(HomeController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: IbColors.primaryColor,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: <Widget>[
-              _handleAvatarImage(),
-              Obx(
+      backgroundColor: IbColors.lightBlue,
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            _handleAvatarImage(),
+            SizedBox(
+              width: 100,
+              child: Obx(
                 () => Text(
-                  _homeController.currentIbName.value,
+                  _homeController.currentIbUsername.value,
+                  textAlign: TextAlign.center,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 22,
+                    fontSize: IbConfig.kNormalTextSize,
                     color: Colors.black,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
-              TextButton.icon(
-                  onPressed: () {
-                    Get.find<AuthController>().signOut();
-                  },
-                  icon: const Icon(
-                    Icons.exit_to_app_outlined,
-                    color: IbColors.errorRed,
-                  ),
-                  label: Text(
-                    'sign_out'.tr,
-                    style: const TextStyle(color: Colors.black),
-                  )),
-            ],
-          ),
+            ),
+            TextButton.icon(
+                onPressed: () {
+                  Get.find<AuthController>().signOut();
+                },
+                icon: const Icon(
+                  Icons.exit_to_app_outlined,
+                  color: IbColors.errorRed,
+                ),
+                label: Text(
+                  'sign_out'.tr,
+                  style: const TextStyle(color: Colors.black),
+                )),
+          ],
         ),
       ),
     );
@@ -54,11 +61,11 @@ class MenuPage extends StatelessWidget {
 
       if (isEmptyUrl) {
         return const CircleAvatar(
-            radius: 56,
+            radius: 48,
             foregroundImage: AssetImage('assets/icons/logo_ios.png'));
       }
       return CircleAvatar(
-        radius: 56,
+        radius: 48,
         foregroundImage: NetworkImage(_homeController.currentIbAvatarUrl.value),
       );
     });

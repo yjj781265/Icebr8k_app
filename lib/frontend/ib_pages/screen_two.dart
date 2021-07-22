@@ -61,7 +61,7 @@ class ScreenTwo extends StatelessWidget {
                 textTrKey: 'camera',
                 onPressed: () async {
                   final _picker = ImagePicker();
-                  final PickedFile? pickedFile = await _picker.getImage(
+                  final XFile? pickedFile = await _picker.pickImage(
                     source: ImageSource.camera,
                     preferredCameraDevice: CameraDevice.front,
                     imageQuality: 50,
@@ -85,7 +85,7 @@ class ScreenTwo extends StatelessWidget {
                 textTrKey: 'gallery',
                 onPressed: () async {
                   final _picker = ImagePicker();
-                  final PickedFile? pickedFile = await _picker.getImage(
+                  final XFile? pickedFile = await _picker.pickImage(
                       source: ImageSource.gallery, imageQuality: 50);
                   if (pickedFile != null) {
                     Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));

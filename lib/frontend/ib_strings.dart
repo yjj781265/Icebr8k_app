@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 
 class IbStrings extends Translations {
   @override
@@ -66,6 +67,29 @@ class IbStrings extends Translations {
           'score': 'Score',
           'question': 'Question',
           'profile': 'Profile',
+          'add_choice': 'Add a choice',
+          'add_endpoint': 'Add an endpoint',
+          'tap_to_add': 'Tap to add up to 4 choices',
+          'tap_to_add_sc': 'Tap to add 2 end points',
+          'add': 'Add',
+          'choice_limit':
+              'You can only have max ${IbConfig.kChoiceLimit} choices per question.',
+          'choice_limit_sc':
+              'You can only have max ${IbConfig.kScChoiceLimit} endpoints per scale question.',
+          'sc_question_not_valid': 'You need 2 endpoints for a scale question',
+          'mc_question_not_valid':
+              'You need at least 2 choices for a multiple choice question',
+          'description_option': 'Description(optional)',
+          'create_question': 'Create a question',
+          'mc': 'Multiple Choice',
+          'sc': 'Scale',
+          'question_empty': 'Question field is empty',
+          'vote': 'Vote',
+          'voting': 'Voting',
+          'voted': 'Voted',
+          'submit': 'Submit',
+          'submitting': 'Submitting',
+          'submitted': 'Submitted',
         }
       };
 }

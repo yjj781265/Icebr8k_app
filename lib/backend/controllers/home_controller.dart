@@ -7,13 +7,18 @@ import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 
 class HomeController extends GetxController {
   final currentIndex = 0.obs;
-  final currentTabTitle = ''.obs;
   final isIbUserOnline = false.obs;
   final currentIbName = ''.obs;
   final currentIbUsername = ''.obs;
   final currentIbAvatarUrl = ''.obs;
   IbUser? currentIbUser;
   late StreamSubscription _currentIbUserStream;
+  final tabTitleList = [
+    '${'question'.tr} 🤔',
+    '${'chat'.tr} 💬',
+    '${'score'.tr} 💯',
+    '${'profile'.tr} 👤'
+  ];
 
   @override
   void onInit() {
