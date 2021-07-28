@@ -19,11 +19,17 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     with SingleTickerProviderStateMixin {
   final IbCreateQuestionController _controller =
       Get.put(IbCreateQuestionController());
+  final TextEditingController _questionEditingController =
+      TextEditingController();
+  final TextEditingController _descriptionEditingController =
+      TextEditingController();
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _controller.questionEditController = _questionEditingController;
+    _controller.descriptionEditController = _descriptionEditingController;
     _tabController = TabController(vsync: this, length: 2);
     _tabController.addListener(() {
       if (_tabController.index == 0) {
@@ -61,12 +67,12 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                 children: [
                   IbCard(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 8),
+                      padding: const EdgeInsets.all(8),
                       child: TextField(
                         onChanged: (question) {
                           _controller.question = question;
                         },
+                        controller: _questionEditingController,
                         maxLines: 2,
                         maxLength: IbConfig.kQuestionTitleMaxLength,
                         style: const TextStyle(
@@ -83,13 +89,13 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                   ),
                   IbCard(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 8),
+                      padding: const EdgeInsets.all(8),
                       child: TextField(
                         maxLines: 2,
                         onChanged: (description) {
                           _controller.description = description;
                         },
+                        controller: _descriptionEditingController,
                         style: const TextStyle(
                           fontSize: IbConfig.kDescriptionTextSize,
                         ),
@@ -106,7 +112,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                     margin: const EdgeInsets.only(top: 10),
                     decoration: const BoxDecoration(
                         borderRadius: BorderRadius.all(
-                            Radius.circular(IbConfig.kTextBoxCornerRadius)),
+                            Radius.circular(IbConfig.kCardCornerRadius)),
                         color: IbColors.white),
                     child: TabBar(
                       controller: _tabController,
@@ -121,7 +127,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                           const EdgeInsets.symmetric(horizontal: 32),
                       unselectedLabelStyle:
                           const TextStyle(fontWeight: FontWeight.bold),
-                      labelColor: IbColors.primaryColor,
+                      labelColor: Colors.black,
                       unselectedLabelColor: IbColors.lightGrey,
                       indicatorColor: IbColors.primaryColor,
                     ),

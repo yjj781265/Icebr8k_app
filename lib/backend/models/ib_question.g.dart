@@ -8,13 +8,13 @@ part of 'ib_question.dart';
 
 IbQuestion _$IbQuestionFromJson(Map<String, dynamic> json) {
   return IbQuestion(
-    question: (json['question'] as String).trim(),
+    question: json['question'] as String,
     id: json['id'] as String,
     creatorId: json['creatorId'] as String,
     choices:
         (json['choices'] as List<dynamic>).map((e) => e as String).toList(),
     questionType: json['questionType'] as String,
-    description: (json['description'] as String).trim(),
+    description: json['description'] as String,
     createdTimeInMs: json['createdTimeInMs'] as int,
     endTimeInMs: json['endTimeInMs'] as int,
   );

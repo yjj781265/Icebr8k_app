@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
@@ -18,7 +16,6 @@ class IbQuestionItemController extends GetxController {
   final IbQuestion ibQuestion;
   final height = 300.0.obs;
   final width = 300.0.obs;
-  final _answeredList = <String>[];
   final resultMap = <String, double>{};
   bool isSample = false;
   DateTime _lastResultUpdatedTime = DateTime.now();
@@ -35,14 +32,12 @@ class IbQuestionItemController extends GetxController {
       username.value = ibUser.username;
       avatarUrl.value = ibUser.avatarUrl;
     }
-    //TODO REMOVE THIS ONCE IT CONNECTED TO DATABASE
+
     if (ibQuestion.questionType == IbQuestion.kMultipleChoice) {
-      _generateAnsweredList();
-      _initResultMap();
+      selectedChoice.value = '';
     } else {
       selectedChoice.value = '1';
     }
-
     return;
   }
 
@@ -67,24 +62,22 @@ class IbQuestionItemController extends GetxController {
     }
 
     selectedChoice.value = choice;
-    _calculateResult(choice);
   }
 
-  void _calculateResult(String answer) {
+  Future<void> _calculateResult(
+      {required String answer, required double totalPollSize}) async {
     double _result = 0.0;
-    final double _pollSize = _answeredList.length.toDouble();
-    double _counter = 0;
-    for (final String str in _answeredList) {
-      if (str == answer) {
-        _counter++;
-      }
-    }
-    _result = _counter / _pollSize;
-    resultMap.putIfAbsent(answer, () => _result);
+    final double _answerPollSize = (await IbQuestionDbService()
+            .querySpecificAnswerPollSize(
+                questionId: ibQuestion.id, answer: answer))
+        .toDouble();
+    print('$answer, $_answerPollSize');
+    _result = _answerPollSize / totalPollSize;
+    resultMap.update(answer, (_) => _result, ifAbsent: () => _result);
   }
 
   Future<void> onVote() async {
-    if (isVoted.value) {
+    if (isVoted.value || selectedChoice.value.isEmpty) {
       return;
     }
     voteBtnTrKey.value = 'voting';
@@ -92,6 +85,8 @@ class IbQuestionItemController extends GetxController {
         answer: selectedChoice.value,
         questionId: ibQuestion.id,
         uid: Get.find<AuthController>().firebaseUser!.uid);
+
+    await _initResultMap();
     isVoted.value = true;
     voteBtnTrKey.value = 'voted';
   }
@@ -111,34 +106,30 @@ class IbQuestionItemController extends GetxController {
     submitBtnTrKey.value = 'submitted';
   }
 
-  void _generateAnsweredList() {
-    final rng = Random();
-    for (int i = 0; i < 100; i++) {
-      if (rng.nextInt(10) % 2 == 0) {
-        _answeredList.add(ibQuestion.choices[0]);
-      } else {
-        _answeredList.add(ibQuestion.choices[1]);
+  Future<void> _initResultMap() async {
+    final double _pollSize =
+        (await IbQuestionDbService().queryPollSize(ibQuestion.id)).toDouble();
+
+    if (ibQuestion.questionType == IbQuestion.kMultipleChoice) {
+      for (final String choice in ibQuestion.choices) {
+        await _calculateResult(answer: choice, totalPollSize: _pollSize);
+      }
+    } else {
+      for (int i = 1; i <= 5; i++) {
+        await _calculateResult(answer: i.toString(), totalPollSize: _pollSize);
       }
     }
+    print(resultMap);
   }
 
-  void _initResultMap() {
-    for (final String choice in ibQuestion.choices) {
-      _calculateResult(choice);
-    }
-  }
-
-  void updateResult() {
+  Future<void> updateResult() async {
     if (DateTime.now().difference(_lastResultUpdatedTime).inMilliseconds >=
-        IbConfig.kUpdateResultMinCadenceInMillis) {
-      print(
-          'update result diff ${DateTime.now().difference(_lastResultUpdatedTime).inMilliseconds}');
+            IbConfig.kUpdateResultMinCadenceInMillis &&
+        isVoted.isTrue &&
+        !isSample) {
       _lastResultUpdatedTime = DateTime.now();
+      await _initResultMap();
+      print('updateResult for ${ibQuestion.question}');
     }
-  }
-
-  @override
-  void onReady() {
-    print('IbQuestionItemController ready');
   }
 }

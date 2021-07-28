@@ -1,6 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/ib_create_question_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 
 import '../ib_colors.dart';
@@ -8,6 +8,7 @@ import '../ib_config.dart';
 import '../ib_utils.dart';
 import 'ib_card.dart';
 import 'ib_elevated_button.dart';
+import 'ib_user_avatar.dart';
 
 class IbMcQuestionCard extends StatelessWidget {
   final IbQuestionItemController _controller;
@@ -19,6 +20,7 @@ class IbMcQuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _controller.isSample = isSample;
+    _controller.updateResult();
     return Center(
       child: LimitedBox(
         maxHeight: Get.height * 0.7,
@@ -117,9 +119,12 @@ class IbMcQuestionCard extends StatelessWidget {
                                       : _controller.selectedChoice.isNotEmpty
                                           ? IbColors.primaryColor
                                           : IbColors.lightGrey,
-                                  onPressed: () {
-                                    _controller.onVote();
-                                  }),
+                                  onPressed:
+                                      _controller.selectedChoice.value.isEmpty
+                                          ? null
+                                          : () {
+                                              _controller.onVote();
+                                            }),
                             ),
                           ),
                           /* Expanded(
@@ -134,7 +139,17 @@ class IbMcQuestionCard extends StatelessWidget {
                     else
                       Row(
                         children: [
+                          Expanded(
+                            child: IconButton(
+                                icon: const Icon(Icons.edit_outlined),
+                                onPressed: () {
+                                  Get.find<IbCreateQuestionController>()
+                                      .reset();
+                                  Get.back();
+                                }),
+                          ),
                           Obx(() => Expanded(
+                                flex: 2,
                                 child: IbElevatedButton(
                                     textTrKey: _controller.submitBtnTrKey.value,
                                     onPressed: () {
@@ -142,9 +157,8 @@ class IbMcQuestionCard extends StatelessWidget {
                                     }),
                               )),
                           Expanded(
-                            child: IbElevatedButton(
-                                color: IbColors.primaryColor,
-                                textTrKey: 'Home',
+                            child: IconButton(
+                                icon: const Icon(Icons.home_outlined),
                                 onPressed: () {
                                   Navigator.of(context)
                                       .popUntil((route) => route.isFirst);
@@ -164,18 +178,7 @@ class IbMcQuestionCard extends StatelessWidget {
 
   Widget _handleAvatarImage() {
     return Obx(() {
-      final bool isEmptyUrl = _controller.avatarUrl.value.isEmpty;
-
-      if (isEmptyUrl) {
-        return const CircleAvatar(
-            radius: 16,
-            foregroundImage: AssetImage('assets/icons/logo_ios.png'));
-      }
-      return CircleAvatar(
-        radius: 16,
-        foregroundImage:
-            CachedNetworkImageProvider(_controller.avatarUrl.value),
-      );
+      return IbUserAvatar(avatarUrl: _controller.avatarUrl.value);
     });
   }
 }
@@ -271,7 +274,7 @@ class IbQuestionMcItem extends StatelessWidget {
     }
 
     if (isVoted && !isSelected) {
-      return IbColors.lightGrey;
+      return IbColors.lightGrey.withOpacity(0.3);
     }
 
     if (!isVoted && !isSelected) {

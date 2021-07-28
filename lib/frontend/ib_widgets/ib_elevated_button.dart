@@ -37,13 +37,7 @@ class IbElevatedButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(IbConfig.kButtonCornerRadius),
           ),
           primary: onPressed != null ? color : IbColors.lightGrey),
-      onPressed: () {
-        if (onPressed != null) {
-          onPressed!();
-        } else {
-          return;
-        }
-      },
+      onPressed: onPressed == null ? null : () => onPressed!(),
       child: Text(
         textTrKey.tr,
         style: const TextStyle(

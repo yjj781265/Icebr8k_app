@@ -2,6 +2,11 @@ import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 
 class IbStrings extends Translations {
+  static const String kFriendshipStatusPending = 'pending';
+  static const String kFriendshipStatusAccepted = 'accepted';
+  static const String kFriendshipStatusRequestSent = 'request_sent';
+  static const String kFriendshipStatusBlocked = 'blocked';
+
   @override
   Map<String, Map<String, String>> get keys => {
         'en_US': {
@@ -27,12 +32,12 @@ class IbStrings extends Translations {
           'birthdate_hint': 'Please enter your birthdate',
           'confirm': 'Confirm',
           'cancel': 'Cancel',
-          'email_not_valid': 'email is not valid',
+          'email_not_valid': 'Email is not valid',
           'date_picker_instruction': 'Please pick your birthdate',
-          'field_is_empty': 'field is empty',
-          '6_characters_error': 'at least 6 characters',
-          'password_match_error': 'password does not match',
-          'age_limit_msg': 'user needs to be at least age of 13',
+          'field_is_empty': 'Field is empty',
+          '6_characters_error': 'At least 6 characters',
+          'password_match_error': 'Password does not match',
+          'age_limit_msg': 'User needs to be at least age of 13',
           'loading': 'Loading...',
           'signing_in': 'Signing in...',
           'signing_up': 'Signing up...',
@@ -54,14 +59,14 @@ class IbStrings extends Translations {
           'gallery': 'Gallery',
           'username': 'Username',
           'username_hint': 'Create your unique username',
-          'username_exist_error': 'username already exists',
+          'username_exist_error': 'Username already exists',
           'username_not_valid':
-              'username is not valid, make sure it has at least 2 characters without spacing',
+              'Username is not valid, make sure it has at least 2 characters without spacing',
           'username_empty':
               "Oops, looks like you forgot to create your username.",
           'avatar_empty':
               'Oops, looks like you forgot to pick your selfie picture.',
-          'fail_try_again': 'failed, please try again',
+          'fail_try_again': 'Failed, please try again',
           'to_previous_page': 'To previous page',
           'chat': 'Chat',
           'score': 'Score',
@@ -85,11 +90,19 @@ class IbStrings extends Translations {
           'sc': 'Scale',
           'question_empty': 'Question field is empty',
           'vote': 'Vote',
-          'voting': 'Voting',
+          'voting': 'Voting...',
           'voted': 'Voted',
           'submit': 'Submit',
-          'submitting': 'Submitting',
+          'submitting': 'Submitting...',
           'submitted': 'Submitted',
+          'search': 'Search',
+          'user_not_found': 'User not found',
+          'username_search_hint': 'Type Icebr8k username here',
+          'friend_request_pending_tip': 'Friend request sent',
+          'friend_request_dialog_title': 'Send @username a friend request?',
+          'friend_request_msg_hint': 'Leave a personal message(optional)',
+          'send_friend_request': 'Send friend request',
+          'send_friend_request_success': 'Friend Request sent',
         }
       };
 }

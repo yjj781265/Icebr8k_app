@@ -1,6 +1,6 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_card_swipper/flutter_card_swiper.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
@@ -8,7 +8,9 @@ import 'package:icebr8k/backend/controllers/ib_question_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_page.dart';
+import 'package:icebr8k/frontend/ib_pages/ib_user_search_page.dart';
 import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
+import 'package:icebr8k/frontend/ib_pages/score_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_icon.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
@@ -23,11 +25,35 @@ class HomePage extends StatelessWidget {
   final HomeController _homeController = Get.put(HomeController());
   final _drawerController = ZoomDrawerController();
   final GlobalKey<IbAnimatedIconState> _iconKey = GlobalKey();
-  final _actionsList = [
-    [
-      IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
-      IconButton(onPressed: () {}, icon: const Icon(Icons.notifications))
-    ]
+  final List<List<Widget>> _actionsList = [
+    List<Widget>.generate(
+        1,
+        (index) => IconButton(
+            onPressed: () {
+              Get.to(() => const CreateQuestionPage());
+            },
+            icon: const Icon(Icons.edit_outlined))),
+    List<Widget>.generate(
+        1,
+        (index) => IconButton(
+            onPressed: () {
+              //Get.to(() => const CreateQuestionPage());
+            },
+            icon: const Icon(Icons.edit))),
+    List<Widget>.generate(
+        1,
+        (index) => IconButton(
+            onPressed: () {
+              Get.to(() => IbUserSearchPage());
+            },
+            icon: const Icon(Icons.person_add_alt_1_outlined))),
+    List<Widget>.generate(
+        1,
+        (index) => IconButton(
+            onPressed: () {
+              //Get.to(() => const CreateQuestionPage());
+            },
+            icon: const Icon(Icons.notification_add))),
   ];
 
   @override
@@ -47,57 +73,53 @@ class HomePage extends StatelessWidget {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: IbColors.lightBlue),
     );
-    return Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          titleSpacing: 0,
-          backgroundColor: IbColors.lightBlue,
-          automaticallyImplyLeading: false,
-          actions: [
-            IconButton(
+    return Obx(
+      () => Scaffold(
+          appBar: AppBar(
+            elevation: 0,
+            titleSpacing: 0,
+            backgroundColor: IbColors.lightBlue,
+            automaticallyImplyLeading: false,
+            actions: _actionsList[_homeController.currentIndex.value],
+            leading: IconButton(
+                icon: IbAnimatedIcon(
+                    key: _iconKey, icon: AnimatedIcons.menu_close),
                 onPressed: () {
-                  Get.to(() => const CreateQuestionPage());
-                },
-                icon: const Icon(Icons.edit)),
-            IconButton(onPressed: () {}, icon: const Icon(Icons.notifications))
-          ],
-          leading: IconButton(
-              icon:
-                  IbAnimatedIcon(key: _iconKey, icon: AnimatedIcons.menu_close),
-              onPressed: () {
-                if (_drawerController.stateNotifier!.value ==
-                    DrawerState.open) {
-                  _drawerController.close!();
-                  _iconKey.currentState!.reverse();
-                } else {
-                  _drawerController.open!();
-                  _iconKey.currentState!.forward();
-                }
-              }),
-          title: Obx(
-            () => Text(
-              _homeController.tabTitleList[_homeController.currentIndex.value],
-              style: const TextStyle(
-                  fontSize: IbConfig.kPageTitleSize,
-                  fontWeight: FontWeight.bold),
+                  if (_drawerController.stateNotifier!.value ==
+                      DrawerState.open) {
+                    _drawerController.close!();
+                    _iconKey.currentState!.reverse();
+                  } else {
+                    _drawerController.open!();
+                    _iconKey.currentState!.forward();
+                  }
+                }),
+            title: Obx(
+              () => Text(
+                _homeController
+                    .tabTitleList[_homeController.currentIndex.value],
+                style: const TextStyle(
+                    fontSize: IbConfig.kPageTitleSize,
+                    fontWeight: FontWeight.bold),
+              ),
             ),
           ),
-        ),
-        backgroundColor: IbColors.lightBlue,
-        body: ZoomDrawer(
-          slideWidth: 200,
-          controller: _drawerController,
-          style: DrawerStyle.Style1,
-          menuScreen: MenuPage(),
-          mainScreen: getBody(),
-          borderRadius: IbConfig.kCardCornerRadius,
-          showShadow: true,
-          angle: 0,
           backgroundColor: IbColors.lightBlue,
-          openCurve: Curves.linear,
-          closeCurve: Curves.linear,
-        ),
-        bottomNavigationBar: _buildBottomBar());
+          body: ZoomDrawer(
+            slideWidth: 200,
+            controller: _drawerController,
+            style: DrawerStyle.Style1,
+            menuScreen: MenuPage(),
+            mainScreen: getBody(),
+            borderRadius: IbConfig.kCardCornerRadius,
+            showShadow: true,
+            angle: 0,
+            backgroundColor: IbColors.lightBlue,
+            openCurve: Curves.linear,
+            closeCurve: Curves.linear,
+          ),
+          bottomNavigationBar: _buildBottomBar()),
+    );
   }
 
   Widget getBody() {
@@ -107,31 +129,39 @@ class HomePage extends StatelessWidget {
     final List<Widget> pages = [
       Obx(() {
         if (_ibQuestionController.isLoading.isTrue) {
-          return const Center(
-            child: IbProgressIndicator(),
+          return Container(
+            color: IbColors.lightBlue,
+            child: const Center(
+              child: IbProgressIndicator(),
+            ),
           );
         }
         return Container(
           color: IbColors.lightBlue,
-          child: Swiper(
-            physics: const BouncingScrollPhysics(),
-            controller: SwiperController(),
-            itemBuilder: (BuildContext context, int index) {
-              final _ibQuestion = _ibQuestionController.ibQuestions[index];
+          child: CarouselSlider(
+            options: CarouselOptions(
+                onPageChanged: (index, reason) {
+                  print('$index , $reason');
+                  if (index == _ibQuestionController.ibQuestions.length - 2) {
+                    _ibQuestionController.addQuestion();
+                  }
+                },
+                viewportFraction: 0.95,
+                height: Get.height,
+                enableInfiniteScroll: false),
+            items: _ibQuestionController.ibQuestions.map((_ibQuestion) {
               if (_ibQuestion.questionType == IbQuestion.kScale) {
-                return IbScQuestionCard(Get.put(
-                    IbQuestionItemController(_ibQuestion),
-                    tag: _ibQuestion.id));
+                return Center(
+                  child: IbScQuestionCard(Get.put(
+                      IbQuestionItemController(_ibQuestion),
+                      tag: _ibQuestion.id)),
+                );
               }
 
               return IbMcQuestionCard(Get.put(
                   IbQuestionItemController(_ibQuestion),
                   tag: _ibQuestion.id));
-            },
-            loop: false,
-            itemCount: _ibQuestionController.ibQuestions.length,
-            viewportFraction: 0.9,
-            scale: 0.96,
+            }).toList(),
           ),
         );
       }),
@@ -143,14 +173,7 @@ class HomePage extends StatelessWidget {
           style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
       ),
-      Container(
-        alignment: Alignment.center,
-        color: IbColors.lightBlue,
-        child: const Text(
-          "Score",
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-        ),
-      ),
+      const ScorePage(),
       Container(
         alignment: Alignment.center,
         color: IbColors.primaryColor,

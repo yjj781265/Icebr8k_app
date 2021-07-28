@@ -1,7 +1,7 @@
 class IbConfig {
   static const double kLoadingIndicatorSize = 40;
   static const double kAppLogoSize = 96;
-  static const double kCardCornerRadius = 32;
+  static const double kCardCornerRadius = 16;
   static const double kScrollbarCornerRadius = 32;
   static const double kTextBoxCornerRadius = 32;
   static const double kButtonCornerRadius = 32;
@@ -16,6 +16,7 @@ class IbConfig {
   static const int kScChoiceLimit = 2;
   static const int kPasswordMinLength = 6;
   static const int kQuestionTitleMaxLength = 50; //characters
+  static const int kFriendRequestMsgMaxLength = 100; //characters
   static const int kQuestionDescMaxLength = 100; //characters
   static const int kAnswerMaxLength = 30; // characters
   static const int kScAnswerMaxLength = 20; // characters

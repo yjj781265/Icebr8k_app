@@ -29,6 +29,7 @@ class SignInPage extends StatelessWidget {
       const SystemUiOverlayStyle(statusBarColor: IbColors.primaryColor),
     );
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: IbColors.primaryColor,
       body: GestureDetector(
         onTap: () => IbUtils.hideKeyboard(),
@@ -135,9 +136,11 @@ class SignInPage extends StatelessWidget {
                                       padding: EdgeInsets.zero),
                                   onPressed: () {
                                     _resetPwdController.reset();
-                                    Get.dialog(
+                                    Get.bottomSheet(
                                       Obx(
                                         () => IbTextFieldDialog(
+                                          textInputType:
+                                              TextInputType.emailAddress,
                                           buttons: [
                                             TextButton(
                                                 onPressed: _resetPassword,
@@ -308,11 +311,13 @@ class SignInPage extends StatelessWidget {
     );
   }
 
-  void _resetPassword() {
+  Future<void> _resetPassword() async {
     _resetPwdController.validateEmail();
     if (_resetPwdController.isEmailValid.isTrue) {
       Get.back();
-      _authController.resetPassword(_resetPwdController.email.value.trim());
+      IbUtils.hideKeyboard();
+      await _authController
+          .resetPassword(_resetPwdController.email.value.trim());
     }
   }
 

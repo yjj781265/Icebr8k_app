@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:icebr8k/backend/models/ib_answer.dart';
+import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:uuid/uuid.dart';
@@ -76,5 +78,41 @@ class IbUtils {
       return '${diffDt.inDays ~/ 365} yr ago';
     }
     return '${diffDt.inDays} days ago';
+  }
+
+  static Color getRandomColor() {
+    final List<Color> colors = [
+      Colors.lightBlue,
+      Colors.greenAccent,
+      Colors.redAccent,
+      Colors.lightBlueAccent,
+      Colors.orangeAccent,
+      IbColors.primaryColor,
+      IbColors.accentColor,
+      IbColors.darkPrimaryColor,
+    ];
+    colors.shuffle();
+    return colors.first;
+  }
+
+  static Future<double> getCompScore(String uid1, String uid2) async {
+    final List<IbAnswer> uid1QuestionAnswers =
+        await IbQuestionDbService().queryUserAnswers(uid1);
+    final List<IbAnswer> uid2QuestionAnswers =
+        await IbQuestionDbService().queryUserAnswers(uid2);
+
+    if (uid1QuestionAnswers.isEmpty || uid2QuestionAnswers.isEmpty) {
+      return 0;
+    }
+
+    final int uid1AnsweredQuestionSize = uid1QuestionAnswers.length;
+
+    uid1QuestionAnswers
+        .removeWhere((element) => !uid2QuestionAnswers.contains(element));
+
+    //now uid1QuestionAnswers will contain  questions with same answer between uid1 and uid2
+    final _score =
+        uid1QuestionAnswers.length.toDouble() / uid1AnsweredQuestionSize;
+    return _score;
   }
 }

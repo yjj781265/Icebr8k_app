@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 
 class IbQuestionDbService {
@@ -10,6 +11,7 @@ class IbQuestionDbService {
   factory IbQuestionDbService() => _ibQuestionDbService;
 
   IbQuestionDbService._() {
+    _db.settings = const Settings(persistenceEnabled: true);
     _collectionRef = _db.collection(_kQuestionCollection);
   }
 
@@ -20,19 +22,70 @@ class IbQuestionDbService {
         .set(question.toJson(), SetOptions(merge: true));
   }
 
-  Future<List<IbQuestion>> queryQuestions(
-      {required String creatorId, required int limit}) async {
+  Future<IbQuestion?> queryQuestion(String questionId) async {
+    final snapshot = await _collectionRef.doc(questionId).get();
+    if (snapshot.exists && snapshot.data() != null) {
+      return IbQuestion.fromJson(snapshot.data()!);
+    }
+    return null;
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> queryQuestions(
+      {required int limit, DocumentSnapshot? lastDoc}) async {
     final List<IbQuestion> _list = [];
-    final _snapshot = await _collectionRef
-        .where('creatorId', isEqualTo: creatorId)
-        .limit(limit)
-        .get();
+    QuerySnapshot<Map<String, dynamic>> _snapshot;
+    if (lastDoc != null) {
+      _snapshot = await _collectionRef
+          .orderBy('createdTimeInMs')
+          .startAfterDocument(lastDoc)
+          .limit(limit)
+          .get();
+    } else {
+      _snapshot =
+          await _collectionRef.orderBy('createdTimeInMs').limit(limit).get();
+    }
+
+    return _snapshot;
+  }
+
+  Future<List<IbQuestion>> queryAnsweredQuestions(String uid) async {
+    final List<IbQuestion> _list = [];
+    final _snapshot =
+        await _db.collectionGroup('Answers').where('uid', isEqualTo: uid).get();
 
     for (final element in _snapshot.docs) {
-      _list.add(IbQuestion.fromJson(element.data()));
+      final IbQuestion? ibQuestion =
+          await queryQuestion(element['questionId'].toString());
+      if (ibQuestion != null) {
+        _list.add(ibQuestion);
+      }
     }
-    print("question list size ${_list.length}");
+    print("answered question list size ${_list.length}");
     return _list;
+  }
+
+  Future<List<IbAnswer>> queryUserAnswers(String uid) async {
+    final List<IbAnswer> answers = [];
+    final _snapshot =
+        await _db.collectionGroup('Answers').where('uid', isEqualTo: uid).get();
+    for (final doc in _snapshot.docs) {
+      answers.add(IbAnswer.fromJson(doc.data()));
+    }
+    print("answers list size ${answers.length}");
+    return answers;
+  }
+
+  Future<String?> queryAnswer(String uid, String questionId) async {
+    final _snapshot = await _collectionRef
+        .doc(questionId)
+        .collection('Answers')
+        .doc(uid)
+        .get();
+    if (!_snapshot.exists) {
+      return null;
+    }
+
+    return _snapshot['answer'].toString();
   }
 
   Future<void> answerQuestion(
@@ -44,6 +97,22 @@ class IbQuestionDbService {
       'questionId': questionId,
       'answer': answer,
       'timeStampInMs': DateTime.now().millisecondsSinceEpoch
-    });
+    }, SetOptions(merge: true));
+  }
+
+  Future<int> queryPollSize(String questionId) async {
+    final _snapshot =
+        await _collectionRef.doc(questionId).collection('Answers').get();
+    return _snapshot.size;
+  }
+
+  Future<int> querySpecificAnswerPollSize(
+      {required String questionId, required String answer}) async {
+    final _snapshot = await _collectionRef
+        .doc(questionId)
+        .collection('Answers')
+        .where('answer', isEqualTo: answer)
+        .get();
+    return _snapshot.size;
   }
 }

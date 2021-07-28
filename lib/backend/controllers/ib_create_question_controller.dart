@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_pages/review_question_page.dart';
@@ -8,6 +9,8 @@ import 'auth_controller.dart';
 
 class IbCreateQuestionController extends GetxController {
   String questionType = IbQuestion.kMultipleChoice;
+  late TextEditingController? questionEditController;
+  late TextEditingController? descriptionEditController;
   final choiceList = <String>[].obs;
   final scaleChoiceList = <String>[].obs;
   String question = '';
@@ -58,5 +61,20 @@ class IbCreateQuestionController extends GetxController {
             questionType: questionType,
             createdTimeInMs: DateTime.now().millisecondsSinceEpoch,
             choices: _getCorrectList())));
+  }
+
+  void reset() {
+    question = '';
+    description = '';
+    choiceList.clear();
+    scaleChoiceList.clear();
+
+    if (questionEditController != null) {
+      questionEditController!.clear();
+    }
+
+    if (descriptionEditController != null) {
+      descriptionEditController!.clear();
+    }
   }
 }

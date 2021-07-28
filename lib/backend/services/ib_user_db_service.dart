@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/frontend/ib_strings.dart';
 
 class IbUserDbService {
   static final _ibUserService = IbUserDbService._();
@@ -9,6 +10,7 @@ class IbUserDbService {
 
   factory IbUserDbService() => _ibUserService;
   IbUserDbService._() {
+    _db.settings = const Settings(persistenceEnabled: true);
     _collectionRef = _db.collection(_kUserCollection);
   }
 
@@ -85,5 +87,51 @@ class IbUserDbService {
       return null;
     }
     return IbUser.fromJson(snapshot.data()!);
+  }
+
+  Future<String?> queryFriendshipStatus(String myUid, String friendUid) async {
+    final _snapshot = await _collectionRef
+        .doc(myUid)
+        .collection('Friends')
+        .doc(friendUid)
+        .get();
+    if (!_snapshot.exists) {
+      return null;
+    }
+
+    return _snapshot['status'].toString();
+  }
+
+  Future<void> sendFriendRequest(
+      {required String myUid,
+      required String friendUid,
+      required String requestMsg}) async {
+    final int timestamp = DateTime.now().millisecondsSinceEpoch;
+
+    //my sub collection
+    await _collectionRef.doc(myUid).collection('Friends').doc(friendUid).set({
+      'friendUid': friendUid,
+      'status': IbStrings.kFriendshipStatusRequestSent,
+      'timestampInMs': timestamp
+    }, SetOptions(merge: true));
+
+    //my friends sub collection
+    await _collectionRef.doc(friendUid).collection('Friends').doc(myUid).set({
+      'friendUid': myUid,
+      'status': IbStrings.kFriendshipStatusPending,
+      'requestMsg': requestMsg.trim(),
+      'timestampInMs': timestamp
+    }, SetOptions(merge: true));
+  }
+
+  Future<IbUser?> queryIbUserFromUsername(String username) async {
+    final snapshot = await _collectionRef
+        .where('username', isEqualTo: username.trim().toLowerCase())
+        .get();
+    if (snapshot.docs.isEmpty || snapshot.docs.length != 1) {
+      return null;
+    }
+
+    return IbUser.fromJson(snapshot.docs.first.data());
   }
 }
