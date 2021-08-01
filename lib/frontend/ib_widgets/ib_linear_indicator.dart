@@ -67,11 +67,15 @@ class IbLinearIndicator extends StatelessWidget {
       return const Color(0xFFFFB700);
     }
 
-    if (value > 0.6 && value <= 0.8) {
-      return const Color(0xFFB3FF00);
+    if (value > 0.6 && value <= 0.7) {
+      return const Color(0xFFB1E423);
     }
 
-    if (value > 0.8 && value <= 1.0) {
+    if (value > 0.8 && value <= 0.9) {
+      return const Color(0xFF23E480);
+    }
+
+    if (value > 0.9 && value <= 1.0) {
       return IbColors.accentColor;
     }
     return IbColors.errorRed;

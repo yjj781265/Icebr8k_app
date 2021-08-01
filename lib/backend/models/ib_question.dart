@@ -36,4 +36,9 @@ class IbQuestion {
 
   @override
   int get hashCode => id.hashCode;
+
+  @override
+  String toString() {
+    return 'IbQuestion{question: $question, id: $id}';
+  }
 }

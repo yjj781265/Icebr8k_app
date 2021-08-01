@@ -46,7 +46,7 @@ class HomePage extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.refresh_outlined),
           onPressed: () async {
-            await Get.find<IbQuestionController>().loadMoreQuestions();
+            await Get.find<IbQuestionController>().loadQuestions();
           },
         ),
         IconButton(

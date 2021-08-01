@@ -80,6 +80,7 @@ class IbQuestionItemController extends GetxController {
                 questionId: ibQuestion.id, answer: answer))
         .toDouble();
     _result = _answerPollSize / totalPollSize;
+    if (_result == 0) return;
     resultMap.update(answer, (_) => _result, ifAbsent: () => _result);
   }
 

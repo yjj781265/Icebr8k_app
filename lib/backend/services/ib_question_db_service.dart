@@ -31,33 +31,39 @@ class IbQuestionDbService {
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> queryQuestions(
-      {required int limit, DocumentSnapshot? lastDoc}) async {
+      {required int limit,
+      DocumentSnapshot? lastDoc,
+      required List<String> answeredQuestionIds}) async {
     QuerySnapshot<Map<String, dynamic>> _snapshot;
+    if (answeredQuestionIds.isEmpty) {
+      return _collectionRef.orderBy('id').limit(limit).get();
+    }
+
     if (lastDoc != null) {
       _snapshot = await _collectionRef
-          .orderBy('createdTimeInMs')
+          .orderBy('id')
+          .where('id', whereNotIn: answeredQuestionIds)
           .startAfterDocument(lastDoc)
           .limit(limit)
           .get();
     } else {
-      _snapshot =
-          await _collectionRef.orderBy('createdTimeInMs').limit(limit).get();
+      _snapshot = await _collectionRef
+          .orderBy('id')
+          .limit(limit)
+          .where('id', whereNotIn: answeredQuestionIds)
+          .get();
     }
 
     return _snapshot;
   }
 
-  Future<List<IbQuestion>> queryAnsweredQuestions(String uid) async {
-    final List<IbQuestion> _list = [];
+  Future<List<String>> queryAnsweredQuestions(String uid) async {
+    final List<String> _list = [];
     final _snapshot =
         await _db.collectionGroup('Answers').where('uid', isEqualTo: uid).get();
 
     for (final element in _snapshot.docs) {
-      final IbQuestion? ibQuestion =
-          await queryQuestion(element['questionId'].toString());
-      if (ibQuestion != null) {
-        _list.add(ibQuestion);
-      }
+      _list.add(element['questionId'].toString());
     }
     print("answered question list size ${_list.length}");
     return _list;

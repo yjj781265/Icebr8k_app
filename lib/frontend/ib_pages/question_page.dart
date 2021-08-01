@@ -17,7 +17,8 @@ class QuestionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (_ibQuestionController.isLoading.isTrue) {
+      if (_ibQuestionController.isLoading.isTrue &&
+          _ibQuestionController.ibQuestions.isEmpty) {
         return Container(
           color: IbColors.lightBlue,
           child: const Center(
@@ -41,7 +42,7 @@ class QuestionPage extends StatelessWidget {
               enableInfiniteScroll: false,
               onPageChanged: (index, reason) {
                 if (index == _ibQuestionController.ibQuestions.length - 1) {
-                  _ibQuestionController.loadMoreQuestions();
+                  _ibQuestionController.loadQuestions();
                 }
               },
               viewportFraction: 0.95,
