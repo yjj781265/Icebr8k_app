@@ -56,7 +56,6 @@ class SignUpController extends GetxController {
     final bool isOver13 = IbUtils.isOver13(date);
     isBirthDateFirstTime.value = false;
     isBirthdateValid.value = readableBirthdate.value.isNotEmpty && isOver13;
-    print('validating birthdate ${isBirthdateValid.value}');
 
     if (readableBirthdate.value.isEmpty) {
       birthdateErrorTrKey.value = 'field_is_empty';
@@ -75,7 +74,6 @@ class SignUpController extends GetxController {
     isPwdFirstTime.value = false;
     isPasswordValid.value = password.value.isNotEmpty &&
         password.value.length >= IbConfig.kPasswordMinLength;
-    print('validating password $isPasswordValid');
 
     if (password.value.isEmpty) {
       pwdErrorTrKey.value = 'field_is_empty';
@@ -94,7 +92,7 @@ class SignUpController extends GetxController {
     isCfPwdValid.value = confirmPassword.value.isNotEmpty &&
         confirmPassword.value.length >= IbConfig.kPasswordMinLength &&
         confirmPassword.value == password.value;
-    print('validating confirmPassword $isCfPwdValid');
+
     if (confirmPassword.value.isEmpty) {
       confirmPwdErrorTrKey.value = 'field_is_empty';
       return;
@@ -115,7 +113,7 @@ class SignUpController extends GetxController {
     isEmailFirstTime.value = false;
     email.value = email.value.trim();
     isEmailValid.value = GetUtils.isEmail(email.value.trim());
-    print('validating email $isEmailValid');
+
     if (email.value.isEmpty) {
       emailErrorTrKey.value = 'field_is_empty';
       return;

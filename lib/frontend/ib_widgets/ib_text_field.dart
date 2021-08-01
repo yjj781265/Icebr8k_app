@@ -7,13 +7,14 @@ import '../ib_config.dart';
 class IbTextField extends StatelessWidget {
   final Icon titleIcon;
   final TextEditingController? controller;
-  final Widget suffixIcon;
+  final Widget? suffixIcon;
   final String titleTrKey;
   final String hintTrKey;
   final String errorTrKey;
   final String prefixText;
   final Color borderColor;
   final bool obscureText;
+  final int? charLimit;
   final Iterable<String> autofillHints;
   final TextInputType textInputType;
   final Function(String) onChanged;
@@ -23,10 +24,11 @@ class IbTextField extends StatelessWidget {
     required this.titleIcon,
     required this.titleTrKey,
     required this.hintTrKey,
-    this.suffixIcon = const Icon(null),
+    this.suffixIcon,
     this.errorTrKey = '',
     this.borderColor = IbColors.lightGrey,
     this.enabled = true,
+    this.charLimit,
     required this.onChanged,
     this.textInputType = TextInputType.text,
     this.obscureText = false,
@@ -40,7 +42,9 @@ class IbTextField extends StatelessWidget {
     final textField = TextField(
       autofillHints: enabled ? autofillHints : null,
       keyboardType: textInputType,
+      scrollPhysics: const NeverScrollableScrollPhysics(),
       obscureText: obscureText,
+      maxLength: charLimit,
       onChanged: (text) {
         onChanged(text);
       },
@@ -77,15 +81,14 @@ class IbTextField extends StatelessWidget {
                 color: borderColor,
               ),
             ),
-            child: Padding(
-                padding: const EdgeInsets.only(left: 16), child: textField),
+            child: Padding(padding: const EdgeInsets.all(8), child: textField),
           ),
         ),
         /******* error text ****/
         SizedBox(
           width: Get.width * 0.9,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(30, 0, 16, 0),
+            padding: const EdgeInsets.fromLTRB(8, 0, 16, 8),
             child: Text(
               errorTrKey.tr,
               maxLines: 2,

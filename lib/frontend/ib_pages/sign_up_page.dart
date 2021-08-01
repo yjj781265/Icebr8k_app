@@ -197,7 +197,6 @@ class SignUpPage extends GetView<SignUpController> {
     return Obx(
       () => IbSingleDatePicker(
         onSelectionChanged: (arg) {
-          print(arg.value as DateTime);
           controller.birthdateInMs.value =
               (arg.value as DateTime).millisecondsSinceEpoch;
           controller.birthdatePickerInstructionKey.value = '';
@@ -217,7 +216,7 @@ class SignUpPage extends GetView<SignUpController> {
                     _readableDateTime(_dateTime);
                 _birthdateTeController.text =
                     controller.readableBirthdate.value;
-                print(_readableDateTime(_dateTime));
+
                 Get.back();
               },
               child: Text('confirm'.tr)),

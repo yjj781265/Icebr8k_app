@@ -44,6 +44,7 @@ class ScreenOne extends StatelessWidget {
                     color: IbColors.primaryColor,
                   ),
                   titleTrKey: "username",
+                  charLimit: IbConfig.kUsernameMaxLength,
                   errorTrKey: _setUpController.usernameErrorTrKey.value,
                   borderColor: _setUpController.isUsernameFirstTime.isTrue
                       ? IbColors.lightGrey

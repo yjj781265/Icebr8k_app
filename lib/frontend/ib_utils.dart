@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -95,24 +96,54 @@ class IbUtils {
     return colors.first;
   }
 
+  static void showSimpleSnackBar(
+      {required String msg, required Color backgroundColor}) {
+    Get.showSnackbar(GetBar(
+      borderRadius: IbConfig.kCardCornerRadius,
+      margin: const EdgeInsets.all(8),
+      duration: const Duration(seconds: 3),
+      backgroundColor: backgroundColor,
+      messageText: Text(msg),
+    ));
+  }
+
   static Future<double> getCompScore(String uid1, String uid2) async {
     final List<IbAnswer> uid1QuestionAnswers =
         await IbQuestionDbService().queryUserAnswers(uid1);
     final List<IbAnswer> uid2QuestionAnswers =
         await IbQuestionDbService().queryUserAnswers(uid2);
 
+    print('uid1 has answered ${uid1QuestionAnswers.length} questions');
+    print('uid2 has answered ${uid2QuestionAnswers.length} questions');
+
     if (uid1QuestionAnswers.isEmpty || uid2QuestionAnswers.isEmpty) {
       return 0;
     }
 
-    final int uid1AnsweredQuestionSize = uid1QuestionAnswers.length;
+    final List<String> uid1QuestionIds = [];
+    final List<String> uid2QuestionIds = [];
 
-    uid1QuestionAnswers
-        .removeWhere((element) => !uid2QuestionAnswers.contains(element));
+    for (final IbAnswer answer in uid1QuestionAnswers) {
+      uid1QuestionIds.add(answer.questionId);
+    }
 
-    //now uid1QuestionAnswers will contain  questions with same answer between uid1 and uid2
-    final _score =
-        uid1QuestionAnswers.length.toDouble() / uid1AnsweredQuestionSize;
+    for (final IbAnswer answer in uid2QuestionAnswers) {
+      uid2QuestionIds.add(answer.questionId);
+    }
+
+    final int commonQuestionSize =
+        uid1QuestionIds.toSet().intersection(uid2QuestionIds.toSet()).length;
+    final int commonAnswerSize = uid1QuestionAnswers
+        .toSet()
+        .intersection(uid2QuestionAnswers.toSet())
+        .length;
+
+    print('commonQuestionSize is $commonQuestionSize');
+    print('commonAnswerSize is $commonAnswerSize');
+
+    final _score = commonAnswerSize / commonQuestionSize.toDouble();
+    print('score is $_score');
+
     return _score;
   }
 }

@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_user_search_controller.dart';
+import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_strings.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
@@ -86,73 +87,25 @@ class IbUserSearchPage extends StatelessWidget {
           _controller.username.isNotEmpty &&
           _controller.noResultTrKey.value.isEmpty) {
         return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ListTile(
-            tileColor: IbColors.white,
-            subtitle: TweenAnimationBuilder(
-                tween: Tween<double>(begin: 0, end: _controller.score.value),
-                duration: Duration(
-                    milliseconds: _controller.score.value < 0.5
-                        ? IbConfig.kEventTriggerDelayInMillis
-                        : 1200),
-                builder: (context, double value, child) {
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: LinearProgressIndicator(
-                          color: _handleIndicatorColor(value),
-                          backgroundColor: IbColors.lightGrey,
-                          minHeight: 5,
-                          value: value,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Text('${(value * 100).toInt()}%'),
-                      )
-                    ],
-                  );
-                }),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(IbConfig.kCardCornerRadius),
-            ),
-            leading: IbUserAvatar(
-              avatarUrl: _controller.avatarUrl.value,
-            ),
-            title: Text(
-              _controller.username.value,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: handleFriendshipStatus(),
-          ),
-        );
+            padding: const EdgeInsets.all(8.0),
+            child: ListTile(
+              tileColor: IbColors.white,
+              leading: IbUserAvatar(
+                avatarUrl: _controller.avatarUrl.value,
+              ),
+              title: Text(
+                _controller.username.value,
+                style: const TextStyle(
+                    fontSize: IbConfig.kNormalTextSize,
+                    fontWeight: FontWeight.bold),
+              ),
+              subtitle: IbLinearIndicator(endValue: _controller.score.value),
+              trailing: handleFriendshipStatus(),
+            ));
       }
 
       return const SizedBox();
     });
-  }
-
-  Color _handleIndicatorColor(double value) {
-    if (value > 0 && value <= 0.2) {
-      return const Color(0xFFFF0000);
-    }
-
-    if (value > 0.2 && value <= 0.4) {
-      return const Color(0xFFFF6600);
-    }
-
-    if (value > 0.4 && value <= 0.6) {
-      return const Color(0xFFFFB700);
-    }
-
-    if (value > 0.6 && value <= 0.8) {
-      return const Color(0xFFB3FF00);
-    }
-
-    if (value > 0.8 && value <= 1.0) {
-      return IbColors.accentColor;
-    }
-    return IbColors.errorRed;
   }
 
   void showFriendRequestDialog() {
@@ -243,6 +196,7 @@ class IbUserSearchPage extends StatelessWidget {
 
       if (_controller.friendshipStatus.isEmpty) {
         return IconButton(
+          tooltip: _controller.friendshipStatus.value,
           onPressed: () {
             showFriendRequestDialog();
           },
@@ -251,19 +205,19 @@ class IbUserSearchPage extends StatelessWidget {
       }
 
       if (_controller.friendshipStatus.value ==
-          IbStrings.kFriendshipStatusPending) {
+          IbFriend.kFriendshipStatusPending) {
         return IconButton(
           onPressed: null,
-          tooltip: 'friend_request_pending_tip'.tr,
+          tooltip: _controller.friendshipStatus.value,
           icon: const Icon(Icons.pending_outlined),
         );
       }
 
       if (_controller.friendshipStatus.value ==
-          IbStrings.kFriendshipStatusRequestSent) {
+          IbFriend.kFriendshipStatusRequestSent) {
         return IconButton(
           onPressed: null,
-          tooltip: 'friend_request_pending_tip'.tr,
+          tooltip: _controller.friendshipStatus.value,
           icon: const Icon(Icons.pending_outlined),
         );
       }

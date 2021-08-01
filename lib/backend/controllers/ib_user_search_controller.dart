@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
+import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_strings.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 class IbUserSearchController extends GetxController {
@@ -67,7 +67,7 @@ class IbUserSearchController extends GetxController {
           myUid: Get.find<AuthController>().firebaseUser!.uid,
           friendUid: friendUid.value,
           requestMsg: requestMsg);
-      friendshipStatus.value = IbStrings.kFriendshipStatusRequestSent;
+      friendshipStatus.value = IbFriend.kFriendshipStatusRequestSent;
       Get.showSnackbar(GetBar(
         borderRadius: IbConfig.kCardCornerRadius,
         margin: const EdgeInsets.all(8),

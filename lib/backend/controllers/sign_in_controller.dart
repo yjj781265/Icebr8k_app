@@ -30,7 +30,7 @@ class SignInController extends GetxController {
     isPasswordFirstTime.value = false;
     isPasswordValid.value = password.value.isNotEmpty &&
         password.value.length >= IbConfig.kPasswordMinLength;
-    print('validating password $isPasswordValid');
+
     if (password.value.isEmpty) {
       passwordErrorTrKey.value = 'field_is_empty';
       return;
@@ -47,7 +47,7 @@ class SignInController extends GetxController {
     isEmailFirstTime.value = false;
     email.value = email.value.trim();
     isEmailValid.value = GetUtils.isEmail(email.value.trim());
-    print('validating email $isEmailValid');
+
     if (email.value.isEmpty) {
       emailErrorTrKey.value = 'field_is_empty';
       return;

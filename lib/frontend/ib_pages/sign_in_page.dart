@@ -29,7 +29,6 @@ class SignInPage extends StatelessWidget {
       const SystemUiOverlayStyle(statusBarColor: IbColors.primaryColor),
     );
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       backgroundColor: IbColors.primaryColor,
       body: GestureDetector(
         onTap: () => IbUtils.hideKeyboard(),
@@ -143,8 +142,17 @@ class SignInPage extends StatelessWidget {
                                               TextInputType.emailAddress,
                                           buttons: [
                                             TextButton(
+                                                onPressed: () {
+                                                  Get.back();
+                                                },
+                                                child: Text(
+                                                  'cancel'.tr,
+                                                  style: const TextStyle(
+                                                      color: IbColors.errorRed),
+                                                )),
+                                            TextButton(
                                                 onPressed: _resetPassword,
-                                                child: Text('reset_pwd'.tr))
+                                                child: Text('reset_pwd'.tr)),
                                           ],
                                           borderColor: _resetPwdController
                                                   .isFirstTime.value
@@ -328,14 +336,18 @@ class SignInPage extends StatelessWidget {
         Obx(
           () => IbSingleDatePicker(
             onSelectionChanged: (arg) {
-              print(arg.value as DateTime);
               _controller.birthdateInMs.value =
                   (arg.value as DateTime).millisecondsSinceEpoch;
               _controller.birthdatePickerInstructionKey.value = '';
             },
             titleTrKey: _controller.birthdatePickerInstructionKey.value,
             buttons: [
-              TextButton(onPressed: () => Get.back(), child: Text('cancel'.tr)),
+              TextButton(
+                  onPressed: () => Get.back(),
+                  child: Text(
+                    'cancel'.tr,
+                    style: const TextStyle(color: IbColors.errorRed),
+                  )),
               TextButton(
                   onPressed: () async {
                     if (_controller

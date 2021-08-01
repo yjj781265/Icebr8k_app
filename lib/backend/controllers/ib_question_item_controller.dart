@@ -1,31 +1,40 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
-import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
+
+enum CardState {
+  init,
+  picked, // user made a selection but haven't submitted the question
+  processing,
+  submitted,
+}
 
 class IbQuestionItemController extends GetxController {
   final selectedChoice = ''.obs;
-  final isVoted = false.obs;
   final voteBtnTrKey = 'vote'.obs;
   final submitBtnTrKey = 'submit'.obs;
   final username = ''.obs;
   final avatarUrl = ''.obs;
   final IbQuestion ibQuestion;
   final height = 300.0.obs;
-  final width = 300.0.obs;
+  final width = 350.0.obs;
+  final currentState = CardState.init.obs;
   final resultMap = <String, double>{};
   bool isSample = false;
-  DateTime _lastResultUpdatedTime = DateTime.now();
 
   IbQuestionItemController(this.ibQuestion);
 
   @override
   Future<void> onInit() async {
-    print('IbQuestionItemController init');
     super.onInit();
+    currentState.value = isSample ? CardState.picked : CardState.init;
+
     final IbUser? ibUser =
         await IbUserDbService().queryIbUser(ibQuestion.creatorId);
     if (ibUser != null) {
@@ -37,14 +46,9 @@ class IbQuestionItemController extends GetxController {
       selectedChoice.value = '';
     } else {
       selectedChoice.value = '1';
+      currentState.value = CardState.picked;
     }
     return;
-  }
-
-  @override
-  void onClose() {
-    print('IbQuestionItemController onClose');
-    super.onClose();
   }
 
   void updateSelected(String choice) {
@@ -52,16 +56,20 @@ class IbQuestionItemController extends GetxController {
       return;
     }
 
-    if (isVoted.isTrue) {
+    if (currentState.value == CardState.submitted) {
       return;
     }
 
     if (selectedChoice.value == choice) {
       selectedChoice.value = '';
+      currentState.value = CardState.init;
       return;
     }
 
     selectedChoice.value = choice;
+    if (choice.isNotEmpty) {
+      currentState.value = CardState.picked;
+    }
   }
 
   Future<void> _calculateResult(
@@ -71,13 +79,13 @@ class IbQuestionItemController extends GetxController {
             .querySpecificAnswerPollSize(
                 questionId: ibQuestion.id, answer: answer))
         .toDouble();
-    print('$answer, $_answerPollSize');
     _result = _answerPollSize / totalPollSize;
     resultMap.update(answer, (_) => _result, ifAbsent: () => _result);
   }
 
   Future<void> onVote() async {
-    if (isVoted.value || selectedChoice.value.isEmpty) {
+    if (currentState.value == CardState.submitted ||
+        selectedChoice.value.isEmpty) {
       return;
     }
     voteBtnTrKey.value = 'voting';
@@ -87,23 +95,25 @@ class IbQuestionItemController extends GetxController {
         uid: Get.find<AuthController>().firebaseUser!.uid);
 
     await _initResultMap();
-    isVoted.value = true;
-    voteBtnTrKey.value = 'voted';
+    currentState.value = CardState.submitted;
+    voteBtnTrKey.value = ibQuestion.questionType == IbQuestion.kMultipleChoice
+        ? 'voted'
+        : 'show_result';
   }
 
-  void reset() {
-    selectedChoice.value = '';
-    isVoted.value = false;
-    voteBtnTrKey.value = 'vote';
-  }
-
+  // submit new question
   Future<void> submit() async {
-    if (submitBtnTrKey.value == 'submitted') {
-      return;
+    if (currentState.value == CardState.picked) {
+      currentState.value = CardState.processing;
+      submitBtnTrKey.value = 'submitting';
+      await IbQuestionDbService().uploadQuestion(ibQuestion);
+      currentState.value = CardState.submitted;
+      submitBtnTrKey.value = 'submitted';
+      Navigator.of(Get.context!).popUntil((route) => route.isFirst);
+      IbUtils.showSimpleSnackBar(
+          msg: 'Question submitted successfully',
+          backgroundColor: IbColors.accentColor);
     }
-    submitBtnTrKey.value = 'submitting';
-    await IbQuestionDbService().uploadQuestion(ibQuestion);
-    submitBtnTrKey.value = 'submitted';
   }
 
   Future<void> _initResultMap() async {
@@ -115,21 +125,15 @@ class IbQuestionItemController extends GetxController {
         await _calculateResult(answer: choice, totalPollSize: _pollSize);
       }
     } else {
+      // if user is the only one answered this SC question, there is no need to query result from database, showing 100% directly
+      if (_pollSize == 1) {
+        resultMap.update(selectedChoice.value, (_) => 1, ifAbsent: () => 1);
+        return;
+      }
+
       for (int i = 1; i <= 5; i++) {
         await _calculateResult(answer: i.toString(), totalPollSize: _pollSize);
       }
-    }
-    print(resultMap);
-  }
-
-  Future<void> updateResult() async {
-    if (DateTime.now().difference(_lastResultUpdatedTime).inMilliseconds >=
-            IbConfig.kUpdateResultMinCadenceInMillis &&
-        isVoted.isTrue &&
-        !isSample) {
-      _lastResultUpdatedTime = DateTime.now();
-      await _initResultMap();
-      print('updateResult for ${ibQuestion.question}');
     }
   }
 }

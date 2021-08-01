@@ -16,9 +16,9 @@ class SplashPage extends GetView<AuthController> {
   @override
   Widget build(BuildContext context) {
     Future.delayed(
-            const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
-            () => navigateToCorrectPage())
-        .then((_) => print('leaving splash page'));
+        const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
+        () => navigateToCorrectPage());
+
     return Scaffold(
       backgroundColor: IbColors.lightBlue,
       body: Center(

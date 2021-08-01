@@ -9,7 +9,7 @@ class IbUserAvatar extends StatelessWidget {
       {Key? key,
       required this.avatarUrl,
       this.showOnlineStatus = false,
-      this.radius = 16})
+      this.radius = 24})
       : super(key: key);
 
   @override
@@ -21,7 +21,7 @@ class IbUserAvatar extends StatelessWidget {
     }
     return CircleAvatar(
       radius: radius,
-      foregroundImage: CachedNetworkImageProvider(avatarUrl),
+      backgroundImage: CachedNetworkImageProvider(avatarUrl),
     );
   }
 }

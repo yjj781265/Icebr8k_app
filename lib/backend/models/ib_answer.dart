@@ -17,6 +17,7 @@ class IbAnswer {
 
   factory IbAnswer.fromJson(Map<String, dynamic> json) =>
       _$IbAnswerFromJson(json);
+
   Map<String, dynamic> toJson() => _$IbAnswerToJson(this);
 
   @override

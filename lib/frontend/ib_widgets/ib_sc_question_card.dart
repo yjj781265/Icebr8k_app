@@ -1,11 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/ib_create_question_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
@@ -30,18 +29,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    print('build');
     widget._controller.isSample = widget.isSample;
-    widget._controller.updateResult();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      if (cardKey.currentContext == null) {
-        return;
-      }
-      widget._controller.height.value = cardKey.currentContext!.size!.height;
-      widget._controller.width.value = cardKey.currentContext!.size!.width;
-      print(cardKey.currentContext!.size);
-    });
-
     return Center(
       child: FlipCard(
           flipOnTouch: false,
@@ -110,69 +98,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                 LimitedBox(
                     maxHeight: Get.height * 0.4,
                     child: IbQuestionScItem(widget._controller)),
-                if (!widget.isSample)
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Obx(
-                          () => IbElevatedButton(
-                              textTrKey: widget._controller.voteBtnTrKey.value,
-                              color: widget._controller.isVoted.isTrue
-                                  ? IbColors.accentColor
-                                  : widget._controller.selectedChoice.isNotEmpty
-                                      ? IbColors.primaryColor
-                                      : IbColors.lightGrey,
-                              onPressed:
-                                  widget._controller.selectedChoice.isEmpty
-                                      ? null
-                                      : () async {
-                                          await widget._controller.onVote();
-                                          cardKey.currentState!.toggleCard();
-                                          setState(() {});
-                                        }),
-                        ),
-                      ),
-                      /*    Expanded(
-                      child: IbElevatedButton(
-                          color: IbColors.primaryColor,
-                          textTrKey: 'Home',
-                          onPressed: () {
-                            Navigator.of(context)
-                                .popUntil((route) => route.isFirst);
-                          }),
-                    )*/
-                    ],
-                  )
-                else
-                  Row(
-                    children: [
-                      Expanded(
-                        child: IconButton(
-                            icon: const Icon(Icons.edit_outlined),
-                            onPressed: () {
-                              Get.find<IbCreateQuestionController>().reset();
-                              Get.back();
-                            }),
-                      ),
-                      Obx(() => Expanded(
-                            flex: 2,
-                            child: IbElevatedButton(
-                                textTrKey:
-                                    widget._controller.submitBtnTrKey.value,
-                                onPressed: () {
-                                  widget._controller.submit();
-                                }),
-                          )),
-                      Expanded(
-                        child: IconButton(
-                            icon: const Icon(Icons.home_outlined),
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .popUntil((route) => route.isFirst);
-                            }),
-                      )
-                    ],
-                  ),
+                _handleButtons()
               ],
             ),
           )),
@@ -180,35 +106,79 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     );
   }
 
+  Widget _handleButtons() {
+    return Obx(() {
+      Color btnColor = IbColors.primaryColor;
+      final CardState currentState = widget._controller.currentState.value;
+      switch (currentState) {
+        case CardState.init:
+          btnColor = IbColors.lightGrey;
+          break;
+        case CardState.picked:
+          btnColor = IbColors.primaryColor;
+          break;
+        case CardState.processing:
+          btnColor = IbColors.processingColor;
+          break;
+        case CardState.submitted:
+          btnColor = IbColors.accentColor;
+          break;
+      }
+
+      if (!widget.isSample) {
+        return Center(
+          child: IbElevatedButton(
+              textTrKey: widget._controller.voteBtnTrKey.value,
+              color: btnColor,
+              onPressed: widget._controller.selectedChoice.isEmpty
+                  ? null
+                  : () async {
+                      await widget._controller.onVote();
+                      setState(() {
+                        cardKey.currentState!.toggleCard();
+                      });
+                    }),
+        );
+      } else {
+        return Center(
+          child: IbElevatedButton(
+              textTrKey: widget._controller.submitBtnTrKey.value,
+              onPressed: () async {
+                await widget._controller.submit();
+              }),
+        );
+      }
+    });
+  }
+
   Widget _cardBackSide() {
-    return Obx(
-      () => SizedBox(
-        height: widget._controller.height.value,
-        width: widget._controller.width.value,
-        child: IbCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: IconButton(
-                    onPressed: () {
-                      cardKey.currentState!.toggleCard();
-                    },
-                    icon: const Icon(Icons.arrow_back_ios_outlined)),
-              ),
-              Expanded(
-                flex: 10,
-                child: PieChart(
-                  PieChartData(
-                    sectionsSpace: 2,
-                    centerSpaceRadius: 0,
-                    startDegreeOffset: 45,
-                    sections: _getSectionData(),
-                  ),
+    return SizedBox(
+      height: widget._controller.height.value,
+      width: widget._controller.width.value,
+      child: IbCard(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: IconButton(
+                  onPressed: () {
+                    cardKey.currentState!.toggleCard();
+                  },
+                  icon: const Icon(Icons.arrow_back_ios_outlined)),
+            ),
+            Expanded(
+              flex: 9,
+              child: PieChart(
+                PieChartData(
+                  sectionsSpace: 2,
+                  centerSpaceRadius: 30,
+                  startDegreeOffset: 45,
+                  sections: _getSectionData(),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -227,40 +197,36 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
       lastRandomColor = randomColor;
 
       final PieChartSectionData data = PieChartSectionData(
-          badgeWidget: (percentage > 0 && percentage != 100)
-              ? Container(
-                  width: 32.0,
-                  height: 32.0,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: randomColor),
-                    color: IbColors.lightBlue,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset:
-                            const Offset(0, 3), // changes position of shadow
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                      child: Text(
-                    choice,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: IbColors.primaryColor),
-                  )),
-                )
-              : null,
+          badgeWidget: Container(
+            width: 32.0,
+            height: 32.0,
+            decoration: BoxDecoration(
+              border: Border.all(color: randomColor),
+              color: IbColors.lightBlue,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(0, 3), // changes position of shadow
+                ),
+              ],
+            ),
+            child: Center(
+                child: Text(
+              choice,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, color: IbColors.primaryColor),
+            )),
+          ),
           color: randomColor,
           badgePositionPercentageOffset: 0.95,
           titlePositionPercentageOffset: 0.5,
           value: percentage.toDouble(),
           radius: 80,
           titleStyle: const TextStyle(
-              fontSize: IbConfig.kPageTitleSize, fontWeight: FontWeight.bold),
+              fontSize: IbConfig.kNormalTextSize, fontWeight: FontWeight.bold),
           title: '$percentage%');
       _pieChartDataList.add(data);
     }
@@ -268,20 +234,10 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
   }
 
   Widget _handleAvatarImage() {
-    return Obx(() {
-      final bool isEmptyUrl = widget._controller.avatarUrl.value.isEmpty;
-
-      if (isEmptyUrl) {
-        return const CircleAvatar(
-            radius: 16,
-            foregroundImage: AssetImage('assets/icons/logo_ios.png'));
-      }
-      return CircleAvatar(
-        radius: 16,
-        foregroundImage:
-            CachedNetworkImageProvider(widget._controller.avatarUrl.value),
-      );
-    });
+    return IbUserAvatar(
+      avatarUrl: widget._controller.avatarUrl.value,
+      radius: 16,
+    );
   }
 
   @override
@@ -324,13 +280,10 @@ class IbQuestionScItem extends StatelessWidget {
                   value: _controller.selectedChoice.isEmpty
                       ? 1
                       : double.parse(_controller.selectedChoice.value),
-                  onChanged: _controller.isSample
-                      ? null
-                      : (value) {
-                          _controller.selectedChoice.value =
-                              value.toInt().toString();
-                          print(value.toInt());
-                        }),
+                  onChanged: (value) {
+                    _controller.selectedChoice.value = value.toInt().toString();
+                    print(value.toInt());
+                  }),
             ),
           ),
         ),

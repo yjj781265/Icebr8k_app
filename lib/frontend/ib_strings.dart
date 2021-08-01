@@ -2,11 +2,6 @@ import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 
 class IbStrings extends Translations {
-  static const String kFriendshipStatusPending = 'pending';
-  static const String kFriendshipStatusAccepted = 'accepted';
-  static const String kFriendshipStatusRequestSent = 'request_sent';
-  static const String kFriendshipStatusBlocked = 'blocked';
-
   @override
   Map<String, Map<String, String>> get keys => {
         'en_US': {
@@ -36,6 +31,7 @@ class IbStrings extends Translations {
           'date_picker_instruction': 'Please pick your birthdate',
           'field_is_empty': 'Field is empty',
           '6_characters_error': 'At least 6 characters',
+          '3_characters_error': 'At least 3 characters',
           'password_match_error': 'Password does not match',
           'age_limit_msg': 'User needs to be at least age of 13',
           'loading': 'Loading...',
@@ -74,7 +70,7 @@ class IbStrings extends Translations {
           'profile': 'Profile',
           'add_choice': 'Add a choice',
           'add_endpoint': 'Add an endpoint',
-          'tap_to_add': 'Tap to add up to 4 choices',
+          'tap_to_add': 'Tap to add up to ${IbConfig.kChoiceLimit} choices',
           'tap_to_add_sc': 'Tap to add 2 end points',
           'add': 'Add',
           'choice_limit':
@@ -98,11 +94,15 @@ class IbStrings extends Translations {
           'search': 'Search',
           'user_not_found': 'User not found',
           'username_search_hint': 'Type Icebr8k username here',
-          'friend_request_pending_tip': 'Friend request sent',
           'friend_request_dialog_title': 'Send @username a friend request?',
           'friend_request_msg_hint': 'Leave a personal message(optional)',
           'send_friend_request': 'Send friend request',
-          'send_friend_request_success': 'Friend Request sent',
+          'send_friend_request_success': 'Friend request sent',
+          'score_page_tab_1_title': 'Friends',
+          'score_page_tab_2_title': 'Friend Requests',
+          'friend_request_accepted': 'Friend request accepted',
+          'friend_request_declined': 'Friend request declined',
+          'show_result': 'Show result'
         }
       };
 }

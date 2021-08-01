@@ -57,6 +57,12 @@ class SetUpController extends GetxController {
       return;
     }
 
+    if (username.value.length < IbConfig.kUsernameMinLength) {
+      usernameErrorTrKey.value = '3_characters_error';
+      isUsernameValid.value = false;
+      return;
+    }
+
     if (!isValid) {
       usernameErrorTrKey.value = "username_not_valid";
       isUsernameValid.value = false;
@@ -77,7 +83,6 @@ class SetUpController extends GetxController {
   void _validateName() {
     isNameFirstTime.value = false;
     isNameValid.value = name.value.isNotEmpty;
-    print('validating name ${isNameValid.value}');
 
     if (name.value.isEmpty) {
       nameErrorTrKey.value = 'field_is_empty';
@@ -185,7 +190,6 @@ class SetUpController extends GetxController {
         Get.dialog(const IbSimpleDialog(
             message: 'uid is not found, because user is signed out',
             positiveBtnTrKey: 'ok'));
-        print('uid is not found, because user signed out');
       }
     }
   }

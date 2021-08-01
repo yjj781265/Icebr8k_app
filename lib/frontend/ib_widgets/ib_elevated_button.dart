@@ -36,7 +36,7 @@ class IbElevatedButton extends StatelessWidget {
             //to set border radius to button
             borderRadius: BorderRadius.circular(IbConfig.kButtonCornerRadius),
           ),
-          primary: onPressed != null ? color : IbColors.lightGrey),
+          primary: color),
       onPressed: onPressed == null ? null : () => onPressed!(),
       child: Text(
         textTrKey.tr,
@@ -56,7 +56,7 @@ class IbElevatedButton extends StatelessWidget {
             //to set border radius to button
             borderRadius: BorderRadius.circular(IbConfig.kButtonCornerRadius),
           ),
-          primary: onPressed != null ? color : IbColors.lightGrey),
+          primary: color),
       onPressed: () {
         if (onPressed != null) {
           onPressed!();

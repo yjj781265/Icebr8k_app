@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class IbAnimatedIcon extends StatefulWidget {
-  const IbAnimatedIcon({Key? key, required this.icon}) : super(key: key);
+  const IbAnimatedIcon({required Key? key, required this.icon})
+      : super(key: key);
   final AnimatedIconData icon;
 
   @override

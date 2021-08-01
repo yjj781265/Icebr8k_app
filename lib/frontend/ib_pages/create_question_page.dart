@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_create_question_controller.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 
 import '../ib_config.dart';
@@ -17,8 +16,7 @@ class CreateQuestionPage extends StatefulWidget {
 
 class _CreateQuestionPageState extends State<CreateQuestionPage>
     with SingleTickerProviderStateMixin {
-  final IbCreateQuestionController _controller =
-      Get.put(IbCreateQuestionController());
+  late IbCreateQuestionController _controller;
   final TextEditingController _questionEditingController =
       TextEditingController();
   final TextEditingController _descriptionEditingController =
@@ -42,30 +40,32 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
 
   @override
   Widget build(BuildContext context) {
+    _controller = Get.put(IbCreateQuestionController());
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'create_question'.tr,
-            style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
-          ),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  _controller.validQuestion();
-                },
-                icon: const Icon(Icons.check))
-          ],
-          backgroundColor: IbColors.lightBlue,
+      appBar: AppBar(
+        title: Text(
+          'create_question'.tr,
+          style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
         ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                _controller.validQuestion();
+              },
+              icon: const Icon(Icons.check))
+        ],
         backgroundColor: IbColors.lightBlue,
-        body: GestureDetector(
-          onTap: () => IbUtils.hideKeyboard(),
-          child: Scrollbar(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IbCard(
+      ),
+      backgroundColor: IbColors.lightBlue,
+      body: Scrollbar(
+        child: NestedScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return [
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 125,
+                  child: IbCard(
                     child: Padding(
                       padding: const EdgeInsets.all(8),
                       child: TextField(
@@ -87,7 +87,12 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                       ),
                     ),
                   ),
-                  IbCard(
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 100,
+                  child: IbCard(
                     child: Padding(
                       padding: const EdgeInsets.all(8),
                       child: TextField(
@@ -108,119 +113,130 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                       ),
                     ),
                   ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 10),
-                    decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.all(
-                            Radius.circular(IbConfig.kCardCornerRadius)),
-                        color: IbColors.white),
-                    child: TabBar(
-                      controller: _tabController,
-                      tabs: [
-                        Tab(
-                          text: 'mc'.tr,
-                        ),
-                        Tab(text: 'sc'.tr),
-                      ],
-                      labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                      indicatorPadding:
-                          const EdgeInsets.symmetric(horizontal: 32),
-                      unselectedLabelStyle:
-                          const TextStyle(fontWeight: FontWeight.bold),
-                      labelColor: Colors.black,
-                      unselectedLabelColor: IbColors.lightGrey,
-                      indicatorColor: IbColors.primaryColor,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 300,
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: [
-                        _mCTab(),
-                        _sCTab(),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+            ];
+          },
+          body: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: 64,
+                child: Container(
+                  margin: const EdgeInsets.only(top: 10),
+                  decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(
+                          Radius.circular(IbConfig.kCardCornerRadius)),
+                      color: IbColors.white),
+                  child: TabBar(
+                    controller: _tabController,
+                    tabs: [
+                      Tab(
+                        text: 'mc'.tr,
+                      ),
+                      Tab(text: 'sc'.tr),
+                    ],
+                    labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                    indicatorPadding:
+                        const EdgeInsets.symmetric(horizontal: 32),
+                    unselectedLabelStyle:
+                        const TextStyle(fontWeight: FontWeight.bold),
+                    labelColor: Colors.black,
+                    unselectedLabelColor: IbColors.lightGrey,
+                    indicatorColor: IbColors.primaryColor,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _mCTab(),
+                    _sCTab(),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _mCTab() {
     return Column(
-      mainAxisSize: MainAxisSize.min,
       children: [
-        InkWell(
-          onTap: () {
-            if (_controller.choiceList.length < IbConfig.kChoiceLimit) {
-              _showTextFiledBottomSheet('add_choice');
-            } else {
-              Get.showSnackbar(GetBar(
-                borderRadius: IbConfig.kCardCornerRadius,
-                margin: const EdgeInsets.all(8),
-                duration: const Duration(seconds: 3),
-                backgroundColor: IbColors.errorRed,
-                messageText: Text('choice_limit'.tr),
-              ));
-            }
-          },
-          child: Container(
-            margin: const EdgeInsets.all(8),
-            padding: const EdgeInsets.all(8),
-            height: 46,
-            decoration: BoxDecoration(
-                color: IbColors.white, borderRadius: BorderRadius.circular(8)),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'tap_to_add'.tr,
-                  style: const TextStyle(color: IbColors.lightGrey),
-                ),
-                const Icon(Icons.add_outlined),
-              ],
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              if (_controller.choiceList.length < IbConfig.kChoiceLimit) {
+                _showTextFiledBottomSheet('add_choice');
+              } else {
+                Get.showSnackbar(GetBar(
+                  borderRadius: IbConfig.kCardCornerRadius,
+                  margin: const EdgeInsets.all(8),
+                  duration: const Duration(seconds: 3),
+                  backgroundColor: IbColors.errorRed,
+                  messageText: Text('choice_limit'.tr),
+                ));
+              }
+            },
+            child: Container(
+              margin: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
+              height: 46,
+              decoration: BoxDecoration(
+                  color: IbColors.white,
+                  borderRadius: BorderRadius.circular(8)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'tap_to_add'.tr,
+                    style: const TextStyle(color: IbColors.lightGrey),
+                  ),
+                  const Icon(Icons.add_outlined),
+                ],
+              ),
             ),
           ),
         ),
         Obx(
-          () => Expanded(
-            child: ReorderableListView(
-              onReorder: (oldIndex, newIndex) {
-                print('$oldIndex to $newIndex');
-                _controller.swapIndex(oldIndex, newIndex);
-              },
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                for (final item in _controller.choiceList)
-                  Container(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    padding: const EdgeInsets.all(8),
-                    key: UniqueKey(),
-                    height: 46,
-                    decoration: BoxDecoration(
-                        color: IbColors.white,
-                        borderRadius: BorderRadius.circular(8)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(item),
-                        IconButton(
-                            onPressed: () {
-                              _controller.choiceList.remove(item);
-                            },
-                            icon: const Icon(
-                              Icons.delete_outlined,
-                              color: IbColors.errorRed,
-                            ))
-                      ],
-                    ),
-                  )
-              ],
-            ),
+          () => ReorderableListView(
+            onReorder: (oldIndex, newIndex) {
+              print('$oldIndex to $newIndex');
+              _controller.swapIndex(oldIndex, newIndex);
+            },
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              for (final item in _controller.choiceList)
+                Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.all(8),
+                  key: UniqueKey(),
+                  height: 46,
+                  decoration: BoxDecoration(
+                      color: IbColors.white,
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(item),
+                      IconButton(
+                          onPressed: () {
+                            _controller.choiceList.remove(item);
+                          },
+                          icon: const Icon(
+                            Icons.delete_outlined,
+                            color: IbColors.errorRed,
+                          ))
+                    ],
+                  ),
+                )
+            ],
           ),
         )
       ],
@@ -229,37 +245,41 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
 
   Widget _sCTab() {
     return Column(
-      mainAxisSize: MainAxisSize.min,
       children: [
-        InkWell(
-          onTap: () {
-            if (_controller.scaleChoiceList.length < IbConfig.kScChoiceLimit) {
-              _showTextFiledBottomSheet('add_endpoint');
-            } else {
-              Get.showSnackbar(GetBar(
-                borderRadius: IbConfig.kCardCornerRadius,
-                margin: const EdgeInsets.all(8),
-                duration: const Duration(seconds: 3),
-                backgroundColor: IbColors.errorRed,
-                messageText: Text('choice_limit_sc'.tr),
-              ));
-            }
-          },
-          child: Container(
-            margin: const EdgeInsets.all(8),
-            padding: const EdgeInsets.all(8),
-            height: 46,
-            decoration: BoxDecoration(
-                color: IbColors.white, borderRadius: BorderRadius.circular(8)),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'tap_to_add_sc'.tr,
-                  style: const TextStyle(color: IbColors.lightGrey),
-                ),
-                const Icon(Icons.add_outlined),
-              ],
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              if (_controller.scaleChoiceList.length <
+                  IbConfig.kScChoiceLimit) {
+                _showTextFiledBottomSheet('add_endpoint');
+              } else {
+                Get.showSnackbar(GetBar(
+                  borderRadius: IbConfig.kCardCornerRadius,
+                  margin: const EdgeInsets.all(8),
+                  duration: const Duration(seconds: 3),
+                  backgroundColor: IbColors.errorRed,
+                  messageText: Text('choice_limit_sc'.tr),
+                ));
+              }
+            },
+            child: Container(
+              margin: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
+              height: 46,
+              decoration: BoxDecoration(
+                  color: IbColors.white,
+                  borderRadius: BorderRadius.circular(8)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'tap_to_add_sc'.tr,
+                    style: const TextStyle(color: IbColors.lightGrey),
+                  ),
+                  const Icon(Icons.add_outlined),
+                ],
+              ),
             ),
           ),
         ),
@@ -271,6 +291,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                 _controller.swapIndex(oldIndex, newIndex);
               },
               physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
               children: [
                 for (final item in _controller.scaleChoiceList)
                   Container(

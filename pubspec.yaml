@@ -45,6 +45,7 @@ dependencies:
   json_annotation: ^4.0.1
   liquid_swipe: ^2.1.0
   lottie: ^1.0.1
+  pull_to_refresh: ^2.0.0
   sign_in_with_apple: ^3.0.0
   syncfusion_flutter_datepicker: ^19.2.44
   uuid: ^3.0.4

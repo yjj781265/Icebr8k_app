@@ -32,7 +32,6 @@ class IbQuestionDbService {
 
   Future<QuerySnapshot<Map<String, dynamic>>> queryQuestions(
       {required int limit, DocumentSnapshot? lastDoc}) async {
-    final List<IbQuestion> _list = [];
     QuerySnapshot<Map<String, dynamic>> _snapshot;
     if (lastDoc != null) {
       _snapshot = await _collectionRef
@@ -62,6 +61,13 @@ class IbQuestionDbService {
     }
     print("answered question list size ${_list.length}");
     return _list;
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> listenToAnsweredQuestionsChange(
+      String uid) {
+    final _snapshots =
+        _db.collectionGroup('Answers').where('uid', isEqualTo: uid).snapshots();
+    return _snapshots;
   }
 
   Future<List<IbAnswer>> queryUserAnswers(String uid) async {

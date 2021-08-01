@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/frontend/ib_strings.dart';
 
 class IbUserDbService {
   static final _ibUserService = IbUserDbService._();
@@ -111,14 +111,15 @@ class IbUserDbService {
     //my sub collection
     await _collectionRef.doc(myUid).collection('Friends').doc(friendUid).set({
       'friendUid': friendUid,
-      'status': IbStrings.kFriendshipStatusRequestSent,
+      'status': IbFriend.kFriendshipStatusRequestSent,
+      'requestMsg': requestMsg.trim(),
       'timestampInMs': timestamp
     }, SetOptions(merge: true));
 
     //my friends sub collection
     await _collectionRef.doc(friendUid).collection('Friends').doc(myUid).set({
       'friendUid': myUid,
-      'status': IbStrings.kFriendshipStatusPending,
+      'status': IbFriend.kFriendshipStatusPending,
       'requestMsg': requestMsg.trim(),
       'timestampInMs': timestamp
     }, SetOptions(merge: true));
@@ -133,5 +134,60 @@ class IbUserDbService {
     }
 
     return IbUser.fromJson(snapshot.docs.first.data());
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> listenToFriendRequest(
+      String uid) {
+    return _collectionRef
+        .doc(uid)
+        .collection('Friends')
+        .where('status', isEqualTo: IbFriend.kFriendshipStatusPending)
+        .orderBy('timestampInMs', descending: true)
+        .snapshots(includeMetadataChanges: true);
+  }
+
+  Future<void> acceptFriendRequest(
+      {required String friendUid, required String myUid}) async {
+    await _collectionRef.doc(myUid).collection('Friends').doc(friendUid).set({
+      'status': IbFriend.kFriendshipStatusAccepted,
+      'timestampInMs': DateTime.now().millisecondsSinceEpoch
+    }, SetOptions(merge: true));
+    await _collectionRef.doc(friendUid).collection('Friends').doc(myUid).set({
+      'status': IbFriend.kFriendshipStatusAccepted,
+      'timestampInMs': DateTime.now().millisecondsSinceEpoch
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> rejectFriendRequest(
+      {required String friendUid, required String myUid}) async {
+    await _collectionRef
+        .doc(myUid)
+        .collection('Friends')
+        .doc(friendUid)
+        .delete();
+
+    await _collectionRef
+        .doc(friendUid)
+        .collection('Friends')
+        .doc(myUid)
+        .delete();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> listenToFriendList(String uid) {
+    return _collectionRef
+        .doc(uid)
+        .collection('Friends')
+        .where('status', isEqualTo: IbFriend.kFriendshipStatusAccepted)
+        .orderBy('timestampInMs', descending: true)
+        .snapshots(includeMetadataChanges: true);
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> queryFriendList(String uid) {
+    return _collectionRef
+        .doc(uid)
+        .collection('Friends')
+        .where('status', isEqualTo: IbFriend.kFriendshipStatusAccepted)
+        .orderBy('timestampInMs', descending: true)
+        .get();
   }
 }
