@@ -16,7 +16,8 @@ class CreateQuestionPage extends StatefulWidget {
 
 class _CreateQuestionPageState extends State<CreateQuestionPage>
     with SingleTickerProviderStateMixin {
-  late IbCreateQuestionController _controller;
+  final IbCreateQuestionController _controller =
+      Get.put(IbCreateQuestionController());
   final TextEditingController _questionEditingController =
       TextEditingController();
   final TextEditingController _descriptionEditingController =
@@ -40,7 +41,6 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
 
   @override
   Widget build(BuildContext context) {
-    _controller = Get.put(IbCreateQuestionController());
     return Scaffold(
       appBar: AppBar(
         title: Text(

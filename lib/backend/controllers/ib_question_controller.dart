@@ -9,12 +9,10 @@ class IbQuestionController extends GetxController {
   List<String> _answeredQuestionIds = [];
   late DocumentSnapshot? lastDocSnapShot;
   final isLoading = true.obs;
-  final id = 'tCH8AIqRxWM0eEQcmlnniUIfo6F3';
 
   @override
   Future<void> onInit() async {
     await loadQuestions();
-    isLoading.value = false;
     super.onInit();
   }
 

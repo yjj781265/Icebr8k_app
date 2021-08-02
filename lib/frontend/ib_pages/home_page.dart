@@ -38,9 +38,7 @@ class HomePage extends StatelessWidget {
         }
       });
     });
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(statusBarColor: IbColors.lightBlue),
-    );
+
     final List<List<Widget>> _actionsList = [
       [
         IconButton(
@@ -66,53 +64,61 @@ class HomePage extends StatelessWidget {
       List<Widget>.generate(1, (index) => const SizedBox()),
     ];
     return Obx(
-      () => Scaffold(
-          appBar: AppBar(
-            elevation: 0,
-            titleSpacing: 0,
-            backgroundColor: IbColors.lightBlue,
-            automaticallyImplyLeading: false,
-            actions: _actionsList[_homeController.currentIndex.value],
-            leading: IconButton(
-                icon: IbAnimatedIcon(
-                    key: _iconKey, icon: AnimatedIcons.menu_close),
-                onPressed: () {
-                  if (_drawerController.stateNotifier == null) {
-                    return;
-                  }
-                  if (_drawerController.stateNotifier!.value ==
-                      DrawerState.open) {
-                    _drawerController.close!();
-                    _iconKey.currentState!.reverse();
-                  } else {
-                    _drawerController.open!();
-                    _iconKey.currentState!.forward();
-                  }
-                }),
-            title: Obx(
-              () => Text(
-                _homeController
-                    .tabTitleList[_homeController.currentIndex.value],
-                style: const TextStyle(
-                    fontSize: IbConfig.kPageTitleSize,
-                    fontWeight: FontWeight.bold),
+      () => AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(statusBarColor: IbColors.lightBlue),
+        child: Scaffold(
+            appBar: AppBar(
+              elevation: 0,
+              titleSpacing: 0,
+              backwardsCompatibility: false,
+              brightness: Brightness.light,
+              systemOverlayStyle: const SystemUiOverlayStyle(
+                  statusBarColor: IbColors.lightBlue),
+              backgroundColor: IbColors.lightBlue,
+              automaticallyImplyLeading: false,
+              actions: _actionsList[_homeController.currentIndex.value],
+              leading: IconButton(
+                  icon: IbAnimatedIcon(
+                      key: _iconKey, icon: AnimatedIcons.menu_close),
+                  onPressed: () {
+                    if (_drawerController.stateNotifier == null) {
+                      return;
+                    }
+                    if (_drawerController.stateNotifier!.value ==
+                        DrawerState.open) {
+                      _drawerController.close!();
+                      _iconKey.currentState!.reverse();
+                    } else {
+                      _drawerController.open!();
+                      _iconKey.currentState!.forward();
+                    }
+                  }),
+              title: Obx(
+                () => Text(
+                  _homeController
+                      .tabTitleList[_homeController.currentIndex.value],
+                  style: const TextStyle(
+                      fontSize: IbConfig.kPageTitleSize,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
             ),
-          ),
-          backgroundColor: IbColors.lightBlue,
-          body: ZoomDrawer(
-            slideWidth: 200,
-            controller: _drawerController,
-            style: DrawerStyle.Style1,
-            menuScreen: MenuPage(),
-            mainScreen: getBody(),
-            showShadow: true,
-            angle: 0,
             backgroundColor: IbColors.lightBlue,
-            openCurve: Curves.linear,
-            closeCurve: Curves.linear,
-          ),
-          bottomNavigationBar: _buildBottomBar()),
+            body: ZoomDrawer(
+              slideWidth: 200,
+              controller: _drawerController,
+              style: DrawerStyle.Style1,
+              menuScreen: MenuPage(),
+              mainScreen: getBody(),
+              showShadow: true,
+              angle: 0,
+              backgroundColor: IbColors.lightBlue,
+              openCurve: Curves.linear,
+              closeCurve: Curves.linear,
+            ),
+            bottomNavigationBar: _buildBottomBar()),
+      ),
     );
   }
 
