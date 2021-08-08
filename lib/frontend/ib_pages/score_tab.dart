@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/auth_controller.dart';
+import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_list_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_request_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
@@ -12,14 +15,14 @@ import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-class ScorePage extends StatefulWidget {
-  const ScorePage({Key? key}) : super(key: key);
+class ScoreTab extends StatefulWidget {
+  const ScoreTab({Key? key}) : super(key: key);
 
   @override
-  _ScorePageState createState() => _ScorePageState();
+  _ScoreTabState createState() => _ScoreTabState();
 }
 
-class _ScorePageState extends State<ScorePage>
+class _ScoreTabState extends State<ScoreTab>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -164,7 +167,12 @@ class FriendItemView extends StatelessWidget {
             Icons.message_outlined,
             color: IbColors.accentColor,
           ),
-          onPressed: () {},
+          onPressed: () {
+            final String mUid = Get.find<AuthController>().firebaseUser!.uid;
+            final List<String> memberUids = [mUid, friendListItem.uid];
+            Get.to(() => ChatPage(Get.put(ChatPageController(memberUids),
+                tag: memberUids.toString())));
+          },
         ),
       ),
     );

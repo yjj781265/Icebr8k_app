@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_list_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_request_controller.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_controller.dart';
+import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_page.dart';
 import 'package:icebr8k/frontend/ib_pages/ib_user_search_page.dart';
 import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
-import 'package:icebr8k/frontend/ib_pages/question_page.dart';
-import 'package:icebr8k/frontend/ib_pages/score_page.dart';
+import 'package:icebr8k/frontend/ib_pages/question_tab.dart';
+import 'package:icebr8k/frontend/ib_pages/score_tab.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_icon.dart';
 
@@ -21,8 +23,8 @@ class HomePage extends StatelessWidget {
   HomePage({Key? key}) : super(key: key);
   final HomeController _homeController = Get.put(HomeController());
   final _drawerController = ZoomDrawerController();
-  final GlobalKey<IbAnimatedIconState> _iconKey = GlobalKey();
 
+  final GlobalKey<IbAnimatedIconState> _iconKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
     initGetXControllers();
@@ -41,11 +43,17 @@ class HomePage extends StatelessWidget {
 
     final List<List<Widget>> _actionsList = [
       [
-        IconButton(
-          icon: const Icon(Icons.refresh_outlined),
-          onPressed: () async {
-            await Get.find<IbQuestionController>().loadQuestions();
+        GestureDetector(
+          onLongPress: () {
+            IbQuestionDbService().eraseAllAnsweredQuestions(
+                Get.find<AuthController>().firebaseUser!.uid);
           },
+          child: IconButton(
+            icon: const Icon(Icons.refresh_outlined),
+            onPressed: () async {
+              await Get.find<IbQuestionController>().refreshQuestions();
+            },
+          ),
         ),
         IconButton(
             onPressed: () {
@@ -65,12 +73,14 @@ class HomePage extends StatelessWidget {
     ];
     return Obx(
       () => AnnotatedRegion<SystemUiOverlayStyle>(
-        value: const SystemUiOverlayStyle(statusBarColor: IbColors.lightBlue),
+        value: const SystemUiOverlayStyle(
+          statusBarColor: IbColors.lightBlue,
+        ),
         child: Scaffold(
             appBar: AppBar(
               elevation: 0,
               titleSpacing: 0,
-              backwardsCompatibility: false,
+              backwardsCompatibility: true,
               brightness: Brightness.light,
               systemOverlayStyle: const SystemUiOverlayStyle(
                   statusBarColor: IbColors.lightBlue),
@@ -124,16 +134,12 @@ class HomePage extends StatelessWidget {
 
   Widget getBody() {
     final List<Widget> pages = [
-      QuestionPage(),
+      QuestionTab(),
       Container(
-        alignment: Alignment.center,
-        color: IbColors.lightBlue,
-        child: const Text(
-          "Chat",
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-        ),
-      ),
-      const ScorePage(),
+          alignment: Alignment.center,
+          color: IbColors.lightBlue,
+          child: const Text('I do not know')),
+      const ScoreTab(),
       Container(
         alignment: Alignment.center,
         color: IbColors.lightBlue,

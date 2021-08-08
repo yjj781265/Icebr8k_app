@@ -26,9 +26,9 @@ class IbQuestionItemController extends GetxController {
   final width = 350.0.obs;
   final currentState = CardState.init.obs;
   final resultMap = <String, double>{};
-  bool isSample = false;
+  final bool isSample;
 
-  IbQuestionItemController(this.ibQuestion);
+  IbQuestionItemController({required this.ibQuestion, required this.isSample});
 
   @override
   Future<void> onInit() async {

@@ -7,50 +7,45 @@ import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 class IbQuestionController extends GetxController {
   final ibQuestions = <IbQuestion>[].obs;
   List<String> _answeredQuestionIds = [];
-  late DocumentSnapshot? lastDocSnapShot;
+  DocumentSnapshot? lastDocSnapShot;
   final isLoading = true.obs;
 
   @override
   Future<void> onInit() async {
-    await loadQuestions();
+    await loadFirst8Q();
     super.onInit();
   }
 
-  Future<void> loadQuestions() async {
-    isLoading.value = true;
+  Future<void> loadFirst8Q() async {
+    final int total = await IbQuestionDbService().queryTotalQuestionSize();
     _answeredQuestionIds = await IbQuestionDbService()
         .queryAnsweredQuestions(Get.find<AuthController>().firebaseUser!.uid);
-    final int loopCount = (_answeredQuestionIds.length.toDouble() / 10).ceil();
+    print('there are $total questions in DB, '
+        'user has answered ${_answeredQuestionIds.length} questions');
 
-    if (loopCount == 0) {
-      _queryQuestionsFromDB([]);
+    if (total == _answeredQuestionIds.length) {
+      isLoading.value = false;
       return;
     }
-
-    int counter = 0;
-    print('total loop count $loopCount');
-    while (counter != loopCount) {
-      if (counter == (loopCount - 1)) {
-        print('last loop $ibQuestions');
-        final List<String> ids = _answeredQuestionIds.sublist(
-            counter * 10, _answeredQuestionIds.length);
-        _queryQuestionsFromDB(ids);
-        counter++;
-      } else {
-        final start = counter * 10;
-        final end = start + 10;
-        final List<String> ids = _answeredQuestionIds.sublist(start, end);
-        _queryQuestionsFromDB(ids);
-        counter++;
-        print(ibQuestions);
-      }
+    await _queryQuestionsFromDb();
+    final int targetSize = (total - _answeredQuestionIds.length) > 8
+        ? 8
+        : total - _answeredQuestionIds.length;
+    if (ibQuestions.length < targetSize) {
+      loadFirst8Q();
     }
+
     isLoading.value = false;
+    print('init question size ${ibQuestions.length}');
   }
 
-  Future<void> _queryQuestionsFromDB(List<String> answeredQuestionIds) async {
+  Future<void> loadQuestions() async {
+    await _queryQuestionsFromDb();
+  }
+
+  Future<void> _queryQuestionsFromDb() async {
     final snapshot = await IbQuestionDbService()
-        .queryQuestions(limit: 8, answeredQuestionIds: answeredQuestionIds);
+        .queryQuestions(limit: 3, lastDoc: lastDocSnapShot);
 
     if (snapshot.docs.isNotEmpty) {
       lastDocSnapShot = snapshot.docs[snapshot.size - 1];
@@ -61,8 +56,14 @@ class IbQuestionController extends GetxController {
                 !_answeredQuestionIds.contains(ibQuestion.id),
             ibQuestion);
       }
-    } else {
-      lastDocSnapShot = null;
     }
+    print('ibQuestions size ${ibQuestions.length}');
+  }
+
+  Future<void> refreshQuestions() async {
+    isLoading.value = true;
+    lastDocSnapShot = null;
+    ibQuestions.clear();
+    await loadFirst8Q();
   }
 }

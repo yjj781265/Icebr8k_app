@@ -203,40 +203,42 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
           ),
         ),
         Obx(
-          () => ReorderableListView(
-            onReorder: (oldIndex, newIndex) {
-              print('$oldIndex to $newIndex');
-              _controller.swapIndex(oldIndex, newIndex);
-            },
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            children: [
-              for (final item in _controller.choiceList)
-                Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  padding: const EdgeInsets.all(8),
-                  key: UniqueKey(),
-                  height: 46,
-                  decoration: BoxDecoration(
-                      color: IbColors.white,
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(item),
-                      IconButton(
-                          onPressed: () {
-                            _controller.choiceList.remove(item);
-                          },
-                          icon: const Icon(
-                            Icons.delete_outlined,
-                            color: IbColors.errorRed,
-                          ))
-                    ],
-                  ),
-                )
-            ],
+          () => Expanded(
+            child: ReorderableListView(
+              onReorder: (oldIndex, newIndex) {
+                print('$oldIndex to $newIndex');
+                _controller.swapIndex(oldIndex, newIndex);
+              },
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                for (final item in _controller.choiceList)
+                  Container(
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.all(8),
+                    key: UniqueKey(),
+                    height: 46,
+                    decoration: BoxDecoration(
+                        color: IbColors.white,
+                        borderRadius: BorderRadius.circular(8)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(item),
+                        IconButton(
+                            onPressed: () {
+                              _controller.choiceList.remove(item);
+                            },
+                            icon: const Icon(
+                              Icons.delete_outlined,
+                              color: IbColors.errorRed,
+                            ))
+                      ],
+                    ),
+                  )
+              ],
+            ),
           ),
         )
       ],

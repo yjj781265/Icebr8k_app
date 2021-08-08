@@ -26,13 +26,13 @@ class ReviewQuestionPage extends StatelessWidget {
   Widget _handleQuestionType() {
     if (question.questionType == IbQuestion.kMultipleChoice) {
       return IbMcQuestionCard(
-        Get.put(IbQuestionItemController(question), tag: question.id),
-        isSample: true,
+        Get.put(IbQuestionItemController(ibQuestion: question, isSample: true),
+            tag: question.id),
       );
     }
     return IbScQuestionCard(
-      Get.put(IbQuestionItemController(question), tag: question.id),
-      isSample: true,
+      Get.put(IbQuestionItemController(ibQuestion: question, isSample: true),
+          tag: question.id),
     );
   }
 }

@@ -30,31 +30,23 @@ class IbQuestionDbService {
     return null;
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> queryQuestions(
-      {required int limit,
-      DocumentSnapshot? lastDoc,
-      required List<String> answeredQuestionIds}) async {
-    QuerySnapshot<Map<String, dynamic>> _snapshot;
-    if (answeredQuestionIds.isEmpty) {
-      return _collectionRef.orderBy('id').limit(limit).get();
+  Future<QuerySnapshot<Map<String, dynamic>>> queryQuestions({
+    required int limit,
+    DocumentSnapshot? lastDoc,
+  }) {
+    if (lastDoc == null) {
+      return _collectionRef.orderBy('createdTimeInMs').limit(limit).get();
     }
+    return _collectionRef
+        .orderBy('createdTimeInMs')
+        .startAfterDocument(lastDoc)
+        .limit(limit)
+        .get();
+  }
 
-    if (lastDoc != null) {
-      _snapshot = await _collectionRef
-          .orderBy('id')
-          .where('id', whereNotIn: answeredQuestionIds)
-          .startAfterDocument(lastDoc)
-          .limit(limit)
-          .get();
-    } else {
-      _snapshot = await _collectionRef
-          .orderBy('id')
-          .limit(limit)
-          .where('id', whereNotIn: answeredQuestionIds)
-          .get();
-    }
-
-    return _snapshot;
+  Future<int> queryTotalQuestionSize() async {
+    final _snapshot = await _collectionRef.get();
+    return _snapshot.size;
   }
 
   Future<List<String>> queryAnsweredQuestions(String uid) async {
@@ -126,5 +118,19 @@ class IbQuestionDbService {
         .where('answer', isEqualTo: answer)
         .get();
     return _snapshot.size;
+  }
+
+  Future<void> eraseAllAnsweredQuestions(String uid) async {
+    print('eraseAllAnsweredQuestions');
+    final _snapshot =
+        await _db.collectionGroup('Answers').where('uid', isEqualTo: uid).get();
+    for (final doc in _snapshot.docs) {
+      final questionId = doc.data()['questionId'].toString();
+      await _collectionRef
+          .doc(questionId)
+          .collection('Answers')
+          .doc(uid)
+          .delete();
+    }
   }
 }

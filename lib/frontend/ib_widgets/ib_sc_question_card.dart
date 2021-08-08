@@ -1,10 +1,10 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:page_flip_builder/page_flip_builder.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
@@ -14,9 +14,7 @@ import 'ib_elevated_button.dart';
 
 class IbScQuestionCard extends StatefulWidget {
   final IbQuestionItemController _controller;
-  final bool isSample;
-  const IbScQuestionCard(this._controller, {Key? key, this.isSample = false})
-      : super(key: key);
+  const IbScQuestionCard(this._controller, {Key? key}) : super(key: key);
 
   @override
   _IbScQuestionCardState createState() => _IbScQuestionCardState();
@@ -24,18 +22,20 @@ class IbScQuestionCard extends StatefulWidget {
 
 class _IbScQuestionCardState extends State<IbScQuestionCard>
     with AutomaticKeepAliveClientMixin {
-  final GlobalKey<FlipCardState> cardKey = GlobalKey<FlipCardState>();
+  final GlobalKey<PageFlipBuilderState> cardKey =
+      GlobalKey<PageFlipBuilderState>();
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    widget._controller.isSample = widget.isSample;
     return Center(
-      child: FlipCard(
-          flipOnTouch: false,
-          key: cardKey,
-          front: IbCard(
-              child: Padding(
+      child: PageFlipBuilder(
+        nonInteractiveAnimationDuration:
+            const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
+        interactiveFlipEnabled: false,
+        key: cardKey,
+        frontBuilder: (_) => IbCard(
+          child: Padding(
             padding:
                 const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 8),
             child: Column(
@@ -101,8 +101,12 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                 _handleButtons()
               ],
             ),
-          )),
-          back: _cardBackSide()),
+          ),
+        ),
+        backBuilder: (BuildContext context) {
+          return _cardBackSide();
+        },
+      ),
     );
   }
 
@@ -125,7 +129,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
           break;
       }
 
-      if (!widget.isSample) {
+      if (!widget._controller.isSample) {
         return Center(
           child: IbElevatedButton(
               textTrKey: widget._controller.voteBtnTrKey.value,
@@ -135,7 +139,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                   : () async {
                       await widget._controller.onVote();
                       setState(() {
-                        cardKey.currentState!.toggleCard();
+                        cardKey.currentState!.flip();
                       });
                     }),
         );
@@ -163,12 +167,12 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
             Expanded(
               child: IconButton(
                   onPressed: () {
-                    cardKey.currentState!.toggleCard();
+                    cardKey.currentState!.flip();
                   },
                   icon: const Icon(Icons.arrow_back_ios_outlined)),
             ),
             Expanded(
-              flex: 9,
+              flex: 8,
               child: PieChart(
                 PieChartData(
                   sectionsSpace: 2,
@@ -186,22 +190,17 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
 
   List<PieChartSectionData> _getSectionData() {
     final List<PieChartSectionData> _pieChartDataList = [];
-    Color lastRandomColor = IbUtils.getRandomColor();
     for (final String choice in widget._controller.resultMap.keys) {
       final int percentage =
           ((widget._controller.resultMap[choice] ?? 0) * 100).toInt();
-      Color randomColor = IbUtils.getRandomColor();
-      while (randomColor == lastRandomColor) {
-        randomColor = IbUtils.getRandomColor();
-      }
-      lastRandomColor = randomColor;
-
+      final Color color =
+          IbUtils.getRandomColor(widget._controller.resultMap[choice] ?? 0);
       final PieChartSectionData data = PieChartSectionData(
           badgeWidget: Container(
             width: 32.0,
             height: 32.0,
             decoration: BoxDecoration(
-              border: Border.all(color: randomColor),
+              border: Border.all(color: color),
               color: IbColors.lightBlue,
               shape: BoxShape.circle,
               boxShadow: [
@@ -220,7 +219,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                   fontWeight: FontWeight.bold, color: IbColors.primaryColor),
             )),
           ),
-          color: randomColor,
+          color: color,
           badgePositionPercentageOffset: 0.95,
           titlePositionPercentageOffset: 0.5,
           value: percentage.toDouble(),

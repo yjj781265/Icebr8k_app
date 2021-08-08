@@ -17,7 +17,7 @@ class IbUserAvatar extends StatelessWidget {
     if (avatarUrl.isEmpty) {
       return CircleAvatar(
           radius: radius,
-          foregroundImage: const AssetImage('assets/icons/logo_ios.png'));
+          backgroundImage: const AssetImage('assets/icons/logo_ios.png'));
     }
     return CircleAvatar(
       radius: radius,

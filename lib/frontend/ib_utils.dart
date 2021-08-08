@@ -81,19 +81,31 @@ class IbUtils {
     return '${diffDt.inDays} days ago';
   }
 
-  static Color getRandomColor() {
-    final List<Color> colors = [
-      Colors.lightBlue,
-      Colors.greenAccent,
-      Colors.redAccent,
-      Colors.lightBlueAccent,
-      Colors.orangeAccent,
-      IbColors.primaryColor,
-      IbColors.accentColor,
-      IbColors.darkPrimaryColor,
-    ];
-    colors.shuffle();
-    return colors.first;
+  static Color getRandomColor(double value) {
+    if (value > 0 && value <= 0.2) {
+      return const Color(0xFFFF0000);
+    }
+
+    if (value > 0.2 && value <= 0.4) {
+      return const Color(0xFFFF6600);
+    }
+
+    if (value > 0.4 && value <= 0.6) {
+      return const Color(0xFFFFB700);
+    }
+
+    if (value > 0.6 && value <= 0.7) {
+      return const Color(0xFFB1E423);
+    }
+
+    if (value > 0.8 && value <= 0.9) {
+      return const Color(0xFF23E480);
+    }
+
+    if (value > 0.9 && value <= 1.0) {
+      return IbColors.accentColor;
+    }
+    return IbColors.errorRed;
   }
 
   static void showSimpleSnackBar(
@@ -140,6 +152,10 @@ class IbUtils {
 
     print('commonQuestionSize is $commonQuestionSize');
     print('commonAnswerSize is $commonAnswerSize');
+
+    if (commonQuestionSize == 0) {
+      return 0;
+    }
 
     final _score = commonAnswerSize / commonQuestionSize.toDouble();
     print('score is $_score');

@@ -12,13 +12,10 @@ import 'ib_user_avatar.dart';
 class IbMcQuestionCard extends StatelessWidget {
   final IbQuestionItemController _controller;
   final _scrollController = ScrollController();
-  final bool isSample;
-  IbMcQuestionCard(this._controller, {this.isSample = false, Key? key})
-      : super(key: key);
+  IbMcQuestionCard(this._controller, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    _controller.isSample = isSample;
     return Center(
       child: LimitedBox(
         maxHeight: Get.height * 0.7,
