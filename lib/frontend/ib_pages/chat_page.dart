@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
@@ -42,6 +42,10 @@ class ChatPage extends StatelessWidget {
                   key: _controller.listKey,
                   itemBuilder: (BuildContext context, int index,
                       Animation<double> animation) {
+                    if (index == _controller.messages.length - 2) {
+                      _controller.loadMoreMessages();
+                    }
+
                     return buildItem(_controller.messages[index], animation);
                   },
                   initialItemCount: _controller.messages.length,
@@ -69,20 +73,22 @@ class ChatPage extends StatelessWidget {
                           hintStyle: const TextStyle(color: IbColors.lightGrey),
                           hintText: 'Type something creative',
                           border: InputBorder.none,
-                          suffixIcon: IconButton(
-                            icon: const Icon(
-                              Icons.send_outlined,
-                              color: IbColors.primaryColor,
-                            ),
-                            onPressed: () async {
-                              if (_txtController.text.trim().isEmpty) {
-                                return;
-                              }
-                              await _controller
-                                  .uploadMessage(_txtController.text);
-                              _txtController.clear();
-                            },
-                          )),
+                          suffixIcon: _controller.isSending.isTrue
+                              ? const CircularProgressIndicator()
+                              : IconButton(
+                                  icon: const Icon(
+                                    Icons.send_outlined,
+                                    color: IbColors.primaryColor,
+                                  ),
+                                  onPressed: () async {
+                                    if (_txtController.text.trim().isEmpty) {
+                                      return;
+                                    }
+                                    await _controller
+                                        .uploadMessage(_txtController.text);
+                                    _txtController.clear();
+                                  },
+                                )),
                     ),
                   ),
                 ),
@@ -93,31 +99,23 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget buildItem(ChatMessageItem item, Animation<double> animation) {
-    final String mUid = Get.find<AuthController>().firebaseUser!.uid;
-    final bool isMe = item.message.senderUid == mUid;
-
     return SlideTransition(
       position: Tween<Offset>(
         end: Offset.zero,
-        begin: isMe ? const Offset(1.5, 0) : const Offset(-1.5, 0),
+        begin: item.isMe ? const Offset(1.5, 0) : const Offset(-1.5, 0),
       ).animate(
           CurvedAnimation(parent: animation, curve: Curves.linearToEaseOut)),
-      child: isMe
-          ? MyMessageItemView(item.message.content)
-          : MessageItemView(
-              text: item.message.content,
-              user: _controller.ibUserMap[item.message.senderUid],
-            ),
+      child: item.isMe ? MyMessageItemView(item) : MessageItemView(item),
     );
   }
 }
 
 class MyMessageItemView extends StatelessWidget {
   const MyMessageItemView(
-    this.text, {
+    this.item, {
     Key? key,
   }) : super(key: key);
-  final String text;
+  final ChatMessageItem item;
 
   @override
   Widget build(BuildContext context) {
@@ -128,42 +126,70 @@ class MyMessageItemView extends StatelessWidget {
         children: [
           LimitedBox(
             maxWidth: Get.width * 0.8,
-            child: Container(
-              decoration: const BoxDecoration(
-                color: IbColors.primaryColor,
-                borderRadius: BorderRadius.all(
-                    Radius.circular(IbConfig.kTextBoxCornerRadius)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  text,
-                  style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  decoration: const BoxDecoration(
+                    color: IbColors.primaryColor,
+                    borderRadius: BorderRadius.all(
+                        Radius.circular(IbConfig.kTextBoxCornerRadius)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      item.message.content,
+                      style: const TextStyle(
+                          fontSize: IbConfig.kChatMessagesTextSize),
+                    ),
+                  ),
                 ),
-              ),
+                handleSeenIndicator()
+              ],
             ),
           )
         ],
       ),
     );
   }
+
+  Widget handleSeenIndicator() {
+    if (!item.showReadIndicator) {
+      return const SizedBox();
+    }
+
+    final List<Widget> widgets = [];
+    for (final String uid in item.message.readUids) {
+      if (uid != IbUtils.getCurrentUid()) {
+        widgets.add(Padding(
+          padding: const EdgeInsets.all(2.0),
+          child: IbUserAvatar(
+            avatarUrl: item.controller.ibUserMap[uid]!.avatarUrl,
+            radius: 6,
+          ),
+        ));
+      }
+    }
+    return Wrap(
+      children: widgets,
+    );
+  }
 }
 
 class MessageItemView extends StatelessWidget {
-  final String text;
-  final IbUser? user;
-  const MessageItemView({required this.text, required this.user, Key? key})
-      : super(key: key);
+  final ChatMessageItem item;
+  const MessageItemView(this.item, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final IbUser? user = item.controller.ibUserMap[item.message.senderUid];
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
         children: [
           IbUserAvatar(
             radius: 16,
-            avatarUrl: user == null ? '' : user!.avatarUrl,
+            avatarUrl: user == null ? '' : user.avatarUrl,
           ),
           const SizedBox(
             width: 8,
@@ -179,8 +205,9 @@ class MessageItemView extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  text,
-                  style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                  item.message.content,
+                  style:
+                      const TextStyle(fontSize: IbConfig.kChatMessagesTextSize),
                 ),
               ),
             ),

@@ -20,8 +20,12 @@ class ChatPageController extends GetxController {
   late StreamSubscription _messageSub;
   late String chatRoomId;
   final isLoading = true.obs;
+  final isSending = false.obs;
+  bool isInit = true;
+  late bool isGroupChat;
   final listKey = GlobalKey<AnimatedListState>();
   final scrollController = ScrollController();
+  DocumentSnapshot<Map<String, dynamic>>? lastDocumentSnapshot;
 
   ChatPageController(this.memberUids);
 
@@ -29,36 +33,45 @@ class ChatPageController extends GetxController {
   Future<void> onInit() async {
     await initUserMap();
     isLoading.value = false;
+    isGroupChat = memberUids.length > 2;
     chatRoomId = await IbChatDbService().getChatRoomId(memberUids);
-    _messageSub =
-        IbChatDbService().listenToMessageChanges(chatRoomId).listen((event) {
+    _messageSub = IbChatDbService()
+        .listenToMessageChanges(chatRoomId)
+        .listen((event) async {
+      if (isInit && event.docs.isNotEmpty) {
+        lastDocumentSnapshot = event.docs.first;
+        isInit = false;
+      }
+
       for (final docChange in event.docChanges) {
         if (docChange.type == DocumentChangeType.added) {
           print('added');
-          final ChatMessageItem chatMessageItem =
-              ChatMessageItem(IbMessage.fromJson(docChange.doc.data()!));
-
+          final ChatMessageItem chatMessageItem = ChatMessageItem(
+              message: IbMessage.fromJson(docChange.doc.data()!),
+              controller: this);
+          await chatMessageItem.updateReadUidArray();
           if (!messages.contains(chatMessageItem)) {
             messages.insert(0, chatMessageItem);
+            chatMessageItem.updateIndicator();
             if (listKey.currentState != null) {
               listKey.currentState!.insertItem(0,
                   duration: const Duration(
                       milliseconds: IbConfig.kEventTriggerDelayInMillis));
-              /*scrollController.animateTo(0,
-                  duration: const Duration(
-                      milliseconds: IbConfig.kEventTriggerDelayInMillis),
-                  curve: Curves.bounceOut);*/
               scrollController.jumpTo(0);
             }
           }
         }
 
         if (docChange.type == DocumentChangeType.modified) {
-          final ChatMessageItem chatMessageItem =
-              ChatMessageItem(IbMessage.fromJson(docChange.doc.data()!));
+          final ChatMessageItem chatMessageItem = ChatMessageItem(
+              message: IbMessage.fromJson(docChange.doc.data()!),
+              controller: this);
+          await chatMessageItem.updateReadUidArray();
+          final index = messages.indexOf(chatMessageItem);
 
           if (messages.contains(chatMessageItem)) {
-            messages[messages.indexOf(chatMessageItem)] = chatMessageItem;
+            messages[index] = chatMessageItem;
+            chatMessageItem.updateIndicator();
             print('modified');
           }
         }
@@ -72,6 +85,7 @@ class ChatPageController extends GetxController {
   }
 
   Future<void> uploadMessage(String text) async {
+    isSending.value = true;
     final String mUid = Get.find<AuthController>().firebaseUser!.uid;
     final IbMessage ibMessage = IbMessage(
         messageId: IbUtils.getUniqueName(),
@@ -83,9 +97,11 @@ class ChatPageController extends GetxController {
         chatRoomId: chatRoomId);
     if (messages.isEmpty) {
       await IbChatDbService().uploadMessage(ibMessage, memberUids: memberUids);
+      isSending.value = false;
       return;
     }
     await IbChatDbService().uploadMessage(ibMessage);
+    isSending.value = false;
   }
 
   Future<void> initUserMap() async {
@@ -102,6 +118,39 @@ class ChatPageController extends GetxController {
     }
   }
 
+  Future<void> loadMoreMessages() async {
+    if (messages.length < IbConfig.kInitChatMessagesLoadSize) {
+      return;
+    }
+
+    if (lastDocumentSnapshot != null) {
+      final _snapshot = await IbChatDbService().queryMessages(
+          chatRoomId: chatRoomId, snapshot: lastDocumentSnapshot!);
+      if (_snapshot.docs.isEmpty) {
+        lastDocumentSnapshot = null;
+        return;
+      }
+      lastDocumentSnapshot = _snapshot.docs.last;
+      print('loadMoreMessages');
+
+      for (final doc in _snapshot.docs) {
+        final ChatMessageItem chatMessageItem = ChatMessageItem(
+            message: IbMessage.fromJson(doc.data()), controller: this);
+        await chatMessageItem.updateReadUidArray();
+
+        if (!messages.contains(chatMessageItem)) {
+          final index = messages.length - 1;
+          messages.add(chatMessageItem);
+          if (listKey.currentState != null) {
+            listKey.currentState!.insertItem(index,
+                duration: const Duration(
+                    milliseconds: IbConfig.kEventTriggerDelayInMillis));
+          }
+        }
+      }
+    }
+  }
+
   @override
   void onClose() {
     _messageSub.cancel();
@@ -111,9 +160,15 @@ class ChatPageController extends GetxController {
 
 class ChatMessageItem {
   final IbMessage message;
+  late bool isMe;
+  bool showReadIndicator = false;
+  late String msgStatus;
+  final String mUid = Get.find<AuthController>().firebaseUser!.uid;
+  final ChatPageController controller;
 
-  ChatMessageItem(this.message) {
-    _updateReadUidArray();
+  ChatMessageItem({required this.message, required this.controller}) {
+    final String mUid = Get.find<AuthController>().firebaseUser!.uid;
+    isMe = message.senderUid == mUid;
   }
 
   @override
@@ -126,15 +181,35 @@ class ChatMessageItem {
   @override
   int get hashCode => message.hashCode;
 
-  void _updateReadUidArray() {
-    final String mUid = Get.find<AuthController>().firebaseUser!.uid;
+  Future<void> updateReadUidArray() async {
     if (message.readUids.contains(mUid)) {
       return;
     }
-    IbChatDbService().updateReadUidArray(
+    await IbChatDbService().updateReadUidArray(
         chatRoomId: message.chatRoomId,
         messageId: message.messageId,
         uids: [mUid]);
-    print('_updateReadUidArray');
+    print(updateReadUidArray);
+  }
+
+  void updateIndicator() {
+    final List<String> tempArr = [];
+    tempArr.addAll(message.readUids);
+    tempArr.remove(mUid);
+    final int index = controller.messages.indexOf(this);
+
+    if (isMe && controller.messages.indexOf(this) == 0) {
+      showReadIndicator = tempArr.isNotEmpty;
+    } else {
+      showReadIndicator = false;
+    }
+
+    if (showReadIndicator ||
+        (!isMe && controller.messages.indexOf(this) == 0)) {
+      //remove all the old ones
+      for (int i = 1; i < controller.messages.length; i++) {
+        controller.messages[i].showReadIndicator = false;
+      }
+    }
   }
 }

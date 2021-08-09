@@ -33,7 +33,20 @@ class IbChatDbService {
         .doc(chatRoomId)
         .collection('Messages')
         .orderBy('timestamp', descending: false)
+        .limitToLast(16)
         .snapshots();
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> queryMessages(
+      {required String chatRoomId,
+      required DocumentSnapshot<Map<String, dynamic>> snapshot}) {
+    return _collectionRef
+        .doc(chatRoomId)
+        .collection('Messages')
+        .orderBy('timestamp', descending: true)
+        .startAfterDocument(snapshot)
+        .limit(16)
+        .get();
   }
 
   Future<void> uploadMessage(IbMessage ibMessage,

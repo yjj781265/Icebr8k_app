@@ -22,6 +22,8 @@ class IbConfig {
   static const int kQuestionDescMaxLength = 100; //characters
   static const int kAnswerMaxLength = 30; // characters
   static const int kScAnswerMaxLength = 20; // characters
+  static const double kInitChatMessagesLoadSize = 16;
+  static const double kChatMessagesTextSize = 18;
 
   IbConfig._();
 }

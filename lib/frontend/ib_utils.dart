@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -106,6 +107,13 @@ class IbUtils {
       return IbColors.accentColor;
     }
     return IbColors.errorRed;
+  }
+
+  static String? getCurrentUid() {
+    if (Get.find<AuthController>().firebaseUser == null) {
+      return null;
+    }
+    return Get.find<AuthController>().firebaseUser!.uid;
   }
 
   static void showSimpleSnackBar(
