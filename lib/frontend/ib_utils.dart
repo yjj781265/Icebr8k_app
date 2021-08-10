@@ -7,6 +7,7 @@ import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import 'ib_config.dart';
@@ -80,6 +81,50 @@ class IbUtils {
       return '${diffDt.inDays ~/ 365} yr ago';
     }
     return '${diffDt.inDays} days ago';
+  }
+
+  static String getChatDateTimeString(DateTime _dateTime) {
+    final Duration diffDt = DateTime.now().difference(_dateTime);
+    if (diffDt.inSeconds == 0) {
+      return 'now';
+    }
+
+    if (diffDt.inSeconds < 60) {
+      return '${diffDt.inSeconds} s';
+    }
+
+    if (diffDt.inMinutes >= 1 && diffDt.inMinutes < 60) {
+      return '${diffDt.inMinutes} min';
+    }
+
+    if (diffDt.inHours >= 1 && diffDt.inHours < 24) {
+      return '${diffDt.inHours} hr';
+    }
+
+    if (diffDt.inDays >= 1 && diffDt.inDays < 30) {
+      return '${diffDt.inDays} d';
+    }
+
+    if (diffDt.inDays >= 30 && diffDt.inDays < 365) {
+      final DateFormat formatter = DateFormat('MM/dd/yyyy');
+      final String formatted = formatter.format(_dateTime);
+      return formatted;
+    }
+
+    if (diffDt.inDays == 365) {
+      final DateFormat formatter = DateFormat('MM/dd/yyyy');
+      final String formatted = formatter.format(_dateTime);
+      return formatted;
+    }
+
+    if (diffDt.inDays > 365) {
+      final DateFormat formatter = DateFormat('MM/dd/yyyy');
+      final String formatted = formatter.format(_dateTime);
+      return formatted;
+    }
+    final DateFormat formatter = DateFormat('MM/dd/yyyy');
+    final String formatted = formatter.format(_dateTime);
+    return formatted;
   }
 
   static Color getRandomColor(double value) {

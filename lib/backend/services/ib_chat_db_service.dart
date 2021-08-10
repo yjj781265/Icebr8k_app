@@ -37,6 +37,24 @@ class IbChatDbService {
         .snapshots();
   }
 
+  Stream<QuerySnapshot<Map<String, dynamic>>> listenToChatRoomChanges(
+      String uid) {
+    return _collectionRef.where('memberUids', arrayContains: uid).snapshots();
+  }
+
+  Future<int> queryUnreadCount(
+      {required String chatRoomId, required String uid}) async {
+    final _snapshot1 = await _collectionRef
+        .doc(chatRoomId)
+        .collection('Messages')
+        .where('readUids', arrayContains: uid)
+        .get();
+
+    final _snapshot2 =
+        await _collectionRef.doc(chatRoomId).collection('Messages').get();
+    return _snapshot2.size - _snapshot1.size;
+  }
+
   Future<QuerySnapshot<Map<String, dynamic>>> queryMessages(
       {required String chatRoomId,
       required DocumentSnapshot<Map<String, dynamic>> snapshot}) {
@@ -53,7 +71,9 @@ class IbChatDbService {
       {List<String>? memberUids}) async {
     if (memberUids != null) {
       await createChatRoom(
-          chatRoomId: ibMessage.chatRoomId, memberUids: memberUids);
+          chatRoomId: ibMessage.chatRoomId,
+          memberUids: memberUids,
+          lastMessage: ibMessage);
     }
     await _collectionRef
         .doc(ibMessage.chatRoomId)
@@ -67,7 +87,9 @@ class IbChatDbService {
   }
 
   Future<void> createChatRoom(
-      {required String chatRoomId, required List<String> memberUids}) async {
+      {required String chatRoomId,
+      required List<String> memberUids,
+      required IbMessage lastMessage}) async {
     final _snapshot = await _collectionRef.doc(chatRoomId).get();
     if (_snapshot.exists) {
       print('createChatRoom $chatRoomId existed');
@@ -78,7 +100,8 @@ class IbChatDbService {
     await _collectionRef.doc(chatRoomId).set({
       'memberUids': memberUids,
       'chatRoomId': chatRoomId,
-      'createdTimestampInMs': DateTime.now().millisecondsSinceEpoch
+      'createdTimestampInMs': DateTime.now().millisecondsSinceEpoch,
+      'lastMessage': lastMessage.toJson(),
     }, SetOptions(merge: true));
     print('createChatRoom new room $chatRoomId');
   }

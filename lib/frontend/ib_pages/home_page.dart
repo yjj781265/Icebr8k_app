@@ -1,13 +1,18 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
+import 'package:icebr8k/backend/controllers/chat_tab_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_list_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_request_controller.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_controller.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_page.dart';
 import 'package:icebr8k/frontend/ib_pages/ib_user_search_page.dart';
 import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
@@ -15,6 +20,7 @@ import 'package:icebr8k/frontend/ib_pages/question_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/score_tab.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_icon.dart';
+import 'package:move_to_background/move_to_background.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
@@ -73,61 +79,64 @@ class HomePage extends StatelessWidget {
     ];
     return Obx(
       () => AnnotatedRegion<SystemUiOverlayStyle>(
-        value: const SystemUiOverlayStyle(
-          statusBarColor: IbColors.lightBlue,
-        ),
-        child: Scaffold(
-            appBar: AppBar(
-              elevation: 0,
-              titleSpacing: 0,
-              backwardsCompatibility: true,
-              brightness: Brightness.light,
-              systemOverlayStyle: const SystemUiOverlayStyle(
-                  statusBarColor: IbColors.lightBlue),
-              backgroundColor: IbColors.lightBlue,
-              automaticallyImplyLeading: false,
-              actions: _actionsList[_homeController.currentIndex.value],
-              leading: IconButton(
-                  icon: IbAnimatedIcon(
-                      key: _iconKey, icon: AnimatedIcons.menu_close),
-                  onPressed: () {
-                    if (_drawerController.stateNotifier == null) {
-                      return;
-                    }
-                    if (_drawerController.stateNotifier!.value ==
-                        DrawerState.open) {
-                      _drawerController.close!();
-                      _iconKey.currentState!.reverse();
-                    } else {
-                      _drawerController.open!();
-                      _iconKey.currentState!.forward();
-                    }
-                  }),
-              title: Obx(
-                () => Text(
-                  _homeController
-                      .tabTitleList[_homeController.currentIndex.value],
-                  style: const TextStyle(
-                      fontSize: IbConfig.kPageTitleSize,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
+        value: const SystemUiOverlayStyle(statusBarColor: IbColors.lightBlue),
+        child: WillPopScope(
+          onWillPop: () async {
+            if (Platform.isAndroid) {
+              MoveToBackground.moveTaskToBack();
+            }
+            return false;
+          },
+          child: Scaffold(
+              appBar: AppBar(
+                elevation: 0,
+                titleSpacing: 0,
+                backgroundColor: IbColors.lightBlue,
+                brightness: Brightness.light,
+                automaticallyImplyLeading: false,
+                actions: _actionsList[_homeController.currentIndex.value],
+                leading: IconButton(
+                    icon: IbAnimatedIcon(
+                        key: _iconKey, icon: AnimatedIcons.menu_close),
+                    onPressed: () {
+                      if (_drawerController.stateNotifier == null) {
+                        return;
+                      }
+                      if (_drawerController.stateNotifier!.value ==
+                          DrawerState.open) {
+                        _drawerController.close!();
+                        _iconKey.currentState!.reverse();
+                      } else {
+                        _drawerController.open!();
+                        _iconKey.currentState!.forward();
+                      }
+                    }),
+                title: Obx(
+                  () => Text(
+                    _homeController
+                        .tabTitleList[_homeController.currentIndex.value],
+                    style: const TextStyle(
+                        fontSize: IbConfig.kPageTitleSize,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
-            ),
-            backgroundColor: IbColors.lightBlue,
-            body: ZoomDrawer(
-              slideWidth: 200,
-              controller: _drawerController,
-              style: DrawerStyle.Style1,
-              menuScreen: MenuPage(),
-              mainScreen: getBody(),
-              showShadow: true,
-              angle: 0,
               backgroundColor: IbColors.lightBlue,
-              openCurve: Curves.linear,
-              closeCurve: Curves.linear,
-            ),
-            bottomNavigationBar: _buildBottomBar()),
+              body: ZoomDrawer(
+                slideWidth: 200,
+                controller: _drawerController,
+                style: DrawerStyle.Style1,
+                menuScreen: MenuPage(),
+                mainScreen: getBody(),
+                showShadow: true,
+                angle: 0,
+                backgroundColor: IbColors.lightBlue,
+                openCurve: Curves.linear,
+                closeCurve: Curves.linear,
+              ),
+              bottomNavigationBar: _buildBottomBar()),
+        ),
       ),
     );
   }
@@ -135,13 +144,9 @@ class HomePage extends StatelessWidget {
   Widget getBody() {
     final List<Widget> pages = [
       QuestionTab(),
-      Container(
-          alignment: Alignment.center,
-          color: IbColors.lightBlue,
-          child: const Text('I do not know')),
+      ChatTab(),
       const ScoreTab(),
       Container(
-        alignment: Alignment.center,
         color: IbColors.lightBlue,
         child: const Text(
           "Profile",
@@ -206,5 +211,6 @@ class HomePage extends StatelessWidget {
     Get.put(FriendRequestController());
     Get.put(FriendListController());
     Get.put(IbQuestionController());
+    Get.put(ChatTabController());
   }
 }

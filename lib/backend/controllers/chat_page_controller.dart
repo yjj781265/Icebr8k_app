@@ -32,7 +32,6 @@ class ChatPageController extends GetxController {
   @override
   Future<void> onInit() async {
     await initUserMap();
-    isLoading.value = false;
     isGroupChat = memberUids.length > 2;
     chatRoomId = await IbChatDbService().getChatRoomId(memberUids);
     _messageSub = IbChatDbService()
@@ -80,6 +79,7 @@ class ChatPageController extends GetxController {
           print('removed');
         }
       }
+      isLoading.value = false;
     });
     super.onInit();
   }

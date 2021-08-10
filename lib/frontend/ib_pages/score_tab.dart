@@ -151,10 +151,13 @@ class FriendItemView extends StatelessWidget {
     return Material(
       color: IbColors.white,
       child: ListTile(
-        dense: true,
+        contentPadding: EdgeInsets.zero,
         tileColor: IbColors.white,
-        leading: IbUserAvatar(
-          avatarUrl: friendListItem.avatarUrl,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: IbUserAvatar(
+            avatarUrl: friendListItem.avatarUrl,
+          ),
         ),
         title: Text(
           friendListItem.username,

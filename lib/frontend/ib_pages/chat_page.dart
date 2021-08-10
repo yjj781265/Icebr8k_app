@@ -68,13 +68,23 @@ class ChatPage extends StatelessWidget {
                       minLines: 1,
                       maxLines: 5,
                       textInputAction: TextInputAction.newline,
+                      style:
+                          const TextStyle(fontSize: IbConfig.kNormalTextSize),
                       keyboardType: TextInputType.multiline,
                       decoration: InputDecoration(
-                          hintStyle: const TextStyle(color: IbColors.lightGrey),
+                          hintStyle: const TextStyle(
+                              color: IbColors.lightGrey,
+                              fontSize: IbConfig.kNormalTextSize),
                           hintText: 'Type something creative',
                           border: InputBorder.none,
                           suffixIcon: _controller.isSending.isTrue
-                              ? const CircularProgressIndicator()
+                              ? const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                      height: 16,
+                                      width: 16,
+                                      child: CircularProgressIndicator()),
+                                )
                               : IconButton(
                                   icon: const Icon(
                                     Icons.send_outlined,
@@ -139,8 +149,8 @@ class MyMessageItemView extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       item.message.content,
-                      style: const TextStyle(
-                          fontSize: IbConfig.kChatMessagesTextSize),
+                      style:
+                          const TextStyle(fontSize: IbConfig.kNormalTextSize),
                     ),
                   ),
                 ),
@@ -206,8 +216,7 @@ class MessageItemView extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   item.message.content,
-                  style:
-                      const TextStyle(fontSize: IbConfig.kChatMessagesTextSize),
+                  style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
                 ),
               ),
             ),
