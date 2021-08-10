@@ -96,6 +96,8 @@ PODS:
     - TOCropViewController (~> 2.6.0)
   - image_picker (0.0.1):
     - Flutter
+  - move_to_background (0.0.1):
+    - Flutter
   - nanopb (2.30908.0):
     - nanopb/decode (= 2.30908.0)
     - nanopb/encode (= 2.30908.0)
@@ -122,6 +124,7 @@ DEPENDENCIES:
   - google_sign_in (from `.symlinks/plugins/google_sign_in/ios`)
   - image_cropper (from `.symlinks/plugins/image_cropper/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
+  - move_to_background (from `.symlinks/plugins/move_to_background/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - sign_in_with_apple (from `.symlinks/plugins/sign_in_with_apple/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
@@ -166,6 +169,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/image_cropper/ios"
   image_picker:
     :path: ".symlinks/plugins/image_picker/ios"
+  move_to_background:
+    :path: ".symlinks/plugins/move_to_background/ios"
   path_provider:
     :path: ".symlinks/plugins/path_provider/ios"
   sign_in_with_apple:
@@ -201,6 +206,7 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: 36689134877faeb055b27dfa4ccc9ceaa42e029e
   image_cropper: f1668dd8d2cad2d357955caad15a40547856edcb
   image_picker: e06f7a68f000bd36f552c1847e33cda96ed31f1f
+  move_to_background: 39a5b79b26d577b0372cbe8a8c55e7aa9fcd3a2d
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58

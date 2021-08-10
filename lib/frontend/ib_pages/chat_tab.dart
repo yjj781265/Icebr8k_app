@@ -9,6 +9,7 @@ import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:lottie/lottie.dart';
 
 class ChatTab extends StatelessWidget {
   ChatTab({Key? key}) : super(key: key);
@@ -23,7 +24,14 @@ class ChatTab extends StatelessWidget {
         );
       }
 
-      if (_controller.chatTabItems.isEmpty) {}
+      if (_controller.chatTabItems.isEmpty) {
+        return Center(
+          child: SizedBox(
+              width: 230,
+              height: 230,
+              child: Lottie.asset('assets/images/business_chat.json')),
+        );
+      }
 
       return Material(
         color: IbColors.lightBlue,
@@ -51,7 +59,6 @@ class ChatTab extends StatelessWidget {
     return Container(
       color: IbColors.white,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             flex: 2,

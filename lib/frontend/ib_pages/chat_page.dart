@@ -33,77 +33,80 @@ class ChatPage extends StatelessWidget {
               child: IbProgressIndicator(),
             );
           }
-          return Column(
-            children: [
-              Expanded(
-                child: AnimatedList(
-                  reverse: true,
-                  controller: _controller.scrollController,
-                  key: _controller.listKey,
-                  itemBuilder: (BuildContext context, int index,
-                      Animation<double> animation) {
-                    if (index == _controller.messages.length - 2) {
-                      _controller.loadMoreMessages();
-                    }
+          return GestureDetector(
+            onTap: () => IbUtils.hideKeyboard(),
+            child: Column(
+              children: [
+                Expanded(
+                  child: AnimatedList(
+                    reverse: true,
+                    controller: _controller.scrollController,
+                    key: _controller.listKey,
+                    itemBuilder: (BuildContext context, int index,
+                        Animation<double> animation) {
+                      if (index == _controller.messages.length - 2) {
+                        _controller.loadMoreMessages();
+                      }
 
-                    return buildItem(_controller.messages[index], animation);
-                  },
-                  initialItemCount: _controller.messages.length,
-                ),
-              ),
-              SafeArea(
-                child: Container(
-                  margin: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(
-                        Radius.circular(IbConfig.kTextBoxCornerRadius)),
-                    border: Border.all(
-                      color: IbColors.primaryColor,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 3),
-                    child: TextField(
-                      controller: _txtController,
-                      minLines: 1,
-                      maxLines: 5,
-                      textInputAction: TextInputAction.newline,
-                      style:
-                          const TextStyle(fontSize: IbConfig.kNormalTextSize),
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                          hintStyle: const TextStyle(
-                              color: IbColors.lightGrey,
-                              fontSize: IbConfig.kNormalTextSize),
-                          hintText: 'Type something creative',
-                          border: InputBorder.none,
-                          suffixIcon: _controller.isSending.isTrue
-                              ? const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: SizedBox(
-                                      height: 16,
-                                      width: 16,
-                                      child: CircularProgressIndicator()),
-                                )
-                              : IconButton(
-                                  icon: const Icon(
-                                    Icons.send_outlined,
-                                    color: IbColors.primaryColor,
-                                  ),
-                                  onPressed: () async {
-                                    if (_txtController.text.trim().isEmpty) {
-                                      return;
-                                    }
-                                    await _controller
-                                        .uploadMessage(_txtController.text);
-                                    _txtController.clear();
-                                  },
-                                )),
-                    ),
+                      return buildItem(_controller.messages[index], animation);
+                    },
+                    initialItemCount: _controller.messages.length,
                   ),
                 ),
-              )
-            ],
+                SafeArea(
+                  child: Container(
+                    margin: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(
+                          Radius.circular(IbConfig.kTextBoxCornerRadius)),
+                      border: Border.all(
+                        color: IbColors.primaryColor,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 3),
+                      child: TextField(
+                        controller: _txtController,
+                        minLines: 1,
+                        maxLines: 5,
+                        textInputAction: TextInputAction.newline,
+                        style:
+                            const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                        keyboardType: TextInputType.multiline,
+                        decoration: InputDecoration(
+                            hintStyle: const TextStyle(
+                                color: IbColors.lightGrey,
+                                fontSize: IbConfig.kNormalTextSize),
+                            hintText: 'Type something creative',
+                            border: InputBorder.none,
+                            suffixIcon: _controller.isSending.isTrue
+                                ? const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: SizedBox(
+                                        height: 16,
+                                        width: 16,
+                                        child: CircularProgressIndicator()),
+                                  )
+                                : IconButton(
+                                    icon: const Icon(
+                                      Icons.send_outlined,
+                                      color: IbColors.primaryColor,
+                                    ),
+                                    onPressed: () async {
+                                      if (_txtController.text.trim().isEmpty) {
+                                        return;
+                                      }
+                                      await _controller
+                                          .uploadMessage(_txtController.text);
+                                      _txtController.clear();
+                                    },
+                                  )),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
           );
         }));
   }
