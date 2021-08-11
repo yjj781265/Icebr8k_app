@@ -31,20 +31,19 @@ class ChatPageController extends GetxController {
 
   @override
   Future<void> onInit() async {
+    isInit = true;
+    isLoading.value = true;
     scrollController.addListener(() {
       IbUtils.hideKeyboard();
     });
     await initUserMap();
     isGroupChat = memberUids.length > 2;
     chatRoomId = await IbChatDbService().getChatRoomId(memberUids);
+    await IbChatDbService().updateInChatUidArray(
+        chatRoomId: chatRoomId, uids: [IbUtils.getCurrentUid()!]);
     _messageSub = IbChatDbService()
         .listenToMessageChanges(chatRoomId)
         .listen((event) async {
-      if (isInit && event.docs.isNotEmpty) {
-        lastDocumentSnapshot = event.docs.first;
-        isInit = false;
-      }
-
       for (final docChange in event.docChanges) {
         if (docChange.type == DocumentChangeType.added) {
           print('added');
@@ -56,9 +55,7 @@ class ChatPageController extends GetxController {
             messages.insert(0, chatMessageItem);
             chatMessageItem.updateIndicator();
             if (listKey.currentState != null) {
-              listKey.currentState!.insertItem(0,
-                  duration: const Duration(
-                      milliseconds: IbConfig.kEventTriggerDelayInMillis));
+              listKey.currentState!.insertItem(0);
               scrollController.jumpTo(0);
             }
           }
@@ -68,7 +65,6 @@ class ChatPageController extends GetxController {
           final ChatMessageItem chatMessageItem = ChatMessageItem(
               message: IbMessage.fromJson(docChange.doc.data()!),
               controller: this);
-          await chatMessageItem.updateReadUidArray();
           final index = messages.indexOf(chatMessageItem);
 
           if (messages.contains(chatMessageItem)) {
@@ -82,6 +78,12 @@ class ChatPageController extends GetxController {
           print('removed');
         }
       }
+
+      if (isInit && event.docs.isNotEmpty) {
+        lastDocumentSnapshot = event.docs.first;
+        isInit = false;
+      }
+
       isLoading.value = false;
     });
     super.onInit();
@@ -145,9 +147,7 @@ class ChatPageController extends GetxController {
           final index = messages.length - 1;
           messages.add(chatMessageItem);
           if (listKey.currentState != null) {
-            listKey.currentState!.insertItem(index,
-                duration: const Duration(
-                    milliseconds: IbConfig.kEventTriggerDelayInMillis));
+            listKey.currentState!.insertItem(index);
           }
         }
       }
@@ -156,6 +156,8 @@ class ChatPageController extends GetxController {
 
   @override
   void onClose() {
+    IbChatDbService().removeInChatUidArray(
+        chatRoomId: chatRoomId, uids: [IbUtils.getCurrentUid()!]);
     _messageSub.cancel();
     super.onClose();
   }
@@ -192,14 +194,13 @@ class ChatMessageItem {
         chatRoomId: message.chatRoomId,
         messageId: message.messageId,
         uids: [mUid]);
-    print(updateReadUidArray);
+    print('updateReadUidArray');
   }
 
   void updateIndicator() {
     final List<String> tempArr = [];
     tempArr.addAll(message.readUids);
     tempArr.remove(mUid);
-    final int index = controller.messages.indexOf(this);
 
     if (isMe && controller.messages.indexOf(this) == 0) {
       showReadIndicator = tempArr.isNotEmpty;

@@ -18,13 +18,25 @@ class IbChatDbService {
   Future<void> updateReadUidArray(
       {required String chatRoomId,
       required String messageId,
-      required List<String> uids}) async {
-    await _collectionRef
+      required List<String> uids}) {
+    return _collectionRef
         .doc(chatRoomId)
         .collection('Messages')
         .doc(messageId)
         .set(
             {'readUids': FieldValue.arrayUnion(uids)}, SetOptions(merge: true));
+  }
+
+  Future<void> updateInChatUidArray(
+      {required String chatRoomId, required List<String> uids}) {
+    return _collectionRef.doc(chatRoomId).set(
+        {'inChatUids': FieldValue.arrayUnion(uids)}, SetOptions(merge: true));
+  }
+
+  Future<void> removeInChatUidArray(
+      {required String chatRoomId, required List<String> uids}) {
+    return _collectionRef.doc(chatRoomId).set(
+        {'inChatUids': FieldValue.arrayRemove(uids)}, SetOptions(merge: true));
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> listenToMessageChanges(

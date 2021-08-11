@@ -96,7 +96,6 @@ class ChatTabController extends GetxController {
         ibUserMap.addIf(!ibUserMap.containsKey(uid), uid, ibUser);
       }
     }
-    print(ibUserMap);
   }
 }
 
