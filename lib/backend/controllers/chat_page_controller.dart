@@ -19,7 +19,6 @@ class ChatPageController extends GetxController {
   final ibUserMap = <String, IbUser>{};
   late StreamSubscription _messageSub;
   late String chatRoomId;
-  final isLoading = true.obs;
   final isSending = false.obs;
   bool isInit = true;
   late bool isGroupChat;
@@ -32,27 +31,23 @@ class ChatPageController extends GetxController {
   @override
   Future<void> onInit() async {
     isInit = true;
-    isLoading.value = true;
     scrollController.addListener(() {
       IbUtils.hideKeyboard();
     });
     await initUserMap();
     isGroupChat = memberUids.length > 2;
     chatRoomId = await IbChatDbService().getChatRoomId(memberUids);
-    await IbChatDbService().updateInChatUidArray(
-        chatRoomId: chatRoomId, uids: [IbUtils.getCurrentUid()!]);
     _messageSub = IbChatDbService()
         .listenToMessageChanges(chatRoomId)
         .listen((event) async {
       for (final docChange in event.docChanges) {
         if (docChange.type == DocumentChangeType.added) {
-          print('added');
           final ChatMessageItem chatMessageItem = ChatMessageItem(
               message: IbMessage.fromJson(docChange.doc.data()!),
               controller: this);
-          await chatMessageItem.updateReadUidArray();
           if (!messages.contains(chatMessageItem)) {
             messages.insert(0, chatMessageItem);
+            print('message added');
             chatMessageItem.updateIndicator();
             if (listKey.currentState != null) {
               listKey.currentState!.insertItem(0);
@@ -70,7 +65,7 @@ class ChatPageController extends GetxController {
           if (messages.contains(chatMessageItem)) {
             messages[index] = chatMessageItem;
             chatMessageItem.updateIndicator();
-            print('modified');
+            print('message modified');
           }
         }
 
@@ -79,14 +74,34 @@ class ChatPageController extends GetxController {
         }
       }
 
+      await updateReadUidArray();
+
       if (isInit && event.docs.isNotEmpty) {
+        print('loading first ${event.docs.length} messages');
         lastDocumentSnapshot = event.docs.first;
         isInit = false;
+        await setInChat();
       }
-
-      isLoading.value = false;
     });
+
     super.onInit();
+  }
+
+  Future<void> updateReadUidArray() async {
+    if (messages.isEmpty) {
+      return;
+    }
+
+    final IbMessage message = messages.first.message;
+    if (message.readUids.contains(IbUtils.getCurrentUid())) {
+      return;
+    }
+
+    await IbChatDbService().updateReadUidArray(
+        chatRoomId: message.chatRoomId,
+        messageId: message.messageId,
+        uids: [IbUtils.getCurrentUid()!]);
+    print('updateReadUidArray');
   }
 
   Future<void> uploadMessage(String text) async {
@@ -100,6 +115,7 @@ class ChatPageController extends GetxController {
         senderUid: mUid,
         messageType: IbMessage.kMessageTypeText,
         chatRoomId: chatRoomId);
+
     if (messages.isEmpty) {
       await IbChatDbService().uploadMessage(ibMessage, memberUids: memberUids);
       isSending.value = false;
@@ -141,8 +157,6 @@ class ChatPageController extends GetxController {
       for (final doc in _snapshot.docs) {
         final ChatMessageItem chatMessageItem = ChatMessageItem(
             message: IbMessage.fromJson(doc.data()), controller: this);
-        await chatMessageItem.updateReadUidArray();
-
         if (!messages.contains(chatMessageItem)) {
           final index = messages.length - 1;
           messages.add(chatMessageItem);
@@ -152,6 +166,22 @@ class ChatPageController extends GetxController {
         }
       }
     }
+  }
+
+  Future<void> setInChat() async {
+    if (messages.isEmpty) {
+      return;
+    }
+    await IbChatDbService().updateInChatUidArray(
+        chatRoomId: chatRoomId, uids: [IbUtils.getCurrentUid()!]);
+  }
+
+  Future<void> setOffChat() async {
+    if (messages.isEmpty) {
+      return;
+    }
+    await IbChatDbService().removeInChatUidArray(
+        chatRoomId: chatRoomId, uids: [IbUtils.getCurrentUid()!]);
   }
 
   @override
@@ -185,17 +215,6 @@ class ChatMessageItem {
 
   @override
   int get hashCode => message.hashCode;
-
-  Future<void> updateReadUidArray() async {
-    if (message.readUids.contains(mUid)) {
-      return;
-    }
-    await IbChatDbService().updateReadUidArray(
-        chatRoomId: message.chatRoomId,
-        messageId: message.messageId,
-        uids: [mUid]);
-    print('updateReadUidArray');
-  }
 
   void updateIndicator() {
     final List<String> tempArr = [];

@@ -4,7 +4,6 @@ import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
 import '../ib_config.dart';
@@ -28,11 +27,6 @@ class ChatPage extends StatelessWidget {
           ),
         ),
         body: Obx(() {
-          if (_controller.isLoading.isTrue) {
-            return const Center(
-              child: IbProgressIndicator(),
-            );
-          }
           return GestureDetector(
             onTap: () => IbUtils.hideKeyboard(),
             child: Column(

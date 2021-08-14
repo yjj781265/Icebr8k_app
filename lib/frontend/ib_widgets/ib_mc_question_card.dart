@@ -84,7 +84,6 @@ class IbMcQuestionCard extends StatelessWidget {
                   height: 16,
                 ),
                 Scrollbar(
-                  isAlwaysShown: true,
                   controller: _scrollController,
                   child: LimitedBox(
                     maxHeight: 300,
@@ -103,7 +102,15 @@ class IbMcQuestionCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                _handleButtons()
+                _handleButtons(),
+                Obx(
+                  () => Text(
+                    '${_controller.pollSize.value} polled',
+                    style: const TextStyle(
+                        fontSize: IbConfig.kDescriptionTextSize,
+                        color: IbColors.lightGrey),
+                  ),
+                )
               ],
             ),
           ),

@@ -98,7 +98,15 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                 LimitedBox(
                     maxHeight: Get.height * 0.4,
                     child: IbQuestionScItem(widget._controller)),
-                _handleButtons()
+                _handleButtons(),
+                Obx(
+                  () => Text(
+                    '${widget._controller.pollSize.value} polled',
+                    style: const TextStyle(
+                        fontSize: IbConfig.kDescriptionTextSize,
+                        color: IbColors.lightGrey),
+                  ),
+                ),
               ],
             ),
           ),
@@ -179,6 +187,17 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                   centerSpaceRadius: 30,
                   startDegreeOffset: 45,
                   sections: _getSectionData(),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Obx(
+                () => Text(
+                  '${widget._controller.pollSize.value} polled',
+                  style: const TextStyle(
+                      fontSize: IbConfig.kDescriptionTextSize,
+                      color: IbColors.lightGrey),
                 ),
               ),
             ),

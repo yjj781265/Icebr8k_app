@@ -40,10 +40,10 @@ class ChatTab extends StatelessWidget {
             final ChatTabItem item = _controller.chatTabItems[index];
             return Material(
               child: InkWell(
-                onTap: () => {
+                onTap: () {
                   Get.to(() => ChatPage(Get.put(
                       ChatPageController(item.memberUids),
-                      tag: item.chatRoomId)))
+                      tag: item.chatRoomId)));
                 },
                 child: buildItem(item),
               ),

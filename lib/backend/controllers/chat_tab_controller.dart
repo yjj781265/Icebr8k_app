@@ -48,7 +48,6 @@ class ChatTabController extends GetxController {
           if (a.ibMessage.timestamp != null && b.ibMessage.timestamp != null) {
             final Timestamp timestamp1 = a.ibMessage.timestamp as Timestamp;
             final Timestamp timestamp2 = b.ibMessage.timestamp as Timestamp;
-            print(timestamp1);
             return timestamp2.compareTo(timestamp1);
           }
           return b.title.compareTo(a.title);
@@ -77,6 +76,7 @@ class ChatTabController extends GetxController {
     await cacheAvatarUrls(uids);
     final int unReadCount = await IbChatDbService().queryUnreadCount(
         chatRoomId: chatRoomId, uid: IbUtils.getCurrentUid()!);
+    print('unReadCount $unReadCount');
     final ChatTabItem item = ChatTabItem(
         controller: this,
         chatRoomId: chatRoomId,

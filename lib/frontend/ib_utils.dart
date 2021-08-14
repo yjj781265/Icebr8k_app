@@ -178,9 +178,6 @@ class IbUtils {
     final List<IbAnswer> uid2QuestionAnswers =
         await IbQuestionDbService().queryUserAnswers(uid2);
 
-    print('uid1 has answered ${uid1QuestionAnswers.length} questions');
-    print('uid2 has answered ${uid2QuestionAnswers.length} questions');
-
     if (uid1QuestionAnswers.isEmpty || uid2QuestionAnswers.isEmpty) {
       return 0;
     }
@@ -202,9 +199,6 @@ class IbUtils {
         .toSet()
         .intersection(uid2QuestionAnswers.toSet())
         .length;
-
-    print('commonQuestionSize is $commonQuestionSize');
-    print('commonAnswerSize is $commonAnswerSize');
 
     if (commonQuestionSize == 0) {
       return 0;

@@ -21,6 +21,7 @@ class IbQuestionItemController extends GetxController {
   final submitBtnTrKey = 'submit'.obs;
   final username = ''.obs;
   final avatarUrl = ''.obs;
+  final pollSize = 0.obs;
   final IbQuestion ibQuestion;
   final height = 300.0.obs;
   final width = 350.0.obs;
@@ -48,7 +49,7 @@ class IbQuestionItemController extends GetxController {
       selectedChoice.value = '1';
       currentState.value = CardState.picked;
     }
-    return;
+    pollSize.value = await IbQuestionDbService().queryPollSize(ibQuestion.id);
   }
 
   void updateSelected(String choice) {
@@ -120,6 +121,7 @@ class IbQuestionItemController extends GetxController {
   Future<void> _initResultMap() async {
     final double _pollSize =
         (await IbQuestionDbService().queryPollSize(ibQuestion.id)).toDouble();
+    pollSize.value = _pollSize.toInt();
 
     if (ibQuestion.questionType == IbQuestion.kMultipleChoice) {
       for (final String choice in ibQuestion.choices) {

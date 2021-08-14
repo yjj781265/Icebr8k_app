@@ -53,7 +53,6 @@ class FriendListController extends GetxController {
         }
       }
       friendItems.sort((a, b) => b.score.compareTo(a.score));
-      print(friendItems);
     });
 
     _myAnsweredQuestionsSub = IbQuestionDbService()

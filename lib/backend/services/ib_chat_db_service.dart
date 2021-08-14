@@ -59,12 +59,22 @@ class IbChatDbService {
     final _snapshot1 = await _collectionRef
         .doc(chatRoomId)
         .collection('Messages')
+        .orderBy('timestamp')
         .where('readUids', arrayContains: uid)
+        .limitToLast(1)
         .get();
 
-    final _snapshot2 =
-        await _collectionRef.doc(chatRoomId).collection('Messages').get();
-    return _snapshot2.size - _snapshot1.size;
+    if (_snapshot1.size == 0) {
+      return 0;
+    }
+
+    final _snapshot2 = await _collectionRef
+        .doc(chatRoomId)
+        .collection('Messages')
+        .orderBy('timestamp')
+        .startAfterDocument(_snapshot1.docs.last)
+        .get();
+    return _snapshot2.size;
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> queryMessages(
@@ -103,12 +113,14 @@ class IbChatDbService {
       required List<String> memberUids,
       required IbMessage lastMessage}) async {
     final _snapshot = await _collectionRef.doc(chatRoomId).get();
+
     if (_snapshot.exists) {
       print('createChatRoom $chatRoomId existed');
       return;
     }
 
     memberUids.sort();
+
     await _collectionRef.doc(chatRoomId).set({
       'memberUids': memberUids,
       'chatRoomId': chatRoomId,
