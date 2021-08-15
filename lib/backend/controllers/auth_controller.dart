@@ -20,17 +20,19 @@ class AuthController extends GetxService {
   final isSigningInViaThirdParty = false.obs;
   final isSigningUp = false.obs;
   User? firebaseUser;
+  IbUser? ibUser;
   final _ibAuthService = IbAuthService();
 
   @override
   void onReady() {
     super.onReady();
-    _fbAuthSub = _ibAuthService.listenToAuthStateChanges().listen((user) {
+    _fbAuthSub = _ibAuthService.listenToAuthStateChanges().listen((user) async {
       if (user == null) {
         firebaseUser = null;
         print('User is signed out!');
       } else {
         firebaseUser = user;
+        ibUser = await IbUserDbService().queryIbUser(firebaseUser!.uid);
         print('User is signed in! ${firebaseUser!.uid}');
       }
     });

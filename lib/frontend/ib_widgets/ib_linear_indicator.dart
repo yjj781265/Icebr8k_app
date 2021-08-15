@@ -15,11 +15,15 @@ class IbLinearIndicator extends StatelessWidget {
       return Row(
         children: [
           Expanded(
-            child: LinearProgressIndicator(
-              color: _handleIndicatorColor(endValue),
-              backgroundColor: IbColors.lightGrey,
-              minHeight: 5,
-              value: endValue,
+            child: ClipRRect(
+              borderRadius: const BorderRadius.all(
+                  Radius.circular(IbConfig.kScrollbarCornerRadius)),
+              child: LinearProgressIndicator(
+                color: _handleIndicatorColor(endValue),
+                backgroundColor: IbColors.lightGrey,
+                minHeight: 5,
+                value: endValue,
+              ),
             ),
           ),
           Padding(
@@ -38,11 +42,15 @@ class IbLinearIndicator extends StatelessWidget {
           return Row(
             children: [
               Expanded(
-                child: LinearProgressIndicator(
-                  color: _handleIndicatorColor(value),
-                  backgroundColor: IbColors.lightGrey,
-                  minHeight: 5,
-                  value: value,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.all(
+                      Radius.circular(IbConfig.kScrollbarCornerRadius)),
+                  child: LinearProgressIndicator(
+                    color: _handleIndicatorColor(value),
+                    backgroundColor: IbColors.lightGrey,
+                    minHeight: 5,
+                    value: value,
+                  ),
                 ),
               ),
               Padding(

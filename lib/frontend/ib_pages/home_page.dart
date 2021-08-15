@@ -16,6 +16,7 @@ import 'package:icebr8k/frontend/ib_pages/chat_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_page.dart';
 import 'package:icebr8k/frontend/ib_pages/ib_user_search_page.dart';
 import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
+import 'package:icebr8k/frontend/ib_pages/my_profile_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/question_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/score_tab.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
@@ -146,13 +147,7 @@ class HomePage extends StatelessWidget {
       QuestionTab(),
       ChatTab(),
       const ScoreTab(),
-      Container(
-        color: IbColors.lightBlue,
-        child: const Text(
-          "Profile",
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-        ),
-      ),
+      const MyProfileTab(),
     ];
     return Obx(
       () => IndexedStack(

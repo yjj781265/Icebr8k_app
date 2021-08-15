@@ -72,7 +72,7 @@ class IbTextField extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Container(
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(
@@ -81,7 +81,10 @@ class IbTextField extends StatelessWidget {
                 color: borderColor,
               ),
             ),
-            child: Padding(padding: const EdgeInsets.all(8), child: textField),
+            child: Padding(
+              padding: const EdgeInsets.all(3),
+              child: textField,
+            ),
           ),
         ),
         /******* error text ****/

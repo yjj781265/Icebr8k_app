@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
+import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -128,30 +129,27 @@ class IbUtils {
   }
 
   static Color getRandomColor(double value) {
-    if (value > 0 && value <= 0.2) {
-      return const Color(0xFFFF0000);
+    if (value > 0 && value <= 0.1) {
+      return Colors.redAccent;
     }
 
     if (value > 0.2 && value <= 0.4) {
-      return const Color(0xFFFF6600);
+      return Colors.orangeAccent;
     }
 
     if (value > 0.4 && value <= 0.6) {
-      return const Color(0xFFFFB700);
+      return Colors.yellowAccent;
     }
 
-    if (value > 0.6 && value <= 0.7) {
+    if (value > 0.6 && value <= 0.8) {
       return const Color(0xFFB1E423);
     }
 
-    if (value > 0.8 && value <= 0.9) {
-      return const Color(0xFF23E480);
-    }
-
-    if (value > 0.9 && value <= 1.0) {
+    if (value > 0.8 && value <= 1.0) {
       return IbColors.accentColor;
     }
-    return IbColors.errorRed;
+
+    return IbColors.accentColor;
   }
 
   static String? getCurrentUid() {
@@ -159,6 +157,13 @@ class IbUtils {
       return null;
     }
     return Get.find<AuthController>().firebaseUser!.uid;
+  }
+
+  static IbUser? getCurrentIbUser() {
+    if (Get.find<AuthController>().firebaseUser == null) {
+      return null;
+    }
+    return Get.find<AuthController>().ibUser;
   }
 
   static void showSimpleSnackBar(
