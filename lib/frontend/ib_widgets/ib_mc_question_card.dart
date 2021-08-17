@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
@@ -9,13 +10,81 @@ import 'ib_card.dart';
 import 'ib_elevated_button.dart';
 import 'ib_user_avatar.dart';
 
-class IbMcQuestionCard extends StatelessWidget {
+class IbMcQuestionCard extends StatefulWidget {
   final IbQuestionItemController _controller;
+
+  const IbMcQuestionCard(this._controller, {Key? key}) : super(key: key);
+
+  @override
+  _IbMcQuestionCardState createState() => _IbMcQuestionCardState();
+}
+
+class _IbMcQuestionCardState extends State<IbMcQuestionCard>
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final _scrollController = ScrollController();
-  IbMcQuestionCard(this._controller, {Key? key}) : super(key: key);
+  late AnimationController expandController;
+  late Animation<double> animation;
+
+  @override
+  void initState() {
+    _prepareAnimations();
+    _runExpandCheck();
+    super.initState();
+  }
+
+  ///Setting up the animation
+  void _prepareAnimations() {
+    expandController = AnimationController(
+        vsync: this,
+        duration:
+            const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis));
+    animation = CurvedAnimation(
+      parent: expandController,
+      curve: Curves.linear,
+    );
+  }
+
+  void _runExpandCheck() {
+    if (widget._controller.isExpanded.isTrue) {
+      expandController.forward();
+    } else {
+      expandController.reverse();
+    }
+  }
+
+  @override
+  void dispose() {
+    expandController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+    final Widget expandableInfo = Column(
+      children: [
+        Scrollbar(
+          controller: _scrollController,
+          child: LimitedBox(
+            maxHeight: 300,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: ListView.builder(
+                controller: _scrollController,
+                itemBuilder: (context, index) {
+                  final String _choice =
+                      widget._controller.ibQuestion.choices[index];
+                  return IbQuestionMcItem(_choice, widget._controller);
+                },
+                shrinkWrap: true,
+                itemCount: widget._controller.ibQuestion.choices.length,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 56, child: Center(child: _handleButtons())),
+      ],
+    );
     return Center(
       child: LimitedBox(
         maxHeight: Get.height * 0.7,
@@ -26,24 +95,24 @@ class IbMcQuestionCard extends StatelessWidget {
               const EdgeInsets.only(left: 16, right: 8, top: 16, bottom: 8),
           child: Padding(
             padding: const EdgeInsets.only(right: 8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    _handleAvatarImage(),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Obx(
-                          () => SizedBox(
+            child: Obx(
+              () => Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      _handleAvatarImage(),
+                      const SizedBox(
+                        width: 8,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
                             width: 200,
                             child: Text(
-                              _controller.username.value,
+                              widget._controller.title.value,
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: const TextStyle(
@@ -51,67 +120,73 @@ class IbMcQuestionCard extends StatelessWidget {
                                   fontWeight: FontWeight.w700),
                             ),
                           ),
-                        ),
-                        Text(
-                          IbUtils.getAgoDateTimeString(
-                              DateTime.fromMillisecondsSinceEpoch(
-                                  _controller.ibQuestion.createdTimeInMs)),
-                          style: const TextStyle(
-                              fontSize: IbConfig.kDescriptionTextSize,
-                              color: IbColors.lightGrey),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                Text(
-                  _controller.ibQuestion.question,
-                  style: const TextStyle(
-                      fontSize: IbConfig.kPageTitleSize,
-                      fontWeight: FontWeight.bold),
-                ),
-                if (_controller.ibQuestion.description.isNotEmpty)
-                  Text(
-                    _controller.ibQuestion.description,
-                    style: const TextStyle(
-                        fontSize: IbConfig.kDescriptionTextSize,
-                        color: Colors.black),
-                  ),
-                const SizedBox(
-                  height: 16,
-                ),
-                Scrollbar(
-                  controller: _scrollController,
-                  child: LimitedBox(
-                    maxHeight: 300,
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        itemBuilder: (context, index) {
-                          final String _choice =
-                              _controller.ibQuestion.choices[index];
-                          return IbQuestionMcItem(_choice, _controller);
-                        },
-                        shrinkWrap: true,
-                        itemCount: _controller.ibQuestion.choices.length,
+                          Text(
+                            IbUtils.getAgoDateTimeString(
+                                DateTime.fromMillisecondsSinceEpoch(widget
+                                    ._controller.ibQuestion.createdTimeInMs)),
+                            style: const TextStyle(
+                                fontSize: IbConfig.kDescriptionTextSize,
+                                color: IbColors.lightGrey),
+                          )
+                        ],
                       ),
-                    ),
+                    ],
                   ),
-                ),
-                _handleButtons(),
-                Obx(
-                  () => Text(
-                    '${_controller.pollSize.value} polled',
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  Text(
+                    widget._controller.ibQuestion.question,
                     style: const TextStyle(
-                        fontSize: IbConfig.kDescriptionTextSize,
-                        color: IbColors.lightGrey),
+                        fontSize: IbConfig.kPageTitleSize,
+                        fontWeight: FontWeight.bold),
                   ),
-                )
-              ],
+                  if (widget._controller.ibQuestion.description.isNotEmpty)
+                    Text(
+                      widget._controller.ibQuestion.description,
+                      style: const TextStyle(
+                          fontSize: IbConfig.kDescriptionTextSize,
+                          color: Colors.black),
+                    ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  if (widget._controller.isExpandable)
+                    SizeTransition(
+                      sizeFactor: animation,
+                      child: expandableInfo,
+                    )
+                  else
+                    expandableInfo,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${widget._controller.totalPolled.value} polled',
+                        style: const TextStyle(
+                            fontSize: IbConfig.kDescriptionTextSize,
+                            color: IbColors.lightGrey),
+                      ),
+                      if (widget._controller.isExpandable)
+                        IconButton(
+                            onPressed: () {
+                              widget._controller.isExpanded.value =
+                                  !widget._controller.isExpanded.value;
+                              _runExpandCheck();
+                            },
+                            icon: widget._controller.isExpanded.isTrue
+                                ? const Icon(
+                                    Icons.expand_less_outlined,
+                                    color: IbColors.primaryColor,
+                                  )
+                                : const Icon(
+                                    Icons.expand_more_outlined,
+                                    color: IbColors.primaryColor,
+                                  )),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         )),
@@ -121,39 +196,50 @@ class IbMcQuestionCard extends StatelessWidget {
 
   Widget _handleButtons() {
     return Obx(() {
-      Color btnColor = IbColors.primaryColor;
-      final CardState currentState = _controller.currentState.value;
-      switch (currentState) {
-        case CardState.init:
-          btnColor = IbColors.lightGrey;
-          break;
-        case CardState.picked:
-          btnColor = IbColors.primaryColor;
-          break;
-        case CardState.processing:
-          btnColor = IbColors.processingColor;
-          break;
-        case CardState.submitted:
-          btnColor = IbColors.accentColor;
-          break;
+      if (widget._controller.isAnswering.isTrue) {
+        return const IbProgressIndicator(
+          width: 20,
+          height: 20,
+        );
       }
-      if (!_controller.isSample) {
+
+      if (widget._controller.isAnswered.isTrue) {
+        return Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            const Icon(
+              Icons.check_circle_outline,
+              color: IbColors.accentColor,
+              size: 16,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                  'Voted ${IbUtils.getAgoDateTimeString(widget._controller.votedDateTime.value)}'),
+            )
+          ],
+        );
+      }
+
+      if (!widget._controller.isSample) {
         return Center(
           child: IbElevatedButton(
-              textTrKey: _controller.voteBtnTrKey.value,
-              color: btnColor,
-              onPressed: currentState == CardState.init
+              textTrKey: 'vote',
+              color: IbColors.primaryColor,
+              onPressed: widget._controller.selectedChoice.isEmpty
                   ? null
                   : () {
-                      _controller.onVote();
+                      widget._controller.onVote();
                     }),
         );
       } else {
         return Center(
           child: IbElevatedButton(
-              textTrKey: _controller.submitBtnTrKey.value,
+              textTrKey: 'submit',
+              color: IbColors.primaryColor,
               onPressed: () async {
-                await _controller.submit();
+                await widget._controller.onSubmit();
               }),
         );
       }
@@ -163,11 +249,14 @@ class IbMcQuestionCard extends StatelessWidget {
   Widget _handleAvatarImage() {
     return Obx(() {
       return IbUserAvatar(
-        avatarUrl: _controller.avatarUrl.value,
+        avatarUrl: widget._controller.avatarUrl.value,
         radius: 16,
       );
     });
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class IbQuestionMcItem extends StatelessWidget {
@@ -182,7 +271,15 @@ class IbQuestionMcItem extends StatelessWidget {
     return Obx(
       () => GestureDetector(
         onTap: () {
-          if (!_controller.isSample) _controller.updateSelected(choice);
+          if (_controller.isSample || _controller.isAnswered.isTrue) {
+            return;
+          }
+
+          if (_controller.selectedChoice.value == choice) {
+            _controller.selectedChoice.value = '';
+          } else {
+            _controller.selectedChoice.value = choice;
+          }
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -200,23 +297,18 @@ class IbQuestionMcItem extends StatelessWidget {
                 height: 46,
                 decoration: BoxDecoration(
                     color: _determineColor(
-                      result: _controller.resultMap[choice] ?? 0,
-                      isSelected: _controller.selectedChoice.value == choice,
-                      isVoted:
-                          _controller.currentState.value == CardState.submitted,
-                    ),
+                        result: _controller.resultMap[choice] ?? 0,
+                        isSelected: _controller.selectedChoice.value == choice,
+                        isVoted: _controller.isAnswered.value),
                     borderRadius: BorderRadius.circular(8)),
                 width: _determineWidth(
-                  isSelected: _controller.selectedChoice.value == choice,
-                  result: _controller.resultMap[choice] ?? 0,
-                  isVoted:
-                      _controller.currentState.value == CardState.submitted,
-                ),
+                    isSelected: _controller.selectedChoice.value == choice,
+                    result: _controller.resultMap[choice] ?? 0,
+                    isVoted: _controller.isAnswered.value),
                 duration: Duration(
-                    milliseconds:
-                        _controller.currentState.value == CardState.submitted
-                            ? IbConfig.kEventTriggerDelayInMillis
-                            : 0),
+                    milliseconds: _controller.isAnswered.value
+                        ? IbConfig.kEventTriggerDelayInMillis
+                        : 0),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -227,7 +319,7 @@ class IbQuestionMcItem extends StatelessWidget {
                       fontSize: IbConfig.kNormalTextSize, color: Colors.black),
                 ),
               ),
-              if (_controller.currentState.value == CardState.submitted)
+              if (_controller.isAnswered.value)
                 TweenAnimationBuilder(
                   builder:
                       (BuildContext context, Object? value, Widget? child) {

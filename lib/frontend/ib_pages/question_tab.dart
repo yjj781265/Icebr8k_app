@@ -54,13 +54,17 @@ class QuestionTab extends StatelessWidget {
                   return Center(
                       child: IbScQuestionCard(Get.put(
                           IbQuestionItemController(
-                              ibQuestion: _ibQuestion, isSample: false),
+                              ibQuestion: _ibQuestion,
+                              isSample: false,
+                              isExpanded: true.obs),
                           tag: _ibQuestion.id)));
                 }
 
                 return IbMcQuestionCard(Get.put(
                     IbQuestionItemController(
-                        ibQuestion: _ibQuestion, isSample: false),
+                        ibQuestion: _ibQuestion,
+                        isSample: false,
+                        isExpanded: true.obs),
                     tag: _ibQuestion.id));
               }));
     });

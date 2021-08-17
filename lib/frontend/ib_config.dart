@@ -9,7 +9,7 @@ class IbConfig {
   static const double kSecondaryTextSize = 14;
   static const double kDescriptionTextSize = 12;
   static const double kNormalTextSize = 16;
-  static const int kEventTriggerDelayInMillis = 800;
+  static const int kEventTriggerDelayInMillis = 500;
   static const int kUpdateResultMinCadenceInMillis = 8000;
   static const int kAgeLimitInDays = 4745;
   static const int kChoiceLimit = 8;

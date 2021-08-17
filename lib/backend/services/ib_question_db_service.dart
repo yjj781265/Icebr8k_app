@@ -22,12 +22,9 @@ class IbQuestionDbService {
         .set(question.toJson(), SetOptions(merge: true));
   }
 
-  Future<IbQuestion?> queryQuestion(String questionId) async {
+  Future<IbQuestion> queryQuestion(String questionId) async {
     final snapshot = await _collectionRef.doc(questionId).get();
-    if (snapshot.exists && snapshot.data() != null) {
-      return IbQuestion.fromJson(snapshot.data()!);
-    }
-    return null;
+    return IbQuestion.fromJson(snapshot.data()!);
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> queryQuestions({
@@ -57,7 +54,6 @@ class IbQuestionDbService {
     for (final element in _snapshot.docs) {
       _list.add(element['questionId'].toString());
     }
-    print("answered question list size ${_list.length}");
     return _list;
   }
 
@@ -75,11 +71,10 @@ class IbQuestionDbService {
     for (final doc in _snapshot.docs) {
       answers.add(IbAnswer.fromJson(doc.data()));
     }
-    print("answers list size ${answers.length}");
     return answers;
   }
 
-  Future<String?> queryAnswer(String uid, String questionId) async {
+  Future<IbAnswer?> queryIbAnswer(String uid, String questionId) async {
     final _snapshot = await _collectionRef
         .doc(questionId)
         .collection('Answers')
@@ -89,7 +84,7 @@ class IbQuestionDbService {
       return null;
     }
 
-    return _snapshot['answer'].toString();
+    return IbAnswer.fromJson(_snapshot.data()!);
   }
 
   Future<void> answerQuestion(
