@@ -186,8 +186,7 @@ class ChatPageController extends GetxController {
 
   @override
   void onClose() {
-    IbChatDbService().removeInChatUidArray(
-        chatRoomId: chatRoomId, uids: [IbUtils.getCurrentUid()!]);
+    setInChat();
     _messageSub.cancel();
     super.onClose();
   }

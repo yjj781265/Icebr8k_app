@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
+import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -16,6 +17,7 @@ class IbUserSearchController extends GetxController {
   final score = (-1.0).obs;
   final isSearching = false.obs;
   final noResultTrKey = ''.obs;
+  IbUser? ibUser;
   String requestMsg = '';
 
   @override
@@ -37,6 +39,7 @@ class IbUserSearchController extends GetxController {
         noResultTrKey.value = 'user_not_found';
         return;
       }
+      ibUser = user;
       noResultTrKey.value = '';
       username.value = user.username;
       avatarUrl.value = user.avatarUrl;

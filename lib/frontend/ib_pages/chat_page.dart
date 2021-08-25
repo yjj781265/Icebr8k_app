@@ -172,6 +172,7 @@ class MyMessageItemView extends StatelessWidget {
           padding: const EdgeInsets.all(2.0),
           child: IbUserAvatar(
             avatarUrl: item.controller.ibUserMap[uid]!.avatarUrl,
+            uid: uid,
             radius: 6,
           ),
         ));
@@ -196,7 +197,8 @@ class MessageItemView extends StatelessWidget {
         children: [
           IbUserAvatar(
             radius: 16,
-            avatarUrl: user == null ? '' : user.avatarUrl,
+            avatarUrl: user!.avatarUrl,
+            uid: user.id,
           ),
           const SizedBox(
             width: 8,

@@ -13,6 +13,7 @@ class IbLinearIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     if (disableAnimation) {
       return Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
             width: 160,
@@ -41,6 +42,7 @@ class IbLinearIndicator extends StatelessWidget {
                 endValue < 0.5 ? IbConfig.kEventTriggerDelayInMillis : 1200),
         builder: (context, double value, child) {
           return Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(
                 width: 160,
@@ -57,7 +59,10 @@ class IbLinearIndicator extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text('${(value * 100).toInt()}%'),
+                child: Text(
+                  '${(value * 100).toInt()}%',
+                  style: TextStyle(color: _handleIndicatorColor(value)),
+                ),
               )
             ],
           );

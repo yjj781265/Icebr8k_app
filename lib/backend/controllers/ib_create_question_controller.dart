@@ -26,7 +26,7 @@ class IbCreateQuestionController extends GetxController {
     scaleChoiceList.insert(oldIndex < newIndex ? newIndex - 1 : newIndex, item);
   }
 
-  List<String> _getCorrectList() {
+  List<String> _getChoiceList() {
     if (questionType == IbQuestion.kMultipleChoice) {
       return choiceList;
     }
@@ -54,13 +54,13 @@ class IbCreateQuestionController extends GetxController {
     IbUtils.hideKeyboard();
     Get.to(() => ReviewQuestionPage(
         question: IbQuestion(
-            question: question,
+            question: question.trim(),
             id: IbUtils.getUniqueName(),
             creatorId: Get.find<AuthController>().firebaseUser!.uid,
-            description: description,
-            questionType: questionType,
-            createdTimeInMs: DateTime.now().millisecondsSinceEpoch,
-            choices: _getCorrectList())));
+            description: description.trim(),
+            questionType: questionType.trim(),
+            askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
+            choices: _getChoiceList())));
   }
 
   void reset() {

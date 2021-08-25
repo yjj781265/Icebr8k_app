@@ -9,6 +9,7 @@ part of 'ib_user.dart';
 IbUser _$IbUserFromJson(Map<String, dynamic> json) {
   return IbUser(
     avatarUrl: json['avatarUrl'] as String,
+    coverPhotoUrl: json['coverPhotoUrl'] as String,
     loginTimeInMs: json['loginTimeInMs'] as int,
     joinTimeInMs: json['joinTimeInMs'] as int,
     birthdateInMs: json['birthdateInMs'] as int,
@@ -31,5 +32,6 @@ Map<String, dynamic> _$IbUserToJson(IbUser instance) => <String, dynamic>{
       'joinTimeInMs': instance.joinTimeInMs,
       'birthdateInMs': instance.birthdateInMs,
       'isOnline': instance.isOnline,
+      'coverPhotoUrl': instance.coverPhotoUrl,
       'description': instance.description,
     };

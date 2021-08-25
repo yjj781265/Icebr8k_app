@@ -91,7 +91,8 @@ class IbUserSearchPage extends StatelessWidget {
             child: ListTile(
               tileColor: IbColors.white,
               leading: IbUserAvatar(
-                avatarUrl: _controller.avatarUrl.value,
+                avatarUrl: _controller.ibUser!.avatarUrl,
+                uid: _controller.ibUser!.id,
               ),
               title: Text(
                 _controller.username.value,
@@ -129,7 +130,8 @@ class IbUserSearchPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(right: 16),
                 child: IbUserAvatar(
-                  avatarUrl: _controller.avatarUrl.value,
+                  avatarUrl: _controller.ibUser!.avatarUrl,
+                  uid: _controller.ibUser!.id,
                   radius: 32,
                 ),
               ),

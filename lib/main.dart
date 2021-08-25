@@ -43,7 +43,7 @@ class _MyAppState extends State<MyApp> {
           return GetMaterialApp(
             initialBinding: BindingsBuilder(() => {Get.put(AuthController())}),
             defaultTransition: Transition.cupertino,
-            enableLog: true,
+            enableLog: false,
             debugShowCheckedModeBanner: false,
             home: const SplashPage(),
             translations: IbStrings(),

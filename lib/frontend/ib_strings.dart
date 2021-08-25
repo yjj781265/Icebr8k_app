@@ -72,6 +72,7 @@ class IbStrings extends Translations {
           'add_endpoint': 'Add an endpoint',
           'tap_to_add': 'Tap to add up to ${IbConfig.kChoiceLimit} choices',
           'tap_to_add_sc': 'Tap to add 2 end points',
+          'match_interests': 'Match Interests',
           'add': 'Add',
           'choice_limit':
               'You can only have max ${IbConfig.kChoiceLimit} choices per question.',

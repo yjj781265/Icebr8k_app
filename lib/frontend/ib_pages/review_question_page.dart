@@ -28,15 +28,19 @@ class ReviewQuestionPage extends StatelessWidget {
       return IbMcQuestionCard(
         Get.put(
             IbQuestionItemController(
-                ibQuestion: question, isSample: true, isExpanded: true.obs),
-            tag: question.id),
+              ibQuestion: question,
+              isSample: true,
+            ),
+            tag: 'sample${question.id}'),
       );
     }
     return IbScQuestionCard(
       Get.put(
           IbQuestionItemController(
-              ibQuestion: question, isSample: true, isExpanded: true.obs),
-          tag: question.id),
+            ibQuestion: question,
+            isSample: true,
+          ),
+          tag: 'sample${question.id}'),
     );
   }
 }

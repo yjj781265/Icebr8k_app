@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -67,6 +68,9 @@ class IbUtils {
     }
 
     if (diffDt.inDays >= 1 && diffDt.inDays < 30) {
+      if (diffDt.inDays == 1) {
+        return '${diffDt.inDays} day ago';
+      }
       return '${diffDt.inDays} days ago';
     }
 
@@ -82,6 +86,48 @@ class IbUtils {
       return '${diffDt.inDays ~/ 365} yr ago';
     }
     return '${diffDt.inDays} days ago';
+  }
+
+  /// Returns the difference (in full days) between the provided date and today.
+  static int _calculateDifference(DateTime date) {
+    final DateTime now = DateTime.now();
+    return DateTime(date.year, date.month, date.day)
+        .difference(DateTime(now.year, now.month, now.day))
+        .inDays;
+  }
+
+  static String getStatsString(int num) {
+    if (num < 10000) {
+      return num.toString();
+    }
+
+    final String d = (num.toDouble() / 1000).toStringAsFixed(0);
+    return '${d}k';
+  }
+
+  static String getSuffixDateTimeString(DateTime _dateTime) {
+    if (_calculateDifference(_dateTime) == 0) {
+      return 'today';
+    }
+
+    if (_calculateDifference(_dateTime) == 1) {
+      return 'tomorrow';
+    }
+
+    if (_calculateDifference(_dateTime) == -1) {
+      return 'yesterday';
+    }
+
+    final Duration diffDt = DateTime.now().difference(_dateTime);
+    if (diffDt.inDays >= 30 && diffDt.inDays < 365) {
+      final DateFormat formatter = DateFormat('MM/dd');
+      final String formatted = formatter.format(_dateTime);
+      return 'on $formatted';
+    } else {
+      final DateFormat formatter = DateFormat('MM/dd/yyyy');
+      final String formatted = formatter.format(_dateTime);
+      return 'on $formatted';
+    }
   }
 
   static String getChatDateTimeString(DateTime _dateTime) {
@@ -107,7 +153,7 @@ class IbUtils {
     }
 
     if (diffDt.inDays >= 30 && diffDt.inDays < 365) {
-      final DateFormat formatter = DateFormat('MM/dd/yyyy');
+      final DateFormat formatter = DateFormat('MM/dd');
       final String formatted = formatter.format(_dateTime);
       return formatted;
     }
@@ -126,30 +172,6 @@ class IbUtils {
     final DateFormat formatter = DateFormat('MM/dd/yyyy');
     final String formatted = formatter.format(_dateTime);
     return formatted;
-  }
-
-  static Color getRandomColor(double value) {
-    if (value > 0 && value <= 0.1) {
-      return Colors.redAccent;
-    }
-
-    if (value > 0.2 && value <= 0.4) {
-      return Colors.orangeAccent;
-    }
-
-    if (value > 0.4 && value <= 0.6) {
-      return Colors.yellowAccent;
-    }
-
-    if (value > 0.6 && value <= 0.8) {
-      return const Color(0xFFB1E423);
-    }
-
-    if (value > 0.8 && value <= 1.0) {
-      return IbColors.accentColor;
-    }
-
-    return IbColors.accentColor;
   }
 
   static String? getCurrentUid() {
@@ -213,5 +235,33 @@ class IbUtils {
     print('score is $_score');
 
     return _score;
+  }
+
+  static Future<List<IbAnswer>> getCommonAnsweredQ(
+      String uid1, String uid2) async {
+    /// query each user answered questions then intersect
+    final List<IbAnswer> uid1QuestionAnswers =
+        await IbQuestionDbService().queryUserAnswers(uid1);
+    final List<IbAnswer> uid2QuestionAnswers =
+        await IbQuestionDbService().queryUserAnswers(uid2);
+
+    return uid1QuestionAnswers
+        .toSet()
+        .intersection(uid2QuestionAnswers.toSet())
+        .toList();
+  }
+
+  static Color getRandomColor() {
+    final Random random = Random();
+    final List<Color> _colors = [
+      IbColors.primaryColor,
+      IbColors.accentColor,
+      IbColors.darkPrimaryColor,
+    ];
+    _colors.addAll(Colors.accents);
+    _colors.addAll(Colors.primaries);
+    _colors.remove(Colors.yellowAccent);
+    _colors.remove(Colors.yellow);
+    return _colors[random.nextInt(_colors.length)];
   }
 }

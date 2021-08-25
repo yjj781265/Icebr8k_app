@@ -25,11 +25,14 @@ class ChatTab extends StatelessWidget {
       }
 
       if (_controller.chatTabItems.isEmpty) {
-        return Center(
-          child: SizedBox(
-              width: 230,
-              height: 230,
-              child: Lottie.asset('assets/images/business_chat.json')),
+        return Container(
+          color: IbColors.lightBlue,
+          child: Center(
+            child: SizedBox(
+                width: 230,
+                height: 230,
+                child: Lottie.asset('assets/images/business_chat.json')),
+          ),
         );
       }
 
@@ -65,7 +68,8 @@ class ChatTab extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: IbUserAvatar(
-                avatarUrl: item.avatarUrl,
+                avatarUrl: item.ibUser!.avatarUrl,
+                uid: item.ibUser!.id,
                 radius: 32,
               ),
             ),

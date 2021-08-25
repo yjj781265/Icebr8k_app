@@ -2,17 +2,21 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'ib_answer.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class IbAnswer {
   final String answer;
-  final String questionId;
-  final int timeStampInMs;
+  final int answeredTimeInMs;
   final String uid;
+  final int askedTimeInMs;
+  final String questionId;
+  final String questionType;
 
   IbAnswer(
       {required this.answer,
+      required this.answeredTimeInMs,
+      required this.askedTimeInMs,
       required this.questionId,
-      required this.timeStampInMs,
+      required this.questionType,
       required this.uid});
 
   factory IbAnswer.fromJson(Map<String, dynamic> json) =>
@@ -33,6 +37,6 @@ class IbAnswer {
 
   @override
   String toString() {
-    return 'IbAnswer{answer: $answer, questionId: $questionId, timeStampInMs: $timeStampInMs, uid: $uid}';
+    return 'IbAnswer{answer: $answer, questionType: $questionType';
   }
 }

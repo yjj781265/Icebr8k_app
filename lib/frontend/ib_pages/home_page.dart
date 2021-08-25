@@ -16,9 +16,10 @@ import 'package:icebr8k/frontend/ib_pages/chat_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_page.dart';
 import 'package:icebr8k/frontend/ib_pages/ib_user_search_page.dart';
 import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
-import 'package:icebr8k/frontend/ib_pages/my_profile_tab.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/question_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/score_tab.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_icon.dart';
 import 'package:move_to_background/move_to_background.dart';
@@ -29,12 +30,18 @@ import '../ib_config.dart';
 class HomePage extends StatelessWidget {
   HomePage({Key? key}) : super(key: key);
   final HomeController _homeController = Get.put(HomeController());
+  final IbQuestionController _questionController =
+      Get.put(IbQuestionController());
+  final FriendRequestController _friendRequestController =
+      Get.put(FriendRequestController());
+  final FriendListController _friendListController =
+      Get.put(FriendListController());
+  final ChatTabController _chatTabController = Get.put(ChatTabController());
   final _drawerController = ZoomDrawerController();
 
   final GlobalKey<IbAnimatedIconState> _iconKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
-    initGetXControllers();
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       if (_drawerController.stateNotifier == null) {
         return;
@@ -147,7 +154,7 @@ class HomePage extends StatelessWidget {
       QuestionTab(),
       ChatTab(),
       const ScoreTab(),
-      const MyProfileTab(),
+      ProfilePage(IbUtils.getCurrentUid()!),
     ];
     return Obx(
       () => IndexedStack(
@@ -181,14 +188,15 @@ class HomePage extends StatelessWidget {
             icon: const Icon(Icons.chat_outlined),
             title: Text('chat'.tr),
             inactiveColor: _inactiveColor,
+            notification: Get.find<ChatTabController>().totalUnread.value,
             textAlign: TextAlign.center,
           ),
           BottomNavyBarItem(
-            icon: const Icon(Icons.star_border_outlined),
-            title: Text('score'.tr),
-            inactiveColor: _inactiveColor,
-            textAlign: TextAlign.center,
-          ),
+              icon: const Icon(Icons.star_border_outlined),
+              title: Text('score'.tr),
+              inactiveColor: _inactiveColor,
+              textAlign: TextAlign.center,
+              notification: _friendRequestController.requests.length),
           BottomNavyBarItem(
             icon: const Icon(Icons.person_outline),
             title: Text(
@@ -200,12 +208,5 @@ class HomePage extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  void initGetXControllers() {
-    Get.put(FriendRequestController());
-    Get.put(FriendListController());
-    Get.put(IbQuestionController());
-    Get.put(ChatTabController());
   }
 }

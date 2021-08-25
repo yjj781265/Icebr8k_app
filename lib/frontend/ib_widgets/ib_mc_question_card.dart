@@ -45,7 +45,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   }
 
   void _runExpandCheck() {
-    if (widget._controller.isExpanded.isTrue) {
+    if (widget._controller.isRxExpanded.isTrue) {
       expandController.forward();
     } else {
       expandController.reverse();
@@ -82,7 +82,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
             ),
           ),
         ),
-        SizedBox(height: 56, child: Center(child: _handleButtons())),
+        Center(child: _handleButtons()),
       ],
     );
     return Center(
@@ -123,7 +123,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                           Text(
                             IbUtils.getAgoDateTimeString(
                                 DateTime.fromMillisecondsSinceEpoch(widget
-                                    ._controller.ibQuestion.createdTimeInMs)),
+                                    ._controller.ibQuestion.askedTimeInMs)),
                             style: const TextStyle(
                                 fontSize: IbConfig.kDescriptionTextSize,
                                 color: IbColors.lightGrey),
@@ -141,23 +141,27 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                         fontSize: IbConfig.kPageTitleSize,
                         fontWeight: FontWeight.bold),
                   ),
-                  if (widget._controller.ibQuestion.description.isNotEmpty)
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  if (widget._controller.ibQuestion.description
+                      .trim()
+                      .isNotEmpty)
                     Text(
-                      widget._controller.ibQuestion.description,
+                      widget._controller.ibQuestion.description.trim(),
                       style: const TextStyle(
                           fontSize: IbConfig.kDescriptionTextSize,
                           color: Colors.black),
                     ),
-                  const SizedBox(
-                    height: 16,
-                  ),
                   if (widget._controller.isExpandable)
                     SizeTransition(
                       sizeFactor: animation,
                       child: expandableInfo,
                     )
                   else
-                    expandableInfo,
+                    widget._controller.isRxExpanded.isTrue
+                        ? expandableInfo
+                        : const SizedBox(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -168,21 +172,24 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                             color: IbColors.lightGrey),
                       ),
                       if (widget._controller.isExpandable)
-                        IconButton(
-                            onPressed: () {
-                              widget._controller.isExpanded.value =
-                                  !widget._controller.isExpanded.value;
-                              _runExpandCheck();
-                            },
-                            icon: widget._controller.isExpanded.isTrue
-                                ? const Icon(
-                                    Icons.expand_less_outlined,
-                                    color: IbColors.primaryColor,
-                                  )
-                                : const Icon(
-                                    Icons.expand_more_outlined,
-                                    color: IbColors.primaryColor,
-                                  )),
+                        Obx(
+                          () => IconButton(
+                              padding: EdgeInsets.zero,
+                              onPressed: () {
+                                widget._controller.isRxExpanded.value =
+                                    !widget._controller.isRxExpanded.value;
+                                _runExpandCheck();
+                              },
+                              icon: widget._controller.isRxExpanded.isTrue
+                                  ? const Icon(
+                                      Icons.expand_less_outlined,
+                                      color: IbColors.primaryColor,
+                                    )
+                                  : const Icon(
+                                      Icons.expand_more_outlined,
+                                      color: IbColors.primaryColor,
+                                    )),
+                        ),
                     ],
                   ),
                 ],
@@ -203,7 +210,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
         );
       }
 
-      if (widget._controller.isAnswered.isTrue) {
+      if (widget._controller.showResult.isTrue) {
         return Wrap(
           alignment: WrapAlignment.center,
           crossAxisAlignment: WrapCrossAlignment.center,
@@ -216,7 +223,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                  'Voted ${IbUtils.getAgoDateTimeString(widget._controller.votedDateTime.value)}'),
+                  'Voted ${IbUtils.getSuffixDateTimeString(widget._controller.votedDateTime.value)}'),
             )
           ],
         );
@@ -250,6 +257,9 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
     return Obx(() {
       return IbUserAvatar(
         avatarUrl: widget._controller.avatarUrl.value,
+        uid: widget._controller.ibUser == null
+            ? ''
+            : widget._controller.ibUser!.id,
         radius: 16,
       );
     });
@@ -271,7 +281,7 @@ class IbQuestionMcItem extends StatelessWidget {
     return Obx(
       () => GestureDetector(
         onTap: () {
-          if (_controller.isSample || _controller.isAnswered.isTrue) {
+          if (_controller.isSample || _controller.showResult.isTrue) {
             return;
           }
 
@@ -299,14 +309,14 @@ class IbQuestionMcItem extends StatelessWidget {
                     color: _determineColor(
                         result: _controller.resultMap[choice] ?? 0,
                         isSelected: _controller.selectedChoice.value == choice,
-                        isVoted: _controller.isAnswered.value),
+                        isVoted: _controller.showResult.value),
                     borderRadius: BorderRadius.circular(8)),
                 width: _determineWidth(
                     isSelected: _controller.selectedChoice.value == choice,
                     result: _controller.resultMap[choice] ?? 0,
-                    isVoted: _controller.isAnswered.value),
+                    isVoted: _controller.showResult.value),
                 duration: Duration(
-                    milliseconds: _controller.isAnswered.value
+                    milliseconds: _controller.showResult.value
                         ? IbConfig.kEventTriggerDelayInMillis
                         : 0),
               ),
@@ -319,14 +329,14 @@ class IbQuestionMcItem extends StatelessWidget {
                       fontSize: IbConfig.kNormalTextSize, color: Colors.black),
                 ),
               ),
-              if (_controller.isAnswered.value)
+              if (_controller.showResult.value)
                 TweenAnimationBuilder(
                   builder:
                       (BuildContext context, Object? value, Widget? child) {
                     return Positioned(
                       right: 8,
                       child: Text(
-                          '${((_controller.resultMap[choice] ?? 0) * 100).toInt()}%'),
+                          '${((_controller.resultMap[choice] ?? 0) * 100).toStringAsFixed(1)}%'),
                     );
                   },
                   duration: const Duration(

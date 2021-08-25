@@ -25,7 +25,6 @@ class ScoreTab extends StatefulWidget {
 class _ScoreTabState extends State<ScoreTab>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-
   final _friendListController = Get.find<FriendListController>();
   final _friendRequestController = Get.find<FriendRequestController>();
 
@@ -33,11 +32,6 @@ class _ScoreTabState extends State<ScoreTab>
   void initState() {
     super.initState();
     _tabController = TabController(vsync: this, length: 2);
-    _tabController.addListener(() {
-      if (_tabController.index == 0) {
-        _friendListController.refreshEverything();
-      }
-    });
   }
 
   @override
@@ -49,7 +43,11 @@ class _ScoreTabState extends State<ScoreTab>
           TabBar(
             controller: _tabController,
             tabs: [
-              Tab(text: 'score_page_tab_1_title'.tr),
+              Obx(
+                () => Tab(
+                    text:
+                        '${'score_page_tab_1_title'.tr}${_friendListController.friendItems.isEmpty ? '' : '(${_friendListController.friendItems.length})'}'),
+              ),
               Obx(
                 () => Tab(
                   text:
@@ -156,6 +154,7 @@ class FriendItemView extends StatelessWidget {
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: IbUserAvatar(
+            uid: friendListItem.uid,
             avatarUrl: friendListItem.avatarUrl,
           ),
         ),
@@ -242,7 +241,10 @@ class _FriendRequestTabState extends State<FriendRequestTab>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: IbUserAvatar(avatarUrl: item.avatarUrl),
+                child: IbUserAvatar(
+                  avatarUrl: item.avatarUrl,
+                  uid: item.friendUid,
+                ),
               ),
               Expanded(
                 flex: 5,

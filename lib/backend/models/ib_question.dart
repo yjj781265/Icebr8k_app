@@ -8,9 +8,12 @@ class IbQuestion {
   static const String kScale = "sc";
   String question;
   String description;
+  int comments;
+  int pollSize;
+  int likes;
   String id;
   String creatorId;
-  int createdTimeInMs;
+  int askedTimeInMs;
   int endTimeInMs;
   List<String> choices;
   String questionType;
@@ -22,7 +25,10 @@ class IbQuestion {
       required this.choices,
       required this.questionType,
       this.description = '',
-      required this.createdTimeInMs,
+      this.likes = 0,
+      this.comments = 0,
+      this.pollSize = 0,
+      required this.askedTimeInMs,
       this.endTimeInMs = 0});
 
   factory IbQuestion.fromJson(Map<String, dynamic> json) =>

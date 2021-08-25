@@ -15,7 +15,10 @@ IbQuestion _$IbQuestionFromJson(Map<String, dynamic> json) {
         (json['choices'] as List<dynamic>).map((e) => e as String).toList(),
     questionType: json['questionType'] as String,
     description: json['description'] as String,
-    createdTimeInMs: json['createdTimeInMs'] as int,
+    likes: json['likes'] as int,
+    comments: json['comments'] as int,
+    pollSize: json['pollSize'] as int,
+    askedTimeInMs: json['askedTimeInMs'] as int,
     endTimeInMs: json['endTimeInMs'] as int,
   );
 }
@@ -24,9 +27,12 @@ Map<String, dynamic> _$IbQuestionToJson(IbQuestion instance) =>
     <String, dynamic>{
       'question': instance.question,
       'description': instance.description,
+      'comments': instance.comments,
+      'pollSize': instance.pollSize,
+      'likes': instance.likes,
       'id': instance.id,
       'creatorId': instance.creatorId,
-      'createdTimeInMs': instance.createdTimeInMs,
+      'askedTimeInMs': instance.askedTimeInMs,
       'endTimeInMs': instance.endTimeInMs,
       'choices': instance.choices,
       'questionType': instance.questionType,

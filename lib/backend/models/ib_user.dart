@@ -13,10 +13,12 @@ class IbUser {
   final int joinTimeInMs;
   final int birthdateInMs;
   final bool isOnline;
+  final String coverPhotoUrl;
   final String description;
 
   IbUser({
     this.avatarUrl = '',
+    this.coverPhotoUrl = '',
     this.loginTimeInMs = 0,
     this.joinTimeInMs = 0,
     this.birthdateInMs = 0,

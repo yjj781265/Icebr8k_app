@@ -35,6 +35,12 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     super.initState();
   }
 
+  @override
+  void dispose() {
+    expandController.dispose();
+    super.dispose();
+  }
+
   ///Setting up the animation
   void _prepareAnimations() {
     expandController = AnimationController(
@@ -48,7 +54,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
   }
 
   void _runExpandCheck() {
-    if (widget._controller.isExpanded.isTrue) {
+    if (widget._controller.isRxExpanded.isTrue) {
       expandController.forward();
     } else {
       expandController.reverse();
@@ -60,10 +66,8 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     super.build(context);
     final expandableInfo = Column(
       children: [
-        LimitedBox(
-            maxHeight: Get.height * 0.4,
-            child: IbQuestionScItem(widget._controller)),
-        SizedBox(height: 56, child: Center(child: _handleButtons())),
+        IbQuestionScItem(widget._controller),
+        Center(child: _handleButtons()),
       ],
     );
     return Obx(
@@ -108,7 +112,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                                       DateTime.fromMillisecondsSinceEpoch(widget
                                           ._controller
                                           .ibQuestion
-                                          .createdTimeInMs)),
+                                          .askedTimeInMs)),
                                   style: const TextStyle(
                                       fontSize: IbConfig.kDescriptionTextSize,
                                       color: IbColors.lightGrey),
@@ -126,8 +130,9 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                               fontSize: IbConfig.kPageTitleSize,
                               fontWeight: FontWeight.bold),
                         ),
-                        if (widget
-                            ._controller.ibQuestion.description.isNotEmpty)
+                        if (widget._controller.ibQuestion.description
+                            .trim()
+                            .isNotEmpty)
                           Text(
                             widget._controller.ibQuestion.description,
                             style: const TextStyle(
@@ -143,7 +148,9 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                             child: expandableInfo,
                           )
                         else
-                          expandableInfo,
+                          widget._controller.isRxExpanded.isTrue
+                              ? expandableInfo
+                              : const SizedBox(),
                         Obx(
                           () => Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -155,21 +162,26 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                                     color: IbColors.lightGrey),
                               ),
                               if (widget._controller.isExpandable)
-                                IconButton(
-                                    onPressed: () {
-                                      widget._controller.isExpanded.value =
-                                          !widget._controller.isExpanded.value;
-                                      _runExpandCheck();
-                                    },
-                                    icon: widget._controller.isExpanded.value
-                                        ? const Icon(
-                                            Icons.expand_less_outlined,
-                                            color: IbColors.primaryColor,
-                                          )
-                                        : const Icon(
-                                            Icons.expand_more_outlined,
-                                            color: IbColors.primaryColor,
-                                          ))
+                                Obx(
+                                  () => IconButton(
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () {
+                                        widget._controller.isRxExpanded.value =
+                                            !widget
+                                                ._controller.isRxExpanded.value;
+                                        _runExpandCheck();
+                                      },
+                                      icon:
+                                          widget._controller.isRxExpanded.value
+                                              ? const Icon(
+                                                  Icons.expand_less_outlined,
+                                                  color: IbColors.primaryColor,
+                                                )
+                                              : const Icon(
+                                                  Icons.expand_more_outlined,
+                                                  color: IbColors.primaryColor,
+                                                )),
+                                )
                             ],
                           ),
                         ),
@@ -194,7 +206,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
         );
       }
 
-      if (widget._controller.isAnswered.isTrue) {
+      if (widget._controller.showResult.isTrue) {
         return Wrap(
           direction: Axis.vertical,
           crossAxisAlignment: WrapCrossAlignment.center,
@@ -209,13 +221,14 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Text(
-                    'Voted ${IbUtils.getAgoDateTimeString(widget._controller.votedDateTime.value)}',
+                    'Voted ${IbUtils.getSuffixDateTimeString(widget._controller.votedDateTime.value)}',
                     style:
                         const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
                   ),
                 ),
                 TextButton(
                     onPressed: () {
+                      widget._controller.calculateResult();
                       cardKey.currentState!.flip();
                     },
                     child: const Text(
@@ -256,43 +269,51 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
   }
 
   Widget _cardBackSide() {
-    return SizedBox(
-      height: 300,
-      child: IbCard(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: IconButton(
-                  onPressed: () {
-                    cardKey.currentState!.flip();
-                  },
-                  icon: const Icon(Icons.arrow_back_ios_outlined)),
-            ),
-            Expanded(
-              flex: 8,
-              child: PieChart(
-                PieChartData(
-                  sectionsSpace: 2,
-                  centerSpaceRadius: 30,
-                  startDegreeOffset: 45,
-                  sections: _getSectionData(),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SizedBox(
+        height: 300,
+        child: IbCard(
+          child: Obx(
+            () => Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: IconButton(
+                      onPressed: () {
+                        cardKey.currentState!.flip();
+                      },
+                      icon: const Icon(Icons.arrow_back_ios_outlined)),
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Obx(
-                () => Text(
-                  '${widget._controller.totalPolled.value} polled',
-                  style: const TextStyle(
-                      fontSize: IbConfig.kDescriptionTextSize,
-                      color: IbColors.lightGrey),
+                Expanded(
+                  flex: 8,
+                  child: widget._controller.isCalculating.isTrue
+                      ? const Center(
+                          child: IbProgressIndicator(),
+                        )
+                      : PieChart(
+                          PieChartData(
+                            sectionsSpace: 2,
+                            centerSpaceRadius: 20,
+                            startDegreeOffset: 45,
+                            sections: _getSectionData(),
+                          ),
+                        ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    '${widget._controller.totalPolled.value} polled',
+                    style: const TextStyle(
+                        fontSize: IbConfig.kDescriptionTextSize,
+                        color: IbColors.lightGrey),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -300,17 +321,22 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
 
   List<PieChartSectionData> _getSectionData() {
     final List<PieChartSectionData> _pieChartDataList = [];
+    Color lastColor = IbUtils.getRandomColor();
     for (final String choice in widget._controller.resultMap.keys) {
-      final int percentage =
-          ((widget._controller.resultMap[choice] ?? 0) * 100).toInt();
-      final Color color =
-          IbUtils.getRandomColor(widget._controller.resultMap[choice] ?? 0);
+      final String percentage =
+          ((widget._controller.resultMap[choice] ?? 0) * 100)
+              .toStringAsFixed(1);
+      Color currentColor = IbUtils.getRandomColor();
+      while (currentColor == lastColor) {
+        currentColor = IbUtils.getRandomColor();
+      }
+      lastColor = currentColor;
       final PieChartSectionData data = PieChartSectionData(
           badgeWidget: Container(
             width: 32.0,
             height: 32.0,
             decoration: BoxDecoration(
-              border: Border.all(color: color),
+              border: Border.all(color: lastColor),
               color: IbColors.lightBlue,
               shape: BoxShape.circle,
               boxShadow: [
@@ -329,10 +355,10 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                   fontWeight: FontWeight.bold, color: IbColors.primaryColor),
             )),
           ),
-          color: color,
+          color: lastColor,
           badgePositionPercentageOffset: 0.95,
-          titlePositionPercentageOffset: 0.5,
-          value: percentage.toDouble(),
+          titlePositionPercentageOffset: 0.4,
+          value: double.parse(percentage),
           radius: 80,
           titleStyle: const TextStyle(
               fontSize: IbConfig.kNormalTextSize, fontWeight: FontWeight.bold),
@@ -345,6 +371,9 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
   Widget _handleAvatarImage() {
     return IbUserAvatar(
       avatarUrl: widget._controller.avatarUrl.value,
+      uid: widget._controller.ibUser == null
+          ? ''
+          : widget._controller.ibUser!.id,
       radius: 16,
     );
   }
@@ -373,14 +402,14 @@ class IbQuestionScItem extends StatelessWidget {
             valueIndicatorShape:
                 const _CustomSliderThumbCircle(thumbRadius: 24, min: 1, max: 5),
             thumbColor: IbColors.primaryColor,
-            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12.0),
+            thumbShape:
+                const _CustomSliderThumbCircle(thumbRadius: 24, min: 1, max: 5),
             overlayColor: IbColors.primaryColor.withAlpha(80),
-            overlayShape: const RoundSliderOverlayShape(overlayRadius: 28.0),
+            overlayShape: const RoundSliderOverlayShape(overlayRadius: 26.0),
           ),
           child: Obx(
             () => SizedBox(
               width: Get.width * 0.9,
-              height: 50,
               child: Slider(
                   min: 1,
                   max: 5,
@@ -390,7 +419,7 @@ class IbQuestionScItem extends StatelessWidget {
                       ? 1
                       : double.parse(_controller.selectedChoice.value),
                   onChanged: (value) {
-                    if (_controller.isAnswered.isFalse) {
+                    if (_controller.showResult.isFalse) {
                       _controller.selectedChoice.value =
                           value.toInt().toString();
                     }

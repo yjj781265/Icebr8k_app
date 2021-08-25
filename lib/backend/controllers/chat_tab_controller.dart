@@ -14,6 +14,7 @@ class ChatTabController extends GetxController {
   late StreamSubscription<QuerySnapshot<Map<String, dynamic>>>
       _streamSubscription;
   final isLoading = true.obs;
+  final totalUnread = 0.obs;
 
   @override
   void onInit() {
@@ -53,6 +54,7 @@ class ChatTabController extends GetxController {
           return b.title.compareTo(a.title);
         });
       }
+      getTotalUnread();
       isLoading.value = false;
     });
     super.onInit();
@@ -62,6 +64,13 @@ class ChatTabController extends GetxController {
   void onClose() {
     _streamSubscription.cancel();
     super.onClose();
+  }
+
+  void getTotalUnread() {
+    totalUnread.value = 0;
+    for (final ChatTabItem item in chatTabItems) {
+      totalUnread.value = totalUnread.value + item.unReadCount;
+    }
   }
 
   Future<ChatTabItem> getChatTabItemFromDocChange(
@@ -103,6 +112,7 @@ class ChatTabItem {
   String chatRoomId;
   String title = '';
   List<String> memberUids;
+  IbUser? ibUser;
   IbMessage ibMessage;
   int unReadCount;
   String avatarUrl = '';
@@ -122,6 +132,7 @@ class ChatTabItem {
       final List<String> tempArr = [];
       tempArr.addAll(memberUids);
       tempArr.remove(IbUtils.getCurrentUid());
+      ibUser = controller.ibUserMap[tempArr.first];
       title = controller.ibUserMap[tempArr.first]!.username.toString();
       avatarUrl = controller.ibUserMap[tempArr.first]!.avatarUrl.toString();
     } else {

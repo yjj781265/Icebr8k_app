@@ -11,6 +11,7 @@ class HomeController extends GetxController {
   final currentIbName = ''.obs;
   final currentIbUsername = ''.obs;
   final currentIbAvatarUrl = ''.obs;
+  final currentIbCoverPhotoUrl = ''.obs;
   IbUser? currentIbUser;
   late StreamSubscription _currentIbUserStream;
   final tabTitleList = [
@@ -33,11 +34,11 @@ class HomeController extends GetxController {
 
   void _setupIbUser() {
     if (currentIbUser != null) {
-      print(currentIbUser);
       isIbUserOnline.value = currentIbUser!.isOnline;
       currentIbName.value = currentIbUser!.name;
       currentIbUsername.value = currentIbUser!.username;
       currentIbAvatarUrl.value = currentIbUser!.avatarUrl;
+      currentIbCoverPhotoUrl.value = currentIbUser!.coverPhotoUrl;
     }
   }
 
