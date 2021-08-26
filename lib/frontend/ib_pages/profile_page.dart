@@ -2,12 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/answered_question_controller.dart';
+import 'package:icebr8k/backend/controllers/common_answers_controller.dart';
 import 'package:icebr8k/backend/controllers/created_question_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/profile_controller.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
@@ -31,18 +33,25 @@ class _ProfilePageState extends State<ProfilePage>
   late TabController _tabController;
   late AnsweredQuestionController _answeredQuestionController;
   late CreatedQuestionController _createdQuestionController;
+  late CommonAnswersController _commonAnswersController;
   late ProfileController _profileController;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 2);
     _profileController =
         Get.put(ProfileController(widget.uid), tag: widget.uid);
-    _answeredQuestionController =
-        Get.put(AnsweredQuestionController(widget.uid), tag: widget.uid);
-    _createdQuestionController =
-        Get.put(CreatedQuestionController(widget.uid), tag: widget.uid);
+    if (widget.uid == IbUtils.getCurrentUid()) {
+      _answeredQuestionController =
+          Get.put(AnsweredQuestionController(widget.uid), tag: widget.uid);
+      _createdQuestionController =
+          Get.put(CreatedQuestionController(widget.uid), tag: widget.uid);
+    }
+    _commonAnswersController =
+        Get.put(CommonAnswersController(widget.uid), tag: widget.uid);
+
+    _tabController = TabController(
+        vsync: this, length: _profileController.isMe.isTrue ? 2 : 1);
   }
 
   @override
@@ -215,12 +224,12 @@ class _ProfilePageState extends State<ProfilePage>
                             () => Wrap(
                               children: [
                                 IbStats(
-                                    title: 'Asked',
-                                    num: _profileController.totalAsked.value),
-                                IbStats(
                                     title: 'Answered',
                                     num:
                                         _profileController.totalAnswered.value),
+                                IbStats(
+                                    title: 'Asked',
+                                    num: _profileController.totalAsked.value),
                               ],
                             ),
                           ),
@@ -240,23 +249,32 @@ class _ProfilePageState extends State<ProfilePage>
             children: [
               TabBar(
                 controller: _tabController,
-                tabs: const [
-                  Tab(text: 'Answered Questions'),
-                  Tab(text: 'My Questions'),
+                tabs: [
+                  if (_profileController.isMe.isTrue)
+                    const Tab(text: 'Answered Questions'),
+                  if (_profileController.isMe.isTrue)
+                    const Tab(text: 'Asked Questions'),
+                  if (_profileController.isMe.isFalse)
+                    Obx(() => Tab(
+                        text:
+                            'Common Answers(${_commonAnswersController.ibQuestions.length})')),
                 ],
                 labelStyle: const TextStyle(fontWeight: FontWeight.bold),
                 unselectedLabelStyle:
                     const TextStyle(fontWeight: FontWeight.bold),
                 labelColor: Colors.black,
                 unselectedLabelColor: IbColors.lightGrey,
-                indicatorColor: IbColors.primaryColor,
+                indicatorColor: _tabController.length == 1
+                    ? Colors.transparent
+                    : IbColors.primaryColor,
               ),
               Expanded(
                   child: TabBarView(
                 controller: _tabController,
                 children: [
-                  buildMyAnsweredQTab(),
-                  buildQuestionTab(),
+                  if (_profileController.isMe.isTrue) buildAnsweredQTab(),
+                  if (_profileController.isMe.isTrue) buildAskedTab(),
+                  if (_profileController.isMe.isFalse) buildCommonAnswersTab(),
                 ],
               ))
             ],
@@ -266,7 +284,7 @@ class _ProfilePageState extends State<ProfilePage>
     );
   }
 
-  Widget buildMyAnsweredQTab() {
+  Widget buildAnsweredQTab() {
     final refreshController = RefreshController();
     return Obx(
       () {
@@ -326,7 +344,7 @@ class _ProfilePageState extends State<ProfilePage>
     );
   }
 
-  Widget buildQuestionTab() {
+  Widget buildAskedTab() {
     final refreshController = RefreshController();
     return Obx(
       () {
@@ -374,6 +392,51 @@ class _ProfilePageState extends State<ProfilePage>
               return IbScQuestionCard(_controller);
             },
             itemCount: _createdQuestionController.createdQuestions.length,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildCommonAnswersTab() {
+    final refreshController = RefreshController();
+    return Obx(
+      () {
+        return SmartRefresher(
+          footer: const ClassicFooter(
+            textStyle: TextStyle(color: IbColors.primaryColor),
+            failedIcon: Icon(
+              Icons.error_outline,
+              color: IbColors.errorRed,
+            ),
+            loadingIcon: IbProgressIndicator(
+              width: 24,
+              height: 24,
+              padding: 0,
+            ),
+          ),
+          controller: refreshController,
+          enablePullDown: false,
+          enablePullUp: true,
+          onLoading: () async {
+            refreshController.loadComplete();
+          },
+          child: ListView.builder(
+            itemBuilder: (context, index) {
+              final IbQuestion item =
+                  _commonAnswersController.ibQuestions[index];
+              final tag = 'common${item.id}';
+              final IbQuestionItemController _controller = Get.put(
+                  IbQuestionItemController(
+                      ibQuestion: item, isExpandable: true),
+                  tag: tag.toString());
+
+              if (item.questionType == IbQuestion.kMultipleChoice) {
+                return IbMcQuestionCard(_controller);
+              }
+              return IbScQuestionCard(_controller);
+            },
+            itemCount: _commonAnswersController.ibQuestions.length,
           ),
         );
       },

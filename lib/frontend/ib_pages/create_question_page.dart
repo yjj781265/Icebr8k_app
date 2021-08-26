@@ -118,7 +118,6 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
             ];
           },
           body: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(
                 height: 64,
@@ -164,51 +163,52 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
   }
 
   Widget _mCTab() {
-    return Column(
-      children: [
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              if (_controller.choiceList.length < IbConfig.kChoiceLimit) {
-                _showTextFiledBottomSheet('add_choice');
-              } else {
-                Get.showSnackbar(GetBar(
-                  borderRadius: IbConfig.kCardCornerRadius,
-                  margin: const EdgeInsets.all(8),
-                  duration: const Duration(seconds: 3),
-                  backgroundColor: IbColors.errorRed,
-                  messageText: Text('choice_limit'.tr),
-                ));
-              }
-            },
-            child: Container(
-              margin: const EdgeInsets.all(8),
-              padding: const EdgeInsets.all(8),
-              height: 46,
-              decoration: BoxDecoration(
-                  color: IbColors.white,
-                  borderRadius: BorderRadius.circular(8)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'tap_to_add'.tr,
-                    style: const TextStyle(color: IbColors.lightGrey),
-                  ),
-                  const Icon(Icons.add_outlined),
-                ],
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                if (_controller.choiceList.length < IbConfig.kChoiceLimit) {
+                  _showTextFiledBottomSheet('add_choice');
+                } else {
+                  Get.showSnackbar(GetBar(
+                    borderRadius: IbConfig.kCardCornerRadius,
+                    margin: const EdgeInsets.all(8),
+                    duration: const Duration(seconds: 3),
+                    backgroundColor: IbColors.errorRed,
+                    messageText: Text('choice_limit'.tr),
+                  ));
+                }
+              },
+              child: Container(
+                margin: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
+                height: 46,
+                decoration: BoxDecoration(
+                    color: IbColors.white,
+                    borderRadius: BorderRadius.circular(8)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'tap_to_add'.tr,
+                      style: const TextStyle(color: IbColors.lightGrey),
+                    ),
+                    const Icon(Icons.add_outlined),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        Obx(
-          () => Expanded(
-            child: ReorderableListView(
+          Obx(
+            () => ReorderableListView(
               onReorder: (oldIndex, newIndex) {
                 print('$oldIndex to $newIndex');
                 _controller.swapIndex(oldIndex, newIndex);
               },
+              primary: false,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: [
@@ -239,61 +239,62 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                   )
               ],
             ),
-          ),
-        )
-      ],
+          )
+        ],
+      ),
     );
   }
 
   Widget _sCTab() {
-    return Column(
-      children: [
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              if (_controller.scaleChoiceList.length <
-                  IbConfig.kScChoiceLimit) {
-                _showTextFiledBottomSheet('add_endpoint');
-              } else {
-                Get.showSnackbar(GetBar(
-                  borderRadius: IbConfig.kCardCornerRadius,
-                  margin: const EdgeInsets.all(8),
-                  duration: const Duration(seconds: 3),
-                  backgroundColor: IbColors.errorRed,
-                  messageText: Text('choice_limit_sc'.tr),
-                ));
-              }
-            },
-            child: Container(
-              margin: const EdgeInsets.all(8),
-              padding: const EdgeInsets.all(8),
-              height: 46,
-              decoration: BoxDecoration(
-                  color: IbColors.white,
-                  borderRadius: BorderRadius.circular(8)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'tap_to_add_sc'.tr,
-                    style: const TextStyle(color: IbColors.lightGrey),
-                  ),
-                  const Icon(Icons.add_outlined),
-                ],
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                if (_controller.scaleChoiceList.length <
+                    IbConfig.kScChoiceLimit) {
+                  _showTextFiledBottomSheet('add_endpoint');
+                } else {
+                  Get.showSnackbar(GetBar(
+                    borderRadius: IbConfig.kCardCornerRadius,
+                    margin: const EdgeInsets.all(8),
+                    duration: const Duration(seconds: 3),
+                    backgroundColor: IbColors.errorRed,
+                    messageText: Text('choice_limit_sc'.tr),
+                  ));
+                }
+              },
+              child: Container(
+                margin: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
+                height: 46,
+                decoration: BoxDecoration(
+                    color: IbColors.white,
+                    borderRadius: BorderRadius.circular(8)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'tap_to_add_sc'.tr,
+                      style: const TextStyle(color: IbColors.lightGrey),
+                    ),
+                    const Icon(Icons.add_outlined),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        Obx(
-          () => Expanded(
-            child: ReorderableListView(
+          Obx(
+            () => ReorderableListView(
               onReorder: (oldIndex, newIndex) {
                 print('$oldIndex to $newIndex');
                 _controller.swapIndex(oldIndex, newIndex);
               },
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
+              primary: false,
               children: [
                 for (final item in _controller.scaleChoiceList)
                   Container(
@@ -322,9 +323,9 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                   )
               ],
             ),
-          ),
-        )
-      ],
+          )
+        ],
+      ),
     );
   }
 

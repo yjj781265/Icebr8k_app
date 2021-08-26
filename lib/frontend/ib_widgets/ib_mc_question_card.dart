@@ -141,9 +141,6 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                         fontSize: IbConfig.kPageTitleSize,
                         fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(
-                    height: 16,
-                  ),
                   if (widget._controller.ibQuestion.description
                       .trim()
                       .isNotEmpty)
@@ -153,6 +150,9 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                           fontSize: IbConfig.kDescriptionTextSize,
                           color: Colors.black),
                     ),
+                  const SizedBox(
+                    height: 8,
+                  ),
                   if (widget._controller.isExpandable)
                     SizeTransition(
                       sizeFactor: animation,

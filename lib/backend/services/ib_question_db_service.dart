@@ -158,13 +158,13 @@ class IbQuestionDbService {
         .collectionGroup('Answers')
         .limit(1)
         .where('uid', isEqualTo: uid)
-        .orderBy('askedTimeInMs', descending: true)
+        .orderBy('askedTimeInMs', descending: false)
         .get();
     if (_snapshot.docs.isEmpty) {
       return null;
     }
 
-    return _snapshot.docs.first;
+    return _snapshot.docs.last;
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>>

@@ -15,8 +15,8 @@ class IbLinearIndicator extends StatelessWidget {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: 160,
+          Expanded(
+            flex: 7,
             child: ClipRRect(
               borderRadius: const BorderRadius.all(
                   Radius.circular(IbConfig.kScrollbarCornerRadius)),
@@ -28,9 +28,14 @@ class IbLinearIndicator extends StatelessWidget {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text('${(endValue * 100).toInt()}%'),
+          Expanded(
+            flex: 3,
+            child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  '${(endValue * 100).toInt()}%',
+                  style: TextStyle(color: _handleIndicatorColor(endValue)),
+                )),
           )
         ],
       );
@@ -44,8 +49,8 @@ class IbLinearIndicator extends StatelessWidget {
           return Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(
-                width: 160,
+              Expanded(
+                flex: 7,
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(
                       Radius.circular(IbConfig.kScrollbarCornerRadius)),
@@ -57,11 +62,14 @@ class IbLinearIndicator extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  '${(value * 100).toInt()}%',
-                  style: TextStyle(color: _handleIndicatorColor(value)),
+              Expanded(
+                flex: 3,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    '${(value * 100).toInt()}%',
+                    style: TextStyle(color: _handleIndicatorColor(value)),
+                  ),
                 ),
               )
             ],

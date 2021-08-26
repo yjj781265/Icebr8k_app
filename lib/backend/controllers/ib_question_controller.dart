@@ -56,22 +56,20 @@ class IbQuestionController extends GetxController {
   Future<void> queryQuestionsFromDb() async {
     final snapshot = await IbQuestionDbService()
         .queryQuestions(limit: 3, lastDoc: lastDocSnapShot);
-
     if (snapshot.docs.isNotEmpty) {
       lastDocSnapShot = snapshot.docs[snapshot.size - 1];
       for (final docSnapShot in snapshot.docs) {
         final IbQuestion ibQuestion = IbQuestion.fromJson(docSnapShot.data());
         ibQuestions.addIf(!ibQuestions.contains(ibQuestion), ibQuestion);
       }
-    } else {
-      lastDocSnapShot = null;
     }
   }
 
   Future<void> refreshQuestions() async {
+    print(' IbQuestionController refreshQuestions');
     isLoading.value = true;
-    lastDocSnapShot = null;
     ibQuestions.clear();
-    //await loadFirst8Q();
+    await queryQuestionsFromDb();
+    isLoading.value = false;
   }
 }

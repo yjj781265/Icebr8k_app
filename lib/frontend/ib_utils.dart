@@ -237,7 +237,7 @@ class IbUtils {
     return _score;
   }
 
-  static Future<List<IbAnswer>> getCommonAnsweredQ(
+  static Future<List<IbAnswer>> getCommonAnswersQ(
       String uid1, String uid2) async {
     /// query each user answered questions then intersect
     final List<IbAnswer> uid1QuestionAnswers =

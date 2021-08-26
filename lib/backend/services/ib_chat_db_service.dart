@@ -65,7 +65,7 @@ class IbChatDbService {
         .get();
 
     if (_snapshot1.size == 0) {
-      return 0;
+      return 1;
     }
 
     final _snapshot2 = await _collectionRef
