@@ -25,8 +25,9 @@ class IbQuestionItemController extends GetxController {
   final title = ''.obs;
   final subtitle = ''.obs;
   final avatarUrl = ''.obs;
-  bool isExpandable;
-  bool isSample;
+  final bool isExpandable;
+  final bool isSample;
+  final bool disableAvatarOnTouch;
 
   late RxBool isRxExpanded;
   final bool isExpanded;
@@ -42,6 +43,7 @@ class IbQuestionItemController extends GetxController {
       this.isExpanded = true,
       this.isExpandable = false,
       this.isSample = false,
+      this.disableAvatarOnTouch = false,
       this.ibAnswer});
 
   @override

@@ -8,7 +8,6 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 
 class IbQuestionController extends GetxController {
   final ibQuestions = <IbQuestion>[].obs;
-  final List<String> _answeredQuestionIds = [];
   DocumentSnapshot? lastDocSnapShot;
   late StreamSubscription questionSub;
   final isLoading = true.obs;
@@ -56,6 +55,7 @@ class IbQuestionController extends GetxController {
   Future<void> queryQuestionsFromDb() async {
     final snapshot = await IbQuestionDbService()
         .queryQuestions(limit: 3, lastDoc: lastDocSnapShot);
+
     if (snapshot.docs.isNotEmpty) {
       lastDocSnapShot = snapshot.docs[snapshot.size - 1];
       for (final docSnapShot in snapshot.docs) {

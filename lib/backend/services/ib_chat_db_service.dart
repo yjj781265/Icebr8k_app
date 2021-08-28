@@ -130,6 +130,10 @@ class IbChatDbService {
     print('createChatRoom new room $chatRoomId');
   }
 
+  Future<void> removeChatRoom(String chatRoomId) {
+    return _collectionRef.doc(chatRoomId).delete();
+  }
+
   Future<String> getChatRoomId(List<String> uids) async {
     uids.sort();
     print('getChatRoomId $uids');

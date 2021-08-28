@@ -370,6 +370,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
 
   Widget _handleAvatarImage() {
     return IbUserAvatar(
+      disableOnTap: widget._controller.disableAvatarOnTouch,
       avatarUrl: widget._controller.avatarUrl.value,
       uid: widget._controller.ibUser == null
           ? ''

@@ -26,13 +26,15 @@ class FriendRequestController extends GetxController {
         .listenToFriendRequest(Get.find<AuthController>().firebaseUser!.uid)
         .listen((event) async {
       print('find ${event.docChanges.length} requests');
+
       for (final change in event.docChanges) {
+        final IbFriend friend = IbFriend.fromJson(change.doc.data()!);
+        final IbUser? user =
+            await IbUserDbService().queryIbUser(friend.friendUid);
+        final double score = await IbUtils.getCompScore(
+            Get.find<AuthController>().firebaseUser!.uid, friend.friendUid);
+
         if (change.type == DocumentChangeType.added) {
-          final IbFriend friend = IbFriend.fromJson(change.doc.data()!);
-          final IbUser? user =
-              await IbUserDbService().queryIbUser(friend.friendUid);
-          final double score = await IbUtils.getCompScore(
-              Get.find<AuthController>().firebaseUser!.uid, friend.friendUid);
           if (user != null) {
             final FriendRequestItem item = FriendRequestItem(
                 avatarUrl: user.avatarUrl,
@@ -50,11 +52,33 @@ class FriendRequestController extends GetxController {
         }
 
         if (change.type == DocumentChangeType.modified) {
-          print('modified ${change.doc['status'].toString()}');
+          if (user != null) {
+            final FriendRequestItem item = FriendRequestItem(
+                avatarUrl: user.avatarUrl,
+                username: user.username,
+                timeStampInMs: friend.timestampInMs,
+                friendUid: friend.friendUid,
+                score: score,
+                requestMsg: friend.requestMsg);
+
+            if (requests.contains(item)) {
+              requests[requests.indexOf(item)] = item;
+            }
+          }
         }
 
         if (change.type == DocumentChangeType.removed) {
-          print('removed ${change.doc['status'].toString()}');
+          if (user != null) {
+            final FriendRequestItem item = FriendRequestItem(
+                avatarUrl: user.avatarUrl,
+                username: user.username,
+                timeStampInMs: friend.timestampInMs,
+                friendUid: friend.friendUid,
+                score: score,
+                requestMsg: friend.requestMsg);
+
+            requests.remove(item);
+          }
         }
       }
       requests.sort((a, b) => b.timeStampInMs.compareTo(a.timeStampInMs));

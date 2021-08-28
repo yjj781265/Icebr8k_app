@@ -59,87 +59,131 @@ class ChatTab extends StatelessWidget {
   }
 
   Widget buildItem(ChatTabItem item) {
-    return Container(
-      color: IbColors.white,
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: IbUserAvatar(
-                avatarUrl: item.ibUser!.avatarUrl,
-                uid: item.ibUser!.id,
-                radius: 32,
-              ),
-            ),
-          ),
-          Expanded(
-              flex: 8,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      item.title,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: IbConfig.kNormalTextSize),
-                    ),
-                    Text(item.ibMessage.content,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontSize: IbConfig.kSecondaryTextSize)),
-                  ],
+    return Dismissible(
+      direction: DismissDirection.endToStart,
+      key: Key(item.chatRoomId),
+      confirmDismiss: (direction) {
+        return Get.defaultDialog<bool>(
+            middleText: '',
+            titleStyle: const TextStyle(
+                fontSize: IbConfig.kNormalTextSize,
+                fontWeight: FontWeight.bold),
+            confirmTextColor: IbColors.primaryColor,
+            cancelTextColor: IbColors.errorRed,
+            buttonColor: Colors.transparent,
+            title: 'Are you sure to delete chat with ${item.title}',
+            onConfirm: () {
+              _controller.removeChatItem(item);
+              Get.back(result: true);
+            },
+            onCancel: () => Get.back(result: false));
+      },
+      background: Container(
+        color: IbColors.errorRed,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Row(
+              children: const [
+                Text(
+                  'Delete Chat',
+                  style: TextStyle(
+                      color: IbColors.white, fontWeight: FontWeight.bold),
                 ),
-              )),
-          Expanded(
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Icon(
+                    Icons.delete_forever_outlined,
+                    color: IbColors.white,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      child: Container(
+        color: IbColors.white,
+        child: Row(
+          children: [
+            Expanded(
               flex: 2,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (item.ibMessage.timestamp != null)
+                child: IbUserAvatar(
+                  avatarUrl: item.ibUser!.avatarUrl,
+                  uid: item.ibUser!.id,
+                  radius: 32,
+                ),
+              ),
+            ),
+            Expanded(
+                flex: 8,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                       Text(
-                        IbUtils.getChatDateTimeString(
-                            (item.ibMessage.timestamp as Timestamp).toDate()),
+                        item.title,
                         style: const TextStyle(
-                            color: IbColors.lightGrey,
-                            fontSize: IbConfig.kDescriptionTextSize),
+                            fontWeight: FontWeight.bold,
+                            fontSize: IbConfig.kNormalTextSize),
                       ),
-                    if (item.unReadCount == 0)
-                      const SizedBox(
-                        width: 16,
-                      )
-                    else
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: CircleAvatar(
-                          backgroundColor: IbColors.errorRed,
-                          radius: 11,
-                          child: Text(
-                            item.unReadCount >= 99
-                                ? '99+'
-                                : item.unReadCount.toString(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: IbColors.white,
-                              fontSize: 11,
+                      Text(item.ibMessage.content,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: IbConfig.kSecondaryTextSize)),
+                    ],
+                  ),
+                )),
+            Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (item.ibMessage.timestamp != null)
+                        Text(
+                          IbUtils.getChatDateTimeString(
+                              (item.ibMessage.timestamp as Timestamp).toDate()),
+                          style: const TextStyle(
+                              color: IbColors.lightGrey,
+                              fontSize: IbConfig.kDescriptionTextSize),
+                        ),
+                      if (item.unReadCount == 0)
+                        const SizedBox(
+                          width: 16,
+                        )
+                      else
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CircleAvatar(
+                            backgroundColor: IbColors.errorRed,
+                            radius: 11,
+                            child: Text(
+                              item.unReadCount >= 99
+                                  ? '99+'
+                                  : item.unReadCount.toString(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: IbColors.white,
+                                fontSize: 11,
+                              ),
                             ),
                           ),
-                        ),
-                      )
-                  ],
-                ),
-              ))
-        ],
+                        )
+                    ],
+                  ),
+                ))
+          ],
+        ),
       ),
     );
   }

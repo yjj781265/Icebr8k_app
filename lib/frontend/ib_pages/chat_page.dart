@@ -171,6 +171,7 @@ class MyMessageItemView extends StatelessWidget {
         widgets.add(Padding(
           padding: const EdgeInsets.all(2.0),
           child: IbUserAvatar(
+            disableOnTap: true,
             avatarUrl: item.controller.ibUserMap[uid]!.avatarUrl,
             uid: uid,
             radius: 6,
@@ -196,6 +197,7 @@ class MessageItemView extends StatelessWidget {
       child: Row(
         children: [
           IbUserAvatar(
+            disableOnTap: true,
             radius: 16,
             avatarUrl: user!.avatarUrl,
             uid: user.id,

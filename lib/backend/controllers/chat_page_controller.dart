@@ -172,6 +172,7 @@ class ChatPageController extends GetxController {
     if (messages.isEmpty) {
       return;
     }
+    print('setInChat');
     await IbChatDbService().updateInChatUidArray(
         chatRoomId: chatRoomId, uids: [IbUtils.getCurrentUid()!]);
   }
@@ -180,13 +181,14 @@ class ChatPageController extends GetxController {
     if (messages.isEmpty) {
       return;
     }
+    print('setOffChat');
     await IbChatDbService().removeInChatUidArray(
         chatRoomId: chatRoomId, uids: [IbUtils.getCurrentUid()!]);
   }
 
   @override
   void onClose() {
-    setInChat();
+    setOffChat();
     _messageSub.cancel();
     super.onClose();
   }

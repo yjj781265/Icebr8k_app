@@ -95,6 +95,10 @@ class ChatTabController extends GetxController {
     return item;
   }
 
+  Future<void> removeChatItem(ChatTabItem item) async {
+    await IbChatDbService().removeChatRoom(item.chatRoomId);
+  }
+
   Future<void> cacheAvatarUrls(List<String> uids) async {
     for (final String uid in uids) {
       if (ibUserMap.containsKey(uid)) {

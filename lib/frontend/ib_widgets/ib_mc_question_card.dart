@@ -256,6 +256,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   Widget _handleAvatarImage() {
     return Obx(() {
       return IbUserAvatar(
+        disableOnTap: widget._controller.disableAvatarOnTouch,
         avatarUrl: widget._controller.avatarUrl.value,
         uid: widget._controller.ibUser == null
             ? ''

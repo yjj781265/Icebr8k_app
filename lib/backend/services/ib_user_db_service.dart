@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 
 class IbUserDbService {
   static final _ibUserService = IbUserDbService._();
@@ -179,6 +180,15 @@ class IbUserDbService {
         .collection('Friends')
         .where('status', isEqualTo: IbFriend.kFriendshipStatusAccepted)
         .orderBy('timestampInMs', descending: true)
+        .snapshots(includeMetadataChanges: true);
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> listenToSingleFriend(
+      String friendUid) {
+    return _collectionRef
+        .doc(IbUtils.getCurrentUid()!)
+        .collection('Friends')
+        .doc(friendUid)
         .snapshots(includeMetadataChanges: true);
   }
 

@@ -8,19 +8,57 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 class CommonAnswersController extends GetxController {
   final ibQuestions = <IbQuestion>[].obs;
   final String uid;
-
+  late List<IbAnswer> commonAnswers;
+  IbAnswer? lastIbAnswer;
   CommonAnswersController(this.uid);
+  final int kPaginationMax = 8;
 
   @override
   Future<void> onInit() async {
-    final List<IbAnswer> commonAnswers =
+    commonAnswers =
         await IbUtils.getCommonAnswersQ(IbUtils.getCurrentUid()!, uid);
-    for (final answer in commonAnswers) {
-      final q =
-          await IbQuestionDbService().querySingleQuestion(answer.questionId);
-      ibQuestions.add(q);
+
+    if (commonAnswers.length <= kPaginationMax) {
+      for (final answer in commonAnswers) {
+        final q =
+            await IbQuestionDbService().querySingleQuestion(answer.questionId);
+        ibQuestions.add(q);
+      }
+      ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
+    } else {
+      for (int i = 0; i < kPaginationMax; i++) {
+        final q = await IbQuestionDbService()
+            .querySingleQuestion(commonAnswers[i].questionId);
+        ibQuestions.add(q);
+      }
+      lastIbAnswer = commonAnswers[kPaginationMax - 1];
+      ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
     }
 
     super.onInit();
+  }
+
+  Future<void> loadMore() async {
+    if (lastIbAnswer == null) {
+      return;
+    }
+
+    final int index = commonAnswers.indexOf(lastIbAnswer!);
+
+    if (index == commonAnswers.length - 1) {
+      lastIbAnswer = null;
+      return;
+    }
+
+    final int endIndex = (commonAnswers.length - index) > kPaginationMax
+        ? (index + kPaginationMax)
+        : commonAnswers.length;
+    for (int i = index + 1; i < endIndex; i++) {
+      final q = await IbQuestionDbService()
+          .querySingleQuestion(commonAnswers[i].questionId);
+      ibQuestions.add(q);
+    }
+    lastIbAnswer = commonAnswers[endIndex - 1];
+    ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
   }
 }

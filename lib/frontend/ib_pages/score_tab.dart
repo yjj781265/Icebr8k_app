@@ -167,7 +167,7 @@ class FriendItemView extends StatelessWidget {
         trailing: IconButton(
           icon: const Icon(
             Icons.message_outlined,
-            color: IbColors.accentColor,
+            color: IbColors.primaryColor,
           ),
           onPressed: () {
             final String mUid = Get.find<AuthController>().firebaseUser!.uid;

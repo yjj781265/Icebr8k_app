@@ -36,9 +36,11 @@ class FriendListController extends GetxController {
             score: score);
         if (change.type == DocumentChangeType.added) {
           friendItems.addIf(!friendItems.contains(item), item);
+          print('added');
         }
 
         if (change.type == DocumentChangeType.modified) {
+          print('modified');
           if (!friendItems.contains(item)) {
             continue;
           }
@@ -46,9 +48,7 @@ class FriendListController extends GetxController {
         }
 
         if (change.type == DocumentChangeType.removed) {
-          if (!friendItems.contains(item)) {
-            continue;
-          }
+          print('removed');
           friendItems.remove(item);
         }
       }
@@ -96,6 +96,15 @@ class FriendListController extends GetxController {
       }
     }
     friendItems.sort((a, b) => b.score.compareTo(a.score));
+  }
+
+  bool isFriendExist(String uid) {
+    for (final item in friendItems) {
+      if (item.uid == uid) {
+        return true;
+      }
+    }
+    return false;
   }
 
   Future<void> _refreshScore() async {

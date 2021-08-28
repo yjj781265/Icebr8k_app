@@ -2,14 +2,20 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/answered_question_controller.dart';
+import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/common_answers_controller.dart';
 import 'package:icebr8k/backend/controllers/created_question_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/profile_controller.dart';
+import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
@@ -52,6 +58,7 @@ class _ProfilePageState extends State<ProfilePage>
 
     _tabController = TabController(
         vsync: this, length: _profileController.isMe.isTrue ? 2 : 1);
+    IbUtils.hideKeyboard();
   }
 
   @override
@@ -63,225 +70,224 @@ class _ProfilePageState extends State<ProfilePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: IbColors.lightBlue,
-      appBar: widget.showAppBar
-          ? AppBar(
-              backgroundColor: IbColors.lightBlue,
-              title: Obx(() => Text(_profileController.username.value.isEmpty
-                  ? ''
-                  : "${_profileController.username.value}'s profile")),
-            )
-          : null,
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.bottomLeft,
-                    children: [
-                      ///cover photo
-                      Obx(
-                        () => Stack(
-                          alignment: Alignment.bottomRight,
-                          children: [
-                            SizedBox(
-                              height: 200,
-                              width: double.infinity,
-                              child: _profileController.coverPhotoUrl.isEmpty
-                                  ? Image.asset(
-                                      'assets/images/default_cover_photo.jpeg',
-                                      fit: BoxFit.cover,
-                                    )
-                                  : CachedNetworkImage(
-                                      fit: BoxFit.fill,
-                                      imageUrl: _profileController
-                                          .coverPhotoUrl.value,
-                                    ),
-                            ),
-
-                            ///edit button
-                            if (_profileController.isMe.isTrue)
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: FloatingActionButton(
-                                    heroTag: null,
-                                    backgroundColor: IbColors.lightBlue,
-                                    onPressed: () {},
-                                    child: const Icon(
-                                      Icons.edit_outlined,
-                                      size: 16,
-                                    ),
-                                  ),
-                                ),
-                              )
-                          ],
-                        ),
-                      ),
-
-                      /// avatar
-                      Obx(
-                        () => Positioned(
-                          left: 16,
-                          bottom: -40,
-                          child: Stack(
+        backgroundColor: IbColors.lightBlue,
+        appBar: widget.showAppBar
+            ? AppBar(
+                backgroundColor: IbColors.lightBlue,
+                title: Obx(() => Text(_profileController.username.value.isEmpty
+                    ? ''
+                    : "${_profileController.username.value}'s profile")),
+              )
+            : null,
+        body: NestedScrollView(
+          headerSliverBuilder: (context, value) {
+            return [
+              SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.bottomLeft,
+                      children: [
+                        ///cover photo
+                        Obx(
+                          () => Stack(
                             alignment: Alignment.bottomRight,
                             children: [
-                              GestureDetector(
-                                onTap: () {
-                                  print('tapped');
-                                },
-                                child: IbUserAvatar(
-                                    disableOnTap: true,
-                                    radius: 40,
-                                    uid: widget.uid,
-                                    avatarUrl:
-                                        _profileController.avatarUrl.value),
+                              SizedBox(
+                                height: 200,
+                                width: double.infinity,
+                                child: _profileController.coverPhotoUrl.isEmpty
+                                    ? Image.asset(
+                                        'assets/images/default_cover_photo.jpeg',
+                                        fit: BoxFit.cover,
+                                      )
+                                    : CachedNetworkImage(
+                                        fit: BoxFit.fill,
+                                        imageUrl: _profileController
+                                            .coverPhotoUrl.value,
+                                      ),
                               ),
+
+                              ///edit button
                               if (_profileController.isMe.isTrue)
-                                SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: FloatingActionButton(
-                                    heroTag: null,
-                                    backgroundColor: IbColors.lightBlue,
-                                    onPressed: () {},
-                                    child: const Icon(
-                                      Icons.edit_outlined,
-                                      size: 16,
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: FloatingActionButton(
+                                      heroTag: null,
+                                      backgroundColor: IbColors.lightBlue,
+                                      onPressed: () {},
+                                      child: const Icon(
+                                        Icons.edit_outlined,
+                                        size: 16,
+                                      ),
                                     ),
                                   ),
                                 )
                             ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
 
-                  /// name info
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 40, left: 16),
-                          child: Obx(
-                            () => Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                        /// avatar
+                        Obx(
+                          () => Positioned(
+                            left: 16,
+                            bottom: -40,
+                            child: Stack(
+                              alignment: Alignment.bottomRight,
                               children: [
-                                Text('@${_profileController.username.value}',
-                                    style: const TextStyle(
-                                        fontSize: IbConfig.kPageTitleSize,
-                                        fontWeight: FontWeight.bold)),
-                                Text(
-                                  _profileController.name.value,
-                                  style: const TextStyle(
-                                      fontSize: IbConfig.kNormalTextSize),
+                                GestureDetector(
+                                  onTap: () {
+                                    print('tapped');
+                                  },
+                                  child: IbUserAvatar(
+                                      disableOnTap: true,
+                                      radius: 40,
+                                      uid: widget.uid,
+                                      avatarUrl:
+                                          _profileController.avatarUrl.value),
                                 ),
-                                if (_profileController.description.isNotEmpty)
-                                  Text(_profileController.description.value,
-                                      style: const TextStyle(
-                                          fontSize:
-                                              IbConfig.kDescriptionTextSize)),
-                                if (_profileController.isMe.isFalse)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 16),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'match_interests'.tr,
-                                          style: const TextStyle(
-                                              fontSize:
-                                                  IbConfig.kNormalTextSize,
-                                              fontWeight: FontWeight.w800),
-                                        ),
-                                        IbLinearIndicator(
-                                          endValue: _profileController
-                                              .compScore.value,
-                                        ),
-                                      ],
+                                if (_profileController.isMe.isTrue)
+                                  SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: FloatingActionButton(
+                                      heroTag: null,
+                                      backgroundColor: IbColors.lightBlue,
+                                      onPressed: () {},
+                                      child: const Icon(
+                                        Icons.edit_outlined,
+                                        size: 16,
+                                      ),
                                     ),
-                                  ),
+                                  )
                               ],
                             ),
                           ),
                         ),
-                      ),
+                      ],
+                    ),
 
-                      /// questions stats
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: Obx(
-                            () => Wrap(
-                              children: [
-                                IbStats(
-                                    title: 'Answered',
-                                    num:
-                                        _profileController.totalAnswered.value),
-                                IbStats(
-                                    title: 'Asked',
-                                    num: _profileController.totalAsked.value),
-                              ],
+                    /// name info
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 40, left: 16),
+                            child: Obx(
+                              () => Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('@${_profileController.username.value}',
+                                      style: const TextStyle(
+                                          fontSize: IbConfig.kPageTitleSize,
+                                          fontWeight: FontWeight.bold)),
+                                  Text(
+                                    _profileController.name.value,
+                                    style: const TextStyle(
+                                        fontSize: IbConfig.kNormalTextSize),
+                                  ),
+                                  if (_profileController.description.isNotEmpty)
+                                    Text(_profileController.description.value,
+                                        style: const TextStyle(
+                                            fontSize:
+                                                IbConfig.kDescriptionTextSize)),
+                                  if (_profileController.isMe.isFalse)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 16),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'match_interests'.tr,
+                                            style: const TextStyle(
+                                                fontSize:
+                                                    IbConfig.kNormalTextSize,
+                                                fontWeight: FontWeight.w800),
+                                          ),
+                                          IbLinearIndicator(
+                                            endValue: _profileController
+                                                .compScore.value,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      )
-                    ],
-                  )
-                ],
+
+                        /// questions stats
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 16),
+                            child: Obx(
+                              () => Wrap(
+                                children: [
+                                  IbStats(
+                                      title: 'Answered',
+                                      num: _profileController
+                                          .totalAnswered.value),
+                                  IbStats(
+                                      title: 'Asked',
+                                      num: _profileController.totalAsked.value),
+                                ],
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    if (_profileController.isMe.isFalse) _buildActionButtons(),
+                  ],
+                ),
               ),
-            ),
-          ];
-        },
-        body: Container(
-          margin: const EdgeInsets.only(top: 16),
-          color: IbColors.lightBlue,
-          child: Column(
+              SliverPersistentHeader(
+                  pinned: true,
+                  delegate: PersistentHeader(
+                    widget: TabBar(
+                      controller: _tabController,
+                      tabs: [
+                        if (_profileController.isMe.isTrue)
+                          const Tab(text: 'Answered Questions'),
+                        if (_profileController.isMe.isTrue)
+                          const Tab(text: 'Asked Questions'),
+                        if (_profileController.isMe.isFalse)
+                          Obx(() => Tab(
+                              text:
+                                  'Common Answers(${_commonAnswersController.ibQuestions.length})')),
+                      ],
+                      labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                      unselectedLabelStyle:
+                          const TextStyle(fontWeight: FontWeight.bold),
+                      labelColor: Colors.black,
+                      unselectedLabelColor: IbColors.lightGrey,
+                      indicatorColor: _tabController.length == 1
+                          ? Colors.transparent
+                          : IbColors.primaryColor,
+                    ),
+                  )),
+            ];
+          },
+          body: TabBarView(
+            controller: _tabController,
             children: [
-              TabBar(
-                controller: _tabController,
-                tabs: [
-                  if (_profileController.isMe.isTrue)
-                    const Tab(text: 'Answered Questions'),
-                  if (_profileController.isMe.isTrue)
-                    const Tab(text: 'Asked Questions'),
-                  if (_profileController.isMe.isFalse)
-                    Obx(() => Tab(
-                        text:
-                            'Common Answers(${_commonAnswersController.ibQuestions.length})')),
-                ],
-                labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                unselectedLabelStyle:
-                    const TextStyle(fontWeight: FontWeight.bold),
-                labelColor: Colors.black,
-                unselectedLabelColor: IbColors.lightGrey,
-                indicatorColor: _tabController.length == 1
-                    ? Colors.transparent
-                    : IbColors.primaryColor,
-              ),
-              Expanded(
-                  child: TabBarView(
-                controller: _tabController,
-                children: [
-                  if (_profileController.isMe.isTrue) buildAnsweredQTab(),
-                  if (_profileController.isMe.isTrue) buildAskedTab(),
-                  if (_profileController.isMe.isFalse) buildCommonAnswersTab(),
-                ],
-              ))
+              if (_profileController.isMe.isTrue) buildAnsweredQTab(),
+              if (_profileController.isMe.isTrue) buildAskedTab(),
+              if (_profileController.isMe.isFalse) buildCommonAnswersTab(),
             ],
           ),
-        ),
-      ),
-    );
+        ));
   }
 
   Widget buildAnsweredQTab() {
@@ -319,7 +325,6 @@ class _ProfilePageState extends State<ProfilePage>
             refreshController.loadComplete();
           },
           child: ListView.builder(
-            shrinkWrap: true,
             itemBuilder: (context, index) {
               final AnsweredQuestionItem item =
                   _answeredQuestionController.myAnsweredQuestions[index];
@@ -328,6 +333,8 @@ class _ProfilePageState extends State<ProfilePage>
                   IbQuestionItemController(
                       ibAnswer: item.ibAnswer,
                       ibQuestion: item.ibQuestion,
+                      disableAvatarOnTouch:
+                          item.ibQuestion.creatorId == widget.uid,
                       isExpandable: true,
                       isExpanded: index == 0),
                   tag: tag.toString());
@@ -383,7 +390,10 @@ class _ProfilePageState extends State<ProfilePage>
                   _createdQuestionController.createdQuestions[index];
               final tag = 'created_${item.id}';
               final IbQuestionItemController _controller = Get.put(
-                  IbQuestionItemController(ibQuestion: item, isExpanded: false),
+                  IbQuestionItemController(
+                      ibQuestion: item,
+                      isExpanded: false,
+                      disableAvatarOnTouch: item.creatorId == widget.uid),
                   tag: tag.toString());
 
               if (item.questionType == IbQuestion.kMultipleChoice) {
@@ -419,6 +429,12 @@ class _ProfilePageState extends State<ProfilePage>
           enablePullDown: false,
           enablePullUp: true,
           onLoading: () async {
+            if (_commonAnswersController.lastIbAnswer == null) {
+              refreshController.loadNoData();
+              return;
+            }
+
+            await _commonAnswersController.loadMore();
             refreshController.loadComplete();
           },
           child: ListView.builder(
@@ -428,7 +444,9 @@ class _ProfilePageState extends State<ProfilePage>
               final tag = 'common${item.id}';
               final IbQuestionItemController _controller = Get.put(
                   IbQuestionItemController(
-                      ibQuestion: item, isExpandable: true),
+                      ibQuestion: item,
+                      isExpandable: true,
+                      disableAvatarOnTouch: item.creatorId == widget.uid),
                   tag: tag.toString());
 
               if (item.questionType == IbQuestion.kMultipleChoice) {
@@ -441,5 +459,157 @@ class _ProfilePageState extends State<ProfilePage>
         );
       },
     );
+  }
+
+  Widget _buildActionButtons() {
+    return Obx(
+      () => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SingleChildScrollView(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IbActionButton(
+                text: 'Message',
+                iconData: Icons.message_outlined,
+                color: IbColors.primaryColor,
+                onPressed: () {
+                  final List<String> memberUids = [
+                    IbUtils.getCurrentUid()!,
+                    widget.uid
+                  ];
+                  Get.to(() => ChatPage(Get.put(ChatPageController(memberUids),
+                      tag: memberUids.toString())));
+                },
+              ),
+              if (_profileController.friendshipStatus.value.isEmpty)
+                IbActionButton(
+                  text: 'Add Friend',
+                  iconData: Icons.person_add_alt_1_outlined,
+                  color: IbColors.accentColor,
+                  onPressed: () => showFriendRequestDialog(),
+                )
+              else if (_profileController.friendshipStatus.value ==
+                  IbFriend.kFriendshipStatusAccepted)
+                IbActionButton(
+                  text: 'Unfriend',
+                  iconData: Icons.person_remove_alt_1_outlined,
+                  color: IbColors.errorRed,
+                  onPressed: () => _profileController.unfriend(),
+                )
+              else if (_profileController.friendshipStatus.value ==
+                  IbFriend.kFriendshipStatusRequestSent)
+                IbActionButton(
+                  text: 'Cancel Request',
+                  iconData: Icons.cancel_outlined,
+                  color: Colors.orangeAccent,
+                  onPressed: () => _profileController.unfriend(),
+                )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void showFriendRequestDialog() {
+    final Widget dialog = IbCard(
+        child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'friend_request_dialog_title'.trParams(
+                    {'username': _profileController.username.value}) ??
+                '',
+            style: const TextStyle(
+                fontSize: IbConfig.kNormalTextSize,
+                fontWeight: FontWeight.bold),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: IbUserAvatar(
+                  avatarUrl: _profileController.avatarUrl.value,
+                  uid: _profileController.uid,
+                  radius: 32,
+                ),
+              ),
+              Expanded(
+                child: TextField(
+                  textInputAction: TextInputAction.done,
+                  maxLines: 3,
+                  onChanged: (requestMsg) {
+                    _profileController.requestMsg = requestMsg;
+                  },
+                  autofocus: true,
+                  style: const TextStyle(
+                    fontSize: IbConfig.kSecondaryTextSize,
+                  ),
+                  maxLength: IbConfig.kFriendRequestMsgMaxLength,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintStyle: const TextStyle(color: IbColors.lightGrey),
+                    hintText: 'friend_request_msg_hint'.tr,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                  child: IbElevatedButton(
+                onPressed: () {
+                  Get.back();
+                },
+                textTrKey: 'cancel',
+                color: IbColors.primaryColor,
+              )),
+              Expanded(
+                flex: 2,
+                child: IbElevatedButton(
+                  onPressed: () {
+                    _profileController.sendFriendRequest();
+                    Get.back();
+                    IbUtils.hideKeyboard();
+                  },
+                  textTrKey: 'send_friend_request',
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    ));
+
+    Get.bottomSheet(dialog);
+  }
+}
+
+class PersistentHeader extends SliverPersistentHeaderDelegate {
+  final Widget widget;
+
+  PersistentHeader({required this.widget});
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(height: 56, color: IbColors.lightBlue, child: widget);
+  }
+
+  @override
+  double get maxExtent => 56;
+
+  @override
+  double get minExtent => 56;
+
+  @override
+  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
+    return true;
   }
 }
