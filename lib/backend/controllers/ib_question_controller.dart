@@ -58,6 +58,7 @@ class IbQuestionController extends GetxController {
 
     if (snapshot.docs.isNotEmpty) {
       lastDocSnapShot = snapshot.docs[snapshot.size - 1];
+
       for (final docSnapShot in snapshot.docs) {
         final IbQuestion ibQuestion = IbQuestion.fromJson(docSnapShot.data());
         ibQuestions.addIf(!ibQuestions.contains(ibQuestion), ibQuestion);
@@ -67,6 +68,8 @@ class IbQuestionController extends GetxController {
 
   Future<void> refreshQuestions() async {
     print(' IbQuestionController refreshQuestions');
+    lastDocSnapShot = await IbQuestionDbService()
+        .queryLastAnsweredQ(IbUtils.getCurrentUid()!);
     isLoading.value = true;
     ibQuestions.clear();
     await queryQuestionsFromDb();
