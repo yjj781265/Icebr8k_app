@@ -44,7 +44,8 @@ class ProfileController extends GetxController {
           await IbQuestionDbService().queryAnsweredQuestionIds(uid);
       totalAnswered.value = ids.length;
 
-      final snapshot = await IbQuestionDbService().queryUserQuestions(uid: uid);
+      final snapshot =
+          await IbQuestionDbService().queryAskedQuestions(uid: uid);
       totalAsked.value = snapshot.size;
 
       friendStatusStream =
@@ -68,10 +69,10 @@ class ProfileController extends GetxController {
       });
 
       totalAnsweredStream = IbQuestionDbService()
-          .listenToUserCreatedQuestionsChange(uid)
+          .listenToUserAskedQuestionsChange(uid)
           .listen((event) async {
         final snapshot =
-            await IbQuestionDbService().queryUserQuestions(uid: uid);
+            await IbQuestionDbService().queryAskedQuestions(uid: uid);
         totalAsked.value = snapshot.size;
       });
     }

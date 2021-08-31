@@ -17,7 +17,7 @@ class IbConfig {
   static const int kPasswordMinLength = 6;
   static const int kUsernameMinLength = 3;
   static const int kUsernameMaxLength = 20;
-  static const int kQuestionTitleMaxLength = 50; //characters
+  static const int kQuestionTitleMaxLength = 100; //characters
   static const int kFriendRequestMsgMaxLength = 100; //characters
   static const int kQuestionDescMaxLength = 100; //characters
   static const int kAnswerMaxLength = 30; // characters

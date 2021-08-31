@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:lottie/lottie.dart';
@@ -12,7 +13,8 @@ import 'frontend/ib_strings.dart';
 import 'frontend/ib_themes.dart';
 import 'frontend/ib_widgets/ib_progress_indicator.dart';
 
-void main() {
+Future<void> main() async {
+  await GetStorage.init();
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);

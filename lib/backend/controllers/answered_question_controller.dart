@@ -24,8 +24,12 @@ class AnsweredQuestionController extends GetxController {
         .listen((event) async {
       for (final docChange in event.docChanges) {
         final IbAnswer ibAnswer = IbAnswer.fromJson(docChange.doc.data()!);
-        final IbQuestion ibQuestion = await IbQuestionDbService()
+        final IbQuestion? ibQuestion = await IbQuestionDbService()
             .querySingleQuestion(ibAnswer.questionId);
+        if (ibQuestion == null) {
+          continue;
+        }
+
         final AnsweredQuestionItem item =
             AnsweredQuestionItem(ibQuestion: ibQuestion, ibAnswer: ibAnswer);
 
@@ -71,8 +75,11 @@ class AnsweredQuestionController extends GetxController {
       print('AnsweredQuestionController last doc is ${lastDoc!.data()}');
       for (final doc in _snapshot.docs) {
         final IbAnswer ibAnswer = IbAnswer.fromJson(doc.data());
-        final IbQuestion ibQuestion = await IbQuestionDbService()
+        final IbQuestion? ibQuestion = await IbQuestionDbService()
             .querySingleQuestion(ibAnswer.questionId);
+        if (ibQuestion == null) {
+          continue;
+        }
         final AnsweredQuestionItem item =
             AnsweredQuestionItem(ibQuestion: ibQuestion, ibAnswer: ibAnswer);
         myAnsweredQuestions.addIf(!myAnsweredQuestions.contains(item), item);

@@ -22,6 +22,9 @@ class CommonAnswersController extends GetxController {
       for (final answer in commonAnswers) {
         final q =
             await IbQuestionDbService().querySingleQuestion(answer.questionId);
+        if (q == null) {
+          continue;
+        }
         ibQuestions.add(q);
       }
       ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
@@ -29,6 +32,9 @@ class CommonAnswersController extends GetxController {
       for (int i = 0; i < kPaginationMax; i++) {
         final q = await IbQuestionDbService()
             .querySingleQuestion(commonAnswers[i].questionId);
+        if (q == null) {
+          continue;
+        }
         ibQuestions.add(q);
       }
       lastIbAnswer = commonAnswers[kPaginationMax - 1];
@@ -56,6 +62,9 @@ class CommonAnswersController extends GetxController {
     for (int i = index + 1; i < endIndex; i++) {
       final q = await IbQuestionDbService()
           .querySingleQuestion(commonAnswers[i].questionId);
+      if (q == null) {
+        continue;
+      }
       ibQuestions.add(q);
     }
     lastIbAnswer = commonAnswers[endIndex - 1];

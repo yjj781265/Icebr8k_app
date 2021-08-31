@@ -45,7 +45,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   }
 
   void _runExpandCheck() {
-    if (widget._controller.isRxExpanded.isTrue) {
+    if (widget._controller.isExpanded) {
       expandController.forward();
     } else {
       expandController.reverse();
@@ -87,7 +87,6 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
     );
     return Center(
       child: LimitedBox(
-        maxHeight: Get.height * 0.7,
         maxWidth: Get.width * 0.95,
         child: IbCard(
             child: Padding(
@@ -159,7 +158,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                       child: expandableInfo,
                     )
                   else
-                    widget._controller.isRxExpanded.isTrue
+                    widget._controller.isExpanded
                         ? expandableInfo
                         : const SizedBox(),
                   Row(
@@ -172,24 +171,24 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                             color: IbColors.lightGrey),
                       ),
                       if (widget._controller.isExpandable)
-                        Obx(
-                          () => IconButton(
-                              padding: EdgeInsets.zero,
-                              onPressed: () {
-                                widget._controller.isRxExpanded.value =
-                                    !widget._controller.isRxExpanded.value;
-                                _runExpandCheck();
-                              },
-                              icon: widget._controller.isRxExpanded.isTrue
-                                  ? const Icon(
-                                      Icons.expand_less_outlined,
-                                      color: IbColors.primaryColor,
-                                    )
-                                  : const Icon(
-                                      Icons.expand_more_outlined,
-                                      color: IbColors.primaryColor,
-                                    )),
-                        ),
+                        IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              setState(() {
+                                widget._controller.isExpanded =
+                                    !widget._controller.isExpanded;
+                              });
+                              _runExpandCheck();
+                            },
+                            icon: widget._controller.isExpanded
+                                ? const Icon(
+                                    Icons.expand_less_outlined,
+                                    color: IbColors.primaryColor,
+                                  )
+                                : const Icon(
+                                    Icons.expand_more_outlined,
+                                    color: IbColors.primaryColor,
+                                  )),
                     ],
                   ),
                 ],
@@ -202,6 +201,9 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   }
 
   Widget _handleButtons() {
+    if (!widget._controller.showActionButtons) {
+      return const SizedBox();
+    }
     return Obx(() {
       if (widget._controller.isAnswering.isTrue) {
         return const IbProgressIndicator(
@@ -282,7 +284,9 @@ class IbQuestionMcItem extends StatelessWidget {
     return Obx(
       () => GestureDetector(
         onTap: () {
-          if (_controller.isSample || _controller.showResult.isTrue) {
+          if (_controller.isSample ||
+              _controller.showResult.isTrue ||
+              _controller.disableChoiceOnTouch) {
             return;
           }
 

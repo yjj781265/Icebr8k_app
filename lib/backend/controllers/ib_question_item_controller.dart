@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -28,9 +29,9 @@ class IbQuestionItemController extends GetxController {
   final bool isExpandable;
   final bool isSample;
   final bool disableAvatarOnTouch;
-
-  late RxBool isRxExpanded;
-  final bool isExpanded;
+  final bool disableChoiceOnTouch;
+  final bool showActionButtons;
+  bool isExpanded;
 
   /// if user already answered, pass the answer here
   IbAnswer? ibAnswer;
@@ -40,16 +41,16 @@ class IbQuestionItemController extends GetxController {
 
   IbQuestionItemController(
       {required this.ibQuestion,
+      this.showActionButtons = true,
       this.isExpanded = true,
       this.isExpandable = false,
       this.isSample = false,
+      this.disableChoiceOnTouch = false,
       this.disableAvatarOnTouch = false,
       this.ibAnswer});
 
   @override
   Future<void> onInit() async {
-    isRxExpanded = isExpanded.obs;
-
     /// check if user has already answered this question
     ibAnswer ??= await IbQuestionDbService()
         .queryIbAnswer(IbUtils.getCurrentUid()!, ibQuestion.id);
@@ -140,7 +141,7 @@ class IbQuestionItemController extends GetxController {
         questionType: ibQuestion.questionType);
 
     await IbQuestionDbService().answerQuestion(ibAnswer);
-
+    IbLocalStorageService().removeUnAnsweredIbQid(ibQuestion.id);
     await calculateResult();
     votedDateTime.value = DateTime.now();
     isAnswering.value = false;

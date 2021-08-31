@@ -5,21 +5,24 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 
-class CreatedQuestionController extends GetxController {
+class AskedQuestionsController extends GetxController {
   final String uid;
   final isLoading = true.obs;
   final createdQuestions = <IbQuestion>[].obs;
 
   late StreamSubscription _streamSubscription;
+
+  /// handle update poll size and result, todo remove this after cloud function implemented
+  late StreamSubscription _answeredQuestionStream;
   DocumentSnapshot? lastDoc;
 
-  CreatedQuestionController(this.uid);
+  AskedQuestionsController(this.uid);
 
   @override
   void onInit() {
     super.onInit();
     _streamSubscription = IbQuestionDbService()
-        .listenToUserCreatedQuestionsChange(uid)
+        .listenToUserAskedQuestionsChange(uid)
         .listen((event) {
       for (final docChange in event.docChanges) {
         if (docChange.type == DocumentChangeType.added) {
@@ -55,7 +58,7 @@ class CreatedQuestionController extends GetxController {
 
   Future<void> loadMore() async {
     final _snapshot = await IbQuestionDbService()
-        .queryUserQuestions(limit: 8, uid: uid, lastDoc: lastDoc);
+        .queryAskedQuestions(limit: 8, uid: uid, lastDoc: lastDoc);
     if (_snapshot.docs.isNotEmpty) {
       lastDoc = _snapshot.docs.last;
       print('CreatedQuestionController last doc is ${lastDoc!.data()}');

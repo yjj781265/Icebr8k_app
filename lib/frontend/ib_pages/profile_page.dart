@@ -38,7 +38,7 @@ class _ProfilePageState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late AnsweredQuestionController _answeredQuestionController;
-  late CreatedQuestionController _createdQuestionController;
+  late AskedQuestionsController _createdQuestionController;
   late CommonAnswersController _commonAnswersController;
   late ProfileController _profileController;
 
@@ -51,7 +51,7 @@ class _ProfilePageState extends State<ProfilePage>
       _answeredQuestionController =
           Get.put(AnsweredQuestionController(widget.uid), tag: widget.uid);
       _createdQuestionController =
-          Get.put(CreatedQuestionController(widget.uid), tag: widget.uid);
+          Get.put(AskedQuestionsController(widget.uid), tag: widget.uid);
     }
     _commonAnswersController =
         Get.put(CommonAnswersController(widget.uid), tag: widget.uid);
@@ -392,7 +392,10 @@ class _ProfilePageState extends State<ProfilePage>
               final IbQuestionItemController _controller = Get.put(
                   IbQuestionItemController(
                       ibQuestion: item,
-                      isExpanded: false,
+                      isExpanded: index == 0,
+                      disableChoiceOnTouch: true,
+                      isExpandable: true,
+                      showActionButtons: false,
                       disableAvatarOnTouch: item.creatorId == widget.uid),
                   tag: tag.toString());
 

@@ -38,6 +38,7 @@ dependencies:
   flutter_slidable: ^0.6.0
   flutter_zoom_drawer: ^2.0.2+4
   get: ^4.1.4
+  get_storage: ^2.0.3
   google_sign_in: ^5.0.4
   image_cropper: ^1.4.1
   image_picker: ^0.8.1+3

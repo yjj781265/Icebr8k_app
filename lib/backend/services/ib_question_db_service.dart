@@ -22,27 +22,12 @@ class IbQuestionDbService {
         .set(question.toJson(), SetOptions(merge: true));
   }
 
-  Future<IbQuestion> querySingleQuestion(String questionId) async {
+  Future<IbQuestion?> querySingleQuestion(String questionId) async {
     final snapshot = await _collectionRef.doc(questionId).get();
-    return IbQuestion.fromJson(snapshot.data()!);
-  }
-
-  ///query new questions
-  Future<QuerySnapshot<Map<String, dynamic>>> queryQuestions({
-    required int limit,
-    DocumentSnapshot? lastDoc,
-  }) {
-    if (lastDoc == null) {
-      return _collectionRef
-          .orderBy('askedTimeInMs', descending: true)
-          .limit(limit)
-          .get();
+    if (!snapshot.exists) {
+      return null;
     }
-    return _collectionRef
-        .orderBy('askedTimeInMs', descending: true)
-        .startAfterDocument(lastDoc)
-        .limit(limit)
-        .get();
+    return IbQuestion.fromJson(snapshot.data()!);
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> queryUserAnsweredQuestions({
@@ -68,7 +53,7 @@ class IbQuestionDbService {
   }
 
   /// query all question this uid asked
-  Future<QuerySnapshot<Map<String, dynamic>>> queryUserQuestions({
+  Future<QuerySnapshot<Map<String, dynamic>>> queryAskedQuestions({
     int limit = -1,
     required String uid,
     DocumentSnapshot? lastDoc,
@@ -152,8 +137,21 @@ class IbQuestionDbService {
     return query.snapshots();
   }
 
-  Future<DocumentSnapshot<Map<String, dynamic>>?> queryLastAnsweredQ(
-      String uid) async {
+  Future<IbAnswer?> queryLatestAnsweredQ(String uid) async {
+    final _snapshot = await _db
+        .collectionGroup('Answers')
+        .limit(1)
+        .where('uid', isEqualTo: uid)
+        .orderBy('askedTimeInMs', descending: true)
+        .get();
+    if (_snapshot.docs.isEmpty) {
+      return null;
+    }
+
+    return IbAnswer.fromJson(_snapshot.docs.first.data());
+  }
+
+  Future<IbAnswer?> queryLastAnsweredQ(String uid) async {
     final _snapshot = await _db
         .collectionGroup('Answers')
         .limit(1)
@@ -164,12 +162,12 @@ class IbQuestionDbService {
       return null;
     }
 
-    return _snapshot.docs.last;
+    return IbAnswer.fromJson(_snapshot.docs.first.data());
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>>
-      listenToUserCreatedQuestionsChange(String uid,
-          {DocumentSnapshot? lastDoc}) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> listenToUserAskedQuestionsChange(
+      String uid,
+      {DocumentSnapshot? lastDoc}) {
     late Query<Map<String, dynamic>> query;
     if (lastDoc == null) {
       query = _collectionRef
@@ -188,20 +186,32 @@ class IbQuestionDbService {
   }
 
   /// load questions for question tab
-  Stream<QuerySnapshot<Map<String, dynamic>>> listenToIbQuestionsChange(
-      {DocumentSnapshot? lastDoc}) {
-    late Query<Map<String, dynamic>> query;
-    if (lastDoc == null) {
-      query =
-          _collectionRef.orderBy('askedTimeInMs', descending: true).limit(8);
-    } else {
-      query = _collectionRef
+  Future<List<IbQuestion>> queryIbQuestions(int limit,
+      {int? timestamp, bool isGreaterThan = true}) async {
+    late QuerySnapshot<Map<String, dynamic>> snapshot;
+
+    if (timestamp == null) {
+      snapshot =
+          await _collectionRef.orderBy('askedTimeInMs', descending: true).get();
+    } else if (isGreaterThan) {
+      snapshot = await _collectionRef
+          .where('askedTimeInMs', isGreaterThan: timestamp)
           .orderBy('askedTimeInMs', descending: true)
-          .where('askedTimeInMs', isLessThan: lastDoc['askedTimeInMs'])
-          .limit(8);
+          .get();
+    } else {
+      snapshot = await _collectionRef
+          .where('askedTimeInMs', isLessThan: timestamp)
+          .orderBy('askedTimeInMs', descending: true)
+          .get();
     }
 
-    return query.snapshots();
+    final list = <IbQuestion>[];
+
+    for (final doc in snapshot.docs) {
+      list.add(IbQuestion.fromJson(doc.data()));
+    }
+
+    return list;
   }
 
   Future<List<IbAnswer>> queryUserAnswers(String uid) async {
@@ -251,6 +261,16 @@ class IbQuestionDbService {
         .where('answer', isEqualTo: answer)
         .get();
     return _snapshot.size;
+  }
+
+  Future<bool> isQuestionAnswered(
+      {required String uid, required String questionId}) async {
+    final _snapshot = await _collectionRef
+        .doc(questionId)
+        .collection('Answers')
+        .doc(uid)
+        .get();
+    return _snapshot.exists;
   }
 
   Future<void> eraseAllAnsweredQuestions(String uid) async {

@@ -1,78 +1,117 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 class IbQuestionController extends GetxController {
   final ibQuestions = <IbQuestion>[].obs;
-  DocumentSnapshot? lastDocSnapShot;
-  late StreamSubscription questionSub;
   final isLoading = true.obs;
+  bool hasMore = false;
 
   @override
   Future<void> onInit() async {
-    lastDocSnapShot = await IbQuestionDbService()
-        .queryLastAnsweredQ(IbUtils.getCurrentUid()!);
-    questionSub = IbQuestionDbService()
-        .listenToIbQuestionsChange(lastDoc: lastDocSnapShot)
-        .listen((event) {
-      for (final docChange in event.docChanges) {
-        final IbQuestion ibQuestion =
-            IbQuestion.fromJson(docChange.doc.data()!);
-        if (docChange.type == DocumentChangeType.added) {
-          print('new questions');
-          ibQuestions.addIf(!ibQuestions.contains(ibQuestion), ibQuestion);
-        }
-
-        if (docChange.type == DocumentChangeType.removed) {
-          ibQuestions.remove(ibQuestion);
-        }
-
-        if (docChange.type == DocumentChangeType.modified) {
-          if (ibQuestions.contains(ibQuestion)) {
-            ibQuestions[ibQuestions.indexOf(ibQuestion)] = ibQuestion;
-          }
-        }
-      }
-      if (isLoading.isTrue && event.docs.isNotEmpty) {
-        lastDocSnapShot = event.docs.last;
-      }
-
-      isLoading.value = false;
-    });
     super.onInit();
+    await _initQuestions();
   }
 
-  @override
-  void onClose() {
-    questionSub.cancel();
-    super.onClose();
+  Future<void> _initQuestions() async {
+    ibQuestions.clear();
+
+    /// load latest question
+    final IbAnswer? answer = await IbQuestionDbService()
+        .queryLatestAnsweredQ(IbUtils.getCurrentUid()!);
+    if (answer != null) {
+      ibQuestions.addAll(await IbQuestionDbService()
+          .queryIbQuestions(8, timestamp: answer.askedTimeInMs));
+    } else {
+      ibQuestions.addAll(await IbQuestionDbService().queryIbQuestions(
+        8,
+      ));
+    }
+
+    /// load old question
+    final IbAnswer? oldAnswer = await IbQuestionDbService()
+        .queryLastAnsweredQ(IbUtils.getCurrentUid()!);
+
+    if (oldAnswer != null) {
+      final list = await IbQuestionDbService().queryIbQuestions(8,
+          timestamp: oldAnswer.askedTimeInMs, isGreaterThan: false);
+      hasMore = list.isNotEmpty;
+      ibQuestions.addAll(list);
+    }
+
+    /// load cached question
+    loadCachedQuestions();
+
+    ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
+    if (ibQuestions.isNotEmpty) {
+      IbLocalStorageService().updateUnAnsweredIbQList(ibQuestions);
+    }
+    isLoading.value = false;
   }
 
-  Future<void> queryQuestionsFromDb() async {
-    final snapshot = await IbQuestionDbService()
-        .queryQuestions(limit: 3, lastDoc: lastDocSnapShot);
+  Future<void> loadCachedQuestions() async {
+    final List<String>? localQuestionIds =
+        IbLocalStorageService().getUnAnsweredIbQidList();
 
-    if (snapshot.docs.isNotEmpty) {
-      lastDocSnapShot = snapshot.docs[snapshot.size - 1];
+    if (localQuestionIds == null || localQuestionIds.isEmpty) {
+      return;
+    }
 
-      for (final docSnapShot in snapshot.docs) {
-        final IbQuestion ibQuestion = IbQuestion.fromJson(docSnapShot.data());
-        ibQuestions.addIf(!ibQuestions.contains(ibQuestion), ibQuestion);
+    print(
+        'IbQuestionController there are ${localQuestionIds.length} local unanswered questions');
+    for (final id in localQuestionIds) {
+      if (await IbQuestionDbService()
+          .isQuestionAnswered(uid: IbUtils.getCurrentUid()!, questionId: id)) {
+        IbLocalStorageService().removeUnAnsweredIbQid(id);
+        print('IbQuestionController remove $id');
+        continue;
+      }
+
+      if (!containQuestionId(id)) {
+        final q = await IbQuestionDbService().querySingleQuestion(id);
+        ibQuestions.addIf(q != null && !ibQuestions.contains(q), q!);
       }
     }
+    ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
   }
 
-  Future<void> refreshQuestions() async {
-    print(' IbQuestionController refreshQuestions');
-    lastDocSnapShot = await IbQuestionDbService()
-        .queryLastAnsweredQ(IbUtils.getCurrentUid()!);
+  bool containQuestionId(String id) {
+    for (final q in ibQuestions) {
+      if (q.id == id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<void> loadMoreQuestion() async {
+    if (!hasMore) {
+      return;
+    }
+
+    print('IbQuestionController loadMoreQuestion');
+    final list = await IbQuestionDbService().queryIbQuestions(8,
+        timestamp: ibQuestions.last.askedTimeInMs, isGreaterThan: false);
+
+    if (list.isEmpty) {
+      return;
+    }
+
+    for (final IbQuestion ibQuestion in list) {
+      ibQuestions.addIf(!ibQuestions.contains(ibQuestion), ibQuestion);
+      IbLocalStorageService().appendUnAnsweredIbQidList(ibQuestion);
+    }
+
+    ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
+  }
+
+  Future<void> refreshEverything() async {
     isLoading.value = true;
-    ibQuestions.clear();
-    await queryQuestionsFromDb();
-    isLoading.value = false;
+    await _initQuestions();
   }
 }
