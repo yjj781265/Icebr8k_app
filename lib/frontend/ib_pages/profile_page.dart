@@ -22,6 +22,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_stats.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -92,43 +93,27 @@ class _ProfilePageState extends State<ProfilePage>
                       children: [
                         ///cover photo
                         Obx(
-                          () => Stack(
-                            alignment: Alignment.bottomRight,
-                            children: [
-                              SizedBox(
-                                height: 200,
-                                width: double.infinity,
-                                child: _profileController.coverPhotoUrl.isEmpty
-                                    ? Image.asset(
-                                        'assets/images/default_cover_photo.jpeg',
-                                        fit: BoxFit.cover,
-                                      )
-                                    : CachedNetworkImage(
-                                        fit: BoxFit.fill,
-                                        imageUrl: _profileController
-                                            .coverPhotoUrl.value,
-                                      ),
-                              ),
-
-                              ///edit button
-                              if (_profileController.isMe.isTrue)
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: FloatingActionButton(
-                                      heroTag: null,
-                                      backgroundColor: IbColors.lightBlue,
-                                      onPressed: () {},
-                                      child: const Icon(
-                                        Icons.edit_outlined,
-                                        size: 16,
-                                      ),
+                          () => GestureDetector(
+                            onTap: () {
+                              if (_profileController.isMe.isFalse) {
+                                return;
+                              }
+                              showCoverPhotoBottomSheet();
+                            },
+                            child: SizedBox(
+                              height: 200,
+                              width: double.infinity,
+                              child: _profileController.coverPhotoUrl.isEmpty
+                                  ? Image.asset(
+                                      'assets/images/default_cover_photo.jpeg',
+                                      fit: BoxFit.cover,
+                                    )
+                                  : CachedNetworkImage(
+                                      fit: BoxFit.fill,
+                                      imageUrl: _profileController
+                                          .coverPhotoUrl.value,
                                     ),
-                                  ),
-                                )
-                            ],
+                            ),
                           ),
                         ),
 
@@ -151,20 +136,6 @@ class _ProfilePageState extends State<ProfilePage>
                                       avatarUrl:
                                           _profileController.avatarUrl.value),
                                 ),
-                                if (_profileController.isMe.isTrue)
-                                  SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: FloatingActionButton(
-                                      heroTag: null,
-                                      backgroundColor: IbColors.lightBlue,
-                                      onPressed: () {},
-                                      child: const Icon(
-                                        Icons.edit_outlined,
-                                        size: 16,
-                                      ),
-                                    ),
-                                  )
                               ],
                             ),
                           ),
@@ -328,16 +299,23 @@ class _ProfilePageState extends State<ProfilePage>
             itemBuilder: (context, index) {
               final AnsweredQuestionItem item =
                   _answeredQuestionController.myAnsweredQuestions[index];
+
               final tag = 'answered_${item.ibQuestion.id}';
-              final IbQuestionItemController _controller = Get.put(
-                  IbQuestionItemController(
-                      ibAnswer: item.ibAnswer,
-                      ibQuestion: item.ibQuestion,
-                      disableAvatarOnTouch:
-                          item.ibQuestion.creatorId == widget.uid,
-                      isExpandable: true,
-                      isExpanded: index == 0),
-                  tag: tag.toString());
+              late IbQuestionItemController _controller;
+              if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
+                _controller = Get.find(tag: tag);
+              } else {
+                _controller = Get.put(
+                    IbQuestionItemController(
+                        ibAnswer: item.ibAnswer,
+                        ibQuestion: item.ibQuestion,
+                        disableAvatarOnTouch:
+                            item.ibQuestion.creatorId == widget.uid,
+                        isExpandable: true),
+                    tag: tag.toString());
+              }
+
+              _controller.isExpanded.value = index == 0;
 
               if (item.ibQuestion.questionType == IbQuestion.kMultipleChoice) {
                 return IbMcQuestionCard(_controller);
@@ -389,15 +367,20 @@ class _ProfilePageState extends State<ProfilePage>
               final IbQuestion item =
                   _createdQuestionController.createdQuestions[index];
               final tag = 'created_${item.id}';
-              final IbQuestionItemController _controller = Get.put(
-                  IbQuestionItemController(
-                      ibQuestion: item,
-                      isExpanded: index == 0,
-                      disableChoiceOnTouch: true,
-                      isExpandable: true,
-                      showActionButtons: false,
-                      disableAvatarOnTouch: item.creatorId == widget.uid),
-                  tag: tag.toString());
+              late IbQuestionItemController _controller;
+              if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
+                _controller = Get.find(tag: tag);
+              } else {
+                _controller = Get.put(
+                    IbQuestionItemController(
+                        ibQuestion: item,
+                        disableChoiceOnTouch: true,
+                        isExpandable: true,
+                        showActionButtons: false,
+                        disableAvatarOnTouch: item.creatorId == widget.uid),
+                    tag: tag.toString());
+              }
+              _controller.isExpanded.value = index == 0;
 
               if (item.questionType == IbQuestion.kMultipleChoice) {
                 return IbMcQuestionCard(_controller);
@@ -445,12 +428,17 @@ class _ProfilePageState extends State<ProfilePage>
               final IbQuestion item =
                   _commonAnswersController.ibQuestions[index];
               final tag = 'common${item.id}';
-              final IbQuestionItemController _controller = Get.put(
-                  IbQuestionItemController(
-                      ibQuestion: item,
-                      isExpandable: true,
-                      disableAvatarOnTouch: item.creatorId == widget.uid),
-                  tag: tag.toString());
+              late IbQuestionItemController _controller;
+              if (Get.isRegistered(tag: tag)) {
+                _controller = Get.find(tag: tag);
+              } else {
+                _controller = Get.put(
+                    IbQuestionItemController(
+                        ibQuestion: item,
+                        isExpandable: true,
+                        disableAvatarOnTouch: item.creatorId == widget.uid),
+                    tag: tag.toString());
+              }
 
               if (item.questionType == IbQuestion.kMultipleChoice) {
                 return IbMcQuestionCard(_controller);
@@ -592,6 +580,78 @@ class _ProfilePageState extends State<ProfilePage>
 
     Get.bottomSheet(dialog);
   }
+
+  void showCoverPhotoBottomSheet() {
+    final Widget options = ListView(
+      shrinkWrap: true,
+      children: [
+        InkWell(
+          onTap: () async {
+            final _picker = ImagePicker();
+            final XFile? pickedFile = await _picker.pickImage(
+              source: ImageSource.camera,
+              preferredCameraDevice: CameraDevice.front,
+              imageQuality: 50,
+            );
+
+            _profileController.updateCoverPhoto(pickedFile!.path);
+          },
+          child: Ink(
+            height: 56,
+            width: double.infinity,
+            color: IbColors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: const [
+                  Icon(Icons.camera_alt_outlined),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Text('Take a photo',
+                      style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
+                ],
+              ),
+            ),
+          ),
+        ),
+        InkWell(
+          onTap: () async {
+            final _picker = ImagePicker();
+            final XFile? pickedFile = await _picker.pickImage(
+              source: ImageSource.gallery,
+              preferredCameraDevice: CameraDevice.front,
+              imageQuality: 50,
+            );
+
+            _profileController.updateCoverPhoto(pickedFile!.path);
+          },
+          child: Ink(
+            height: 56,
+            width: double.infinity,
+            color: IbColors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: const [
+                  Icon(Icons.photo_album_outlined),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Text(
+                    'Choose from gallery',
+                    style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+
+    Get.bottomSheet(SafeArea(child: options));
+  }
 }
 
 class PersistentHeader extends SliverPersistentHeaderDelegate {
@@ -602,14 +662,14 @@ class PersistentHeader extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(height: 56, color: IbColors.lightBlue, child: widget);
+    return Container(height: 48, color: IbColors.lightBlue, child: widget);
   }
 
   @override
-  double get maxExtent => 56;
+  double get maxExtent => 48;
 
   @override
-  double get minExtent => 56;
+  double get minExtent => 48;
 
   @override
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {

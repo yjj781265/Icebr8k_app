@@ -72,6 +72,11 @@ class IbUserDbService {
     return _collectionRef.doc(uid).update({'name': name});
   }
 
+  Future<void> updateCoverPhotoUrl(
+      {required String photoUrl, required String uid}) {
+    return _collectionRef.doc(uid).update({'coverPhotoUrl': photoUrl});
+  }
+
   Stream<IbUser?> listenToIbUserChanges(String uid) {
     return _collectionRef.doc(uid).snapshots().map((event) {
       if (event.data() == null) {

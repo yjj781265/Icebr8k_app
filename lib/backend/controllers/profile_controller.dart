@@ -5,10 +5,12 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
+import 'package:icebr8k/backend/services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
 class ProfileController extends GetxController {
   final currentIndex = 0.obs;
@@ -136,5 +138,26 @@ class ProfileController extends GetxController {
       IbUtils.showSimpleSnackBar(
           msg: error.toString(), backgroundColor: IbColors.errorRed);
     });
+  }
+
+  Future<void> updateCoverPhoto(String _filePath) async {
+    if (isMe.isFalse) {
+      return;
+    }
+
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'),
+        barrierDismissible: false);
+
+    final String? photoUrl =
+        await IbStorageService().uploadAndRetrieveImgUrl(_filePath);
+
+    if (photoUrl == null) {
+      Get.back();
+      return;
+    }
+
+    await IbUserDbService()
+        .updateCoverPhotoUrl(photoUrl: photoUrl, uid: IbUtils.getCurrentUid()!);
+    Get.back();
   }
 }

@@ -54,7 +54,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
   }
 
   void _runExpandCheck() {
-    if (widget._controller.isExpanded) {
+    if (widget._controller.isExpanded.isTrue) {
       expandController.forward();
     } else {
       expandController.reverse();
@@ -67,7 +67,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     final expandableInfo = Column(
       children: [
         IbQuestionScItem(widget._controller),
-        Center(child: _handleButtons()),
+        SizedBox(height: 56, child: Center(child: _handleButtons())),
       ],
     );
     return Obx(
@@ -148,11 +148,11 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                             child: expandableInfo,
                           )
                         else
-                          widget._controller.isExpanded
+                          widget._controller.isExpanded.isTrue
                               ? expandableInfo
                               : const SizedBox(),
-                        Obx(
-                          () => Row(
+                        Obx(() {
+                          return Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
@@ -165,13 +165,12 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                                 IconButton(
                                   padding: EdgeInsets.zero,
                                   onPressed: () {
-                                    setState(() {
-                                      widget._controller.isExpanded =
-                                          !widget._controller.isExpanded;
-                                    });
+                                    widget._controller.isExpanded.value =
+                                        !widget._controller.isExpanded.value;
+
                                     _runExpandCheck();
                                   },
-                                  icon: widget._controller.isExpanded
+                                  icon: widget._controller.isExpanded.isTrue
                                       ? const Icon(
                                           Icons.expand_less_outlined,
                                           color: IbColors.primaryColor,
@@ -182,8 +181,8 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                                         ),
                                 )
                             ],
-                          ),
-                        ),
+                          );
+                        }),
                       ],
                     ),
                   ),

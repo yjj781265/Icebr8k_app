@@ -31,7 +31,7 @@ class IbQuestionItemController extends GetxController {
   final bool disableAvatarOnTouch;
   final bool disableChoiceOnTouch;
   final bool showActionButtons;
-  bool isExpanded;
+  final isExpanded = true.obs;
 
   /// if user already answered, pass the answer here
   IbAnswer? ibAnswer;
@@ -42,7 +42,6 @@ class IbQuestionItemController extends GetxController {
   IbQuestionItemController(
       {required this.ibQuestion,
       this.showActionButtons = true,
-      this.isExpanded = true,
       this.isExpandable = false,
       this.isSample = false,
       this.disableChoiceOnTouch = false,

@@ -262,6 +262,8 @@ class IbUtils {
     _colors.addAll(Colors.primaries);
     _colors.remove(Colors.yellowAccent);
     _colors.remove(Colors.yellow);
+    _colors.remove(Colors.amberAccent);
+    _colors.remove(Colors.amber);
     return _colors[random.nextInt(_colors.length)];
   }
 }

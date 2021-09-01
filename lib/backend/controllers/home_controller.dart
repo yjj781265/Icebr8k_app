@@ -28,11 +28,11 @@ class HomeController extends GetxController {
         .listenToIbUserChanges(Get.find<AuthController>().firebaseUser!.uid)
         .listen((ibUser) {
       currentIbUser = ibUser;
-      _setupIbUser();
+      _populateUserInfo();
     });
   }
 
-  void _setupIbUser() {
+  void _populateUserInfo() {
     if (currentIbUser != null) {
       isIbUserOnline.value = currentIbUser!.isOnline;
       currentIbName.value = currentIbUser!.name;

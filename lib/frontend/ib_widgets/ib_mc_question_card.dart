@@ -45,7 +45,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   }
 
   void _runExpandCheck() {
-    if (widget._controller.isExpanded) {
+    if (widget._controller.isExpanded.isTrue) {
       expandController.forward();
     } else {
       expandController.reverse();
@@ -82,7 +82,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
             ),
           ),
         ),
-        Center(child: _handleButtons()),
+        SizedBox(height: 56, child: Center(child: _handleButtons())),
       ],
     );
     return Center(
@@ -158,7 +158,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                       child: expandableInfo,
                     )
                   else
-                    widget._controller.isExpanded
+                    widget._controller.isExpanded.isTrue
                         ? expandableInfo
                         : const SizedBox(),
                   Row(
@@ -171,24 +171,26 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                             color: IbColors.lightGrey),
                       ),
                       if (widget._controller.isExpandable)
-                        IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              setState(() {
-                                widget._controller.isExpanded =
-                                    !widget._controller.isExpanded;
-                              });
-                              _runExpandCheck();
-                            },
-                            icon: widget._controller.isExpanded
-                                ? const Icon(
-                                    Icons.expand_less_outlined,
-                                    color: IbColors.primaryColor,
-                                  )
-                                : const Icon(
-                                    Icons.expand_more_outlined,
-                                    color: IbColors.primaryColor,
-                                  )),
+                        Obx(() {
+                          _runExpandCheck();
+                          return IconButton(
+                              padding: EdgeInsets.zero,
+                              onPressed: () {
+                                widget._controller.isExpanded.value =
+                                    !widget._controller.isExpanded.value;
+
+                                _runExpandCheck();
+                              },
+                              icon: widget._controller.isExpanded.isTrue
+                                  ? const Icon(
+                                      Icons.expand_less_outlined,
+                                      color: IbColors.primaryColor,
+                                    )
+                                  : const Icon(
+                                      Icons.expand_more_outlined,
+                                      color: IbColors.primaryColor,
+                                    ));
+                        }),
                     ],
                   ),
                 ],

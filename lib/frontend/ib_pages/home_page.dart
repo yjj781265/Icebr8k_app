@@ -83,7 +83,13 @@ class HomePage extends StatelessWidget {
                 Get.to(() => IbUserSearchPage());
               },
               icon: const Icon(Icons.person_add_alt_1_outlined))),
-      List<Widget>.generate(1, (index) => const SizedBox()),
+      List<Widget>.generate(
+          1,
+          (index) => IconButton(
+              onPressed: () {
+                print('edit profile page');
+              },
+              icon: const Icon(Icons.edit_outlined))),
     ];
     return Obx(
       () => AnnotatedRegion<SystemUiOverlayStyle>(
