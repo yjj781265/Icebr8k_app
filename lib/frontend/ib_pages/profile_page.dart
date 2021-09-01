@@ -5,6 +5,7 @@ import 'package:icebr8k/backend/controllers/answered_question_controller.dart';
 import 'package:icebr8k/backend/controllers/asked_questions_controller.dart';
 import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/common_answers_controller.dart';
+import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/profile_controller.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
@@ -42,6 +43,7 @@ class _ProfilePageState extends State<ProfilePage>
   late AskedQuestionsController _createdQuestionController;
   late CommonAnswersController _commonAnswersController;
   late ProfileController _profileController;
+  late HomeController _homeController;
 
   @override
   void initState() {
@@ -53,6 +55,7 @@ class _ProfilePageState extends State<ProfilePage>
           Get.put(AnsweredQuestionController(widget.uid), tag: widget.uid);
       _createdQuestionController =
           Get.put(AskedQuestionsController(widget.uid), tag: widget.uid);
+      _homeController = Get.find();
     }
     _commonAnswersController =
         Get.put(CommonAnswersController(widget.uid), tag: widget.uid);
@@ -101,19 +104,9 @@ class _ProfilePageState extends State<ProfilePage>
                               showCoverPhotoBottomSheet();
                             },
                             child: SizedBox(
-                              height: 200,
-                              width: double.infinity,
-                              child: _profileController.coverPhotoUrl.isEmpty
-                                  ? Image.asset(
-                                      'assets/images/default_cover_photo.jpeg',
-                                      fit: BoxFit.cover,
-                                    )
-                                  : CachedNetworkImage(
-                                      fit: BoxFit.fill,
-                                      imageUrl: _profileController
-                                          .coverPhotoUrl.value,
-                                    ),
-                            ),
+                                height: 200,
+                                width: double.infinity,
+                                child: handleCoverPhoto()),
                           ),
                         ),
 
@@ -133,8 +126,10 @@ class _ProfilePageState extends State<ProfilePage>
                                       disableOnTap: true,
                                       radius: 40,
                                       uid: widget.uid,
-                                      avatarUrl:
-                                          _profileController.avatarUrl.value),
+                                      avatarUrl: _profileController.isMe.isTrue
+                                          ? _homeController
+                                              .currentIbAvatarUrl.value
+                                          : _profileController.avatarUrl.value),
                                 ),
                               ],
                             ),
@@ -154,12 +149,15 @@ class _ProfilePageState extends State<ProfilePage>
                               () => Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('@${_profileController.username.value}',
+                                  Text(
+                                      '@${_profileController.isMe.isTrue ? _homeController.currentIbUsername.value : _profileController.username.value}',
                                       style: const TextStyle(
                                           fontSize: IbConfig.kPageTitleSize,
                                           fontWeight: FontWeight.bold)),
                                   Text(
-                                    _profileController.name.value,
+                                    _profileController.isMe.isTrue
+                                        ? _homeController.currentIbName.value
+                                        : _profileController.name.value,
                                     style: const TextStyle(
                                         fontSize: IbConfig.kNormalTextSize),
                                   ),
@@ -259,6 +257,53 @@ class _ProfilePageState extends State<ProfilePage>
             ],
           ),
         ));
+  }
+
+  Widget handleCoverPhoto() {
+    if (_profileController.isMe.isTrue) {
+      final Widget coverPhoto = _homeController.currentIbCoverPhotoUrl.isEmpty
+          ? Image.asset(
+              'assets/images/default_cover_photo.jpeg',
+              fit: BoxFit.cover,
+            )
+          : CachedNetworkImage(
+              progressIndicatorBuilder: (context, value, progress) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    IbProgressIndicator(),
+                    Text('rendering cover photo'),
+                  ],
+                );
+              },
+              fit: BoxFit.fitWidth,
+              imageUrl: _homeController.currentIbCoverPhotoUrl.value,
+            );
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          coverPhoto,
+          const Positioned(
+            right: 8,
+            bottom: 8,
+            child: Icon(
+              Icons.edit_outlined,
+              color: IbColors.lightBlue,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return _profileController.coverPhotoUrl.isEmpty
+        ? Image.asset(
+            'assets/images/default_cover_photo.jpeg',
+            fit: BoxFit.cover,
+          )
+        : CachedNetworkImage(
+            fit: BoxFit.fill,
+            imageUrl: _profileController.coverPhotoUrl.value,
+          );
   }
 
   Widget buildAnsweredQTab() {
@@ -587,10 +632,10 @@ class _ProfilePageState extends State<ProfilePage>
       children: [
         InkWell(
           onTap: () async {
+            Get.back();
             final _picker = ImagePicker();
             final XFile? pickedFile = await _picker.pickImage(
               source: ImageSource.camera,
-              preferredCameraDevice: CameraDevice.front,
               imageQuality: 50,
             );
 
@@ -617,10 +662,10 @@ class _ProfilePageState extends State<ProfilePage>
         ),
         InkWell(
           onTap: () async {
+            Get.back();
             final _picker = ImagePicker();
             final XFile? pickedFile = await _picker.pickImage(
               source: ImageSource.gallery,
-              preferredCameraDevice: CameraDevice.front,
               imageQuality: 50,
             );
 

@@ -145,7 +145,7 @@ class ProfileController extends GetxController {
       return;
     }
 
-    Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'),
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'uploading...'),
         barrierDismissible: false);
 
     final String? photoUrl =
