@@ -177,8 +177,7 @@ class HomePage extends StatelessWidget {
         backgroundColor: IbColors.white,
         selectedIndex: _homeController.currentIndex.value,
         itemCornerRadius: IbConfig.kCardCornerRadius,
-        animationDuration:
-            const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
+        animationDuration: const Duration(milliseconds: 1000),
         curve: Curves.fastLinearToSlowEaseIn,
         onItemSelected: (index) {
           _homeController.currentIndex.value = index;

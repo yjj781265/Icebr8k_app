@@ -82,7 +82,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
             ),
           ),
         ),
-        SizedBox(height: 56, child: Center(child: _handleButtons())),
+        Center(child: _handleButtons()),
       ],
     );
     return Center(
@@ -206,55 +206,57 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
     if (!widget._controller.showActionButtons) {
       return const SizedBox();
     }
-    return Obx(() {
-      if (widget._controller.isAnswering.isTrue) {
-        return const IbProgressIndicator(
-          width: 20,
-          height: 20,
-        );
-      }
+    return SizedBox(
+      height: 56,
+      child: Obx(() {
+        if (widget._controller.isAnswering.isTrue) {
+          return const IbProgressIndicator(
+            width: 20,
+            height: 20,
+          );
+        }
 
-      if (widget._controller.showResult.isTrue) {
-        return Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            const Icon(
-              Icons.check_circle_outline,
-              color: IbColors.accentColor,
-              size: 16,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                  'Voted ${IbUtils.getSuffixDateTimeString(widget._controller.votedDateTime.value)}'),
-            )
-          ],
-        );
-      }
+        if (widget._controller.showResult.isTrue) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.check_circle_outline,
+                color: IbColors.accentColor,
+                size: 16,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                    'Voted ${IbUtils.getSuffixDateTimeString(widget._controller.votedDateTime.value)}'),
+              )
+            ],
+          );
+        }
 
-      if (!widget._controller.isSample) {
-        return Center(
-          child: IbElevatedButton(
-              textTrKey: 'vote',
-              color: IbColors.primaryColor,
-              onPressed: widget._controller.selectedChoice.isEmpty
-                  ? null
-                  : () {
-                      widget._controller.onVote();
-                    }),
-        );
-      } else {
-        return Center(
-          child: IbElevatedButton(
-              textTrKey: 'submit',
-              color: IbColors.primaryColor,
-              onPressed: () async {
-                await widget._controller.onSubmit();
-              }),
-        );
-      }
-    });
+        if (!widget._controller.isSample) {
+          return Center(
+            child: IbElevatedButton(
+                textTrKey: 'vote',
+                color: IbColors.primaryColor,
+                onPressed: widget._controller.selectedChoice.isEmpty
+                    ? null
+                    : () {
+                        widget._controller.onVote();
+                      }),
+          );
+        } else {
+          return Center(
+            child: IbElevatedButton(
+                textTrKey: 'submit',
+                color: IbColors.primaryColor,
+                onPressed: () async {
+                  await widget._controller.onSubmit();
+                }),
+          );
+        }
+      }),
+    );
   }
 
   Widget _handleAvatarImage() {

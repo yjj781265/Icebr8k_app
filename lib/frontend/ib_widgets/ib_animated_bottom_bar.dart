@@ -92,7 +92,7 @@ class _ItemWidget extends StatelessWidget {
     required this.animationDuration,
     required this.itemCornerRadius,
     required this.iconSize,
-    this.curve = Curves.linear,
+    this.curve = Curves.fastLinearToSlowEaseIn,
   }) : super(key: key);
 
   @override

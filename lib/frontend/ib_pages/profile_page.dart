@@ -276,7 +276,7 @@ class _ProfilePageState extends State<ProfilePage>
                   ],
                 );
               },
-              fit: BoxFit.fitWidth,
+              fit: BoxFit.fill,
               imageUrl: _homeController.currentIbCoverPhotoUrl.value,
             );
       return Stack(
@@ -636,7 +636,7 @@ class _ProfilePageState extends State<ProfilePage>
             final _picker = ImagePicker();
             final XFile? pickedFile = await _picker.pickImage(
               source: ImageSource.camera,
-              imageQuality: 50,
+              imageQuality: 88,
             );
 
             _profileController.updateCoverPhoto(pickedFile!.path);
@@ -666,7 +666,7 @@ class _ProfilePageState extends State<ProfilePage>
             final _picker = ImagePicker();
             final XFile? pickedFile = await _picker.pickImage(
               source: ImageSource.gallery,
-              imageQuality: 50,
+              imageQuality: 88,
             );
 
             _profileController.updateCoverPhoto(pickedFile!.path);
