@@ -1,4 +1,3 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_controller.dart';
@@ -15,7 +14,6 @@ import '../ib_colors.dart';
 class QuestionTab extends StatelessWidget {
   QuestionTab({Key? key}) : super(key: key);
   final _ibQuestionController = Get.find<IbQuestionController>();
-  final _carouselController = CarouselController();
   final _refreshController = RefreshController();
   @override
   Widget build(BuildContext context) {
@@ -38,39 +36,55 @@ class QuestionTab extends StatelessWidget {
 
       return Container(
           color: IbColors.lightBlue,
-          child: CarouselSlider.builder(
-              itemCount: _ibQuestionController.ibQuestions.length,
-              carouselController: _carouselController,
-              options: CarouselOptions(
-                  enableInfiniteScroll: false,
-                  onPageChanged: (index, reason) {
-                    print('page changed to index $index');
-                    if (index == _ibQuestionController.ibQuestions.length - 1) {
-                      _ibQuestionController.loadMoreQuestion();
-                    }
-                  },
-                  viewportFraction: 0.95,
-                  height: Get.height),
-              itemBuilder: (context, index, pageViewIndex) {
-                final _ibQuestion = _ibQuestionController.ibQuestions[index];
-                if (_ibQuestion.questionType == IbQuestion.kScale) {
-                  return Center(
-                      child: IbScQuestionCard(Get.put(
-                          IbQuestionItemController(
-                              ibQuestion: _ibQuestion,
-                              disableAvatarOnTouch: IbUtils.getCurrentUid()! ==
-                                  _ibQuestion.creatorId),
-                          tag: _ibQuestion.id)));
-                }
+          child: SmartRefresher(
+            footer: const ClassicFooter(
+              textStyle: TextStyle(color: IbColors.primaryColor),
+              failedIcon: Icon(
+                Icons.error_outline,
+                color: IbColors.errorRed,
+              ),
+              loadingIcon: IbProgressIndicator(
+                width: 24,
+                height: 24,
+                padding: 0,
+              ),
+            ),
+            controller: _refreshController,
+            enablePullDown: false,
+            enablePullUp: true,
+            onLoading: () async {
+              if (!_ibQuestionController.hasMore) {
+                _refreshController.loadNoData();
+                return;
+              }
 
-                return IbMcQuestionCard(Get.put(
-                    IbQuestionItemController(
-                      disableAvatarOnTouch:
-                          IbUtils.getCurrentUid()! == _ibQuestion.creatorId,
-                      ibQuestion: _ibQuestion,
-                    ),
-                    tag: _ibQuestion.id));
-              }));
+              await _ibQuestionController.loadMoreQuestion();
+              _refreshController.loadComplete();
+            },
+            child: ListView.builder(
+                itemCount: _ibQuestionController.ibQuestions.length,
+                itemBuilder: (context, index) {
+                  final _ibQuestion = _ibQuestionController.ibQuestions[index];
+                  if (_ibQuestion.questionType == IbQuestion.kScale) {
+                    return Center(
+                        child: IbScQuestionCard(Get.put(
+                            IbQuestionItemController(
+                                ibQuestion: _ibQuestion,
+                                disableAvatarOnTouch:
+                                    IbUtils.getCurrentUid()! ==
+                                        _ibQuestion.creatorId),
+                            tag: _ibQuestion.id)));
+                  }
+
+                  return IbMcQuestionCard(Get.put(
+                      IbQuestionItemController(
+                        disableAvatarOnTouch:
+                            IbUtils.getCurrentUid()! == _ibQuestion.creatorId,
+                        ibQuestion: _ibQuestion,
+                      ),
+                      tag: _ibQuestion.id));
+                }),
+          ));
     });
   }
 }

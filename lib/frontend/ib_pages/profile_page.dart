@@ -669,7 +669,9 @@ class _ProfilePageState extends State<ProfilePage>
               imageQuality: 88,
             );
 
-            _profileController.updateCoverPhoto(pickedFile!.path);
+            if (pickedFile != null) {
+              _profileController.updateCoverPhoto(pickedFile.path);
+            }
           },
           child: Ink(
             height: 56,

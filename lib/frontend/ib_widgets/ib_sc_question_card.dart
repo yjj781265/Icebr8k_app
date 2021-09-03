@@ -67,7 +67,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     final expandableInfo = Column(
       children: [
         IbQuestionScItem(widget._controller),
-        SizedBox(height: 56, child: Center(child: _handleButtons())),
+        Center(child: _handleButtons()),
       ],
     );
     return Obx(
@@ -195,8 +195,14 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     );
   }
 
-  Widget _handleButtons() {
-    if (!widget._controller.showActionButtons) {
+  Widget? _handleButtons() {
+    if (!widget._controller.showActionButtons &&
+        widget._controller.showResult.isFalse) {
+      return null;
+    }
+
+    if (!widget._controller.showActionButtons &&
+        widget._controller.showResult.isTrue) {
       return TextButton(
           onPressed: () {
             widget._controller.calculateResult();
@@ -279,50 +285,48 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
   }
 
   Widget _cardBackSide() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: SizedBox(
-        height: 300,
-        child: IbCard(
-          child: Obx(
-            () => Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: IconButton(
-                      onPressed: () {
-                        cardKey.currentState!.flip();
-                      },
-                      icon: const Icon(Icons.arrow_back_ios_outlined)),
-                ),
-                Expanded(
-                  flex: 8,
-                  child: widget._controller.isCalculating.isTrue
-                      ? const Center(
-                          child: IbProgressIndicator(),
-                        )
-                      : PieChart(
-                          PieChartData(
-                            sectionsSpace: 2,
-                            centerSpaceRadius: 20,
-                            startDegreeOffset: 45,
-                            sections: _getSectionData(),
-                          ),
+    return SizedBox(
+      width: double.infinity,
+      height: 300,
+      child: IbCard(
+        child: Obx(
+          () => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 2,
+                child: IconButton(
+                    onPressed: () {
+                      cardKey.currentState!.flip();
+                    },
+                    icon: const Icon(Icons.arrow_back_ios_outlined)),
+              ),
+              Expanded(
+                flex: 8,
+                child: widget._controller.isCalculating.isTrue
+                    ? const Center(
+                        child: IbProgressIndicator(),
+                      )
+                    : PieChart(
+                        PieChartData(
+                          sectionsSpace: 2,
+                          centerSpaceRadius: 20,
+                          startDegreeOffset: 45,
+                          sections: _getSectionData(),
                         ),
+                      ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  '${widget._controller.totalPolled.value} polled',
+                  style: const TextStyle(
+                      fontSize: IbConfig.kDescriptionTextSize,
+                      color: IbColors.lightGrey),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    '${widget._controller.totalPolled.value} polled',
-                    style: const TextStyle(
-                        fontSize: IbConfig.kDescriptionTextSize,
-                        color: IbColors.lightGrey),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -438,24 +442,20 @@ class IbQuestionScItem extends StatelessWidget {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                  width: 100,
-                  child: Text(_controller.ibQuestion.choices.first)),
-              SizedBox(
-                width: 100,
-                child: Text(
-                  _controller.ibQuestion.choices[1],
-                  textAlign: TextAlign.end,
-                ),
-              )
-            ],
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+                width: 100, child: Text(_controller.ibQuestion.choices.first)),
+            SizedBox(
+              width: 100,
+              child: Text(
+                _controller.ibQuestion.choices[1],
+                textAlign: TextAlign.end,
+              ),
+            )
+          ],
         )
       ],
     );

@@ -99,6 +99,7 @@ class IbQuestionController extends GetxController {
         timestamp: ibQuestions.last.askedTimeInMs, isGreaterThan: false);
 
     if (list.isEmpty) {
+      hasMore = false;
       return;
     }
 
