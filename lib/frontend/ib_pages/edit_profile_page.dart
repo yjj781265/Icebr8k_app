@@ -4,6 +4,7 @@ import 'package:icebr8k/backend/controllers/edit_profile_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_single_date_picker.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
@@ -26,87 +27,103 @@ class EditProfilePage extends StatelessWidget {
         backgroundColor: IbColors.lightBlue,
         title: const Text('Edit Profile'),
       ),
-      body: Column(
-        children: [
-          SizedBox(
-            width: 112,
-            height: 112,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.bottomRight,
-                children: [
-                  Center(
-                    child: IbUserAvatar(
-                      avatarUrl: currentUser.avatarUrl,
-                      disableOnTap: true,
-                      radius: 56,
-                    ),
-                  ),
-                  Positioned(
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: IbColors.accentColor,
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(3.0),
-                        child: Icon(
-                          Icons.edit_outlined,
-                          size: 16,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+              width: 112,
+              height: 112,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    Hero(
+                      transitionOnUserGestures: true,
+                      tag: 'profile_avatar',
+                      child: Center(
+                        child: IbUserAvatar(
+                          avatarUrl: currentUser.avatarUrl,
+                          disableOnTap: true,
+                          radius: 56,
                         ),
                       ),
                     ),
-                  )
-                ],
+                    Positioned(
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: IbColors.accentColor,
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.all(3.0),
+                          child: Icon(
+                            Icons.edit_outlined,
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
-          IbTextField(
-              titleIcon: const Icon(
-                Icons.person_outline,
-                color: IbColors.primaryColor,
+            IbCard(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    IbTextField(
+                        titleIcon: const Icon(
+                          Icons.person_outline,
+                          color: IbColors.primaryColor,
+                        ),
+                        titleTrKey: 'name',
+                        hintTrKey: 'name_hint',
+                        controller: _nameEditController,
+                        text: currentUser.name,
+                        onChanged: (text) {}),
+                    IbTextField(
+                        textInputType: TextInputType.multiline,
+                        titleIcon: const Icon(
+                          Icons.person_rounded,
+                          color: IbColors.primaryColor,
+                        ),
+                        titleTrKey: 'bio',
+                        hintTrKey: 'bio_hint',
+                        maxLines: 8,
+                        charLimit: IbConfig.kBioMaxLength,
+                        controller: _bioEditController,
+                        text: currentUser.description,
+                        onChanged: (text) {}),
+                    InkWell(
+                      onTap: () => showDialog(
+                          context: context,
+                          builder: (context) => _getDatePicker(),
+                          barrierDismissible: false),
+                      child: IbTextField(
+                        titleIcon: const Icon(
+                          Icons.cake_outlined,
+                          color: IbColors.primaryColor,
+                        ),
+                        text: _readableDateTime(
+                            DateTime.fromMillisecondsSinceEpoch(
+                                currentUser.birthdateInMs)),
+                        controller: _birthdateEditController,
+                        suffixIcon: const Icon(Icons.calendar_today_outlined),
+                        titleTrKey: 'birthdate',
+                        hintTrKey: 'birthdate_hint',
+                        enabled: false,
+                        onChanged: (birthdate) {},
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              titleTrKey: 'name',
-              hintTrKey: 'name_hint',
-              controller: _nameEditController,
-              text: currentUser.name,
-              onChanged: (text) {}),
-          IbTextField(
-              textInputType: TextInputType.multiline,
-              titleIcon: const Icon(
-                Icons.person_rounded,
-                color: IbColors.primaryColor,
-              ),
-              titleTrKey: 'bio',
-              hintTrKey: 'bio_hint',
-              maxLines: 8,
-              charLimit: IbConfig.kBioMaxLength,
-              controller: _bioEditController,
-              text: currentUser.description,
-              onChanged: (text) {}),
-          InkWell(
-            onTap: () => showDialog(
-                context: context,
-                builder: (context) => _getDatePicker(),
-                barrierDismissible: false),
-            child: IbTextField(
-              titleIcon: const Icon(
-                Icons.cake_outlined,
-                color: IbColors.primaryColor,
-              ),
-              text: _readableDateTime(DateTime.fromMillisecondsSinceEpoch(
-                  currentUser.birthdateInMs)),
-              controller: _birthdateEditController,
-              suffixIcon: const Icon(Icons.calendar_today_outlined),
-              titleTrKey: 'birthdate',
-              hintTrKey: 'birthdate_hint',
-              enabled: false,
-              onChanged: (birthdate) {},
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
