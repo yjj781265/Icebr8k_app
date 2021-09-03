@@ -14,6 +14,7 @@ import 'package:icebr8k/backend/controllers/ib_question_controller.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_page.dart';
+import 'package:icebr8k/frontend/ib_pages/edit_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/ib_user_search_page.dart';
 import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
@@ -82,12 +83,19 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 Get.to(() => IbUserSearchPage());
               },
-              icon: const Icon(Icons.person_add_alt_1_outlined))),
+              icon: const Icon(Icons.person_search_outlined))),
       List<Widget>.generate(
           1,
           (index) => IconButton(
               onPressed: () {
-                print('edit profile page');
+                if (_homeController.currentIbUser == null) {
+                  return;
+                }
+                Get.to(
+                  () => EditProfilePage(
+                    currentUser: _homeController.currentIbUser!,
+                  ),
+                );
               },
               icon: const Icon(Icons.edit_outlined))),
     ];

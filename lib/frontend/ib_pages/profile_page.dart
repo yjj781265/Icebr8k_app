@@ -115,24 +115,13 @@ class _ProfilePageState extends State<ProfilePage>
                           () => Positioned(
                             left: 16,
                             bottom: -40,
-                            child: Stack(
-                              alignment: Alignment.bottomRight,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    print('tapped');
-                                  },
-                                  child: IbUserAvatar(
-                                      disableOnTap: true,
-                                      radius: 40,
-                                      uid: widget.uid,
-                                      avatarUrl: _profileController.isMe.isTrue
-                                          ? _homeController
-                                              .currentIbAvatarUrl.value
-                                          : _profileController.avatarUrl.value),
-                                ),
-                              ],
-                            ),
+                            child: IbUserAvatar(
+                                disableOnTap: true,
+                                radius: 40,
+                                uid: widget.uid,
+                                avatarUrl: _profileController.isMe.isTrue
+                                    ? _homeController.currentIbAvatarUrl.value
+                                    : _profileController.avatarUrl.value),
                           ),
                         ),
                       ],

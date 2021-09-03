@@ -103,7 +103,9 @@ class IbStrings extends Translations {
           'score_page_tab_2_title': 'Friend Requests',
           'friend_request_accepted': 'Friend request accepted',
           'friend_request_declined': 'Friend request declined',
-          'show_result': 'Show result'
+          'show_result': 'Show result',
+          'bio': 'Bio',
+          'bio_hint': 'Enter your bio here'
         }
       };
 }

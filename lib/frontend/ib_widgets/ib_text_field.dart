@@ -15,6 +15,8 @@ class IbTextField extends StatelessWidget {
   final Color borderColor;
   final bool obscureText;
   final int? charLimit;
+  final int maxLines;
+  final String? text;
   final Iterable<String> autofillHints;
   final TextInputType textInputType;
   final Function(String) onChanged;
@@ -29,6 +31,8 @@ class IbTextField extends StatelessWidget {
     this.borderColor = IbColors.lightGrey,
     this.enabled = true,
     this.charLimit,
+    this.maxLines = 1,
+    this.text,
     required this.onChanged,
     this.textInputType = TextInputType.text,
     this.obscureText = false,
@@ -45,6 +49,8 @@ class IbTextField extends StatelessWidget {
       scrollPhysics: const NeverScrollableScrollPhysics(),
       obscureText: obscureText,
       maxLength: charLimit,
+      maxLines: maxLines,
+      minLines: 1,
       onChanged: (text) {
         onChanged(text);
       },
@@ -57,10 +63,13 @@ class IbTextField extends StatelessWidget {
           border: InputBorder.none,
           suffixIcon: suffixIcon),
     );
+    if (text != null && controller != null) {
+      controller!.text = text!;
+    }
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Row(
             children: [
               titleIcon,

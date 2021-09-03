@@ -6,14 +6,14 @@ import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
 class IbUserAvatar extends StatelessWidget {
   final String avatarUrl;
-  final String uid;
+  final String? uid;
   final bool showOnlineStatus;
   final bool disableOnTap;
   final double radius;
   const IbUserAvatar(
       {Key? key,
       required this.avatarUrl,
-      required this.uid,
+      this.uid,
       this.disableOnTap = false,
       this.showOnlineStatus = false,
       this.radius = 24})
@@ -21,28 +21,33 @@ class IbUserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (avatarUrl.isEmpty || uid.isEmpty) {
+    if (avatarUrl.isEmpty) {
       return CircleAvatar(radius: radius, child: const IbProgressIndicator());
     }
-    if (disableOnTap) {
-      return CircleAvatar(
-        radius: radius,
-        backgroundImage: CachedNetworkImageProvider(avatarUrl),
-      );
-    }
-
     return GestureDetector(
       onTap: () {
+        if (disableOnTap || uid == null || uid!.isEmpty) {
+          return;
+        }
+
         Get.to(
             () => ProfilePage(
-                  uid,
+                  uid!,
                   showAppBar: true,
                 ),
             preventDuplicates: false);
       },
-      child: CircleAvatar(
-        radius: radius,
-        backgroundImage: CachedNetworkImageProvider(avatarUrl),
+      child: CachedNetworkImage(
+        imageUrl: avatarUrl,
+        imageBuilder: (context, imageProvider) => Container(
+          height: radius * 2,
+          width: radius * 2,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            image: DecorationImage(image: imageProvider),
+          ),
+        ),
+        placeholder: (context, url) => const IbProgressIndicator(),
       ),
     );
   }

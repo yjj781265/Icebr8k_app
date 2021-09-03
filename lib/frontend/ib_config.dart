@@ -20,6 +20,7 @@ class IbConfig {
   static const int kQuestionTitleMaxLength = 100; //characters
   static const int kFriendRequestMsgMaxLength = 100; //characters
   static const int kQuestionDescMaxLength = 100; //characters
+  static const int kBioMaxLength = 300; //characters
   static const int kAnswerMaxLength = 30; // characters
   static const int kScAnswerMaxLength = 20; // characters
   static const double kInitChatMessagesLoadSize = 16;

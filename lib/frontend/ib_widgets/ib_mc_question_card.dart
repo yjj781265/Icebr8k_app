@@ -171,26 +171,26 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                             color: IbColors.lightGrey),
                       ),
                       if (widget._controller.isExpandable)
-                        Obx(() {
-                          _runExpandCheck();
-                          return IconButton(
-                              padding: EdgeInsets.zero,
-                              onPressed: () {
-                                widget._controller.isExpanded.value =
-                                    !widget._controller.isExpanded.value;
+                        IconButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            widget._controller.isExpanded.value =
+                                !widget._controller.isExpanded.value;
 
-                                _runExpandCheck();
-                              },
-                              icon: widget._controller.isExpanded.isTrue
-                                  ? const Icon(
-                                      Icons.expand_less_outlined,
-                                      color: IbColors.primaryColor,
-                                    )
-                                  : const Icon(
-                                      Icons.expand_more_outlined,
-                                      color: IbColors.primaryColor,
-                                    ));
-                        }),
+                            _runExpandCheck();
+                          },
+                          icon: Obx(
+                            () => widget._controller.isExpanded.isTrue
+                                ? const Icon(
+                                    Icons.expand_less_outlined,
+                                    color: IbColors.primaryColor,
+                                  )
+                                : const Icon(
+                                    Icons.expand_more_outlined,
+                                    color: IbColors.primaryColor,
+                                  ),
+                          ),
+                        ),
                     ],
                   ),
                 ],
