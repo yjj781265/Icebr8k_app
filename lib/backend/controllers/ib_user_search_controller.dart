@@ -47,8 +47,7 @@ class IbUserSearchController extends GetxController {
       final String? status = await IbUserDbService().queryFriendshipStatus(
           Get.find<AuthController>().firebaseUser!.uid, user.id);
       friendshipStatus.value = status ?? '';
-      score.value = await IbUtils.getCompScore(
-          Get.find<AuthController>().firebaseUser!.uid, friendUid.value);
+      score.value = await IbUtils.getCompScore(friendUid.value);
       isSearching.value = false;
     });
   }

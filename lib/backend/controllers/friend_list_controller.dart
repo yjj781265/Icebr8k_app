@@ -9,6 +9,7 @@ import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
+/// controller for current user's friend list in social tab
 class FriendListController extends GetxController {
   final friendItems = <FriendListItem>[].obs;
   late StreamSubscription _friendListSub;
@@ -27,8 +28,7 @@ class FriendListController extends GetxController {
         if (ibUser == null) {
           continue;
         }
-        final double score =
-            await IbUtils.getCompScore(myUid, friend.friendUid);
+        final double score = await IbUtils.getCompScore(friend.friendUid);
         final FriendListItem item = FriendListItem(
             username: ibUser.username,
             avatarUrl: ibUser.avatarUrl,
@@ -82,7 +82,7 @@ class FriendListController extends GetxController {
       if (ibUser == null) {
         continue;
       }
-      final double score = await IbUtils.getCompScore(myUid, friend.friendUid);
+      final double score = await IbUtils.getCompScore(friend.friendUid);
       final FriendListItem item = FriendListItem(
           username: ibUser.username,
           avatarUrl: ibUser.avatarUrl,
@@ -110,7 +110,7 @@ class FriendListController extends GetxController {
   Future<void> _refreshScore() async {
     final String myUid = Get.find<AuthController>().firebaseUser!.uid;
     for (final FriendListItem item in friendItems) {
-      final double score = await IbUtils.getCompScore(myUid, item.uid);
+      final double score = await IbUtils.getCompScore(item.uid);
       item.score = score;
     }
     friendItems.sort((a, b) => b.score.compareTo(a.score));

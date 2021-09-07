@@ -10,10 +10,7 @@ class AskedQuestionsController extends GetxController {
   final isLoading = true.obs;
   final createdQuestions = <IbQuestion>[].obs;
 
-  late StreamSubscription _streamSubscription;
-
-  /// handle update poll size and result, todo remove this after cloud function implemented
-  late StreamSubscription _answeredQuestionStream;
+  late StreamSubscription _userAskedQStream;
   DocumentSnapshot? lastDoc;
 
   AskedQuestionsController(this.uid);
@@ -21,7 +18,7 @@ class AskedQuestionsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _streamSubscription = IbQuestionDbService()
+    _userAskedQStream = IbQuestionDbService()
         .listenToUserAskedQuestionsChange(uid)
         .listen((event) {
       for (final docChange in event.docChanges) {
@@ -78,7 +75,7 @@ class AskedQuestionsController extends GetxController {
 
   @override
   void onClose() {
-    _streamSubscription.cancel();
+    _userAskedQStream.cancel();
     super.onClose();
   }
 }

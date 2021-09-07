@@ -154,11 +154,6 @@ class _ProfilePageState extends State<ProfilePage>
                                     style: const TextStyle(
                                         fontSize: IbConfig.kNormalTextSize),
                                   ),
-                                  if (_profileController.description.isNotEmpty)
-                                    Text(_profileController.description.value,
-                                        style: const TextStyle(
-                                            fontSize:
-                                                IbConfig.kDescriptionTextSize)),
                                   if (_profileController.isMe.isFalse)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 16),
@@ -211,6 +206,29 @@ class _ProfilePageState extends State<ProfilePage>
                       height: 16,
                     ),
                     if (_profileController.isMe.isFalse) _buildActionButtons(),
+                    if (_profileController.isMe.isFalse &&
+                        _profileController.description.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Obx(
+                          () => Text(
+                            _profileController.description.value,
+                            style: const TextStyle(
+                                fontSize: IbConfig.kNormalTextSize),
+                          ),
+                        ),
+                      ),
+                    if (_profileController.isMe.isTrue)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Obx(
+                          () => Text(
+                            _homeController.currentBio.value,
+                            style: const TextStyle(
+                                fontSize: IbConfig.kNormalTextSize),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),

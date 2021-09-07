@@ -38,8 +38,7 @@ class ProfileController extends GetxController {
       final String? status = await IbUserDbService()
           .queryFriendshipStatus(IbUtils.getCurrentUid()!, uid);
       friendshipStatus.value = status ?? '';
-      compScore.value =
-          await IbUtils.getCompScore(IbUtils.getCurrentUid()!, uid);
+      compScore.value = await IbUtils.getCompScore(uid);
 
       // TODO convert to cloud function for getting the total count, important!
       final List ids =

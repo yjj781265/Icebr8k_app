@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
+import 'package:icebr8k/backend/controllers/my_answered_quetions_controller.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
@@ -27,7 +28,6 @@ class IbUtils {
     return ImageCropper.cropImage(
         sourcePath: filePath,
         cropStyle: CropStyle.circle,
-        compressQuality: 50,
         aspectRatioPresets: [
           CropAspectRatioPreset.ratio3x2,
           CropAspectRatioPreset.original,
@@ -199,11 +199,11 @@ class IbUtils {
     ));
   }
 
-  static Future<double> getCompScore(String uid1, String uid2) async {
+  static Future<double> getCompScore(String uid) async {
     final List<IbAnswer> uid1QuestionAnswers =
-        await IbQuestionDbService().queryUserAnswers(uid1);
+        Get.find<MyAnsweredQuestionsController>().ibAnswers;
     final List<IbAnswer> uid2QuestionAnswers =
-        await IbQuestionDbService().queryUserAnswers(uid2);
+        await IbQuestionDbService().queryUserAnswers(uid);
 
     if (uid1QuestionAnswers.isEmpty || uid2QuestionAnswers.isEmpty) {
       return 0;
@@ -237,13 +237,12 @@ class IbUtils {
     return _score;
   }
 
-  static Future<List<IbAnswer>> getCommonAnswersQ(
-      String uid1, String uid2) async {
+  static Future<List<IbAnswer>> getCommonAnswersQ(String uid) async {
     /// query each user answered questions then intersect
     final List<IbAnswer> uid1QuestionAnswers =
-        await IbQuestionDbService().queryUserAnswers(uid1);
+        Get.find<MyAnsweredQuestionsController>().ibAnswers;
     final List<IbAnswer> uid2QuestionAnswers =
-        await IbQuestionDbService().queryUserAnswers(uid2);
+        await IbQuestionDbService().queryUserAnswers(uid);
 
     return uid1QuestionAnswers
         .toSet()

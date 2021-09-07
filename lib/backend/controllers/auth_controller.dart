@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/sign_in_controller.dart';
 import 'package:icebr8k/backend/controllers/sign_up_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -96,7 +97,7 @@ class AuthController extends GetxService {
           if (isSetupNeeded) {
             Get.offAll(() => SetupPage());
           } else {
-            Get.offAll(() => HomePage());
+            Get.offAll(() => HomePage(), binding: HomeBinding());
           }
         } else {
           Get.dialog(const IbSimpleDialog(
@@ -135,7 +136,7 @@ class AuthController extends GetxService {
           Get.dialog(const IbSimpleDialog(
               message: 'User already registered', positiveBtnTrKey: 'ok'));
         } else {
-          await IbUserDbService().loginNewIbUser(
+          await IbUserDbService().updateIbUser(
             IbUser(
               id: user.uid,
               birthdateInMs: _controller.birthdateInMs.value,
@@ -209,7 +210,7 @@ class AuthController extends GetxService {
           loginTimeInMs: DateTime.now().millisecondsSinceEpoch,
         );
       } else {
-        await IbUserDbService().loginNewIbUser(IbUser(
+        await IbUserDbService().updateIbUser(IbUser(
           id: user.uid,
           email: _credential.user!.email ?? '',
           birthdateInMs: _controller.birthdateInMs.value,
@@ -224,7 +225,7 @@ class AuthController extends GetxService {
       if (isSetupNeeded) {
         Get.offAll(() => SetupPage());
       } else {
-        Get.offAll(() => HomePage());
+        Get.offAll(() => HomePage(), binding: HomeBinding());
       }
     }
   }

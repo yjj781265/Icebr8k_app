@@ -7,6 +7,7 @@ import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
+/// controller for Question tab in Homepage
 class IbQuestionController extends GetxController {
   final ibQuestions = <IbQuestion>[].obs;
   final isLoading = true.obs;

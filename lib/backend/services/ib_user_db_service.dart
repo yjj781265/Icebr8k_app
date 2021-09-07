@@ -15,9 +15,11 @@ class IbUserDbService {
     _collectionRef = _db.collection(_kUserCollection);
   }
 
-  Future<void> loginNewIbUser(IbUser _ibUser) {
-    print('loginNewIbUser');
-    return _collectionRef.doc(_ibUser.id).set(_ibUser.toJson());
+  Future<void> updateIbUser(IbUser _ibUser) {
+    print('updateIbUser');
+    return _collectionRef
+        .doc(_ibUser.id)
+        .set(_ibUser.toJson(), SetOptions(merge: true));
   }
 
   Future<void> loginIbUser({required String uid, required int loginTimeInMs}) {

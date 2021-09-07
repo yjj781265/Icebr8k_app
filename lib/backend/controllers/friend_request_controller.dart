@@ -10,6 +10,7 @@ import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
+/// controller for current user's friend request list in Social tab in Home Page
 class FriendRequestController extends GetxController {
   late StreamSubscription friendRequestStream;
   final requests = <FriendRequestItem>[].obs;
@@ -31,8 +32,7 @@ class FriendRequestController extends GetxController {
         final IbFriend friend = IbFriend.fromJson(change.doc.data()!);
         final IbUser? user =
             await IbUserDbService().queryIbUser(friend.friendUid);
-        final double score = await IbUtils.getCompScore(
-            Get.find<AuthController>().firebaseUser!.uid, friend.friendUid);
+        final double score = await IbUtils.getCompScore(friend.friendUid);
 
         if (change.type == DocumentChangeType.added) {
           if (user != null) {

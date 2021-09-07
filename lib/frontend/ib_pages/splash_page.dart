@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -49,6 +50,7 @@ class SplashPage extends GetView<AuthController> {
       } else {
         Get.offAll(
           () => HomePage(),
+          binding: HomeBinding(),
           transition: Transition.fadeIn,
         );
       }

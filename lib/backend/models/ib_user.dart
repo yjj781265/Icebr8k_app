@@ -4,17 +4,17 @@ part 'ib_user.g.dart';
 
 @JsonSerializable()
 class IbUser {
-  final String id;
-  final String name;
-  final String email;
-  final String username;
-  final String avatarUrl;
-  final int loginTimeInMs;
-  final int joinTimeInMs;
-  final int birthdateInMs;
-  final bool isOnline;
-  final String coverPhotoUrl;
-  final String description;
+  String id;
+  String name;
+  String email;
+  String username;
+  String avatarUrl;
+  int loginTimeInMs;
+  int joinTimeInMs;
+  int birthdateInMs;
+  bool isOnline;
+  String coverPhotoUrl;
+  String description;
 
   IbUser({
     this.avatarUrl = '',

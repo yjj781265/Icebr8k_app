@@ -8,6 +8,7 @@ import 'package:icebr8k/backend/services/ib_chat_db_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
+/// controller for the Chat tab in Homepage
 class ChatTabController extends GetxController {
   Map<String, IbUser> ibUserMap = {};
   final chatTabItems = <ChatTabItem>[].obs;

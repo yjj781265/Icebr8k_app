@@ -7,7 +7,6 @@ import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/chat_tab_controller.dart';
-import 'package:icebr8k/backend/controllers/friend_list_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_request_controller.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_controller.dart';
@@ -30,14 +29,8 @@ import '../ib_config.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({Key? key}) : super(key: key);
-  final HomeController _homeController = Get.put(HomeController());
-  final IbQuestionController _questionController =
-      Get.put(IbQuestionController());
-  final FriendRequestController _friendRequestController =
-      Get.put(FriendRequestController());
-  final FriendListController _friendListController =
-      Get.put(FriendListController());
-  final ChatTabController _chatTabController = Get.put(ChatTabController());
+  final HomeController _homeController = Get.find();
+  final FriendRequestController _friendRequestController = Get.find();
   final _drawerController = ZoomDrawerController();
 
   final GlobalKey<IbAnimatedIconState> _iconKey = GlobalKey();
@@ -92,9 +85,7 @@ class HomePage extends StatelessWidget {
                   return;
                 }
                 Get.to(
-                  () => EditProfilePage(
-                    currentUser: _homeController.currentIbUser!,
-                  ),
+                  () => EditProfilePage(),
                 );
               },
               icon: const Icon(Icons.edit_outlined))),
@@ -205,8 +196,8 @@ class HomePage extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           BottomNavyBarItem(
-              icon: const Icon(Icons.star_border_outlined),
-              title: Text('score'.tr),
+              icon: const Icon(Icons.group_work_outlined),
+              title: Text('social'.tr),
               inactiveColor: _inactiveColor,
               textAlign: TextAlign.center,
               notification: _friendRequestController.requests.length),

@@ -1,71 +1,91 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/edit_profile_controller.dart';
+import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_single_date_picker.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class EditProfilePage extends StatelessWidget {
-  final IbUser currentUser;
-  EditProfilePage({Key? key, required this.currentUser}) : super(key: key);
+  EditProfilePage({Key? key}) : super(key: key);
   final _controller = Get.put(EditProfileController());
   final TextEditingController _nameEditController = TextEditingController();
   final TextEditingController _bioEditController = TextEditingController();
   final TextEditingController _birthdateEditController =
       TextEditingController();
+  final HomeController _homeController = Get.find();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: IbColors.lightBlue,
       appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.check),
+            onPressed: () async {
+              final IbUser? ibUser = _homeController.currentIbUser;
+              if (ibUser != null) {
+                ibUser.birthdateInMs = _controller.birthdateInMs.value;
+                ibUser.name = _nameEditController.text.trim();
+                ibUser.description = _bioEditController.text.trim();
+                _controller.updateUserInfo(ibUser);
+              }
+            },
+          )
+        ],
         backgroundColor: IbColors.lightBlue,
         title: const Text('Edit Profile'),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(
-              width: 112,
-              height: 112,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    Hero(
-                      transitionOnUserGestures: true,
-                      tag: 'profile_avatar',
-                      child: Center(
-                        child: IbUserAvatar(
-                          avatarUrl: currentUser.avatarUrl,
-                          disableOnTap: true,
-                          radius: 56,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: IbColors.accentColor,
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(3.0),
-                          child: Icon(
-                            Icons.edit_outlined,
-                            size: 16,
+            GestureDetector(
+              onTap: () => showEditAvatarBottomSheet(),
+              child: SizedBox(
+                width: 112,
+                height: 112,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      Center(
+                        child: Obx(
+                          () => IbUserAvatar(
+                            avatarUrl: _homeController.currentIbAvatarUrl.value,
+                            disableOnTap: true,
+                            radius: 56,
                           ),
                         ),
                       ),
-                    )
-                  ],
+                      Positioned(
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: IbColors.accentColor,
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.all(3.0),
+                            child: Icon(
+                              Icons.edit_outlined,
+                              size: 16,
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -74,48 +94,54 @@ class EditProfilePage extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
-                    IbTextField(
-                        titleIcon: const Icon(
-                          Icons.person_outline,
-                          color: IbColors.primaryColor,
-                        ),
-                        titleTrKey: 'name',
-                        hintTrKey: 'name_hint',
-                        controller: _nameEditController,
-                        text: currentUser.name,
-                        onChanged: (text) {}),
-                    IbTextField(
-                        textInputType: TextInputType.multiline,
-                        titleIcon: const Icon(
-                          Icons.person_rounded,
-                          color: IbColors.primaryColor,
-                        ),
-                        titleTrKey: 'bio',
-                        hintTrKey: 'bio_hint',
-                        maxLines: 8,
-                        charLimit: IbConfig.kBioMaxLength,
-                        controller: _bioEditController,
-                        text: currentUser.description,
-                        onChanged: (text) {}),
+                    Obx(
+                      () => IbTextField(
+                          titleIcon: const Icon(
+                            Icons.person_outline,
+                            color: IbColors.primaryColor,
+                          ),
+                          titleTrKey: 'name',
+                          hintTrKey: 'name_hint',
+                          controller: _nameEditController,
+                          text: _homeController.currentIbName.value,
+                          onChanged: (text) {}),
+                    ),
+                    Obx(
+                      () => IbTextField(
+                          textInputType: TextInputType.multiline,
+                          titleIcon: const Icon(
+                            Icons.person_rounded,
+                            color: IbColors.primaryColor,
+                          ),
+                          titleTrKey: 'bio',
+                          hintTrKey: 'bio_hint',
+                          maxLines: 8,
+                          charLimit: IbConfig.kBioMaxLength,
+                          controller: _bioEditController,
+                          text: _homeController.currentBio.value,
+                          onChanged: (text) {}),
+                    ),
                     InkWell(
                       onTap: () => showDialog(
                           context: context,
                           builder: (context) => _getDatePicker(),
                           barrierDismissible: false),
-                      child: IbTextField(
-                        titleIcon: const Icon(
-                          Icons.cake_outlined,
-                          color: IbColors.primaryColor,
+                      child: Obx(
+                        () => IbTextField(
+                          titleIcon: const Icon(
+                            Icons.cake_outlined,
+                            color: IbColors.primaryColor,
+                          ),
+                          text: _readableDateTime(
+                              DateTime.fromMillisecondsSinceEpoch(
+                                  _homeController.currentBirthdate.value)),
+                          controller: _birthdateEditController,
+                          suffixIcon: const Icon(Icons.calendar_today_outlined),
+                          titleTrKey: 'birthdate',
+                          hintTrKey: 'birthdate_hint',
+                          enabled: false,
+                          onChanged: (birthdate) {},
                         ),
-                        text: _readableDateTime(
-                            DateTime.fromMillisecondsSinceEpoch(
-                                currentUser.birthdateInMs)),
-                        controller: _birthdateEditController,
-                        suffixIcon: const Icon(Icons.calendar_today_outlined),
-                        titleTrKey: 'birthdate',
-                        hintTrKey: 'birthdate_hint',
-                        enabled: false,
-                        onChanged: (birthdate) {},
                       ),
                     ),
                   ],
@@ -129,6 +155,98 @@ class EditProfilePage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void showEditAvatarBottomSheet() {
+    final Widget options = ListView(
+      shrinkWrap: true,
+      children: [
+        InkWell(
+          onTap: () async {
+            Get.back();
+            final _picker = ImagePicker();
+            final XFile? pickedFile = await _picker.pickImage(
+              source: ImageSource.camera,
+              imageQuality: 88,
+            );
+
+            if (pickedFile != null) {
+              final File? croppedFile =
+                  await IbUtils.showImageCropper(pickedFile.path);
+              if (croppedFile != null) {
+                await _controller.updateAvatarUrl(croppedFile.path);
+              }
+            }
+          },
+          child: Ink(
+            height: 56,
+            width: double.infinity,
+            color: IbColors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    Icons.camera_alt_outlined,
+                    color: IbColors.primaryColor,
+                  ),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Text('Take a photo',
+                      style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
+                ],
+              ),
+            ),
+          ),
+        ),
+        InkWell(
+          onTap: () async {
+            Get.back();
+            final _picker = ImagePicker();
+            final XFile? pickedFile = await _picker.pickImage(
+              source: ImageSource.gallery,
+              imageQuality: 88,
+            );
+
+            if (pickedFile != null) {
+              final File? croppedFile =
+                  await IbUtils.showImageCropper(pickedFile.path);
+              if (croppedFile != null) {
+                await _controller.updateAvatarUrl(croppedFile.path);
+              }
+            }
+          },
+          child: Ink(
+            height: 56,
+            width: double.infinity,
+            color: IbColors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    Icons.photo_album_outlined,
+                    color: IbColors.primaryColor,
+                  ),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Text(
+                    'Choose from gallery',
+                    style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+
+    Get.bottomSheet(SafeArea(child: options));
   }
 
   String _readableDateTime(DateTime _dateTime) {

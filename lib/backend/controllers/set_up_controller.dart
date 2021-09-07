@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
@@ -184,7 +185,7 @@ class SetUpController extends GetxController {
               IbSimpleDialog(message: e.message!, positiveBtnTrKey: 'ok'));
         }
         Get.back();
-        Get.offAll(() => HomePage());
+        Get.offAll(() => HomePage(), binding: HomeBinding());
       } else {
         Get.back();
         Get.dialog(const IbSimpleDialog(

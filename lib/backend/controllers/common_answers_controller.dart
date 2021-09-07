@@ -15,8 +15,7 @@ class CommonAnswersController extends GetxController {
 
   @override
   Future<void> onInit() async {
-    commonAnswers =
-        await IbUtils.getCommonAnswersQ(IbUtils.getCurrentUid()!, uid);
+    commonAnswers = await IbUtils.getCommonAnswersQ(uid);
 
     if (commonAnswers.length <= kPaginationMax) {
       for (final answer in commonAnswers) {

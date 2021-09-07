@@ -25,18 +25,16 @@ class IbUserAvatar extends StatelessWidget {
       return CircleAvatar(radius: radius, child: const IbProgressIndicator());
     }
     return GestureDetector(
-      onTap: () {
-        if (disableOnTap || uid == null || uid!.isEmpty) {
-          return;
-        }
-
-        Get.to(
-            () => ProfilePage(
-                  uid!,
-                  showAppBar: true,
-                ),
-            preventDuplicates: false);
-      },
+      onTap: (disableOnTap || uid == null || uid!.isEmpty)
+          ? null
+          : () {
+              Get.to(
+                  () => ProfilePage(
+                        uid!,
+                        showAppBar: true,
+                      ),
+                  preventDuplicates: false);
+            },
       child: CachedNetworkImage(
         imageUrl: avatarUrl,
         imageBuilder: (context, imageProvider) => Container(
@@ -44,7 +42,10 @@ class IbUserAvatar extends StatelessWidget {
           width: radius * 2,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            image: DecorationImage(image: imageProvider),
+            image: DecorationImage(
+              image: imageProvider,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         placeholder: (context, url) => const IbProgressIndicator(),

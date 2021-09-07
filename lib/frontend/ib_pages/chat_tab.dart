@@ -13,7 +13,7 @@ import 'package:lottie/lottie.dart';
 
 class ChatTab extends StatelessWidget {
   ChatTab({Key? key}) : super(key: key);
-  final _controller = Get.find<ChatTabController>();
+  final ChatTabController _controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
