@@ -35,7 +35,9 @@ class EditProfilePage extends StatelessWidget {
             onPressed: () async {
               final IbUser? ibUser = _homeController.currentIbUser;
               if (ibUser != null) {
-                ibUser.birthdateInMs = _controller.birthdateInMs.value;
+                ibUser.birthdateInMs = _controller.birthdateInMs.value == 0
+                    ? _homeController.currentBirthdate.value
+                    : _controller.birthdateInMs.value;
                 ibUser.name = _nameEditController.text.trim();
                 ibUser.description = _bioEditController.text.trim();
                 _controller.updateUserInfo(ibUser);
@@ -185,11 +187,9 @@ class EditProfilePage extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   Icon(
                     Icons.camera_alt_outlined,
-                    color: IbColors.primaryColor,
                   ),
                   SizedBox(
                     width: 8,
@@ -225,11 +225,9 @@ class EditProfilePage extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   Icon(
                     Icons.photo_album_outlined,
-                    color: IbColors.primaryColor,
                   ),
                   SizedBox(
                     width: 8,

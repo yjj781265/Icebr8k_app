@@ -19,6 +19,7 @@ class ProfileController extends GetxController {
   final avatarUrl = ''.obs;
   final coverPhotoUrl = ''.obs;
   final username = ''.obs;
+  final birthdateInMs = 0.obs;
   final name = ''.obs;
   final description = ''.obs;
   final isMe = false.obs;
@@ -88,6 +89,7 @@ class ProfileController extends GetxController {
     username.value = user.username;
     name.value = user.name;
     description.value = user.description;
+    birthdateInMs.value = user.birthdateInMs;
     super.onInit();
   }
 

@@ -49,6 +49,11 @@ class IbUtils {
     return const Uuid().v4();
   }
 
+  static String readableDateTime(DateTime _dateTime) {
+    final f = DateFormat('MM/dd/yyyy');
+    return f.format(_dateTime);
+  }
+
   static String getAgoDateTimeString(DateTime _dateTime) {
     final Duration diffDt = DateTime.now().difference(_dateTime);
     if (diffDt.inSeconds == 0) {

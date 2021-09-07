@@ -154,6 +154,11 @@ class _ProfilePageState extends State<ProfilePage>
                                     style: const TextStyle(
                                         fontSize: IbConfig.kNormalTextSize),
                                   ),
+                                  Text(
+                                    '🎂 ${_profileController.isMe.isTrue ? IbUtils.readableDateTime(DateTime.fromMillisecondsSinceEpoch(_homeController.currentBirthdate.value)) : IbUtils.readableDateTime(DateTime.fromMillisecondsSinceEpoch(_profileController.birthdateInMs.value))}',
+                                    style: const TextStyle(
+                                        fontSize: IbConfig.kNormalTextSize),
+                                  ),
                                   if (_profileController.isMe.isFalse)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 16),
@@ -287,6 +292,7 @@ class _ProfilePageState extends State<ProfilePage>
                   ],
                 );
               },
+              useOldImageOnUrlChange: true,
               fit: BoxFit.fill,
               imageUrl: _homeController.currentIbCoverPhotoUrl.value,
             );
