@@ -50,6 +50,7 @@ class IbQuestionController extends GetxController {
 
     ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
     if (ibQuestions.isNotEmpty) {
+      ///cached unanswered question to local db
       IbLocalStorageService().updateUnAnsweredIbQList(ibQuestions);
     }
     isLoading.value = false;

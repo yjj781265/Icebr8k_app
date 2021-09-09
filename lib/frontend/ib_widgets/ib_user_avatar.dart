@@ -48,7 +48,8 @@ class IbUserAvatar extends StatelessWidget {
             ),
           ),
         ),
-        placeholder: (context, url) => const IbProgressIndicator(),
+        placeholder: (context, url) =>
+            CircleAvatar(radius: radius, child: const IbProgressIndicator()),
       ),
     );
   }

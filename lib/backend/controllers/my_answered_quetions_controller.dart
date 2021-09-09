@@ -19,15 +19,26 @@ class MyAnsweredQuestionsController extends GetxService {
       for (final docChange in event.docChanges) {
         final IbAnswer ibAnswer = IbAnswer.fromJson(docChange.doc.data()!);
         if (docChange.type == DocumentChangeType.added) {
+          print('MyAnsweredQuestionsController added');
           ibAnswers.addIf(!ibAnswers.contains(ibAnswer), ibAnswer);
         } else if (docChange.type == DocumentChangeType.removed) {
           final int index = ibAnswers.indexOf(ibAnswer);
           if (index != -1) {
+            print('MyAnsweredQuestionsController removed');
             ibAnswers.removeAt(index);
           }
         }
       }
     });
+  }
+
+  IbAnswer? retrieveAnswer(String questionId) {
+    final int index =
+        ibAnswers.indexWhere((element) => element.questionId == questionId);
+    if (index == -1) {
+      return null;
+    }
+    return ibAnswers[index];
   }
 
   @override

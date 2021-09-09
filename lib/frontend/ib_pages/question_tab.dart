@@ -27,7 +27,8 @@ class QuestionTab extends StatelessWidget {
         );
       }
 
-      if (_ibQuestionController.ibQuestions.isEmpty) {
+      if (_ibQuestionController.isLoading.isFalse &&
+          _ibQuestionController.ibQuestions.isEmpty) {
         return Container(
             color: IbColors.lightBlue,
             child:
@@ -49,8 +50,26 @@ class QuestionTab extends StatelessWidget {
                 padding: 0,
               ),
             ),
+            header: const ClassicHeader(
+              textStyle: TextStyle(color: IbColors.primaryColor),
+              failedIcon: Icon(
+                Icons.error_outline,
+                color: IbColors.errorRed,
+              ),
+              completeIcon: Icon(
+                Icons.check_circle_outline,
+                color: IbColors.accentColor,
+              ),
+              refreshingIcon: IbProgressIndicator(
+                width: 24,
+                height: 24,
+                padding: 0,
+              ),
+            ),
+            onRefresh: () async {
+              await Get.find<IbQuestionController>().refreshEverything();
+            },
             controller: _refreshController,
-            enablePullDown: false,
             enablePullUp: true,
             onLoading: () async {
               if (!_ibQuestionController.hasMore) {

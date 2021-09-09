@@ -123,7 +123,6 @@ class IbQuestionDbService {
     if (lastDoc == null) {
       query = _db
           .collectionGroup('Answers')
-          .limit(8)
           .where('uid', isEqualTo: uid)
           .orderBy('answeredTimeInMs', descending: true);
     } else {

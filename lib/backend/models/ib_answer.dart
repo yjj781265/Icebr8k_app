@@ -28,7 +28,6 @@ class IbAnswer {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is IbAnswer &&
-          runtimeType == other.runtimeType &&
           answer == other.answer &&
           questionId == other.questionId;
 

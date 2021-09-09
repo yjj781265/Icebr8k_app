@@ -164,6 +164,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
 
   Widget _mCTab() {
     return SingleChildScrollView(
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       child: Column(
         children: [
           Material(
@@ -247,6 +248,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
 
   Widget _sCTab() {
     return SingleChildScrollView(
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       child: Column(
         children: [
           Material(

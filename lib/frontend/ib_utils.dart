@@ -205,8 +205,9 @@ class IbUtils {
   }
 
   static Future<double> getCompScore(String uid) async {
-    final List<IbAnswer> uid1QuestionAnswers =
-        Get.find<MyAnsweredQuestionsController>().ibAnswers;
+    final List<IbAnswer> uid1QuestionAnswers = [];
+    uid1QuestionAnswers
+        .addAll(Get.find<MyAnsweredQuestionsController>().ibAnswers);
     final List<IbAnswer> uid2QuestionAnswers =
         await IbQuestionDbService().queryUserAnswers(uid);
 
@@ -244,15 +245,56 @@ class IbUtils {
 
   static Future<List<IbAnswer>> getCommonAnswersQ(String uid) async {
     /// query each user answered questions then intersect
-    final List<IbAnswer> uid1QuestionAnswers =
-        Get.find<MyAnsweredQuestionsController>().ibAnswers;
+    final List<IbAnswer> uid1QuestionAnswers = [];
+    uid1QuestionAnswers
+        .addAll(Get.find<MyAnsweredQuestionsController>().ibAnswers);
     final List<IbAnswer> uid2QuestionAnswers =
         await IbQuestionDbService().queryUserAnswers(uid);
 
-    return uid1QuestionAnswers
+    return uid2QuestionAnswers
         .toSet()
-        .intersection(uid2QuestionAnswers.toSet())
+        .intersection(uid1QuestionAnswers.toSet())
         .toList();
+  }
+
+  static Future<List<IbAnswer>> getUncommonAnswersQ(String uid) async {
+    /// query each user answered questions then find the difference
+    final List<IbAnswer> uid1QuestionAnswers = [];
+    uid1QuestionAnswers
+        .addAll(Get.find<MyAnsweredQuestionsController>().ibAnswers);
+    final List<IbAnswer> uid2QuestionAnswers =
+        await IbQuestionDbService().queryUserAnswers(uid);
+
+    final List<String> uid1QuestionIds = [];
+    final List<String> uid2QuestionIds = [];
+
+    for (final IbAnswer answer in uid1QuestionAnswers) {
+      uid1QuestionIds.add(answer.questionId);
+    }
+
+    for (final IbAnswer answer in uid2QuestionAnswers) {
+      uid2QuestionIds.add(answer.questionId);
+    }
+
+    final List<String> commonQ =
+        uid1QuestionIds.toSet().intersection(uid2QuestionIds.toSet()).toList();
+    final List<IbAnswer> uncommonAnswers = [];
+
+    for (final id in commonQ) {
+      if (uid1QuestionAnswers
+              .firstWhere((element) => element.questionId == id)
+              .answer !=
+          uid2QuestionAnswers
+              .firstWhere((element) => element.questionId == id)
+              .answer) {
+        print(
+            'add uncommon answer ${uid2QuestionAnswers.firstWhere((element) => element.questionId == id)}');
+        uncommonAnswers.add(uid2QuestionAnswers
+            .firstWhere((element) => element.questionId == id));
+      }
+    }
+
+    return uncommonAnswers;
   }
 
   static Color getRandomColor() {

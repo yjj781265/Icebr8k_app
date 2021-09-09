@@ -8,6 +8,7 @@ import 'package:icebr8k/backend/controllers/common_answers_controller.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/profile_controller.dart';
+import 'package:icebr8k/backend/controllers/uncommon_answers_controller.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -42,6 +43,7 @@ class _ProfilePageState extends State<ProfilePage>
   late AnsweredQuestionController _answeredQuestionController;
   late AskedQuestionsController _createdQuestionController;
   late CommonAnswersController _commonAnswersController;
+  late UncommonAnswersController _uncommonAnswersController;
   late ProfileController _profileController;
   late HomeController _homeController;
 
@@ -59,9 +61,10 @@ class _ProfilePageState extends State<ProfilePage>
     }
     _commonAnswersController =
         Get.put(CommonAnswersController(widget.uid), tag: widget.uid);
+    _uncommonAnswersController =
+        Get.put(UncommonAnswersController(widget.uid), tag: widget.uid);
 
-    _tabController = TabController(
-        vsync: this, length: _profileController.isMe.isTrue ? 2 : 1);
+    _tabController = TabController(vsync: this, length: 2);
     IbUtils.hideKeyboard();
   }
 
@@ -247,6 +250,10 @@ class _ProfilePageState extends State<ProfilePage>
                           Obx(() => Tab(
                               text:
                                   'Common Answers(${_commonAnswersController.ibQuestions.length})')),
+                        if (_profileController.isMe.isFalse)
+                          Obx(() => Tab(
+                              text:
+                                  'Uncommon Answers(${_uncommonAnswersController.ibQuestions.length})')),
                       ],
                       labelStyle: const TextStyle(fontWeight: FontWeight.bold),
                       unselectedLabelStyle:
@@ -266,6 +273,7 @@ class _ProfilePageState extends State<ProfilePage>
               if (_profileController.isMe.isTrue) buildAnsweredQTab(),
               if (_profileController.isMe.isTrue) buildAskedTab(),
               if (_profileController.isMe.isFalse) buildCommonAnswersTab(),
+              if (_profileController.isMe.isFalse) buildUncommonAnswersTab(),
             ],
           ),
         ));
@@ -424,7 +432,7 @@ class _ProfilePageState extends State<ProfilePage>
             itemBuilder: (context, index) {
               final IbQuestion item =
                   _createdQuestionController.createdQuestions[index];
-              final tag = 'created_${item.id}';
+              final tag = 'asked_${item.id}';
               late IbQuestionItemController _controller;
               if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
                 _controller = Get.find(tag: tag);
@@ -433,12 +441,11 @@ class _ProfilePageState extends State<ProfilePage>
                     IbQuestionItemController(
                         ibQuestion: item,
                         disableChoiceOnTouch: true,
-                        isExpandable: true,
                         showActionButtons: false,
                         disableAvatarOnTouch: item.creatorId == widget.uid),
                     tag: tag.toString());
               }
-              _controller.isExpanded.value = index == 0;
+              _controller.isExpanded.value = false;
 
               if (item.questionType == IbQuestion.kMultipleChoice) {
                 return IbMcQuestionCard(_controller);
@@ -485,13 +492,15 @@ class _ProfilePageState extends State<ProfilePage>
             itemBuilder: (context, index) {
               final IbQuestion item =
                   _commonAnswersController.ibQuestions[index];
-              final tag = 'common${item.id}';
+              final tag = 'common_${item.id}';
               late IbQuestionItemController _controller;
               if (Get.isRegistered(tag: tag)) {
                 _controller = Get.find(tag: tag);
               } else {
                 _controller = Get.put(
                     IbQuestionItemController(
+                        ibAnswer:
+                            _commonAnswersController.retrieveAnswer(item.id),
                         ibQuestion: item,
                         isExpandable: true,
                         disableAvatarOnTouch: item.creatorId == widget.uid),
@@ -504,6 +513,68 @@ class _ProfilePageState extends State<ProfilePage>
               return IbScQuestionCard(_controller);
             },
             itemCount: _commonAnswersController.ibQuestions.length,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildUncommonAnswersTab() {
+    final refreshController = RefreshController();
+    return Obx(
+      () {
+        return SmartRefresher(
+          footer: const ClassicFooter(
+            textStyle: TextStyle(color: IbColors.primaryColor),
+            failedIcon: Icon(
+              Icons.error_outline,
+              color: IbColors.errorRed,
+            ),
+            loadingIcon: IbProgressIndicator(
+              width: 24,
+              height: 24,
+              padding: 0,
+            ),
+          ),
+          controller: refreshController,
+          enablePullDown: false,
+          enablePullUp: true,
+          onLoading: () async {
+            if (_uncommonAnswersController.lastIbAnswer == null) {
+              refreshController.loadNoData();
+              return;
+            }
+
+            await _uncommonAnswersController.loadMore();
+            refreshController.loadComplete();
+          },
+          child: ListView.builder(
+            itemBuilder: (context, index) {
+              final IbQuestion item =
+                  _uncommonAnswersController.ibQuestions[index];
+              final tag = 'uncommon_${item.id}';
+              late IbQuestionItemController _controller;
+
+              if (Get.isRegistered(tag: tag)) {
+                _controller = Get.find(tag: tag);
+              } else {
+                _controller = Get.put(
+                    IbQuestionItemController(
+                        ibAnswer:
+                            _uncommonAnswersController.retrieveAnswer(item.id),
+                        showMyAnswer: true,
+                        ibQuestion: item,
+                        isExpandable: true,
+                        disableAvatarOnTouch: item.creatorId == widget.uid),
+                    tag: tag.toString());
+              }
+
+              if (item.questionType == IbQuestion.kMultipleChoice) {
+                return IbMcQuestionCard(_controller);
+              }
+              return IbScQuestionCard(_controller);
+            },
+            itemCount: _uncommonAnswersController.ibQuestions.length,
           ),
         );
       },

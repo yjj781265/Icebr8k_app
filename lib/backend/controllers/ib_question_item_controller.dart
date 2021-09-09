@@ -29,12 +29,14 @@ class IbQuestionItemController extends GetxController {
   final bool isExpandable;
   final bool isSample;
   final bool disableAvatarOnTouch;
+  final bool showMyAnswer;
   final bool disableChoiceOnTouch;
   final bool showActionButtons;
   final isExpanded = true.obs;
 
   /// if user already answered, pass the answer here
   IbAnswer? ibAnswer;
+  final answeredUsername = ''.obs;
   final totalPolled = 0.obs;
   final selectedChoice = ''.obs;
   final resultMap = <String, double>{}.obs;
@@ -46,6 +48,7 @@ class IbQuestionItemController extends GetxController {
       this.isSample = false,
       this.disableChoiceOnTouch = false,
       this.disableAvatarOnTouch = false,
+      this.showMyAnswer = false,
       this.ibAnswer});
 
   @override
@@ -57,6 +60,8 @@ class IbQuestionItemController extends GetxController {
     if (ibAnswer != null) {
       votedDateTime.value =
           DateTime.fromMillisecondsSinceEpoch(ibAnswer!.answeredTimeInMs);
+      answeredUsername.value =
+          (await IbUserDbService().queryIbUser(ibAnswer!.uid))!.username;
     }
 
     selectedChoice.value = ibAnswer == null

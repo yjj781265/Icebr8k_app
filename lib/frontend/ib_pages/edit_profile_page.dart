@@ -19,6 +19,7 @@ class EditProfilePage extends StatelessWidget {
   EditProfilePage({Key? key}) : super(key: key);
   final _controller = Get.put(EditProfileController());
   final TextEditingController _nameEditController = TextEditingController();
+  final TextEditingController _usernameEditController = TextEditingController();
   final TextEditingController _bioEditController = TextEditingController();
   final TextEditingController _birthdateEditController =
       TextEditingController();
@@ -39,6 +40,8 @@ class EditProfilePage extends StatelessWidget {
                     ? _homeController.currentBirthdate.value
                     : _controller.birthdateInMs.value;
                 ibUser.name = _nameEditController.text.trim();
+                ibUser.username =
+                    _usernameEditController.text.trim().toLowerCase();
                 ibUser.description = _bioEditController.text.trim();
                 _controller.updateUserInfo(ibUser);
               }
@@ -123,6 +126,20 @@ class EditProfilePage extends StatelessWidget {
                           text: _homeController.currentBio.value,
                           onChanged: (text) {}),
                     ),
+                    IbTextField(
+                        titleIcon: const Icon(
+                          Icons.tag_outlined,
+                          color: IbColors.primaryColor,
+                        ),
+                        titleTrKey: "username",
+                        controller: _usernameEditController,
+                        text: _homeController.currentIbUsername.value,
+                        charLimit: IbConfig.kUsernameMaxLength,
+                        hintTrKey: 'username_hint',
+                        onChanged: (text) {
+                          _controller.username.value =
+                              text.trim().toLowerCase();
+                        }),
                     InkWell(
                       onTap: () => showDialog(
                           context: context,

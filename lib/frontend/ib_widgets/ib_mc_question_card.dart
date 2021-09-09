@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
+import 'package:icebr8k/backend/controllers/my_answered_quetions_controller.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
 import '../ib_colors.dart';
@@ -161,6 +162,25 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                     widget._controller.isExpanded.isTrue
                         ? expandableInfo
                         : const SizedBox(),
+
+                  /// show current user answer is available
+                  if (Get.find<MyAnsweredQuestionsController>().retrieveAnswer(
+                              widget._controller.ibQuestion.id) !=
+                          null &&
+                      widget._controller.showMyAnswer)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Row(
+                        children: [
+                          IbUserAvatar(
+                            avatarUrl: IbUtils.getCurrentIbUser()!.avatarUrl,
+                            radius: 8,
+                          ),
+                          Text(
+                              ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.ibQuestion.id)!.answer}')
+                        ],
+                      ),
+                    ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -228,7 +248,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                    'Voted ${IbUtils.getSuffixDateTimeString(widget._controller.votedDateTime.value)}'),
+                    '${widget._controller.answeredUsername.value} voted ${IbUtils.getSuffixDateTimeString(widget._controller.votedDateTime.value)}'),
               )
             ],
           );

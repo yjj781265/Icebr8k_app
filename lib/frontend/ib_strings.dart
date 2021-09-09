@@ -22,7 +22,7 @@ class IbStrings extends Translations {
           'new_here': 'New here? ',
           'sign_up': 'Sign up',
           'name': 'Name',
-          'updating': 'updating...',
+          'updating': 'Updating...',
           'name_hint': 'Please enter name',
           'birthdate': 'Birthdate',
           'birthdate_hint': 'Please enter your birthdate',
@@ -58,7 +58,7 @@ class IbStrings extends Translations {
           'username_hint': 'Create your unique username',
           'username_exist_error': 'Username already exists',
           'username_not_valid':
-              'Username is not valid, make sure it has at least 2 characters without spacing',
+              'Username is not valid, make sure it has at least 3 characters without spacing',
           'username_empty':
               "Oops, looks like you forgot to create your username.",
           'avatar_empty':

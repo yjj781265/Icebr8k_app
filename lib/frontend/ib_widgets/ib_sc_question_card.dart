@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
+import 'package:icebr8k/backend/controllers/my_answered_quetions_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
@@ -151,6 +152,27 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                           widget._controller.isExpanded.isTrue
                               ? expandableInfo
                               : const SizedBox(),
+
+                        /// show current user answer is available
+                        if (Get.find<MyAnsweredQuestionsController>()
+                                    .retrieveAnswer(
+                                        widget._controller.ibQuestion.id) !=
+                                null &&
+                            widget._controller.showMyAnswer)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Row(
+                              children: [
+                                IbUserAvatar(
+                                  avatarUrl:
+                                      IbUtils.getCurrentIbUser()!.avatarUrl,
+                                  radius: 8,
+                                ),
+                                Text(
+                                    ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.ibQuestion.id)!.answer}')
+                              ],
+                            ),
+                          ),
                         Obx(() {
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -205,8 +227,8 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
         widget._controller.showResult.isTrue) {
       return TextButton(
           onPressed: () {
-            widget._controller.calculateResult();
             cardKey.currentState!.flip();
+            widget._controller.calculateResult();
           },
           child: const Text(
             'Show Result',
@@ -237,7 +259,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Text(
-                    'Voted ${IbUtils.getSuffixDateTimeString(widget._controller.votedDateTime.value)}',
+                    '${widget._controller.answeredUsername.value} voted ${IbUtils.getSuffixDateTimeString(widget._controller.votedDateTime.value)}',
                     style:
                         const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
                   ),

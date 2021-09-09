@@ -4,21 +4,20 @@ import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
-/// uid: not current user uid
-class CommonAnswersController extends GetxController {
+class UncommonAnswersController extends GetxController {
   final ibQuestions = <IbQuestion>[].obs;
   final String uid;
-  late List<IbAnswer> commonAnswers;
+  late List<IbAnswer> uncommonAnswers;
   IbAnswer? lastIbAnswer;
-  CommonAnswersController(this.uid);
+  UncommonAnswersController(this.uid);
   final int kPaginationMax = 8;
 
   @override
   Future<void> onInit() async {
-    commonAnswers = await IbUtils.getCommonAnswersQ(uid);
+    uncommonAnswers = await IbUtils.getUncommonAnswersQ(uid);
 
-    if (commonAnswers.length <= kPaginationMax) {
-      for (final answer in commonAnswers) {
+    if (uncommonAnswers.length <= kPaginationMax) {
+      for (final answer in uncommonAnswers) {
         final q =
             await IbQuestionDbService().querySingleQuestion(answer.questionId);
         if (q == null) {
@@ -30,13 +29,13 @@ class CommonAnswersController extends GetxController {
     } else {
       for (int i = 0; i < kPaginationMax; i++) {
         final q = await IbQuestionDbService()
-            .querySingleQuestion(commonAnswers[i].questionId);
+            .querySingleQuestion(uncommonAnswers[i].questionId);
         if (q == null) {
           continue;
         }
         ibQuestions.add(q);
       }
-      lastIbAnswer = commonAnswers[kPaginationMax - 1];
+      lastIbAnswer = uncommonAnswers[kPaginationMax - 1];
       ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
     }
 
@@ -48,34 +47,34 @@ class CommonAnswersController extends GetxController {
       return;
     }
 
-    final int index = commonAnswers.indexOf(lastIbAnswer!);
+    final int index = uncommonAnswers.indexOf(lastIbAnswer!);
 
-    if (index == commonAnswers.length - 1) {
+    if (index == uncommonAnswers.length - 1) {
       lastIbAnswer = null;
       return;
     }
 
-    final int endIndex = (commonAnswers.length - index) > kPaginationMax
+    final int endIndex = (uncommonAnswers.length - index) > kPaginationMax
         ? (index + kPaginationMax)
-        : commonAnswers.length;
+        : uncommonAnswers.length;
     for (int i = index + 1; i < endIndex; i++) {
       final q = await IbQuestionDbService()
-          .querySingleQuestion(commonAnswers[i].questionId);
+          .querySingleQuestion(uncommonAnswers[i].questionId);
       if (q == null) {
         continue;
       }
       ibQuestions.add(q);
     }
-    lastIbAnswer = commonAnswers[endIndex - 1];
+    lastIbAnswer = uncommonAnswers[endIndex - 1];
     ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
   }
 
   IbAnswer? retrieveAnswer(String questionId) {
-    final int index =
-        commonAnswers.indexWhere((element) => element.questionId == questionId);
+    final int index = uncommonAnswers
+        .indexWhere((element) => element.questionId == questionId);
     if (index == -1) {
       return null;
     }
-    return commonAnswers[index];
+    return uncommonAnswers[index];
   }
 }
