@@ -52,7 +52,7 @@ class IbUserDbService {
     print(uid);
     final snapshot = await _collectionRef.doc(uid).get();
     print('isUsernameMissing, user with username ${snapshot['username']}');
-    return snapshot['username'] == '';
+    return true;
   }
 
   Future<bool> isAvatarUrlMissing(String? uid) async {

@@ -4,6 +4,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
+import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -14,6 +15,7 @@ import 'package:liquid_swipe/liquid_swipe.dart';
 
 class SetUpController extends GetxController {
   late LiquidController liquidController;
+  final ibQuestions = <IbQuestion>[].obs;
   final isUsernameValid = false.obs;
   final username = ''.obs;
   final name = ''.obs;

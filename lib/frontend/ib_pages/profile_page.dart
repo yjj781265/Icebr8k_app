@@ -312,11 +312,12 @@ class _ProfilePageState extends State<ProfilePage>
             )
           : CachedNetworkImage(
               progressIndicatorBuilder: (context, value, progress) {
+                /// todo keep eye on this one
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     IbProgressIndicator(),
-                    Text('rendering cover photo'),
+                    Text('rendering cover photo...'),
                   ],
                 );
               },
@@ -811,20 +812,21 @@ class _ProfilePageState extends State<ProfilePage>
 
 class PersistentHeader extends SliverPersistentHeaderDelegate {
   final Widget widget;
+  double height;
 
-  PersistentHeader({required this.widget});
+  PersistentHeader({required this.widget, this.height = 48});
 
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(height: 48, color: IbColors.lightBlue, child: widget);
+    return Container(height: height, color: IbColors.lightBlue, child: widget);
   }
 
   @override
-  double get maxExtent => 48;
+  double get maxExtent => height;
 
   @override
-  double get minExtent => 48;
+  double get minExtent => height;
 
   @override
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {

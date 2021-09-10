@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/set_up_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/screen_one.dart';
+import 'package:icebr8k/frontend/ib_pages/screen_three.dart';
 import 'package:icebr8k/frontend/ib_pages/screen_two.dart';
 import 'package:liquid_swipe/liquid_swipe.dart';
 
@@ -32,6 +33,7 @@ class SetupPage extends StatelessWidget {
             pages: [
               ScreenOne(),
               ScreenTwo(),
+              ScreenThree(),
             ],
           ),
           if (_setUpController.isKeyBoardVisible.isFalse)
@@ -62,7 +64,7 @@ class SetupPage extends StatelessWidget {
                       );
                     });
                   },
-                  itemCount: 2,
+                  itemCount: 3,
                 ),
               ),
             ),
