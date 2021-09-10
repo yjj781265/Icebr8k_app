@@ -13,6 +13,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
 class ProfileController extends GetxController {
+  final isLoading = true.obs;
   final currentIndex = 0.obs;
   final String uid;
   String requestMsg = '';
@@ -81,6 +82,7 @@ class ProfileController extends GetxController {
 
     final IbUser? user = await IbUserDbService().queryIbUser(uid);
     if (user == null) {
+      isLoading.value = false;
       return;
     }
 
@@ -90,6 +92,7 @@ class ProfileController extends GetxController {
     name.value = user.name;
     description.value = user.description;
     birthdateInMs.value = user.birthdateInMs;
+    isLoading.value = false;
     super.onInit();
   }
 

@@ -118,19 +118,38 @@ class IbQuestionDbService {
 
   Stream<QuerySnapshot<Map<String, dynamic>>> listenToAnsweredQuestionsChange(
       String uid,
-      {DocumentSnapshot? lastDoc}) {
+      {DocumentSnapshot? lastDoc,
+      int? limit}) {
     late Query<Map<String, dynamic>> query;
-    if (lastDoc == null) {
+    if (limit == null && lastDoc == null) {
       query = _db
           .collectionGroup('Answers')
           .where('uid', isEqualTo: uid)
           .orderBy('answeredTimeInMs', descending: true);
-    } else {
+    } else if (limit != null && lastDoc == null) {
+      query = _db
+          .collectionGroup('Answers')
+          .where('uid', isEqualTo: uid)
+          .limit(limit)
+          .orderBy('answeredTimeInMs', descending: true);
+    } else if (limit == null && lastDoc != null) {
       query = _db
           .collectionGroup('Answers')
           .where('uid', isEqualTo: uid)
           .orderBy('answeredTimeInMs', descending: true)
           .startAfterDocument(lastDoc);
+    } else if (limit != null && lastDoc != null) {
+      query = _db
+          .collectionGroup('Answers')
+          .where('uid', isEqualTo: uid)
+          .orderBy('answeredTimeInMs', descending: true)
+          .limit(limit)
+          .startAfterDocument(lastDoc);
+    } else {
+      query = _db
+          .collectionGroup('Answers')
+          .where('uid', isEqualTo: uid)
+          .orderBy('answeredTimeInMs', descending: true);
     }
 
     return query.snapshots();

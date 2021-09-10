@@ -28,12 +28,7 @@ class IbUtils {
     return ImageCropper.cropImage(
         sourcePath: filePath,
         cropStyle: CropStyle.circle,
-        aspectRatioPresets: [
-          CropAspectRatioPreset.ratio3x2,
-          CropAspectRatioPreset.original,
-          CropAspectRatioPreset.ratio4x3,
-          CropAspectRatioPreset.ratio16x9
-        ],
+        aspectRatioPresets: [],
         androidUiSettings: const AndroidUiSettings(
             toolbarTitle: 'Cropper',
             toolbarColor: IbColors.primaryColor,
@@ -41,6 +36,7 @@ class IbUtils {
             initAspectRatio: CropAspectRatioPreset.original,
             lockAspectRatio: false),
         iosUiSettings: const IOSUiSettings(
+          resetAspectRatioEnabled: false,
           minimumAspectRatio: 1.0,
         ));
   }

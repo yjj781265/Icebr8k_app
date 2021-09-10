@@ -20,7 +20,7 @@ class AnsweredQuestionController extends GetxController {
   @override
   Future<void> onInit() async {
     myAnsweredQuestionsSub = IbQuestionDbService()
-        .listenToAnsweredQuestionsChange(uid)
+        .listenToAnsweredQuestionsChange(uid, limit: 8)
         .listen((event) async {
       for (final docChange in event.docChanges) {
         final IbAnswer ibAnswer = IbAnswer.fromJson(docChange.doc.data()!);
