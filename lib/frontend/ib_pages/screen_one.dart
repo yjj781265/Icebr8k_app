@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/set_up_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
 import 'package:lottie/lottie.dart';
 
@@ -14,11 +15,9 @@ class ScreenOne extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: IbColors.lightBlue,
-      height: double.infinity,
-      width: double.infinity,
-      child: SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: IbColors.lightBlue,
+      body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -76,15 +75,14 @@ class ScreenOne extends StatelessWidget {
                 },
               ),
             ),
-            TextButton(
-                onPressed: () => _setUpController.liquidController
-                    .animateToPage(
-                        page:
-                            _setUpController.liquidController.currentPage + 1),
-                child: Text('next'.tr,
-                    style: const TextStyle(
-                      fontSize: IbConfig.kPageTitleSize,
-                    ))),
+            IbActionButton(
+                color: IbColors.accentColor,
+                iconData: Icons.arrow_forward_outlined,
+                onPressed: () {
+                  _setUpController.liquidController.animateToPage(
+                      page: _setUpController.liquidController.currentPage + 1);
+                },
+                text: ''),
             const SizedBox(
               height: 36,
             ),

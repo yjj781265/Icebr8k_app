@@ -1,11 +1,12 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/set_up_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:image_picker/image_picker.dart';
@@ -19,23 +20,34 @@ class ScreenTwo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: double.infinity,
-      width: double.infinity,
-      color: IbColors.lightBlue,
-      child: SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: IbColors.lightBlue,
+      body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(
-                  top: 48, left: 24, right: 24, bottom: 16),
-              child: Text(
-                'selfie_time'.tr,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 36,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 32.0, left: 16.0),
+                  child: IconButton(
+                      onPressed: () {
+                        _setUpController.liquidController
+                            .animateToPage(page: 0);
+                      },
+                      icon: const Icon(Icons.arrow_back_ios)),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Text(
+                    'selfie_time'.tr,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 36,
+                    ),
+                  ),
+                ),
+              ],
             ),
             Obx(
               () => SizedBox(
@@ -64,7 +76,7 @@ class ScreenTwo extends StatelessWidget {
                   final XFile? pickedFile = await _picker.pickImage(
                     source: ImageSource.camera,
                     preferredCameraDevice: CameraDevice.front,
-                    imageQuality: 50,
+                    imageQuality: 90,
                   );
                   if (pickedFile != null) {
                     Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));
@@ -86,7 +98,7 @@ class ScreenTwo extends StatelessWidget {
                 onPressed: () async {
                   final _picker = ImagePicker();
                   final XFile? pickedFile = await _picker.pickImage(
-                      source: ImageSource.gallery, imageQuality: 50);
+                      source: ImageSource.gallery, imageQuality: 90);
                   if (pickedFile != null) {
                     Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));
                     final File? croppedFile =
@@ -97,15 +109,17 @@ class ScreenTwo extends StatelessWidget {
                     Get.back();
                   }
                 }),
-            TextButton(
-                onPressed: () async {
-                  await _setUpController.updateUsernameAndAvatarUrl(
-                      _setUpController.avatarFilePath.value);
+            const SizedBox(
+              height: 16,
+            ),
+            IbActionButton(
+                color: IbColors.accentColor,
+                iconData: Icons.arrow_forward_outlined,
+                onPressed: () {
+                  _setUpController.liquidController.animateToPage(
+                      page: _setUpController.liquidController.currentPage + 1);
                 },
-                child: Text(
-                  'confirm'.tr,
-                  style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
-                ))
+                text: ''),
           ],
         ),
       ),

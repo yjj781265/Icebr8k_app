@@ -51,7 +51,7 @@ class IbElevatedButton extends StatelessWidget {
   Widget _iconButton() {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(8),
           shape: RoundedRectangleBorder(
             //to set border radius to button
             borderRadius: BorderRadius.circular(IbConfig.kButtonCornerRadius),

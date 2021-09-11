@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
@@ -14,7 +13,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
 import 'package:liquid_swipe/liquid_swipe.dart';
 
 class SetUpController extends GetxController {
-  late LiquidController liquidController;
+  final LiquidController liquidController = LiquidController();
   final ibQuestions = <IbQuestion>[].obs;
   final isUsernameValid = false.obs;
   final username = ''.obs;
@@ -26,18 +25,10 @@ class SetUpController extends GetxController {
   final usernameErrorTrKey = ''.obs;
   final avatarFilePath = ''.obs;
   final currentPage = 0.obs;
-  final isKeyBoardVisible = false.obs;
-  final _keyboardVisibilityController = KeyboardVisibilityController();
 
   @override
   void onInit() {
     super.onInit();
-    // Subscribe to keyboard state changes
-    _keyboardVisibilityController.onChange.listen((bool visible) {
-      print('Keyboard visibility update. Is visible: $visible');
-      isKeyBoardVisible.value = visible;
-    });
-
     debounce(
       username,
       (_) => validateUsername(),
