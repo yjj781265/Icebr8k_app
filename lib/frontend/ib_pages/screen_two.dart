@@ -22,105 +22,106 @@ class ScreenTwo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: IbColors.lightBlue,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 32.0, left: 16.0),
-                  child: IconButton(
-                      onPressed: () {
-                        _setUpController.liquidController
-                            .animateToPage(page: 0);
-                      },
-                      icon: const Icon(Icons.arrow_back_ios)),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Text(
-                    'selfie_time'.tr,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 36,
-                    ),
+      appBar: AppBar(
+        backgroundColor: IbColors.lightBlue,
+        leading: IconButton(
+            onPressed: () {
+              _setUpController.liquidController.animateToPage(page: 0);
+            },
+            icon: const Icon(Icons.arrow_back_ios)),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Text(
+                  'selfie_time'.tr,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 36,
                   ),
                 ),
-              ],
-            ),
-            Obx(
-              () => SizedBox(
-                  width: 230,
-                  height: 230,
-                  child: _setUpController.avatarFilePath.value.isNotEmpty
-                      ? CircleAvatar(
-                          key: UniqueKey(),
-                          foregroundImage: FileImage(
-                              File(_setUpController.avatarFilePath.value)),
-                        )
-                      : selfie),
-            ),
-            const SizedBox(
-              height: 16,
-            ),
-            IbElevatedButton(
-                color: IbColors.primaryColor,
-                icon: const Icon(
-                  Icons.camera_alt_outlined,
-                  color: IbColors.white,
-                ),
-                textTrKey: 'camera',
-                onPressed: () async {
-                  final _picker = ImagePicker();
-                  final XFile? pickedFile = await _picker.pickImage(
-                    source: ImageSource.camera,
-                    preferredCameraDevice: CameraDevice.front,
-                    imageQuality: 90,
-                  );
-                  if (pickedFile != null) {
-                    Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));
-                    final File? croppedFile =
-                        await IbUtils.showImageCropper(pickedFile.path);
-                    if (croppedFile != null) {
-                      _setUpController.avatarFilePath.value = croppedFile.path;
+              ),
+              Obx(
+                () => SizedBox(
+                    width: 230,
+                    height: 230,
+                    child: _setUpController.avatarFilePath.value.isNotEmpty
+                        ? CircleAvatar(
+                            key: UniqueKey(),
+                            foregroundImage: FileImage(
+                                File(_setUpController.avatarFilePath.value)),
+                          )
+                        : selfie),
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              IbElevatedButton(
+                  color: IbColors.primaryColor,
+                  icon: const Icon(
+                    Icons.camera_alt_outlined,
+                    color: IbColors.white,
+                  ),
+                  textTrKey: 'camera',
+                  onPressed: () async {
+                    final _picker = ImagePicker();
+                    final XFile? pickedFile = await _picker.pickImage(
+                      source: ImageSource.camera,
+                      preferredCameraDevice: CameraDevice.front,
+                      imageQuality: 90,
+                    );
+                    if (pickedFile != null) {
+                      Get.dialog(
+                          const IbLoadingDialog(messageTrKey: 'loading'));
+                      final File? croppedFile =
+                          await IbUtils.showImageCropper(pickedFile.path);
+                      if (croppedFile != null) {
+                        _setUpController.avatarFilePath.value =
+                            croppedFile.path;
+                      }
+                      Get.back();
                     }
-                    Get.back();
-                  }
-                }),
-            IbElevatedButton(
-                icon: const Icon(
-                  Icons.photo_album_outlined,
-                  color: IbColors.white,
-                ),
-                color: IbColors.errorRed,
-                textTrKey: 'gallery',
-                onPressed: () async {
-                  final _picker = ImagePicker();
-                  final XFile? pickedFile = await _picker.pickImage(
-                      source: ImageSource.gallery, imageQuality: 90);
-                  if (pickedFile != null) {
-                    Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));
-                    final File? croppedFile =
-                        await IbUtils.showImageCropper(pickedFile.path);
-                    if (croppedFile != null) {
-                      _setUpController.avatarFilePath.value = croppedFile.path;
+                  }),
+              IbElevatedButton(
+                  icon: const Icon(
+                    Icons.photo_album_outlined,
+                    color: IbColors.white,
+                  ),
+                  color: IbColors.errorRed,
+                  textTrKey: 'gallery',
+                  onPressed: () async {
+                    final _picker = ImagePicker();
+                    final XFile? pickedFile = await _picker.pickImage(
+                        source: ImageSource.gallery, imageQuality: 90);
+                    if (pickedFile != null) {
+                      Get.dialog(
+                          const IbLoadingDialog(messageTrKey: 'loading'));
+                      final File? croppedFile =
+                          await IbUtils.showImageCropper(pickedFile.path);
+                      if (croppedFile != null) {
+                        _setUpController.avatarFilePath.value =
+                            croppedFile.path;
+                      }
+                      Get.back();
                     }
-                    Get.back();
-                  }
-                }),
-            const SizedBox(
-              height: 16,
-            ),
-            IbActionButton(
-                color: IbColors.accentColor,
-                iconData: Icons.arrow_forward_outlined,
-                onPressed: () {
-                  _setUpController.liquidController.animateToPage(
-                      page: _setUpController.liquidController.currentPage + 1);
-                },
-                text: ''),
-          ],
+                  }),
+              const SizedBox(
+                height: 16,
+              ),
+              IbActionButton(
+                  color: IbColors.accentColor,
+                  iconData: Icons.arrow_forward_outlined,
+                  onPressed: () {
+                    _setUpController.liquidController.animateToPage(
+                        page:
+                            _setUpController.liquidController.currentPage + 1);
+                  },
+                  text: ''),
+            ],
+          ),
         ),
       ),
     );
