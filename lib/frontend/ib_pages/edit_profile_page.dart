@@ -9,11 +9,9 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_single_date_picker.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 
 class EditProfilePage extends StatelessWidget {
   EditProfilePage({Key? key}) : super(key: key);
@@ -21,8 +19,8 @@ class EditProfilePage extends StatelessWidget {
   final TextEditingController _nameEditController = TextEditingController();
   final TextEditingController _usernameEditController = TextEditingController();
   final TextEditingController _bioEditController = TextEditingController();
-  final TextEditingController _birthdateEditController =
-      TextEditingController();
+  //final TextEditingController _birthdateEditController =
+  //   TextEditingController();
   final HomeController _homeController = Get.find();
 
   @override
@@ -140,7 +138,7 @@ class EditProfilePage extends StatelessWidget {
                           _controller.username.value =
                               text.trim().toLowerCase();
                         }),
-                    InkWell(
+                    /*    InkWell(
                       onTap: () => showDialog(
                           context: context,
                           builder: (context) => _getDatePicker(),
@@ -162,7 +160,7 @@ class EditProfilePage extends StatelessWidget {
                           onChanged: (birthdate) {},
                         ),
                       ),
-                    ),
+                    ),*/
                   ],
                 ),
               ),
@@ -264,12 +262,12 @@ class EditProfilePage extends StatelessWidget {
     Get.bottomSheet(SafeArea(child: options));
   }
 
-  String _readableDateTime(DateTime _dateTime) {
+  /*String _readableDateTime(DateTime _dateTime) {
     final f = DateFormat('MM/dd/yyyy');
     return f.format(_dateTime);
-  }
+  }*/
 
-  Widget _getDatePicker() {
+  /* Widget _getDatePicker() {
     _controller.birthdatePickerInstructionKey.value = 'date_picker_instruction';
     return Obx(
       () => IbSingleDatePicker(
@@ -301,5 +299,5 @@ class EditProfilePage extends StatelessWidget {
         ],
       ),
     );
-  }
+  }*/
 }

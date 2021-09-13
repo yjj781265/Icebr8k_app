@@ -30,6 +30,21 @@ class IbQuestionDbService {
     return IbQuestion.fromJson(snapshot.data()!);
   }
 
+  Future<List<IbQuestion>> queryIcebr8kQ() async {
+    final snapshot = await _collectionRef
+        .where('creatorId', isEqualTo: 'tCH8AIqRxWM0eEQcmlnniUIfo6F3')
+        .orderBy('askedTimeInMs')
+        .limit(8)
+        .get();
+
+    final List<IbQuestion> list = [];
+    for (final doc in snapshot.docs) {
+      list.add(IbQuestion.fromJson(doc.data()));
+    }
+
+    return list;
+  }
+
   Future<QuerySnapshot<Map<String, dynamic>>> queryUserAnsweredQuestions({
     required int limit,
     required String uid,

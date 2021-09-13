@@ -165,34 +165,30 @@ class _ProfilePageState extends State<ProfilePage>
                                               fontSize:
                                                   IbConfig.kNormalTextSize),
                                         ),
-                                        Text(
+                                        /*  Text(
                                           '🎂 ${_profileController.isMe.isTrue ? IbUtils.readableDateTime(DateTime.fromMillisecondsSinceEpoch(_homeController.currentBirthdate.value)) : IbUtils.readableDateTime(DateTime.fromMillisecondsSinceEpoch(_profileController.birthdateInMs.value))}',
                                           style: const TextStyle(
                                               fontSize:
                                                   IbConfig.kNormalTextSize),
-                                        ),
+                                        ),*/
                                         if (_profileController.isMe.isFalse)
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 16),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'match_interests'.tr,
-                                                  style: const TextStyle(
-                                                      fontSize: IbConfig
-                                                          .kNormalTextSize,
-                                                      fontWeight:
-                                                          FontWeight.w800),
-                                                ),
-                                                IbLinearIndicator(
-                                                  endValue: _profileController
-                                                      .compScore.value,
-                                                ),
-                                              ],
-                                            ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'match_interests'.tr,
+                                                style: const TextStyle(
+                                                    fontSize: IbConfig
+                                                        .kNormalTextSize,
+                                                    fontWeight:
+                                                        FontWeight.w800),
+                                              ),
+                                              IbLinearIndicator(
+                                                endValue: _profileController
+                                                    .compScore.value,
+                                              ),
+                                            ],
                                           ),
                                       ],
                                     ),
@@ -222,11 +218,7 @@ class _ProfilePageState extends State<ProfilePage>
                               )
                             ],
                           ),
-                          const SizedBox(
-                            height: 16,
-                          ),
-                          if (_profileController.isMe.isFalse)
-                            _buildActionButtons(),
+
                           if (_profileController.isMe.isFalse &&
                               _profileController.description.isNotEmpty)
                             Padding(
@@ -252,6 +244,13 @@ class _ProfilePageState extends State<ProfilePage>
                                 ),
                               ),
                             ),
+
+                          if (_profileController.isMe.isFalse)
+                            _buildActionButtons(),
+
+                          const SizedBox(
+                            height: 16,
+                          ),
                         ],
                       ),
                     ),
@@ -609,7 +608,7 @@ class _ProfilePageState extends State<ProfilePage>
   Widget _buildActionButtons() {
     return Obx(
       () => Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

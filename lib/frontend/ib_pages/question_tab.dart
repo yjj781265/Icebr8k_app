@@ -85,14 +85,12 @@ class QuestionTab extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final _ibQuestion = _ibQuestionController.ibQuestions[index];
                   if (_ibQuestion.questionType == IbQuestion.kScale) {
-                    return Center(
-                        child: IbScQuestionCard(Get.put(
-                            IbQuestionItemController(
-                                ibQuestion: _ibQuestion,
-                                disableAvatarOnTouch:
-                                    IbUtils.getCurrentUid()! ==
-                                        _ibQuestion.creatorId),
-                            tag: _ibQuestion.id)));
+                    return IbScQuestionCard(Get.put(
+                        IbQuestionItemController(
+                            ibQuestion: _ibQuestion,
+                            disableAvatarOnTouch: IbUtils.getCurrentUid()! ==
+                                _ibQuestion.creatorId),
+                        tag: _ibQuestion.id));
                   }
 
                   return IbMcQuestionCard(Get.put(

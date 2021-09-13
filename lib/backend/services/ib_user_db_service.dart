@@ -27,9 +27,12 @@ class IbUserDbService {
     return _collectionRef.doc(uid).update({'loginTimeInMs': loginTimeInMs});
   }
 
-  Future<void> signOutIbUser(String _uid) {
-    print('signOutIbUser');
-    return _collectionRef.doc(_uid).update({'isOnline': false});
+  Future<void> signOutIbUser(String _uid) async {
+    final snapshot = await _collectionRef.doc(_uid).get();
+    if (snapshot.exists) {
+      print('signOutIbUser');
+      _collectionRef.doc(_uid).update({'isOnline': false});
+    }
   }
 
   Future<bool> isIbUserExist(String _uid) async {
@@ -51,8 +54,9 @@ class IbUserDbService {
   Future<bool> isUsernameMissing(String uid) async {
     print(uid);
     final snapshot = await _collectionRef.doc(uid).get();
-    print('isUsernameMissing, user with username ${snapshot['username']}');
-    return true;
+    return !snapshot.exists ||
+        snapshot['username'] == '' ||
+        snapshot['username'] == null;
   }
 
   Future<bool> isAvatarUrlMissing(String? uid) async {
@@ -67,11 +71,13 @@ class IbUserDbService {
 
   /// update username of current IbUser, it will convert to all lower case
   Future<void> updateUsername({required String username, required String uid}) {
-    return _collectionRef.doc(uid).update({'username': username.toLowerCase()});
+    return _collectionRef
+        .doc(uid)
+        .update({'username': username.trim().toLowerCase()});
   }
 
   Future<void> updateName({required String name, required String uid}) {
-    return _collectionRef.doc(uid).update({'name': name});
+    return _collectionRef.doc(uid).update({'name': name.trim()});
   }
 
   Future<void> updateCoverPhotoUrl(
@@ -193,7 +199,7 @@ class IbUserDbService {
   Stream<DocumentSnapshot<Map<String, dynamic>>> listenToSingleFriend(
       String friendUid) {
     return _collectionRef
-        .doc(IbUtils.getCurrentUid()!)
+        .doc(IbUtils.getCurrentUid())
         .collection('Friends')
         .doc(friendUid)
         .snapshots(includeMetadataChanges: true);

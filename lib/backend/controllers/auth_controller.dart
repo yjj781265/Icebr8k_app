@@ -100,10 +100,9 @@ class AuthController extends GetxService {
             Get.offAll(() => HomePage(), binding: HomeBinding());
           }
         } else {
-          Get.dialog(const IbSimpleDialog(
-              message: 'User does not exist', positiveBtnTrKey: 'ok'));
+          Get.back();
+          Get.offAll(() => SetupPage());
         }
-        Get.back();
       }
     } on FirebaseAuthException catch (e) {
       Get.back();

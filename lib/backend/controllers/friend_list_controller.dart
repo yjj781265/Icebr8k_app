@@ -108,7 +108,6 @@ class FriendListController extends GetxController {
   }
 
   Future<void> _refreshScore() async {
-    final String myUid = Get.find<AuthController>().firebaseUser!.uid;
     for (final FriendListItem item in friendItems) {
       final double score = await IbUtils.getCompScore(item.uid);
       item.score = score;

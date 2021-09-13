@@ -39,7 +39,7 @@ class EditProfileController extends GetxController {
     }
 
     if (username.value.isEmpty) {
-      usernameErrorTrKey.value = 'field_is_empty';
+      usernameErrorTrKey.value = 'username is empty';
       isUsernameValid.value = false;
       return;
     }

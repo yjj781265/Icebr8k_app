@@ -1,13 +1,18 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
+import 'package:icebr8k/backend/controllers/my_answered_quetions_controller.dart';
+import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/home_page.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
 import 'package:liquid_swipe/liquid_swipe.dart';
@@ -15,6 +20,8 @@ import 'package:liquid_swipe/liquid_swipe.dart';
 class SetUpController extends GetxController {
   final LiquidController liquidController = LiquidController();
   final ibQuestions = <IbQuestion>[].obs;
+  final answeredCounter = 0.obs;
+  late StreamSubscription answeredQStream;
   final isUsernameValid = false.obs;
   final username = ''.obs;
   final name = ''.obs;
@@ -27,26 +34,96 @@ class SetUpController extends GetxController {
   final currentPage = 0.obs;
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
+    Get.lazyPut(() => MyAnsweredQuestionsController());
+    ibQuestions.addAll(await IbQuestionDbService().queryIcebr8kQ());
+    answeredQStream = IbQuestionDbService()
+        .listenToAnsweredQuestionsChange(IbUtils.getCurrentUid()!)
+        .listen((event) {
+      for (final docChange in event.docChanges) {
+        final IbAnswer ibAnswer = IbAnswer.fromJson(docChange.doc.data()!);
+        if (docChange.type == DocumentChangeType.added &&
+            ibQuestions.indexWhere(
+                    (element) => element.id == ibAnswer.questionId) !=
+                -1) {
+          answeredCounter.value++;
+        }
+      }
+    });
     super.onInit();
-    debounce(
-      username,
-      (_) => validateUsername(),
-      time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
-    );
+  }
 
-    debounce(
-      name,
-      (_) => _validateName(),
-      time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
-    );
+  Future<void> validateScreenTwo() async {
+    if (avatarFilePath.value.isEmpty) {
+      Get.dialog(IbSimpleDialog(
+        message: 'avatar_empty'.tr,
+        positiveBtnTrKey: 'ok',
+      ));
+      return;
+    }
+
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'),
+        barrierDismissible: false);
+    final String? avatarUrl =
+        await IbStorageService().uploadAndRetrieveImgUrl(avatarFilePath.value);
+    if (Get.find<AuthController>().firebaseUser != null && avatarUrl != null) {
+      try {
+        await IbUserDbService().updateAvatarUrl(
+            url: avatarUrl, uid: Get.find<AuthController>().firebaseUser!.uid);
+      } on FirebaseException catch (e) {
+        Get.back();
+        Get.dialog(IbSimpleDialog(message: e.message!, positiveBtnTrKey: 'ok'));
+      }
+      Get.back();
+      liquidController.animateToPage(page: 2);
+    }
+  }
+
+  Future<void> validateScreenOne() async {
+    await validateUsername();
+    _validateName();
+
+    if (isUsernameValid.isFalse) {
+      Get.dialog(IbSimpleDialog(
+        message: usernameErrorTrKey.value.tr,
+        positiveBtnTrKey: 'ok',
+      ));
+      return;
+    }
+
+    if (isNameValid.isFalse) {
+      Get.dialog(
+        const IbSimpleDialog(
+          message: 'name is empty',
+          positiveBtnTrKey: 'ok',
+        ),
+      );
+      return;
+    }
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'),
+        barrierDismissible: false);
+    if (Get.find<AuthController>().firebaseUser != null) {
+      try {
+        await IbUserDbService().updateUsername(
+            username: username.value.trim(),
+            uid: Get.find<AuthController>().firebaseUser!.uid);
+        await IbUserDbService().updateName(
+            name: name.value,
+            uid: Get.find<AuthController>().firebaseUser!.uid);
+      } on FirebaseException catch (e) {
+        Get.back();
+        Get.dialog(IbSimpleDialog(message: e.message!, positiveBtnTrKey: 'ok'));
+      }
+      Get.back();
+      liquidController.animateToPage(page: 1);
+    }
   }
 
   Future<void> validateUsername() async {
     final bool isValid = GetUtils.isUsername(username.value.toLowerCase());
     isUsernameFirstTime.value = false;
     if (username.value.isEmpty) {
-      usernameErrorTrKey.value = 'field_is_empty';
+      usernameErrorTrKey.value = 'username is empty';
       isUsernameValid.value = false;
       return;
     }
@@ -86,72 +163,7 @@ class SetUpController extends GetxController {
     nameErrorTrKey.value = '';
   }
 
-  bool _validateEverything() {
-    if (isUsernameValid.isFalse && username.value.isEmpty) {
-      Get.dialog(IbSimpleDialog(
-        message: 'username_empty'.tr,
-        positiveBtnTrKey: 'ok',
-        actionButtons: [
-          TextButton(
-              onPressed: () {
-                Get.back();
-                liquidController.jumpToPage(page: 0);
-              },
-              child: Text('to_previous_page'.tr))
-        ],
-      ));
-      return false;
-    }
-    if (isUsernameValid.isFalse) {
-      Get.dialog(IbSimpleDialog(
-        message: 'username_not_valid'.tr,
-        positiveBtnTrKey: 'ok',
-        actionButtons: [
-          TextButton(
-              onPressed: () {
-                Get.back();
-                liquidController.jumpToPage(page: 0);
-              },
-              child: Text('to_previous_page'.tr))
-        ],
-      ));
-      return false;
-    }
-
-    if (avatarFilePath.value.isEmpty) {
-      Get.dialog(IbSimpleDialog(
-        message: 'avatar_empty'.tr,
-        positiveBtnTrKey: 'ok',
-      ));
-      return false;
-    }
-
-    if (isNameValid.isFalse) {
-      Get.dialog(
-        IbSimpleDialog(
-          message: 'nameErrorTrKey'.tr,
-          positiveBtnTrKey: 'ok',
-          actionButtons: [
-            TextButton(
-                onPressed: () {
-                  Get.back();
-                  liquidController.jumpToPage(page: 0);
-                },
-                child: Text('to_previous_page'.tr))
-          ],
-        ),
-      );
-      return false;
-    }
-
-    return true;
-  }
-
   Future<void> updateUsernameAndAvatarUrl(String _filePath) async {
-    if (!_validateEverything()) {
-      return;
-    }
-
     Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'),
         barrierDismissible: false);
     final String? avatarUrl =
@@ -186,5 +198,11 @@ class SetUpController extends GetxController {
             positiveBtnTrKey: 'ok'));
       }
     }
+  }
+
+  @override
+  void onClose() {
+    answeredQStream.cancel();
+    super.onClose();
   }
 }

@@ -114,10 +114,8 @@ class ScreenTwo extends StatelessWidget {
               IbActionButton(
                   color: IbColors.accentColor,
                   iconData: Icons.arrow_forward_outlined,
-                  onPressed: () {
-                    _setUpController.liquidController.animateToPage(
-                        page:
-                            _setUpController.liquidController.currentPage + 1);
+                  onPressed: () async {
+                    await _setUpController.validateScreenTwo();
                   },
                   text: ''),
             ],

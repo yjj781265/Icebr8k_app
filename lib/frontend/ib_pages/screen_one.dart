@@ -12,6 +12,9 @@ import '../ib_config.dart';
 class ScreenOne extends StatelessWidget {
   ScreenOne({Key? key}) : super(key: key);
   final SetUpController _setUpController = Get.find();
+  final TextEditingController nameEditingController = TextEditingController();
+  final TextEditingController usernameEditingController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -36,60 +39,46 @@ class ScreenOne extends StatelessWidget {
                   width: 230,
                   height: 230,
                   child: Lottie.asset('assets/images/business_chat.json')),
-              Obx(
-                () => IbTextField(
-                    titleIcon: const Icon(
-                      Icons.tag_outlined,
-                      color: IbColors.primaryColor,
-                    ),
-                    titleTrKey: "username",
-                    charLimit: IbConfig.kUsernameMaxLength,
-                    errorTrKey: _setUpController.usernameErrorTrKey.value,
-                    borderColor: _setUpController.isUsernameFirstTime.isTrue
-                        ? IbColors.lightGrey
-                        : _setUpController.isUsernameValid.isTrue
-                            ? IbColors.accentColor
-                            : IbColors.errorRed,
-                    hintTrKey: 'username_hint',
-                    onChanged: (text) {
-                      _setUpController.username.value = text;
-                    }),
-              ),
-              Obx(
-                () => IbTextField(
+              IbTextField(
+                  controller: usernameEditingController,
                   titleIcon: const Icon(
-                    Icons.person_outline,
+                    Icons.tag_outlined,
                     color: IbColors.primaryColor,
                   ),
-                  titleTrKey: 'name',
-                  hintTrKey: 'name_hint',
-                  textInputType: TextInputType.name,
-                  errorTrKey: _setUpController.nameErrorTrKey.value,
-                  borderColor: _setUpController.isNameFirstTime.value
-                      ? IbColors.lightGrey
-                      : (_setUpController.isNameValid.value
-                          ? IbColors.accentColor
-                          : IbColors.errorRed),
-                  onChanged: (name) {
-                    _setUpController.name.value = name;
-                  },
+                  text: _setUpController.username.value,
+                  titleTrKey: "username",
+                  charLimit: IbConfig.kUsernameMaxLength,
+                  hintTrKey: 'username_hint',
+                  onChanged: (text) {
+                    _setUpController.username.value = text;
+                  }),
+              IbTextField(
+                controller: nameEditingController,
+                titleIcon: const Icon(
+                  Icons.person_outline,
+                  color: IbColors.primaryColor,
                 ),
+                text: _setUpController.name.value,
+                titleTrKey: 'name',
+                hintTrKey: 'name_hint',
+                textInputType: TextInputType.name,
+                onChanged: (name) {
+                  _setUpController.name.value = name;
+                },
               ),
               IbActionButton(
                   color: IbColors.accentColor,
                   iconData: Icons.arrow_forward_outlined,
                   onPressed: () {
-                    _setUpController.liquidController.animateToPage(
-                        page:
-                            _setUpController.liquidController.currentPage + 1);
+                    _setUpController.validateScreenOne();
                   },
                   text: ''),
               const SizedBox(
                 height: 36,
               ),
               TextButton(
-                onPressed: () {
-                  Get.find<AuthController>().signOut();
+                onPressed: () async {
+                  await Get.find<AuthController>().signOut();
                 },
                 child: Text('sign_out'.tr),
               )
