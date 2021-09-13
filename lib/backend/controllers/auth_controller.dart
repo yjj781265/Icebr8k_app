@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
+import 'package:icebr8k/backend/controllers/my_answered_quetions_controller.dart';
 import 'package:icebr8k/backend/controllers/sign_in_controller.dart';
 import 'package:icebr8k/backend/controllers/sign_up_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -245,6 +246,7 @@ class AuthController extends GetxService {
 
   Future<void> signOut() async {
     Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_out'));
+    await Get.delete<MyAnsweredQuestionsController>();
     if (firebaseUser != null) {
       await IbUserDbService().signOutIbUser(firebaseUser!.uid);
     }

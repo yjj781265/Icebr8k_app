@@ -101,8 +101,9 @@ class ProfileController extends GetxController {
     totalAskedStream.cancel();
 
     totalAnsweredStream.cancel();
-
-    friendStatusStream.cancel();
+    if (friendStatusStream != null) {
+      friendStatusStream.cancel();
+    }
 
     super.onClose();
   }
