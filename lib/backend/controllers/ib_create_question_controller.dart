@@ -13,6 +13,7 @@ class IbCreateQuestionController extends GetxController {
   late TextEditingController? descriptionEditController;
   final choiceList = <String>[].obs;
   final scaleChoiceList = <String>[].obs;
+  final filePath = ''.obs;
   String question = '';
   String description = '';
 

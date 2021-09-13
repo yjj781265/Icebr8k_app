@@ -16,6 +16,7 @@ class IbQuestion {
   int askedTimeInMs;
   int endTimeInMs;
   List<String> choices;
+  List<String> extras;
   String questionType;
 
   IbQuestion(
@@ -24,6 +25,7 @@ class IbQuestion {
       required this.creatorId,
       required this.choices,
       required this.questionType,
+      this.extras = const <String>[],
       this.description = '',
       this.likes = 0,
       this.comments = 0,

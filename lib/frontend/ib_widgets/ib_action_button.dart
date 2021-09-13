@@ -3,12 +3,16 @@ import 'package:icebr8k/frontend/ib_config.dart';
 
 class IbActionButton extends StatelessWidget {
   final Color color;
+  final Color bgColor;
+  final double size;
   final IconData? iconData;
   final String text;
   final Function onPressed;
 
   const IbActionButton(
       {required this.color,
+      this.bgColor = Colors.transparent,
+      this.size = 24,
       required this.iconData,
       required this.onPressed,
       required this.text});
@@ -24,13 +28,14 @@ class IbActionButton extends StatelessWidget {
           },
           child: Container(
             decoration: BoxDecoration(
-                color: Colors.transparent,
+                color: bgColor,
                 shape: BoxShape.circle,
                 border: Border.all(width: 2, color: color)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Icon(
                 iconData,
+                size: size,
                 color: color,
               ),
             ),
