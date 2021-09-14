@@ -55,19 +55,22 @@ class _ProfilePageState extends State<ProfilePage>
     super.initState();
     _profileController =
         Get.put(ProfileController(widget.uid), tag: widget.uid);
+    _createdQuestionController =
+        Get.put(AskedQuestionsController(widget.uid), tag: widget.uid);
+
     if (widget.uid == IbUtils.getCurrentUid()) {
       _answeredQuestionController =
           Get.put(AnsweredQuestionController(widget.uid), tag: widget.uid);
-      _createdQuestionController =
-          Get.put(AskedQuestionsController(widget.uid), tag: widget.uid);
       _homeController = Get.find();
+    } else {
+      _commonAnswersController =
+          Get.put(CommonAnswersController(widget.uid), tag: widget.uid);
+      _uncommonAnswersController =
+          Get.put(UncommonAnswersController(widget.uid), tag: widget.uid);
     }
-    _commonAnswersController =
-        Get.put(CommonAnswersController(widget.uid), tag: widget.uid);
-    _uncommonAnswersController =
-        Get.put(UncommonAnswersController(widget.uid), tag: widget.uid);
 
-    _tabController = TabController(vsync: this, length: 2);
+    _tabController = TabController(
+        vsync: this, length: _profileController.isMe.isTrue ? 2 : 3);
     IbUtils.hideKeyboard();
   }
 
@@ -260,12 +263,13 @@ class _ProfilePageState extends State<ProfilePage>
                         pinned: true,
                         delegate: PersistentHeader(
                           widget: TabBar(
+                            isScrollable: !_profileController.isMe.value,
                             controller: _tabController,
                             tabs: [
                               if (_profileController.isMe.isTrue)
-                                const Tab(text: 'Answered Questions'),
-                              if (_profileController.isMe.isTrue)
-                                const Tab(text: 'Asked Questions'),
+                                Tab(
+                                    text:
+                                        'Answered Questions(${_profileController.totalAnswered.value})'),
                               if (_profileController.isMe.isFalse)
                                 Obx(() => Tab(
                                     text:
@@ -274,6 +278,9 @@ class _ProfilePageState extends State<ProfilePage>
                                 Obx(() => Tab(
                                     text:
                                         'Uncommon Answers(${_uncommonAnswersController.ibQuestions.length})')),
+                              Tab(
+                                  text:
+                                      'Asked Questions(${_profileController.totalAsked.value})'),
                             ],
                             labelStyle:
                                 const TextStyle(fontWeight: FontWeight.bold),
@@ -292,11 +299,11 @@ class _ProfilePageState extends State<ProfilePage>
                   controller: _tabController,
                   children: [
                     if (_profileController.isMe.isTrue) buildAnsweredQTab(),
-                    if (_profileController.isMe.isTrue) buildAskedTab(),
                     if (_profileController.isMe.isFalse)
                       buildCommonAnswersTab(),
                     if (_profileController.isMe.isFalse)
                       buildUncommonAnswersTab(),
+                    buildAskedTab(),
                   ],
                 ),
               ),
