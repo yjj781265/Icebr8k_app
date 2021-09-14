@@ -44,6 +44,7 @@ class _SocialTabState extends State<SocialTab>
       child: Column(
         children: [
           TabBar(
+            isScrollable: true,
             controller: _tabController,
             tabs: [
               Obx(

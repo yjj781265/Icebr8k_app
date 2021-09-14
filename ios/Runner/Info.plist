@@ -68,9 +68,7 @@
 
     <!-- Location Request Section -->
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>You location is required in order to see people nearby</string>
-    <key>UIBackgroundModes</key>
-    <string>location</string>
+    <string>Your location is required in order to see people nearby</string>
     <!-- End of Location Request Section -->
 
 </dict>

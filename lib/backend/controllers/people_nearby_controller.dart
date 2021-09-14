@@ -74,7 +74,7 @@ class PeopleNearbyController extends GetxController {
       return;
     }
 
-    List<PeopleNearbyItem> tempList = [];
+    final List<PeopleNearbyItem> tempList = [];
 
     for (final doc in documentList) {
       final String uid = doc.data()!['uid'] as String;

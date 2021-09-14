@@ -263,7 +263,7 @@ class _ProfilePageState extends State<ProfilePage>
                         pinned: true,
                         delegate: PersistentHeader(
                           widget: TabBar(
-                            isScrollable: !_profileController.isMe.value,
+                            isScrollable: true,
                             controller: _tabController,
                             tabs: [
                               if (_profileController.isMe.isTrue)
@@ -277,7 +277,7 @@ class _ProfilePageState extends State<ProfilePage>
                               if (_profileController.isMe.isFalse)
                                 Obx(() => Tab(
                                     text:
-                                        'Uncommon Answers(${_uncommonAnswersController.ibQuestions.length})')),
+                                        'Different Answers(${_uncommonAnswersController.ibQuestions.length})')),
                               Tab(
                                   text:
                                       'Asked Questions(${_profileController.totalAsked.value})'),
@@ -320,7 +320,7 @@ class _ProfilePageState extends State<ProfilePage>
             )
           : CachedNetworkImage(
               progressIndicatorBuilder: (context, value, progress) {
-                /// todo keep eye on this one
+                /// Todo keep eye on this one
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [

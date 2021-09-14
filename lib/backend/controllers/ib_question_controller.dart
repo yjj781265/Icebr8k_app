@@ -76,7 +76,9 @@ class IbQuestionController extends GetxController {
 
       if (!containQuestionId(id)) {
         final q = await IbQuestionDbService().querySingleQuestion(id);
-        ibQuestions.addIf(q != null && !ibQuestions.contains(q), q!);
+        if (q != null) {
+          ibQuestions.addIf(!ibQuestions.contains(q), q);
+        }
       }
     }
     ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));

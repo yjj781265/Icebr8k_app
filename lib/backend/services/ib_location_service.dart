@@ -79,6 +79,8 @@ class IbLocationService {
       }
     }
 
+    print('checkPermissionsAndDeviceService _serviceEnabled $_serviceEnabled');
+
     _permissionGranted = await _location.hasPermission();
     if (_permissionGranted == PermissionStatus.denied) {
       _permissionGranted = await _location.requestPermission();
@@ -86,7 +88,10 @@ class IbLocationService {
         return false;
       }
     }
+
     _location.changeSettings(interval: 60000, distanceFilter: 8);
+    print(
+        'checkPermissionsAndDeviceService _permissionGranted $_permissionGranted');
     return true;
   }
 }
