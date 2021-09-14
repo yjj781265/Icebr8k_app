@@ -4,6 +4,7 @@ import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_user_search_controller.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
@@ -89,6 +90,12 @@ class IbUserSearchPage extends StatelessWidget {
         return Padding(
             padding: const EdgeInsets.all(8.0),
             child: ListTile(
+              onTap: () => Get.to(
+                  () => ProfilePage(
+                        _controller.ibUser!.id,
+                        showAppBar: true,
+                      ),
+                  preventDuplicates: false),
               tileColor: IbColors.white,
               leading: IbUserAvatar(
                 avatarUrl: _controller.ibUser!.avatarUrl,

@@ -24,20 +24,25 @@ class IbUtils {
     return isOver13;
   }
 
-  static Future<File?> showImageCropper(String filePath) async {
+  static Future<File?> showImageCropper(String filePath,
+      {CropStyle cropStyle = CropStyle.circle,
+      List<CropAspectRatioPreset> ratios = const [],
+      CropAspectRatioPreset initAspectRatio = CropAspectRatioPreset.original,
+      bool lockAspectRatio = false,
+      double? minimumAspectRatio}) async {
     return ImageCropper.cropImage(
         sourcePath: filePath,
-        cropStyle: CropStyle.circle,
-        aspectRatioPresets: [],
-        androidUiSettings: const AndroidUiSettings(
-            toolbarTitle: 'Cropper',
-            toolbarColor: IbColors.primaryColor,
-            toolbarWidgetColor: Colors.white,
-            initAspectRatio: CropAspectRatioPreset.original,
-            lockAspectRatio: false),
-        iosUiSettings: const IOSUiSettings(
-          resetAspectRatioEnabled: false,
-          minimumAspectRatio: 1.0,
+        cropStyle: cropStyle,
+        aspectRatioPresets: ratios,
+        androidUiSettings: AndroidUiSettings(
+            statusBarColor: IbColors.lightBlue,
+            toolbarTitle: 'Image Cropper',
+            toolbarColor: IbColors.lightBlue,
+            initAspectRatio: initAspectRatio,
+            lockAspectRatio: lockAspectRatio),
+        iosUiSettings: IOSUiSettings(
+          minimumAspectRatio: minimumAspectRatio,
+          title: 'Image Cropper',
         ));
   }
 
@@ -87,6 +92,15 @@ class IbUtils {
       return '${diffDt.inDays ~/ 365} yr ago';
     }
     return '${diffDt.inDays} days ago';
+  }
+
+  static String getDistanceString(double distanceInKm,
+      {bool isMetric = false}) {
+    final double foot = 3.28084 * distanceInKm * 1000;
+    if (foot < 528) {
+      return '${foot.toPrecision(1)} ft';
+    }
+    return '${(foot / 5280).toPrecision(1)} mi';
   }
 
   /// Returns the difference (in full days) between the provided date and today.

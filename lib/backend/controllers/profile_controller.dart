@@ -28,9 +28,9 @@ class ProfileController extends GetxController {
   final totalAsked = 0.obs;
   final totalAnswered = 0.obs;
   final friendshipStatus = ''.obs;
-  late StreamSubscription totalAskedStream;
-  late StreamSubscription totalAnsweredStream;
-  late StreamSubscription friendStatusStream;
+  StreamSubscription? totalAskedStream;
+  StreamSubscription? totalAnsweredStream;
+  StreamSubscription? friendStatusStream;
   ProfileController(this.uid);
 
   @override
@@ -98,11 +98,16 @@ class ProfileController extends GetxController {
 
   @override
   void onClose() {
-    totalAskedStream.cancel();
+    if (totalAskedStream != null) {
+      totalAskedStream!.cancel();
+    }
 
-    totalAnsweredStream.cancel();
+    if (totalAnsweredStream != null) {
+      totalAnsweredStream!.cancel();
+    }
+
     if (friendStatusStream != null) {
-      friendStatusStream.cancel();
+      friendStatusStream!.cancel();
     }
 
     super.onClose();

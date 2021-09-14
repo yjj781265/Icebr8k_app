@@ -35,4 +35,17 @@ class IbLocalStorageService {
     list.remove(questionId);
     _box.write('unAnsweredIbQList', list);
   }
+
+  bool isLocSharingOn() {
+    final flag = _box.read('locationSharing');
+    if (flag == null) {
+      return false;
+    }
+    return flag as bool;
+  }
+
+  // ignore: avoid_positional_boolean_parameters
+  void updateLocSharingFlag(bool isOn) {
+    _box.write('locationSharing', isOn);
+  }
 }

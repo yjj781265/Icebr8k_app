@@ -18,7 +18,7 @@ import 'package:icebr8k/frontend/ib_pages/ib_user_search_page.dart';
 import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/question_tab.dart';
-import 'package:icebr8k/frontend/ib_pages/score_tab.dart';
+import 'package:icebr8k/frontend/ib_pages/social_tab.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_icon.dart';
@@ -158,7 +158,7 @@ class HomePage extends StatelessWidget {
     final List<Widget> pages = [
       QuestionTab(),
       ChatTab(),
-      const ScoreTab(),
+      const SocialTab(),
       ProfilePage(IbUtils.getCurrentUid()!),
     ];
     return Obx(

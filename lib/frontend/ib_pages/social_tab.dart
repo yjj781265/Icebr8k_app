@@ -4,9 +4,12 @@ import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_list_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_request_controller.dart';
+import 'package:icebr8k/backend/controllers/people_nearby_controller.dart';
+import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
@@ -15,14 +18,14 @@ import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-class ScoreTab extends StatefulWidget {
-  const ScoreTab({Key? key}) : super(key: key);
+class SocialTab extends StatefulWidget {
+  const SocialTab({Key? key}) : super(key: key);
 
   @override
-  _ScoreTabState createState() => _ScoreTabState();
+  _SocialTabState createState() => _SocialTabState();
 }
 
-class _ScoreTabState extends State<ScoreTab>
+class _SocialTabState extends State<SocialTab>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _friendListController = Get.find<FriendListController>();
@@ -31,7 +34,7 @@ class _ScoreTabState extends State<ScoreTab>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 2);
+    _tabController = TabController(vsync: this, length: 3);
   }
 
   @override
@@ -54,6 +57,9 @@ class _ScoreTabState extends State<ScoreTab>
                       '${'score_page_tab_2_title'.tr}${_friendRequestController.requests.isEmpty ? '' : '(${_friendRequestController.requests.length})'}',
                 ),
               ),
+              const Tab(
+                text: 'People Nearby',
+              )
             ],
             labelStyle: const TextStyle(fontWeight: FontWeight.bold),
             unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
@@ -64,9 +70,10 @@ class _ScoreTabState extends State<ScoreTab>
           Expanded(
               child: TabBarView(
             controller: _tabController,
-            children: const [
+            children: [
               MyFriendsTab(),
               FriendRequestTab(),
+              PeopleNearByTab(),
             ],
           ))
         ],
@@ -149,6 +156,12 @@ class FriendItemView extends StatelessWidget {
     return Material(
       color: IbColors.white,
       child: ListTile(
+        onTap: () => Get.to(
+            () => ProfilePage(
+                  friendListItem.uid,
+                  showAppBar: true,
+                ),
+            preventDuplicates: false),
         contentPadding: EdgeInsets.zero,
         tileColor: IbColors.white,
         leading: Padding(
@@ -179,6 +192,146 @@ class FriendItemView extends StatelessWidget {
       ),
     );
   }
+}
+
+class PeopleNearByTab extends StatefulWidget {
+  @override
+  _PeopleNearByTabState createState() => _PeopleNearByTabState();
+}
+
+class _PeopleNearByTabState extends State<PeopleNearByTab>
+    with AutomaticKeepAliveClientMixin {
+  final PeopleNearbyController _controller = Get.find();
+  final _refreshController = RefreshController();
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return NestedScrollView(
+      physics: const NeverScrollableScrollPhysics(),
+      headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+        return [
+          SliverToBoxAdapter(
+            child: Obx(
+              () => SwitchListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                value: _controller.shareLoc.value,
+                onChanged: (value) async {
+                  _controller.shareLoc.value = value;
+                  IbLocalStorageService().updateLocSharingFlag(value);
+                  if (value) {
+                    _controller.isSearching.value = true;
+                    await _controller.searchPeopleNearby();
+                  } else {
+                    _controller.isSearching.value = false;
+                    await _controller.removeMyLoc();
+                  }
+                },
+                title: const Padding(
+                  padding: EdgeInsets.only(left: 16.0),
+                  child: Text('Share my location'),
+                ),
+              ),
+            ),
+          ),
+        ];
+      },
+      body: Obx(() {
+        if (_controller.isGranted.isFalse || _controller.shareLoc.isFalse) {
+          return Center(
+              child: SizedBox(
+            height: 230,
+            width: 230,
+            child: Lottie.asset('assets/images/location.json'),
+          ));
+        }
+
+        if (_controller.isGranted.isTrue && _controller.isSearching.isTrue) {
+          return const Center(
+            child: IbProgressIndicator(),
+          );
+        }
+
+        return SmartRefresher(
+          controller: _refreshController,
+          onRefresh: () async {
+            await _controller.searchPeopleNearby();
+            _refreshController.refreshCompleted();
+          },
+          header: ClassicHeader(
+            height: 40,
+            idleText:
+                'Pull down to refresh\nLast update ${IbUtils.getAgoDateTimeString(_controller.lastRefreshTime.value)}',
+            refreshingText: 'Searching people nearby...',
+            releaseText: 'Release to search people nearby',
+            completeText: 'Search completed',
+            textStyle: const TextStyle(color: IbColors.primaryColor),
+            failedIcon: const Icon(
+              Icons.error_outline,
+              color: IbColors.errorRed,
+            ),
+            completeIcon: const Icon(
+              Icons.check_circle_outline,
+              color: IbColors.accentColor,
+            ),
+            refreshingIcon: const IbProgressIndicator(
+              width: 24,
+              height: 24,
+              padding: 0,
+            ),
+          ),
+          child: _controller.isGranted.isTrue &&
+                  _controller.isSearching.isFalse &&
+                  _controller.items.isEmpty
+              ? Center(
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: const [
+                      Icon(
+                        Icons.not_listed_location,
+                        size: 36,
+                        color: IbColors.errorRed,
+                      ),
+                      Text(
+                        'There is no people nearby',
+                        style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                      )
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  itemBuilder: (context, index) {
+                    final PeopleNearbyItem item = _controller.items[index];
+                    return Material(
+                      child: ListTile(
+                        onTap: () {
+                          Get.to(() => ProfilePage(
+                                item.ibUser.id,
+                                showAppBar: true,
+                              ));
+                        },
+                        tileColor: IbColors.white,
+                        leading: IbUserAvatar(
+                          uid: item.ibUser.id,
+                          avatarUrl: item.ibUser.avatarUrl,
+                        ),
+                        title: Text(item.ibUser.username),
+                        subtitle: IbLinearIndicator(
+                          endValue: item.compScore,
+                        ),
+                        trailing:
+                            Text(IbUtils.getDistanceString(item.distance)),
+                      ),
+                    );
+                  },
+                  itemCount: _controller.items.length,
+                ),
+        );
+      }),
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class FriendRequestTab extends StatefulWidget {

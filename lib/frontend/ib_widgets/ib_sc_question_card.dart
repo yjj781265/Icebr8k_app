@@ -246,8 +246,11 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
       }
 
       if (widget._controller.showResult.isTrue) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        return Wrap(
+          spacing: 5,
+          direction: Axis.vertical,
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             Row(
               children: [

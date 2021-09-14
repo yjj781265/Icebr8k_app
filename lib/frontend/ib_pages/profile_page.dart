@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,6 +26,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_stats.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -112,9 +115,8 @@ class _ProfilePageState extends State<ProfilePage>
                                     }
                                     showCoverPhotoBottomSheet();
                                   },
-                                  child: SizedBox(
-                                      height: 200,
-                                      width: double.infinity,
+                                  child: AspectRatio(
+                                      aspectRatio: 16 / 9,
                                       child: handleCoverPhoto()),
                                 ),
                               ),
@@ -321,7 +323,7 @@ class _ProfilePageState extends State<ProfilePage>
                 );
               },
               useOldImageOnUrlChange: true,
-              fit: BoxFit.fill,
+              fit: BoxFit.fitHeight,
               imageUrl: _homeController.currentIbCoverPhotoUrl.value,
             );
       return Stack(
@@ -346,7 +348,7 @@ class _ProfilePageState extends State<ProfilePage>
             fit: BoxFit.cover,
           )
         : CachedNetworkImage(
-            fit: BoxFit.fill,
+            fit: BoxFit.fitHeight,
             imageUrl: _profileController.coverPhotoUrl.value,
           );
   }
@@ -744,10 +746,22 @@ class _ProfilePageState extends State<ProfilePage>
             final _picker = ImagePicker();
             final XFile? pickedFile = await _picker.pickImage(
               source: ImageSource.camera,
-              imageQuality: 88,
+              imageQuality: 90,
             );
 
-            _profileController.updateCoverPhoto(pickedFile!.path);
+            if (pickedFile != null) {
+              final File? file = await IbUtils.showImageCropper(pickedFile.path,
+                  lockAspectRatio: true,
+                  minimumAspectRatio: 16 / 9,
+                  ratios: <CropAspectRatioPreset>[
+                    CropAspectRatioPreset.ratio16x9
+                  ],
+                  cropStyle: CropStyle.rectangle);
+
+              if (file != null) {
+                _profileController.updateCoverPhoto(file.path);
+              }
+            }
           },
           child: Ink(
             height: 56,
@@ -778,7 +792,17 @@ class _ProfilePageState extends State<ProfilePage>
             );
 
             if (pickedFile != null) {
-              _profileController.updateCoverPhoto(pickedFile.path);
+              final File? file = await IbUtils.showImageCropper(pickedFile.path,
+                  lockAspectRatio: true,
+                  minimumAspectRatio: 16 / 9,
+                  ratios: <CropAspectRatioPreset>[
+                    CropAspectRatioPreset.ratio16x9
+                  ],
+                  cropStyle: CropStyle.rectangle);
+
+              if (file != null) {
+                _profileController.updateCoverPhoto(file.path);
+              }
             }
           },
           child: Ink(

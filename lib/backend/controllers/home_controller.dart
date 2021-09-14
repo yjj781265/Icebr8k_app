@@ -20,7 +20,7 @@ class HomeController extends GetxController {
   final tabTitleList = [
     '${'question'.tr} 🤔',
     '${'chat'.tr} 💬',
-    ('social'.tr),
+    '${'social'.tr} 🤝',
     '${'profile'.tr} 👤'
   ];
 

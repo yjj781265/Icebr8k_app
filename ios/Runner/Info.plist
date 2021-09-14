@@ -66,5 +66,12 @@
     <string>Allow access to microphone</string>
     <!-- End of the Image Picker Section -->
 
+    <!-- Location Request Section -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>You location is required in order to see people nearby</string>
+    <key>UIBackgroundModes</key>
+    <string>location</string>
+    <!-- End of Location Request Section -->
+
 </dict>
 </plist>
