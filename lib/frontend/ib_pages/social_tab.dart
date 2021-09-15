@@ -30,6 +30,7 @@ class _SocialTabState extends State<SocialTab>
   late TabController _tabController;
   final _friendListController = Get.find<FriendListController>();
   final _friendRequestController = Get.find<FriendRequestController>();
+  final _peopleNearbyController = Get.find<PeopleNearbyController>();
 
   @override
   void initState() {
@@ -49,6 +50,12 @@ class _SocialTabState extends State<SocialTab>
             tabs: [
               Obx(
                 () => Tab(
+                  text:
+                      '${'score_page_tab_3_title'.tr}${_peopleNearbyController.items.isEmpty ? '' : '(${_peopleNearbyController.items.length})'}',
+                ),
+              ),
+              Obx(
+                () => Tab(
                     text:
                         '${'score_page_tab_1_title'.tr}${_friendListController.friendItems.isEmpty ? '' : '(${_friendListController.friendItems.length})'}'),
               ),
@@ -58,9 +65,6 @@ class _SocialTabState extends State<SocialTab>
                       '${'score_page_tab_2_title'.tr}${_friendRequestController.requests.isEmpty ? '' : '(${_friendRequestController.requests.length})'}',
                 ),
               ),
-              const Tab(
-                text: 'People Nearby',
-              )
             ],
             labelStyle: const TextStyle(fontWeight: FontWeight.bold),
             unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
@@ -72,9 +76,9 @@ class _SocialTabState extends State<SocialTab>
               child: TabBarView(
             controller: _tabController,
             children: [
-              MyFriendsTab(),
-              FriendRequestTab(),
               PeopleNearByTab(),
+              const MyFriendsTab(),
+              const FriendRequestTab(),
             ],
           ))
         ],
@@ -261,7 +265,7 @@ class _PeopleNearByTabState extends State<PeopleNearByTab>
           header: ClassicHeader(
             height: 40,
             idleText:
-                'Pull down to refresh\nLast update ${IbUtils.getAgoDateTimeString(_controller.lastRefreshTime.value)}',
+                'Pull down to refresh\nLast update ${IbUtils.readableDateTime(_controller.lastRefreshTime.value, showTime: true)}',
             refreshingText: 'Searching people nearby...',
             releaseText: 'Release to search people nearby',
             completeText: 'Search completed',

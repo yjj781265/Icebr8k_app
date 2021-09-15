@@ -27,6 +27,9 @@ class IbUtils {
   static Future<File?> showImageCropper(String filePath,
       {CropStyle cropStyle = CropStyle.circle,
       List<CropAspectRatioPreset> ratios = const [],
+      double? height,
+      double? width,
+      bool resetAspectRatioEnabled = true,
       CropAspectRatioPreset initAspectRatio = CropAspectRatioPreset.original,
       bool lockAspectRatio = false,
       double? minimumAspectRatio}) async {
@@ -41,6 +44,14 @@ class IbUtils {
             initAspectRatio: initAspectRatio,
             lockAspectRatio: lockAspectRatio),
         iosUiSettings: IOSUiSettings(
+          rectHeight: 900,
+          rectWidth: 1600,
+          rectX: 1600,
+          rectY: 900,
+          aspectRatioLockEnabled: true,
+          aspectRatioLockDimensionSwapEnabled: true,
+          resetAspectRatioEnabled: resetAspectRatioEnabled,
+          resetButtonHidden: !resetAspectRatioEnabled,
           minimumAspectRatio: minimumAspectRatio,
           title: 'Image Cropper',
         ));
@@ -50,7 +61,10 @@ class IbUtils {
     return const Uuid().v4();
   }
 
-  static String readableDateTime(DateTime _dateTime) {
+  static String readableDateTime(DateTime _dateTime, {bool showTime = false}) {
+    if (showTime) {
+      return '${DateFormat('hh:mm aa').format(_dateTime)} ${getSuffixDateTimeString(_dateTime)}';
+    }
     final f = DateFormat('MM/dd/yyyy');
     return f.format(_dateTime);
   }

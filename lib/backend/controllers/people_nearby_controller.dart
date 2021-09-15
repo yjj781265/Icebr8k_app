@@ -51,8 +51,8 @@ class PeopleNearbyController extends GetxController {
           IbLocationService().listenToPeopleNearbyChanges(currentLoc!);
 
       if (pplNearbyStream != null && locStream == null) {
-        locStream = pplNearbyStream.listen((list) {
-          handleGeoPointList(list);
+        locStream = pplNearbyStream.listen((list) async {
+          await handleGeoPointList(list);
         });
       }
       isSearching.value = false;

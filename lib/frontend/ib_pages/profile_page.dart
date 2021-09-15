@@ -321,6 +321,9 @@ class _ProfilePageState extends State<ProfilePage>
           : CachedNetworkImage(
               progressIndicatorBuilder: (context, value, progress) {
                 /// Todo keep eye on this one
+                if (progress.progress == null) {
+                  return const SizedBox();
+                }
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
@@ -329,7 +332,6 @@ class _ProfilePageState extends State<ProfilePage>
                   ],
                 );
               },
-              useOldImageOnUrlChange: true,
               fit: BoxFit.fitHeight,
               imageUrl: _homeController.currentIbCoverPhotoUrl.value,
             );
@@ -760,6 +762,10 @@ class _ProfilePageState extends State<ProfilePage>
               final File? file = await IbUtils.showImageCropper(pickedFile.path,
                   lockAspectRatio: true,
                   minimumAspectRatio: 16 / 9,
+                  resetAspectRatioEnabled: false,
+                  height: 9,
+                  width: 16,
+                  initAspectRatio: CropAspectRatioPreset.ratio16x9,
                   ratios: <CropAspectRatioPreset>[
                     CropAspectRatioPreset.ratio16x9
                   ],
@@ -802,6 +808,10 @@ class _ProfilePageState extends State<ProfilePage>
               final File? file = await IbUtils.showImageCropper(pickedFile.path,
                   lockAspectRatio: true,
                   minimumAspectRatio: 16 / 9,
+                  resetAspectRatioEnabled: false,
+                  height: 9,
+                  width: 16,
+                  initAspectRatio: CropAspectRatioPreset.ratio16x9,
                   ratios: <CropAspectRatioPreset>[
                     CropAspectRatioPreset.ratio16x9
                   ],

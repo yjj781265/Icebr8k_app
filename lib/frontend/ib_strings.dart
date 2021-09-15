@@ -103,6 +103,7 @@ class IbStrings extends Translations {
           'send_friend_request_success': 'Friend request sent',
           'score_page_tab_1_title': 'Friends',
           'score_page_tab_2_title': 'Friend Requests',
+          'score_page_tab_3_title': 'People Nearby',
           'friend_request_accepted': 'Friend request accepted',
           'friend_request_declined': 'Friend request declined',
           'show_result': 'Show result',
