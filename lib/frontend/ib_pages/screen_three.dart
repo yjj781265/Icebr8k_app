@@ -1,13 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/set_up_controller.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/home_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
@@ -22,17 +20,13 @@ class ScreenThree extends StatelessWidget {
       backgroundColor: IbColors.lightBlue,
       appBar: AppBar(
         backgroundColor: IbColors.lightBlue,
-        leading: IconButton(
-            onPressed: () {
-              _setUpController.liquidController.animateToPage(page: 1);
-            },
-            icon: const Icon(Icons.arrow_back_ios)),
         actions: [
           Obx(() {
-            if (_setUpController.answeredCounter.value == 8) {
+            if (_setUpController.answeredCounter.value ==
+                _setUpController.ibQuestions.length) {
               return IconButton(
                   onPressed: () {
-                    Get.offAll(() => HomePage(), binding: HomeBinding());
+                    _setUpController.handlePageTransition();
                   },
                   icon: const Icon(Icons.check));
             }
@@ -44,12 +38,14 @@ class ScreenThree extends StatelessWidget {
         child: NestedScrollView(
           headerSliverBuilder: (context, value) {
             return [
-              const SliverToBoxAdapter(
+              SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.only(left: 16, right: 24, bottom: 16),
+                  padding:
+                      const EdgeInsets.only(left: 16, right: 24, bottom: 16),
                   child: Text(
-                    'Finally, answer the following 8 questions to get your Icebr8k journey started',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    'Answer the following ${_setUpController.ibQuestions.length} questions to get your Icebr8k journey started',
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),

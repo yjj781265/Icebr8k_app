@@ -32,7 +32,7 @@ class IbStrings extends Translations {
           'date_picker_instruction': 'Please pick your birthdate',
           'field_is_empty': 'Field is empty',
           '6_characters_error': 'At least 6 characters',
-          '3_characters_error': 'At least 3 characters',
+          '3_characters_error': 'Username needs at least 3 characters',
           'password_match_error': 'Password does not match',
           'age_limit_msg': 'User needs to be at least age of 13',
           'loading': 'Loading...',

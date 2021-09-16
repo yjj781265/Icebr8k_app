@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/set_up_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:image_picker/image_picker.dart';
@@ -24,11 +23,13 @@ class ScreenTwo extends StatelessWidget {
       backgroundColor: IbColors.lightBlue,
       appBar: AppBar(
         backgroundColor: IbColors.lightBlue,
-        leading: IconButton(
-            onPressed: () {
-              _setUpController.liquidController.animateToPage(page: 0);
-            },
-            icon: const Icon(Icons.arrow_back_ios)),
+        actions: [
+          IconButton(
+              onPressed: () async {
+                await _setUpController.validateScreenTwo();
+              },
+              icon: const Icon(Icons.check))
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -111,13 +112,6 @@ class ScreenTwo extends StatelessWidget {
               const SizedBox(
                 height: 16,
               ),
-              IbActionButton(
-                  color: IbColors.accentColor,
-                  iconData: Icons.arrow_forward_outlined,
-                  onPressed: () async {
-                    await _setUpController.validateScreenTwo();
-                  },
-                  text: ''),
             ],
           ),
         ),

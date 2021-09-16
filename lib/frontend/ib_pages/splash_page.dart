@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
+import 'package:icebr8k/backend/controllers/set_up_controller.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/screen_one.dart';
+import 'package:icebr8k/frontend/ib_pages/screen_three.dart';
+import 'package:icebr8k/frontend/ib_pages/screen_two.dart';
 import 'package:icebr8k/frontend/ib_pages/set_up_page.dart';
 import 'package:icebr8k/frontend/ib_pages/sign_in_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
@@ -40,11 +44,33 @@ class SplashPage extends GetView<AuthController> {
 
   Future<void> navigateToCorrectPage() async {
     if (controller.firebaseUser != null) {
-      final bool isSetupNeeded = await IbUserDbService()
+      final List<Widget> pages = [];
+      final bool isUserNameMissing = await IbUserDbService()
           .isUsernameMissing(controller.firebaseUser!.uid);
-      if (isSetupNeeded) {
+      final bool isAvatarUrlMissing = await IbUserDbService()
+          .isAvatarUrlMissing(controller.firebaseUser!.uid);
+      final questions = await IbUserDbService()
+          .queryUnAnsweredFirst8Q(controller.firebaseUser!.uid);
+      final _controller = Get.put(SetUpController());
+      if (isUserNameMissing) {
+        pages.add(ScreenOne());
+      }
+
+      if (isAvatarUrlMissing) {
+        pages.add(ScreenTwo());
+      }
+
+      if (questions.isNotEmpty) {
+        _controller.ibQuestions.value = questions;
+        pages.add(ScreenThree());
+      }
+
+      if (pages.isNotEmpty) {
+        _controller.totalPageSize.value = pages.length;
         Get.offAll(
-          () => SetupPage(),
+          () => SetupPage(
+            pages: pages,
+          ),
           transition: Transition.fadeIn,
         );
       } else {

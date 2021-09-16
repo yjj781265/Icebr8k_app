@@ -45,28 +45,6 @@ class IbQuestionDbService {
     return list;
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> queryUserAnsweredQuestions({
-    required int limit,
-    required String uid,
-    DocumentSnapshot? lastDoc,
-  }) {
-    if (lastDoc == null) {
-      return _db
-          .collectionGroup('Answers')
-          .where('uid', isEqualTo: uid)
-          .orderBy('timeStampInMs', descending: true)
-          .limit(limit)
-          .get();
-    }
-    return _db
-        .collectionGroup('Answers')
-        .where('uid', isEqualTo: uid)
-        .startAfterDocument(lastDoc)
-        .orderBy('timeStampInMs', descending: true)
-        .limit(limit)
-        .get();
-  }
-
   /// query all question this uid asked
   Future<QuerySnapshot<Map<String, dynamic>>> queryAskedQuestions({
     int limit = -1,

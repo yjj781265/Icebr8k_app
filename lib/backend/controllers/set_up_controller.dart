@@ -31,12 +31,12 @@ class SetUpController extends GetxController {
   final nameErrorTrKey = ''.obs;
   final usernameErrorTrKey = ''.obs;
   final avatarFilePath = ''.obs;
-  final currentPage = 0.obs;
+  final currentPageIndex = 0.obs;
+  final totalPageSize = 0.obs;
 
   @override
   Future<void> onInit() async {
     Get.lazyPut(() => MyAnsweredQuestionsController());
-    ibQuestions.addAll(await IbQuestionDbService().queryIcebr8kQ());
     answeredQStream = IbQuestionDbService()
         .listenToAnsweredQuestionsChange(IbUtils.getCurrentUid()!)
         .listen((event) {
@@ -75,7 +75,7 @@ class SetUpController extends GetxController {
         Get.dialog(IbSimpleDialog(message: e.message!, positiveBtnTrKey: 'ok'));
       }
       Get.back();
-      liquidController.animateToPage(page: 2);
+      handlePageTransition();
     }
   }
 
@@ -100,6 +100,7 @@ class SetUpController extends GetxController {
       );
       return;
     }
+
     Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'),
         barrierDismissible: false);
     if (Get.find<AuthController>().firebaseUser != null) {
@@ -115,7 +116,7 @@ class SetUpController extends GetxController {
         Get.dialog(IbSimpleDialog(message: e.message!, positiveBtnTrKey: 'ok'));
       }
       Get.back();
-      liquidController.animateToPage(page: 1);
+      handlePageTransition();
     }
   }
 
@@ -198,6 +199,15 @@ class SetUpController extends GetxController {
             positiveBtnTrKey: 'ok'));
       }
     }
+  }
+
+  void handlePageTransition() {
+    if (totalPageSize.value == (currentPageIndex.value + 1)) {
+      Get.offAll(() => HomePage(), binding: HomeBinding());
+    } else {
+      liquidController.animateToPage(page: currentPageIndex.value + 1);
+    }
+    return;
   }
 
   @override

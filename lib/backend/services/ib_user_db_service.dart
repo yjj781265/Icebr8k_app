@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
+import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 class IbUserDbService {
@@ -59,10 +61,21 @@ class IbUserDbService {
         snapshot['username'] == null;
   }
 
-  Future<bool> isAvatarUrlMissing(String? uid) async {
+  Future<bool> isAvatarUrlMissing(String uid) async {
     final snapshot = await _collectionRef.doc(uid).get();
     print('isAvatarUrlMissing, user with avatarUrl ${snapshot['avatarUrl']}');
-    return snapshot['avatarUrl'] == '';
+    return !snapshot.exists ||
+        snapshot['avatarUrl'] == null ||
+        snapshot['avatarUrl'] == '';
+  }
+
+  Future<List<IbQuestion>> queryUnAnsweredFirst8Q(String uid) async {
+    final List<IbQuestion> questions =
+        await IbQuestionDbService().queryIcebr8kQ();
+    final List<String> questionIds =
+        await IbQuestionDbService().queryAnsweredQuestionIds(uid);
+    questions.removeWhere((element) => questionIds.contains(element.id));
+    return questions;
   }
 
   Future<void> updateAvatarUrl({required String url, required String uid}) {
@@ -71,18 +84,21 @@ class IbUserDbService {
 
   /// update username of current IbUser, it will convert to all lower case
   Future<void> updateUsername({required String username, required String uid}) {
-    return _collectionRef
-        .doc(uid)
-        .update({'username': username.trim().toLowerCase()});
+    return _collectionRef.doc(uid).set(
+        {'username': username.trim().toLowerCase()}, SetOptions(merge: true));
   }
 
   Future<void> updateName({required String name, required String uid}) {
-    return _collectionRef.doc(uid).update({'name': name.trim()});
+    return _collectionRef
+        .doc(uid)
+        .set({'name': name.trim()}, SetOptions(merge: true));
   }
 
   Future<void> updateCoverPhotoUrl(
       {required String photoUrl, required String uid}) {
-    return _collectionRef.doc(uid).update({'coverPhotoUrl': photoUrl});
+    return _collectionRef
+        .doc(uid)
+        .set({'coverPhotoUrl': photoUrl}, SetOptions(merge: true));
   }
 
   Stream<IbUser?> listenToIbUserChanges(String uid) {

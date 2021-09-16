@@ -263,7 +263,7 @@ class _PeopleNearByTabState extends State<PeopleNearByTab>
             _refreshController.refreshCompleted();
           },
           header: ClassicHeader(
-            height: 40,
+            height: 88,
             idleText:
                 'Pull down to refresh\nLast update ${IbUtils.readableDateTime(_controller.lastRefreshTime.value, showTime: true)}',
             refreshingText: 'Searching people nearby...',

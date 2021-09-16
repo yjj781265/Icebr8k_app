@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/set_up_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
 import 'package:lottie/lottie.dart';
 
@@ -20,6 +18,16 @@ class ScreenOne extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: IbColors.lightBlue,
+      appBar: AppBar(
+        backgroundColor: IbColors.lightBlue,
+        actions: [
+          IconButton(
+              onPressed: () async {
+                await _setUpController.validateScreenOne();
+              },
+              icon: const Icon(Icons.check)),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -66,22 +74,6 @@ class ScreenOne extends StatelessWidget {
                   _setUpController.name.value = name;
                 },
               ),
-              IbActionButton(
-                  color: IbColors.accentColor,
-                  iconData: Icons.arrow_forward_outlined,
-                  onPressed: () {
-                    _setUpController.validateScreenOne();
-                  },
-                  text: ''),
-              const SizedBox(
-                height: 36,
-              ),
-              TextButton(
-                onPressed: () async {
-                  await Get.find<AuthController>().signOut();
-                },
-                child: Text('sign_out'.tr),
-              )
             ],
           ),
         ),

@@ -48,11 +48,11 @@ class IbQuestionController extends GetxController {
     /// load cached question
     loadCachedQuestions();
 
-    ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
     if (ibQuestions.isNotEmpty) {
       ///cached unanswered question to local db
       IbLocalStorageService().updateUnAnsweredIbQList(ibQuestions);
     }
+    ibQuestions.shuffle();
     isLoading.value = false;
   }
 
@@ -81,7 +81,6 @@ class IbQuestionController extends GetxController {
         }
       }
     }
-    ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
   }
 
   bool containQuestionId(String id) {
@@ -94,11 +93,8 @@ class IbQuestionController extends GetxController {
   }
 
   Future<void> loadMoreQuestion() async {
-    if (!hasMore) {
-      return;
-    }
-
     print('IbQuestionController loadMoreQuestion');
+    ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
     final list = await IbQuestionDbService().queryIbQuestions(8,
         timestamp: ibQuestions.last.askedTimeInMs, isGreaterThan: false);
 
@@ -112,7 +108,7 @@ class IbQuestionController extends GetxController {
       IbLocalStorageService().appendUnAnsweredIbQidList(ibQuestion);
     }
 
-    ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
+    ibQuestions.shuffle();
   }
 
   Future<void> refreshEverything() async {
