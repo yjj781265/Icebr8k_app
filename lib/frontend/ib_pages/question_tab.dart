@@ -27,6 +27,11 @@ class QuestionTab extends StatelessWidget {
         );
       }
 
+      if (_ibQuestionController.isLoading.isFalse &&
+          _ibQuestionController.ibQuestions.isEmpty) {
+        return const Center(child: Text('You have answered all questions!'));
+      }
+
       return Container(
           color: IbColors.lightBlue,
           child: SmartRefresher(
@@ -76,12 +81,6 @@ class QuestionTab extends StatelessWidget {
             child: ListView.builder(
                 itemCount: _ibQuestionController.ibQuestions.length,
                 itemBuilder: (context, index) {
-                  if (_ibQuestionController.isLoading.isFalse &&
-                      _ibQuestionController.ibQuestions.isEmpty) {
-                    return const Center(
-                        child: Text('You have answered all questions!'));
-                  }
-
                   final _ibQuestion = _ibQuestionController.ibQuestions[index];
                   if (_ibQuestion.questionType == IbQuestion.kScale) {
                     return IbScQuestionCard(Get.put(
