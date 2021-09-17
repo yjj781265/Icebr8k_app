@@ -47,7 +47,7 @@ class IbSimpleDialog extends StatelessWidget {
                         onPressed: () {
                           Get.back();
                           if (positiveBtnEvent != null) {
-                            positiveBtnEvent!();
+                            positiveBtnEvent?.call();
                           }
                         },
                         child: Text(positiveBtnTrKey.tr),

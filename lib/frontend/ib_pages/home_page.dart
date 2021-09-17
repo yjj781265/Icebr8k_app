@@ -105,7 +105,6 @@ class HomePage extends StatelessWidget {
                 elevation: 0,
                 titleSpacing: 0,
                 backgroundColor: IbColors.lightBlue,
-                brightness: Brightness.light,
                 automaticallyImplyLeading: false,
                 actions: _actionsList[_homeController.currentIndex.value],
                 leading: IconButton(
@@ -170,7 +169,7 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildBottomBar() {
-    final _inactiveColor = IbColors.lightGrey;
+    const _inactiveColor = IbColors.lightGrey;
     return Obx(
       () => IbAnimatedBottomBar(
         backgroundColor: IbColors.white,

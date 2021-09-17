@@ -125,8 +125,7 @@ class IbUserSearchPage extends StatelessWidget {
         children: [
           Text(
             'friend_request_dialog_title'
-                    .trParams({'username': _controller.username.value}) ??
-                '',
+                .trParams({'username': _controller.username.value}),
             style: const TextStyle(
                 fontSize: IbConfig.kNormalTextSize,
                 fontWeight: FontWeight.bold),

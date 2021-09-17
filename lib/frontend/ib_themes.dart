@@ -6,6 +6,7 @@ import 'ib_config.dart';
 class IbThemes {
   static final ThemeData lightTheme = ThemeData(
       brightness: Brightness.light,
+      toggleableActiveColor: IbColors.accentColor,
       backgroundColor: IbColors.lightBlue,
       primaryColor: IbColors.primaryColor,
       primaryColorDark: IbColors.darkPrimaryColor,
@@ -14,10 +15,12 @@ class IbThemes {
         elevation: 0,
         titleSpacing: 0,
         titleTextStyle: TextStyle(
-            fontSize: IbConfig.kPageTitleSize, fontWeight: FontWeight.bold),
+            color: Colors.black,
+            fontSize: IbConfig.kPageTitleSize,
+            fontWeight: FontWeight.bold),
       ),
-      primarySwatch: Colors.lightBlue,
-      accentColor: IbColors.accentColor);
+      colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.lightBlue)
+          .copyWith(secondary: IbColors.accentColor));
 
   static final ThemeData darkTheme = ThemeData(
       brightness: Brightness.dark,
@@ -25,8 +28,8 @@ class IbThemes {
       primaryColor: IbColors.primaryColor,
       primaryColorDark: IbColors.darkPrimaryColor,
       fontFamily: 'OpenSans',
-      primarySwatch: Colors.lightBlue,
-      accentColor: IbColors.accentColor);
+      colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.lightBlue)
+          .copyWith(secondary: IbColors.accentColor));
 
   IbThemes._();
 }

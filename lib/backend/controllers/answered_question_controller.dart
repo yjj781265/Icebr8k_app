@@ -60,8 +60,10 @@ class AnsweredQuestionController extends GetxController {
       }
 
       isLoading.value = false;
-      myAnsweredQuestions.sort((a, b) =>
-          b.ibAnswer.answeredTimeInMs.compareTo(a.ibAnswer.answeredTimeInMs));
+      myAnsweredQuestions.sort(
+        (a, b) =>
+            b.ibAnswer.answeredTimeInMs.compareTo(a.ibAnswer.answeredTimeInMs),
+      );
     });
     super.onInit();
   }
@@ -84,8 +86,10 @@ class AnsweredQuestionController extends GetxController {
             AnsweredQuestionItem(ibQuestion: ibQuestion, ibAnswer: ibAnswer);
         myAnsweredQuestions.addIf(!myAnsweredQuestions.contains(item), item);
       }
-      myAnsweredQuestions.sort((a, b) =>
-          b.ibAnswer.answeredTimeInMs.compareTo(a.ibAnswer.answeredTimeInMs));
+      myAnsweredQuestions.sort(
+        (a, b) =>
+            b.ibAnswer.answeredTimeInMs.compareTo(a.ibAnswer.answeredTimeInMs),
+      );
     } else {
       lastDoc = null;
     }

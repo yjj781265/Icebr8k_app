@@ -52,8 +52,10 @@ class AuthController extends GetxService {
   }
 
   Future signInViaEmail(String email, String password) async {
-    Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_in'),
-        barrierDismissible: false);
+    Get.dialog(
+      const IbLoadingDialog(messageTrKey: 'signing_in'),
+      barrierDismissible: false,
+    );
     try {
       isSigningIn.value = true;
       final UserCredential userCredential =
@@ -63,33 +65,41 @@ class AuthController extends GetxService {
       if (user != null && !user.emailVerified) {
         Get.back();
         Get.dialog(
-            IbSimpleDialog(
-              message: 'sign_in_email_verification'.tr,
-              positiveBtnTrKey: 'ok',
-              positiveBtnEvent: () {
-                _ibAuthService.signOut();
-              },
-              actionButtons: [
-                TextButton(
-                    onPressed: () async {
-                      try {
-                        await user.sendEmailVerification();
-                        _ibAuthService.signOut();
-                        Get.back();
-                        Get.dialog(IbSimpleDialog(
-                          message: 'verification_email_sent'.tr,
-                          positiveBtnTrKey: 'ok',
-                        ));
-                      } on FirebaseException catch (e) {
-                        Get.back();
-                        Get.dialog(IbSimpleDialog(
-                            message: e.message!, positiveBtnTrKey: 'ok'));
-                      }
-                    },
-                    child: Text('resend_verification_email'.tr))
-              ],
-            ),
-            barrierDismissible: false);
+          IbSimpleDialog(
+            message: 'sign_in_email_verification'.tr,
+            positiveBtnTrKey: 'ok',
+            positiveBtnEvent: () {
+              _ibAuthService.signOut();
+            },
+            actionButtons: [
+              TextButton(
+                onPressed: () async {
+                  try {
+                    await user.sendEmailVerification();
+                    _ibAuthService.signOut();
+                    Get.back();
+                    Get.dialog(
+                      IbSimpleDialog(
+                        message: 'verification_email_sent'.tr,
+                        positiveBtnTrKey: 'ok',
+                      ),
+                    );
+                  } on FirebaseException catch (e) {
+                    Get.back();
+                    Get.dialog(
+                      IbSimpleDialog(
+                        message: e.message!,
+                        positiveBtnTrKey: 'ok',
+                      ),
+                    );
+                  }
+                },
+                child: Text('resend_verification_email'.tr),
+              )
+            ],
+          ),
+          barrierDismissible: false,
+        );
       } else if (user != null && user.emailVerified) {
         final isIbUserExist = await IbUserDbService().isIbUserExist(user.uid);
         if (isIbUserExist) {
@@ -265,12 +275,13 @@ class AuthController extends GetxService {
     try {
       await _ibAuthService.resetPassword(email);
       Get.back();
-      final String msg = 'reset_email_msg'.trParams({'email': email}) ?? '';
+      final String msg = 'reset_email_msg'.trParams({'email': email});
       Get.dialog(IbSimpleDialog(message: msg, positiveBtnTrKey: 'ok'));
     } on FirebaseAuthException catch (e) {
       Get.back();
-      Get.dialog(IbSimpleDialog(
-          message: e.message ?? 'error', positiveBtnTrKey: 'ok'));
+      Get.dialog(
+        IbSimpleDialog(message: e.message ?? 'error', positiveBtnTrKey: 'ok'),
+      );
     }
   }
 

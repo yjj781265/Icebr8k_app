@@ -413,7 +413,7 @@ class _ProfilePageState extends State<ProfilePage>
                         disableAvatarOnTouch:
                             item.ibQuestion.creatorId == widget.uid,
                         isExpandable: true),
-                    tag: tag.toString());
+                    tag: tag);
               }
 
               _controller.isExpanded.value = index == 0;
@@ -478,7 +478,7 @@ class _ProfilePageState extends State<ProfilePage>
                         disableChoiceOnTouch: true,
                         showActionButtons: false,
                         disableAvatarOnTouch: item.creatorId == widget.uid),
-                    tag: tag.toString());
+                    tag: tag);
               }
               _controller.isExpanded.value = false;
 
@@ -539,7 +539,7 @@ class _ProfilePageState extends State<ProfilePage>
                         ibQuestion: item,
                         isExpandable: true,
                         disableAvatarOnTouch: item.creatorId == widget.uid),
-                    tag: tag.toString());
+                    tag: tag);
               }
 
               if (item.questionType == IbQuestion.kMultipleChoice) {
@@ -601,7 +601,7 @@ class _ProfilePageState extends State<ProfilePage>
                         ibQuestion: item,
                         isExpandable: true,
                         disableAvatarOnTouch: item.creatorId == widget.uid),
-                    tag: tag.toString());
+                    tag: tag);
               }
 
               if (item.questionType == IbQuestion.kMultipleChoice) {
@@ -676,8 +676,8 @@ class _ProfilePageState extends State<ProfilePage>
         children: [
           Text(
             'friend_request_dialog_title'.trParams(
-                    {'username': _profileController.username.value}) ??
-                '',
+              {'username': _profileController.username.value},
+            ),
             style: const TextStyle(
                 fontSize: IbConfig.kNormalTextSize,
                 fontWeight: FontWeight.bold),

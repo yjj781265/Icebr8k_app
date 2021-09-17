@@ -138,8 +138,8 @@ class ChatTabItem {
       tempArr.addAll(memberUids);
       tempArr.remove(IbUtils.getCurrentUid());
       ibUser = controller.ibUserMap[tempArr.first];
-      title = controller.ibUserMap[tempArr.first]!.username.toString();
-      avatarUrl = controller.ibUserMap[tempArr.first]!.avatarUrl.toString();
+      title = controller.ibUserMap[tempArr.first]!.username;
+      avatarUrl = controller.ibUserMap[tempArr.first]!.avatarUrl;
     } else {
       // handle group chat info here
     }
