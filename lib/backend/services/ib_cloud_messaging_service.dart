@@ -8,7 +8,7 @@ class IbCloudMessagingService extends GetConnect {
 
   factory IbCloudMessagingService() => _ibCloudMessagingService;
 
-  IbCloudMessagingService._() {}
+  IbCloudMessagingService._();
 
   Future init() async {
     final NotificationSettings settings = await _fcm.requestPermission();
