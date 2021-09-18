@@ -167,14 +167,10 @@ class FriendItemView extends StatelessWidget {
                   showAppBar: true,
                 ),
             preventDuplicates: false),
-        contentPadding: EdgeInsets.zero,
         tileColor: IbColors.white,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: IbUserAvatar(
-            uid: friendListItem.uid,
-            avatarUrl: friendListItem.avatarUrl,
-          ),
+        leading: IbUserAvatar(
+          uid: friendListItem.uid,
+          avatarUrl: friendListItem.avatarUrl,
         ),
         title: Text(
           friendListItem.username,
@@ -398,11 +394,9 @@ class _FriendRequestTabState extends State<FriendRequestTab>
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: IbUserAvatar(
-                  avatarUrl: item.avatarUrl,
-                  uid: item.friendUid,
-                ),
+              IbUserAvatar(
+                avatarUrl: item.avatarUrl,
+                uid: item.friendUid,
               ),
               Expanded(
                 flex: 5,

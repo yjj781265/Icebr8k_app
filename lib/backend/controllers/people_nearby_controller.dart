@@ -55,7 +55,6 @@ class PeopleNearbyController extends GetxController {
           await handleGeoPointList(list);
         });
       }
-      isSearching.value = false;
     }
   }
 
@@ -109,6 +108,7 @@ class PeopleNearbyController extends GetxController {
     items.removeWhere((element) => !tempList.contains(element));
     items.value = items.toSet().toList();
     items.sort((a, b) => b.compScore.compareTo(a.compScore));
+    isSearching.value = false;
   }
 
   double calculateDistance(double lat, double lng) {
