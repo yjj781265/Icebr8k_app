@@ -232,7 +232,7 @@ class IbUtils {
   static Future<double> getCompScore(String uid) async {
     final List<IbAnswer> uid1QuestionAnswers = [];
     uid1QuestionAnswers
-        .addAll(Get.find<MyAnsweredQuestionsController>().ibAnswers);
+        .addAll(Get.put(MyAnsweredQuestionsController()).ibAnswers);
     final List<IbAnswer> uid2QuestionAnswers =
         await IbQuestionDbService().queryUserAnswers(uid);
 
@@ -272,7 +272,7 @@ class IbUtils {
     /// query each user answered questions then intersect
     final List<IbAnswer> uid1QuestionAnswers = [];
     uid1QuestionAnswers
-        .addAll(Get.find<MyAnsweredQuestionsController>().ibAnswers);
+        .addAll(Get.put(MyAnsweredQuestionsController()).ibAnswers);
     final List<IbAnswer> uid2QuestionAnswers =
         await IbQuestionDbService().queryUserAnswers(uid);
 
@@ -286,7 +286,7 @@ class IbUtils {
     /// query each user answered questions then find the difference
     final List<IbAnswer> uid1QuestionAnswers = [];
     uid1QuestionAnswers
-        .addAll(Get.find<MyAnsweredQuestionsController>().ibAnswers);
+        .addAll(Get.put(MyAnsweredQuestionsController()).ibAnswers);
     final List<IbAnswer> uid2QuestionAnswers =
         await IbQuestionDbService().queryUserAnswers(uid);
 
