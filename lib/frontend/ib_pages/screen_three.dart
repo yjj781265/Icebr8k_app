@@ -16,7 +16,6 @@ class ScreenThree extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('ScreenThree ${_setUpController.hashCode}');
     return Scaffold(
       backgroundColor: IbColors.lightBlue,
       appBar: AppBar(

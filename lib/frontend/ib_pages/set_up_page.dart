@@ -36,19 +36,17 @@ class SetupPage extends StatelessWidget {
                 }
                 return true;
               },
-              child: Obx(
-                () => LiquidSwipe(
-                  onPageChangeCallback: (index) {
-                    setUpController.currentPageIndex.value = index;
-                  },
-                  liquidController: setUpController.liquidController,
-                  fullTransitionValue:
-                      IbConfig.kEventTriggerDelayInMillis.toDouble(),
-                  disableUserGesture: true,
-                  ignoreUserGestureWhileAnimating: true,
-                  enableLoop: false,
-                  pages: setUpController.pages,
-                ),
+              child: LiquidSwipe(
+                onPageChangeCallback: (index) {
+                  setUpController.currentPageIndex.value = index;
+                },
+                liquidController: setUpController.liquidController,
+                fullTransitionValue:
+                    IbConfig.kEventTriggerDelayInMillis.toDouble(),
+                disableUserGesture: true,
+                ignoreUserGestureWhileAnimating: true,
+                enableLoop: false,
+                pages: setUpController.pages,
               ),
             );
           }

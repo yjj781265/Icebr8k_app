@@ -19,6 +19,7 @@ class MyAnsweredQuestionsController extends GetxController {
         .listen((event) {
       print(
           "MyAnsweredQuestionsController total answered questions : ${event.size}");
+
       for (final docChange in event.docChanges) {
         final IbAnswer ibAnswer = IbAnswer.fromJson(docChange.doc.data()!);
         if (docChange.type == DocumentChangeType.added) {
