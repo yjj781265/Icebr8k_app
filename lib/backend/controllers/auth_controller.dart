@@ -4,17 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
-import 'package:icebr8k/backend/controllers/my_answered_quetions_controller.dart';
-import 'package:icebr8k/backend/controllers/set_up_controller.dart';
 import 'package:icebr8k/backend/controllers/sign_in_controller.dart';
 import 'package:icebr8k/backend/controllers/sign_up_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_auth_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/home_page.dart';
-import 'package:icebr8k/frontend/ib_pages/screen_one.dart';
-import 'package:icebr8k/frontend/ib_pages/screen_three.dart';
-import 'package:icebr8k/frontend/ib_pages/screen_two.dart';
 import 'package:icebr8k/frontend/ib_pages/set_up_page.dart';
 import 'package:icebr8k/frontend/ib_pages/sign_in_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
@@ -23,7 +18,6 @@ import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
 class AuthController extends GetxService {
   late StreamSubscription _fbAuthSub;
   final isSigningIn = false.obs;
-  final isSigningInViaThirdParty = false.obs;
   final isSigningUp = false.obs;
   User? firebaseUser;
   IbUser? ibUser;
@@ -35,6 +29,7 @@ class AuthController extends GetxService {
     _fbAuthSub = _ibAuthService.listenToAuthStateChanges().listen((user) async {
       if (user == null) {
         firebaseUser = null;
+        ibUser = null;
         print('User is signed out!');
       } else {
         firebaseUser = user;
@@ -107,9 +102,9 @@ class AuthController extends GetxService {
             uid: user.uid,
             loginTimeInMs: DateTime.now().millisecondsSinceEpoch,
           );
+
           _handleUserFirstLogin(user.uid);
         } else {
-          Get.back();
           _handleUserFirstLogin(user.uid);
         }
       }
@@ -226,39 +221,21 @@ class AuthController extends GetxService {
           loginTimeInMs: DateTime.now().millisecondsSinceEpoch,
         ));
       }
-      Get.back();
-
       await _handleUserFirstLogin(user.uid);
     }
   }
 
   Future<void> _handleUserFirstLogin(String uid) async {
-    final List<Widget> pages = [];
     final bool isUserNameMissing =
         await IbUserDbService().isUsernameMissing(uid);
     final bool isAvatarUrlMissing =
         await IbUserDbService().isAvatarUrlMissing(uid);
     final questions = await IbUserDbService().queryUnAnsweredFirst8Q(uid);
-    final _controller = Get.put(SetUpController());
-    if (isUserNameMissing) {
-      pages.add(ScreenOne());
-    }
 
-    if (isAvatarUrlMissing) {
-      pages.add(ScreenTwo());
-    }
-
-    if (questions.isNotEmpty) {
-      _controller.ibQuestions.value = questions;
-      pages.add(ScreenThree());
-    }
-
-    if (pages.isNotEmpty) {
-      _controller.totalPageSize.value = pages.length;
+    Get.back();
+    if (questions.isNotEmpty || isUserNameMissing || isAvatarUrlMissing) {
       Get.offAll(
-        () => SetupPage(
-          pages: pages,
-        ),
+        () => SetupPage(),
         transition: Transition.fadeIn,
       );
     } else {
@@ -287,7 +264,6 @@ class AuthController extends GetxService {
 
   Future<void> signOut() async {
     Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_out'));
-    await Get.delete<MyAnsweredQuestionsController>();
     if (firebaseUser != null) {
       await IbUserDbService().signOutIbUser(firebaseUser!.uid);
     }

@@ -161,4 +161,18 @@ class IbQuestionItemController extends GetxController {
         msg: 'Question submitted successfully',
         backgroundColor: IbColors.accentColor);
   }
+
+  Future<void> eraseAnswer() async {
+    try {
+      if (showResult.isTrue &&
+          ibAnswer != null &&
+          isExpandable &&
+          ibAnswer!.uid == IbUtils.getCurrentUid()!) {
+        await IbQuestionDbService().eraseSingleAnsweredQuestions(
+            IbUtils.getCurrentUid()!, ibAnswer!.questionId);
+      }
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
 }

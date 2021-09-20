@@ -5,12 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/chat_tab_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_request_controller.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_controller.dart';
-import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_page.dart';
 import 'package:icebr8k/frontend/ib_pages/edit_profile_page.dart';
@@ -53,8 +51,8 @@ class HomePage extends StatelessWidget {
       [
         GestureDetector(
           onLongPress: () {
-            IbQuestionDbService().eraseAllAnsweredQuestions(
-                Get.find<AuthController>().firebaseUser!.uid);
+            /* IbQuestionDbService().eraseAllAnsweredQuestions(
+                Get.find<AuthController>().firebaseUser!.uid);*/
           },
           child: IconButton(
             icon: const Icon(Icons.refresh_outlined),

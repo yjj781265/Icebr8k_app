@@ -2,7 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
-import 'package:icebr8k/backend/controllers/my_answered_quetions_controller.dart';
+import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
@@ -71,154 +71,167 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
         Center(child: _handleButtons()),
       ],
     );
-    return Obx(
-      () => Center(
-        child: widget._controller.isLoading.isTrue
-            ? const IbProgressIndicator()
-            : PageFlipBuilder(
-                interactiveFlipEnabled: false,
-                key: cardKey,
-                frontBuilder: (_) => IbCard(
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      top: 16,
-                      bottom: 8,
-                    ),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+    return InkWell(
+      onLongPress: () async {
+        await widget._controller.eraseAnswer();
+      },
+      child: Ink(
+        child: Obx(
+          () => Center(
+            child: widget._controller.isLoading.isTrue
+                ? const IbProgressIndicator()
+                : PageFlipBuilder(
+                    interactiveFlipEnabled: false,
+                    key: cardKey,
+                    frontBuilder: (_) => IbCard(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                          top: 16,
+                          bottom: 8,
+                        ),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _handleAvatarImage(),
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              Row(
                                 children: [
-                                  Obx(
-                                    () => SizedBox(
-                                      width: 200,
-                                      child: Text(
-                                        widget._controller.title.value,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
+                                  _handleAvatarImage(),
+                                  const SizedBox(
+                                    width: 8,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Obx(
+                                        () => SizedBox(
+                                          width: 200,
+                                          child: Text(
+                                            widget._controller.title.value,
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            style: const TextStyle(
+                                                fontSize:
+                                                    IbConfig.kSecondaryTextSize,
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        IbUtils.getAgoDateTimeString(
+                                            DateTime.fromMillisecondsSinceEpoch(
+                                                widget._controller.ibQuestion
+                                                    .askedTimeInMs)),
                                         style: const TextStyle(
                                             fontSize:
-                                                IbConfig.kSecondaryTextSize,
-                                            fontWeight: FontWeight.w700),
-                                      ),
-                                    ),
+                                                IbConfig.kDescriptionTextSize,
+                                            color: IbColors.lightGrey),
+                                      )
+                                    ],
                                   ),
-                                  Text(
-                                    IbUtils.getAgoDateTimeString(
-                                        DateTime.fromMillisecondsSinceEpoch(
-                                            widget._controller.ibQuestion
-                                                .askedTimeInMs)),
-                                    style: const TextStyle(
-                                        fontSize: IbConfig.kDescriptionTextSize,
-                                        color: IbColors.lightGrey),
-                                  )
                                 ],
                               ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Text(
-                            widget._controller.ibQuestion.question,
-                            style: const TextStyle(
-                                fontSize: IbConfig.kPageTitleSize,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          if (widget._controller.ibQuestion.description
-                              .trim()
-                              .isNotEmpty)
-                            Text(
-                              widget._controller.ibQuestion.description,
-                              style: const TextStyle(
-                                  fontSize: IbConfig.kDescriptionTextSize,
-                                  color: Colors.black),
-                            ),
-                          const SizedBox(
-                            height: 16,
-                          ),
-                          if (widget._controller.isExpandable)
-                            SizeTransition(
-                              sizeFactor: animation,
-                              child: expandableInfo,
-                            )
-                          else
-                            widget._controller.isExpanded.isTrue
-                                ? expandableInfo
-                                : const SizedBox(),
-
-                          /// show current user answer is available
-                          if (Get.find<MyAnsweredQuestionsController>()
-                                      .retrieveAnswer(
-                                          widget._controller.ibQuestion.id) !=
-                                  null &&
-                              widget._controller.showMyAnswer)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: Row(
-                                children: [
-                                  IbUserAvatar(
-                                    avatarUrl:
-                                        IbUtils.getCurrentIbUser()!.avatarUrl,
-                                    radius: 8,
-                                  ),
-                                  Text(
-                                      ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.ibQuestion.id)!.answer}')
-                                ],
+                              const SizedBox(
+                                height: 8,
                               ),
-                            ),
-                          Obx(() {
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
+                              Text(
+                                widget._controller.ibQuestion.question,
+                                style: const TextStyle(
+                                    fontSize: IbConfig.kPageTitleSize,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              if (widget._controller.ibQuestion.description
+                                  .trim()
+                                  .isNotEmpty)
                                 Text(
-                                  '${widget._controller.totalPolled.value} polled',
+                                  widget._controller.ibQuestion.description,
                                   style: const TextStyle(
                                       fontSize: IbConfig.kDescriptionTextSize,
-                                      color: IbColors.lightGrey),
+                                      color: Colors.black),
                                 ),
-                                if (widget._controller.isExpandable)
-                                  IconButton(
-                                    padding: EdgeInsets.zero,
-                                    onPressed: () {
-                                      widget._controller.isExpanded.value =
-                                          !widget._controller.isExpanded.value;
+                              const SizedBox(
+                                height: 16,
+                              ),
+                              if (widget._controller.isExpandable)
+                                SizeTransition(
+                                  sizeFactor: animation,
+                                  child: expandableInfo,
+                                )
+                              else
+                                widget._controller.isExpanded.isTrue
+                                    ? expandableInfo
+                                    : const SizedBox(),
 
-                                      _runExpandCheck();
-                                    },
-                                    icon: widget._controller.isExpanded.isTrue
-                                        ? const Icon(
-                                            Icons.expand_less_outlined,
-                                            color: IbColors.primaryColor,
-                                          )
-                                        : const Icon(
-                                            Icons.expand_more_outlined,
-                                            color: IbColors.primaryColor,
-                                          ),
-                                  )
-                              ],
-                            );
-                          }),
-                        ],
+                              /// show current user answer is available
+                              if (Get.find<MyAnsweredQuestionsController>()
+                                          .retrieveAnswer(widget
+                                              ._controller.ibQuestion.id) !=
+                                      null &&
+                                  widget._controller.showMyAnswer)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: Row(
+                                    children: [
+                                      IbUserAvatar(
+                                        avatarUrl: IbUtils.getCurrentIbUser()!
+                                            .avatarUrl,
+                                        radius: 8,
+                                      ),
+                                      Text(
+                                          ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.ibQuestion.id)!.answer}')
+                                    ],
+                                  ),
+                                ),
+                              Obx(() {
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      '${widget._controller.totalPolled.value} polled',
+                                      style: const TextStyle(
+                                          fontSize:
+                                              IbConfig.kDescriptionTextSize,
+                                          color: IbColors.lightGrey),
+                                    ),
+                                    if (widget._controller.isExpandable)
+                                      IconButton(
+                                        padding: EdgeInsets.zero,
+                                        onPressed: () {
+                                          widget._controller.isExpanded.value =
+                                              !widget
+                                                  ._controller.isExpanded.value;
+
+                                          _runExpandCheck();
+                                        },
+                                        icon: widget
+                                                ._controller.isExpanded.isTrue
+                                            ? const Icon(
+                                                Icons.expand_less_outlined,
+                                                color: IbColors.primaryColor,
+                                              )
+                                            : const Icon(
+                                                Icons.expand_more_outlined,
+                                                color: IbColors.primaryColor,
+                                              ),
+                                      )
+                                  ],
+                                );
+                              }),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
+                    backBuilder: (BuildContext context) {
+                      return _cardBackSide();
+                    },
                   ),
-                ),
-                backBuilder: (BuildContext context) {
-                  return _cardBackSide();
-                },
-              ),
+          ),
+        ),
       ),
     );
   }

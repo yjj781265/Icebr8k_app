@@ -6,25 +6,26 @@ import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
-class MyAnsweredQuestionsController extends GetxService {
+class MyAnsweredQuestionsController extends GetxController {
   late StreamSubscription myAnsweredQStream;
   List<IbAnswer> ibAnswers = <IbAnswer>[];
 
   @override
   void onInit() {
+    print("MyAnsweredQuestionsController init");
     super.onInit();
     myAnsweredQStream = IbQuestionDbService()
         .listenToAnsweredQuestionsChange(IbUtils.getCurrentUid()!)
         .listen((event) {
+      print(
+          "MyAnsweredQuestionsController total answered questions : ${event.size}");
       for (final docChange in event.docChanges) {
         final IbAnswer ibAnswer = IbAnswer.fromJson(docChange.doc.data()!);
         if (docChange.type == DocumentChangeType.added) {
-          print('MyAnsweredQuestionsController added');
           ibAnswers.addIf(!ibAnswers.contains(ibAnswer), ibAnswer);
         } else if (docChange.type == DocumentChangeType.removed) {
           final int index = ibAnswers.indexOf(ibAnswer);
           if (index != -1) {
-            print('MyAnsweredQuestionsController removed');
             ibAnswers.removeAt(index);
           }
         }
@@ -43,6 +44,7 @@ class MyAnsweredQuestionsController extends GetxService {
 
   @override
   void onClose() {
+    print("MyAnsweredQuestionsController onClose");
     myAnsweredQStream.cancel();
     super.onClose();
   }

@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
-import 'package:icebr8k/backend/controllers/my_answered_quetions_controller.dart';
+import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
@@ -219,9 +219,10 @@ class IbUtils {
 
   static void showSimpleSnackBar(
       {required String msg, required Color backgroundColor}) {
+    hideKeyboard();
     Get.showSnackbar(GetBar(
       borderRadius: IbConfig.kCardCornerRadius,
-      margin: const EdgeInsets.all(8),
+      margin: const EdgeInsets.only(left: 8, right: 8, bottom: 64),
       duration: const Duration(seconds: 3),
       backgroundColor: backgroundColor,
       messageText: Text(msg),

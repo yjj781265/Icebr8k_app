@@ -16,6 +16,7 @@ class ScreenThree extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('ScreenThree ${_setUpController.hashCode}');
     return Scaffold(
       backgroundColor: IbColors.lightBlue,
       appBar: AppBar(
@@ -42,10 +43,12 @@ class ScreenThree extends StatelessWidget {
                 child: Padding(
                   padding:
                       const EdgeInsets.only(left: 16, right: 24, bottom: 16),
-                  child: Text(
-                    'Answer the following ${_setUpController.ibQuestions.length} questions to get your Icebr8k journey started',
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
+                  child: Obx(
+                    () => Text(
+                      'Answer the following ${_setUpController.ibQuestions.length} questions to get your Icebr8k journey started',
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ),
@@ -67,8 +70,10 @@ class ScreenThree extends StatelessWidget {
                             child: Obx(
                               () => LinearProgressIndicator(
                                 color: IbColors.accentColor,
-                                value: _setUpController.answeredCounter.value /
-                                    _setUpController.ibQuestions.length,
+                                value: _setUpController.ibQuestions.isEmpty
+                                    ? 0
+                                    : _setUpController.answeredCounter.value /
+                                        _setUpController.ibQuestions.length,
                                 backgroundColor: IbColors.lightGrey,
                                 minHeight: 8,
                               ),

@@ -34,7 +34,7 @@ class ScreenOne extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Padding(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Text(
                   'slogan_one'.tr,
                   style: const TextStyle(

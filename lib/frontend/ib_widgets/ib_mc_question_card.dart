@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
-import 'package:icebr8k/backend/controllers/my_answered_quetions_controller.dart';
+import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
 import '../ib_colors.dart';
@@ -86,138 +86,147 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
         Center(child: _handleButtons()),
       ],
     );
-    return Center(
-      child: LimitedBox(
-        maxWidth: Get.width * 0.95,
-        child: IbCard(
-            child: Padding(
-          padding:
-              const EdgeInsets.only(left: 16, right: 8, top: 16, bottom: 8),
-          child: Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: Obx(
-              () => Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+    return InkWell(
+      onLongPress: () async {
+        await widget._controller.eraseAnswer();
+      },
+      child: Ink(
+        child: Center(
+          child: LimitedBox(
+            maxWidth: Get.width * 0.95,
+            child: IbCard(
+                child: Padding(
+              padding:
+                  const EdgeInsets.only(left: 16, right: 8, top: 16, bottom: 8),
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: Obx(
+                  () => Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _handleAvatarImage(),
-                      const SizedBox(
-                        width: 8,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
                         children: [
-                          SizedBox(
-                            width: 200,
-                            child: Text(
-                              widget._controller.title.value,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: const TextStyle(
-                                  fontSize: IbConfig.kSecondaryTextSize,
-                                  fontWeight: FontWeight.w700),
-                            ),
+                          _handleAvatarImage(),
+                          const SizedBox(
+                            width: 8,
                           ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 200,
+                                child: Text(
+                                  widget._controller.title.value,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                      fontSize: IbConfig.kSecondaryTextSize,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                              ),
+                              Text(
+                                IbUtils.getAgoDateTimeString(
+                                    DateTime.fromMillisecondsSinceEpoch(widget
+                                        ._controller.ibQuestion.askedTimeInMs)),
+                                style: const TextStyle(
+                                    fontSize: IbConfig.kDescriptionTextSize,
+                                    color: IbColors.lightGrey),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      Text(
+                        widget._controller.ibQuestion.question,
+                        style: const TextStyle(
+                            fontSize: IbConfig.kPageTitleSize,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      if (widget._controller.ibQuestion.description
+                          .trim()
+                          .isNotEmpty)
+                        Text(
+                          widget._controller.ibQuestion.description.trim(),
+                          style: const TextStyle(
+                              fontSize: IbConfig.kDescriptionTextSize,
+                              color: Colors.black),
+                        ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      if (widget._controller.isExpandable)
+                        SizeTransition(
+                          sizeFactor: animation,
+                          child: expandableInfo,
+                        )
+                      else
+                        widget._controller.isExpanded.isTrue
+                            ? expandableInfo
+                            : const SizedBox(),
+
+                      /// show current user answer is available
+                      if (Get.find<MyAnsweredQuestionsController>()
+                                  .retrieveAnswer(
+                                      widget._controller.ibQuestion.id) !=
+                              null &&
+                          widget._controller.showMyAnswer)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Row(
+                            children: [
+                              IbUserAvatar(
+                                avatarUrl:
+                                    IbUtils.getCurrentIbUser()!.avatarUrl,
+                                radius: 8,
+                              ),
+                              Text(
+                                  ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.ibQuestion.id)!.answer}')
+                            ],
+                          ),
+                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
                           Text(
-                            IbUtils.getAgoDateTimeString(
-                                DateTime.fromMillisecondsSinceEpoch(widget
-                                    ._controller.ibQuestion.askedTimeInMs)),
+                            '${widget._controller.totalPolled.value} polled',
                             style: const TextStyle(
                                 fontSize: IbConfig.kDescriptionTextSize,
                                 color: IbColors.lightGrey),
-                          )
+                          ),
+                          if (widget._controller.isExpandable)
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              onPressed: () {
+                                widget._controller.isExpanded.value =
+                                    !widget._controller.isExpanded.value;
+
+                                _runExpandCheck();
+                              },
+                              icon: Obx(
+                                () => widget._controller.isExpanded.isTrue
+                                    ? const Icon(
+                                        Icons.expand_less_outlined,
+                                        color: IbColors.primaryColor,
+                                      )
+                                    : const Icon(
+                                        Icons.expand_more_outlined,
+                                        color: IbColors.primaryColor,
+                                      ),
+                              ),
+                            ),
                         ],
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  Text(
-                    widget._controller.ibQuestion.question,
-                    style: const TextStyle(
-                        fontSize: IbConfig.kPageTitleSize,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  if (widget._controller.ibQuestion.description
-                      .trim()
-                      .isNotEmpty)
-                    Text(
-                      widget._controller.ibQuestion.description.trim(),
-                      style: const TextStyle(
-                          fontSize: IbConfig.kDescriptionTextSize,
-                          color: Colors.black),
-                    ),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  if (widget._controller.isExpandable)
-                    SizeTransition(
-                      sizeFactor: animation,
-                      child: expandableInfo,
-                    )
-                  else
-                    widget._controller.isExpanded.isTrue
-                        ? expandableInfo
-                        : const SizedBox(),
-
-                  /// show current user answer is available
-                  if (Get.find<MyAnsweredQuestionsController>().retrieveAnswer(
-                              widget._controller.ibQuestion.id) !=
-                          null &&
-                      widget._controller.showMyAnswer)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Row(
-                        children: [
-                          IbUserAvatar(
-                            avatarUrl: IbUtils.getCurrentIbUser()!.avatarUrl,
-                            radius: 8,
-                          ),
-                          Text(
-                              ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.ibQuestion.id)!.answer}')
-                        ],
-                      ),
-                    ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${widget._controller.totalPolled.value} polled',
-                        style: const TextStyle(
-                            fontSize: IbConfig.kDescriptionTextSize,
-                            color: IbColors.lightGrey),
-                      ),
-                      if (widget._controller.isExpandable)
-                        IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            widget._controller.isExpanded.value =
-                                !widget._controller.isExpanded.value;
-
-                            _runExpandCheck();
-                          },
-                          icon: Obx(
-                            () => widget._controller.isExpanded.isTrue
-                                ? const Icon(
-                                    Icons.expand_less_outlined,
-                                    color: IbColors.primaryColor,
-                                  )
-                                : const Icon(
-                                    Icons.expand_more_outlined,
-                                    color: IbColors.primaryColor,
-                                  ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
+                ),
               ),
-            ),
+            )),
           ),
-        )),
+        ),
       ),
     );
   }

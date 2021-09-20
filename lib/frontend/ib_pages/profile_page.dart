@@ -262,35 +262,37 @@ class _ProfilePageState extends State<ProfilePage>
                     SliverPersistentHeader(
                         pinned: true,
                         delegate: PersistentHeader(
-                          widget: TabBar(
-                            isScrollable: true,
-                            controller: _tabController,
-                            tabs: [
-                              if (_profileController.isMe.isTrue)
+                          widget: Obx(
+                            () => TabBar(
+                              isScrollable: true,
+                              controller: _tabController,
+                              tabs: [
+                                if (_profileController.isMe.isTrue)
+                                  Tab(
+                                      text:
+                                          'Answered Questions(${_profileController.totalAnswered.value})'),
+                                if (_profileController.isMe.isFalse)
+                                  Obx(() => Tab(
+                                      text:
+                                          'Common Answers(${_commonAnswersController.ibQuestions.length})')),
+                                if (_profileController.isMe.isFalse)
+                                  Obx(() => Tab(
+                                      text:
+                                          'Different Answers(${_uncommonAnswersController.ibQuestions.length})')),
                                 Tab(
                                     text:
-                                        'Answered Questions(${_profileController.totalAnswered.value})'),
-                              if (_profileController.isMe.isFalse)
-                                Obx(() => Tab(
-                                    text:
-                                        'Common Answers(${_commonAnswersController.ibQuestions.length})')),
-                              if (_profileController.isMe.isFalse)
-                                Obx(() => Tab(
-                                    text:
-                                        'Different Answers(${_uncommonAnswersController.ibQuestions.length})')),
-                              Tab(
-                                  text:
-                                      'Asked Questions(${_profileController.totalAsked.value})'),
-                            ],
-                            labelStyle:
-                                const TextStyle(fontWeight: FontWeight.bold),
-                            unselectedLabelStyle:
-                                const TextStyle(fontWeight: FontWeight.bold),
-                            labelColor: Colors.black,
-                            unselectedLabelColor: IbColors.lightGrey,
-                            indicatorColor: _tabController.length == 1
-                                ? Colors.transparent
-                                : IbColors.primaryColor,
+                                        'Asked Questions(${_profileController.totalAsked.value})'),
+                              ],
+                              labelStyle:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                              unselectedLabelStyle:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                              labelColor: Colors.black,
+                              unselectedLabelColor: IbColors.lightGrey,
+                              indicatorColor: _tabController.length == 1
+                                  ? Colors.transparent
+                                  : IbColors.primaryColor,
+                            ),
                           ),
                         )),
                   ];

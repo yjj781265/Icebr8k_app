@@ -35,7 +35,7 @@ class ProfileController extends GetxController {
 
   @override
   Future<void> onInit() async {
-    isMe.value = uid == IbUtils.getCurrentUid();
+    isMe.value = uid == IbUtils.getCurrentUid()!;
     if (isMe.isFalse) {
       final String? status = await IbUserDbService()
           .queryFriendshipStatus(IbUtils.getCurrentUid()!, uid);
@@ -62,7 +62,7 @@ class ProfileController extends GetxController {
         friendshipStatus.value = '';
       });
     } else {
-      totalAskedStream = IbQuestionDbService()
+      totalAnsweredStream = IbQuestionDbService()
           .listenToAnsweredQuestionsChange(uid)
           .listen((event) async {
         // TODO convert to cloud function for getting the total count, important!
@@ -71,7 +71,7 @@ class ProfileController extends GetxController {
         totalAnswered.value = ids.length;
       });
 
-      totalAnsweredStream = IbQuestionDbService()
+      totalAskedStream = IbQuestionDbService()
           .listenToUserAskedQuestionsChange(uid)
           .listen((event) async {
         final snapshot =

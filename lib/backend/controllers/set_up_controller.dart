@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
-import 'package:icebr8k/backend/controllers/my_answered_quetions_controller.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
@@ -12,6 +12,9 @@ import 'package:icebr8k/backend/services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/home_page.dart';
+import 'package:icebr8k/frontend/ib_pages/screen_one.dart';
+import 'package:icebr8k/frontend/ib_pages/screen_three.dart';
+import 'package:icebr8k/frontend/ib_pages/screen_two.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
@@ -19,9 +22,9 @@ import 'package:liquid_swipe/liquid_swipe.dart';
 
 class SetUpController extends GetxController {
   final LiquidController liquidController = LiquidController();
+  final pages = <Widget>[].obs;
   final ibQuestions = <IbQuestion>[].obs;
   final answeredCounter = 0.obs;
-  late StreamSubscription answeredQStream;
   final isUsernameValid = false.obs;
   final username = ''.obs;
   final name = ''.obs;
@@ -33,24 +36,69 @@ class SetUpController extends GetxController {
   final avatarFilePath = ''.obs;
   final currentPageIndex = 0.obs;
   final totalPageSize = 0.obs;
+  final isLoading = true.obs;
+  late StreamSubscription myAnsweredQStream;
 
   @override
   Future<void> onInit() async {
-    Get.lazyPut(() => MyAnsweredQuestionsController());
-    answeredQStream = IbQuestionDbService()
+    final bool isUserNameMissing =
+        await IbUserDbService().isUsernameMissing(IbUtils.getCurrentUid()!);
+    final bool isAvatarUrlMissing =
+        await IbUserDbService().isAvatarUrlMissing(IbUtils.getCurrentUid()!);
+    ibQuestions.value = await IbUserDbService()
+        .queryUnAnsweredFirst8Q(IbUtils.getCurrentUid()!);
+
+    if (isUserNameMissing) {
+      pages.add(ScreenOne());
+    }
+
+    if (isAvatarUrlMissing) {
+      pages.add(ScreenTwo());
+    }
+
+    if (ibQuestions.isNotEmpty) {
+      pages.add(ScreenThree());
+    }
+
+    totalPageSize.value = pages.length;
+
+    myAnsweredQStream = IbQuestionDbService()
         .listenToAnsweredQuestionsChange(IbUtils.getCurrentUid()!)
         .listen((event) {
-      for (final docChange in event.docChanges) {
-        final IbAnswer ibAnswer = IbAnswer.fromJson(docChange.doc.data()!);
-        if (docChange.type == DocumentChangeType.added &&
-            ibQuestions.indexWhere(
-                    (element) => element.id == ibAnswer.questionId) !=
-                -1) {
-          answeredCounter.value++;
-        }
-      }
+      _handleSetupPageScreenThree(event);
     });
+
+    isLoading.value = false;
+
+    print("SetUpController: init ");
     super.onInit();
+  }
+
+  void _handleSetupPageScreenThree(
+      final QuerySnapshot<Map<String, dynamic>> event) {
+    if (!Get.isRegistered<SetUpController>()) {
+      return;
+    }
+    final SetUpController _setupController = Get.find();
+
+    for (final docChange in event.docChanges) {
+      final IbAnswer ibAnswer = IbAnswer.fromJson(docChange.doc.data()!);
+      if (docChange.type == DocumentChangeType.added &&
+          _setupController.ibQuestions
+                  .indexWhere((element) => element.id == ibAnswer.questionId) !=
+              -1) {
+        _setupController.answeredCounter.value =
+            _setupController.answeredCounter.value + 1;
+        print(
+            'updating SetUpController answeredCounter to ${_setupController.answeredCounter.value}');
+      }
+    }
+  }
+
+  @override
+  void onClose() {
+    print("SetUpController: close ");
+    super.onClose();
   }
 
   Future<void> validateScreenTwo() async {
@@ -208,11 +256,5 @@ class SetUpController extends GetxController {
       liquidController.animateToPage(page: currentPageIndex.value + 1);
     }
     return;
-  }
-
-  @override
-  void onClose() {
-    answeredQStream.cancel();
-    super.onClose();
   }
 }

@@ -297,4 +297,13 @@ class IbQuestionDbService {
           .delete();
     }
   }
+
+  Future<void> eraseSingleAnsweredQuestions(
+      String uid, String questionId) async {
+    return _collectionRef
+        .doc(questionId)
+        .collection('Answers')
+        .doc(uid)
+        .delete();
+  }
 }

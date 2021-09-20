@@ -1,11 +1,7 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:icebr8k/backend/controllers/auth_controller.dart';
-import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
+import 'package:icebr8k/backend/controllers/main_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:lottie/lottie.dart';
 
@@ -16,91 +12,65 @@ import 'frontend/ib_themes.dart';
 import 'frontend/ib_widgets/ib_progress_indicator.dart';
 
 Future<void> main() async {
-  await GetStorage.init();
-
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(statusBarColor: IbColors.lightBlue),
   );
-  runApp(MyApp());
+  runApp(MainApp());
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
+class MainApp extends StatelessWidget {
+  final MainController _controller = Get.put(MainController());
 
-class _MyAppState extends State<MyApp> {
-  final Future<void> _initialization = init();
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _initialization,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return _somethingWrong();
-        }
-        // Once complete, show your application
-        if (snapshot.connectionState == ConnectionState.done) {
-          print('Firebase init success');
-          return GetMaterialApp(
-            initialBinding: BindingsBuilder(() => {Get.put(AuthController())}),
-            defaultTransition: Transition.cupertino,
-            enableLog: false,
-            debugShowCheckedModeBanner: false,
-            home: const SplashPage(),
-            translations: IbStrings(),
-            locale: const Locale('en', 'US'),
-            theme: IbThemes.lightTheme,
-          );
-        }
+    return Obx(() {
+      if (_controller.hasError.isTrue) {
+        return _somethingWrong();
+      }
 
+      if (_controller.isLoading.isTrue) {
         return _loading();
-      },
+      }
+      return GetMaterialApp(
+        defaultTransition: Transition.cupertino,
+        enableLog: true,
+        debugShowCheckedModeBanner: false,
+        home: SplashPage(),
+        translations: IbStrings(),
+        locale: const Locale('en', 'US'),
+        theme: IbThemes.lightTheme,
+      );
+    });
+  }
+
+  Widget _loading() {
+    return Container(
+      color: IbColors.lightBlue,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/icons/logo_android.png',
+              width: IbConfig.kAppLogoSize,
+              height: IbConfig.kAppLogoSize,
+            ),
+            const IbProgressIndicator(),
+          ],
+        ),
+      ),
     );
   }
-}
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going to use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
-  await Firebase.initializeApp();
-  print("Handling a background message: ${message.messageId}");
-}
-
-// future to register for background notification listener
-Future<void> init() async {
-  await Firebase.initializeApp();
-  await IbCloudMessagingService().init();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-}
-
-Widget _loading() {
-  return Container(
-    color: IbColors.lightBlue,
-    child: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            'assets/icons/logo_android.png',
-            width: IbConfig.kAppLogoSize,
-            height: IbConfig.kAppLogoSize,
-          ),
-          const IbProgressIndicator(),
-        ],
+  Widget _somethingWrong() {
+    return Container(
+      color: IbColors.lightBlue,
+      child: Center(
+        child: Lottie.asset('assets/images/error.json'),
       ),
-    ),
-  );
-}
-
-Widget _somethingWrong() {
-  return Container(
-    color: IbColors.lightBlue,
-    child: Center(
-      child: Lottie.asset('assets/images/error.json'),
-    ),
-  );
+    );
+  }
 }
