@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/answered_question_controller.dart';
@@ -99,6 +100,7 @@ class _ProfilePageState extends State<ProfilePage>
                 child: IbProgressIndicator(),
               )
             : NestedScrollView(
+                dragStartBehavior: DragStartBehavior.down,
                 headerSliverBuilder: (context, value) {
                   return [
                     SliverToBoxAdapter(
@@ -259,54 +261,61 @@ class _ProfilePageState extends State<ProfilePage>
                         ],
                       ),
                     ),
-                    SliverPersistentHeader(
-                        pinned: true,
-                        delegate: PersistentHeader(
-                          widget: Obx(
-                            () => TabBar(
-                              isScrollable: true,
-                              controller: _tabController,
-                              tabs: [
-                                if (_profileController.isMe.isTrue)
+                    SliverOverlapAbsorber(
+                      handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                          context),
+                      sliver: SliverPersistentHeader(
+                          pinned: true,
+                          delegate: PersistentHeader(
+                            widget: Obx(
+                              () => TabBar(
+                                isScrollable: true,
+                                controller: _tabController,
+                                tabs: [
+                                  if (_profileController.isMe.isTrue)
+                                    Tab(
+                                        text:
+                                            'Answered Questions(${_profileController.totalAnswered.value})'),
+                                  if (_profileController.isMe.isFalse)
+                                    Obx(() => Tab(
+                                        text:
+                                            'Common Answers(${_commonAnswersController.ibQuestions.length})')),
+                                  if (_profileController.isMe.isFalse)
+                                    Obx(() => Tab(
+                                        text:
+                                            'Different Answers(${_uncommonAnswersController.ibQuestions.length})')),
                                   Tab(
                                       text:
-                                          'Answered Questions(${_profileController.totalAnswered.value})'),
-                                if (_profileController.isMe.isFalse)
-                                  Obx(() => Tab(
-                                      text:
-                                          'Common Answers(${_commonAnswersController.ibQuestions.length})')),
-                                if (_profileController.isMe.isFalse)
-                                  Obx(() => Tab(
-                                      text:
-                                          'Different Answers(${_uncommonAnswersController.ibQuestions.length})')),
-                                Tab(
-                                    text:
-                                        'Asked Questions(${_profileController.totalAsked.value})'),
-                              ],
-                              labelStyle:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                              unselectedLabelStyle:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                              labelColor: Colors.black,
-                              unselectedLabelColor: IbColors.lightGrey,
-                              indicatorColor: _tabController.length == 1
-                                  ? Colors.transparent
-                                  : IbColors.primaryColor,
+                                          'Asked Questions(${_profileController.totalAsked.value})'),
+                                ],
+                                labelStyle: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                                unselectedLabelStyle: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                                labelColor: Colors.black,
+                                unselectedLabelColor: IbColors.lightGrey,
+                                indicatorColor: _tabController.length == 1
+                                    ? Colors.transparent
+                                    : IbColors.primaryColor,
+                              ),
                             ),
-                          ),
-                        )),
+                          )),
+                    ),
                   ];
                 },
-                body: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    if (_profileController.isMe.isTrue) buildAnsweredQTab(),
-                    if (_profileController.isMe.isFalse)
-                      buildCommonAnswersTab(),
-                    if (_profileController.isMe.isFalse)
-                      buildUncommonAnswersTab(),
-                    buildAskedTab(),
-                  ],
+                body: Padding(
+                  padding: const EdgeInsets.only(top: 48.0),
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      if (_profileController.isMe.isTrue) buildAnsweredQTab(),
+                      if (_profileController.isMe.isFalse)
+                        buildCommonAnswersTab(),
+                      if (_profileController.isMe.isFalse)
+                        buildUncommonAnswersTab(),
+                      buildAskedTab(),
+                    ],
+                  ),
                 ),
               ),
       ),
