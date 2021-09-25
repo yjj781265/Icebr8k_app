@@ -8,6 +8,7 @@ import 'package:icebr8k/backend/controllers/sign_in_controller.dart';
 import 'package:icebr8k/backend/controllers/sign_up_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_auth_service.dart';
+import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/home_page.dart';
 import 'package:icebr8k/frontend/ib_pages/set_up_page.dart';
@@ -34,6 +35,7 @@ class AuthController extends GetxService {
       } else {
         firebaseUser = user;
         ibUser = await IbUserDbService().queryIbUser(firebaseUser!.uid);
+        await IbCloudMessagingService().init();
         print('User is signed in! ${firebaseUser!.uid}');
       }
     });

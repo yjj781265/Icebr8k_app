@@ -238,7 +238,7 @@ class IbUserDbService {
     }
 
     await _collectionRef.doc(userId).set({
-      'cloud_msg_token': token,
+      'cloudMsgToken': token,
     }, SetOptions(merge: true));
   }
 }
