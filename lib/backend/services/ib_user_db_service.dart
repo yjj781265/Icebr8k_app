@@ -229,4 +229,16 @@ class IbUserDbService {
         .orderBy('timestampInMs', descending: true)
         .get();
   }
+
+  Future<void> saveTokenToDatabase(String token) async {
+    // Assume user is logged in for this example
+    final String? userId = IbUtils.getCurrentUid();
+    if (userId == null) {
+      return;
+    }
+
+    await _collectionRef.doc(userId).set({
+      'cloud_msg_token': token,
+    }, SetOptions(merge: true));
+  }
 }

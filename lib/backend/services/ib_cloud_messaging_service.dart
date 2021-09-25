@@ -1,5 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 
 class IbCloudMessagingService extends GetConnect {
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
@@ -17,7 +18,14 @@ class IbCloudMessagingService extends GetConnect {
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       final String? token = await _fcm.getToken();
-      print('token $token');
+
+      if (token != null) {
+        await IbUserDbService().saveTokenToDatabase(token);
+        // Any time the token refreshes, store this in the database too.
+        FirebaseMessaging.instance.onTokenRefresh
+            .listen(IbUserDbService().saveTokenToDatabase);
+      }
+
       FirebaseMessaging.onMessage.listen((message) {
         print('Got a message whilst in the foreground!');
         print('Message data: ${message.data}');
