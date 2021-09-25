@@ -36,6 +36,7 @@ class QuestionTab extends StatelessWidget {
           color: IbColors.lightBlue,
           child: SmartRefresher(
             footer: const ClassicFooter(
+              noDataText: "No more questions to load",
               textStyle: TextStyle(color: IbColors.primaryColor),
               failedIcon: Icon(
                 Icons.error_outline,

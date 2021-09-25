@@ -217,6 +217,7 @@ class _PeopleNearByTabState extends State<PeopleNearByTab>
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                 value: _controller.shareLoc.value,
                 onChanged: (value) async {
+                  print(value);
                   _controller.shareLoc.value = value;
                   IbLocalStorageService().updateLocSharingFlag(value);
                   if (value) {
@@ -225,6 +226,7 @@ class _PeopleNearByTabState extends State<PeopleNearByTab>
                   } else {
                     _controller.isSearching.value = false;
                     await _controller.removeMyLoc();
+                    _controller.items.clear();
                   }
                 },
                 title: const Padding(

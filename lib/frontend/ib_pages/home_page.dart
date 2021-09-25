@@ -193,7 +193,7 @@ class HomePage extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           BottomNavyBarItem(
-              icon: const Icon(Icons.group),
+              icon: const Icon(Icons.group_outlined),
               title: Text('social'.tr),
               inactiveColor: _inactiveColor,
               textAlign: TextAlign.center,

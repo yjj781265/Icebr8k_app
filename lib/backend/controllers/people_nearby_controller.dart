@@ -52,6 +52,14 @@ class PeopleNearbyController extends GetxController {
 
       if (pplNearbyStream != null && locStream == null) {
         locStream = pplNearbyStream.listen((list) async {
+          if (shareLoc.isFalse) {
+            if (locStream != null) {
+              locStream!.cancel();
+              locStream = null;
+              items.clear();
+            }
+            return;
+          }
           await handleGeoPointList(list);
         });
       }
@@ -60,6 +68,10 @@ class PeopleNearbyController extends GetxController {
 
   Future<void> removeMyLoc() async {
     await IbLocationService().removeLocation();
+    if (locStream != null) {
+      locStream!.cancel();
+      locStream = null;
+    }
   }
 
   Future<void> handleGeoPointList(
@@ -77,6 +89,14 @@ class PeopleNearbyController extends GetxController {
 
     for (final doc in documentList) {
       final String uid = doc.data()!['uid'] as String;
+      final int timestampInMs = doc.data()!['timestampInMs'] as int;
+
+      if (DateTime.now()
+              .difference(DateTime.fromMillisecondsSinceEpoch(timestampInMs))
+              .compareTo(const Duration(days: 1)) >
+          0) {
+        continue;
+      }
 
       if (documentList.length == 1 && uid == IbUtils.getCurrentUid()) {
         items.clear();

@@ -25,6 +25,7 @@ class IbQuestionController extends GetxController {
     /// load latest question
     final IbAnswer? answer = await IbQuestionDbService()
         .queryLatestAnsweredQ(IbUtils.getCurrentUid()!);
+
     if (answer != null) {
       ibQuestions.addAll(await IbQuestionDbService()
           .queryIbQuestions(8, timestamp: answer.askedTimeInMs));
@@ -46,7 +47,7 @@ class IbQuestionController extends GetxController {
     }
 
     /// load cached question
-    loadCachedQuestions();
+    await loadCachedQuestions();
 
     if (ibQuestions.isNotEmpty) {
       ///cached unanswered question to local db
