@@ -64,8 +64,11 @@ class IbChatDbService {
         .limitToLast(1)
         .get();
 
+    // todo add cloud function
     if (_snapshot1.size == 0) {
-      return 1;
+      final snapshot =
+          await _collectionRef.doc(chatRoomId).collection('Messages').get();
+      return snapshot.size;
     }
 
     final _snapshot2 = await _collectionRef
