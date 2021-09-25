@@ -19,11 +19,14 @@ class EditProfileController extends GetxController {
   final isUsernameValid = false.obs;
   final isUsernameFirstTime = true.obs;
   final usernameErrorTrKey = ''.obs;
+  final avatarUrl = ''.obs;
+  final isProfilePicPicked = false.obs;
 
   @override
   void onInit() {
     super.onInit();
     username.value = Get.find<HomeController>().currentIbUsername.value;
+    avatarUrl.value = Get.find<HomeController>().currentIbAvatarUrl.value;
   }
 
   Future<void> validateUsername() async {
@@ -68,20 +71,18 @@ class EditProfileController extends GetxController {
   }
 
   Future<void> updateAvatarUrl(String _filePath) async {
-    Get.dialog(const IbLoadingDialog(messageTrKey: 'uploading...'),
-        barrierDismissible: false);
+    /* Get.dialog(const IbLoadingDialog(messageTrKey: 'uploading...'),
+        barrierDismissible: false);*/
 
     final String? photoUrl =
         await IbStorageService().uploadAndRetrieveImgUrl(_filePath);
 
     if (photoUrl == null) {
-      Get.back();
       return;
     }
 
     await IbUserDbService()
         .updateAvatarUrl(url: photoUrl, uid: IbUtils.getCurrentUid()!);
-    Get.back();
   }
 
   Future<void> updateUserInfo(IbUser ibUser) async {
@@ -98,6 +99,10 @@ class EditProfileController extends GetxController {
       messageTrKey: 'updating',
     ));
     await IbUserDbService().updateIbUser(ibUser);
+    if (isProfilePicPicked.isTrue) {
+      await updateAvatarUrl(avatarUrl.value);
+    }
+
     Get.back(closeOverlays: true);
     IbUtils.showSimpleSnackBar(
         msg: 'Profile updated successfully',

@@ -11,6 +11,8 @@ import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 
+import '../ib_config.dart';
+
 class ScreenTwo extends StatelessWidget {
   ScreenTwo({Key? key}) : super(key: key);
   final Widget selfie =
@@ -72,7 +74,7 @@ class ScreenTwo extends StatelessWidget {
                     final XFile? pickedFile = await _picker.pickImage(
                       source: ImageSource.camera,
                       preferredCameraDevice: CameraDevice.front,
-                      imageQuality: 90,
+                      imageQuality: IbConfig.kImageQuality,
                     );
                     if (pickedFile != null) {
                       Get.dialog(
@@ -96,7 +98,8 @@ class ScreenTwo extends StatelessWidget {
                   onPressed: () async {
                     final _picker = ImagePicker();
                     final XFile? pickedFile = await _picker.pickImage(
-                        source: ImageSource.gallery, imageQuality: 90);
+                        source: ImageSource.gallery,
+                        imageQuality: IbConfig.kImageQuality);
                     if (pickedFile != null) {
                       Get.dialog(
                           const IbLoadingDialog(messageTrKey: 'loading'));

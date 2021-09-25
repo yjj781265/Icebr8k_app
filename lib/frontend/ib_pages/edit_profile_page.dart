@@ -64,13 +64,21 @@ class EditProfilePage extends StatelessWidget {
                     alignment: Alignment.bottomRight,
                     children: [
                       Center(
-                        child: Obx(
-                          () => IbUserAvatar(
-                            avatarUrl: _homeController.currentIbAvatarUrl.value,
-                            disableOnTap: true,
+                        child: Obx(() {
+                          if (_controller.isProfilePicPicked.isFalse) {
+                            return IbUserAvatar(
+                              avatarUrl: _controller.avatarUrl.value,
+                              disableOnTap: true,
+                              radius: 56,
+                            );
+                          }
+                          return CircleAvatar(
                             radius: 56,
-                          ),
-                        ),
+                            key: UniqueKey(),
+                            foregroundImage:
+                                FileImage(File(_controller.avatarUrl.value)),
+                          );
+                        }),
                       ),
                       Positioned(
                         child: Container(
@@ -184,14 +192,15 @@ class EditProfilePage extends StatelessWidget {
             final _picker = ImagePicker();
             final XFile? pickedFile = await _picker.pickImage(
               source: ImageSource.camera,
-              imageQuality: 88,
+              imageQuality: IbConfig.kImageQuality,
             );
 
             if (pickedFile != null) {
               final File? croppedFile =
                   await IbUtils.showImageCropper(pickedFile.path);
               if (croppedFile != null) {
-                await _controller.updateAvatarUrl(croppedFile.path);
+                _controller.avatarUrl.value = croppedFile.path;
+                _controller.isProfilePicPicked.value = true;
               }
             }
           },
@@ -222,14 +231,15 @@ class EditProfilePage extends StatelessWidget {
             final _picker = ImagePicker();
             final XFile? pickedFile = await _picker.pickImage(
               source: ImageSource.gallery,
-              imageQuality: 88,
+              imageQuality: IbConfig.kImageQuality,
             );
 
             if (pickedFile != null) {
               final File? croppedFile =
                   await IbUtils.showImageCropper(pickedFile.path);
               if (croppedFile != null) {
-                await _controller.updateAvatarUrl(croppedFile.path);
+                _controller.avatarUrl.value = croppedFile.path;
+                _controller.isProfilePicPicked.value = true;
               }
             }
           },

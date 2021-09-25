@@ -25,6 +25,7 @@ class IbConfig {
   static const int kScAnswerMaxLength = 20; // characters
   static const double kInitChatMessagesLoadSize = 16;
   static const double kChatMessagesTextSize = 18;
+  static const int kImageQuality = 70;
 
   IbConfig._();
 }

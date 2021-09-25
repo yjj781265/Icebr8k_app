@@ -766,7 +766,7 @@ class _ProfilePageState extends State<ProfilePage>
             final _picker = ImagePicker();
             final XFile? pickedFile = await _picker.pickImage(
               source: ImageSource.camera,
-              imageQuality: 90,
+              imageQuality: IbConfig.kImageQuality,
             );
 
             if (pickedFile != null) {
@@ -812,7 +812,7 @@ class _ProfilePageState extends State<ProfilePage>
             final _picker = ImagePicker();
             final XFile? pickedFile = await _picker.pickImage(
               source: ImageSource.gallery,
-              imageQuality: 88,
+              imageQuality: IbConfig.kImageQuality,
             );
 
             if (pickedFile != null) {
