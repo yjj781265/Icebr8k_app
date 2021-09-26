@@ -136,7 +136,7 @@ class IbQuestionItemController extends GetxController {
     }
 
     isAnswering.value = true;
-    final IbAnswer ibAnswer = IbAnswer(
+    final IbAnswer answer = IbAnswer(
         answer: selectedChoice.value,
         answeredTimeInMs: DateTime.now().millisecondsSinceEpoch,
         askedTimeInMs: ibQuestion.askedTimeInMs,
@@ -144,9 +144,11 @@ class IbQuestionItemController extends GetxController {
         questionId: ibQuestion.id,
         questionType: ibQuestion.questionType);
 
-    await IbQuestionDbService().answerQuestion(ibAnswer);
+    await IbQuestionDbService().answerQuestion(answer);
     IbLocalStorageService().removeUnAnsweredIbQid(ibQuestion.id);
     await calculateResult();
+    answeredUsername.value =
+        (await IbUserDbService().queryIbUser(answer.uid))!.username;
     votedDateTime.value = DateTime.now();
     isAnswering.value = false;
     showResult.value = true;

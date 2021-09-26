@@ -485,13 +485,12 @@ class _ProfilePageState extends State<ProfilePage>
               } else {
                 _controller = Get.put(
                     IbQuestionItemController(
+                        isExpandable: true,
                         ibQuestion: item,
-                        disableChoiceOnTouch: true,
-                        showActionButtons: false,
                         disableAvatarOnTouch: item.creatorId == widget.uid),
                     tag: tag);
               }
-              _controller.isExpanded.value = false;
+              _controller.isExpanded.value = index == 0;
 
               if (item.questionType == IbQuestion.kMultipleChoice) {
                 return IbMcQuestionCard(_controller);
