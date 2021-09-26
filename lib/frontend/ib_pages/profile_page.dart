@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -99,7 +100,8 @@ class _ProfilePageState extends State<ProfilePage>
             ? const Center(
                 child: IbProgressIndicator(),
               )
-            : NestedScrollView(
+            : ExtendedNestedScrollView(
+                onlyOneScrollInBody: true,
                 dragStartBehavior: DragStartBehavior.down,
                 headerSliverBuilder: (context, value) {
                   return [
@@ -262,8 +264,8 @@ class _ProfilePageState extends State<ProfilePage>
                       ),
                     ),
                     SliverOverlapAbsorber(
-                      handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                          context),
+                      handle: ExtendedNestedScrollView
+                          .sliverOverlapAbsorberHandleFor(context),
                       sliver: SliverPersistentHeader(
                           pinned: true,
                           delegate: PersistentHeader(
@@ -375,255 +377,34 @@ class _ProfilePageState extends State<ProfilePage>
 
   Widget buildAnsweredQTab() {
     final refreshController = RefreshController();
-    return Obx(
-      () {
-        if (_answeredQuestionController.isLoading.isTrue) {
-          return const Center(
-            child: IbProgressIndicator(),
-          );
-        }
-
-        return SmartRefresher(
-          footer: const ClassicFooter(
-            textStyle: TextStyle(color: IbColors.primaryColor),
-            failedIcon: Icon(
-              Icons.error_outline,
-              color: IbColors.errorRed,
-            ),
-            loadingIcon: IbProgressIndicator(
-              width: 24,
-              height: 24,
-              padding: 0,
-            ),
-          ),
-          controller: refreshController,
-          enablePullDown: false,
-          enablePullUp: true,
-          onLoading: () async {
-            await _answeredQuestionController.loadMore();
-            if (_answeredQuestionController.lastDoc == null) {
-              refreshController.loadNoData();
-              return;
-            }
-            refreshController.loadComplete();
-          },
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              final AnsweredQuestionItem item =
-                  _answeredQuestionController.myAnsweredQuestions[index];
-
-              final tag = 'answered_${item.ibQuestion.id}';
-              late IbQuestionItemController _controller;
-              if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
-                _controller = Get.find(tag: tag);
-              } else {
-                _controller = Get.put(
-                    IbQuestionItemController(
-                        ibAnswer: item.ibAnswer,
-                        ibQuestion: item.ibQuestion,
-                        disableAvatarOnTouch:
-                            item.ibQuestion.creatorId == widget.uid,
-                        isExpandable: true),
-                    tag: tag);
-              }
-
-              _controller.isExpanded.value = index == 0;
-
-              if (item.ibQuestion.questionType == IbQuestion.kMultipleChoice) {
-                return IbMcQuestionCard(_controller);
-              }
-              return IbScQuestionCard(_controller);
-            },
-            itemCount: _answeredQuestionController.myAnsweredQuestions.length,
-          ),
-        );
-      },
-    );
+    return AnsweredQTab(
+        answeredQuestionController: _answeredQuestionController,
+        refreshController: refreshController,
+        widget: widget);
   }
 
   Widget buildAskedTab() {
     final refreshController = RefreshController();
-    return Obx(
-      () {
-        if (_createdQuestionController.isLoading.isTrue) {
-          return const Center(
-            child: IbProgressIndicator(),
-          );
-        }
-        return SmartRefresher(
-          footer: const ClassicFooter(
-            textStyle: TextStyle(color: IbColors.primaryColor),
-            failedIcon: Icon(
-              Icons.error_outline,
-              color: IbColors.errorRed,
-            ),
-            loadingIcon: IbProgressIndicator(
-              width: 24,
-              height: 24,
-              padding: 0,
-            ),
-          ),
-          controller: refreshController,
-          enablePullDown: false,
-          enablePullUp: true,
-          onLoading: () async {
-            await _createdQuestionController.loadMore();
-            if (_createdQuestionController.lastDoc == null) {
-              refreshController.loadNoData();
-              return;
-            }
-            refreshController.loadComplete();
-          },
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              final IbQuestion item =
-                  _createdQuestionController.createdQuestions[index];
-              final tag = 'asked_${item.id}';
-              late IbQuestionItemController _controller;
-              if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
-                _controller = Get.find(tag: tag);
-              } else {
-                _controller = Get.put(
-                    IbQuestionItemController(
-                        isExpandable: true,
-                        ibQuestion: item,
-                        disableAvatarOnTouch: item.creatorId == widget.uid),
-                    tag: tag);
-              }
-              _controller.isExpanded.value = index == 0;
-
-              if (item.questionType == IbQuestion.kMultipleChoice) {
-                return IbMcQuestionCard(_controller);
-              }
-              return IbScQuestionCard(_controller);
-            },
-            itemCount: _createdQuestionController.createdQuestions.length,
-          ),
-        );
-      },
-    );
+    return AskedQTab(
+        createdQuestionController: _createdQuestionController,
+        refreshController: refreshController,
+        widget: widget);
   }
 
   Widget buildCommonAnswersTab() {
     final refreshController = RefreshController();
-    return Obx(
-      () {
-        return SmartRefresher(
-          footer: const ClassicFooter(
-            textStyle: TextStyle(color: IbColors.primaryColor),
-            failedIcon: Icon(
-              Icons.error_outline,
-              color: IbColors.errorRed,
-            ),
-            loadingIcon: IbProgressIndicator(
-              width: 24,
-              height: 24,
-              padding: 0,
-            ),
-          ),
-          controller: refreshController,
-          enablePullDown: false,
-          enablePullUp: true,
-          onLoading: () async {
-            if (_commonAnswersController.lastIbAnswer == null) {
-              refreshController.loadNoData();
-              return;
-            }
-
-            await _commonAnswersController.loadMore();
-            refreshController.loadComplete();
-          },
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              final IbQuestion item =
-                  _commonAnswersController.ibQuestions[index];
-              final tag = 'common_${item.id}';
-              late IbQuestionItemController _controller;
-              if (Get.isRegistered(tag: tag)) {
-                _controller = Get.find(tag: tag);
-              } else {
-                _controller = Get.put(
-                    IbQuestionItemController(
-                        ibAnswer:
-                            _commonAnswersController.retrieveAnswer(item.id),
-                        ibQuestion: item,
-                        isExpandable: true,
-                        disableAvatarOnTouch: item.creatorId == widget.uid),
-                    tag: tag);
-              }
-
-              if (item.questionType == IbQuestion.kMultipleChoice) {
-                return IbMcQuestionCard(_controller);
-              }
-              return IbScQuestionCard(_controller);
-            },
-            itemCount: _commonAnswersController.ibQuestions.length,
-          ),
-        );
-      },
-    );
+    return CommonAnswersTab(
+        refreshController: refreshController,
+        commonAnswersController: _commonAnswersController,
+        widget: widget);
   }
 
   Widget buildUncommonAnswersTab() {
     final refreshController = RefreshController();
-    return Obx(
-      () {
-        return SmartRefresher(
-          footer: const ClassicFooter(
-            textStyle: TextStyle(color: IbColors.primaryColor),
-            failedIcon: Icon(
-              Icons.error_outline,
-              color: IbColors.errorRed,
-            ),
-            loadingIcon: IbProgressIndicator(
-              width: 24,
-              height: 24,
-              padding: 0,
-            ),
-          ),
-          controller: refreshController,
-          enablePullDown: false,
-          enablePullUp: true,
-          onLoading: () async {
-            if (_uncommonAnswersController.lastIbAnswer == null) {
-              refreshController.loadNoData();
-              return;
-            }
-
-            await _uncommonAnswersController.loadMore();
-            refreshController.loadComplete();
-          },
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              final IbQuestion item =
-                  _uncommonAnswersController.ibQuestions[index];
-              final tag = 'uncommon_${item.id}';
-              late IbQuestionItemController _controller;
-
-              if (Get.isRegistered(tag: tag)) {
-                _controller = Get.find(tag: tag);
-              } else {
-                _controller = Get.put(
-                    IbQuestionItemController(
-                        ibAnswer:
-                            _uncommonAnswersController.retrieveAnswer(item.id),
-                        showMyAnswer: true,
-                        ibQuestion: item,
-                        isExpandable: true,
-                        disableAvatarOnTouch: item.creatorId == widget.uid),
-                    tag: tag);
-              }
-
-              if (item.questionType == IbQuestion.kMultipleChoice) {
-                return IbMcQuestionCard(_controller);
-              }
-              return IbScQuestionCard(_controller);
-            },
-            itemCount: _uncommonAnswersController.ibQuestions.length,
-          ),
-        );
-      },
-    );
+    return DifferentAnswersTab(
+        refreshController: refreshController,
+        uncommonAnswersController: _uncommonAnswersController,
+        widget: widget);
   }
 
   Widget _buildActionButtons() {
@@ -858,6 +639,360 @@ class _ProfilePageState extends State<ProfilePage>
 
     Get.bottomSheet(SafeArea(child: options));
   }
+}
+
+class CommonAnswersTab extends StatefulWidget {
+  const CommonAnswersTab({
+    Key? key,
+    required this.refreshController,
+    required CommonAnswersController commonAnswersController,
+    required this.widget,
+  })  : _commonAnswersController = commonAnswersController,
+        super(key: key);
+
+  final RefreshController refreshController;
+  final CommonAnswersController _commonAnswersController;
+  final ProfilePage widget;
+
+  @override
+  State<CommonAnswersTab> createState() => _CommonAnswersTabState();
+}
+
+class _CommonAnswersTabState extends State<CommonAnswersTab>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Obx(
+      () {
+        return SmartRefresher(
+          footer: const ClassicFooter(
+            textStyle: TextStyle(color: IbColors.primaryColor),
+            failedIcon: Icon(
+              Icons.error_outline,
+              color: IbColors.errorRed,
+            ),
+            loadingIcon: IbProgressIndicator(
+              width: 24,
+              height: 24,
+              padding: 0,
+            ),
+          ),
+          controller: widget.refreshController,
+          enablePullDown: false,
+          enablePullUp: true,
+          onLoading: () async {
+            if (widget._commonAnswersController.lastIbAnswer == null) {
+              widget.refreshController.loadNoData();
+              return;
+            }
+
+            await widget._commonAnswersController.loadMore();
+            widget.refreshController.loadComplete();
+          },
+          child: ListView.builder(
+            itemBuilder: (context, index) {
+              final IbQuestion item =
+                  widget._commonAnswersController.ibQuestions[index];
+              final tag = 'common_${item.id}';
+              late IbQuestionItemController _controller;
+              if (Get.isRegistered(tag: tag)) {
+                _controller = Get.find(tag: tag);
+              } else {
+                _controller = Get.put(
+                    IbQuestionItemController(
+                        ibAnswer: widget._commonAnswersController
+                            .retrieveAnswer(item.id),
+                        ibQuestion: item,
+                        isExpandable: true,
+                        disableAvatarOnTouch:
+                            item.creatorId == widget.widget.uid),
+                    tag: tag);
+              }
+
+              if (item.questionType == IbQuestion.kMultipleChoice) {
+                return IbMcQuestionCard(_controller);
+              }
+              return IbScQuestionCard(_controller);
+            },
+            itemCount: widget._commonAnswersController.ibQuestions.length,
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}
+
+class DifferentAnswersTab extends StatefulWidget {
+  const DifferentAnswersTab({
+    Key? key,
+    required this.refreshController,
+    required UncommonAnswersController uncommonAnswersController,
+    required this.widget,
+  })  : _uncommonAnswersController = uncommonAnswersController,
+        super(key: key);
+
+  final RefreshController refreshController;
+  final UncommonAnswersController _uncommonAnswersController;
+  final ProfilePage widget;
+
+  @override
+  State<DifferentAnswersTab> createState() => _DifferentAnswersTabState();
+}
+
+class _DifferentAnswersTabState extends State<DifferentAnswersTab>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Obx(
+      () {
+        return SmartRefresher(
+          footer: const ClassicFooter(
+            textStyle: TextStyle(color: IbColors.primaryColor),
+            failedIcon: Icon(
+              Icons.error_outline,
+              color: IbColors.errorRed,
+            ),
+            loadingIcon: IbProgressIndicator(
+              width: 24,
+              height: 24,
+              padding: 0,
+            ),
+          ),
+          controller: widget.refreshController,
+          enablePullDown: false,
+          enablePullUp: true,
+          onLoading: () async {
+            if (widget._uncommonAnswersController.lastIbAnswer == null) {
+              widget.refreshController.loadNoData();
+              return;
+            }
+
+            await widget._uncommonAnswersController.loadMore();
+            widget.refreshController.loadComplete();
+          },
+          child: ListView.builder(
+            itemBuilder: (context, index) {
+              final IbQuestion item =
+                  widget._uncommonAnswersController.ibQuestions[index];
+              final tag = 'uncommon_${item.id}';
+              late IbQuestionItemController _controller;
+
+              if (Get.isRegistered(tag: tag)) {
+                _controller = Get.find(tag: tag);
+              } else {
+                _controller = Get.put(
+                    IbQuestionItemController(
+                        ibAnswer: widget._uncommonAnswersController
+                            .retrieveAnswer(item.id),
+                        showMyAnswer: true,
+                        ibQuestion: item,
+                        isExpandable: true,
+                        disableAvatarOnTouch:
+                            item.creatorId == widget.widget.uid),
+                    tag: tag);
+              }
+
+              if (item.questionType == IbQuestion.kMultipleChoice) {
+                return IbMcQuestionCard(_controller);
+              }
+              return IbScQuestionCard(_controller);
+            },
+            itemCount: widget._uncommonAnswersController.ibQuestions.length,
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}
+
+class AskedQTab extends StatefulWidget {
+  const AskedQTab({
+    Key? key,
+    required AskedQuestionsController createdQuestionController,
+    required this.refreshController,
+    required this.widget,
+  })  : _createdQuestionController = createdQuestionController,
+        super(key: key);
+
+  final AskedQuestionsController _createdQuestionController;
+  final RefreshController refreshController;
+  final ProfilePage widget;
+
+  @override
+  State<AskedQTab> createState() => _AskedQTabState();
+}
+
+class _AskedQTabState extends State<AskedQTab>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Obx(
+      () {
+        if (widget._createdQuestionController.isLoading.isTrue) {
+          return const Center(
+            child: IbProgressIndicator(),
+          );
+        }
+        return SmartRefresher(
+          footer: const ClassicFooter(
+            textStyle: TextStyle(color: IbColors.primaryColor),
+            failedIcon: Icon(
+              Icons.error_outline,
+              color: IbColors.errorRed,
+            ),
+            loadingIcon: IbProgressIndicator(
+              width: 24,
+              height: 24,
+              padding: 0,
+            ),
+          ),
+          controller: widget.refreshController,
+          enablePullDown: false,
+          enablePullUp: true,
+          onLoading: () async {
+            await widget._createdQuestionController.loadMore();
+            if (widget._createdQuestionController.lastDoc == null) {
+              widget.refreshController.loadNoData();
+              return;
+            }
+            widget.refreshController.loadComplete();
+          },
+          child: ListView.builder(
+            itemBuilder: (context, index) {
+              final IbQuestion item =
+                  widget._createdQuestionController.createdQuestions[index];
+              final tag = 'asked_${item.id}';
+              late IbQuestionItemController _controller;
+              if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
+                _controller = Get.find(tag: tag);
+              } else {
+                _controller = Get.put(
+                    IbQuestionItemController(
+                        isExpandable: true,
+                        ibQuestion: item,
+                        disableAvatarOnTouch:
+                            item.creatorId == widget.widget.uid),
+                    tag: tag);
+              }
+              _controller.isExpanded.value = index == 0;
+
+              if (item.questionType == IbQuestion.kMultipleChoice) {
+                return IbMcQuestionCard(_controller);
+              }
+              return IbScQuestionCard(_controller);
+            },
+            itemCount:
+                widget._createdQuestionController.createdQuestions.length,
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}
+
+class AnsweredQTab extends StatefulWidget {
+  const AnsweredQTab({
+    Key? key,
+    required AnsweredQuestionController answeredQuestionController,
+    required this.refreshController,
+    required this.widget,
+  })  : _answeredQuestionController = answeredQuestionController,
+        super(key: key);
+
+  final AnsweredQuestionController _answeredQuestionController;
+  final RefreshController refreshController;
+  final ProfilePage widget;
+
+  @override
+  State<AnsweredQTab> createState() => _AnsweredQTabState();
+}
+
+class _AnsweredQTabState extends State<AnsweredQTab>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Obx(
+      () {
+        if (widget._answeredQuestionController.isLoading.isTrue) {
+          return const Center(
+            child: IbProgressIndicator(),
+          );
+        }
+
+        return SmartRefresher(
+          footer: const ClassicFooter(
+            textStyle: TextStyle(color: IbColors.primaryColor),
+            failedIcon: Icon(
+              Icons.error_outline,
+              color: IbColors.errorRed,
+            ),
+            loadingIcon: IbProgressIndicator(
+              width: 24,
+              height: 24,
+              padding: 0,
+            ),
+          ),
+          controller: widget.refreshController,
+          enablePullDown: false,
+          enablePullUp: true,
+          onLoading: () async {
+            await widget._answeredQuestionController.loadMore();
+            if (widget._answeredQuestionController.lastDoc == null) {
+              widget.refreshController.loadNoData();
+              return;
+            }
+            widget.refreshController.loadComplete();
+          },
+          child: ListView.builder(
+            itemBuilder: (context, index) {
+              final AnsweredQuestionItem item =
+                  widget._answeredQuestionController.myAnsweredQuestions[index];
+
+              final tag = 'answered_${item.ibQuestion.id}';
+              late IbQuestionItemController _controller;
+              if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
+                _controller = Get.find(tag: tag);
+              } else {
+                _controller = Get.put(
+                    IbQuestionItemController(
+                        ibAnswer: item.ibAnswer,
+                        ibQuestion: item.ibQuestion,
+                        disableAvatarOnTouch:
+                            item.ibQuestion.creatorId == widget.widget.uid,
+                        isExpandable: true),
+                    tag: tag);
+              }
+
+              _controller.isExpanded.value = index == 0;
+
+              if (item.ibQuestion.questionType == IbQuestion.kMultipleChoice) {
+                return IbMcQuestionCard(_controller);
+              }
+              return IbScQuestionCard(_controller);
+            },
+            itemCount:
+                widget._answeredQuestionController.myAnsweredQuestions.length,
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class PersistentHeader extends SliverPersistentHeaderDelegate {
