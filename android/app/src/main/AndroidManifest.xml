@@ -9,6 +9,19 @@
    <application
         android:label="Icebr8k"
         android:icon="@mipmap/ic_launcher">
+
+       <meta-data
+           android:name="com.google.firebase.messaging.default_notification_icon"
+           android:resource="@drawable/notification_icon"/>
+
+       <meta-data
+           android:name="com.google.firebase.messaging.default_notification_color"
+           android:resource="@color/primaryColor" />
+
+       <meta-data
+           android:name="com.google.firebase.messaging.default_notification_channel_id"
+           android:value="icebr8k_notification_id" />
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

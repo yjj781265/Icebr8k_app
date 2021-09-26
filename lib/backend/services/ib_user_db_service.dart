@@ -241,4 +241,16 @@ class IbUserDbService {
       'cloudMsgToken': token,
     }, SetOptions(merge: true));
   }
+
+  Future<void> removeTokenFromDatabase() async {
+    // Assume user is logged in for this example
+    final String? userId = IbUtils.getCurrentUid();
+    if (userId == null) {
+      return;
+    }
+
+    await _collectionRef.doc(userId).set({
+      'cloudMsgToken': null,
+    }, SetOptions(merge: true));
+  }
 }

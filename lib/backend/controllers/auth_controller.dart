@@ -267,6 +267,7 @@ class AuthController extends GetxService {
   Future<void> signOut() async {
     Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_out'));
     if (firebaseUser != null) {
+      await IbCloudMessagingService().removeMyToken();
       await IbUserDbService().signOutIbUser(firebaseUser!.uid);
     }
     await _ibAuthService.signOut();

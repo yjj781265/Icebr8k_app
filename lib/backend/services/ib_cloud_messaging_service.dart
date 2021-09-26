@@ -43,6 +43,11 @@ class IbCloudMessagingService extends GetConnect {
     }
   }
 
+  Future<void> removeMyToken() async {
+    await _fcm.deleteToken();
+    await IbUserDbService().removeTokenFromDatabase();
+  }
+
   /// @param type: use IbCloudMessagingService notification constant string
   Future<void> sendNotification(
       {required List<String> tokens,

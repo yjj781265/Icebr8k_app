@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
@@ -25,11 +26,13 @@ class HomeController extends GetxController {
   ];
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
     if (IbUtils.getCurrentUid() == null) {
       print('HomeController unable retrieve current user UID');
+      return;
     }
+    await setupInteractedMessage();
     _currentIbUserStream = IbUserDbService()
         .listenToIbUserChanges(IbUtils.getCurrentUid()!)
         .listen((ibUser) {
@@ -48,6 +51,28 @@ class HomeController extends GetxController {
       currentBio.value = currentIbUser!.description;
       currentBirthdate.value = currentIbUser!.birthdateInMs;
     }
+  }
+
+  // It is assumed that all messages contain a data field with the key 'type'
+  Future<void> setupInteractedMessage() async {
+    // Get any messages which caused the application to open from
+    // a terminated state.
+    final RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+
+    // If the message also contains a data property with a "type" of "chat",
+    // navigate to a chat screen
+    if (initialMessage != null) {
+      _handleMessage(initialMessage);
+    }
+
+    // Also handle any interaction when the app is in the background via a
+    // Stream listener
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+  }
+
+  void _handleMessage(RemoteMessage message) {
+    print('handle user click notification');
   }
 
   @override
