@@ -154,4 +154,14 @@ class IbChatDbService {
     }
     return _snapshot.docs.first.data()['chatRoomId'].toString();
   }
+
+  Future<List<String>> queryMemberUids(String chatRoomId) async {
+    final _snapshot = await _collectionRef.doc(chatRoomId).get();
+    if (!_snapshot.exists) {
+      return <String>[];
+    }
+    return (_snapshot['memberUids'] as List<dynamic>)
+        .map((e) => e as String)
+        .toList();
+  }
 }

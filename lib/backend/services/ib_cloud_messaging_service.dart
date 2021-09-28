@@ -48,42 +48,37 @@ class IbCloudMessagingService extends GetConnect {
     await IbUserDbService().removeTokenFromDatabase();
   }
 
+  Future<String?> retrieveToken(String uid) async {
+    return IbUserDbService().retrieveTokenFromDatabase(uid);
+  }
+
   /// @param type: use IbCloudMessagingService notification constant string
   Future<void> sendNotification(
       {required List<String> tokens,
       required String title,
+      String? imageUrl,
+      String? chatRoomId,
       required String body,
       required String type}) async {
-    print('sendNotification');
-    final String? token = await _fcm.getToken();
-    final HttpsCallable callable =
-        FirebaseFunctions.instance.httpsCallable('pushNotification');
-    final result = await callable.call({
-      'tokens': [token!],
-      'body': "Hello World",
-      "title": "this is title",
-      "data": {'type': "chat"}
-    });
-    print(result.data);
-  }
-
-  Future<void> sendPushMessage() async {
-    if (_token == null) {
-      print('Unable to send FCM message, no token exists.');
+    if (IbCloudMessagingService.kNotificationTypeChat == type &&
+            chatRoomId == null ||
+        chatRoomId!.isEmpty) {
+      print('chatRoom Id is null or empty');
       return;
     }
 
-    try {
-      await http.post(
-        Uri.parse('https://api.rnfirebase.io/messaging/send'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: constructFCMPayload(_token),
-      );
-      print('FCM request for device sent!');
-    } catch (e) {
-      print(e);
-    }
+    final HttpsCallable callable =
+        FirebaseFunctions.instance.httpsCallable('pushNotification');
+    final result = await callable.call({
+      'tokens': tokens,
+      'body': body,
+      "title": title,
+      "imageUrl": imageUrl,
+      "data": {
+        'type': type,
+        'chatRoomId': chatRoomId,
+      }
+    });
+    print('${tokens.length} tokens, sent ${result.data}');
   }
 }

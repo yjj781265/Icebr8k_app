@@ -7,6 +7,7 @@ import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_chat_db_service.dart';
+import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -122,7 +123,28 @@ class ChatPageController extends GetxController {
       return;
     }
     await IbChatDbService().uploadMessage(ibMessage);
+    await _handleNotificationDelivery(ibMessage);
     isSending.value = false;
+  }
+
+  Future<void> _handleNotificationDelivery(IbMessage ibMessage) async {
+    final List<String> memberUids =
+        await IbChatDbService().queryMemberUids(chatRoomId);
+    memberUids.remove(IbUtils.getCurrentUid());
+    if (memberUids.isNotEmpty) {
+      final List<String> tokens = [];
+      for (final uid in memberUids) {
+        final token = await IbUserDbService().retrieveTokenFromDatabase(uid);
+        tokens.addIf(token != null, token!);
+      }
+
+      await IbCloudMessagingService().sendNotification(
+          tokens: tokens,
+          chatRoomId: chatRoomId,
+          title: IbUtils.getCurrentIbUser()!.username,
+          body: ibMessage.content,
+          type: IbCloudMessagingService.kNotificationTypeChat);
+    }
   }
 
   Future<void> initUserMap() async {

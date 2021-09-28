@@ -253,4 +253,13 @@ class IbUserDbService {
       'cloudMsgToken': null,
     }, SetOptions(merge: true));
   }
+
+  Future<String?> retrieveTokenFromDatabase(String uid) async {
+    final snapshot = await _collectionRef.doc(uid).get();
+
+    if (!snapshot.exists) {
+      return null;
+    }
+    return snapshot['cloudMsgToken'] as String?;
+  }
 }
