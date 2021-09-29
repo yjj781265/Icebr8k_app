@@ -133,7 +133,8 @@ class IbChatDbService {
     print('createChatRoom new room $chatRoomId');
   }
 
-  Future<void> removeChatRoom(String chatRoomId) {
+  // todo call cloud function for this
+  Future<void> removeChatRoom(String chatRoomId) async {
     return _collectionRef.doc(chatRoomId).delete();
   }
 

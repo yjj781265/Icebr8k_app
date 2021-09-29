@@ -128,14 +128,17 @@ class ChatPageController extends GetxController {
   }
 
   Future<void> _handleNotificationDelivery(IbMessage ibMessage) async {
-    final List<String> memberUids =
-        await IbChatDbService().queryMemberUids(chatRoomId);
     memberUids.remove(IbUtils.getCurrentUid());
     if (memberUids.isNotEmpty) {
       final List<String> tokens = [];
+
       for (final uid in memberUids) {
         final token = await IbUserDbService().retrieveTokenFromDatabase(uid);
         tokens.addIf(token != null, token!);
+      }
+
+      if (tokens.isEmpty) {
+        return;
       }
 
       await IbCloudMessagingService().sendNotification(
