@@ -59,14 +59,7 @@
 	</array>
 
 	<key>UISupportedInterfaceOrientations~ipad</key>
-
-	<key>LSApplicationQueriesSchemes</key>
     <array>
-       <string>https</string>
-       <string>http</string>
-    </array>
-
-	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
