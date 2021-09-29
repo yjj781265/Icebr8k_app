@@ -119,12 +119,12 @@ class ChatPageController extends GetxController {
 
     if (messages.isEmpty) {
       await IbChatDbService().uploadMessage(ibMessage, memberUids: memberUids);
-      isSending.value = false;
-      return;
+    } else {
+      await IbChatDbService().uploadMessage(ibMessage);
     }
-    await IbChatDbService().uploadMessage(ibMessage);
-    await _handleNotificationDelivery(ibMessage);
     isSending.value = false;
+
+    await _handleNotificationDelivery(ibMessage);
   }
 
   Future<void> _handleNotificationDelivery(IbMessage ibMessage) async {

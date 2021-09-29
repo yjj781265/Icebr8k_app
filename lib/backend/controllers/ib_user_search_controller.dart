@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -69,7 +70,18 @@ class IbUserSearchController extends GetxController {
           myUid: Get.find<AuthController>().firebaseUser!.uid,
           friendUid: friendUid.value,
           requestMsg: requestMsg);
+      final _token =
+          await IbCloudMessagingService().retrieveToken(friendUid.value);
+
+      if (_token != null) {
+        IbCloudMessagingService().sendNotification(
+            tokens: [_token],
+            title: IbUtils.getCurrentIbUser()!.username,
+            body: '${'send_you_a_friend_request'.tr}\n $requestMsg',
+            type: IbCloudMessagingService.kNotificationTypeRequest);
+      }
       friendshipStatus.value = IbFriend.kFriendshipStatusRequestSent;
+
       Get.showSnackbar(GetBar(
         borderRadius: IbConfig.kCardCornerRadius,
         margin: const EdgeInsets.all(8),

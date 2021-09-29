@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../ib_config.dart';
 
@@ -150,8 +152,14 @@ class MyMessageItemView extends StatelessWidget {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      item.message.content,
+                    child: SelectableLinkify(
+                      onOpen: (link) async {
+                        if (await canLaunch(link.url)) {
+                          launch(link.url);
+                        }
+                      },
+                      text: item.message.content,
+                      linkStyle: const TextStyle(color: Colors.white),
                       style:
                           const TextStyle(fontSize: IbConfig.kNormalTextSize),
                     ),
@@ -221,8 +229,14 @@ class MessageItemView extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  item.message.content,
+                child: SelectableLinkify(
+                  text: item.message.content,
+                  onOpen: (link) async {
+                    if (await canLaunch(link.url)) {
+                      launch(link.url);
+                    }
+                  },
+                  linkStyle: const TextStyle(color: Colors.white),
                   style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
                 ),
               ),

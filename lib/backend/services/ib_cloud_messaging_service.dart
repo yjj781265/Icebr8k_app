@@ -61,10 +61,16 @@ class IbCloudMessagingService extends GetConnect {
       required String body,
       required String type}) async {
     if (IbCloudMessagingService.kNotificationTypeChat == type &&
-            chatRoomId == null ||
-        chatRoomId!.isEmpty) {
+        chatRoomId == null) {
       print('chatRoom Id is null or empty');
       return;
+    }
+
+    final Map<String, String> data = {};
+    data['type'] = type;
+
+    if (chatRoomId != null) {
+      data['chatRoomId'] = chatRoomId;
     }
 
     final HttpsCallable callable =
@@ -72,12 +78,10 @@ class IbCloudMessagingService extends GetConnect {
     final result = await callable.call({
       'tokens': tokens,
       'body': body,
+      'badge': 12,
       "title": title,
       "imageUrl": imageUrl,
-      "data": {
-        'type': type,
-        'chatRoomId': chatRoomId,
-      }
+      "data": data
     });
     print('${tokens.length} tokens, sent ${result.data}');
   }

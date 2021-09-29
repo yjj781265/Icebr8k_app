@@ -5,6 +5,7 @@ import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_list_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_request_controller.dart';
 import 'package:icebr8k/backend/controllers/people_nearby_controller.dart';
+import 'package:icebr8k/backend/controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -36,6 +37,7 @@ class _SocialTabState extends State<SocialTab>
   void initState() {
     super.initState();
     _tabController = TabController(vsync: this, length: 3);
+    Get.find<SocialTabController>().tabController = _tabController;
   }
 
   @override

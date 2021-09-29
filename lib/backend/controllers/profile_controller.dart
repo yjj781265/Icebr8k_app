@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
@@ -119,6 +120,16 @@ class ProfileController extends GetxController {
           myUid: IbUtils.getCurrentUid()!,
           friendUid: uid,
           requestMsg: requestMsg);
+      final _token = await IbCloudMessagingService().retrieveToken(uid);
+
+      if (_token != null) {
+        IbCloudMessagingService().sendNotification(
+            tokens: [_token],
+            title: IbUtils.getCurrentIbUser()!.username,
+            body: '${'send_you_a_friend_request'.tr}\n $requestMsg',
+            type: IbCloudMessagingService.kNotificationTypeRequest);
+      }
+
       friendshipStatus.value = IbFriend.kFriendshipStatusRequestSent;
       Get.showSnackbar(GetBar(
         borderRadius: IbConfig.kCardCornerRadius,

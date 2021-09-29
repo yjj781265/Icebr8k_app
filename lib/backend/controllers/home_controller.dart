@@ -2,8 +2,13 @@ import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
+import 'package:icebr8k/backend/controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/ib_chat_db_service.dart';
+import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 /// this controller control info of current IbUser, and index current home page tab
@@ -72,7 +77,24 @@ class HomeController extends GetxController {
   }
 
   void _handleMessage(RemoteMessage message) {
-    print('handle user click notification');
+    final data = message.data;
+    final type = data['type'];
+    if (IbCloudMessagingService.kNotificationTypeChat == type) {
+      final String? chatRoomId = data['chatRoomId'] as String?;
+      if (chatRoomId == null || chatRoomId.isEmpty) {
+        return;
+      }
+
+      IbChatDbService().queryMemberUids(chatRoomId).then((value) {
+        Get.to(() => ChatPage(Get.put(ChatPageController(value))));
+      });
+    }
+
+    if (IbCloudMessagingService.kNotificationTypeRequest == type) {
+      currentIndex.value = 2;
+      Get.find<SocialTabController>().tabController!.animateTo(2);
+      return;
+    }
   }
 
   @override
