@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
+import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -211,10 +212,10 @@ class IbUtils {
   }
 
   static IbUser? getCurrentIbUser() {
-    if (Get.find<AuthController>().firebaseUser == null) {
+    if (!Get.isRegistered<HomeController>()) {
       return null;
     }
-    return Get.find<AuthController>().ibUser;
+    return Get.find<HomeController>().currentIbUser;
   }
 
   static void showSimpleSnackBar(
@@ -232,7 +233,7 @@ class IbUtils {
   static Future<double> getCompScore(String uid) async {
     final List<IbAnswer> uid1QuestionAnswers = [];
     uid1QuestionAnswers
-        .addAll(Get.put(MyAnsweredQuestionsController()).ibAnswers);
+        .addAll(Get.find<MyAnsweredQuestionsController>().ibAnswers);
     final List<IbAnswer> uid2QuestionAnswers =
         await IbQuestionDbService().queryUserAnswers(uid);
 
@@ -272,7 +273,7 @@ class IbUtils {
     /// query each user answered questions then intersect
     final List<IbAnswer> uid1QuestionAnswers = [];
     uid1QuestionAnswers
-        .addAll(Get.put(MyAnsweredQuestionsController()).ibAnswers);
+        .addAll(Get.find<MyAnsweredQuestionsController>().ibAnswers);
     final List<IbAnswer> uid2QuestionAnswers =
         await IbQuestionDbService().queryUserAnswers(uid);
 
@@ -286,7 +287,7 @@ class IbUtils {
     /// query each user answered questions then find the difference
     final List<IbAnswer> uid1QuestionAnswers = [];
     uid1QuestionAnswers
-        .addAll(Get.put(MyAnsweredQuestionsController()).ibAnswers);
+        .addAll(Get.find<MyAnsweredQuestionsController>().ibAnswers);
     final List<IbAnswer> uid2QuestionAnswers =
         await IbQuestionDbService().queryUserAnswers(uid);
 

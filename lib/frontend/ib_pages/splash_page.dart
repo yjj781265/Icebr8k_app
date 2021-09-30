@@ -13,7 +13,7 @@ import 'home_page.dart';
 
 class SplashPage extends StatelessWidget {
   SplashPage({Key? key}) : super(key: key);
-  final controller = Get.put(AuthController());
+  final controller = Get.find<AuthController>();
   @override
   Widget build(BuildContext context) {
     Future.delayed(

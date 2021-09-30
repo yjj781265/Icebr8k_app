@@ -78,7 +78,7 @@ class IbCloudMessagingService extends GetConnect {
     final result = await callable.call({
       'tokens': tokens,
       'body': body,
-      'badge': 12,
+      'badge': 0,
       "title": title,
       "imageUrl": imageUrl,
       "data": data

@@ -13,8 +13,7 @@ import 'package:liquid_swipe/liquid_swipe.dart';
 class SetupPage extends StatelessWidget {
   SetupPage({Key? key}) : super(key: key);
   final SetUpController setUpController = Get.put(SetUpController());
-  final MyAnsweredQuestionsController _myAnsweredQController =
-      Get.put(MyAnsweredQuestionsController());
+  final MyAnsweredQuestionsController _myAnsweredQController = Get.find();
 
   @override
   Widget build(BuildContext context) {

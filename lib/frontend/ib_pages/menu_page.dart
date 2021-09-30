@@ -8,7 +8,7 @@ import 'package:icebr8k/frontend/ib_config.dart';
 class MenuPage extends StatelessWidget {
   MenuPage({Key? key}) : super(key: key);
 
-  final _homeController = Get.put(HomeController());
+  final _homeController = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {

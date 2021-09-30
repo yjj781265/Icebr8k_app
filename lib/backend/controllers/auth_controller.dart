@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
+import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/backend/controllers/sign_in_controller.dart';
 import 'package:icebr8k/backend/controllers/sign_up_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -21,7 +22,6 @@ class AuthController extends GetxService {
   final isSigningIn = false.obs;
   final isSigningUp = false.obs;
   User? firebaseUser;
-  IbUser? ibUser;
   final _ibAuthService = IbAuthService();
 
   @override
@@ -30,12 +30,10 @@ class AuthController extends GetxService {
     _fbAuthSub = _ibAuthService.listenToAuthStateChanges().listen((user) async {
       if (user == null) {
         firebaseUser = null;
-        ibUser = null;
         print('User is signed out!');
       } else {
         firebaseUser = user;
-        ibUser = await IbUserDbService().queryIbUser(firebaseUser!.uid);
-        await IbCloudMessagingService().init();
+        Get.lazyPut(() => MyAnsweredQuestionsController(), fenix: true);
         print('User is signed in! ${firebaseUser!.uid}');
       }
     });

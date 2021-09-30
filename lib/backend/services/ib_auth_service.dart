@@ -72,7 +72,6 @@ class IbAuthService {
     return digest.toString();
   }
 
-  //Todo test apple Sign in;
   Future<UserCredential?> signInWithApple() async {
     // To prevent replay attacks with the credential returned from Apple, we
     // include a nonce in the credential request. When signing in with

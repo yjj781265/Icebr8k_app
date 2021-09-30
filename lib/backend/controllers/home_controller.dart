@@ -37,6 +37,7 @@ class HomeController extends GetxController {
       print('HomeController unable retrieve current user UID');
       return;
     }
+    await IbCloudMessagingService().init();
     await setupInteractedMessage();
     _currentIbUserStream = IbUserDbService()
         .listenToIbUserChanges(IbUtils.getCurrentUid()!)
