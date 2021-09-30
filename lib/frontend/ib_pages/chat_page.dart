@@ -99,9 +99,9 @@ class ChatPage extends StatelessWidget {
                                     if (_txtController.text.trim().isEmpty) {
                                       return;
                                     }
+                                    _txtController.clear();
                                     await _controller
                                         .uploadMessage(_txtController.text);
-                                    _txtController.clear();
                                   },
                                 )),
                     ),
