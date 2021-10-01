@@ -8,7 +8,6 @@ import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
-import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -66,11 +65,7 @@ class SetUpController extends GetxController {
     myAnsweredQStream = Get.find<MyAnsweredQuestionsController>()
         .broadcastStream
         .listen((event) {
-      IbQuestionDbService()
-          .listenToAnsweredQuestionsChange(IbUtils.getCurrentUid()!)
-          .listen((event) {
-        _handleSetupPageScreenThree(event);
-      });
+      _handleSetupPageScreenThree(event);
     });
 
     isLoading.value = false;
@@ -100,6 +95,7 @@ class SetUpController extends GetxController {
   @override
   void onClose() {
     print("SetUpController: close ");
+    myAnsweredQStream.cancel();
     super.onClose();
   }
 

@@ -283,18 +283,18 @@ class _ProfilePageState extends State<ProfilePage>
                                   if (_profileController.isMe.isTrue)
                                     Tab(
                                         text:
-                                            'Answered Questions(${_profileController.totalAnswered.value})'),
+                                            'Answered Questions(${_homeController.answeredSize.value})'),
                                   if (_profileController.isMe.isFalse)
-                                    Obx(() => Tab(
+                                    Tab(
                                         text:
-                                            'Common Answers(${_commonAnswersController.ibQuestions.length})')),
+                                            'Common Answers(${_commonAnswersController.commonAnswers.length})'),
                                   if (_profileController.isMe.isFalse)
-                                    Obx(() => Tab(
+                                    Tab(
                                         text:
-                                            'Different Answers(${_uncommonAnswersController.ibQuestions.length})')),
+                                            'Different Answers(${_uncommonAnswersController.uncommonAnswers.length})'),
                                   Tab(
                                       text:
-                                          'Asked Questions(${_profileController.totalAsked.value})'),
+                                          'Asked Questions(${_profileController.isMe.isTrue ? _homeController.askedSize.value : _profileController.totalAsked.value})'),
                                 ],
                                 labelStyle: const TextStyle(
                                     fontWeight: FontWeight.bold),

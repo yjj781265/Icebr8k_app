@@ -27,8 +27,10 @@ class MyAnsweredQuestionsController extends GetxController {
       for (final docChange in event.docChanges) {
         final IbAnswer ibAnswer = IbAnswer.fromJson(docChange.doc.data()!);
         if (docChange.type == DocumentChangeType.added) {
+          print("MyAnsweredQuestionsController added");
           ibAnswers.addIf(!ibAnswers.contains(ibAnswer), ibAnswer);
         } else if (docChange.type == DocumentChangeType.removed) {
+          print("MyAnsweredQuestionsController removed");
           final int index = ibAnswers.indexOf(ibAnswer);
           if (index != -1) {
             ibAnswers.removeAt(index);
