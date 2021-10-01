@@ -5,7 +5,7 @@ class IbConfig {
   static const double kScrollbarCornerRadius = 16;
   static const double kTextBoxCornerRadius = 16;
   static const double kButtonCornerRadius = 16;
-  static const double kPageTitleSize = 22;
+  static const double kPageTitleSize = 21;
   static const double kSecondaryTextSize = 14;
   static const double kDescriptionTextSize = 12;
   static const double kNormalTextSize = 16;

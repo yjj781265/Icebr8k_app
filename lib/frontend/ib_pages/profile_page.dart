@@ -9,10 +9,10 @@ import 'package:icebr8k/backend/controllers/answered_question_controller.dart';
 import 'package:icebr8k/backend/controllers/asked_questions_controller.dart';
 import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/common_answers_controller.dart';
+import 'package:icebr8k/backend/controllers/different_answers_controller.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/profile_controller.dart';
-import 'package:icebr8k/backend/controllers/uncommon_answers_controller.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -48,7 +48,7 @@ class _ProfilePageState extends State<ProfilePage>
   late AnsweredQuestionController _answeredQuestionController;
   late AskedQuestionsController _createdQuestionController;
   late CommonAnswersController _commonAnswersController;
-  late UncommonAnswersController _uncommonAnswersController;
+  late DifferentAnswersController _uncommonAnswersController;
   late ProfileController _profileController;
   late HomeController _homeController;
 
@@ -68,7 +68,7 @@ class _ProfilePageState extends State<ProfilePage>
       _commonAnswersController =
           Get.put(CommonAnswersController(widget.uid), tag: widget.uid);
       _uncommonAnswersController =
-          Get.put(UncommonAnswersController(widget.uid), tag: widget.uid);
+          Get.put(DifferentAnswersController(widget.uid), tag: widget.uid);
     }
 
     _tabController = TabController(
@@ -731,13 +731,13 @@ class DifferentAnswersTab extends StatefulWidget {
   const DifferentAnswersTab({
     Key? key,
     required this.refreshController,
-    required UncommonAnswersController uncommonAnswersController,
+    required DifferentAnswersController uncommonAnswersController,
     required this.widget,
   })  : _uncommonAnswersController = uncommonAnswersController,
         super(key: key);
 
   final RefreshController refreshController;
-  final UncommonAnswersController _uncommonAnswersController;
+  final DifferentAnswersController _uncommonAnswersController;
   final ProfilePage widget;
 
   @override
