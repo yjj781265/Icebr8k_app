@@ -672,6 +672,7 @@ class _CommonAnswersTabState extends State<CommonAnswersTab>
               Icons.error_outline,
               color: IbColors.errorRed,
             ),
+            loadStyle: LoadStyle.HideAlways,
             loadingIcon: IbProgressIndicator(
               width: 24,
               height: 24,
@@ -753,6 +754,7 @@ class _DifferentAnswersTabState extends State<DifferentAnswersTab>
         return SmartRefresher(
           footer: const ClassicFooter(
             textStyle: TextStyle(color: IbColors.primaryColor),
+            loadStyle: LoadStyle.HideAlways,
             failedIcon: Icon(
               Icons.error_outline,
               color: IbColors.errorRed,
@@ -845,6 +847,7 @@ class _AskedQTabState extends State<AskedQTab>
         return SmartRefresher(
           footer: const ClassicFooter(
             textStyle: TextStyle(color: IbColors.primaryColor),
+            loadStyle: LoadStyle.HideAlways,
             failedIcon: Icon(
               Icons.error_outline,
               color: IbColors.errorRed,
@@ -934,6 +937,7 @@ class _AnsweredQTabState extends State<AnsweredQTab>
 
         return SmartRefresher(
           footer: const ClassicFooter(
+            loadStyle: LoadStyle.HideAlways,
             textStyle: TextStyle(color: IbColors.primaryColor),
             failedIcon: Icon(
               Icons.error_outline,
@@ -965,6 +969,7 @@ class _AnsweredQTabState extends State<AnsweredQTab>
               late IbQuestionItemController _controller;
               if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
                 _controller = Get.find(tag: tag);
+                _controller.calculateResult();
               } else {
                 _controller = Get.put(
                     IbQuestionItemController(

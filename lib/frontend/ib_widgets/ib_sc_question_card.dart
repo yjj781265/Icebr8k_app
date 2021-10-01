@@ -72,9 +72,6 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
       ],
     );
     return InkWell(
-      onLongPress: () async {
-        await widget._controller.eraseAnswer();
-      },
       child: Ink(
         child: Obx(
           () => Center(

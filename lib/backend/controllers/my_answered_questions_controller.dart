@@ -8,15 +8,19 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 
 class MyAnsweredQuestionsController extends GetxController {
   late StreamSubscription myAnsweredQStream;
+  final Stream<QuerySnapshot<Map<String, dynamic>>> broadcastStream =
+      IbQuestionDbService()
+          .listenToAnsweredQuestionsChange(IbUtils.getCurrentUid()!)
+          .asBroadcastStream();
   List<IbAnswer> ibAnswers = <IbAnswer>[];
+  final isLoaded = false.obs;
 
   @override
   void onInit() {
+    isLoaded.value = false;
     print("MyAnsweredQuestionsController init");
     super.onInit();
-    myAnsweredQStream = IbQuestionDbService()
-        .listenToAnsweredQuestionsChange(IbUtils.getCurrentUid()!)
-        .listen((event) {
+    myAnsweredQStream = broadcastStream.listen((event) {
       print(
           "MyAnsweredQuestionsController total answered questions : ${event.size}");
 
@@ -31,6 +35,8 @@ class MyAnsweredQuestionsController extends GetxController {
           }
         }
       }
+    }, onDone: () {
+      isLoaded.value = true;
     });
   }
 

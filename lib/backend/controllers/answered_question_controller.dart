@@ -69,9 +69,14 @@ class AnsweredQuestionController extends GetxController {
   }
 
   Future<void> loadMore() async {
+    if (lastDoc == null) {
+      print('AnsweredQuestionController no more');
+      return;
+    }
     print('AnsweredQuestionController loadMore');
     final _snapshot = await IbQuestionDbService()
         .queryAnsweredQuestions(uid, lastDoc: lastDoc);
+
     if (_snapshot.docs.isNotEmpty) {
       lastDoc = _snapshot.docs.last;
       print('AnsweredQuestionController last doc is ${lastDoc!.data()}');

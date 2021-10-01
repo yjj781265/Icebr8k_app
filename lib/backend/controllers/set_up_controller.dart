@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
+import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
@@ -62,10 +63,14 @@ class SetUpController extends GetxController {
 
     totalPageSize.value = pages.length;
 
-    myAnsweredQStream = IbQuestionDbService()
-        .listenToAnsweredQuestionsChange(IbUtils.getCurrentUid()!)
+    myAnsweredQStream = Get.find<MyAnsweredQuestionsController>()
+        .broadcastStream
         .listen((event) {
-      _handleSetupPageScreenThree(event);
+      IbQuestionDbService()
+          .listenToAnsweredQuestionsChange(IbUtils.getCurrentUid()!)
+          .listen((event) {
+        _handleSetupPageScreenThree(event);
+      });
     });
 
     isLoading.value = false;
@@ -79,18 +84,15 @@ class SetUpController extends GetxController {
     if (!Get.isRegistered<SetUpController>()) {
       return;
     }
-    final SetUpController _setupController = Get.find();
-
     for (final docChange in event.docChanges) {
       final IbAnswer ibAnswer = IbAnswer.fromJson(docChange.doc.data()!);
       if (docChange.type == DocumentChangeType.added &&
-          _setupController.ibQuestions
+          ibQuestions
                   .indexWhere((element) => element.id == ibAnswer.questionId) !=
               -1) {
-        _setupController.answeredCounter.value =
-            _setupController.answeredCounter.value + 1;
+        answeredCounter.value = answeredCounter.value + 1;
         print(
-            'updating SetUpController answeredCounter to ${_setupController.answeredCounter.value}');
+            'updating SetUpController answeredCounter to ${answeredCounter.value}');
       }
     }
   }

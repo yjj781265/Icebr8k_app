@@ -87,9 +87,6 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
       ],
     );
     return InkWell(
-      onLongPress: () async {
-        await widget._controller.eraseAnswer();
-      },
       child: Ink(
         child: Center(
           child: LimitedBox(

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -10,10 +8,9 @@ import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:liquid_swipe/liquid_swipe.dart';
 
-class SetupPage extends StatelessWidget {
+class SetupPage extends GetView<MyAnsweredQuestionsController> {
   SetupPage({Key? key}) : super(key: key);
   final SetUpController setUpController = Get.put(SetUpController());
-  final MyAnsweredQuestionsController _myAnsweredQController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +27,7 @@ class SetupPage extends StatelessWidget {
           } else {
             return WillPopScope(
               onWillPop: () async {
-                if (Platform.isAndroid) {
-                  await Get.find<AuthController>().signOut();
-                }
+                await Get.find<AuthController>().signOut();
                 return true;
               },
               child: LiquidSwipe(

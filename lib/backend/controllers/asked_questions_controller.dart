@@ -54,6 +54,9 @@ class AskedQuestionsController extends GetxController {
   }
 
   Future<void> loadMore() async {
+    if (lastDoc == null) {
+      return;
+    }
     final _snapshot = await IbQuestionDbService()
         .queryAskedQuestions(limit: 8, uid: uid, lastDoc: lastDoc);
     if (_snapshot.docs.isNotEmpty) {

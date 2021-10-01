@@ -25,8 +25,8 @@ class AuthController extends GetxService {
   final _ibAuthService = IbAuthService();
 
   @override
-  void onReady() {
-    super.onReady();
+  void onInit() {
+    super.onInit();
     _fbAuthSub = _ibAuthService.listenToAuthStateChanges().listen((user) async {
       if (user == null) {
         firebaseUser = null;

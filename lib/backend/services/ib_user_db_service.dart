@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
+import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -70,10 +73,18 @@ class IbUserDbService {
   }
 
   Future<List<IbQuestion>> queryUnAnsweredFirst8Q(String uid) async {
+    List<String> questionIds = [];
+    final _controller = Get.find<MyAnsweredQuestionsController>();
     final List<IbQuestion> questions =
         await IbQuestionDbService().queryIcebr8kQ();
-    final List<String> questionIds =
-        await IbQuestionDbService().queryAnsweredQuestionIds(uid);
+    if (_controller.isLoaded.isTrue && _controller.ibAnswers.isNotEmpty) {
+      for (final IbAnswer ibAnswer in _controller.ibAnswers) {
+        questionIds.add(ibAnswer.questionId);
+      }
+    } else {
+      questionIds = await IbQuestionDbService().queryAnsweredQuestionIds(uid);
+    }
+
     questions.removeWhere((element) => questionIds.contains(element.id));
     return questions;
   }
