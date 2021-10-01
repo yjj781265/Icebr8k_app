@@ -249,7 +249,6 @@ class IbQuestionDbService {
   }
 
   Future<void> answerQuestion(IbAnswer ibAnswer) async {
-    // todo add counter in parent collection show total answers count with cloud function
     await _collectionRef
         .doc(ibAnswer.questionId)
         .collection('Answers')
@@ -258,10 +257,11 @@ class IbQuestionDbService {
   }
 
   Future<int> queryPollSize(String questionId) async {
-    // todo switch to use cloud function add counter doc
-    final _snapshot =
-        await _collectionRef.doc(questionId).collection('Answers').get();
-    return _snapshot.size;
+    final _snapshot = await _collectionRef.doc(questionId).get();
+    if (!_snapshot.exists || _snapshot.data() == null) {
+      return 0;
+    }
+    return _snapshot.data()!['pollSize'] as int;
   }
 
   Future<int> querySpecificAnswerPollSize(

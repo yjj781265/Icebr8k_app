@@ -135,7 +135,7 @@ class IbChatDbService {
 
   // todo call cloud function for this
   Future<void> removeChatRoom(String chatRoomId) async {
-    return _collectionRef.doc(chatRoomId).delete();
+    await _collectionRef.doc(chatRoomId).delete();
   }
 
   Future<String> getChatRoomId(List<String> uids) async {

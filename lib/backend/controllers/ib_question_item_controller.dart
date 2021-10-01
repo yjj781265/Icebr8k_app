@@ -99,6 +99,7 @@ class IbQuestionItemController extends GetxController {
     isCalculating.value = true;
     totalPolled.value =
         await IbQuestionDbService().queryPollSize(ibQuestion.id);
+    totalPolled.value = totalPolled.value + 1;
 
     if (ibQuestion.questionType == IbQuestion.kMultipleChoice) {
       for (final choice in ibQuestion.choices) {

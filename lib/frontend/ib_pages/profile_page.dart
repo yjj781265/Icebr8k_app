@@ -333,7 +333,6 @@ class _ProfilePageState extends State<ProfilePage>
             )
           : CachedNetworkImage(
               progressIndicatorBuilder: (context, value, progress) {
-                /// Todo keep eye on this one
                 if (progress.progress == null) {
                   return const SizedBox();
                 }

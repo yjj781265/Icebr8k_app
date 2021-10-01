@@ -64,8 +64,7 @@ class ChatTab extends StatelessWidget {
             buttonColor: Colors.transparent,
             title: 'Are you sure to delete chat with ${item.title}',
             onConfirm: () {
-              //todo fix this
-              // _controller.removeChatItem(item);
+              _controller.removeChatItem(item);
               Get.back(result: true);
             },
             onCancel: () => Get.back(result: false));
