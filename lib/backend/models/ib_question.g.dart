@@ -6,23 +6,24 @@ part of 'ib_question.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-IbQuestion _$IbQuestionFromJson(Map<String, dynamic> json) {
-  return IbQuestion(
-    question: json['question'] as String,
-    id: json['id'] as String,
-    creatorId: json['creatorId'] as String,
-    choices:
-        (json['choices'] as List<dynamic>).map((e) => e as String).toList(),
-    questionType: json['questionType'] as String,
-    extras: (json['extras'] as List<dynamic>).map((e) => e as String).toList(),
-    description: json['description'] as String,
-    likes: json['likes'] as int,
-    comments: json['comments'] as int,
-    pollSize: json['pollSize'] as int,
-    askedTimeInMs: json['askedTimeInMs'] as int,
-    endTimeInMs: json['endTimeInMs'] as int,
-  );
-}
+IbQuestion _$IbQuestionFromJson(Map<String, dynamic> json) => IbQuestion(
+      question: json['question'] as String,
+      id: json['id'] as String,
+      creatorId: json['creatorId'] as String,
+      choices:
+          (json['choices'] as List<dynamic>).map((e) => e as String).toList(),
+      questionType: json['questionType'] as String,
+      extras: (json['extras'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const <String>[],
+      description: json['description'] as String? ?? '',
+      likes: json['likes'] as int? ?? 0,
+      comments: json['comments'] as int? ?? 0,
+      pollSize: json['pollSize'] as int? ?? 0,
+      askedTimeInMs: json['askedTimeInMs'] as int,
+      endTimeInMs: json['endTimeInMs'] as int? ?? 0,
+    );
 
 Map<String, dynamic> _$IbQuestionToJson(IbQuestion instance) =>
     <String, dynamic>{

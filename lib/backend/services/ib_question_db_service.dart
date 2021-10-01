@@ -258,9 +258,18 @@ class IbQuestionDbService {
 
   Future<int> queryPollSize(String questionId) async {
     final _snapshot = await _collectionRef.doc(questionId).get();
-    if (!_snapshot.exists || _snapshot.data() == null) {
-      return 0;
+
+    if (!_snapshot.exists ||
+        _snapshot.data() == null ||
+        _snapshot.data()!['pollSize'] == 0) {
+      print('queryPollSize legacy method');
+      final _snapshot =
+          await _collectionRef.doc(questionId).collection('Answers').get();
+      return _snapshot.size;
     }
+
+    print('queryPollSize new method');
+
     return _snapshot.data()!['pollSize'] as int;
   }
 

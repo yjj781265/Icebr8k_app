@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
-import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -29,8 +28,6 @@ class ProfileController extends GetxController {
   final totalAsked = 0.obs;
   final totalAnswered = 0.obs;
   final friendshipStatus = ''.obs;
-  StreamSubscription? totalAskedStream;
-  StreamSubscription? totalAnsweredStream;
   StreamSubscription? friendStatusStream;
   ProfileController(this.uid);
 
@@ -43,14 +40,10 @@ class ProfileController extends GetxController {
       friendshipStatus.value = status ?? '';
       compScore.value = await IbUtils.getCompScore(uid);
 
-      // TODO convert to cloud function for getting the total count, important!
-      final List ids =
-          await IbQuestionDbService().queryAnsweredQuestionIds(uid);
-      totalAnswered.value = ids.length;
+      totalAnswered.value =
+          await IbUserDbService().queryIbUserAnsweredSize(uid);
 
-      final snapshot =
-          await IbQuestionDbService().queryAskedQuestions(uid: uid);
-      totalAsked.value = snapshot.size;
+      totalAsked.value = await IbUserDbService().queryIbUserAskedSize(uid);
 
       friendStatusStream =
           IbUserDbService().listenToSingleFriend(uid).listen((event) {
@@ -62,26 +55,10 @@ class ProfileController extends GetxController {
       }, onError: (error) {
         friendshipStatus.value = '';
       });
-    } else {
-      totalAnsweredStream = IbQuestionDbService()
-          .listenToAnsweredQuestionsChange(uid)
-          .listen((event) async {
-        // TODO convert to cloud function for getting the total count, important!
-        final List ids =
-            await IbQuestionDbService().queryAnsweredQuestionIds(uid);
-        totalAnswered.value = ids.length;
-      });
-
-      totalAskedStream = IbQuestionDbService()
-          .listenToUserAskedQuestionsChange(uid)
-          .listen((event) async {
-        final snapshot =
-            await IbQuestionDbService().queryAskedQuestions(uid: uid);
-        totalAsked.value = snapshot.size;
-      });
     }
 
     final IbUser? user = await IbUserDbService().queryIbUser(uid);
+
     if (user == null) {
       isLoading.value = false;
       return;
@@ -99,14 +76,6 @@ class ProfileController extends GetxController {
 
   @override
   void onClose() {
-    if (totalAskedStream != null) {
-      totalAskedStream!.cancel();
-    }
-
-    if (totalAnsweredStream != null) {
-      totalAnsweredStream!.cancel();
-    }
-
     if (friendStatusStream != null) {
       friendStatusStream!.cancel();
     }

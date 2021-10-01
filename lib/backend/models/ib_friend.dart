@@ -16,7 +16,7 @@ class IbFriend {
 
   IbFriend(
       {required this.friendUid,
-      this.status = kFriendshipStatusRequestSent,
+      this.status = '',
       this.timestampInMs = 0,
       this.requestMsg = ''});
 

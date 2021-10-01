@@ -214,12 +214,18 @@ class _ProfilePageState extends State<ProfilePage>
                                       children: [
                                         IbStats(
                                             title: 'Answered',
-                                            num: _profileController
-                                                .totalAnswered.value),
+                                            num: _profileController.isMe.isTrue
+                                                ? _homeController
+                                                    .answeredSize.value
+                                                : _profileController
+                                                    .totalAnswered.value),
                                         IbStats(
                                             title: 'Asked',
-                                            num: _profileController
-                                                .totalAsked.value),
+                                            num: _profileController.isMe.isTrue
+                                                ? _homeController
+                                                    .askedSize.value
+                                                : _profileController
+                                                    .totalAsked.value),
                                       ],
                                     ),
                                   ),

@@ -7,6 +7,7 @@ import 'package:icebr8k/backend/controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_chat_db_service.dart';
 import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
+import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -17,6 +18,8 @@ class HomeController extends GetxController {
   final isIbUserOnline = false.obs;
   final currentIbName = ''.obs;
   final currentBio = ''.obs;
+  final askedSize = 0.obs;
+  final answeredSize = 0.obs;
   final currentIbUsername = ''.obs;
   final currentIbAvatarUrl = ''.obs;
   final currentIbCoverPhotoUrl = ''.obs;
@@ -37,17 +40,17 @@ class HomeController extends GetxController {
       print('HomeController unable retrieve current user UID');
       return;
     }
-    await IbCloudMessagingService().init();
-    await setupInteractedMessage();
     _currentIbUserStream = IbUserDbService()
         .listenToIbUserChanges(IbUtils.getCurrentUid()!)
         .listen((ibUser) {
       currentIbUser = ibUser;
       _populateUserInfo();
     });
+    await IbCloudMessagingService().init();
+    await setupInteractedMessage();
   }
 
-  void _populateUserInfo() {
+  Future<void> _populateUserInfo() async {
     if (currentIbUser != null) {
       isIbUserOnline.value = currentIbUser!.isOnline;
       currentIbName.value = currentIbUser!.name;
@@ -56,6 +59,21 @@ class HomeController extends GetxController {
       currentIbCoverPhotoUrl.value = currentIbUser!.coverPhotoUrl;
       currentBio.value = currentIbUser!.description;
       currentBirthdate.value = currentIbUser!.birthdateInMs;
+      if (currentIbUser!.askedSize == null) {
+        askedSize.value = (await IbQuestionDbService()
+                .queryAskedQuestions(uid: currentIbUser!.id))
+            .size;
+      } else {
+        askedSize.value = currentIbUser!.askedSize!;
+      }
+
+      if (currentIbUser!.answeredSize == null) {
+        answeredSize.value = (await IbQuestionDbService()
+                .queryAnsweredQuestionIds(currentIbUser!.id))
+            .length;
+      } else {
+        answeredSize.value = currentIbUser!.answeredSize!;
+      }
     }
   }
 

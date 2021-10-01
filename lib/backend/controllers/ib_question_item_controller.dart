@@ -97,9 +97,8 @@ class IbQuestionItemController extends GetxController {
 
   Future<void> calculateResult() async {
     isCalculating.value = true;
-    totalPolled.value =
+    final int pollSize =
         await IbQuestionDbService().queryPollSize(ibQuestion.id);
-    totalPolled.value = totalPolled.value + 1;
 
     if (ibQuestion.questionType == IbQuestion.kMultipleChoice) {
       for (final choice in ibQuestion.choices) {
@@ -107,7 +106,7 @@ class IbQuestionItemController extends GetxController {
             .querySpecificAnswerPollSize(
                 questionId: ibQuestion.id, answer: choice);
 
-        final double result = (size.toDouble()) / (totalPolled.toDouble());
+        final double result = (size.toDouble()) / (pollSize.toDouble());
         resultMap[choice] = result;
       }
 
@@ -119,7 +118,7 @@ class IbQuestionItemController extends GetxController {
                 questionId: ibQuestion.id, answer: i.toString());
 
         if (size != 0) {
-          final double result = (size.toDouble()) / (totalPolled.toDouble());
+          final double result = (size.toDouble()) / (pollSize.toDouble());
           resultMap[i.toString()] = result;
         }
       }
@@ -148,6 +147,7 @@ class IbQuestionItemController extends GetxController {
     await IbQuestionDbService().answerQuestion(answer);
     IbLocalStorageService().removeUnAnsweredIbQid(ibQuestion.id);
     await calculateResult();
+    totalPolled.value = totalPolled.value + 1;
     answeredUsername.value =
         (await IbUserDbService().queryIbUser(answer.uid))!.username;
     votedDateTime.value = DateTime.now();

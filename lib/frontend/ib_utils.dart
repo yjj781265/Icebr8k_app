@@ -96,7 +96,7 @@ class IbUtils {
     }
 
     if (diffDt.inDays >= 30 && diffDt.inDays < 365) {
-      return '${diffDt.inDays / 12} mo ago';
+      return '${(diffDt.inDays / 30).toStringAsPrecision(1)} mo ago';
     }
 
     if (diffDt.inDays == 365) {

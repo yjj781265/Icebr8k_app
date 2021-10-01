@@ -177,6 +177,31 @@ class IbUserDbService {
     return IbUser.fromJson(snapshot.docs.first.data());
   }
 
+  Future<int> queryIbUserAnsweredSize(String uid) async {
+    final snapshot = await _collectionRef.doc(uid).get();
+
+    if (!snapshot.exists || snapshot.data()!['answeredSize'] == null) {
+      print('queryIbUserAnsweredSize legacy method');
+      final list = await IbQuestionDbService().queryAnsweredQuestionIds(uid);
+      return list.length;
+    }
+    print('queryIbUserAnsweredSize new method');
+    return snapshot.data()!['answeredSize'] as int;
+  }
+
+  Future<int> queryIbUserAskedSize(String uid) async {
+    final snapshot = await _collectionRef.doc(uid).get();
+
+    if (!snapshot.exists || snapshot.data()!['askedSize'] == null) {
+      print('queryIbUserAskedSize legacy method');
+      final snapshot =
+          await IbQuestionDbService().queryAskedQuestions(uid: uid);
+      return snapshot.size;
+    }
+    print('queryIbUserAskedSize new method');
+    return snapshot.data()!['askedSize'] as int;
+  }
+
   Stream<QuerySnapshot<Map<String, dynamic>>> listenToFriendRequest(
       String uid) {
     return _collectionRef

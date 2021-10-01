@@ -12,6 +12,8 @@ class IbUser {
   int loginTimeInMs;
   int joinTimeInMs;
   int birthdateInMs;
+  int? answeredSize;
+  int? askedSize;
   bool isOnline;
   String coverPhotoUrl;
   String description;
