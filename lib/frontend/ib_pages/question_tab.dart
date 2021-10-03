@@ -7,6 +7,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../ib_colors.dart';
@@ -14,93 +15,87 @@ import '../ib_colors.dart';
 class QuestionTab extends StatelessWidget {
   QuestionTab({Key? key}) : super(key: key);
   final _ibQuestionController = Get.find<IbQuestionController>();
-  final _refreshController = RefreshController();
+
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      if (_ibQuestionController.isLoading.isTrue) {
-        return Container(
-          color: IbColors.lightBlue,
-          child: const Center(
-            child: IbProgressIndicator(),
-          ),
-        );
-      }
-
-      if (_ibQuestionController.isLoading.isFalse &&
-          _ibQuestionController.ibQuestions.isEmpty) {
-        return const Center(child: Text('You have answered all questions!'));
-      }
-
-      return Container(
+    return Obx(
+      () => Container(
           color: IbColors.lightBlue,
           child: SmartRefresher(
-            footer: const ClassicFooter(
-              noDataText: "No more questions to load",
-              textStyle: TextStyle(color: IbColors.primaryColor),
-              failedIcon: Icon(
-                Icons.error_outline,
-                color: IbColors.errorRed,
+              physics: const AlwaysScrollableScrollPhysics(),
+              footer: const ClassicFooter(
+                loadStyle: LoadStyle.HideAlways,
+                noDataText: '',
+                textStyle: TextStyle(color: IbColors.primaryColor),
+                failedIcon: Icon(
+                  Icons.error_outline,
+                  color: IbColors.errorRed,
+                ),
+                loadingIcon: IbProgressIndicator(
+                  width: 24,
+                  height: 24,
+                  padding: 0,
+                ),
               ),
-              loadingIcon: IbProgressIndicator(
-                width: 24,
-                height: 24,
-                padding: 0,
+              header: const WaterDropMaterialHeader(
+                backgroundColor: IbColors.primaryColor,
               ),
-            ),
-            header: const ClassicHeader(
-              textStyle: TextStyle(color: IbColors.primaryColor),
-              failedIcon: Icon(
-                Icons.error_outline,
-                color: IbColors.errorRed,
-              ),
-              completeIcon: Icon(
-                Icons.check_circle_outline,
-                color: IbColors.accentColor,
-              ),
-              refreshingIcon: IbProgressIndicator(
-                width: 24,
-                height: 24,
-                padding: 0,
-              ),
-            ),
-            onRefresh: () async {
-              await Get.find<IbQuestionController>().refreshEverything();
-              _refreshController.refreshCompleted();
-            },
-            controller: _refreshController,
-            enablePullUp: true,
-            onLoading: () async {
-              if (!_ibQuestionController.hasMore) {
-                _refreshController.loadNoData();
-                return;
-              }
+              onRefresh: () async {
+                await _ibQuestionController.refreshEverything();
+              },
+              controller: _ibQuestionController.refreshController,
+              enablePullUp: true,
+              onLoading: () async {
+                if (!_ibQuestionController.hasMore) {
+                  _ibQuestionController.refreshController.loadNoData();
+                  return;
+                }
 
-              await _ibQuestionController.loadMoreQuestion();
-              _refreshController.loadComplete();
-            },
-            child: ListView.builder(
-                itemCount: _ibQuestionController.ibQuestions.length,
-                itemBuilder: (context, index) {
-                  final _ibQuestion = _ibQuestionController.ibQuestions[index];
-                  if (_ibQuestion.questionType == IbQuestion.kScale) {
-                    return IbScQuestionCard(Get.put(
-                        IbQuestionItemController(
-                            ibQuestion: _ibQuestion,
-                            disableAvatarOnTouch: IbUtils.getCurrentUid()! ==
-                                _ibQuestion.creatorId),
-                        tag: _ibQuestion.id));
-                  }
+                await _ibQuestionController.loadMoreQuestion();
+              },
+              child: _handleBodyWidget())),
+    );
+  }
 
-                  return IbMcQuestionCard(Get.put(
-                      IbQuestionItemController(
-                        disableAvatarOnTouch:
-                            IbUtils.getCurrentUid()! == _ibQuestion.creatorId,
-                        ibQuestion: _ibQuestion,
-                      ),
-                      tag: _ibQuestion.id));
-                }),
-          ));
-    });
+  Widget _handleBodyWidget() {
+    if (_ibQuestionController.isLoading.isTrue) {
+      return const SizedBox();
+    }
+
+    if (_ibQuestionController.isLoading.isFalse &&
+        _ibQuestionController.ibQuestions.isEmpty) {
+      return Center(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+              width: 100,
+              height: 100,
+              child: Lottie.asset('assets/images/question.json')),
+          const Text('You have answered all questions!'),
+        ],
+      ));
+    }
+    return ListView.builder(
+        itemCount: _ibQuestionController.ibQuestions.length,
+        itemBuilder: (context, index) {
+          final _ibQuestion = _ibQuestionController.ibQuestions[index];
+          if (_ibQuestion.questionType == IbQuestion.kScale) {
+            return IbScQuestionCard(Get.put(
+                IbQuestionItemController(
+                    ibQuestion: _ibQuestion,
+                    disableAvatarOnTouch:
+                        IbUtils.getCurrentUid()! == _ibQuestion.creatorId),
+                tag: _ibQuestion.id));
+          }
+
+          return IbMcQuestionCard(Get.put(
+              IbQuestionItemController(
+                disableAvatarOnTouch:
+                    IbUtils.getCurrentUid()! == _ibQuestion.creatorId,
+                ibQuestion: _ibQuestion,
+              ),
+              tag: _ibQuestion.id));
+        });
   }
 }

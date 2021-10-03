@@ -15,6 +15,7 @@ class IbQuestion {
   String creatorId;
   int askedTimeInMs;
   int endTimeInMs;
+  Map<String, int> statMap;
   List<String> choices;
   List<String> extras;
   String questionType;
@@ -25,6 +26,7 @@ class IbQuestion {
       required this.creatorId,
       required this.choices,
       required this.questionType,
+      required this.statMap,
       this.extras = const <String>[],
       this.description = '',
       this.likes = 0,

@@ -4,9 +4,9 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/backend/controllers/set_up_controller.dart';
-import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
-import 'package:liquid_swipe/liquid_swipe.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 class SetupPage extends GetView<MyAnsweredQuestionsController> {
   SetupPage({Key? key}) : super(key: key);
@@ -17,8 +17,9 @@ class SetupPage extends GetView<MyAnsweredQuestionsController> {
     SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
 
-    return Scaffold(
-      body: Obx(
+    return Container(
+      color: IbColors.lightBlue,
+      child: Obx(
         () {
           if (setUpController.isLoading.isTrue) {
             return const Center(
@@ -30,17 +31,25 @@ class SetupPage extends GetView<MyAnsweredQuestionsController> {
                 await Get.find<AuthController>().signOut();
                 return true;
               },
-              child: LiquidSwipe(
-                onPageChangeCallback: (index) {
-                  setUpController.currentPageIndex.value = index;
+              child: ListView.builder(
+                controller: setUpController.autoScrollController,
+                physics: const NeverScrollableScrollPhysics(),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (context, index) {
+                  return AutoScrollTag(
+                    key: ValueKey(index),
+                    controller: setUpController.autoScrollController,
+                    index: index,
+                    child: SizedBox(
+                      height: Get.height,
+                      width: Get.width,
+                      child: setUpController.pages[index],
+                    ),
+                  );
                 },
-                liquidController: setUpController.liquidController,
-                fullTransitionValue:
-                    IbConfig.kEventTriggerDelayInMillis.toDouble(),
-                disableUserGesture: true,
-                ignoreUserGestureWhileAnimating: true,
-                enableLoop: false,
-                pages: setUpController.pages,
+                itemCount: setUpController.pages.length,
               ),
             );
           }

@@ -18,10 +18,11 @@ import 'package:icebr8k/frontend/ib_pages/screen_two.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
-import 'package:liquid_swipe/liquid_swipe.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 class SetUpController extends GetxController {
-  final LiquidController liquidController = LiquidController();
+  final ScrollController scrollController = ScrollController();
+  final AutoScrollController autoScrollController = AutoScrollController();
   final pages = <Widget>[].obs;
   final ibQuestions = <IbQuestion>[].obs;
   final answeredCounter = 0.obs;
@@ -251,7 +252,8 @@ class SetUpController extends GetxController {
     if (totalPageSize.value == (currentPageIndex.value + 1)) {
       Get.offAll(() => HomePage(), binding: HomeBinding());
     } else {
-      liquidController.animateToPage(page: currentPageIndex.value + 1);
+      autoScrollController.scrollToIndex(currentPageIndex.value + 1);
+      currentPageIndex.value = currentPageIndex.value + 1;
     }
     return;
   }

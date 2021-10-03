@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 
@@ -73,6 +74,21 @@ class AskedQuestionsController extends GetxController {
           .sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
     } else {
       lastDoc = null;
+    }
+  }
+
+  Future<void> updateItems() async {
+    print('AskedQuestionsController updateItems');
+    for (final item in createdQuestions) {
+      final tag = 'asked_${item.id}';
+      if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
+        final ibQuestion =
+            await IbQuestionDbService().querySingleQuestion(item.id);
+        if (ibQuestion != null) {
+          Get.find<IbQuestionItemController>(tag: tag)
+              .calculateResult(ibQuestion);
+        }
+      }
     }
   }
 

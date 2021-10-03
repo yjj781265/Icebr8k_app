@@ -82,47 +82,44 @@ class IbQuestionItemController extends GetxController {
       avatarUrl.value = ibUser!.avatarUrl;
     }
 
-    /// only calculate result for Mc question at start, Sc question will
-    /// calculate its result when user click on show result button
-    if (ibQuestion.questionType == IbQuestion.kMultipleChoice) {
-      calculateResult();
-    }
+    calculateResult(ibQuestion);
 
-    totalPolled.value =
-        await IbQuestionDbService().queryPollSize(ibQuestion.id);
+    totalPolled.value = ibQuestion.pollSize;
 
     isLoading.value = false;
     super.onInit();
   }
 
-  Future<void> calculateResult() async {
+  Future<void> calculateResult(IbQuestion ibQuestion) async {
+    print("calculateResult for ${ibQuestion.question}");
     isCalculating.value = true;
-    final int pollSize =
-        await IbQuestionDbService().queryPollSize(ibQuestion.id);
+    int pollSize = 0;
+    for (final element in ibQuestion.statMap.values) {
+      pollSize = pollSize + element;
+    }
 
-    if (ibQuestion.questionType == IbQuestion.kMultipleChoice) {
+    if (pollSize == 0) {
+      return;
+    }
+
+    totalPolled.value = pollSize;
+    if (IbQuestion.kScale == ibQuestion.questionType) {
+      for (int i = 1; i < 6; i++) {
+        final int size = ibQuestion.statMap[i.toString()] ?? 0;
+        if (size == 0) {
+          continue;
+        }
+        final double result = (size.toDouble()) / (pollSize.toDouble());
+        resultMap[i.toString()] = result;
+      }
+    } else {
       for (final choice in ibQuestion.choices) {
-        final int size = await IbQuestionDbService()
-            .querySpecificAnswerPollSize(
-                questionId: ibQuestion.id, answer: choice);
-
+        final int size = ibQuestion.statMap[choice] ?? 0;
         final double result = (size.toDouble()) / (pollSize.toDouble());
         resultMap[choice] = result;
       }
-
-      ///scale question has answers from 1 to 5
-    } else if (ibQuestion.questionType == IbQuestion.kScale) {
-      for (int i = 1; i <= 5; i++) {
-        final int size = await IbQuestionDbService()
-            .querySpecificAnswerPollSize(
-                questionId: ibQuestion.id, answer: i.toString());
-
-        if (size != 0) {
-          final double result = (size.toDouble()) / (pollSize.toDouble());
-          resultMap[i.toString()] = result;
-        }
-      }
     }
+
     isCalculating.value = false;
   }
 
@@ -136,7 +133,7 @@ class IbQuestionItemController extends GetxController {
     }
 
     isAnswering.value = true;
-    final IbAnswer answer = IbAnswer(
+    final IbAnswer ibAnswer = IbAnswer(
         answer: selectedChoice.value,
         answeredTimeInMs: DateTime.now().millisecondsSinceEpoch,
         askedTimeInMs: ibQuestion.askedTimeInMs,
@@ -144,12 +141,14 @@ class IbQuestionItemController extends GetxController {
         questionId: ibQuestion.id,
         questionType: ibQuestion.questionType);
 
-    await IbQuestionDbService().answerQuestion(answer);
+    await IbQuestionDbService().answerQuestion(ibAnswer);
     IbLocalStorageService().removeUnAnsweredIbQid(ibQuestion.id);
-    await calculateResult();
-    totalPolled.value = totalPolled.value + 1;
+    ibQuestion.pollSize++;
+    final int size = ibQuestion.statMap[ibAnswer.answer] ?? 0;
+    ibQuestion.statMap[ibAnswer.answer] = size + 1;
+    await calculateResult(ibQuestion);
     answeredUsername.value =
-        (await IbUserDbService().queryIbUser(answer.uid))!.username;
+        (await IbUserDbService().queryIbUser(ibAnswer.uid))!.username;
     votedDateTime.value = DateTime.now();
     isAnswering.value = false;
     showResult.value = true;
@@ -163,19 +162,5 @@ class IbQuestionItemController extends GetxController {
     IbUtils.showSimpleSnackBar(
         msg: 'Question submitted successfully',
         backgroundColor: IbColors.accentColor);
-  }
-
-  Future<void> eraseAnswer() async {
-    try {
-      if (showResult.isTrue &&
-          ibAnswer != null &&
-          isExpandable &&
-          ibAnswer!.uid == IbUtils.getCurrentUid()!) {
-        await IbQuestionDbService().eraseSingleAnsweredQuestions(
-            IbUtils.getCurrentUid()!, ibAnswer!.questionId);
-      }
-    } on Exception catch (e) {
-      print(e);
-    }
   }
 }

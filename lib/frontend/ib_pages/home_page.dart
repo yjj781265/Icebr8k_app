@@ -5,12 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/chat_tab_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_request_controller.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_controller.dart';
-import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_page.dart';
 import 'package:icebr8k/frontend/ib_pages/edit_profile_page.dart';
@@ -51,17 +49,11 @@ class HomePage extends StatelessWidget {
 
     final List<List<Widget>> _actionsList = [
       [
-        GestureDetector(
-          onLongPress: () {
-            IbQuestionDbService().eraseAllAnsweredQuestions(
-                Get.find<AuthController>().firebaseUser!.uid);
+        IconButton(
+          icon: const Icon(Icons.refresh_outlined),
+          onPressed: () async {
+            await Get.find<IbQuestionController>().refreshEverything();
           },
-          child: IconButton(
-            icon: const Icon(Icons.refresh_outlined),
-            onPressed: () async {
-              await Get.find<IbQuestionController>().refreshEverything();
-            },
-          ),
         ),
         IconButton(
             onPressed: () {
@@ -177,8 +169,9 @@ class HomePage extends StatelessWidget {
         itemCornerRadius: IbConfig.kCardCornerRadius,
         animationDuration: const Duration(milliseconds: 1000),
         curve: Curves.fastLinearToSlowEaseIn,
-        onItemSelected: (index) {
+        onItemSelected: (index) async {
           _homeController.currentIndex.value = index;
+          _homeController.handleIndex(index);
         },
         items: <BottomNavyBarItem>[
           BottomNavyBarItem(

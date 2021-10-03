@@ -7,6 +7,7 @@ import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
+import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -337,5 +338,17 @@ class IbUtils {
     _colors.remove(Colors.amberAccent);
     _colors.remove(Colors.amber);
     return _colors[random.nextInt(_colors.length)];
+  }
+
+  static Map<String, int> populateStatMap(List<String> choices, String type) {
+    if (IbQuestion.kScale == type) {
+      return {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0};
+    } else {
+      final map = <String, int>{};
+      for (final choice in choices) {
+        map[choice] = 0;
+      }
+      return map;
+    }
   }
 }

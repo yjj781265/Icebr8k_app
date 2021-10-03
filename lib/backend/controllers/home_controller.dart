@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/answered_question_controller.dart';
+import 'package:icebr8k/backend/controllers/asked_questions_controller.dart';
 import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -113,6 +115,22 @@ class HomeController extends GetxController {
       currentIndex.value = 2;
       Get.find<SocialTabController>().tabController!.animateTo(2);
       return;
+    }
+  }
+
+  Future<void> handleIndex(int index) async {
+    if (index == tabTitleList.length - 1) {
+      if (Get.isRegistered<AnsweredQuestionController>(
+          tag: IbUtils.getCurrentUid())) {
+        await Get.find<AnsweredQuestionController>(tag: IbUtils.getCurrentUid())
+            .updateItems();
+      }
+
+      if (Get.isRegistered<AskedQuestionsController>(
+          tag: IbUtils.getCurrentUid())) {
+        await Get.find<AskedQuestionsController>(tag: IbUtils.getCurrentUid())
+            .updateItems();
+      }
     }
   }
 

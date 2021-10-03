@@ -60,15 +60,16 @@ class IbUserDbService {
     print(uid);
     final snapshot = await _collectionRef.doc(uid).get();
     return !snapshot.exists ||
-        snapshot['username'] == '' ||
-        snapshot['username'] == null;
+        snapshot.data()!['username'] == null ||
+        snapshot['username'] == '';
   }
 
   Future<bool> isAvatarUrlMissing(String uid) async {
     final snapshot = await _collectionRef.doc(uid).get();
-    print('isAvatarUrlMissing, user with avatarUrl ${snapshot['avatarUrl']}');
+    print(
+        'isAvatarUrlMissing, user with avatarUrl ${snapshot.data()!['avatarUrl']}');
     return !snapshot.exists ||
-        snapshot['avatarUrl'] == null ||
+        snapshot.data()!['avatarUrl'] == null ||
         snapshot['avatarUrl'] == '';
   }
 

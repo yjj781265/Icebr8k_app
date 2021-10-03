@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
+import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
@@ -20,7 +21,7 @@ class MyAnsweredQuestionsController extends GetxController {
     isLoaded.value = false;
     print("MyAnsweredQuestionsController init");
     super.onInit();
-    myAnsweredQStream = broadcastStream.listen((event) {
+    myAnsweredQStream = broadcastStream.listen((event) async {
       print(
           "MyAnsweredQuestionsController total answered questions : ${event.size}");
 
@@ -34,6 +35,11 @@ class MyAnsweredQuestionsController extends GetxController {
           final int index = ibAnswers.indexOf(ibAnswer);
           if (index != -1) {
             ibAnswers.removeAt(index);
+            final ibQuestion = await IbQuestionDbService()
+                .querySingleQuestion(ibAnswer.questionId);
+            if (ibQuestion != null) {
+              IbLocalStorageService().appendUnAnsweredIbQidList(ibQuestion);
+            }
           }
         }
       }

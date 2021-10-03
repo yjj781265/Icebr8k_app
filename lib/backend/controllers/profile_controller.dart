@@ -11,11 +11,13 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class ProfileController extends GetxController {
   final isLoading = true.obs;
   final currentIndex = 0.obs;
   final String uid;
+  final refreshController = RefreshController();
   String requestMsg = '';
   final avatarUrl = ''.obs;
   final coverPhotoUrl = ''.obs;

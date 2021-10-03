@@ -244,7 +244,6 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
       return TextButton(
           onPressed: () {
             cardKey.currentState!.flip();
-            widget._controller.calculateResult();
           },
           child: const Text(
             'Show Result',
@@ -262,41 +261,42 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
       }
 
       if (widget._controller.showResult.isTrue) {
-        return Wrap(
-          spacing: 5,
-          direction: Axis.vertical,
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.check_circle_outline,
-                  color: IbColors.accentColor,
-                  size: 16,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Text(
-                    '${widget._controller.answeredUsername.value} voted ${IbUtils.getSuffixDateTimeString(widget._controller.votedDateTime.value)}',
-                    style:
-                        const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
+        return Padding(
+          padding: const EdgeInsets.only(top: 24),
+          child: Wrap(
+            direction: Axis.vertical,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.check_circle_outline,
+                    color: IbColors.accentColor,
+                    size: 16,
                   ),
-                ),
-                TextButton(
-                    onPressed: () {
-                      widget._controller.calculateResult();
-                      cardKey.currentState!.flip();
-                    },
-                    child: const Text(
-                      'Show Result',
-                      style: TextStyle(
-                          color: IbColors.primaryColor,
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text(
+                      '${widget._controller.answeredUsername.value} voted ${IbUtils.getSuffixDateTimeString(widget._controller.votedDateTime.value)}',
+                      style: const TextStyle(
                           fontSize: IbConfig.kSecondaryTextSize),
-                    ))
-              ],
-            ),
-          ],
+                    ),
+                  ),
+                ],
+              ),
+              TextButton(
+                  onPressed: () {
+                    cardKey.currentState!.flip();
+                  },
+                  child: const Text(
+                    'Show Result',
+                    style: TextStyle(
+                        color: IbColors.primaryColor,
+                        fontSize: IbConfig.kSecondaryTextSize),
+                  )),
+            ],
+          ),
         );
       }
 

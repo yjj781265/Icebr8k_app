@@ -55,6 +55,8 @@ class IbCreateQuestionController extends GetxController {
     IbUtils.hideKeyboard();
     Get.to(() => ReviewQuestionPage(
         question: IbQuestion(
+            statMap:
+                IbUtils.populateStatMap(_getChoiceList(), questionType.trim()),
             question: question.trim(),
             id: IbUtils.getUniqueName(),
             creatorId: Get.find<AuthController>().firebaseUser!.uid,

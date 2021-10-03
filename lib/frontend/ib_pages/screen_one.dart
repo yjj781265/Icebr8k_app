@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/set_up_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
 import 'package:lottie/lottie.dart';
 
@@ -23,6 +24,7 @@ class ScreenOne extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () async {
+                IbUtils.hideKeyboard();
                 await _setUpController.validateScreenOne();
               },
               icon: const Icon(Icons.check)),

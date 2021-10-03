@@ -55,6 +55,7 @@ class _ProfilePageState extends State<ProfilePage>
   @override
   void initState() {
     super.initState();
+
     _profileController =
         Get.put(ProfileController(widget.uid), tag: widget.uid);
     _createdQuestionController =
@@ -95,237 +96,220 @@ class _ProfilePageState extends State<ProfilePage>
                   )),
             )
           : null,
-      body: Obx(
-        () => _profileController.isLoading.isTrue
-            ? const Center(
-                child: IbProgressIndicator(),
-              )
-            : ExtendedNestedScrollView(
-                onlyOneScrollInBody: true,
-                dragStartBehavior: DragStartBehavior.down,
-                headerSliverBuilder: (context, value) {
-                  return [
-                    SliverToBoxAdapter(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Stack(
-                            clipBehavior: Clip.none,
-                            alignment: Alignment.bottomLeft,
-                            children: [
-                              ///cover photo
-                              Obx(
-                                () => GestureDetector(
-                                  onTap: () {
-                                    if (_profileController.isMe.isFalse) {
-                                      return;
-                                    }
-                                    showCoverPhotoBottomSheet();
-                                  },
-                                  child: AspectRatio(
-                                      aspectRatio: 16 / 9,
-                                      child: handleCoverPhoto()),
-                                ),
-                              ),
+      body: Obx(() {
+        if (_profileController.isLoading.isTrue) {
+          return const Center(child: IbProgressIndicator());
+        }
+        return buildExtendedNestedScrollView();
+      }),
+    );
+  }
 
-                              /// avatar
-                              Obx(
-                                () => Positioned(
-                                  left: 16,
-                                  bottom: -40,
-                                  child: IbUserAvatar(
-                                      disableOnTap: true,
-                                      radius: 40,
-                                      uid: widget.uid,
-                                      avatarUrl: _profileController.isMe.isTrue
-                                          ? _homeController
-                                              .currentIbAvatarUrl.value
-                                          : _profileController.avatarUrl.value),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          /// name info
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 40, left: 16),
-                                  child: Obx(
-                                    () => Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                            '#${_profileController.isMe.isTrue ? _homeController.currentIbUsername.value : _profileController.username.value}',
-                                            style: const TextStyle(
-                                                fontSize:
-                                                    IbConfig.kPageTitleSize,
-                                                fontWeight: FontWeight.bold)),
-                                        Text(
-                                          _profileController.isMe.isTrue
-                                              ? _homeController
-                                                  .currentIbName.value
-                                              : _profileController.name.value,
-                                          style: const TextStyle(
-                                              fontSize:
-                                                  IbConfig.kNormalTextSize),
-                                        ),
-                                        /*  Text(
-                                          '🎂 ${_profileController.isMe.isTrue ? IbUtils.readableDateTime(DateTime.fromMillisecondsSinceEpoch(_homeController.currentBirthdate.value)) : IbUtils.readableDateTime(DateTime.fromMillisecondsSinceEpoch(_profileController.birthdateInMs.value))}',
-                                          style: const TextStyle(
-                                              fontSize:
-                                                  IbConfig.kNormalTextSize),
-                                        ),*/
-                                        if (_profileController.isMe.isFalse)
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'match_interests'.tr,
-                                                style: const TextStyle(
-                                                    fontSize: IbConfig
-                                                        .kNormalTextSize,
-                                                    fontWeight:
-                                                        FontWeight.w800),
-                                              ),
-                                              IbLinearIndicator(
-                                                endValue: _profileController
-                                                    .compScore.value,
-                                              ),
-                                            ],
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              /// questions stats
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 16),
-                                  child: Obx(
-                                    () => Wrap(
-                                      children: [
-                                        IbStats(
-                                            title: 'Answered',
-                                            num: _profileController.isMe.isTrue
-                                                ? _homeController
-                                                    .answeredSize.value
-                                                : _profileController
-                                                    .totalAnswered.value),
-                                        IbStats(
-                                            title: 'Asked',
-                                            num: _profileController.isMe.isTrue
-                                                ? _homeController
-                                                    .askedSize.value
-                                                : _profileController
-                                                    .totalAsked.value),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-
-                          if (_profileController.isMe.isFalse &&
-                              _profileController.description.isNotEmpty)
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Obx(
-                                () => Text(
-                                  _profileController.description.value,
-                                  style: const TextStyle(
-                                      fontSize: IbConfig.kNormalTextSize),
-                                ),
-                              ),
-                            ),
-                          if (_profileController.isMe.isTrue)
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Obx(
-                                () => Text(
-                                  _homeController.currentBio.value,
-                                  style: const TextStyle(
-                                      fontSize: IbConfig.kNormalTextSize),
-                                ),
-                              ),
-                            ),
-
-                          if (_profileController.isMe.isFalse)
-                            _buildActionButtons(),
-
-                          const SizedBox(
-                            height: 16,
-                          ),
-                        ],
+  ExtendedNestedScrollView buildExtendedNestedScrollView() {
+    return ExtendedNestedScrollView(
+      onlyOneScrollInBody: true,
+      dragStartBehavior: DragStartBehavior.down,
+      headerSliverBuilder: (context, value) {
+        return [
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.bottomLeft,
+                  children: [
+                    ///cover photo
+                    Obx(
+                      () => GestureDetector(
+                        onTap: () {
+                          if (_profileController.isMe.isFalse) {
+                            return;
+                          }
+                          showCoverPhotoBottomSheet();
+                        },
+                        child: AspectRatio(
+                            aspectRatio: 16 / 9, child: handleCoverPhoto()),
                       ),
                     ),
-                    SliverOverlapAbsorber(
-                      handle: ExtendedNestedScrollView
-                          .sliverOverlapAbsorberHandleFor(context),
-                      sliver: SliverPersistentHeader(
-                          pinned: true,
-                          delegate: PersistentHeader(
-                            widget: Obx(
-                              () => TabBar(
-                                isScrollable: true,
-                                controller: _tabController,
-                                tabs: [
-                                  if (_profileController.isMe.isTrue)
-                                    Tab(
-                                        text:
-                                            'Answered Questions(${_homeController.answeredSize.value})'),
-                                  if (_profileController.isMe.isFalse)
-                                    Tab(
-                                        text:
-                                            'Common Answers(${_commonAnswersController.commonAnswers.length})'),
-                                  if (_profileController.isMe.isFalse)
-                                    Tab(
-                                        text:
-                                            'Different Answers(${_uncommonAnswersController.uncommonAnswers.length})'),
-                                  Tab(
-                                      text:
-                                          'Asked Questions(${_profileController.isMe.isTrue ? _homeController.askedSize.value : _profileController.totalAsked.value})'),
-                                ],
-                                labelStyle: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                                unselectedLabelStyle: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                                labelColor: Colors.black,
-                                unselectedLabelColor: IbColors.lightGrey,
-                                indicatorColor: _tabController.length == 1
-                                    ? Colors.transparent
-                                    : IbColors.primaryColor,
-                              ),
-                            ),
-                          )),
+
+                    /// avatar
+                    Obx(
+                      () => Positioned(
+                        left: 16,
+                        bottom: -40,
+                        child: IbUserAvatar(
+                            disableOnTap: true,
+                            radius: 40,
+                            uid: widget.uid,
+                            avatarUrl: _profileController.isMe.isTrue
+                                ? _homeController.currentIbAvatarUrl.value
+                                : _profileController.avatarUrl.value),
+                      ),
                     ),
-                  ];
-                },
-                body: Padding(
-                  padding: const EdgeInsets.only(top: 48.0),
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      if (_profileController.isMe.isTrue) buildAnsweredQTab(),
-                      if (_profileController.isMe.isFalse)
-                        buildCommonAnswersTab(),
-                      if (_profileController.isMe.isFalse)
-                        buildUncommonAnswersTab(),
-                      buildAskedTab(),
-                    ],
-                  ),
+                  ],
                 ),
-              ),
+
+                /// name info
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 40, left: 16),
+                        child: Obx(
+                          () => Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  '#${_profileController.isMe.isTrue ? _homeController.currentIbUsername.value : _profileController.username.value}',
+                                  style: const TextStyle(
+                                      fontSize: IbConfig.kPageTitleSize,
+                                      fontWeight: FontWeight.bold)),
+                              Text(
+                                _profileController.isMe.isTrue
+                                    ? _homeController.currentIbName.value
+                                    : _profileController.name.value,
+                                style: const TextStyle(
+                                    fontSize: IbConfig.kNormalTextSize),
+                              ),
+                              /*  Text(
+                                      '🎂 ${_profileController.isMe.isTrue ? IbUtils.readableDateTime(DateTime.fromMillisecondsSinceEpoch(_homeController.currentBirthdate.value)) : IbUtils.readableDateTime(DateTime.fromMillisecondsSinceEpoch(_profileController.birthdateInMs.value))}',
+                                      style: const TextStyle(
+                                          fontSize:
+                                              IbConfig.kNormalTextSize),
+                                    ),*/
+                              if (_profileController.isMe.isFalse)
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'match_interests'.tr,
+                                      style: const TextStyle(
+                                          fontSize: IbConfig.kNormalTextSize,
+                                          fontWeight: FontWeight.w800),
+                                    ),
+                                    IbLinearIndicator(
+                                      endValue:
+                                          _profileController.compScore.value,
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    /// questions stats
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Obx(
+                          () => Wrap(
+                            children: [
+                              IbStats(
+                                  title: 'Answered',
+                                  num: _profileController.isMe.isTrue
+                                      ? _homeController.answeredSize.value
+                                      : _profileController.totalAnswered.value),
+                              IbStats(
+                                  title: 'Asked',
+                                  num: _profileController.isMe.isTrue
+                                      ? _homeController.askedSize.value
+                                      : _profileController.totalAsked.value),
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+
+                if (_profileController.isMe.isFalse &&
+                    _profileController.description.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Obx(
+                      () => Text(
+                        _profileController.description.value,
+                        style:
+                            const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                      ),
+                    ),
+                  ),
+                if (_profileController.isMe.isTrue)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Obx(
+                      () => Text(
+                        _homeController.currentBio.value,
+                        style:
+                            const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                      ),
+                    ),
+                  ),
+
+                if (_profileController.isMe.isFalse) _buildActionButtons(),
+
+                const SizedBox(
+                  height: 16,
+                ),
+              ],
+            ),
+          ),
+          SliverOverlapAbsorber(
+            handle: ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
+                context),
+            sliver: SliverPersistentHeader(
+                pinned: true,
+                delegate: PersistentHeader(
+                  widget: Obx(
+                    () => TabBar(
+                      isScrollable: true,
+                      controller: _tabController,
+                      tabs: [
+                        if (_profileController.isMe.isTrue)
+                          Tab(
+                              text:
+                                  'Answered Questions(${_homeController.answeredSize.value})'),
+                        if (_profileController.isMe.isFalse)
+                          Tab(
+                              text:
+                                  'Common Answers(${_commonAnswersController.commonAnswers.length})'),
+                        if (_profileController.isMe.isFalse)
+                          Tab(
+                              text:
+                                  'Different Answers(${_uncommonAnswersController.uncommonAnswers.length})'),
+                        Tab(
+                            text:
+                                'Asked Questions(${_profileController.isMe.isTrue ? _homeController.askedSize.value : _profileController.totalAsked.value})'),
+                      ],
+                      labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                      unselectedLabelStyle:
+                          const TextStyle(fontWeight: FontWeight.bold),
+                      labelColor: Colors.black,
+                      unselectedLabelColor: IbColors.lightGrey,
+                      indicatorColor: _tabController.length == 1
+                          ? Colors.transparent
+                          : IbColors.primaryColor,
+                    ),
+                  ),
+                )),
+          ),
+        ];
+      },
+      body: Padding(
+        padding: const EdgeInsets.only(top: 48.0),
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            if (_profileController.isMe.isTrue) buildAnsweredQTab(),
+            if (_profileController.isMe.isFalse) buildCommonAnswersTab(),
+            if (_profileController.isMe.isFalse) buildUncommonAnswersTab(),
+            buildAskedTab(),
+          ],
+        ),
       ),
     );
   }
@@ -381,10 +365,8 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   Widget buildAnsweredQTab() {
-    final refreshController = RefreshController();
     return AnsweredQTab(
         answeredQuestionController: _answeredQuestionController,
-        refreshController: refreshController,
         widget: widget);
   }
 
@@ -914,13 +896,11 @@ class AnsweredQTab extends StatefulWidget {
   const AnsweredQTab({
     Key? key,
     required AnsweredQuestionController answeredQuestionController,
-    required this.refreshController,
     required this.widget,
   })  : _answeredQuestionController = answeredQuestionController,
         super(key: key);
 
   final AnsweredQuestionController _answeredQuestionController;
-  final RefreshController refreshController;
   final ProfilePage widget;
 
   @override
@@ -954,16 +934,12 @@ class _AnsweredQTabState extends State<AnsweredQTab>
               padding: 0,
             ),
           ),
-          controller: widget.refreshController,
+          controller: widget._answeredQuestionController.refreshController,
           enablePullDown: false,
           enablePullUp: true,
           onLoading: () async {
+            print('loading...');
             await widget._answeredQuestionController.loadMore();
-            if (widget._answeredQuestionController.lastDoc == null) {
-              widget.refreshController.loadNoData();
-              return;
-            }
-            widget.refreshController.loadComplete();
           },
           child: ListView.builder(
             itemBuilder: (context, index) {
@@ -971,20 +947,14 @@ class _AnsweredQTabState extends State<AnsweredQTab>
                   widget._answeredQuestionController.myAnsweredQuestions[index];
 
               final tag = 'answered_${item.ibQuestion.id}';
-              late IbQuestionItemController _controller;
-              if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
-                _controller = Get.find(tag: tag);
-                _controller.calculateResult();
-              } else {
-                _controller = Get.put(
-                    IbQuestionItemController(
-                        ibAnswer: item.ibAnswer,
-                        ibQuestion: item.ibQuestion,
-                        disableAvatarOnTouch:
-                            item.ibQuestion.creatorId == widget.widget.uid,
-                        isExpandable: true),
-                    tag: tag);
-              }
+              final IbQuestionItemController _controller = Get.put(
+                  IbQuestionItemController(
+                      ibAnswer: item.ibAnswer,
+                      ibQuestion: item.ibQuestion,
+                      disableAvatarOnTouch:
+                          item.ibQuestion.creatorId == widget.widget.uid,
+                      isExpandable: true),
+                  tag: tag);
 
               _controller.isExpanded.value = index == 0;
 

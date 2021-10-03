@@ -5,11 +5,13 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'ib_question_item_controller.dart';
 
 class AnsweredQuestionController extends GetxController {
   late StreamSubscription myAnsweredQuestionsSub;
+  final refreshController = RefreshController();
   final myAnsweredQuestions = <AnsweredQuestionItem>[].obs;
   final isLoading = true.obs;
   DocumentSnapshot? lastDoc;
@@ -70,6 +72,7 @@ class AnsweredQuestionController extends GetxController {
 
   Future<void> loadMore() async {
     if (lastDoc == null) {
+      refreshController.loadNoData();
       print('AnsweredQuestionController no more');
       return;
     }
@@ -97,6 +100,22 @@ class AnsweredQuestionController extends GetxController {
       );
     } else {
       lastDoc = null;
+    }
+    refreshController.loadComplete();
+  }
+
+  Future<void> updateItems() async {
+    print('AnsweredQuestionController updateItems');
+    for (final item in myAnsweredQuestions) {
+      final tag = 'answered_${item.ibQuestion.id}';
+      if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
+        final ibQuestion =
+            await IbQuestionDbService().querySingleQuestion(item.ibQuestion.id);
+        if (ibQuestion != null) {
+          Get.find<IbQuestionItemController>(tag: tag)
+              .calculateResult(ibQuestion);
+        }
+      }
     }
   }
 
