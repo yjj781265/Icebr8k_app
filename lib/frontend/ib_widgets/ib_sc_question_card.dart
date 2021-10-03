@@ -32,7 +32,6 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
   @override
   void initState() {
     _prepareAnimations();
-    _runExpandCheck();
     super.initState();
   }
 
@@ -65,6 +64,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    _runExpandCheck();
     final expandableInfo = Column(
       children: [
         IbQuestionScItem(widget._controller),

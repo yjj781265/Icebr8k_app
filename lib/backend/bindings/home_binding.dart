@@ -10,12 +10,12 @@ import 'package:icebr8k/backend/controllers/social_tab_controller.dart';
 class HomeBinding implements Bindings {
   @override
   void dependencies() {
-    Get.put(SocialTabController());
-    Get.put(HomeController());
-    Get.put(IbQuestionController());
-    Get.put(ChatTabController());
-    Get.put(FriendListController());
-    Get.put(FriendRequestController());
-    Get.put(PeopleNearbyController());
+    Get.lazyPut(() => SocialTabController(), fenix: true);
+    Get.lazyPut(() => HomeController(), fenix: true);
+    Get.lazyPut(() => IbQuestionController(), fenix: true);
+    Get.lazyPut(() => ChatTabController(), fenix: true);
+    Get.lazyPut(() => FriendListController(), fenix: true);
+    Get.lazyPut(() => FriendRequestController(), fenix: true);
+    Get.lazyPut(() => PeopleNearbyController(), fenix: true);
   }
 }

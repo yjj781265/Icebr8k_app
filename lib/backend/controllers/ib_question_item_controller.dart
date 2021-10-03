@@ -53,24 +53,6 @@ class IbQuestionItemController extends GetxController {
 
   @override
   Future<void> onInit() async {
-    /// check if user has already answered this question
-    ibAnswer ??= await IbQuestionDbService()
-        .queryIbAnswer(IbUtils.getCurrentUid()!, ibQuestion.id);
-
-    if (ibAnswer != null) {
-      votedDateTime.value =
-          DateTime.fromMillisecondsSinceEpoch(ibAnswer!.answeredTimeInMs);
-      answeredUsername.value =
-          (await IbUserDbService().queryIbUser(ibAnswer!.uid))!.username;
-    }
-
-    selectedChoice.value = ibAnswer == null
-        ? ibQuestion.questionType == IbQuestion.kMultipleChoice
-            ? ''
-            : '1'
-        : ibAnswer!.answer;
-    showResult.value = ibAnswer != null;
-
     /// query question author user info
     ibUser = await IbUserDbService().queryIbUser(ibQuestion.creatorId);
 
@@ -94,7 +76,10 @@ class IbQuestionItemController extends GetxController {
     print("calculateResult for ${ibQuestion.question}");
     isCalculating.value = true;
     int pollSize = 0;
-    for (final element in ibQuestion.statMap.values) {
+    if (ibQuestion.statMap == null) {
+      return;
+    }
+    for (final element in ibQuestion.statMap!.values) {
       pollSize = pollSize + element;
     }
 
@@ -105,7 +90,7 @@ class IbQuestionItemController extends GetxController {
     totalPolled.value = pollSize;
     if (IbQuestion.kScale == ibQuestion.questionType) {
       for (int i = 1; i < 6; i++) {
-        final int size = ibQuestion.statMap[i.toString()] ?? 0;
+        final int size = ibQuestion.statMap![i.toString()] ?? 0;
         if (size == 0) {
           continue;
         }
@@ -114,13 +99,33 @@ class IbQuestionItemController extends GetxController {
       }
     } else {
       for (final choice in ibQuestion.choices) {
-        final int size = ibQuestion.statMap[choice] ?? 0;
+        final int size = ibQuestion.statMap![choice] ?? 0;
         final double result = (size.toDouble()) / (pollSize.toDouble());
         resultMap[choice] = result;
       }
     }
-
+    await determineUserAnswer();
     isCalculating.value = false;
+    isAnswering.value = false;
+  }
+
+  Future<void> determineUserAnswer() async {
+    /// check if user has already answered this question
+    ibAnswer ??= await IbQuestionDbService()
+        .queryIbAnswer(IbUtils.getCurrentUid()!, ibQuestion.id);
+
+    if (ibAnswer != null) {
+      votedDateTime.value =
+          DateTime.fromMillisecondsSinceEpoch(ibAnswer!.answeredTimeInMs);
+      answeredUsername.value =
+          (await IbUserDbService().queryIbUser(ibAnswer!.uid))!.username;
+    }
+    selectedChoice.value = ibAnswer == null
+        ? ibQuestion.questionType == IbQuestion.kMultipleChoice
+            ? ''
+            : '1'
+        : ibAnswer!.answer;
+    showResult.value = ibAnswer != null;
   }
 
   Future<void> onVote() async {
@@ -144,14 +149,9 @@ class IbQuestionItemController extends GetxController {
     await IbQuestionDbService().answerQuestion(ibAnswer);
     IbLocalStorageService().removeUnAnsweredIbQid(ibQuestion.id);
     ibQuestion.pollSize++;
-    final int size = ibQuestion.statMap[ibAnswer.answer] ?? 0;
-    ibQuestion.statMap[ibAnswer.answer] = size + 1;
+    final int size = ibQuestion.statMap![ibAnswer.answer] ?? 0;
+    ibQuestion.statMap![ibAnswer.answer] = size + 1;
     await calculateResult(ibQuestion);
-    answeredUsername.value =
-        (await IbUserDbService().queryIbUser(ibAnswer.uid))!.username;
-    votedDateTime.value = DateTime.now();
-    isAnswering.value = false;
-    showResult.value = true;
   }
 
   Future<void> onSubmit() async {

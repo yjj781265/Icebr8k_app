@@ -18,64 +18,71 @@ class QuestionTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => Container(
-          color: IbColors.lightBlue,
-          child: SmartRefresher(
-              physics: const AlwaysScrollableScrollPhysics(),
-              footer: const ClassicFooter(
-                loadStyle: LoadStyle.HideAlways,
-                noDataText: '',
-                textStyle: TextStyle(color: IbColors.primaryColor),
-                failedIcon: Icon(
-                  Icons.error_outline,
-                  color: IbColors.errorRed,
-                ),
-                loadingIcon: IbProgressIndicator(
-                  width: 24,
-                  height: 24,
-                  padding: 0,
-                ),
-              ),
-              header: const WaterDropMaterialHeader(
-                backgroundColor: IbColors.primaryColor,
-              ),
-              onRefresh: () async {
-                await _ibQuestionController.refreshEverything();
-              },
-              controller: _ibQuestionController.refreshController,
-              enablePullUp: true,
-              onLoading: () async {
-                if (!_ibQuestionController.hasMore) {
-                  _ibQuestionController.refreshController.loadNoData();
-                  return;
-                }
+    return Obx(() {
+      if (_ibQuestionController.isLoading.isTrue &&
+          _ibQuestionController.ibQuestions.isEmpty) {
+        return Center(child: const IbProgressIndicator());
+      }
 
-                await _ibQuestionController.loadMoreQuestion();
-              },
-              child: _handleBodyWidget())),
-    );
+      if (_ibQuestionController.isLoading.isFalse &&
+          _ibQuestionController.ibQuestions.isEmpty) {
+        return Center(
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+                width: 100,
+                height: 100,
+                child: Lottie.asset('assets/images/question.json')),
+            const Text('You have answered all questions!'),
+            TextButton(
+                onPressed: () async =>
+                    _ibQuestionController.refreshEverything(),
+                child: const Text('Refresh'))
+          ],
+        ));
+      }
+
+      return Container(
+        color: IbColors.lightBlue,
+        child: SmartRefresher(
+            physics: const AlwaysScrollableScrollPhysics(),
+            footer: const ClassicFooter(
+              loadStyle: LoadStyle.HideAlways,
+              noDataText: '',
+              textStyle: TextStyle(color: IbColors.primaryColor),
+              failedIcon: Icon(
+                Icons.error_outline,
+                color: IbColors.errorRed,
+              ),
+              loadingIcon: IbProgressIndicator(
+                width: 24,
+                height: 24,
+                padding: 0,
+              ),
+            ),
+            header: const WaterDropMaterialHeader(
+              backgroundColor: IbColors.primaryColor,
+            ),
+            onRefresh: () async {
+              await _ibQuestionController.refreshEverything();
+            },
+            controller: _ibQuestionController.refreshController,
+            enablePullUp: true,
+            onLoading: () async {
+              if (!_ibQuestionController.hasMore) {
+                _ibQuestionController.refreshController.loadNoData();
+                return;
+              }
+
+              await _ibQuestionController.loadMoreQuestion();
+            },
+            child: _handleBodyWidget()),
+      );
+    });
   }
 
   Widget _handleBodyWidget() {
-    if (_ibQuestionController.isLoading.isTrue) {
-      return const SizedBox();
-    }
-
-    if (_ibQuestionController.isLoading.isFalse &&
-        _ibQuestionController.ibQuestions.isEmpty) {
-      return Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-              width: 100,
-              height: 100,
-              child: Lottie.asset('assets/images/question.json')),
-          const Text('You have answered all questions!'),
-        ],
-      ));
-    }
     return ListView.builder(
         itemCount: _ibQuestionController.ibQuestions.length,
         itemBuilder: (context, index) {

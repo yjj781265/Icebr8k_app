@@ -15,7 +15,7 @@ class IbQuestion {
   String creatorId;
   int askedTimeInMs;
   int endTimeInMs;
-  Map<String, int> statMap;
+  Map<String, int>? statMap;
   List<String> choices;
   List<String> extras;
   String questionType;

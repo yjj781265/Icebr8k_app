@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class AskedQuestionsController extends GetxController {
   final String uid;
@@ -12,6 +13,7 @@ class AskedQuestionsController extends GetxController {
   final createdQuestions = <IbQuestion>[].obs;
 
   late StreamSubscription _userAskedQStream;
+  final refreshController = RefreshController();
   DocumentSnapshot? lastDoc;
 
   AskedQuestionsController(this.uid);
@@ -56,6 +58,7 @@ class AskedQuestionsController extends GetxController {
 
   Future<void> loadMore() async {
     if (lastDoc == null) {
+      refreshController.loadNoData();
       return;
     }
     final _snapshot = await IbQuestionDbService()
@@ -75,6 +78,12 @@ class AskedQuestionsController extends GetxController {
     } else {
       lastDoc = null;
     }
+
+    if (lastDoc == null) {
+      refreshController.loadNoData();
+      return;
+    }
+    refreshController.loadComplete();
   }
 
   Future<void> updateItems() async {

@@ -29,7 +29,6 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   @override
   void initState() {
     _prepareAnimations();
-    _runExpandCheck();
     super.initState();
   }
 
@@ -46,9 +45,11 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   }
 
   void _runExpandCheck() {
-    if (widget._controller.isExpanded.isTrue) {
+    if (widget._controller.isExpanded.isTrue &&
+        widget._controller.isExpandable) {
       expandController.forward();
-    } else {
+    } else if (widget._controller.isExpanded.isFalse &&
+        widget._controller.isExpandable) {
       expandController.reverse();
     }
   }
@@ -62,6 +63,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    _runExpandCheck();
     final Widget expandableInfo = Column(
       children: [
         Scrollbar(
@@ -200,7 +202,6 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                               onPressed: () {
                                 widget._controller.isExpanded.value =
                                     !widget._controller.isExpanded.value;
-
                                 _runExpandCheck();
                               },
                               icon: Obx(

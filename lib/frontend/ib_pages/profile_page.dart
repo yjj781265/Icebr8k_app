@@ -371,11 +371,8 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   Widget buildAskedTab() {
-    final refreshController = RefreshController();
     return AskedQTab(
-        createdQuestionController: _createdQuestionController,
-        refreshController: refreshController,
-        widget: widget);
+        createdQuestionController: _createdQuestionController, widget: widget);
   }
 
   Widget buildCommonAnswersTab() {
@@ -806,13 +803,11 @@ class AskedQTab extends StatefulWidget {
   const AskedQTab({
     Key? key,
     required AskedQuestionsController createdQuestionController,
-    required this.refreshController,
     required this.widget,
   })  : _createdQuestionController = createdQuestionController,
         super(key: key);
 
   final AskedQuestionsController _createdQuestionController;
-  final RefreshController refreshController;
   final ProfilePage widget;
 
   @override
@@ -845,16 +840,11 @@ class _AskedQTabState extends State<AskedQTab>
               padding: 0,
             ),
           ),
-          controller: widget.refreshController,
+          controller: widget._createdQuestionController.refreshController,
           enablePullDown: false,
           enablePullUp: true,
           onLoading: () async {
             await widget._createdQuestionController.loadMore();
-            if (widget._createdQuestionController.lastDoc == null) {
-              widget.refreshController.loadNoData();
-              return;
-            }
-            widget.refreshController.loadComplete();
           },
           child: ListView.builder(
             itemBuilder: (context, index) {
