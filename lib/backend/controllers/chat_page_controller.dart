@@ -75,6 +75,7 @@ class ChatPageController extends GetxController {
           print('removed');
         }
       }
+      await updateReadUidArray();
 
       if (isInit && event.docs.isNotEmpty) {
         print('loading first ${event.docs.length} messages');
