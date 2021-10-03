@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/chat_tab_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_request_controller.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
-import 'package:icebr8k/backend/controllers/ib_question_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_page.dart';
 import 'package:icebr8k/frontend/ib_pages/edit_profile_page.dart';
@@ -50,21 +49,17 @@ class HomePage extends StatelessWidget {
     final List<List<Widget>> _actionsList = [
       [
         IconButton(
-          icon: const Icon(Icons.refresh_outlined),
-          onPressed: () async {
-            await Get.find<IbQuestionController>().refreshEverything();
-          },
-        ),
-        IconButton(
+            tooltip: 'Ask a question',
             onPressed: () {
               Get.to(() => const CreateQuestionPage());
             },
-            icon: const Icon(Icons.edit_outlined)),
+            icon: const Icon(Icons.add_circle_outline)),
       ],
       List<Widget>.generate(1, (index) => const SizedBox()),
       List<Widget>.generate(
           1,
           (index) => IconButton(
+              tooltip: 'Search username',
               onPressed: () {
                 Get.to(() => IbUserSearchPage());
               },
@@ -72,6 +67,7 @@ class HomePage extends StatelessWidget {
       List<Widget>.generate(
           1,
           (index) => IconButton(
+              tooltip: 'Edit profile',
               onPressed: () {
                 if (_homeController.currentIbUser == null) {
                   return;
