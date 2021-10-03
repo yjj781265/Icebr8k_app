@@ -10,10 +10,39 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../ib_config.dart';
 
-class ChatPage extends StatelessWidget {
-  ChatPage(this._controller, {Key? key}) : super(key: key);
+class ChatPage extends StatefulWidget {
+  const ChatPage(this._controller, {Key? key}) : super(key: key);
   final ChatPageController _controller;
+
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   final _txtController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed) {
+      await widget._controller.setInChat();
+    }
+
+    if (state == AppLifecycleState.inactive) {
+      await widget._controller.setOffChat();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +52,7 @@ class ChatPage extends StatelessWidget {
           backgroundColor: IbColors.lightBlue,
           title: Obx(
             () => Text(
-              _controller.title.value,
+              widget._controller.title.value,
               style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
             ),
           ),
@@ -42,17 +71,18 @@ class ChatPage extends StatelessWidget {
                   child: AnimatedList(
                     reverse: true,
                     physics: const AlwaysScrollableScrollPhysics(),
-                    controller: _controller.scrollController,
-                    key: _controller.listKey,
+                    controller: widget._controller.scrollController,
+                    key: widget._controller.listKey,
                     itemBuilder: (BuildContext context, int index,
                         Animation<double> animation) {
-                      if (index == _controller.messages.length - 2) {
-                        _controller.loadMoreMessages();
+                      if (index == widget._controller.messages.length - 2) {
+                        widget._controller.loadMoreMessages();
                       }
 
-                      return buildItem(_controller.messages[index], animation);
+                      return buildItem(
+                          widget._controller.messages[index], animation);
                     },
-                    initialItemCount: _controller.messages.length,
+                    initialItemCount: widget._controller.messages.length,
                   ),
                 ),
               ),
@@ -82,7 +112,7 @@ class ChatPage extends StatelessWidget {
                               fontSize: IbConfig.kNormalTextSize),
                           hintText: 'Type something creative',
                           border: InputBorder.none,
-                          suffixIcon: _controller.isSending.isTrue
+                          suffixIcon: widget._controller.isSending.isTrue
                               ? const Padding(
                                   padding: EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -101,7 +131,8 @@ class ChatPage extends StatelessWidget {
                                     }
                                     final text = _txtController.text.trim();
                                     _txtController.clear();
-                                    await _controller.uploadMessage(text);
+                                    await widget._controller
+                                        .uploadMessage(text);
                                   },
                                 )),
                     ),

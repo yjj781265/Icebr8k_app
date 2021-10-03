@@ -21,7 +21,7 @@ class QuestionTab extends StatelessWidget {
     return Obx(() {
       if (_ibQuestionController.isLoading.isTrue &&
           _ibQuestionController.ibQuestions.isEmpty) {
-        return Center(child: const IbProgressIndicator());
+        return const Center(child: IbProgressIndicator());
       }
 
       if (_ibQuestionController.isLoading.isFalse &&

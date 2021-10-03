@@ -22,6 +22,7 @@ class ChatPageController extends GetxController {
   late String chatRoomId;
   final isSending = false.obs;
   bool isInit = true;
+  final isInChat = true.obs;
   late bool isGroupChat;
   final listKey = GlobalKey<AnimatedListState>();
   final scrollController = ScrollController();
@@ -75,8 +76,6 @@ class ChatPageController extends GetxController {
         }
       }
 
-      await updateReadUidArray();
-
       if (isInit && event.docs.isNotEmpty) {
         print('loading first ${event.docs.length} messages');
         lastDocumentSnapshot = event.docs.first;
@@ -89,7 +88,7 @@ class ChatPageController extends GetxController {
   }
 
   Future<void> updateReadUidArray() async {
-    if (messages.isEmpty) {
+    if (messages.isEmpty || isInChat.isFalse) {
       return;
     }
 
@@ -198,8 +197,10 @@ class ChatPageController extends GetxController {
       return;
     }
     print('setInChat');
+    isInChat.value = true;
     await IbChatDbService().updateInChatUidArray(
         chatRoomId: chatRoomId, uids: [IbUtils.getCurrentUid()!]);
+    await updateReadUidArray();
   }
 
   Future<void> setOffChat() async {
@@ -207,6 +208,7 @@ class ChatPageController extends GetxController {
       return;
     }
     print('setOffChat');
+    isInChat.value = false;
     await IbChatDbService().removeInChatUidArray(
         chatRoomId: chatRoomId, uids: [IbUtils.getCurrentUid()!]);
   }
