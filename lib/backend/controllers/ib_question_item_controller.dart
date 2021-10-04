@@ -137,8 +137,14 @@ class IbQuestionItemController extends GetxController {
       return;
     }
 
+    determineUserAnswer();
+
+    if (ibAnswer != null) {
+      return;
+    }
+
     isAnswering.value = true;
-    final IbAnswer ibAnswer = IbAnswer(
+    final IbAnswer tempAnswer = IbAnswer(
         answer: selectedChoice.value,
         answeredTimeInMs: DateTime.now().millisecondsSinceEpoch,
         askedTimeInMs: ibQuestion.askedTimeInMs,
@@ -146,11 +152,11 @@ class IbQuestionItemController extends GetxController {
         questionId: ibQuestion.id,
         questionType: ibQuestion.questionType);
 
-    await IbQuestionDbService().answerQuestion(ibAnswer);
+    await IbQuestionDbService().answerQuestion(tempAnswer);
     IbLocalStorageService().removeUnAnsweredIbQid(ibQuestion.id);
     ibQuestion.pollSize++;
-    final int size = ibQuestion.statMap![ibAnswer.answer] ?? 0;
-    ibQuestion.statMap![ibAnswer.answer] = size + 1;
+    final int size = ibQuestion.statMap![tempAnswer.answer] ?? 0;
+    ibQuestion.statMap![tempAnswer.answer] = size + 1;
     await calculateResult(ibQuestion);
   }
 

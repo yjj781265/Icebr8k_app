@@ -1,4 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -15,6 +17,20 @@ class MainController extends GetxController {
     try {
       await GetStorage.init();
       await Firebase.initializeApp();
+      //SetUp Crashlytics
+      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+      // Pass all uncaught errors to Crashlytics.
+      final void Function(FlutterErrorDetails)? originalOnError =
+          FlutterError.onError;
+      FlutterError.onError = (FlutterErrorDetails errorDetails) async {
+        await FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
+        // Forward to original handler.
+        if (originalOnError != null) {
+          originalOnError(errorDetails);
+        }
+      };
+
       // remove all notifications while opening the app
       await FlutterLocalNotificationsPlugin().cancelAll();
       Get.put(AuthController());

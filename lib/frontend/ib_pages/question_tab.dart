@@ -19,8 +19,7 @@ class QuestionTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (_ibQuestionController.isLoading.isTrue &&
-          _ibQuestionController.ibQuestions.isEmpty) {
+      if (_ibQuestionController.isLoading.isTrue) {
         return const Center(child: IbProgressIndicator());
       }
 

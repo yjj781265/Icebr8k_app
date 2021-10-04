@@ -25,6 +25,9 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+apply plugin: 'com.google.firebase.crashlytics'
+// Apply the Performance Monitoring plugin
+apply plugin: 'com.google.firebase.firebase-perf'
 
 android {
     compileSdkVersion 30
@@ -59,5 +62,7 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.google.firebase:firebase-perf:20.0.2'
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
+
 }

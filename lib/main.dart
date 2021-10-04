@@ -1,4 +1,9 @@
+import 'dart:async';
+
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,12 +20,14 @@ import 'frontend/ib_widgets/ib_progress_indicator.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(statusBarColor: IbColors.lightBlue),
   );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
   runApp(MainApp());
 }
 
@@ -34,6 +41,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 class MainApp extends StatelessWidget {
   final MainController _controller = Get.put(MainController());
+  final FirebaseAnalytics analytics = FirebaseAnalytics();
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +53,11 @@ class MainApp extends StatelessWidget {
       if (_controller.isLoading.isTrue) {
         return _loading();
       }
+
       return GetMaterialApp(
+        navigatorObservers: [
+          FirebaseAnalyticsObserver(analytics: analytics),
+        ],
         defaultTransition: Transition.cupertino,
         enableLog: true,
         debugShowCheckedModeBanner: false,

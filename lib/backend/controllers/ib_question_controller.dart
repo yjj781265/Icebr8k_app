@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
@@ -13,48 +12,18 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 /// controller for Question tab in Homepage
 class IbQuestionController extends GetxController {
   final ibQuestions = <IbQuestion>[].obs;
-  late StreamSubscription ibQuestionStream;
   final refreshController =
       RefreshController(initialRefreshStatus: RefreshStatus.refreshing);
-  final isLoading = false.obs;
+  final isLoading = true.obs;
+  final _myAnsweredQuestionsController =
+      Get.find<MyAnsweredQuestionsController>();
+
   bool hasMore = false;
 
   @override
   Future<void> onInit() async {
     super.onInit();
     await _initQuestions();
-    final timestamp = await getLatestQuestionTimestamp();
-    final _myAnsweredQuestionsController =
-        Get.find<MyAnsweredQuestionsController>();
-    ibQuestionStream = IbQuestionDbService()
-        .listenToIbQuestionsChange(timestamp)
-        .listen((event) {
-      for (final docChange in event.docChanges) {
-        if (docChange.type == DocumentChangeType.added) {
-          if (docChange.doc.data() == null) {
-            continue;
-          }
-
-          final IbQuestion ibQuestion =
-              IbQuestion.fromJson(docChange.doc.data()!);
-
-          if (_myAnsweredQuestionsController.retrieveAnswer(ibQuestion.id) ==
-              null) {
-            ibQuestions.insert(0, ibQuestion);
-            print('IbQuestionController add');
-          }
-        } else if (docChange.type == DocumentChangeType.removed) {
-          final IbQuestion ibQuestion =
-              IbQuestion.fromJson(docChange.doc.data()!);
-          if (getQuestionIndex(ibQuestion.id) == -1) {
-            continue;
-          }
-
-          ibQuestions.removeAt(getQuestionIndex(ibQuestion.id));
-          print('IbQuestionController remove');
-        }
-      }
-    });
   }
 
   Future<void> _initQuestions() async {
@@ -180,7 +149,15 @@ class IbQuestionController extends GetxController {
   }
 
   Future<void> refreshEverything() async {
-    isLoading.value = true;
-    await _initQuestions();
+    final timestamp = await getLatestQuestionTimestamp();
+    final list =
+        await IbQuestionDbService().queryIbQuestions(8, timestamp: timestamp);
+    for (final IbQuestion ibQuestion in list) {
+      if (_myAnsweredQuestionsController.retrieveAnswer(ibQuestion.id) ==
+          null) {
+        ibQuestions.insert(0, ibQuestion);
+      }
+    }
+    refreshController.refreshCompleted();
   }
 }

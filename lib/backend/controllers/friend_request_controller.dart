@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -90,10 +91,18 @@ class FriendRequestController extends GetxController {
         .acceptFriendRequest(
             myUid: Get.find<AuthController>().firebaseUser!.uid,
             friendUid: friendUid)
-        .then((value) {
+        .then((value) async {
       IbUtils.showSimpleSnackBar(
           msg: 'friend_request_accepted'.tr,
           backgroundColor: IbColors.accentColor);
+      final token = await IbCloudMessagingService().retrieveToken(friendUid);
+      if (token != null && IbUtils.getCurrentIbUser() != null) {
+        await IbCloudMessagingService().sendNotification(
+            tokens: [token],
+            title: IbUtils.getCurrentIbUser()!.username,
+            body: "has accepted your friend request",
+            type: "");
+      }
     }).onError((error, stackTrace) {
       IbUtils.showSimpleSnackBar(
           msg: error.toString(), backgroundColor: IbColors.errorRed);
