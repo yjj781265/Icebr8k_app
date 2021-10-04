@@ -19,6 +19,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 class SetUpController extends GetxController {
   final ScrollController scrollController = ScrollController();
@@ -50,7 +51,8 @@ class SetUpController extends GetxController {
         .queryUnAnsweredFirst8Q(IbUtils.getCurrentUid()!);
 
     if (isUserNameMissing) {
-      pages.add(ScreenOne());
+      pages.add(
+          ShowCaseWidget(builder: Builder(builder: (context) => ScreenOne())));
     }
 
     if (isAvatarUrlMissing) {

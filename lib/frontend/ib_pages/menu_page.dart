@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
@@ -5,6 +7,7 @@ import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
 class MenuPage extends StatelessWidget {
   MenuPage({Key? key}) : super(key: key);
@@ -15,49 +18,111 @@ class MenuPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: IbColors.lightBlue,
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            _handleAvatarImage(),
-            SizedBox(
-              width: 100,
-              child: Obx(
-                () => Text(
-                  _homeController.currentIbUsername.value,
-                  textAlign: TextAlign.center,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: IbConfig.kNormalTextSize,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Obx(
+            () => Padding(
+              padding: const EdgeInsets.only(top: 30),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.bottomLeft,
+                    children: [
+                      ///cover photo
+                      if (_homeController.currentIbCoverPhotoUrl.value.isEmpty)
+                        Image.asset(
+                          'assets/images/default_cover_photo.jpeg',
+                          fit: BoxFit.cover,
+                        )
+                      else
+                        CachedNetworkImage(
+                          fit: BoxFit.fitHeight,
+                          imageUrl:
+                              _homeController.currentIbCoverPhotoUrl.value,
+                        ),
+
+                      Positioned(
+                        left: 16,
+                        bottom: -40,
+                        child: IbUserAvatar(
+                            disableOnTap: true,
+                            radius: 40,
+                            avatarUrl:
+                                _homeController.currentIbAvatarUrl.value),
+                      ),
+                    ],
                   ),
-                ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      '#${_homeController.currentIbUsername.value}',
+                      textAlign: TextAlign.center,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 28,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const Divider(
+                    height: 5,
+                    color: IbColors.lightGrey,
+                  ),
+                ],
               ),
             ),
-            TextButton(
-                onPressed: () {
-                  showAboutDialog(
-                      context: context,
-                      applicationName: 'Icebr8k',
-                      applicationVersion: '0.0.1',
-                      applicationIcon: SizedBox(
-                          height: 80,
-                          width: 80,
-                          child: Image.asset('assets/icons/logo_ios.png')));
-                },
-                child: const Text("About")),
-            TextButton(
-                onPressed: () {
-                  Get.to(() => TermOfUsePage());
-                },
-                child: const Text("Term of use")),
-            const Spacer(
-              flex: 10,
+          ),
+          ListTile(
+            leading: const Icon(
+              Icons.description_outlined,
+              color: IbColors.primaryColor,
             ),
-            TextButton.icon(
+            title: const Text(
+              "About",
+              style: TextStyle(
+                  fontSize: IbConfig.kNormalTextSize,
+                  fontWeight: FontWeight.bold),
+            ),
+            onTap: () {
+              showAboutDialog(
+                  context: context,
+                  applicationName: 'Icebr8k',
+                  applicationVersion: '0.0.1',
+                  applicationIcon: SizedBox(
+                      height: 80,
+                      width: 80,
+                      child: Image.asset('assets/icons/logo_ios.png')));
+            },
+          ),
+          ListTile(
+            leading: const Icon(
+              Icons.description,
+              color: IbColors.accentColor,
+            ),
+            title: const Text(
+              "Term of Use",
+              style: TextStyle(
+                  fontSize: IbConfig.kNormalTextSize,
+                  fontWeight: FontWeight.bold),
+            ),
+            onTap: () {
+              Get.to(() => TermOfUsePage());
+            },
+          ),
+          const Spacer(
+            flex: 10,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: TextButton.icon(
                 onPressed: () {
                   Get.find<AuthController>().signOut();
                 },
@@ -69,26 +134,10 @@ class MenuPage extends StatelessWidget {
                   'sign_out'.tr,
                   style: const TextStyle(color: Colors.black),
                 )),
-          ],
-        ),
+          ),
+        ],
       ),
     );
-  }
-
-  Widget _handleAvatarImage() {
-    return Obx(() {
-      final bool isEmptyUrl = _homeController.currentIbAvatarUrl.value.isEmpty;
-
-      if (isEmptyUrl) {
-        return const CircleAvatar(
-            radius: 48,
-            foregroundImage: AssetImage('assets/icons/logo_ios.png'));
-      }
-      return CircleAvatar(
-        radius: 48,
-        foregroundImage: NetworkImage(_homeController.currentIbAvatarUrl.value),
-      );
-    });
   }
 }
 
@@ -97,10 +146,12 @@ class TermOfUsePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: IbColors.lightBlue,
         title: const Text('Term of Use'),
       ),
       body: SingleChildScrollView(
         child: Html(
+          // ignore: leading_newlines_in_multiline_strings
           data: """<div>
          
      <h1>Privacy Policy</h1>

@@ -5,6 +5,7 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
 import 'package:lottie/lottie.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../ib_config.dart';
 
@@ -14,20 +15,32 @@ class ScreenOne extends StatelessWidget {
   final TextEditingController nameEditingController = TextEditingController();
   final TextEditingController usernameEditingController =
       TextEditingController();
+  final GlobalKey _showCaseKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance!.addPostFrameCallback(
+        (_) => ShowCaseWidget.of(context)!.startShowCase([_showCaseKey]));
     return Scaffold(
       backgroundColor: IbColors.lightBlue,
       appBar: AppBar(
         backgroundColor: IbColors.lightBlue,
         actions: [
-          IconButton(
+          Showcase(
+            overlayOpacity: 0.5,
+            key: _showCaseKey,
+            title: 'Next',
+            description: 'Click here to go to the next step',
+            shapeBorder: const CircleBorder(),
+            overlayColor: IbColors.primaryColor,
+            child: IconButton(
               onPressed: () async {
                 IbUtils.hideKeyboard();
                 await _setUpController.validateScreenOne();
               },
-              icon: const Icon(Icons.check)),
+              icon: const Icon(Icons.check),
+            ),
+          ),
         ],
       ),
       body: SafeArea(

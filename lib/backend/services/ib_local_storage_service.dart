@@ -8,6 +8,9 @@ class IbLocalStorageService {
   factory IbLocalStorageService() => _ibLocalStorageService;
   IbLocalStorageService._();
 
+  static String firstTimeCustomKey = 'firstTime';
+  static String usernameSearchCustomKey = 'username';
+
   List<String>? getUnAnsweredIbQidList() {
     final list = _box.read('unAnsweredIbQList');
     if (list == null) {
@@ -47,5 +50,18 @@ class IbLocalStorageService {
   // ignore: avoid_positional_boolean_parameters
   void updateLocSharingFlag(bool isOn) {
     _box.write('locationSharing', isOn);
+  }
+
+  bool isCustomKeyTrue(String customKey) {
+    final flag = _box.read(customKey);
+    if (flag == null) {
+      return true;
+    }
+    return flag as bool;
+  }
+
+  // ignore: avoid_positional_boolean_parameters
+  void updateCustomFlag(bool isTrue, String customKey) {
+    _box.write(customKey, isTrue);
   }
 }

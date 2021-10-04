@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/answered_question_controller.dart';
 import 'package:icebr8k/backend/controllers/asked_questions_controller.dart';
@@ -26,6 +27,7 @@ class HomeController extends GetxController {
   final currentIbAvatarUrl = ''.obs;
   final currentIbCoverPhotoUrl = ''.obs;
   final currentBirthdate = 0.obs;
+  late BuildContext context;
   IbUser? currentIbUser;
   late StreamSubscription _currentIbUserStream;
   final tabTitleList = [
@@ -34,6 +36,10 @@ class HomeController extends GetxController {
     '${'social'.tr} 🤝',
     '${'profile'.tr} 👤'
   ];
+
+  final key1 = GlobalKey();
+  final key2 = GlobalKey();
+  final key3 = GlobalKey();
 
   @override
   Future<void> onInit() async {
@@ -119,6 +125,7 @@ class HomeController extends GetxController {
   }
 
   Future<void> handleIndex(int index) async {
+    //refresh profile page tabs questions stats
     if (index == tabTitleList.length - 1) {
       if (Get.isRegistered<AnsweredQuestionController>(
           tag: IbUtils.getCurrentUid())) {
