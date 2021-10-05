@@ -8,9 +8,11 @@ import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MenuPage extends StatelessWidget {
   MenuPage({Key? key}) : super(key: key);
+  final kBetaSurveyLink = 'https://forms.gle/xuYbYcsWGC6WtT7h7';
 
   final _homeController = Get.find<HomeController>();
 
@@ -115,6 +117,24 @@ class MenuPage extends StatelessWidget {
             ),
             onTap: () {
               Get.to(() => TermOfUsePage());
+            },
+          ),
+          ListTile(
+            leading: const Icon(
+              Icons.feedback_outlined,
+              color: IbColors.darkPrimaryColor,
+            ),
+            title: const Text(
+              "Send Feedback",
+              style: TextStyle(
+                  fontSize: IbConfig.kNormalTextSize,
+                  fontWeight: FontWeight.bold),
+            ),
+            subtitle: const Text("Take our 2 minutes survey"),
+            onTap: () async {
+              if (await canLaunch(kBetaSurveyLink)) {
+                launch(kBetaSurveyLink);
+              }
             },
           ),
           const Spacer(
