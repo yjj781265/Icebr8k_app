@@ -218,7 +218,8 @@ class _HomepageViewState extends State<HomepageView>
                   overlayOpacity: 0.2,
                   overlayPadding: const EdgeInsets.all(8),
                   shapeBorder: const CircleBorder(),
-                  description: 'Click here to see people nearby',
+                  description:
+                      'Click here to discover people nearby with common interests',
                   key: _homeController.key2,
                   child: const Icon(Icons.group_outlined)),
               title: Text('social'.tr),

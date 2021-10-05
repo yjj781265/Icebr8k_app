@@ -71,8 +71,12 @@ class EditProfileController extends GetxController {
   }
 
   Future<void> updateAvatarUrl(String _filePath) async {
-    /* Get.dialog(const IbLoadingDialog(messageTrKey: 'uploading...'),
-        barrierDismissible: false);*/
+    //delete the old one first
+    if (IbUtils.getCurrentIbUser() != null &&
+        IbUtils.getCurrentIbUser()!.avatarUrl.isNotEmpty) {
+      await IbStorageService()
+          .deleteFile(IbUtils.getCurrentIbUser()!.avatarUrl);
+    }
 
     final String? photoUrl =
         await IbStorageService().uploadAndRetrieveImgUrl(_filePath);

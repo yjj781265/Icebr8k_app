@@ -134,6 +134,13 @@ class ProfileController extends GetxController {
     Get.dialog(const IbLoadingDialog(messageTrKey: 'uploading...'),
         barrierDismissible: false);
 
+    //delete the old one first
+    if (IbUtils.getCurrentIbUser() != null &&
+        IbUtils.getCurrentIbUser()!.coverPhotoUrl.isNotEmpty) {
+      await IbStorageService()
+          .deleteFile(IbUtils.getCurrentIbUser()!.coverPhotoUrl);
+    }
+
     final String? photoUrl =
         await IbStorageService().uploadAndRetrieveImgUrl(_filePath);
 
