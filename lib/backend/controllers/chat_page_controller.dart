@@ -83,6 +83,9 @@ class ChatPageController extends GetxController {
         isInit = false;
         await setInChat();
       }
+
+      messages.sort((a, b) => (b.message.timestamp as Timestamp)
+          .compareTo(a.message.timestamp as Timestamp));
     });
 
     super.onInit();
