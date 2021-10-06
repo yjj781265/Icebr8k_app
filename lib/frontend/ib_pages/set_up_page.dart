@@ -34,8 +34,6 @@ class SetupPage extends GetView<MyAnsweredQuestionsController> {
               child: ListView.builder(
                 controller: setUpController.autoScrollController,
                 physics: const NeverScrollableScrollPhysics(),
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
                   return AutoScrollTag(
