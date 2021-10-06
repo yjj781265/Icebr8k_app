@@ -94,7 +94,7 @@ class ProfileController extends GetxController {
       final _token = await IbCloudMessagingService().retrieveToken(uid);
 
       if (_token != null) {
-        IbCloudMessagingService().sendNotification(
+        await IbCloudMessagingService().sendNotification(
             tokens: [_token],
             title: IbUtils.getCurrentIbUser()!.username,
             body: '${'send_you_a_friend_request'.tr}\n $requestMsg',

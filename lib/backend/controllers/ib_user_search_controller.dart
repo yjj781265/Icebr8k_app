@@ -74,7 +74,7 @@ class IbUserSearchController extends GetxController {
           await IbCloudMessagingService().retrieveToken(friendUid.value);
 
       if (_token != null) {
-        IbCloudMessagingService().sendNotification(
+        await IbCloudMessagingService().sendNotification(
             tokens: [_token],
             title: IbUtils.getCurrentIbUser()!.username,
             body: '${'send_you_a_friend_request'.tr}\n $requestMsg',

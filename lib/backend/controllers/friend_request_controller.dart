@@ -101,7 +101,7 @@ class FriendRequestController extends GetxController {
             tokens: [token],
             title: IbUtils.getCurrentIbUser()!.username,
             body: "has accepted your friend request",
-            type: "");
+            type: IbCloudMessagingService.kNotificationTypeDefault);
       }
     }).onError((error, stackTrace) {
       IbUtils.showSimpleSnackBar(

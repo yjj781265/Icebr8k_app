@@ -7,6 +7,8 @@ class IbCloudMessagingService extends GetConnect {
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
   static final IbCloudMessagingService _ibCloudMessagingService =
       IbCloudMessagingService._();
+
+  static const String kNotificationTypeDefault = 'default';
   static const String kNotificationTypeChat = 'chat';
   static const String kNotificationTypeRequest = 'request';
   static const String kNotificationTypeQuestion = 'question';
