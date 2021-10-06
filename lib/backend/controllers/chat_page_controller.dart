@@ -85,8 +85,13 @@ class ChatPageController extends GetxController {
       }
 
       if (messages.length > 1) {
-        messages.sort((a, b) => (b.message.timestamp as Timestamp)
-            .compareTo(a.message.timestamp as Timestamp));
+        messages.sort((a, b) {
+          if (b.message.timestamp == null || a.message.timestamp == null) {
+            return 0;
+          }
+          return (b.message.timestamp as Timestamp)
+              .compareTo(a.message.timestamp as Timestamp);
+        });
       }
     });
 
