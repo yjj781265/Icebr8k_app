@@ -97,7 +97,7 @@ class MenuPage extends StatelessWidget {
               showAboutDialog(
                   context: context,
                   applicationName: 'Icebr8k',
-                  applicationVersion: '0.0.1',
+                  applicationVersion: IbConfig.kVersion,
                   applicationIcon: SizedBox(
                       height: 80,
                       width: 80,

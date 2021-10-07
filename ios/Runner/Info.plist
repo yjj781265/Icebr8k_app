@@ -30,11 +30,15 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Allow access to camera to capture photos</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Your location is required in order to see people nearby</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Your location is required in order to see people nearby</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Your location is required in order to see people nearby</string>
 	<key>NSMicrophoneUsageDescription</key>
