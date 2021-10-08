@@ -131,8 +131,8 @@ class ProfileController extends GetxController {
       return;
     }
 
-    Get.dialog(const IbLoadingDialog(messageTrKey: 'uploading...'),
-        barrierDismissible: false);
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'Uploading...'),
+        barrierDismissible: true);
 
     //delete the old one first
     if (IbUtils.getCurrentIbUser() != null &&

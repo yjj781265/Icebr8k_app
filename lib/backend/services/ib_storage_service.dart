@@ -28,10 +28,7 @@ class IbStorageService {
 
   Future<void> deleteFile(String url) async {
     try {
-      final String path = _firebaseStorage.refFromURL(url).fullPath;
-      if (path.isNotEmpty) {
-        await _firebaseStorage.ref(path).delete();
-      }
+      await _firebaseStorage.refFromURL(url).delete();
     } on Exception catch (e) {
       print('failed to remove image $e');
     }

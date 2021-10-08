@@ -408,7 +408,7 @@ PODS:
     - Firebase/Performance (= 8.7.0)
     - firebase_core
     - Flutter
-  - firebase_storage (10.0.3):
+  - firebase_storage (10.0.5):
     - Firebase/Storage (= 8.7.0)
     - firebase_core
     - Flutter
@@ -746,7 +746,7 @@ SPEC CHECKSUMS:
   firebase_crashlytics: 7d9a2a04c1c756f62137ca97f8972790e7be8678
   firebase_messaging: 798cbb6be44b9477d53486ace36a562744480c5d
   firebase_performance: 1c8fc11fb784bee9ba37d6fcbe16a7f755955692
-  firebase_storage: 48cf36c93cd2acff55e643bb08b8d31c728de6e8
+  firebase_storage: d4ced699e5106374a16961d8f2028a0ed34b748d
   FirebaseABTesting: 981336dd14d84787e33466e4247f77ec2343f8d9
   FirebaseAnalytics: 52768800c2add1d84b751420cb4caaf8195f2c41
   FirebaseAuth: 2e7d029977648c67a5d51a263d4cbab76d34cf12

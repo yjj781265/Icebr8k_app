@@ -33,7 +33,7 @@ dependencies:
   firebase_crashlytics: ^2.2.2
   firebase_messaging: ^10.0.7
   firebase_performance: ^0.7.1+1
-  firebase_storage: ^10.0.3
+  firebase_storage: ^10.0.5
   fl_chart: ^0.40.0
   flutter:
     sdk: flutter
