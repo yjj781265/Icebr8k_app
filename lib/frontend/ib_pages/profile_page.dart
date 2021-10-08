@@ -229,7 +229,7 @@ class _ProfilePageState extends State<ProfilePage>
                 if (_profileController.isMe.isFalse &&
                     _profileController.description.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Obx(
                       () => Text(
                         _profileController.description.value,

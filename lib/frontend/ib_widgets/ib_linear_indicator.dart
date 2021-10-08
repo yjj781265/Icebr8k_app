@@ -13,10 +13,9 @@ class IbLinearIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     if (disableAnimation) {
       return Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
           Expanded(
-            flex: 7,
+            flex: 6,
             child: ClipRRect(
               borderRadius: const BorderRadius.all(
                   Radius.circular(IbConfig.kScrollbarCornerRadius)),
@@ -29,7 +28,7 @@ class IbLinearIndicator extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: 3,
+            flex: 4,
             child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Text(
@@ -50,7 +49,7 @@ class IbLinearIndicator extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Expanded(
-                flex: 7,
+                flex: 6,
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(
                       Radius.circular(IbConfig.kScrollbarCornerRadius)),
@@ -63,7 +62,7 @@ class IbLinearIndicator extends StatelessWidget {
                 ),
               ),
               Expanded(
-                flex: 3,
+                flex: 4,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Text(
