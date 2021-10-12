@@ -44,7 +44,7 @@ android {
 
     defaultConfig {
         applicationId "com.icebr8k.android"
-        minSdkVersion 29
+        minSdkVersion 26
         multiDexEnabled true
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
