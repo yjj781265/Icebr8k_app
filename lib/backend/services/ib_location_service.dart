@@ -64,7 +64,7 @@ class IbLocationService {
 
     return geo
         .collection(collectionRef: collectionRef)
-        .within(center: loc, radius: 50, field: 'position');
+        .within(center: loc, radius: 50, field: 'position', strictMode: true);
   }
 
   Future<bool> checkPermissionsAndDeviceService() async {
