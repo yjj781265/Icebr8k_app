@@ -123,7 +123,6 @@ class IbChatDbService {
     }
 
     memberUids.sort();
-
     await _collectionRef.doc(chatRoomId).set({
       'memberUids': memberUids,
       'chatRoomId': chatRoomId,

@@ -52,7 +52,8 @@ class ChatTab extends StatelessWidget {
   Widget buildItem(ChatTabItem item) {
     return InkWell(
       onTap: () {
-        Get.to(() => ChatPage(Get.put(ChatPageController(item.memberUids),
+        Get.to(() => ChatPage(Get.put(
+            ChatPageController(item.memberUids, chatRoomId: item.chatRoomId),
             tag: item.chatRoomId)));
       },
       child: Ink(

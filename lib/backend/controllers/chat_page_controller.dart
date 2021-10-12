@@ -19,7 +19,7 @@ class ChatPageController extends GetxController {
   final messages = <ChatMessageItem>[].obs;
   final ibUserMap = <String, IbUser>{};
   late StreamSubscription _messageSub;
-  late String chatRoomId;
+  String? chatRoomId;
   final isSending = false.obs;
   bool isInit = true;
   final isInChat = true.obs;
@@ -28,7 +28,7 @@ class ChatPageController extends GetxController {
   final scrollController = ScrollController();
   DocumentSnapshot<Map<String, dynamic>>? lastDocumentSnapshot;
 
-  ChatPageController(this.memberUids);
+  ChatPageController(this.memberUids, {this.chatRoomId});
 
   @override
   Future<void> onInit() async {
@@ -38,9 +38,16 @@ class ChatPageController extends GetxController {
     });
     await initUserMap();
     isGroupChat = memberUids.length > 2;
-    chatRoomId = await IbChatDbService().getChatRoomId(memberUids);
+    if (chatRoomId != null) {
+      handleChatMessages();
+    }
+
+    super.onInit();
+  }
+
+  Future<void> handleChatMessages() async {
     _messageSub = IbChatDbService()
-        .listenToMessageChanges(chatRoomId)
+        .listenToMessageChanges(chatRoomId!)
         .listen((event) async {
       for (final docChange in event.docChanges) {
         if (docChange.type == DocumentChangeType.added) {
@@ -94,8 +101,6 @@ class ChatPageController extends GetxController {
         });
       }
     });
-
-    super.onInit();
   }
 
   Future<void> updateReadUidArray() async {
@@ -118,6 +123,7 @@ class ChatPageController extends GetxController {
   Future<void> uploadMessage(String text) async {
     isSending.value = true;
     final String mUid = Get.find<AuthController>().firebaseUser!.uid;
+    chatRoomId ??= await IbChatDbService().getChatRoomId(memberUids);
     final IbMessage ibMessage = IbMessage(
         messageId: IbUtils.getUniqueName(),
         content: text.trim(),
@@ -125,10 +131,11 @@ class ChatPageController extends GetxController {
         timestamp: FieldValue.serverTimestamp(),
         senderUid: mUid,
         messageType: IbMessage.kMessageTypeText,
-        chatRoomId: chatRoomId);
+        chatRoomId: chatRoomId!);
 
     if (messages.isEmpty) {
       await IbChatDbService().uploadMessage(ibMessage, memberUids: memberUids);
+      handleChatMessages();
     } else {
       await IbChatDbService().uploadMessage(ibMessage);
     }
@@ -181,7 +188,7 @@ class ChatPageController extends GetxController {
 
     if (lastDocumentSnapshot != null) {
       final _snapshot = await IbChatDbService().queryMessages(
-          chatRoomId: chatRoomId, snapshot: lastDocumentSnapshot!);
+          chatRoomId: chatRoomId!, snapshot: lastDocumentSnapshot!);
       if (_snapshot.docs.isEmpty) {
         lastDocumentSnapshot = null;
         return;
@@ -210,7 +217,7 @@ class ChatPageController extends GetxController {
     print('setInChat');
     isInChat.value = true;
     await IbChatDbService().updateInChatUidArray(
-        chatRoomId: chatRoomId, uids: [IbUtils.getCurrentUid()!]);
+        chatRoomId: chatRoomId!, uids: [IbUtils.getCurrentUid()!]);
     await updateReadUidArray();
   }
 
@@ -221,7 +228,7 @@ class ChatPageController extends GetxController {
     print('setOffChat');
     isInChat.value = false;
     await IbChatDbService().removeInChatUidArray(
-        chatRoomId: chatRoomId, uids: [IbUtils.getCurrentUid()!]);
+        chatRoomId: chatRoomId!, uids: [IbUtils.getCurrentUid()!]);
   }
 
   @override
