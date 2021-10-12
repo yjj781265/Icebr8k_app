@@ -41,7 +41,7 @@ class MenuPage extends StatelessWidget {
                         )
                       else
                         CachedNetworkImage(
-                          fit: BoxFit.fitHeight,
+                          fit: BoxFit.cover,
                           imageUrl:
                               _homeController.currentIbCoverPhotoUrl.value,
                         ),

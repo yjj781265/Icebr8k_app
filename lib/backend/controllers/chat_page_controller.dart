@@ -39,13 +39,12 @@ class ChatPageController extends GetxController {
     await initUserMap();
     isGroupChat = memberUids.length > 2;
     if (chatRoomId != null) {
-      handleChatMessages();
+      _handleChatMessages();
     }
-
     super.onInit();
   }
 
-  Future<void> handleChatMessages() async {
+  Future<void> _handleChatMessages() async {
     _messageSub = IbChatDbService()
         .listenToMessageChanges(chatRoomId!)
         .listen((event) async {
@@ -135,7 +134,7 @@ class ChatPageController extends GetxController {
 
     if (messages.isEmpty) {
       await IbChatDbService().uploadMessage(ibMessage, memberUids: memberUids);
-      handleChatMessages();
+      _handleChatMessages();
     } else {
       await IbChatDbService().uploadMessage(ibMessage);
     }
