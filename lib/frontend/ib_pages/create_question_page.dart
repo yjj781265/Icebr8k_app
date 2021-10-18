@@ -92,18 +92,18 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
               ),
               SliverToBoxAdapter(
                 child: SizedBox(
-                  height: 100,
+                  height: 120,
                   child: IbCard(
                     child: Padding(
                       padding: const EdgeInsets.all(8),
                       child: TextField(
-                        maxLines: 2,
+                        maxLines: 5,
                         onChanged: (description) {
                           _controller.description = description;
                         },
                         controller: _descriptionEditingController,
                         style: const TextStyle(
-                          fontSize: IbConfig.kDescriptionTextSize,
+                          fontSize: IbConfig.kSecondaryTextSize,
                         ),
                         maxLength: IbConfig.kQuestionDescMaxLength,
                         decoration: InputDecoration(

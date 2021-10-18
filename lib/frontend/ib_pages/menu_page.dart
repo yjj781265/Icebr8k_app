@@ -18,15 +18,14 @@ class MenuPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: IbColors.lightBlue,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Obx(
-            () => Padding(
-              padding: const EdgeInsets.only(top: 30),
-              child: Column(
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: IbColors.lightBlue,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Obx(
+              () => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Stack(
@@ -81,81 +80,81 @@ class MenuPage extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-          ListTile(
-            leading: const Icon(
-              Icons.description_outlined,
-              color: IbColors.primaryColor,
+            ListTile(
+              leading: const Icon(
+                Icons.description_outlined,
+                color: IbColors.primaryColor,
+              ),
+              title: const Text(
+                "About",
+                style: TextStyle(
+                    fontSize: IbConfig.kNormalTextSize,
+                    fontWeight: FontWeight.bold),
+              ),
+              onTap: () {
+                showAboutDialog(
+                    context: context,
+                    applicationName: 'Icebr8k',
+                    applicationVersion: IbConfig.kVersion,
+                    applicationIcon: SizedBox(
+                        height: 80,
+                        width: 80,
+                        child: Image.asset('assets/icons/logo_ios.png')));
+              },
             ),
-            title: const Text(
-              "About",
-              style: TextStyle(
-                  fontSize: IbConfig.kNormalTextSize,
-                  fontWeight: FontWeight.bold),
+            ListTile(
+              leading: const Icon(
+                Icons.description,
+                color: IbColors.accentColor,
+              ),
+              title: const Text(
+                "Term of Use",
+                style: TextStyle(
+                    fontSize: IbConfig.kNormalTextSize,
+                    fontWeight: FontWeight.bold),
+              ),
+              onTap: () {
+                Get.to(() => TermOfUsePage());
+              },
             ),
-            onTap: () {
-              showAboutDialog(
-                  context: context,
-                  applicationName: 'Icebr8k',
-                  applicationVersion: IbConfig.kVersion,
-                  applicationIcon: SizedBox(
-                      height: 80,
-                      width: 80,
-                      child: Image.asset('assets/icons/logo_ios.png')));
-            },
-          ),
-          ListTile(
-            leading: const Icon(
-              Icons.description,
-              color: IbColors.accentColor,
+            ListTile(
+              leading: const Icon(
+                Icons.feedback_outlined,
+                color: IbColors.darkPrimaryColor,
+              ),
+              title: const Text(
+                "Send Feedback",
+                style: TextStyle(
+                    fontSize: IbConfig.kNormalTextSize,
+                    fontWeight: FontWeight.bold),
+              ),
+              subtitle: const Text("Take our 2 minutes survey"),
+              onTap: () async {
+                if (await canLaunch(kBetaSurveyLink)) {
+                  launch(kBetaSurveyLink);
+                }
+              },
             ),
-            title: const Text(
-              "Term of Use",
-              style: TextStyle(
-                  fontSize: IbConfig.kNormalTextSize,
-                  fontWeight: FontWeight.bold),
+            const Spacer(
+              flex: 10,
             ),
-            onTap: () {
-              Get.to(() => TermOfUsePage());
-            },
-          ),
-          ListTile(
-            leading: const Icon(
-              Icons.feedback_outlined,
-              color: IbColors.darkPrimaryColor,
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: TextButton.icon(
+                  onPressed: () {
+                    Get.find<AuthController>().signOut();
+                  },
+                  icon: const Icon(
+                    Icons.exit_to_app_outlined,
+                    color: IbColors.errorRed,
+                  ),
+                  label: Text(
+                    'sign_out'.tr,
+                    style: const TextStyle(color: Colors.black),
+                  )),
             ),
-            title: const Text(
-              "Send Feedback",
-              style: TextStyle(
-                  fontSize: IbConfig.kNormalTextSize,
-                  fontWeight: FontWeight.bold),
-            ),
-            subtitle: const Text("Take our 2 minutes survey"),
-            onTap: () async {
-              if (await canLaunch(kBetaSurveyLink)) {
-                launch(kBetaSurveyLink);
-              }
-            },
-          ),
-          const Spacer(
-            flex: 10,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: TextButton.icon(
-                onPressed: () {
-                  Get.find<AuthController>().signOut();
-                },
-                icon: const Icon(
-                  Icons.exit_to_app_outlined,
-                  color: IbColors.errorRed,
-                ),
-                label: Text(
-                  'sign_out'.tr,
-                  style: const TextStyle(color: Colors.black),
-                )),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
