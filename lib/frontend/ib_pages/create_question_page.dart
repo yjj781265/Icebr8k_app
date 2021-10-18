@@ -64,7 +64,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
             return [
               SliverToBoxAdapter(
                 child: SizedBox(
-                  height: 125,
+                  height: 150,
                   child: IbCard(
                     child: Padding(
                       padding: const EdgeInsets.all(8),
@@ -73,7 +73,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                           _controller.question = question;
                         },
                         controller: _questionEditingController,
-                        maxLines: 2,
+                        minLines: 3,
+                        maxLines: 5,
                         maxLength: IbConfig.kQuestionTitleMaxLength,
                         style: const TextStyle(
                             fontSize: IbConfig.kPageTitleSize,
