@@ -58,7 +58,7 @@ class IbCreateQuestionController extends GetxController {
             statMap:
                 IbUtils.populateStatMap(_getChoiceList(), questionType.trim()),
             question: question.trim(),
-            id: IbUtils.getUniqueName(),
+            id: IbUtils.getUniqueId(),
             creatorId: Get.find<AuthController>().firebaseUser!.uid,
             description: description.trim(),
             questionType: questionType.trim(),

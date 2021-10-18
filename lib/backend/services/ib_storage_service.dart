@@ -12,7 +12,7 @@ class IbStorageService {
 
   Future<String?> uploadAndRetrieveImgUrl(String filePath) async {
     final File file = File(filePath);
-    final String fileName = IbUtils.getUniqueName();
+    final String fileName = IbUtils.getUniqueId();
     final String refString = 'images/$fileName.png';
 
     try {

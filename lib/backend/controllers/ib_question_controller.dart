@@ -17,8 +17,8 @@ class IbQuestionController extends GetxController {
   final isLoading = true.obs;
   final _myAnsweredQuestionsController =
       Get.find<MyAnsweredQuestionsController>();
-
-  bool hasMore = false;
+  String? lastLocalQuestionId;
+  bool hasMoreLocalQ = true;
 
   @override
   Future<void> onInit() async {
@@ -44,19 +44,21 @@ class IbQuestionController extends GetxController {
 
     /// load old question
     final IbAnswer? oldAnswer = await IbQuestionDbService()
-        .queryLastAnsweredQ(IbUtils.getCurrentUid()!);
+        .queryFirstAnsweredQ(IbUtils.getCurrentUid()!);
 
     if (oldAnswer != null) {
       final list = await IbQuestionDbService().queryIbQuestions(8,
           timestamp: oldAnswer.askedTimeInMs, isGreaterThan: false);
-      hasMore = list.isNotEmpty;
       ibQuestions.addAll(list);
     }
 
-    /// load cached question
+    /// load first 8 cached question
     await loadCachedQuestions();
 
     if (ibQuestions.isNotEmpty) {
+      ibQuestions.removeWhere((element) =>
+          _myAnsweredQuestionsController.retrieveAnswer(element.id) != null);
+
       ///cached unanswered question to local db
       IbLocalStorageService().updateUnAnsweredIbQList(ibQuestions);
     }
@@ -66,6 +68,7 @@ class IbQuestionController extends GetxController {
   }
 
   Future<void> loadCachedQuestions() async {
+    const int max = 8;
     final List<String>? localQuestionIds =
         IbLocalStorageService().getUnAnsweredIbQidList();
 
@@ -73,23 +76,54 @@ class IbQuestionController extends GetxController {
       return;
     }
 
-    print(
-        'IbQuestionController there are ${localQuestionIds.length} local unanswered questions');
-    for (final id in localQuestionIds) {
-      if (await IbQuestionDbService()
-          .isQuestionAnswered(uid: IbUtils.getCurrentUid()!, questionId: id)) {
-        IbLocalStorageService().removeUnAnsweredIbQid(id);
-        print('IbQuestionController remove $id');
+    localQuestionIds.sort();
+
+    int startIndex = lastLocalQuestionId == null
+        ? 0
+        : localQuestionIds.indexOf(lastLocalQuestionId!) + 1;
+
+    if (startIndex == -1) {
+      startIndex = 0;
+    }
+
+    int endIndex = startIndex + max;
+    endIndex = endIndex >= localQuestionIds.length
+        ? localQuestionIds.length
+        : endIndex;
+
+    if (startIndex > endIndex) {
+      return;
+    }
+
+    for (int i = startIndex; i < endIndex; i++) {
+      lastLocalQuestionId = localQuestionIds[i];
+      if (await IbQuestionDbService().isQuestionAnswered(
+          uid: IbUtils.getCurrentUid()!, questionId: localQuestionIds[i])) {
+        IbLocalStorageService().removeUnAnsweredIbQid(localQuestionIds[i]);
+        print('IbQuestionController remove ${localQuestionIds[i]}');
         continue;
       }
 
-      if (!containQuestionId(id)) {
-        final q = await IbQuestionDbService().querySingleQuestion(id);
+      if (!containQuestionId(localQuestionIds[i])) {
+        final q = await IbQuestionDbService()
+            .querySingleQuestion(localQuestionIds[i]);
         if (q != null) {
-          ibQuestions.addIf(!ibQuestions.contains(q), q);
+          ibQuestions.addIf(
+              !ibQuestions.contains(q) &&
+                  _myAnsweredQuestionsController
+                          .retrieveAnswer(localQuestionIds[i]) ==
+                      null,
+              q);
+          print(
+              'IbQuestionController load local question ${localQuestionIds[i]}');
         }
       }
     }
+    print(
+        '${localQuestionIds.indexOf(lastLocalQuestionId!)}, ${localQuestionIds.length - 1}');
+    hasMoreLocalQ = localQuestionIds.indexOf(lastLocalQuestionId!) <
+        localQuestionIds.length - 1;
+    print('IbQuestionController hasMore? $hasMoreLocalQ');
   }
 
   bool containQuestionId(String id) {
@@ -128,23 +162,30 @@ class IbQuestionController extends GetxController {
 
   Future<void> loadMoreQuestion() async {
     print('IbQuestionController loadMoreQuestion');
+    loadCachedQuestions();
     final List<IbQuestion> tempList = [];
     tempList.addAll(ibQuestions);
     tempList.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
-    final list = await IbQuestionDbService().queryIbQuestions(20,
+    final list = await IbQuestionDbService().queryIbQuestions(8,
         timestamp: tempList.last.askedTimeInMs, isGreaterThan: false);
 
-    if (list.isEmpty) {
-      hasMore = false;
+    list.removeWhere((element) =>
+        ibQuestions.contains(element) ||
+        _myAnsweredQuestionsController.retrieveAnswer(element.id) != null);
+
+    if (list.isEmpty && !hasMoreLocalQ) {
       refreshController.loadNoData();
       return;
     }
 
     for (final IbQuestion ibQuestion in list) {
-      ibQuestions.addIf(!ibQuestions.contains(ibQuestion), ibQuestion);
+      ibQuestions.addIf(
+          !ibQuestions.contains(ibQuestion) &&
+              _myAnsweredQuestionsController.retrieveAnswer(ibQuestion.id) ==
+                  null,
+          ibQuestion);
       IbLocalStorageService().appendUnAnsweredIbQidList(ibQuestion);
     }
-
     refreshController.loadComplete();
   }
 
@@ -158,6 +199,8 @@ class IbQuestionController extends GetxController {
         ibQuestions.insert(0, ibQuestion);
       }
     }
+    ibQuestions.removeWhere((element) =>
+        _myAnsweredQuestionsController.retrieveAnswer(element.id) != null);
     refreshController.refreshCompleted();
   }
 }

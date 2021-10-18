@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/models/ib_message.dart';
-import 'package:icebr8k/frontend/ib_utils.dart';
 
 class IbChatDbService {
   static final _ibChatDbService = IbChatDbService._();
@@ -137,16 +136,15 @@ class IbChatDbService {
     await _collectionRef.doc(chatRoomId).delete();
   }
 
-  Future<String> getChatRoomId(List<String> uids) async {
+  Future<String?> getChatRoomId(List<String> uids) async {
     uids.sort();
     print('getChatRoomId $uids');
     final _snapshot =
         await _collectionRef.where('memberUids', isEqualTo: uids).get();
 
     if (_snapshot.docs.isEmpty) {
-      print(
-          'getChatRoomId could not find existed chat room, creating a new one');
-      return IbUtils.getUniqueName();
+      print('getChatRoomId could not find existed chat room');
+      return null;
     }
 
     if (_snapshot.size > 1) {

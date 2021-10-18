@@ -681,7 +681,7 @@ class _CommonAnswersTabState extends State<CommonAnswersTab>
                   widget._commonAnswersController.ibQuestions[index];
               final tag = 'common_${item.id}';
               late IbQuestionItemController _controller;
-              if (Get.isRegistered(tag: tag)) {
+              if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
                 _controller = Get.find(tag: tag);
               } else {
                 _controller = Get.put(
@@ -693,6 +693,7 @@ class _CommonAnswersTabState extends State<CommonAnswersTab>
                         disableAvatarOnTouch:
                             item.creatorId == widget.widget.uid),
                     tag: tag);
+                _controller.isExpanded.value = index == 0;
               }
 
               if (item.questionType == IbQuestion.kMultipleChoice) {
@@ -768,7 +769,7 @@ class _DifferentAnswersTabState extends State<DifferentAnswersTab>
               final tag = 'uncommon_${item.id}';
               late IbQuestionItemController _controller;
 
-              if (Get.isRegistered(tag: tag)) {
+              if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
                 _controller = Get.find(tag: tag);
               } else {
                 _controller = Get.put(
@@ -776,11 +777,12 @@ class _DifferentAnswersTabState extends State<DifferentAnswersTab>
                         ibAnswer: widget._uncommonAnswersController
                             .retrieveAnswer(item.id),
                         showMyAnswer: true,
-                        ibQuestion: item,
                         isExpandable: true,
+                        ibQuestion: item,
                         disableAvatarOnTouch:
                             item.creatorId == widget.widget.uid),
                     tag: tag);
+                _controller.isExpanded.value = index == 0;
               }
 
               if (item.questionType == IbQuestion.kMultipleChoice) {
@@ -862,8 +864,8 @@ class _AskedQTabState extends State<AskedQTab>
                         disableAvatarOnTouch:
                             item.creatorId == widget.widget.uid),
                     tag: tag);
+                _controller.isExpanded.value = index == 0;
               }
-              _controller.isExpanded.value = index == 0;
 
               if (item.questionType == IbQuestion.kMultipleChoice) {
                 return IbMcQuestionCard(_controller);
@@ -937,16 +939,20 @@ class _AnsweredQTabState extends State<AnsweredQTab>
                   widget._answeredQuestionController.myAnsweredQuestions[index];
 
               final tag = 'answered_${item.ibQuestion.id}';
-              final IbQuestionItemController _controller = Get.put(
-                  IbQuestionItemController(
-                      ibAnswer: item.ibAnswer,
-                      ibQuestion: item.ibQuestion,
-                      disableAvatarOnTouch:
-                          item.ibQuestion.creatorId == widget.widget.uid,
-                      isExpandable: true),
-                  tag: tag);
-
-              _controller.isExpanded.value = index == 0;
+              late IbQuestionItemController _controller;
+              if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
+                _controller = Get.find(tag: tag);
+              } else {
+                _controller = Get.put(
+                    IbQuestionItemController(
+                        isExpandable: true,
+                        ibAnswer: item.ibAnswer,
+                        ibQuestion: item.ibQuestion,
+                        disableAvatarOnTouch:
+                            item.ibQuestion.creatorId == widget.widget.uid),
+                    tag: tag);
+                _controller.isExpanded.value = index == 0;
+              }
 
               if (item.ibQuestion.questionType == IbQuestion.kMultipleChoice) {
                 return IbMcQuestionCard(_controller);

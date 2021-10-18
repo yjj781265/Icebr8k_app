@@ -151,7 +151,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                         Text(
                           widget._controller.ibQuestion.description.trim(),
                           style: const TextStyle(
-                              fontSize: IbConfig.kDescriptionTextSize,
+                              fontSize: IbConfig.kSecondaryTextSize,
                               color: Colors.black),
                         ),
                       const SizedBox(

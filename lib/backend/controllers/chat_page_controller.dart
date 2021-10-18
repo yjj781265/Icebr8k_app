@@ -37,6 +37,7 @@ class ChatPageController extends GetxController {
       IbUtils.hideKeyboard();
     });
     await initUserMap();
+    chatRoomId = await IbChatDbService().getChatRoomId(memberUids);
     isGroupChat = memberUids.length > 2;
     if (chatRoomId != null) {
       _handleChatMessages();
@@ -122,9 +123,11 @@ class ChatPageController extends GetxController {
   Future<void> uploadMessage(String text) async {
     isSending.value = true;
     final String mUid = Get.find<AuthController>().firebaseUser!.uid;
-    chatRoomId ??= await IbChatDbService().getChatRoomId(memberUids);
+    chatRoomId = chatRoomId == null
+        ? IbUtils.getUniqueId()
+        : await IbChatDbService().getChatRoomId(memberUids);
     final IbMessage ibMessage = IbMessage(
-        messageId: IbUtils.getUniqueName(),
+        messageId: IbUtils.getUniqueId(),
         content: text.trim(),
         readUids: [mUid],
         timestamp: FieldValue.serverTimestamp(),

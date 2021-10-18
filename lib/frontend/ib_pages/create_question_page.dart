@@ -362,13 +362,28 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                     ? IbConfig.kScAnswerMaxLength
                     : IbConfig.kAnswerMaxLength,
                 onSubmitted: (value) {
-                  final String _choice = _txtController.text;
+                  final String _choice = _txtController.text.trim();
+                  if (_controller.questionType == IbQuestion.kMultipleChoice &&
+                      _controller.choiceList.contains(_choice)) {
+                    Get.back();
+                    return;
+                  }
+
+                  if (_controller.questionType == IbQuestion.kScale &&
+                      _controller.scaleChoiceList.contains(_choice)) {
+                    Get.back();
+                    return;
+                  }
                   if (_choice.trim().isNotEmpty &&
                       _controller.questionType == IbQuestion.kMultipleChoice) {
+                    _controller.choiceList
+                        .removeWhere((element) => element == _choice);
                     _controller.choiceList.add(_choice);
                     Get.back();
                   } else if (_choice.trim().isNotEmpty &&
                       _controller.questionType == IbQuestion.kScale) {
+                    _controller.scaleChoiceList
+                        .removeWhere((element) => element == _choice);
                     _controller.scaleChoiceList.add(_choice);
                     Get.back();
                   } else {
@@ -382,13 +397,28 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
               ),
               TextButton(
                 onPressed: () {
-                  final String _choice = _txtController.text;
+                  final String _choice = _txtController.text.trim();
+                  if (_controller.questionType == IbQuestion.kMultipleChoice &&
+                      _controller.choiceList.contains(_choice)) {
+                    Get.back();
+                    return;
+                  }
+
+                  if (_controller.questionType == IbQuestion.kScale &&
+                      _controller.scaleChoiceList.contains(_choice)) {
+                    Get.back();
+                    return;
+                  }
                   if (_choice.trim().isNotEmpty &&
                       _controller.questionType == IbQuestion.kMultipleChoice) {
+                    _controller.choiceList
+                        .removeWhere((element) => element == _choice);
                     _controller.choiceList.add(_choice);
                     Get.back();
                   } else if (_choice.trim().isNotEmpty &&
                       _controller.questionType == IbQuestion.kScale) {
+                    _controller.scaleChoiceList
+                        .removeWhere((element) => element == _choice);
                     _controller.scaleChoiceList.add(_choice);
                     Get.back();
                   } else {

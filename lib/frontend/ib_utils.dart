@@ -59,7 +59,7 @@ class IbUtils {
         ));
   }
 
-  static String getUniqueName() {
+  static String getUniqueId() {
     return const Uuid().v4();
   }
 

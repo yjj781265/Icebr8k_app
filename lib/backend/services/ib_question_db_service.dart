@@ -162,7 +162,7 @@ class IbQuestionDbService {
     return IbAnswer.fromJson(_snapshot.docs.first.data());
   }
 
-  Future<IbAnswer?> queryLastAnsweredQ(String uid) async {
+  Future<IbAnswer?> queryFirstAnsweredQ(String uid) async {
     final _snapshot = await _db
         .collectionGroup('Answers')
         .limit(1)
@@ -202,17 +202,21 @@ class IbQuestionDbService {
     late QuerySnapshot<Map<String, dynamic>> snapshot;
 
     if (timestamp == null) {
-      snapshot =
-          await _collectionRef.orderBy('askedTimeInMs', descending: true).get();
+      snapshot = await _collectionRef
+          .orderBy('askedTimeInMs', descending: true)
+          .limit(limit)
+          .get();
     } else if (isGreaterThan) {
       snapshot = await _collectionRef
           .where('askedTimeInMs', isGreaterThan: timestamp)
           .orderBy('askedTimeInMs', descending: true)
+          .limit(limit)
           .get();
     } else {
       snapshot = await _collectionRef
           .where('askedTimeInMs', isLessThan: timestamp)
           .orderBy('askedTimeInMs', descending: true)
+          .limit(limit)
           .get();
     }
 

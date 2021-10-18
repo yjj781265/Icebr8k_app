@@ -158,6 +158,7 @@ class IbQuestionItemController extends GetxController {
     final int size = ibQuestion.statMap![tempAnswer.answer] ?? 0;
     ibQuestion.statMap![tempAnswer.answer] = size + 1;
     await calculateResult(ibQuestion);
+    updateQuestionTab();
   }
 
   Future<void> onSubmit() async {
@@ -168,5 +169,12 @@ class IbQuestionItemController extends GetxController {
     IbUtils.showSimpleSnackBar(
         msg: 'Question submitted successfully',
         backgroundColor: IbColors.accentColor);
+  }
+
+  Future<void> updateQuestionTab() async {
+    if (Get.isRegistered<IbQuestionItemController>(tag: ibQuestion.id)) {
+      await Get.find<IbQuestionItemController>(tag: ibQuestion.id)
+          .calculateResult(ibQuestion);
+    }
   }
 }

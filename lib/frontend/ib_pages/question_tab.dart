@@ -47,7 +47,7 @@ class QuestionTab extends StatelessWidget {
         child: SmartRefresher(
             physics: const AlwaysScrollableScrollPhysics(),
             footer: const ClassicFooter(
-              loadStyle: LoadStyle.HideAlways,
+              loadStyle: LoadStyle.ShowWhenLoading,
               noDataText: '',
               textStyle: TextStyle(color: IbColors.primaryColor),
               failedIcon: Icon(
@@ -69,12 +69,8 @@ class QuestionTab extends StatelessWidget {
             controller: _ibQuestionController.refreshController,
             enablePullUp: true,
             onLoading: () async {
-              if (!_ibQuestionController.hasMore) {
-                _ibQuestionController.refreshController.loadNoData();
-                return;
-              }
-
-              await _ibQuestionController.loadMoreQuestion();
+              await Future.delayed(const Duration(seconds: 1),
+                  _ibQuestionController.loadMoreQuestion);
             },
             child: _handleBodyWidget()),
       );

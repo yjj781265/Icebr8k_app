@@ -146,7 +146,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                                 Text(
                                   widget._controller.ibQuestion.description,
                                   style: const TextStyle(
-                                      fontSize: IbConfig.kDescriptionTextSize,
+                                      fontSize: IbConfig.kSecondaryTextSize,
                                       color: Colors.black),
                                 ),
                               const SizedBox(
@@ -388,8 +388,8 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
       lastColor = currentColor;
       final PieChartSectionData data = PieChartSectionData(
           badgeWidget: Container(
-            width: 32.0,
-            height: 32.0,
+            width: 30,
+            height: 30,
             decoration: BoxDecoration(
               border: Border.all(color: lastColor),
               color: IbColors.lightBlue,
@@ -411,12 +411,13 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
             )),
           ),
           color: lastColor,
-          badgePositionPercentageOffset: 0.95,
-          titlePositionPercentageOffset: 0.4,
+          badgePositionPercentageOffset: 1,
+          titlePositionPercentageOffset: 0.5,
           value: double.parse(percentage),
           radius: 80,
           titleStyle: const TextStyle(
-              fontSize: IbConfig.kNormalTextSize, fontWeight: FontWeight.bold),
+              fontSize: IbConfig.kSecondaryTextSize,
+              fontWeight: FontWeight.bold),
           title: '$percentage%');
       _pieChartDataList.add(data);
     }
@@ -456,10 +457,10 @@ class IbQuestionScItem extends StatelessWidget {
             trackShape: const RoundedRectSliderTrackShape(),
             trackHeight: 8.0,
             valueIndicatorShape:
-                const _CustomSliderThumbCircle(thumbRadius: 24, min: 1, max: 5),
+                const _CustomSliderThumbCircle(thumbRadius: 20, min: 1, max: 5),
             thumbColor: IbColors.primaryColor,
             thumbShape:
-                const _CustomSliderThumbCircle(thumbRadius: 24, min: 1, max: 5),
+                const _CustomSliderThumbCircle(thumbRadius: 20, min: 1, max: 5),
             overlayColor: IbColors.primaryColor.withAlpha(80),
             overlayShape: const RoundSliderOverlayShape(overlayRadius: 26.0),
           ),
@@ -509,7 +510,7 @@ class _CustomSliderThumbCircle extends SliderComponentShape {
   final int max;
 
   const _CustomSliderThumbCircle({
-    this.thumbRadius = 8,
+    this.thumbRadius = 6,
     this.min = 0,
     this.max = 10,
   });
