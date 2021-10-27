@@ -27,7 +27,7 @@ class IbConfig {
   static const double kChatMessagesTextSize = 18;
   static const int kImageQuality = 70;
   static const String kVersion = '1.0.0$dbSuffix';
-  static const String dbSuffix = '';
+  static const String dbSuffix = '-dev';
 
   IbConfig._();
 }
