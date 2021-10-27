@@ -67,8 +67,6 @@ class IbUserDbService {
 
   Future<bool> isAvatarUrlMissing(String uid) async {
     final snapshot = await _collectionRef.doc(uid).get();
-    print(
-        'isAvatarUrlMissing, user with avatarUrl ${snapshot.data()!['avatarUrl']}');
     return !snapshot.exists ||
         snapshot.data()!['avatarUrl'] == null ||
         snapshot['avatarUrl'] == '';
