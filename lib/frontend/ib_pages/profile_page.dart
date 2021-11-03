@@ -647,8 +647,14 @@ class _CommonAnswersTabState extends State<CommonAnswersTab>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     return Obx(
       () {
+        if (widget._commonAnswersController.isLoading.isTrue) {
+          return const Center(
+            child: IbProgressIndicator(),
+          );
+        }
         return SmartRefresher(
           footer: const ClassicFooter(
             textStyle: TextStyle(color: IbColors.primaryColor),
@@ -736,6 +742,12 @@ class _DifferentAnswersTabState extends State<DifferentAnswersTab>
     super.build(context);
     return Obx(
       () {
+        if (widget._uncommonAnswersController.isLoading.isTrue) {
+          return const Center(
+            child: IbProgressIndicator(),
+          );
+        }
+
         return SmartRefresher(
           footer: const ClassicFooter(
             textStyle: TextStyle(color: IbColors.primaryColor),

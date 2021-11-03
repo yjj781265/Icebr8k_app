@@ -50,9 +50,10 @@ class AskedQuestionsController extends GetxController {
       if (isLoading.isTrue && event.docs.isNotEmpty) {
         lastDoc = event.docs.last;
       }
-      isLoading.value = false;
+
       createdQuestions
           .sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
+      isLoading.value = false;
     });
   }
 
@@ -72,9 +73,6 @@ class AskedQuestionsController extends GetxController {
         createdQuestions.addIf(
             !createdQuestions.contains(ibQuestion), ibQuestion);
       }
-
-      createdQuestions
-          .sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
     } else {
       lastDoc = null;
     }
