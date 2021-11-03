@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 
 class IbQuestionDbService {
   static final _ibQuestionDbService = IbQuestionDbService._();
   static final _db = FirebaseFirestore.instance;
-  static const _kQuestionCollection = 'IbQuestions';
+  static const _kQuestionCollection = 'IbQuestions${IbConfig.dbSuffix}';
+  static const _kAnswerCollectionGroup = 'Answers${IbConfig.dbSuffix}';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
 
   factory IbQuestionDbService() => _ibQuestionDbService;
@@ -80,8 +82,10 @@ class IbQuestionDbService {
 
   Future<List<String>> queryAnsweredQuestionIds(String uid) async {
     final List<String> _list = [];
-    final _snapshot =
-        await _db.collectionGroup('Answers').where('uid', isEqualTo: uid).get();
+    final _snapshot = await _db
+        .collectionGroup(_kAnswerCollectionGroup)
+        .where('uid', isEqualTo: uid)
+        .get();
 
     for (final element in _snapshot.docs) {
       _list.add(element['questionId'].toString());
@@ -94,14 +98,14 @@ class IbQuestionDbService {
     late Query<Map<String, dynamic>> query;
     if (lastDoc != null) {
       query = _db
-          .collectionGroup('Answers')
+          .collectionGroup(_kAnswerCollectionGroup)
           .where('uid', isEqualTo: uid)
           .orderBy('answeredTimeInMs', descending: true)
           .limit(limit)
           .startAfterDocument(lastDoc);
     } else {
       query = _db
-          .collectionGroup('Answers')
+          .collectionGroup(_kAnswerCollectionGroup)
           .where('uid', isEqualTo: uid)
           .orderBy('answeredTimeInMs', descending: true)
           .limit(limit);
@@ -116,31 +120,31 @@ class IbQuestionDbService {
     late Query<Map<String, dynamic>> query;
     if (limit == null && lastDoc == null) {
       query = _db
-          .collectionGroup('Answers')
+          .collectionGroup(_kAnswerCollectionGroup)
           .where('uid', isEqualTo: uid)
           .orderBy('answeredTimeInMs', descending: true);
     } else if (limit != null && lastDoc == null) {
       query = _db
-          .collectionGroup('Answers')
+          .collectionGroup(_kAnswerCollectionGroup)
           .where('uid', isEqualTo: uid)
           .limit(limit)
           .orderBy('answeredTimeInMs', descending: true);
     } else if (limit == null && lastDoc != null) {
       query = _db
-          .collectionGroup('Answers')
+          .collectionGroup(_kAnswerCollectionGroup)
           .where('uid', isEqualTo: uid)
           .orderBy('answeredTimeInMs', descending: true)
           .startAfterDocument(lastDoc);
     } else if (limit != null && lastDoc != null) {
       query = _db
-          .collectionGroup('Answers')
+          .collectionGroup(_kAnswerCollectionGroup)
           .where('uid', isEqualTo: uid)
           .orderBy('answeredTimeInMs', descending: true)
           .limit(limit)
           .startAfterDocument(lastDoc);
     } else {
       query = _db
-          .collectionGroup('Answers')
+          .collectionGroup(_kAnswerCollectionGroup)
           .where('uid', isEqualTo: uid)
           .orderBy('answeredTimeInMs', descending: true);
     }
@@ -150,7 +154,7 @@ class IbQuestionDbService {
 
   Future<IbAnswer?> queryLatestAnsweredQ(String uid) async {
     final _snapshot = await _db
-        .collectionGroup('Answers')
+        .collectionGroup(_kAnswerCollectionGroup)
         .limit(1)
         .where('uid', isEqualTo: uid)
         .orderBy('askedTimeInMs', descending: true)
@@ -164,7 +168,7 @@ class IbQuestionDbService {
 
   Future<IbAnswer?> queryFirstAnsweredQ(String uid) async {
     final _snapshot = await _db
-        .collectionGroup('Answers')
+        .collectionGroup(_kAnswerCollectionGroup)
         .limit(1)
         .where('uid', isEqualTo: uid)
         .orderBy('askedTimeInMs', descending: false)
@@ -231,8 +235,10 @@ class IbQuestionDbService {
 
   Future<List<IbAnswer>> queryUserAnswers(String uid) async {
     final List<IbAnswer> answers = [];
-    final _snapshot =
-        await _db.collectionGroup('Answers').where('uid', isEqualTo: uid).get();
+    final _snapshot = await _db
+        .collectionGroup(_kAnswerCollectionGroup)
+        .where('uid', isEqualTo: uid)
+        .get();
     for (final doc in _snapshot.docs) {
       answers.add(IbAnswer.fromJson(doc.data()));
     }
@@ -242,7 +248,7 @@ class IbQuestionDbService {
   Future<IbAnswer?> queryIbAnswer(String uid, String questionId) async {
     final _snapshot = await _collectionRef
         .doc(questionId)
-        .collection('Answers')
+        .collection(_kAnswerCollectionGroup)
         .doc(uid)
         .get();
     if (!_snapshot.exists) {
@@ -255,7 +261,7 @@ class IbQuestionDbService {
   Future<void> answerQuestion(IbAnswer ibAnswer) async {
     await _collectionRef
         .doc(ibAnswer.questionId)
-        .collection('Answers')
+        .collection(_kAnswerCollectionGroup)
         .doc(ibAnswer.uid)
         .set(ibAnswer.toJson(), SetOptions(merge: true));
   }
@@ -267,8 +273,10 @@ class IbQuestionDbService {
         _snapshot.data() == null ||
         _snapshot.data()!['pollSize'] == 0) {
       print('queryPollSize legacy method');
-      final _snapshot =
-          await _collectionRef.doc(questionId).collection('Answers').get();
+      final _snapshot = await _collectionRef
+          .doc(questionId)
+          .collection(_kAnswerCollectionGroup)
+          .get();
       return _snapshot.size;
     }
 
@@ -281,7 +289,7 @@ class IbQuestionDbService {
       {required String questionId, required String answer}) async {
     final _snapshot = await _collectionRef
         .doc(questionId)
-        .collection('Answers')
+        .collection(_kAnswerCollectionGroup)
         .where('answer', isEqualTo: answer)
         .get();
     return _snapshot.size;
@@ -300,7 +308,7 @@ class IbQuestionDbService {
       {required String uid, required String questionId}) async {
     final _snapshot = await _collectionRef
         .doc(questionId)
-        .collection('Answers')
+        .collection(_kAnswerCollectionGroup)
         .doc(uid)
         .get();
     return _snapshot.exists;
@@ -308,13 +316,15 @@ class IbQuestionDbService {
 
   Future<void> eraseAllAnsweredQuestions(String uid) async {
     print('eraseAllAnsweredQuestions');
-    final _snapshot =
-        await _db.collectionGroup('Answers').where('uid', isEqualTo: uid).get();
+    final _snapshot = await _db
+        .collectionGroup(_kAnswerCollectionGroup)
+        .where('uid', isEqualTo: uid)
+        .get();
     for (final doc in _snapshot.docs) {
       final questionId = doc.data()['questionId'].toString();
       await _collectionRef
           .doc(questionId)
-          .collection('Answers')
+          .collection(_kAnswerCollectionGroup)
           .doc(uid)
           .delete();
     }
@@ -324,7 +334,7 @@ class IbQuestionDbService {
       String uid, String questionId) async {
     return _collectionRef
         .doc(questionId)
-        .collection('Answers')
+        .collection(_kAnswerCollectionGroup)
         .doc(uid)
         .delete();
   }

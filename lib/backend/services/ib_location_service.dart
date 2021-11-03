@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:location/location.dart';
 
@@ -7,6 +8,8 @@ class IbLocationService {
   static final IbLocationService _ibLocationService =
       IbLocationService._internal();
   final Location _location = Location();
+  static const String _kDbCollection = 'IbUsers${IbConfig.dbSuffix}';
+  static const String _kDbLocCollectionGroup = 'Location${IbConfig.dbSuffix}';
 
   // Init firestore and geoFlutterFire
   final geo = Geoflutterfire();
@@ -31,9 +34,9 @@ class IbLocationService {
     final GeoFirePoint loc = geo.point(
         latitude: locationData.latitude!, longitude: locationData.longitude!);
     _firestore
-        .collection('IbUsers')
+        .collection(_kDbCollection)
         .doc(IbUtils.getCurrentUid())
-        .collection('Location')
+        .collection(_kDbLocCollectionGroup)
         .doc(IbUtils.getCurrentUid())
         .set({
       'uid': IbUtils.getCurrentUid(),
@@ -44,9 +47,9 @@ class IbLocationService {
 
   Future<void> removeLocation() {
     return _firestore
-        .collection('IbUsers')
+        .collection(_kDbCollection)
         .doc(IbUtils.getCurrentUid())
-        .collection('Location')
+        .collection(_kDbLocCollectionGroup)
         .doc(IbUtils.getCurrentUid())
         .delete();
   }
@@ -60,7 +63,7 @@ class IbLocationService {
 
     final GeoFirePoint loc = geo.point(
         latitude: centerLoc.latitude!, longitude: centerLoc.longitude!);
-    final collectionRef = _firestore.collectionGroup('Location');
+    final collectionRef = _firestore.collectionGroup(_kDbLocCollectionGroup);
 
     return geo
         .collection(collectionRef: collectionRef)

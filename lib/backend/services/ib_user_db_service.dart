@@ -6,12 +6,13 @@ import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 class IbUserDbService {
   static final _ibUserService = IbUserDbService._();
   static final _db = FirebaseFirestore.instance;
-  static const _kUserCollection = 'IbUsers';
+  static const _kUserCollection = 'IbUsers${IbConfig.dbSuffix}';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
 
   factory IbUserDbService() => _ibUserService;
@@ -66,8 +67,6 @@ class IbUserDbService {
 
   Future<bool> isAvatarUrlMissing(String uid) async {
     final snapshot = await _collectionRef.doc(uid).get();
-    print(
-        'isAvatarUrlMissing, user with avatarUrl ${snapshot.data()!['avatarUrl']}');
     return !snapshot.exists ||
         snapshot.data()!['avatarUrl'] == null ||
         snapshot['avatarUrl'] == '';
