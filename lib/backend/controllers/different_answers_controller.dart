@@ -11,6 +11,7 @@ class DifferentAnswersController extends GetxController {
   IbAnswer? lastIbAnswer;
   DifferentAnswersController(this.uid);
   final int kPaginationMax = 8;
+  final isLoading = true.obs;
 
   @override
   Future<void> onInit() async {
@@ -39,6 +40,7 @@ class DifferentAnswersController extends GetxController {
       ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
     }
 
+    isLoading.value = false;
     super.onInit();
   }
 
@@ -66,7 +68,6 @@ class DifferentAnswersController extends GetxController {
       ibQuestions.add(q);
     }
     lastIbAnswer = uncommonAnswers[endIndex - 1];
-    ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
   }
 
   IbAnswer? retrieveAnswer(String questionId) {

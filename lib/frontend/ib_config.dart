@@ -29,5 +29,6 @@ class IbConfig {
   static const String kVersion = '1.0.0$dbSuffix';
   static const String dbSuffix = '-dev';
 
+
   IbConfig._();
 }
