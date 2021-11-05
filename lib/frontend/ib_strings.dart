@@ -57,8 +57,7 @@ class IbStrings extends Translations {
           'username': 'Username',
           'username_hint': 'Create your unique username',
           'username_exist_error': 'Username already exists',
-          'username_not_valid':
-              'Username is not valid, make sure it has at least 3 characters without spacing',
+          'username_not_valid': 'Username is not valid',
           'username_empty':
               "Oops, looks like you forgot to create your username.",
           'avatar_empty':
