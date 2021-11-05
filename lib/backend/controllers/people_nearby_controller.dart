@@ -88,6 +88,7 @@ class PeopleNearbyController extends GetxController {
     final List<PeopleNearbyItem> tempList = [];
 
     for (final doc in documentList) {
+      print(doc.data());
       final String uid = doc.data()!['uid'] as String;
       final int timestampInMs = doc.data()!['timestampInMs'] as int;
 
@@ -107,15 +108,10 @@ class PeopleNearbyController extends GetxController {
         continue;
       }
 
-      final Map position = doc.data()!['position'] as Map;
-      final GeoPoint geoPoint = position['geopoint'] as GeoPoint;
-      final double distance =
-          calculateDistance(geoPoint.latitude, geoPoint.longitude);
       final user = await IbUserDbService().queryIbUser(uid);
       final compScore = await IbUtils.getCompScore(uid);
       if (user != null) {
-        final item = PeopleNearbyItem(
-            ibUser: user, distance: distance, compScore: compScore);
+        final item = PeopleNearbyItem(ibUser: user, compScore: compScore);
         tempList.add(item);
         final index = items.indexOf(item);
         if (index == -1) {
@@ -148,11 +144,9 @@ class PeopleNearbyController extends GetxController {
 
 class PeopleNearbyItem {
   IbUser ibUser;
-  double distance;
   double compScore;
 
-  PeopleNearbyItem(
-      {required this.ibUser, required this.distance, required this.compScore});
+  PeopleNearbyItem({required this.ibUser, required this.compScore});
 
   @override
   bool operator ==(Object other) =>
