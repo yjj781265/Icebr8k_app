@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
@@ -113,6 +114,7 @@ class _MyFriendsTabState extends State<MyFriendsTab>
       }
 
       return SmartRefresher(
+        physics: const BouncingScrollPhysics(),
         controller: _refreshController,
         header: const ClassicHeader(
           textStyle: TextStyle(color: IbColors.primaryColor),
@@ -137,9 +139,9 @@ class _MyFriendsTabState extends State<MyFriendsTab>
         onRefresh: () async {
           await _controller.refreshEverything();
           _refreshController.refreshCompleted();
-          print('onRefresh');
         },
         child: ListView.builder(
+          physics: const BouncingScrollPhysics(),
           itemBuilder: (context, index) {
             final FriendListItem _item = _controller.friendItems[index];
             return FriendItemView(friendListItem: _item);
@@ -257,6 +259,7 @@ class _PeopleNearByTabState extends State<PeopleNearByTab>
         }
 
         return SmartRefresher(
+          physics: const BouncingScrollPhysics(),
           controller: _refreshController,
           onRefresh: () async {
             await _controller.searchPeopleNearby();
@@ -303,32 +306,44 @@ class _PeopleNearByTabState extends State<PeopleNearByTab>
                     ],
                   ),
                 )
-              : ListView.builder(
-                  itemBuilder: (context, index) {
-                    final PeopleNearbyItem item = _controller.items[index];
-                    return Material(
-                      child: ListTile(
-                        onTap: () {
-                          Get.to(() => ProfilePage(
-                                item.ibUser.id,
-                                showAppBar: true,
-                              ));
-                        },
-                        tileColor: IbColors.white,
-                        leading: IbUserAvatar(
-                          uid: item.ibUser.id,
-                          avatarUrl: item.ibUser.avatarUrl,
-                        ),
-                        title: Text(item.ibUser.username),
-                        subtitle: IbLinearIndicator(
-                          endValue: item.compScore,
-                        ),
-                        trailing:
-                            Text(IbUtils.getDistanceString(item.distance)),
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        'Users within 30 miles',
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                    );
-                  },
-                  itemCount: _controller.items.length,
+                    ),
+                    ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final PeopleNearbyItem item = _controller.items[index];
+                        return Material(
+                          child: ListTile(
+                            onTap: () {
+                              Get.to(() => ProfilePage(
+                                    item.ibUser.id,
+                                    showAppBar: true,
+                                  ));
+                            },
+                            tileColor: IbColors.white,
+                            leading: IbUserAvatar(
+                              uid: item.ibUser.id,
+                              avatarUrl: item.ibUser.avatarUrl,
+                            ),
+                            title: Text(item.ibUser.username),
+                            subtitle: IbLinearIndicator(
+                              endValue: item.compScore,
+                            ),
+                          ),
+                        );
+                      },
+                      itemCount: _controller.items.length,
+                    ),
+                  ],
                 ),
         );
       }),
