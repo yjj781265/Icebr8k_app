@@ -33,16 +33,20 @@ class ChatPageController extends GetxController {
   @override
   Future<void> onInit() async {
     isInit = true;
-    scrollController.addListener(() {
-      IbUtils.hideKeyboard();
-    });
-    await initUserMap();
     isGroupChat = memberUids.length > 2;
+    await initUserMap();
     if (chatRoomId != null) {
       _handleChatMessages();
     } else {
       chatRoomId = await IbChatDbService().getChatRoomId(memberUids);
+      if (chatRoomId != null) {
+        _handleChatMessages();
+      }
     }
+    scrollController.addListener(() {
+      IbUtils.hideKeyboard();
+    });
+
     super.onInit();
   }
 
