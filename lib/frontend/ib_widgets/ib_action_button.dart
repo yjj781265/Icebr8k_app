@@ -41,6 +41,9 @@ class IbActionButton extends StatelessWidget {
             ),
           ),
         ),
+        SizedBox(
+          height: 8,
+        ),
         Text(
           text,
           style: const TextStyle(fontSize: IbConfig.kDescriptionTextSize),

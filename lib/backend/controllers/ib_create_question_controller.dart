@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_pages/review_question_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -11,27 +12,35 @@ class IbCreateQuestionController extends GetxController {
   String questionType = IbQuestion.kMultipleChoice;
   late TextEditingController? questionEditController;
   late TextEditingController? descriptionEditController;
-  final choiceList = <String>[].obs;
-  final scaleChoiceList = <String>[].obs;
+  final choiceList = <IbChoice>[].obs;
+  final scaleEndPoints = <String>[].obs;
   final filePath = ''.obs;
   String question = '';
   String description = '';
 
   void swapIndex(int oldIndex, int newIndex) {
     if (questionType == IbQuestion.kMultipleChoice) {
-      final String item = choiceList.removeAt(oldIndex);
+      final IbChoice item = choiceList.removeAt(oldIndex);
       choiceList.insert(oldIndex < newIndex ? newIndex - 1 : newIndex, item);
       return;
     }
-    final String item = scaleChoiceList.removeAt(oldIndex);
-    scaleChoiceList.insert(oldIndex < newIndex ? newIndex - 1 : newIndex, item);
+    final String item = scaleEndPoints.removeAt(oldIndex);
+    scaleEndPoints.insert(oldIndex < newIndex ? newIndex - 1 : newIndex, item);
   }
 
-  List<String> _getChoiceList() {
-    if (questionType == IbQuestion.kMultipleChoice) {
-      return choiceList;
+  bool isChoiceDuplicated(String text) {
+    if (IbQuestion.kScale == questionType) {
+      return scaleEndPoints.contains(text.trim());
+    } else if (IbQuestion.kMultipleChoice == questionType) {
+      for (final IbChoice choice in choiceList) {
+        if (text.trim() == choice.content) {
+          return true;
+        }
+      }
+      return false;
     }
-    return scaleChoiceList;
+
+    return false;
   }
 
   void validQuestion() {
@@ -46,31 +55,64 @@ class IbCreateQuestionController extends GetxController {
       return;
     }
 
-    if (questionType == IbQuestion.kScale && scaleChoiceList.length != 2) {
+    if (questionType == IbQuestion.kScale && scaleEndPoints.length != 2) {
       Get.dialog(IbSimpleDialog(
           message: 'sc_question_not_valid'.tr, positiveBtnTrKey: 'ok'));
       return;
     }
 
     IbUtils.hideKeyboard();
-    Get.to(() => ReviewQuestionPage(
-        question: IbQuestion(
-            statMap:
-                IbUtils.populateStatMap(_getChoiceList(), questionType.trim()),
+
+    if (questionType == IbQuestion.kScale) {
+      Get.to(
+        () => ReviewQuestionPage(
+          question: IbQuestion(
             question: question.trim(),
             id: IbUtils.getUniqueId(),
             creatorId: Get.find<AuthController>().firebaseUser!.uid,
             description: description.trim(),
             questionType: questionType.trim(),
             askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
-            choices: _getChoiceList())));
+            endpoints: scaleEndPoints,
+            choices: _generateScaleChoiceList(),
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (questionType == IbQuestion.kMultipleChoice) {
+      Get.to(
+        () => ReviewQuestionPage(
+          question: IbQuestion(
+            question: question.trim(),
+            id: IbUtils.getUniqueId(),
+            creatorId: IbUtils.getCurrentUid()!,
+            description: description.trim(),
+            questionType: questionType.trim(),
+            askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
+            choices: choiceList,
+          ),
+        ),
+      );
+      return;
+    }
+  }
+
+  List<IbChoice> _generateScaleChoiceList() {
+    final List<IbChoice> choices = [];
+    for (int i = 1; i < 6; i++) {
+      choices.add(
+          IbChoice(content: i.toString(), choiceId: IbUtils.getUniqueId()));
+    }
+    return choices;
   }
 
   void reset() {
     question = '';
     description = '';
     choiceList.clear();
-    scaleChoiceList.clear();
+    scaleEndPoints.clear();
 
     if (questionEditController != null) {
       questionEditController!.clear();

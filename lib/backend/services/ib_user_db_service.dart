@@ -1,18 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
+import 'package:icebr8k/backend/db_config.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
-import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 class IbUserDbService {
   static final _ibUserService = IbUserDbService._();
   static final _db = FirebaseFirestore.instance;
-  static const _kUserCollection = 'IbUsers${IbConfig.dbSuffix}';
+  static const _kUserCollection = 'IbUsers${DbConfig.dbSuffix}';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
 
   factory IbUserDbService() => _ibUserService;
@@ -30,7 +30,9 @@ class IbUserDbService {
 
   Future<void> loginIbUser({required String uid, required int loginTimeInMs}) {
     print('loginIbUser');
-    return _collectionRef.doc(uid).update({'loginTimeInMs': loginTimeInMs});
+    return _collectionRef
+        .doc(uid)
+        .update({'loginTimeInMs': loginTimeInMs, 'id': uid});
   }
 
   Future<void> signOutIbUser(String _uid) async {

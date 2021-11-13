@@ -10,14 +10,10 @@ IbQuestion _$IbQuestionFromJson(Map<String, dynamic> json) => IbQuestion(
       question: json['question'] as String,
       id: json['id'] as String,
       creatorId: json['creatorId'] as String,
-      choices:
-          (json['choices'] as List<dynamic>).map((e) => e as String).toList(),
+      choices: (json['choices'] as List<dynamic>)
+          .map((e) => IbChoice.fromJson(e as Map<String, dynamic>))
+          .toList(),
       questionType: json['questionType'] as String,
-      statMap: Map<String, int>.from(json['statMap'] as Map),
-      extras: (json['extras'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const <String>[],
       description: json['description'] as String? ?? '',
       likes: json['likes'] as int? ?? 0,
       comments: json['comments'] as int? ?? 0,
@@ -37,8 +33,6 @@ Map<String, dynamic> _$IbQuestionToJson(IbQuestion instance) =>
       'creatorId': instance.creatorId,
       'askedTimeInMs': instance.askedTimeInMs,
       'endTimeInMs': instance.endTimeInMs,
-      'statMap': instance.statMap,
-      'choices': instance.choices,
-      'extras': instance.extras,
+      'choices': instance.choices.map((e) => e.toJson()).toList(),
       'questionType': instance.questionType,
     };

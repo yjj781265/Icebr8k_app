@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_create_question_controller.dart';
+import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 
 import '../ib_config.dart';
@@ -54,110 +56,90 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
               },
               icon: const Icon(Icons.check))
         ],
-        backgroundColor: IbColors.lightBlue,
       ),
-      backgroundColor: IbColors.lightBlue,
-      body: Scrollbar(
-        child: NestedScrollView(
-          physics: const NeverScrollableScrollPhysics(),
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return [
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 150,
-                  child: IbCard(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextField(
-                        onChanged: (question) {
-                          _controller.question = question;
-                        },
-                        controller: _questionEditingController,
-                        minLines: 3,
-                        maxLines: 5,
-                        maxLength: IbConfig.kQuestionTitleMaxLength,
-                        style: const TextStyle(
-                            fontSize: IbConfig.kPageTitleSize,
-                            fontWeight: FontWeight.bold),
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'question'.tr,
-                            hintStyle: const TextStyle(
-                              color: IbColors.lightGrey,
-                            )),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 120,
-                  child: IbCard(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextField(
-                        maxLines: 5,
-                        onChanged: (description) {
-                          _controller.description = description;
-                        },
-                        controller: _descriptionEditingController,
-                        style: const TextStyle(
-                          fontSize: IbConfig.kSecondaryTextSize,
-                        ),
-                        maxLength: IbConfig.kQuestionDescMaxLength,
-                        decoration: InputDecoration(
+      body: NestedScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return [
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 150,
+                child: IbCard(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: TextField(
+                      onChanged: (question) {
+                        _controller.question = question;
+                      },
+                      keyboardType: TextInputType.text,
+                      controller: _questionEditingController,
+                      minLines: 3,
+                      maxLines: 5,
+                      maxLength: IbConfig.kQuestionTitleMaxLength,
+                      style: const TextStyle(
+                          fontSize: IbConfig.kPageTitleSize,
+                          fontWeight: FontWeight.bold),
+                      decoration: InputDecoration(
                           border: InputBorder.none,
-                          hintStyle: const TextStyle(color: IbColors.lightGrey),
-                          hintText: 'description_option'.tr,
-                        ),
+                          hintText: 'question'.tr,
+                          hintStyle: const TextStyle(
+                            color: IbColors.lightGrey,
+                          )),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 120,
+                child: IbCard(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: TextField(
+                      maxLines: 5,
+                      keyboardType: TextInputType.text,
+                      onChanged: (description) {
+                        _controller.description = description;
+                      },
+                      controller: _descriptionEditingController,
+                      style: const TextStyle(
+                        fontSize: IbConfig.kSecondaryTextSize,
+                      ),
+                      maxLength: IbConfig.kQuestionDescMaxLength,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintStyle: const TextStyle(color: IbColors.lightGrey),
+                        hintText: 'description_option'.tr,
                       ),
                     ),
                   ),
                 ),
               ),
-            ];
-          },
-          body: Column(
-            children: [
-              SizedBox(
-                height: 64,
-                child: Container(
-                  margin: const EdgeInsets.only(top: 10),
-                  decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                          Radius.circular(IbConfig.kCardCornerRadius)),
-                      color: IbColors.white),
-                  child: TabBar(
-                    controller: _tabController,
-                    tabs: [
-                      Tab(
-                        text: 'mc'.tr,
-                      ),
-                      Tab(text: 'sc'.tr),
-                    ],
-                    labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                    indicatorPadding:
-                        const EdgeInsets.symmetric(horizontal: 32),
-                    unselectedLabelStyle:
-                        const TextStyle(fontWeight: FontWeight.bold),
-                    labelColor: Colors.black,
-                    unselectedLabelColor: IbColors.lightGrey,
-                    indicatorColor: IbColors.primaryColor,
-                  ),
+            ),
+          ];
+        },
+        body: Column(
+          children: [
+            TabBar(
+              controller: _tabController,
+              tabs: [
+                Tab(
+                  text: 'mc'.tr,
                 ),
+                Tab(text: 'sc'.tr),
+              ],
+            ),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _mCTab(),
+                  _sCTab(),
+                ],
               ),
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _mCTab(),
-                    _sCTab(),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -188,9 +170,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                 margin: const EdgeInsets.all(8),
                 padding: const EdgeInsets.all(8),
                 height: 46,
-                decoration: BoxDecoration(
-                    color: IbColors.white,
-                    borderRadius: BorderRadius.circular(8)),
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(8)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -227,7 +208,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(item),
+                        Text(item.content!),
                         IconButton(
                             onPressed: () {
                               _controller.choiceList.remove(item);
@@ -256,7 +237,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
-                if (_controller.scaleChoiceList.length <
+                if (_controller.scaleEndPoints.length <
                     IbConfig.kScChoiceLimit) {
                   _showTextFiledBottomSheet('add_endpoint');
                 } else {
@@ -299,29 +280,30 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
               shrinkWrap: true,
               primary: false,
               children: [
-                for (final item in _controller.scaleChoiceList)
-                  Container(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    padding: const EdgeInsets.all(8),
+                for (final item in _controller.scaleEndPoints)
+                  IbCard(
                     key: UniqueKey(),
-                    height: 46,
-                    decoration: BoxDecoration(
-                        color: IbColors.white,
-                        borderRadius: BorderRadius.circular(8)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(item),
-                        IconButton(
-                            onPressed: () {
-                              _controller.scaleChoiceList.remove(item);
-                            },
-                            icon: const Icon(
-                              Icons.delete_outlined,
-                              color: IbColors.errorRed,
-                            ))
-                      ],
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.all(8),
+                      height: 46,
+                      decoration:
+                          BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(item),
+                          IconButton(
+                              onPressed: () {
+                                _controller.scaleEndPoints.remove(item);
+                              },
+                              icon: const Icon(
+                                Icons.delete_outlined,
+                                color: IbColors.errorRed,
+                              ))
+                        ],
+                      ),
                     ),
                   )
               ],
@@ -332,109 +314,75 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     );
   }
 
+  void handleUserInput(String _choice) {
+    if (_controller.questionType == IbQuestion.kMultipleChoice &&
+        _controller.isChoiceDuplicated(_choice)) {
+      Get.back();
+      return;
+    }
+
+    if (_controller.questionType == IbQuestion.kScale &&
+        _controller.isChoiceDuplicated(_choice)) {
+      Get.back();
+      return;
+    }
+    if (_choice.trim().isNotEmpty &&
+        _controller.questionType == IbQuestion.kMultipleChoice) {
+      _controller.choiceList
+          .removeWhere((element) => element.content == _choice);
+      _controller.choiceList.add(
+          IbChoice(choiceId: IbUtils.getUniqueId(), content: _choice.trim()));
+      Get.back();
+    } else if (_choice.trim().isNotEmpty &&
+        _controller.questionType == IbQuestion.kScale) {
+      _controller.scaleEndPoints.removeWhere((element) => element == _choice);
+      _controller.scaleEndPoints.add(_choice);
+      Get.back();
+    } else {
+      print('empty');
+    }
+  }
+
   void _showTextFiledBottomSheet(String strTrKey) {
     final TextEditingController _txtController = TextEditingController();
-    final Widget _widget = Container(
-      color: const Color(0xff757575),
-      child: Container(
-        height: 200,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(IbConfig.kCardCornerRadius),
-            topRight: Radius.circular(IbConfig.kCardCornerRadius),
-          ),
-        ),
+    final Widget _widget = IbCard(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                strTrKey.tr,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: IbConfig.kPageTitleSize,
-                ),
-              ),
-              TextField(
-                textInputAction: TextInputAction.done,
-                maxLength: _controller.questionType == IbQuestion.kScale
-                    ? IbConfig.kScAnswerMaxLength
-                    : IbConfig.kAnswerMaxLength,
-                onSubmitted: (value) {
-                  final String _choice = _txtController.text.trim();
-                  if (_controller.questionType == IbQuestion.kMultipleChoice &&
-                      _controller.choiceList.contains(_choice)) {
-                    Get.back();
-                    return;
-                  }
-
-                  if (_controller.questionType == IbQuestion.kScale &&
-                      _controller.scaleChoiceList.contains(_choice)) {
-                    Get.back();
-                    return;
-                  }
-                  if (_choice.trim().isNotEmpty &&
-                      _controller.questionType == IbQuestion.kMultipleChoice) {
-                    _controller.choiceList
-                        .removeWhere((element) => element == _choice);
-                    _controller.choiceList.add(_choice);
-                    Get.back();
-                  } else if (_choice.trim().isNotEmpty &&
-                      _controller.questionType == IbQuestion.kScale) {
-                    _controller.scaleChoiceList
-                        .removeWhere((element) => element == _choice);
-                    _controller.scaleChoiceList.add(_choice);
-                    Get.back();
-                  } else {
-                    print('empty');
-                  }
-                },
-                controller: _txtController,
-                autofocus: true,
-                textAlign: TextAlign.center,
-                cursorColor: IbColors.primaryColor,
-              ),
-              TextButton(
-                onPressed: () {
-                  final String _choice = _txtController.text.trim();
-                  if (_controller.questionType == IbQuestion.kMultipleChoice &&
-                      _controller.choiceList.contains(_choice)) {
-                    Get.back();
-                    return;
-                  }
-
-                  if (_controller.questionType == IbQuestion.kScale &&
-                      _controller.scaleChoiceList.contains(_choice)) {
-                    Get.back();
-                    return;
-                  }
-                  if (_choice.trim().isNotEmpty &&
-                      _controller.questionType == IbQuestion.kMultipleChoice) {
-                    _controller.choiceList
-                        .removeWhere((element) => element == _choice);
-                    _controller.choiceList.add(_choice);
-                    Get.back();
-                  } else if (_choice.trim().isNotEmpty &&
-                      _controller.questionType == IbQuestion.kScale) {
-                    _controller.scaleChoiceList
-                        .removeWhere((element) => element == _choice);
-                    _controller.scaleChoiceList.add(_choice);
-                    Get.back();
-                  } else {
-                    print('empty');
-                  }
-                },
-                child: Text('add'.tr),
-              ),
-            ],
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            strTrKey.tr,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: IbConfig.kPageTitleSize,
+            ),
           ),
-        ),
+          TextField(
+            textInputAction: TextInputAction.done,
+            maxLength: _controller.questionType == IbQuestion.kScale
+                ? IbConfig.kScAnswerMaxLength
+                : IbConfig.kAnswerMaxLength,
+            onSubmitted: (value) {
+              handleUserInput(value.trim());
+            },
+            controller: _txtController,
+            autofocus: true,
+            textAlign: TextAlign.center,
+            cursorColor: IbColors.primaryColor,
+          ),
+          TextButton(
+            onPressed: () {
+              final String _choice = _txtController.text.trim();
+              handleUserInput(_choice);
+            },
+            child: Text('add'.tr),
+          ),
+        ],
       ),
-    );
+    ));
     Get.bottomSheet(
-      _widget,
+      SizedBox(height: 200, child: _widget),
       persistent: true,
     );
   }

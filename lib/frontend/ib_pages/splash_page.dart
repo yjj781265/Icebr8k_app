@@ -1,27 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
+import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
-import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/set_up_page.dart';
 import 'package:icebr8k/frontend/ib_pages/sign_in_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
+import '../ib_colors.dart';
 import 'home_page.dart';
 
 class SplashPage extends StatelessWidget {
   SplashPage({Key? key}) : super(key: key);
   final controller = Get.find<AuthController>();
+
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+          statusBarColor: !IbLocalStorageService()
+                  .isCustomKeyTrue(IbLocalStorageService.isLightModeCustomKey)
+              ? Colors.black
+              : IbColors.lightBlue),
+    );
     Future.delayed(
         const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
         () => navigateToCorrectPage());
 
     return Scaffold(
-      backgroundColor: IbColors.lightBlue,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

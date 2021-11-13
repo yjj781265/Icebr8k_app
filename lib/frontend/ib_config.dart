@@ -1,3 +1,5 @@
+import 'package:icebr8k/backend/db_config.dart';
+
 class IbConfig {
   static const double kLoadingIndicatorSize = 40;
   static const double kAppLogoSize = 96;
@@ -26,8 +28,9 @@ class IbConfig {
   static const double kInitChatMessagesLoadSize = 16;
   static const double kChatMessagesTextSize = 18;
   static const int kImageQuality = 70;
-  static const String kVersion = '0.1.1$dbSuffix';
-  static const String dbSuffix = '';
+  static const double kMcItemHeight = 56;
+  static const double kMcItemCornerRadius = 8;
+  static const String kVersion = '0.1.1${DbConfig.dbSuffix}';
 
   IbConfig._();
 }

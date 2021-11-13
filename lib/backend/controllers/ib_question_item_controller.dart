@@ -38,6 +38,12 @@ class IbQuestionItemController extends GetxController {
   IbAnswer? ibAnswer;
   final answeredUsername = ''.obs;
   final totalPolled = 0.obs;
+  final likes = 0.obs;
+  final dislikes = 0.obs;
+  final liked = false.obs;
+  final disliked = false.obs;
+  final comments = 1001.obs;
+  final commented = false.obs;
   final selectedChoice = ''.obs;
   final resultMap = <String, double>{}.obs;
 
@@ -74,7 +80,7 @@ class IbQuestionItemController extends GetxController {
 
   Future<void> calculateResult(IbQuestion ibQuestion) async {
     print("calculateResult for ${ibQuestion.question}");
-    isCalculating.value = true;
+    /* isCalculating.value = true;
     int pollSize = 0;
     if (ibQuestion.statMap == null) {
       return;
@@ -106,7 +112,7 @@ class IbQuestionItemController extends GetxController {
     }
     await determineUserAnswer();
     isCalculating.value = false;
-    isAnswering.value = false;
+    isAnswering.value = false;*/
   }
 
   Future<void> determineUserAnswer() async {
@@ -155,8 +161,8 @@ class IbQuestionItemController extends GetxController {
     await IbQuestionDbService().answerQuestion(tempAnswer);
     IbLocalStorageService().removeUnAnsweredIbQid(ibQuestion.id);
     ibQuestion.pollSize++;
-    final int size = ibQuestion.statMap![tempAnswer.answer] ?? 0;
-    ibQuestion.statMap![tempAnswer.answer] = size + 1;
+    // final int size = ibQuestion.statMap![tempAnswer.answer] ?? 0;
+    // ibQuestion.statMap![tempAnswer.answer] = size + 1;
     await calculateResult(ibQuestion);
     updateQuestionTab();
   }
@@ -175,6 +181,34 @@ class IbQuestionItemController extends GetxController {
     if (Get.isRegistered<IbQuestionItemController>(tag: ibQuestion.id)) {
       await Get.find<IbQuestionItemController>(tag: ibQuestion.id)
           .calculateResult(ibQuestion);
+    }
+  }
+
+  Future<void> updateLike() async {
+    liked.value = !liked.value;
+    if (liked.isTrue) {
+      likes.value++;
+    } else {
+      likes.value--;
+    }
+
+    if (disliked.isTrue && liked.isTrue) {
+      disliked.value = false;
+      dislikes.value--;
+    }
+  }
+
+  Future<void> updateDislike() async {
+    disliked.value = !disliked.value;
+    if (disliked.isTrue) {
+      dislikes.value++;
+    } else {
+      dislikes.value--;
+    }
+
+    if (liked.isTrue && disliked.isTrue) {
+      liked.value = false;
+      likes.value--;
     }
   }
 }

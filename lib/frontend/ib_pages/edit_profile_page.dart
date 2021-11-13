@@ -26,7 +26,6 @@ class EditProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: IbColors.lightBlue,
       appBar: AppBar(
         actions: [
           IconButton(
@@ -46,14 +45,13 @@ class EditProfilePage extends StatelessWidget {
             },
           )
         ],
-        backgroundColor: IbColors.lightBlue,
         title: const Text('Edit Profile'),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             GestureDetector(
-              onTap: () => showEditAvatarBottomSheet(),
+              onTap: () => showEditAvatarBottomSheet(context),
               child: SizedBox(
                 width: 112,
                 height: 112,
@@ -82,9 +80,9 @@ class EditProfilePage extends StatelessWidget {
                       ),
                       Positioned(
                         child: Container(
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: IbColors.accentColor,
+                            color: Theme.of(context).primaryColor,
                           ),
                           child: const Padding(
                             padding: EdgeInsets.all(3.0),
@@ -182,7 +180,7 @@ class EditProfilePage extends StatelessWidget {
     );
   }
 
-  void showEditAvatarBottomSheet() {
+  void showEditAvatarBottomSheet(BuildContext context) {
     final Widget options = ListView(
       shrinkWrap: true,
       children: [
@@ -207,13 +205,14 @@ class EditProfilePage extends StatelessWidget {
           child: Ink(
             height: 56,
             width: double.infinity,
-            color: IbColors.white,
+            color: Theme.of(context).primaryColor,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: const [
                   Icon(
                     Icons.camera_alt_outlined,
+                    color: IbColors.primaryColor,
                   ),
                   SizedBox(
                     width: 8,
@@ -246,13 +245,14 @@ class EditProfilePage extends StatelessWidget {
           child: Ink(
             height: 56,
             width: double.infinity,
-            color: IbColors.white,
+            color: Theme.of(context).primaryColor,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: const [
                   Icon(
                     Icons.photo_album_outlined,
+                    color: IbColors.errorRed,
                   ),
                   SizedBox(
                     width: 8,

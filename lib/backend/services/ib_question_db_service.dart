@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
-import 'package:icebr8k/frontend/ib_config.dart';
+
+import '../db_config.dart';
 
 class IbQuestionDbService {
   static final _ibQuestionDbService = IbQuestionDbService._();
   static final _db = FirebaseFirestore.instance;
-  static const _kQuestionCollection = 'IbQuestions${IbConfig.dbSuffix}';
-  static const _kAnswerCollectionGroup = 'Answers${IbConfig.dbSuffix}';
+  static const _kQuestionCollection = 'IbQuestions${DbConfig.dbSuffix}';
+  static const _kAnswerCollectionGroup = 'Answers${DbConfig.dbSuffix}';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
 
   factory IbQuestionDbService() => _ibQuestionDbService;

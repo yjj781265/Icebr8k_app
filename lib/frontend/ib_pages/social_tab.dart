@@ -43,49 +43,44 @@ class _SocialTabState extends State<SocialTab>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: IbColors.lightBlue,
-      child: Column(
-        children: [
-          TabBar(
-            isScrollable: true,
-            controller: _tabController,
-            tabs: [
-              Obx(
-                () => Tab(
+    return Column(
+      children: [
+        TabBar(
+          isScrollable: true,
+          controller: _tabController,
+          tabs: [
+            Obx(
+              () => Tab(
+                text:
+                    '${'score_page_tab_3_title'.tr}${_peopleNearbyController.items.isEmpty ? '' : '(${_peopleNearbyController.items.length})'}',
+              ),
+            ),
+            Obx(
+              () => Tab(
                   text:
-                      '${'score_page_tab_3_title'.tr}${_peopleNearbyController.items.isEmpty ? '' : '(${_peopleNearbyController.items.length})'}',
-                ),
+                      '${'score_page_tab_1_title'.tr}${_friendListController.friendItems.isEmpty ? '' : '(${_friendListController.friendItems.length})'}'),
+            ),
+            Obx(
+              () => Tab(
+                text:
+                    '${'score_page_tab_2_title'.tr}${_friendRequestController.requests.isEmpty ? '' : '(${_friendRequestController.requests.length})'}',
               ),
-              Obx(
-                () => Tab(
-                    text:
-                        '${'score_page_tab_1_title'.tr}${_friendListController.friendItems.isEmpty ? '' : '(${_friendListController.friendItems.length})'}'),
-              ),
-              Obx(
-                () => Tab(
-                  text:
-                      '${'score_page_tab_2_title'.tr}${_friendRequestController.requests.isEmpty ? '' : '(${_friendRequestController.requests.length})'}',
-                ),
-              ),
-            ],
-            labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-            labelColor: Colors.black,
-            unselectedLabelColor: IbColors.lightGrey,
-            indicatorColor: IbColors.primaryColor,
-          ),
-          Expanded(
-              child: TabBarView(
-            controller: _tabController,
-            children: [
-              PeopleNearByTab(),
-              const MyFriendsTab(),
-              const FriendRequestTab(),
-            ],
-          ))
-        ],
-      ),
+            ),
+          ],
+          labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+          indicatorColor: IbColors.primaryColor,
+        ),
+        Expanded(
+            child: TabBarView(
+          controller: _tabController,
+          children: [
+            PeopleNearByTab(),
+            const MyFriendsTab(),
+            const FriendRequestTab(),
+          ],
+        ))
+      ],
     );
   }
 }
@@ -106,11 +101,9 @@ class _MyFriendsTabState extends State<MyFriendsTab>
     super.build(context);
     return Obx(() {
       if (_controller.friendItems.isEmpty) {
-        return Material(
-            color: IbColors.lightBlue,
-            child: Center(
-                child: Lottie.asset('assets/images/friendship.json',
-                    width: 230, height: 230)));
+        return Center(
+            child: Lottie.asset('assets/images/friendship.json',
+                width: 230, height: 230));
       }
 
       return SmartRefresher(
@@ -162,38 +155,35 @@ class FriendItemView extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: IbColors.white,
-      child: ListTile(
-        onTap: () => Get.to(
-            () => ProfilePage(
-                  friendListItem.uid,
-                  showAppBar: true,
-                ),
-            preventDuplicates: false),
-        tileColor: IbColors.white,
-        leading: IbUserAvatar(
-          uid: friendListItem.uid,
-          avatarUrl: friendListItem.avatarUrl,
+    return ListTile(
+      onTap: () => Get.to(
+          () => ProfilePage(
+                friendListItem.uid,
+                showAppBar: true,
+              ),
+          preventDuplicates: false),
+      tileColor: Theme.of(context).primaryColor,
+      leading: IbUserAvatar(
+        uid: friendListItem.uid,
+        avatarUrl: friendListItem.avatarUrl,
+      ),
+      title: Text(
+        friendListItem.username,
+        style: const TextStyle(
+            fontSize: IbConfig.kNormalTextSize, fontWeight: FontWeight.bold),
+      ),
+      subtitle: IbLinearIndicator(endValue: friendListItem.score),
+      trailing: IconButton(
+        icon: const Icon(
+          Icons.message_outlined,
+          color: IbColors.primaryColor,
         ),
-        title: Text(
-          friendListItem.username,
-          style: const TextStyle(
-              fontSize: IbConfig.kNormalTextSize, fontWeight: FontWeight.bold),
-        ),
-        subtitle: IbLinearIndicator(endValue: friendListItem.score),
-        trailing: IconButton(
-          icon: const Icon(
-            Icons.message_outlined,
-            color: IbColors.primaryColor,
-          ),
-          onPressed: () {
-            final String mUid = Get.find<AuthController>().firebaseUser!.uid;
-            final List<String> memberUids = [mUid, friendListItem.uid];
-            Get.to(() => ChatPage(Get.put(ChatPageController(memberUids),
-                tag: memberUids.toString())));
-          },
-        ),
+        onPressed: () {
+          final String mUid = Get.find<AuthController>().firebaseUser!.uid;
+          final List<String> memberUids = [mUid, friendListItem.uid];
+          Get.to(() => ChatPage(Get.put(ChatPageController(memberUids),
+              tag: memberUids.toString())));
+        },
       ),
     );
   }
@@ -321,23 +311,21 @@ class _PeopleNearByTabState extends State<PeopleNearByTab>
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
                         final PeopleNearbyItem item = _controller.items[index];
-                        return Material(
-                          child: ListTile(
-                            onTap: () {
-                              Get.to(() => ProfilePage(
-                                    item.ibUser.id,
-                                    showAppBar: true,
-                                  ));
-                            },
-                            tileColor: IbColors.white,
-                            leading: IbUserAvatar(
-                              uid: item.ibUser.id,
-                              avatarUrl: item.ibUser.avatarUrl,
-                            ),
-                            title: Text(item.ibUser.username),
-                            subtitle: IbLinearIndicator(
-                              endValue: item.compScore,
-                            ),
+                        return ListTile(
+                          onTap: () {
+                            Get.to(() => ProfilePage(
+                                  item.ibUser.id,
+                                  showAppBar: true,
+                                ));
+                          },
+                          tileColor: Theme.of(context).primaryColor,
+                          leading: IbUserAvatar(
+                            uid: item.ibUser.id,
+                            avatarUrl: item.ibUser.avatarUrl,
+                          ),
+                          title: Text(item.ibUser.username),
+                          subtitle: IbLinearIndicator(
+                            endValue: item.compScore,
                           ),
                         );
                       },
@@ -374,11 +362,9 @@ class _FriendRequestTabState extends State<FriendRequestTab>
   Widget _getBody() {
     return Obx(() {
       if (_controller.requests.isEmpty) {
-        return Material(
-            color: IbColors.lightBlue,
-            child: Center(
-                child: Lottie.asset('assets/images/ice_cream_cup.json',
-                    width: 230, height: 230)));
+        return Center(
+            child: Lottie.asset('assets/images/ice_cream_cup.json',
+                width: 230, height: 230));
       }
       return AnimatedList(
         key: _controller.animatedListKey,
@@ -411,7 +397,6 @@ class _FriendRequestTabState extends State<FriendRequestTab>
             child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               IbUserAvatar(
                 avatarUrl: item.avatarUrl,
@@ -422,6 +407,7 @@ class _FriendRequestTabState extends State<FriendRequestTab>
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -430,10 +416,6 @@ class _FriendRequestTabState extends State<FriendRequestTab>
                         children: [
                           Text(
                             item.username,
-                            style: const TextStyle(
-                                fontSize: IbConfig.kNormalTextSize,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
                           ),
                           Text(
                             ' · ${IbUtils.getAgoDateTimeString(DateTime.fromMillisecondsSinceEpoch(item.timeStampInMs))}',

@@ -17,9 +17,7 @@ class ScreenThree extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: IbColors.lightBlue,
       appBar: AppBar(
-        backgroundColor: IbColors.lightBlue,
         actions: [
           Obx(() {
             if (_setUpController.answeredCounter.value ==

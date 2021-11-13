@@ -22,9 +22,7 @@ class ScreenTwo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: IbColors.lightBlue,
       appBar: AppBar(
-        backgroundColor: IbColors.lightBlue,
         actions: [
           IconButton(
               onPressed: () async {

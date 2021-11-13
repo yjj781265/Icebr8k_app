@@ -21,6 +21,7 @@ import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_description_text.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
@@ -86,13 +87,10 @@ class _ProfilePageState extends State<ProfilePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: IbColors.lightBlue,
       appBar: widget.showAppBar
           ? AppBar(
-              backgroundColor: IbColors.lightBlue,
               title: Obx(() => Text(
                     _profileController.username.value,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
                   )),
             )
           : null,
@@ -126,7 +124,7 @@ class _ProfilePageState extends State<ProfilePage>
                           if (_profileController.isMe.isFalse) {
                             return;
                           }
-                          showCoverPhotoBottomSheet();
+                          showCoverPhotoBottomSheet(context);
                         },
                         child: AspectRatio(
                             aspectRatio: 16 / 9, child: handleCoverPhoto()),
@@ -231,22 +229,16 @@ class _ProfilePageState extends State<ProfilePage>
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Obx(
-                      () => Text(
-                        _profileController.description.value,
-                        style:
-                            const TextStyle(fontSize: IbConfig.kNormalTextSize),
-                      ),
+                      () => IbDescriptionText(
+                          text: _profileController.description.value),
                     ),
                   ),
                 if (_profileController.isMe.isTrue)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Obx(
-                      () => Text(
-                        _homeController.currentBio.value,
-                        style:
-                            const TextStyle(fontSize: IbConfig.kNormalTextSize),
-                      ),
+                      () => IbDescriptionText(
+                          text: _homeController.currentBio.value),
                     ),
                   ),
 
@@ -286,10 +278,6 @@ class _ProfilePageState extends State<ProfilePage>
                                 'Asked Questions(${_profileController.isMe.isTrue ? _homeController.askedSize.value : _profileController.totalAsked.value})'),
                       ],
                       labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                      unselectedLabelStyle:
-                          const TextStyle(fontWeight: FontWeight.bold),
-                      labelColor: Colors.black,
-                      unselectedLabelColor: IbColors.lightGrey,
                       indicatorColor: _tabController.length == 1
                           ? Colors.transparent
                           : IbColors.primaryColor,
@@ -341,12 +329,21 @@ class _ProfilePageState extends State<ProfilePage>
         fit: StackFit.expand,
         children: [
           coverPhoto,
-          const Positioned(
+          Positioned(
             right: 8,
             bottom: 8,
-            child: Icon(
-              Icons.edit_outlined,
-              color: IbColors.lightBlue,
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Theme.of(context).primaryColor,
+              ),
+              child: const Padding(
+                padding: EdgeInsets.all(3.0),
+                child: Icon(
+                  Icons.edit_outlined,
+                  size: 16,
+                ),
+              ),
             ),
           ),
         ],
@@ -520,7 +517,7 @@ class _ProfilePageState extends State<ProfilePage>
     Get.bottomSheet(dialog);
   }
 
-  void showCoverPhotoBottomSheet() {
+  void showCoverPhotoBottomSheet(BuildContext context) {
     final Widget options = ListView(
       shrinkWrap: true,
       children: [
@@ -552,14 +549,17 @@ class _ProfilePageState extends State<ProfilePage>
             }
           },
           child: Ink(
+            color: Theme.of(context).primaryColor,
             height: 56,
             width: double.infinity,
-            color: IbColors.white,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: const [
-                  Icon(Icons.camera_alt_outlined),
+                  Icon(
+                    Icons.camera_alt_outlined,
+                    color: IbColors.primaryColor,
+                  ),
                   SizedBox(
                     width: 8,
                   ),
@@ -598,14 +598,17 @@ class _ProfilePageState extends State<ProfilePage>
             }
           },
           child: Ink(
+            color: Theme.of(context).primaryColor,
             height: 56,
             width: double.infinity,
-            color: IbColors.white,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: const [
-                  Icon(Icons.photo_album_outlined),
+                  Icon(
+                    Icons.photo_album_outlined,
+                    color: IbColors.errorRed,
+                  ),
                   SizedBox(
                     width: 8,
                   ),
@@ -992,7 +995,7 @@ class PersistentHeader extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(height: height, color: IbColors.lightBlue, child: widget);
+    return SizedBox(height: height, child: widget);
   }
 
   @override

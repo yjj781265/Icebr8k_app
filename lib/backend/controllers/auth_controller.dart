@@ -33,7 +33,13 @@ class AuthController extends GetxService {
         print('User is signed out!');
       } else {
         firebaseUser = user;
+        // get user answered questions and update the login time
         Get.lazyPut(() => MyAnsweredQuestionsController(), fenix: true);
+        if (await IbUserDbService().isIbUserExist(firebaseUser!.uid)) {
+          IbUserDbService().loginIbUser(
+              uid: firebaseUser!.uid,
+              loginTimeInMs: DateTime.now().millisecondsSinceEpoch);
+        }
         print('User is signed in! ${firebaseUser!.uid}');
       }
     });

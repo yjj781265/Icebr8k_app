@@ -10,22 +10,27 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/main_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_themes.dart';
 import 'package:lottie/lottie.dart';
 
+import 'backend/services/ib_local_storage_service.dart';
 import 'frontend/ib_config.dart';
 import 'frontend/ib_pages/splash_page.dart';
 import 'frontend/ib_strings.dart';
-import 'frontend/ib_themes.dart';
 import 'frontend/ib_widgets/ib_progress_indicator.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+        statusBarColor: !IbLocalStorageService()
+                .isCustomKeyTrue(IbLocalStorageService.isLightModeCustomKey)
+            ? Colors.black
+            : IbColors.lightBlue),
+  );
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(statusBarColor: IbColors.lightBlue),
-  );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
   runApp(MainApp());
@@ -64,14 +69,21 @@ class MainApp extends StatelessWidget {
         home: SplashPage(),
         translations: IbStrings(),
         locale: const Locale('en', 'US'),
-        theme: IbThemes.lightTheme,
+        themeMode: ThemeMode.light,
+        theme: IbLocalStorageService()
+                .isCustomKeyTrue(IbLocalStorageService.isLightModeCustomKey)
+            ? IbThemes.light
+            : IbThemes.dark,
       );
     });
   }
 
   Widget _loading() {
     return Container(
-      color: IbColors.lightBlue,
+      color: IbLocalStorageService()
+              .isCustomKeyTrue(IbLocalStorageService.isLightModeCustomKey)
+          ? IbColors.lightBlue
+          : Colors.black,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

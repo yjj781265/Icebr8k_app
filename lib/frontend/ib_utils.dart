@@ -40,9 +40,7 @@ class IbUtils {
         cropStyle: cropStyle,
         aspectRatioPresets: ratios,
         androidUiSettings: AndroidUiSettings(
-            statusBarColor: IbColors.lightBlue,
             toolbarTitle: 'Image Cropper',
-            toolbarColor: IbColors.lightBlue,
             initAspectRatio: initAspectRatio,
             lockAspectRatio: lockAspectRatio),
         iosUiSettings: IOSUiSettings(

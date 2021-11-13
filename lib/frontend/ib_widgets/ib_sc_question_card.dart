@@ -493,11 +493,12 @@ class IbQuestionScItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-                width: 100, child: Text(_controller.ibQuestion.choices.first)),
+                width: 100,
+                child: Text(_controller.ibQuestion.choices.first.content!)),
             SizedBox(
               width: 100,
               child: Text(
-                _controller.ibQuestion.choices[1],
+                _controller.ibQuestion.choices[1].content!,
                 textAlign: TextAlign.end,
               ),
             )

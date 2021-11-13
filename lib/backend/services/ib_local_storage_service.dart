@@ -10,6 +10,7 @@ class IbLocalStorageService {
 
   static String firstTimeCustomKey = 'firstTime';
   static String usernameSearchCustomKey = 'username';
+  static String isLightModeCustomKey = 'lightMode';
 
   List<String>? getUnAnsweredIbQidList() {
     final list = _box.read('unAnsweredIbQList');

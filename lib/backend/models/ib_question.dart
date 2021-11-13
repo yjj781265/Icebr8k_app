@@ -1,8 +1,9 @@
+import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'ib_question.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class IbQuestion {
   static const String kMultipleChoice = "mc";
   static const String kScale = "sc";
@@ -15,9 +16,8 @@ class IbQuestion {
   String creatorId;
   int askedTimeInMs;
   int endTimeInMs;
-  Map<String, int>? statMap;
-  List<String> choices;
-  List<String> extras;
+  List<IbChoice> choices;
+  List<String>? endpoints;
   String questionType;
 
   IbQuestion(
@@ -26,14 +26,17 @@ class IbQuestion {
       required this.creatorId,
       required this.choices,
       required this.questionType,
-      required this.statMap,
-      this.extras = const <String>[],
+      this.endpoints,
       this.description = '',
       this.likes = 0,
       this.comments = 0,
       this.pollSize = 0,
       required this.askedTimeInMs,
-      this.endTimeInMs = 0});
+      this.endTimeInMs = 0}) {
+    if (kScale == questionType && endpoints == null) {
+      throw Exception('Scale question need end points to be defined');
+    }
+  }
 
   factory IbQuestion.fromJson(Map<String, dynamic> json) =>
       _$IbQuestionFromJson(json);

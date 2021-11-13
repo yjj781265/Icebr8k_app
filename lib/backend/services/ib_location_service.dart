@@ -1,15 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
-import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:location/location.dart';
+
+import '../db_config.dart';
 
 class IbLocationService {
   static final IbLocationService _ibLocationService =
       IbLocationService._internal();
   final Location _location = Location();
-  static const String _kDbCollection = 'IbUsers${IbConfig.dbSuffix}';
-  static const String _kDbLocCollectionGroup = 'Location${IbConfig.dbSuffix}';
+  static const String _kDbCollection = 'IbUsers${DbConfig.dbSuffix}';
+  static const String _kDbLocCollectionGroup = 'Location${DbConfig.dbSuffix}';
 
   // Init firestore and geoFlutterFire
   final geo = Geoflutterfire();

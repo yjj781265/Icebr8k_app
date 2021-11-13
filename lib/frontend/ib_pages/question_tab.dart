@@ -42,38 +42,35 @@ class QuestionTab extends StatelessWidget {
         ));
       }
 
-      return Container(
-        color: IbColors.lightBlue,
-        child: SmartRefresher(
-            physics: const AlwaysScrollableScrollPhysics(),
-            footer: const ClassicFooter(
-              loadStyle: LoadStyle.ShowWhenLoading,
-              noDataText: '',
-              textStyle: TextStyle(color: IbColors.primaryColor),
-              failedIcon: Icon(
-                Icons.error_outline,
-                color: IbColors.errorRed,
-              ),
-              loadingIcon: IbProgressIndicator(
-                width: 24,
-                height: 24,
-                padding: 0,
-              ),
+      return SmartRefresher(
+          physics: const AlwaysScrollableScrollPhysics(),
+          footer: const ClassicFooter(
+            loadStyle: LoadStyle.ShowWhenLoading,
+            noDataText: '',
+            textStyle: TextStyle(color: IbColors.primaryColor),
+            failedIcon: Icon(
+              Icons.error_outline,
+              color: IbColors.errorRed,
             ),
-            header: const WaterDropMaterialHeader(
-              backgroundColor: IbColors.primaryColor,
+            loadingIcon: IbProgressIndicator(
+              width: 24,
+              height: 24,
+              padding: 0,
             ),
-            onRefresh: () async {
-              await _ibQuestionController.refreshEverything();
-            },
-            controller: _ibQuestionController.refreshController,
-            enablePullUp: true,
-            onLoading: () async {
-              await Future.delayed(const Duration(seconds: 1),
-                  _ibQuestionController.loadMoreQuestion);
-            },
-            child: _handleBodyWidget()),
-      );
+          ),
+          header: const WaterDropMaterialHeader(
+            backgroundColor: IbColors.primaryColor,
+          ),
+          onRefresh: () async {
+            await _ibQuestionController.refreshEverything();
+          },
+          controller: _ibQuestionController.refreshController,
+          enablePullUp: true,
+          onLoading: () async {
+            await Future.delayed(const Duration(seconds: 1),
+                _ibQuestionController.loadMoreQuestion);
+          },
+          child: _handleBodyWidget());
     });
   }
 

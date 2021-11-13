@@ -25,116 +25,108 @@ class ChatTab extends StatelessWidget {
       }
 
       if (_controller.chatTabItems.isEmpty) {
-        return Container(
-          color: IbColors.lightBlue,
-          child: Center(
-            child: SizedBox(
-                width: 230,
-                height: 230,
-                child: Lottie.asset('assets/images/business_chat.json')),
-          ),
+        return Center(
+          child: SizedBox(
+              width: 230,
+              height: 230,
+              child: Lottie.asset('assets/images/business_chat.json')),
         );
       }
 
-      return Material(
-        color: IbColors.lightBlue,
-        child: ListView.builder(
-          itemBuilder: (context, index) {
-            final ChatTabItem item = _controller.chatTabItems[index];
-            return buildItem(item);
-          },
-          itemCount: _controller.chatTabItems.length,
-        ),
-      );
-    });
-  }
-
-  Widget buildItem(ChatTabItem item) {
-    return InkWell(
-      onTap: () {
-        Get.to(() => ChatPage(Get.put(
-            ChatPageController(item.memberUids, chatRoomId: item.chatRoomId),
-            tag: item.chatRoomId)));
-      },
-      child: Ink(
-        color: IbColors.white,
-        child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: IbUserAvatar(
-                avatarUrl: item.ibUser!.avatarUrl,
-                uid: item.ibUser!.id,
+      return ListView.builder(
+        itemBuilder: (context, index) {
+          final ChatTabItem item = _controller.chatTabItems[index];
+          return Material(
+            color: Theme.of(context).primaryColor,
+            child: InkWell(
+              onTap: () {
+                Get.to(() => ChatPage(Get.put(
+                    ChatPageController(item.memberUids,
+                        chatRoomId: item.chatRoomId),
+                    tag: item.chatRoomId)));
+              },
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: IbUserAvatar(
+                      avatarUrl: item.ibUser!.avatarUrl,
+                      uid: item.ibUser!.id,
+                    ),
+                  ),
+                  Expanded(
+                      flex: 8,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              item.title,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: IbConfig.kNormalTextSize),
+                            ),
+                            Text(item.ibMessage.content,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: IbConfig.kSecondaryTextSize)),
+                          ],
+                        ),
+                      )),
+                  Expanded(
+                      flex: 2,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (item.ibMessage.timestamp != null)
+                              Text(
+                                IbUtils.getChatDateTimeString(
+                                    (item.ibMessage.timestamp as Timestamp)
+                                        .toDate()),
+                                style: const TextStyle(
+                                    color: IbColors.lightGrey,
+                                    fontSize: IbConfig.kDescriptionTextSize),
+                              ),
+                            if (item.unReadCount == 0)
+                              const SizedBox(
+                                width: 16,
+                              )
+                            else
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: CircleAvatar(
+                                  backgroundColor: IbColors.errorRed,
+                                  radius: 11,
+                                  child: Text(
+                                    item.unReadCount >= 99
+                                        ? '99+'
+                                        : item.unReadCount.toString(),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: IbColors.white,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ),
+                              )
+                          ],
+                        ),
+                      ))
+                ],
               ),
             ),
-            Expanded(
-                flex: 8,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        item.title,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: IbConfig.kNormalTextSize),
-                      ),
-                      Text(item.ibMessage.content,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.normal,
-                              fontSize: IbConfig.kSecondaryTextSize)),
-                    ],
-                  ),
-                )),
-            Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (item.ibMessage.timestamp != null)
-                        Text(
-                          IbUtils.getChatDateTimeString(
-                              (item.ibMessage.timestamp as Timestamp).toDate()),
-                          style: const TextStyle(
-                              color: IbColors.lightGrey,
-                              fontSize: IbConfig.kDescriptionTextSize),
-                        ),
-                      if (item.unReadCount == 0)
-                        const SizedBox(
-                          width: 16,
-                        )
-                      else
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: CircleAvatar(
-                            backgroundColor: IbColors.errorRed,
-                            radius: 11,
-                            child: Text(
-                              item.unReadCount >= 99
-                                  ? '99+'
-                                  : item.unReadCount.toString(),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: IbColors.white,
-                                fontSize: 11,
-                              ),
-                            ),
-                          ),
-                        )
-                    ],
-                  ),
-                ))
-          ],
-        ),
-      ),
-    );
+          );
+        },
+        itemCount: _controller.chatTabItems.length,
+      );
+    });
   }
 }

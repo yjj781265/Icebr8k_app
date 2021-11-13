@@ -1,159 +1,130 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
-import 'package:icebr8k/backend/controllers/home_controller.dart';
+import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:icebr8k/frontend/ib_themes.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class MenuPage extends StatelessWidget {
-  MenuPage({Key? key}) : super(key: key);
+class MenuPage extends StatefulWidget {
+  const MenuPage({Key? key}) : super(key: key);
+
+  @override
+  State<MenuPage> createState() => _MenuPageState();
+}
+
+class _MenuPageState extends State<MenuPage> {
   final kBetaSurveyLink = 'https://forms.gle/xuYbYcsWGC6WtT7h7';
 
-  final _homeController = Get.find<HomeController>();
+  bool isDarkMode = !IbLocalStorageService()
+      .isCustomKeyTrue(IbLocalStorageService.isLightModeCustomKey);
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        backgroundColor: IbColors.lightBlue,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Obx(
-              () => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.bottomLeft,
-                    children: [
-                      ///cover photo
-                      if (_homeController.currentIbCoverPhotoUrl.value.isEmpty)
-                        Image.asset(
-                          'assets/images/default_cover_photo.jpeg',
-                          fit: BoxFit.cover,
-                        )
-                      else
-                        CachedNetworkImage(
-                          fit: BoxFit.cover,
-                          imageUrl:
-                              _homeController.currentIbCoverPhotoUrl.value,
-                        ),
-
-                      Positioned(
-                        left: 16,
-                        bottom: -40,
-                        child: IbUserAvatar(
-                            disableOnTap: true,
-                            radius: 40,
-                            avatarUrl:
-                                _homeController.currentIbAvatarUrl.value),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      '#${_homeController.currentIbUsername.value}',
-                      textAlign: TextAlign.center,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 28,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w700,
-                      ),
+      child: SizedBox(
+        width: 300,
+        child: IbCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              SwitchListTile(
+                value: isDarkMode,
+                onChanged: (value) {
+                  print('dark mode to $value');
+                  IbLocalStorageService().updateCustomFlag(
+                      !value, IbLocalStorageService.isLightModeCustomKey);
+                  setState(() {
+                    isDarkMode = value;
+                    Get.changeTheme(value ? IbThemes.dark : IbThemes.light);
+                    SystemChrome.setSystemUIOverlayStyle(
+                      SystemUiOverlayStyle(
+                          statusBarColor:
+                              value ? Colors.black : IbColors.lightBlue),
+                    );
+                  });
+                },
+                title: const Text('Dark Mode'),
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.description_outlined,
+                  color: IbColors.primaryColor,
+                ),
+                title: const Text(
+                  "About",
+                  style: TextStyle(
+                      fontSize: IbConfig.kNormalTextSize,
+                      fontWeight: FontWeight.bold),
+                ),
+                onTap: () {
+                  showAboutDialog(
+                      context: context,
+                      applicationName: 'Icebr8k',
+                      applicationVersion: IbConfig.kVersion,
+                      applicationIcon: SizedBox(
+                          height: 80,
+                          width: 80,
+                          child: Image.asset('assets/icons/logo_ios.png')));
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.description,
+                  color: IbColors.accentColor,
+                ),
+                title: const Text(
+                  "Term of Use",
+                  style: TextStyle(
+                      fontSize: IbConfig.kNormalTextSize,
+                      fontWeight: FontWeight.bold),
+                ),
+                onTap: () {
+                  Get.to(() => TermOfUsePage());
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.feedback_outlined,
+                  color: IbColors.darkPrimaryColor,
+                ),
+                title: const Text(
+                  "Send Feedback",
+                  style: TextStyle(
+                      fontSize: IbConfig.kNormalTextSize,
+                      fontWeight: FontWeight.bold),
+                ),
+                subtitle: const Text("Take our 2 minutes survey"),
+                onTap: () async {
+                  if (await canLaunch(kBetaSurveyLink)) {
+                    launch(kBetaSurveyLink);
+                  }
+                },
+              ),
+              const Spacer(
+                flex: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: TextButton.icon(
+                    onPressed: () {
+                      Get.find<AuthController>().signOut();
+                    },
+                    icon: const Icon(
+                      Icons.exit_to_app_outlined,
+                      color: IbColors.errorRed,
                     ),
-                  ),
-                  const Divider(
-                    height: 5,
-                    color: IbColors.lightGrey,
-                  ),
-                ],
+                    label: Text(
+                      'sign_out'.tr,
+                    )),
               ),
-            ),
-            ListTile(
-              leading: const Icon(
-                Icons.description_outlined,
-                color: IbColors.primaryColor,
-              ),
-              title: const Text(
-                "About",
-                style: TextStyle(
-                    fontSize: IbConfig.kNormalTextSize,
-                    fontWeight: FontWeight.bold),
-              ),
-              onTap: () {
-                showAboutDialog(
-                    context: context,
-                    applicationName: 'Icebr8k',
-                    applicationVersion: IbConfig.kVersion,
-                    applicationIcon: SizedBox(
-                        height: 80,
-                        width: 80,
-                        child: Image.asset('assets/icons/logo_ios.png')));
-              },
-            ),
-            ListTile(
-              leading: const Icon(
-                Icons.description,
-                color: IbColors.accentColor,
-              ),
-              title: const Text(
-                "Term of Use",
-                style: TextStyle(
-                    fontSize: IbConfig.kNormalTextSize,
-                    fontWeight: FontWeight.bold),
-              ),
-              onTap: () {
-                Get.to(() => TermOfUsePage());
-              },
-            ),
-            ListTile(
-              leading: const Icon(
-                Icons.feedback_outlined,
-                color: IbColors.darkPrimaryColor,
-              ),
-              title: const Text(
-                "Send Feedback",
-                style: TextStyle(
-                    fontSize: IbConfig.kNormalTextSize,
-                    fontWeight: FontWeight.bold),
-              ),
-              subtitle: const Text("Take our 2 minutes survey"),
-              onTap: () async {
-                if (await canLaunch(kBetaSurveyLink)) {
-                  launch(kBetaSurveyLink);
-                }
-              },
-            ),
-            const Spacer(
-              flex: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: TextButton.icon(
-                  onPressed: () {
-                    Get.find<AuthController>().signOut();
-                  },
-                  icon: const Icon(
-                    Icons.exit_to_app_outlined,
-                    color: IbColors.errorRed,
-                  ),
-                  label: Text(
-                    'sign_out'.tr,
-                    style: const TextStyle(color: Colors.black),
-                  )),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -165,7 +136,6 @@ class TermOfUsePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: IbColors.lightBlue,
         title: const Text('Term of Use'),
       ),
       body: SingleChildScrollView(

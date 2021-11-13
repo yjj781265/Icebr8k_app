@@ -132,37 +132,33 @@ class _HomepageViewState extends State<HomepageView>
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(statusBarColor: IbColors.lightBlue),
-      child: WillPopScope(
-        onWillPop: () async {
-          if (Platform.isAndroid) {
-            MoveToBackground.moveTaskToBack();
-          }
-          return false;
-        },
-        child: Obx(() => Scaffold(
-            drawer: Drawer(
-              child: MenuPage(),
-            ),
-            appBar: AppBar(
-              backgroundColor: IbColors.lightBlue,
-              actions: _actionsList[_homeController.currentIndex.value],
-              title: Obx(
-                () => Text(
-                  _homeController
-                      .tabTitleList[_homeController.currentIndex.value],
-                  style: const TextStyle(
-                      fontSize: IbConfig.kPageTitleSize,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
-                ),
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+          statusBarColor: !IbLocalStorageService()
+                  .isCustomKeyTrue(IbLocalStorageService.isLightModeCustomKey)
+              ? Colors.black
+              : IbColors.lightBlue),
+    );
+    return WillPopScope(
+      onWillPop: () async {
+        if (Platform.isAndroid) {
+          MoveToBackground.moveTaskToBack();
+        }
+        return false;
+      },
+      child: Obx(() => Scaffold(
+          drawer: const MenuPage(),
+          appBar: AppBar(
+            actions: _actionsList[_homeController.currentIndex.value],
+            title: Obx(
+              () => Text(
+                _homeController
+                    .tabTitleList[_homeController.currentIndex.value],
               ),
             ),
-            backgroundColor: IbColors.lightBlue,
-            body: getBody(),
-            bottomNavigationBar: _buildBottomBar())),
-      ),
+          ),
+          body: getBody(),
+          bottomNavigationBar: _buildBottomBar())),
     );
   }
 
@@ -185,7 +181,6 @@ class _HomepageViewState extends State<HomepageView>
     const _inactiveColor = IbColors.lightGrey;
     return Obx(
       () => IbAnimatedBottomBar(
-        backgroundColor: IbColors.white,
         selectedIndex: _homeController.currentIndex.value,
         itemCornerRadius: IbConfig.kCardCornerRadius,
         animationDuration: const Duration(milliseconds: 1000),

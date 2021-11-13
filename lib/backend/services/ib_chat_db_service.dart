@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/models/ib_message.dart';
-import 'package:icebr8k/frontend/ib_config.dart';
+
+import '../db_config.dart';
 
 class IbChatDbService {
   static final _ibChatDbService = IbChatDbService._();
   static final _db = FirebaseFirestore.instance;
-  static const _kChatRoomCollection = 'IbChatRooms${IbConfig.dbSuffix}';
+  static const _kChatRoomCollection = 'IbChatRooms${DbConfig.dbSuffix}';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
 
   factory IbChatDbService() => _ibChatDbService;

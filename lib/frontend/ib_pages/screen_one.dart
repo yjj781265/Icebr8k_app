@@ -22,9 +22,7 @@ class ScreenOne extends StatelessWidget {
     WidgetsBinding.instance!.addPostFrameCallback(
         (_) => ShowCaseWidget.of(context)!.startShowCase([_showCaseKey]));
     return Scaffold(
-      backgroundColor: IbColors.lightBlue,
       appBar: AppBar(
-        backgroundColor: IbColors.lightBlue,
         actions: [
           Showcase(
             overlayOpacity: 0.5,

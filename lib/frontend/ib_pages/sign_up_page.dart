@@ -20,7 +20,6 @@ class SignUpPage extends GetView<SignUpController> {
   Widget build(BuildContext context) {
     Get.put(SignUpController());
     return Scaffold(
-      backgroundColor: IbColors.lightBlue,
       body: GestureDetector(
         onTap: () => IbUtils.hideKeyboard(),
         child: Center(

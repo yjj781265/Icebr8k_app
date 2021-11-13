@@ -47,9 +47,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: IbColors.lightBlue,
         appBar: AppBar(
-          backgroundColor: IbColors.lightBlue,
           title: Obx(
             () => Text(
               widget._controller.title.value,

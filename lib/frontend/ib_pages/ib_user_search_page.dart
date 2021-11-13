@@ -22,9 +22,7 @@ class IbUserSearchPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: IbColors.lightBlue,
       appBar: AppBar(
-        backgroundColor: IbColors.lightBlue,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -87,29 +85,30 @@ class IbUserSearchPage extends StatelessWidget {
       if (_controller.isSearching.isFalse &&
           _controller.username.isNotEmpty &&
           _controller.noResultTrKey.value.isEmpty) {
-        return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ListTile(
-              onTap: () => Get.to(
-                  () => ProfilePage(
-                        _controller.ibUser!.id,
-                        showAppBar: true,
-                      ),
-                  preventDuplicates: false),
-              tileColor: IbColors.white,
-              leading: IbUserAvatar(
-                avatarUrl: _controller.ibUser!.avatarUrl,
-                uid: _controller.ibUser!.id,
-              ),
-              title: Text(
-                _controller.username.value,
-                style: const TextStyle(
-                    fontSize: IbConfig.kNormalTextSize,
-                    fontWeight: FontWeight.bold),
-              ),
-              subtitle: IbLinearIndicator(endValue: _controller.score.value),
-              trailing: handleFriendshipStatus(),
-            ));
+        return IbCard(
+          child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListTile(
+                onTap: () => Get.to(
+                    () => ProfilePage(
+                          _controller.ibUser!.id,
+                          showAppBar: true,
+                        ),
+                    preventDuplicates: false),
+                leading: IbUserAvatar(
+                  avatarUrl: _controller.ibUser!.avatarUrl,
+                  uid: _controller.ibUser!.id,
+                ),
+                title: Text(
+                  _controller.username.value,
+                  style: const TextStyle(
+                      fontSize: IbConfig.kNormalTextSize,
+                      fontWeight: FontWeight.bold),
+                ),
+                subtitle: IbLinearIndicator(endValue: _controller.score.value),
+                trailing: handleFriendshipStatus(),
+              )),
+        );
       }
 
       return const SizedBox();
