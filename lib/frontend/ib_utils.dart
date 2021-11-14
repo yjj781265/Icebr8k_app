@@ -221,11 +221,15 @@ class IbUtils {
       {required String msg, required Color backgroundColor}) {
     hideKeyboard();
     Get.showSnackbar(GetBar(
+      snackPosition: SnackPosition.TOP,
       borderRadius: IbConfig.kCardCornerRadius,
       margin: const EdgeInsets.only(left: 8, right: 8, bottom: 64),
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 2),
       backgroundColor: backgroundColor,
-      messageText: Text(msg),
+      messageText: Text(
+        msg,
+        style: const TextStyle(color: Colors.black),
+      ),
     ));
   }
 

@@ -36,7 +36,7 @@ class ChatTab extends StatelessWidget {
       return ListView.builder(
         itemBuilder: (context, index) {
           final ChatTabItem item = _controller.chatTabItems[index];
-          return Material(
+          return Container(
             color: Theme.of(context).primaryColor,
             child: InkWell(
               onTap: () {

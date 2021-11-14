@@ -84,6 +84,8 @@ class IbStrings extends Translations {
           'description_option': 'Description(optional)',
           'create_question': 'Create a question',
           'mc': 'Multiple Choice',
+          'mc_p': 'Multiple Choice with Pictures and Text',
+          'pic': 'Multiple Choice with Pictures Only',
           'sc': 'Scale',
           'question_empty': 'Question field is empty',
           'vote': 'Vote',

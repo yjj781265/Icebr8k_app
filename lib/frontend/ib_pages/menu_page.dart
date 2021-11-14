@@ -41,7 +41,9 @@ class _MenuPageState extends State<MenuPage> {
                       !value, IbLocalStorageService.isLightModeCustomKey);
                   setState(() {
                     isDarkMode = value;
-                    Get.changeTheme(value ? IbThemes.dark : IbThemes.light);
+                    Get.changeTheme(value
+                        ? IbThemes(context).buildDarkTheme()
+                        : IbThemes(context).buildLightTheme());
                     SystemChrome.setSystemUIOverlayStyle(
                       SystemUiOverlayStyle(
                           statusBarColor:

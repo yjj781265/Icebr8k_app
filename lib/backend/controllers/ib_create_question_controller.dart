@@ -14,9 +14,38 @@ class IbCreateQuestionController extends GetxController {
   late TextEditingController? descriptionEditController;
   final choiceList = <IbChoice>[].obs;
   final scaleEndPoints = <String>[].obs;
+  final ibTagCheckBoxModels = <IbTagCheckBoxModel>[].obs;
   final filePath = ''.obs;
   String question = '';
   String description = '';
+  final isCustomTagSelected = false.obs;
+  final tags = [
+    'General 🤔',
+    'Food & Drink 🌭 ',
+    'Entertainment 📽️',
+    'Sports ⚽',
+    'Nature 🌳',
+    'Photography 📸 ',
+    'Animal 🐕',
+    'Science 🔬 ',
+    'Funny 😂',
+    'Love ❤ ',
+    'Fashion 👚 ',
+    'Literature 📖 ',
+    'Technology 🤖'
+  ].obs;
+
+  final pickedTags = <String>[].obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    tags.sort();
+    for (final element in tags) {
+      ibTagCheckBoxModels
+          .add(IbTagCheckBoxModel(tag: element, selected: false.obs));
+    }
+  }
 
   void swapIndex(int oldIndex, int newIndex) {
     if (questionType == IbQuestion.kMultipleChoice) {
@@ -122,4 +151,11 @@ class IbCreateQuestionController extends GetxController {
       descriptionEditController!.clear();
     }
   }
+}
+
+class IbTagCheckBoxModel {
+  String tag;
+  RxBool selected;
+
+  IbTagCheckBoxModel({required this.tag, required this.selected});
 }

@@ -44,32 +44,42 @@ class _SocialTabState extends State<SocialTab>
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TabBar(
-          isScrollable: true,
-          controller: _tabController,
-          tabs: [
-            Obx(
-              () => Tab(
-                text:
-                    '${'score_page_tab_3_title'.tr}${_peopleNearbyController.items.isEmpty ? '' : '(${_peopleNearbyController.items.length})'}',
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: TabBar(
+            isScrollable: true,
+            controller: _tabController,
+            tabs: [
+              Obx(
+                () => SizedBox(
+                  height: 32,
+                  child: Tab(
+                    text:
+                        '${'score_page_tab_3_title'.tr}${_peopleNearbyController.items.isEmpty ? '' : '(${_peopleNearbyController.items.length})'}',
+                  ),
+                ),
               ),
-            ),
-            Obx(
-              () => Tab(
-                  text:
-                      '${'score_page_tab_1_title'.tr}${_friendListController.friendItems.isEmpty ? '' : '(${_friendListController.friendItems.length})'}'),
-            ),
-            Obx(
-              () => Tab(
-                text:
-                    '${'score_page_tab_2_title'.tr}${_friendRequestController.requests.isEmpty ? '' : '(${_friendRequestController.requests.length})'}',
+              Obx(
+                () => SizedBox(
+                  height: 32,
+                  child: Tab(
+                      text:
+                          '${'score_page_tab_1_title'.tr}${_friendListController.friendItems.isEmpty ? '' : '(${_friendListController.friendItems.length})'}'),
+                ),
               ),
-            ),
-          ],
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-          indicatorColor: IbColors.primaryColor,
+              Obx(
+                () => SizedBox(
+                  height: 32,
+                  child: Tab(
+                    text:
+                        '${'score_page_tab_2_title'.tr}${_friendRequestController.requests.isEmpty ? '' : '(${_friendRequestController.requests.length})'}',
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         Expanded(
             child: TabBarView(

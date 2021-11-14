@@ -256,31 +256,36 @@ class _ProfilePageState extends State<ProfilePage>
             sliver: SliverPersistentHeader(
                 pinned: true,
                 delegate: PersistentHeader(
+                  height: 32,
                   widget: Obx(
-                    () => TabBar(
-                      isScrollable: true,
-                      controller: _tabController,
-                      tabs: [
-                        if (_profileController.isMe.isTrue)
+                    () => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: TabBar(
+                        isScrollable: true,
+                        controller: _tabController,
+                        tabs: [
+                          if (_profileController.isMe.isTrue)
+                            Tab(
+                                text:
+                                    'Answered Questions(${_homeController.answeredSize.value})'),
+                          if (_profileController.isMe.isFalse)
+                            Tab(
+                                text:
+                                    'Common Answers(${_commonAnswersController.commonAnswers.length})'),
+                          if (_profileController.isMe.isFalse)
+                            Tab(
+                                text:
+                                    'Different Answers(${_uncommonAnswersController.uncommonAnswers.length})'),
                           Tab(
                               text:
-                                  'Answered Questions(${_homeController.answeredSize.value})'),
-                        if (_profileController.isMe.isFalse)
-                          Tab(
-                              text:
-                                  'Common Answers(${_commonAnswersController.commonAnswers.length})'),
-                        if (_profileController.isMe.isFalse)
-                          Tab(
-                              text:
-                                  'Different Answers(${_uncommonAnswersController.uncommonAnswers.length})'),
-                        Tab(
-                            text:
-                                'Asked Questions(${_profileController.isMe.isTrue ? _homeController.askedSize.value : _profileController.totalAsked.value})'),
-                      ],
-                      labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                      indicatorColor: _tabController.length == 1
-                          ? Colors.transparent
-                          : IbColors.primaryColor,
+                                  'Asked Questions(${_profileController.isMe.isTrue ? _homeController.askedSize.value : _profileController.totalAsked.value})'),
+                        ],
+                        labelStyle:
+                            const TextStyle(fontWeight: FontWeight.bold),
+                        indicatorColor: _tabController.length == 1
+                            ? Colors.transparent
+                            : IbColors.primaryColor,
+                      ),
                     ),
                   ),
                 )),
@@ -288,7 +293,7 @@ class _ProfilePageState extends State<ProfilePage>
         ];
       },
       body: Padding(
-        padding: const EdgeInsets.only(top: 48.0),
+        padding: const EdgeInsets.only(top: 32.0),
         child: TabBarView(
           controller: _tabController,
           children: [

@@ -17,7 +17,6 @@ import 'backend/services/ib_local_storage_service.dart';
 import 'frontend/ib_config.dart';
 import 'frontend/ib_pages/splash_page.dart';
 import 'frontend/ib_strings.dart';
-import 'frontend/ib_widgets/ib_progress_indicator.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,18 +71,15 @@ class MainApp extends StatelessWidget {
         themeMode: ThemeMode.light,
         theme: IbLocalStorageService()
                 .isCustomKeyTrue(IbLocalStorageService.isLightModeCustomKey)
-            ? IbThemes.light
-            : IbThemes.dark,
+            ? IbThemes(context).buildLightTheme()
+            : IbThemes(context).buildDarkTheme(),
       );
     });
   }
 
   Widget _loading() {
     return Container(
-      color: IbLocalStorageService()
-              .isCustomKeyTrue(IbLocalStorageService.isLightModeCustomKey)
-          ? IbColors.lightBlue
-          : Colors.black,
+      color: IbColors.lightBlue,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -93,7 +89,6 @@ class MainApp extends StatelessWidget {
               width: IbConfig.kAppLogoSize,
               height: IbConfig.kAppLogoSize,
             ),
-            const IbProgressIndicator(),
           ],
         ),
       ),

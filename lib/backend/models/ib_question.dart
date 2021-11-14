@@ -7,6 +7,7 @@ part 'ib_question.g.dart';
 class IbQuestion {
   static const String kMultipleChoice = "mc";
   static const String kScale = "sc";
+  List<String> tagIds;
   String question;
   String description;
   int comments;
@@ -26,6 +27,7 @@ class IbQuestion {
       required this.creatorId,
       required this.choices,
       required this.questionType,
+      this.tagIds = const [],
       this.endpoints,
       this.description = '',
       this.likes = 0,
