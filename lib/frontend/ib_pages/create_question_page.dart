@@ -178,22 +178,27 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                                 .toList(),
                           ),
                         ),
-                        Chip(
-                          backgroundColor: Theme.of(context).primaryColor,
-                          label: const Text(
-                            'Add at least one 🏷️',
-                            style: TextStyle(color: IbColors.lightGrey),
-                          ),
-                          deleteIcon: const Tooltip(
-                            message: 'Add a tag',
-                            child: Icon(Icons.add_circle_outline),
-                          ),
-                          onDeleted: () {
-                            _customTagController.clear();
-                            _controller.isCustomTagSelected.value = false;
-                            _showTagsBottomSheet();
-                          },
-                        )
+                        Obx(() {
+                          if (_controller.pickedTags.length < 8) {
+                            return Chip(
+                              backgroundColor: Theme.of(context).primaryColor,
+                              label: const Text(
+                                'Add a tag 🏷️',
+                                style: TextStyle(color: IbColors.lightGrey),
+                              ),
+                              deleteIcon: const Tooltip(
+                                message: 'Add a tag',
+                                child: Icon(Icons.add_circle_outline),
+                              ),
+                              onDeleted: () {
+                                _customTagController.clear();
+                                _controller.isCustomTagSelected.value = false;
+                                _showTagsBottomSheet();
+                              },
+                            );
+                          }
+                          return const SizedBox();
+                        }),
                       ],
                     )),
               ),
@@ -235,7 +240,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
           ];
         },
         body: Padding(
-          padding: const EdgeInsets.only(top: 48),
+          padding: const EdgeInsets.only(top: 56),
           child: TabBarView(
             controller: _tabController,
             children: [
@@ -259,26 +264,25 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
           Material(
             color: Colors.transparent,
             child: InkWell(
+              customBorder: ContinuousRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               onTap: () {
                 if (_controller.choiceList.length < IbConfig.kChoiceLimit) {
-                  // _showTextFiledBottomSheet('add_choice');
-                  _showTagsBottomSheet();
+                  _showTextFiledBottomSheet('add_choice');
                 } else {
-                  Get.showSnackbar(GetBar(
-                    borderRadius: IbConfig.kCardCornerRadius,
-                    margin: const EdgeInsets.all(8),
-                    duration: const Duration(seconds: 3),
-                    backgroundColor: IbColors.errorRed,
-                    messageText: Text('choice_limit'.tr),
-                  ));
+                  IbUtils.showSimpleSnackBar(
+                      msg: 'choice_limit'.tr,
+                      backgroundColor: IbColors.errorRed);
                 }
               },
               child: Container(
-                margin: const EdgeInsets.all(8),
                 padding: const EdgeInsets.all(8),
-                height: 46,
-                decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                width: Get.width * 0.95,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Theme.of(context).primaryColor,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -286,50 +290,60 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                       'tap_to_add'.tr,
                       style: const TextStyle(color: IbColors.lightGrey),
                     ),
-                    const Icon(Icons.add_outlined),
+                    const Padding(
+                      padding: EdgeInsets.only(right: 10),
+                      child: Icon(Icons.add_outlined),
+                    ),
                   ],
                 ),
               ),
             ),
           ),
-          Obx(
-            () => ReorderableListView(
-              onReorder: (oldIndex, newIndex) {
-                print('$oldIndex to $newIndex');
-                _controller.swapIndex(oldIndex, newIndex);
-              },
-              primary: false,
-              shrinkWrap: true,
-              physics: const PageScrollPhysics(),
-              children: [
-                for (final item in _controller.choiceList)
-                  Container(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    padding: const EdgeInsets.all(8),
-                    key: UniqueKey(),
-                    height: 46,
-                    decoration: BoxDecoration(
-                        color: IbColors.white,
-                        borderRadius: BorderRadius.circular(8)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(item.content!),
-                        IconButton(
-                            onPressed: () {
-                              _controller.choiceList.remove(item);
-                            },
-                            icon: const Icon(
-                              Icons.delete_outlined,
-                              color: IbColors.errorRed,
-                            ))
-                      ],
-                    ),
-                  )
-              ],
-            ),
-          )
+          const SizedBox(
+            height: 8,
+          ),
+          Obx(() => ReorderableListView(
+                onReorder: (oldIndex, newIndex) {
+                  print('$oldIndex to $newIndex');
+                  _controller.swapIndex(oldIndex, newIndex);
+                },
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                primary: false,
+                children: [
+                  for (final item in _controller.choiceList)
+                    GestureDetector(
+                      key: UniqueKey(),
+                      onTap: () {
+                        _showEditTextFiledBtmSheet(item);
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.all(8),
+                        height: 46,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: Theme.of(context).primaryColor),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(item.content!),
+                            IconButton(
+                                padding: EdgeInsets.zero,
+                                onPressed: () {
+                                  _controller.choiceList.remove(item);
+                                },
+                                icon: const Icon(
+                                  Icons.remove,
+                                  color: IbColors.errorRed,
+                                ))
+                          ],
+                        ),
+                      ),
+                    )
+                ],
+              ))
         ],
       ),
     );
@@ -348,13 +362,9 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                     IbConfig.kScChoiceLimit) {
                   _showTextFiledBottomSheet('add_endpoint');
                 } else {
-                  Get.showSnackbar(GetBar(
-                    borderRadius: IbConfig.kCardCornerRadius,
-                    margin: const EdgeInsets.all(8),
-                    duration: const Duration(seconds: 3),
-                    backgroundColor: IbColors.errorRed,
-                    messageText: Text('choice_limit_sc'.tr),
-                  ));
+                  IbUtils.showSimpleSnackBar(
+                      msg: 'choice_limit_sc'.tr,
+                      backgroundColor: IbColors.errorRed);
                 }
               },
               child: Container(
@@ -450,8 +460,11 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     }
   }
 
-  void _showTextFiledBottomSheet(String strTrKey) {
+  void _showTextFiledBottomSheet(String strTrKey, {IbChoice? ibChoice}) {
     final TextEditingController _txtController = TextEditingController();
+    if (ibChoice != null) {
+      _txtController.text = ibChoice.content!;
+    }
     final Widget _widget = IbCard(
         child: Padding(
       padding: const EdgeInsets.all(16.0),
@@ -619,6 +632,80 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     Get.bottomSheet(
       SizedBox(height: Get.height * 0.6, child: tagsBtmSheet),
       isScrollControlled: true,
+      persistent: true,
+    );
+  }
+
+  void _showEditTextFiledBtmSheet(IbChoice ibChoice) {
+    final TextEditingController _txtController = TextEditingController();
+    _txtController.text = ibChoice.content!;
+
+    final Widget _widget = IbCard(
+        child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Edit a choice',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: IbConfig.kPageTitleSize,
+            ),
+          ),
+          TextField(
+            textInputAction: TextInputAction.done,
+            maxLength: _controller.questionType == IbQuestion.kScale
+                ? IbConfig.kScAnswerMaxLength
+                : IbConfig.kAnswerMaxLength,
+            onSubmitted: (value) {
+              if (_controller.questionType == IbQuestion.kMultipleChoice &&
+                  _controller.isChoiceDuplicated(value.trim())) {
+                Get.back();
+                return;
+              }
+
+              if (_controller.questionType == IbQuestion.kScale &&
+                  _controller.isChoiceDuplicated(value.trim())) {
+                Get.back();
+                return;
+              }
+              setState(() {
+                ibChoice.content = value.trim();
+                Get.back();
+              });
+            },
+            controller: _txtController,
+            autofocus: true,
+            textAlign: TextAlign.center,
+            cursorColor: IbColors.primaryColor,
+          ),
+          TextButton(
+            onPressed: () {
+              if (_controller.questionType == IbQuestion.kMultipleChoice &&
+                  _controller.isChoiceDuplicated(_txtController.text.trim())) {
+                Get.back();
+                return;
+              }
+
+              if (_controller.questionType == IbQuestion.kScale &&
+                  _controller.isChoiceDuplicated(_txtController.text.trim())) {
+                Get.back();
+                return;
+              }
+
+              setState(() {
+                ibChoice.content = _txtController.text.trim();
+                Get.back();
+              });
+            },
+            child: const Text('Apply'),
+          ),
+        ],
+      ),
+    ));
+    Get.bottomSheet(
+      SizedBox(height: 200, child: _widget),
       persistent: true,
     );
   }

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -8,7 +7,6 @@ import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
 import 'package:icebr8k/backend/services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -102,13 +100,9 @@ class ProfileController extends GetxController {
       }
 
       friendshipStatus.value = IbFriend.kFriendshipStatusRequestSent;
-      Get.showSnackbar(GetBar(
-        borderRadius: IbConfig.kCardCornerRadius,
-        margin: const EdgeInsets.all(8),
-        duration: const Duration(seconds: 3),
-        backgroundColor: IbColors.accentColor,
-        messageText: Text('send_friend_request_success'.tr),
-      ));
+      IbUtils.showSimpleSnackBar(
+          msg: 'send_friend_request_success'.tr,
+          backgroundColor: IbColors.accentColor);
     } on Exception catch (e) {
       print(e.toString());
     }

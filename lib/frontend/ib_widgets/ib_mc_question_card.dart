@@ -346,14 +346,14 @@ class IbQuestionMcItem extends StatelessWidget {
                   ],
                 ),
               ),
-              Positioned(
+              const Positioned(
+                bottom: 2,
+                right: 2,
                 child: Icon(
                   Icons.check_circle_rounded,
                   color: IbColors.accentColor,
                   size: 16,
                 ),
-                bottom: 2,
-                right: 2,
               ),
               if (_controller.showResult.value)
                 TweenAnimationBuilder(

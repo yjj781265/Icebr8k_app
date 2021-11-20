@@ -41,7 +41,7 @@ class IbActionButton extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 8,
         ),
         Text(

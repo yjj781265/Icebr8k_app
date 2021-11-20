@@ -293,7 +293,7 @@ class _ProfilePageState extends State<ProfilePage>
         ];
       },
       body: Padding(
-        padding: const EdgeInsets.only(top: 32.0),
+        padding: const EdgeInsets.only(top: 40.0),
         child: TabBarView(
           controller: _tabController,
           children: [

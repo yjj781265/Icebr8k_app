@@ -223,7 +223,7 @@ class IbUtils {
     Get.showSnackbar(GetBar(
       snackPosition: SnackPosition.TOP,
       borderRadius: IbConfig.kCardCornerRadius,
-      margin: const EdgeInsets.only(left: 8, right: 8, bottom: 64),
+      margin: const EdgeInsets.only(left: 8, right: 8, top: 32),
       duration: const Duration(seconds: 2),
       backgroundColor: backgroundColor,
       messageText: Text(
