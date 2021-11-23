@@ -23,8 +23,7 @@ class IbChoice {
       other is IbChoice &&
           runtimeType == other.runtimeType &&
           content == other.content &&
-          url == other.url &&
-          choiceId == other.choiceId;
+          url == other.url;
 
   @override
   int get hashCode => content.hashCode ^ url.hashCode ^ choiceId.hashCode;

@@ -29,8 +29,6 @@ class IbUtils {
   static Future<File?> showImageCropper(String filePath,
       {CropStyle cropStyle = CropStyle.circle,
       List<CropAspectRatioPreset> ratios = const [],
-      double? height,
-      double? width,
       bool resetAspectRatioEnabled = true,
       CropAspectRatioPreset initAspectRatio = CropAspectRatioPreset.original,
       bool lockAspectRatio = false,
@@ -40,6 +38,7 @@ class IbUtils {
         cropStyle: cropStyle,
         aspectRatioPresets: ratios,
         androidUiSettings: AndroidUiSettings(
+            toolbarColor: IbColors.lightBlue,
             toolbarTitle: 'Image Cropper',
             initAspectRatio: initAspectRatio,
             lockAspectRatio: lockAspectRatio),

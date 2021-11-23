@@ -7,6 +7,8 @@ part 'ib_question.g.dart';
 class IbQuestion {
   static const String kMultipleChoice = "mc";
   static const String kScale = "sc";
+  static const String kPic = "pic";
+  static const String kMultipleChoicePic = "mc_pic";
   List<String> tagIds;
   String question;
   String description;
@@ -18,7 +20,7 @@ class IbQuestion {
   int askedTimeInMs;
   int endTimeInMs;
   List<IbChoice> choices;
-  List<String>? endpoints;
+  List<IbChoice>? endpoints;
   String questionType;
 
   IbQuestion(

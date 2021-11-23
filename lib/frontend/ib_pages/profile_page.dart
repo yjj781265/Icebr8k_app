@@ -540,8 +540,6 @@ class _ProfilePageState extends State<ProfilePage>
                   lockAspectRatio: true,
                   minimumAspectRatio: 16 / 9,
                   resetAspectRatioEnabled: false,
-                  height: 9,
-                  width: 16,
                   initAspectRatio: CropAspectRatioPreset.ratio16x9,
                   ratios: <CropAspectRatioPreset>[
                     CropAspectRatioPreset.ratio16x9
@@ -589,8 +587,6 @@ class _ProfilePageState extends State<ProfilePage>
                   lockAspectRatio: true,
                   minimumAspectRatio: 16 / 9,
                   resetAspectRatioEnabled: false,
-                  height: 9,
-                  width: 16,
                   initAspectRatio: CropAspectRatioPreset.ratio16x9,
                   ratios: <CropAspectRatioPreset>[
                     CropAspectRatioPreset.ratio16x9

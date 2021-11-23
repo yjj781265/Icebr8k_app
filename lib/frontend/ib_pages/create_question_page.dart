@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,8 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:reorderables/reorderables.dart';
 
 import '../ib_config.dart';
@@ -42,6 +46,10 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     _tabController.addListener(() {
       if (_tabController.index == 0) {
         _controller.questionType = IbQuestion.kMultipleChoice;
+      } else if (_tabController.index == 1) {
+        _controller.questionType = IbQuestion.kMultipleChoicePic;
+      } else if (_tabController.index == 2) {
+        _controller.questionType = IbQuestion.kPic;
       } else {
         _controller.questionType = IbQuestion.kScale;
       }
@@ -245,8 +253,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
             controller: _tabController,
             children: [
               _mCTab(),
-              _mCTab(),
-              _mCTab(),
+              _mCWithPicTab(),
+              _picTab(),
               _sCTab(),
             ],
           ),
@@ -268,7 +276,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                   borderRadius: BorderRadius.circular(16)),
               onTap: () {
                 if (_controller.choiceList.length < IbConfig.kChoiceLimit) {
-                  _showTextFiledBottomSheet('add_choice');
+                  _showTextFiledBottomSheet(
+                      'add_choice', _controller.choiceList);
                 } else {
                   IbUtils.showSimpleSnackBar(
                       msg: 'choice_limit'.tr,
@@ -349,6 +358,235 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     );
   }
 
+  Widget _picTab() {
+    return AnimatedSize(
+        duration: const Duration(milliseconds: 300),
+        child: Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          alignment: WrapAlignment.center,
+          children: [
+            Obx(() {
+              if (_controller.picChoiceList.length < 8) {
+                return GestureDetector(
+                  onTap: () {
+                    showMediaBottomSheet(
+                        context, null, _controller.picChoiceList);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: IbColors.lightGrey,
+                          borderRadius: BorderRadius.circular(8)),
+                      width: Get.width / 4,
+                      height: Get.width / 4,
+                      child: const Icon(Icons.add),
+                    ),
+                  ),
+                );
+              }
+              return const SizedBox();
+            }),
+            Obx(
+              () => ReorderableWrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                runAlignment: WrapAlignment.center,
+                onReorder: (int oldIndex, int newIndex) {
+                  final IbChoice ibChoice =
+                      _controller.picList.removeAt(oldIndex);
+                  _controller.picList.insert(newIndex, ibChoice);
+                },
+                buildDraggableFeedback: (context, axis, item) {
+                  return Material(
+                    color: Colors.transparent,
+                    child: item,
+                  );
+                },
+                controller: ScrollController(),
+                children: _controller.picChoiceList.value
+                    .map(
+                      (e) => Stack(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              showMediaBottomSheet(
+                                  context, e, _controller.picChoiceList);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.file(
+                                  File(e.url!),
+                                  width: Get.width / 4,
+                                  height: Get.width / 4,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            right: 0,
+                            child: IconButton(
+                              color: IbColors.errorRed.withOpacity(0.6),
+                              onPressed: () {
+                                _controller.picChoiceList.remove(e);
+                              },
+                              icon: const Icon(Icons.remove_circle_outlined),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+          ],
+        ));
+  }
+
+  Widget _mCWithPicTab() {
+    return SingleChildScrollView(
+      physics: const PageScrollPhysics(),
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      child: Column(
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              customBorder: ContinuousRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              onTap: () {
+                if (_controller.picChoiceList.length < IbConfig.kChoiceLimit) {
+                  _showTextFiledBottomSheet(
+                      'add_choice', _controller.picChoiceList);
+                } else {
+                  IbUtils.showSimpleSnackBar(
+                      msg: 'choice_limit'.tr,
+                      backgroundColor: IbColors.errorRed);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                width: Get.width * 0.95,
+                height: 72,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Theme.of(context).primaryColor,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        showMediaBottomSheet(
+                            context, null, _controller.picChoiceList);
+                      },
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: IbColors.lightGrey,
+                        ),
+                        width: 56,
+                        height: 56,
+                        child: const Icon(Icons.add),
+                      ),
+                    ),
+                    Text(
+                      'tap_to_add'.tr,
+                      style: const TextStyle(color: IbColors.lightGrey),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(right: 10),
+                      child: Icon(Icons.add_outlined),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          Obx(() => ReorderableListView(
+                onReorder: (oldIndex, newIndex) {
+                  print('$oldIndex to $newIndex');
+                  _controller.swapIndex(oldIndex, newIndex);
+                },
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                primary: false,
+                children: [
+                  for (final item in _controller.picChoiceList)
+                    GestureDetector(
+                      key: UniqueKey(),
+                      onTap: () {
+                        _showEditTextFiledBtmSheet(item);
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.all(8),
+                        height: 72,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: Theme.of(context).primaryColor),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            if (item.url != null && item.url!.isNotEmpty)
+                              GestureDetector(
+                                onTap: () {
+                                  showMediaBottomSheet(
+                                      context, item, _controller.picChoiceList);
+                                },
+                                child: Image.file(
+                                  File(item.url!),
+                                  width: 56,
+                                  height: 56,
+                                ),
+                              )
+                            else
+                              GestureDetector(
+                                onTap: () {
+                                  showMediaBottomSheet(
+                                      context, item, _controller.picChoiceList);
+                                },
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                    color: IbColors.lightGrey,
+                                  ),
+                                  width: 56,
+                                  height: 56,
+                                  child: const Icon(Icons.add),
+                                ),
+                              ),
+                            if (item.content != null &&
+                                item.content!.isNotEmpty)
+                              Text(item.content!)
+                            else
+                              const Text(
+                                'Add text here',
+                                style: TextStyle(color: IbColors.lightGrey),
+                              ),
+                            IconButton(
+                                padding: EdgeInsets.zero,
+                                onPressed: () {
+                                  _controller.picChoiceList.remove(item);
+                                },
+                                icon: const Icon(
+                                  Icons.remove,
+                                  color: IbColors.errorRed,
+                                ))
+                          ],
+                        ),
+                      ),
+                    )
+                ],
+              ))
+        ],
+      ),
+    );
+  }
+
   Widget _sCTab() {
     return SingleChildScrollView(
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -360,7 +598,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
               onTap: () {
                 if (_controller.scaleEndPoints.length <
                     IbConfig.kScChoiceLimit) {
-                  _showTextFiledBottomSheet('add_endpoint');
+                  _showTextFiledBottomSheet(
+                      'add_endpoint', _controller.scaleEndPoints);
                 } else {
                   IbUtils.showSimpleSnackBar(
                       msg: 'choice_limit_sc'.tr,
@@ -410,7 +649,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(item),
+                          Text(item.content!),
                           IconButton(
                               onPressed: () {
                                 _controller.scaleEndPoints.remove(item);
@@ -431,43 +670,13 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     );
   }
 
-  void handleUserInput(String _choice) {
-    if (_controller.questionType == IbQuestion.kMultipleChoice &&
-        _controller.isChoiceDuplicated(_choice)) {
-      Get.back();
-      return;
-    }
-
-    if (_controller.questionType == IbQuestion.kScale &&
-        _controller.isChoiceDuplicated(_choice)) {
-      Get.back();
-      return;
-    }
-    if (_choice.trim().isNotEmpty &&
-        _controller.questionType == IbQuestion.kMultipleChoice) {
-      _controller.choiceList
-          .removeWhere((element) => element.content == _choice);
-      _controller.choiceList.add(
-          IbChoice(choiceId: IbUtils.getUniqueId(), content: _choice.trim()));
-      Get.back();
-    } else if (_choice.trim().isNotEmpty &&
-        _controller.questionType == IbQuestion.kScale) {
-      _controller.scaleEndPoints.removeWhere((element) => element == _choice);
-      _controller.scaleEndPoints.add(_choice);
-      Get.back();
-    } else {
-      print('empty');
-    }
-  }
-
-  void _showTextFiledBottomSheet(String strTrKey, {IbChoice? ibChoice}) {
+  void _showTextFiledBottomSheet(String strTrKey, List<IbChoice> list) {
     final TextEditingController _txtController = TextEditingController();
-    if (ibChoice != null) {
-      _txtController.text = ibChoice.content!;
-    }
+    final IbChoice ibChoice =
+        IbChoice(choiceId: IbUtils.getUniqueId(), content: '', url: '');
     final Widget _widget = IbCard(
         child: Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -484,7 +693,18 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                 ? IbConfig.kScAnswerMaxLength
                 : IbConfig.kAnswerMaxLength,
             onSubmitted: (value) {
-              handleUserInput(value.trim());
+              ibChoice.content = value.trim();
+              if (ibChoice.content!.isEmpty) {
+                return;
+              }
+
+              if (_controller.isChoiceDuplicated(ibChoice.content!)) {
+                Get.back();
+                return;
+              }
+
+              list.add(ibChoice);
+              Get.back();
             },
             controller: _txtController,
             autofocus: true,
@@ -493,8 +713,16 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
           ),
           TextButton(
             onPressed: () {
-              final String _choice = _txtController.text.trim();
-              handleUserInput(_choice);
+              ibChoice.content = _txtController.text.trim();
+              if (ibChoice.content!.isEmpty) {
+                return;
+              }
+              if (_controller.isChoiceDuplicated(ibChoice.content!)) {
+                Get.back();
+                return;
+              }
+              list.add(ibChoice);
+              Get.back();
             },
             child: Text('add'.tr),
           ),
@@ -638,7 +866,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
 
   void _showEditTextFiledBtmSheet(IbChoice ibChoice) {
     final TextEditingController _txtController = TextEditingController();
-    _txtController.text = ibChoice.content!;
+    _txtController.text = ibChoice.content == null ? '' : ibChoice.content!;
 
     final Widget _widget = IbCard(
         child: Padding(
@@ -670,6 +898,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                 Get.back();
                 return;
               }
+
               setState(() {
                 ibChoice.content = value.trim();
                 Get.back();
@@ -709,4 +938,130 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
       persistent: true,
     );
   }
+}
+
+void showMediaBottomSheet(
+    BuildContext context, IbChoice? ibChoice, RxList<IbChoice> list) {
+  final Widget options = ListView(
+    shrinkWrap: true,
+    children: [
+      InkWell(
+        onTap: () async {
+          Get.back();
+          final _picker = ImagePicker();
+          final XFile? pickedFile = await _picker.pickImage(
+            source: ImageSource.camera,
+            imageQuality: IbConfig.kImageQuality,
+          );
+
+          if (pickedFile != null) {
+            final File? croppedFile = await IbUtils.showImageCropper(
+                pickedFile.path,
+                cropStyle: CropStyle.rectangle,
+                initAspectRatio: CropAspectRatioPreset.square,
+                lockAspectRatio: true,
+                minimumAspectRatio: 1,
+                ratios: [CropAspectRatioPreset.square]);
+            if (croppedFile != null) {
+              if (ibChoice != null) {
+                // ignore: parameter_assignments
+                ibChoice!.url = croppedFile.path;
+              } else {
+                // ignore: parameter_assignments
+                ibChoice = IbChoice(
+                    choiceId: IbUtils.getUniqueId(), url: croppedFile.path);
+                // ignore: parameter_assignments
+                list.add(ibChoice!);
+              }
+
+              list.refresh();
+            }
+          }
+        },
+        child: Ink(
+          height: 56,
+          width: double.infinity,
+          color: Theme.of(context).primaryColor,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: const [
+                Icon(
+                  Icons.camera_alt_outlined,
+                  color: IbColors.primaryColor,
+                ),
+                SizedBox(
+                  width: 8,
+                ),
+                Text('Take a photo',
+                    style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
+              ],
+            ),
+          ),
+        ),
+      ),
+      InkWell(
+        onTap: () async {
+          Get.back();
+          final _picker = ImagePicker();
+          final XFile? pickedFile = await _picker.pickImage(
+            source: ImageSource.gallery,
+            imageQuality: IbConfig.kImageQuality,
+          );
+
+          if (pickedFile != null) {
+            final File? croppedFile = await IbUtils.showImageCropper(
+              pickedFile.path,
+              cropStyle: CropStyle.rectangle,
+              ratios: [CropAspectRatioPreset.square],
+              initAspectRatio: CropAspectRatioPreset.square,
+              lockAspectRatio: true,
+              minimumAspectRatio: 1,
+            );
+
+            if (croppedFile != null) {
+              if (ibChoice != null) {
+                // ignore: parameter_assignments
+                ibChoice!.url = croppedFile.path;
+              } else {
+                // ignore: parameter_assignments
+                ibChoice = IbChoice(
+                  choiceId: IbUtils.getUniqueId(),
+                  url: croppedFile.path,
+                );
+                // ignore: parameter_assignments
+                list.add(ibChoice!);
+              }
+              list.refresh();
+            }
+          }
+        },
+        child: Ink(
+          height: 56,
+          width: double.infinity,
+          color: Theme.of(context).primaryColor,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: const [
+                Icon(
+                  Icons.photo_album_outlined,
+                  color: IbColors.errorRed,
+                ),
+                SizedBox(
+                  width: 8,
+                ),
+                Text(
+                  'Choose from gallery',
+                  style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
+
+  Get.bottomSheet(SafeArea(child: options));
 }

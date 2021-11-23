@@ -13,7 +13,9 @@ class IbCreateQuestionController extends GetxController {
   late TextEditingController? questionEditController;
   late TextEditingController? descriptionEditController;
   final choiceList = <IbChoice>[].obs;
-  final scaleEndPoints = <String>[].obs;
+  final picChoiceList = <IbChoice>[].obs;
+  final picList = <IbChoice>[].obs;
+  final scaleEndPoints = <IbChoice>[].obs;
   final ibTagCheckBoxModels = <IbTagCheckBoxModel>[].obs;
   final filePath = ''.obs;
   String question = '';
@@ -53,15 +55,34 @@ class IbCreateQuestionController extends GetxController {
       choiceList.insert(oldIndex < newIndex ? newIndex - 1 : newIndex, item);
       return;
     }
-    final String item = scaleEndPoints.removeAt(oldIndex);
+
+    if (questionType == IbQuestion.kMultipleChoicePic) {
+      final IbChoice item = picChoiceList.removeAt(oldIndex);
+      picChoiceList.insert(oldIndex < newIndex ? newIndex - 1 : newIndex, item);
+      return;
+    }
+
+    final IbChoice item = scaleEndPoints.removeAt(oldIndex);
     scaleEndPoints.insert(oldIndex < newIndex ? newIndex - 1 : newIndex, item);
   }
 
   bool isChoiceDuplicated(String text) {
     if (IbQuestion.kScale == questionType) {
-      return scaleEndPoints.contains(text.trim());
+      for (final IbChoice choice in scaleEndPoints) {
+        if (text.trim() == choice.content) {
+          return true;
+        }
+      }
+      return false;
     } else if (IbQuestion.kMultipleChoice == questionType) {
       for (final IbChoice choice in choiceList) {
+        if (text.trim() == choice.content) {
+          return true;
+        }
+      }
+      return false;
+    } else if (IbQuestion.kMultipleChoicePic == questionType) {
+      for (final IbChoice choice in picChoiceList) {
         if (text.trim() == choice.content) {
           return true;
         }
