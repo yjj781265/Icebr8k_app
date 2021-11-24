@@ -366,11 +366,10 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
           alignment: WrapAlignment.center,
           children: [
             Obx(() {
-              if (_controller.picChoiceList.length < 8) {
+              if (_controller.picList.length < 8) {
                 return GestureDetector(
                   onTap: () {
-                    showMediaBottomSheet(
-                        context, null, _controller.picChoiceList);
+                    showMediaBottomSheet(context, null, _controller.picList);
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -403,35 +402,38 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                   );
                 },
                 controller: ScrollController(),
-                children: _controller.picChoiceList.value
+                children: _controller.picList
                     .map(
                       (e) => Stack(
                         children: [
                           GestureDetector(
                             onTap: () {
                               showMediaBottomSheet(
-                                  context, e, _controller.picChoiceList);
+                                  context, e, _controller.picList);
                             },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.file(
-                                  File(e.url!),
-                                  width: Get.width / 4,
-                                  height: Get.width / 4,
+                            child: IbCard(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.file(
+                                    File(e.url!),
+                                    width: Get.width / 4,
+                                    height: Get.width / 4,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                           Positioned(
-                            right: 0,
+                            right: -14,
+                            top: -14,
                             child: IconButton(
-                              color: IbColors.errorRed.withOpacity(0.6),
+                              color: IbColors.errorRed.withOpacity(1.0),
                               onPressed: () {
-                                _controller.picChoiceList.remove(e);
+                                _controller.picList.remove(e);
                               },
-                              icon: const Icon(Icons.remove_circle_outlined),
+                              icon: const Icon(Icons.remove_circle),
                             ),
                           ),
                         ],
@@ -482,7 +484,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                             context, null, _controller.picChoiceList);
                       },
                       child: Container(
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
                           color: IbColors.lightGrey,
                         ),
                         width: 56,
@@ -538,10 +541,13 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                                   showMediaBottomSheet(
                                       context, item, _controller.picChoiceList);
                                 },
-                                child: Image.file(
-                                  File(item.url!),
-                                  width: 56,
-                                  height: 56,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.file(
+                                    File(item.url!),
+                                    width: 56,
+                                    height: 56,
+                                  ),
                                 ),
                               )
                             else
