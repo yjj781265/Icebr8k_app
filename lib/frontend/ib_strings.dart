@@ -82,7 +82,7 @@ class IbStrings extends Translations {
           'mc_question_not_valid':
               'You need at least 2 choices for a multiple choice question',
           'description_option': 'Description(optional)',
-          'create_question': 'Create a question',
+          'create_question': 'Create a @type question',
           'mc': 'Multiple Choice',
           'mc_p': 'Multiple Choice with Pictures and Text',
           'pic': 'Multiple Choice with Pictures Only',

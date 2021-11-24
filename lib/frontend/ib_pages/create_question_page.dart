@@ -46,12 +46,16 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     _tabController.addListener(() {
       if (_tabController.index == 0) {
         _controller.questionType = IbQuestion.kMultipleChoice;
+        _controller.title.value = 'text only';
       } else if (_tabController.index == 1) {
         _controller.questionType = IbQuestion.kMultipleChoicePic;
+        _controller.title.value = 'text with picture';
       } else if (_tabController.index == 2) {
         _controller.questionType = IbQuestion.kPic;
+        _controller.title.value = 'picture only';
       } else {
         _controller.questionType = IbQuestion.kScale;
+        _controller.title.value = 'scale';
       }
     });
   }
@@ -60,9 +64,11 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'create_question'.tr,
-          style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
+        title: Obx(
+          () => Text(
+            'create_question'.trParams({'type': _controller.title.value}),
+            style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
+          ),
         ),
         actions: [
           IconButton(
@@ -557,7 +563,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                                       context, item, _controller.picChoiceList);
                                 },
                                 child: Container(
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
                                     color: IbColors.lightGrey,
                                   ),
                                   width: 56,

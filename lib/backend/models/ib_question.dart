@@ -9,9 +9,13 @@ class IbQuestion {
   static const String kScale = "sc";
   static const String kPic = "pic";
   static const String kMultipleChoicePic = "mc_pic";
+
   List<String> tagIds;
+  List<String> privacyBounds;
   String question;
   String description;
+  bool isAnonymous;
+  bool isCommentEnabled;
   int comments;
   int pollSize;
   int likes;
@@ -29,6 +33,9 @@ class IbQuestion {
       required this.creatorId,
       required this.choices,
       required this.questionType,
+      this.isAnonymous = false,
+      this.isCommentEnabled = true,
+      this.privacyBounds = const ['public'],
       this.tagIds = const [],
       this.endpoints,
       this.description = '',

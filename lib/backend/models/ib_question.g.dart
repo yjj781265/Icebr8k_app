@@ -14,6 +14,12 @@ IbQuestion _$IbQuestionFromJson(Map<String, dynamic> json) => IbQuestion(
           .map((e) => IbChoice.fromJson(e as Map<String, dynamic>))
           .toList(),
       questionType: json['questionType'] as String,
+      isAnonymous: json['isAnonymous'] as bool? ?? false,
+      isCommentEnabled: json['isCommentEnabled'] as bool? ?? true,
+      privacyBounds: (json['privacyBounds'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const ['public'],
       tagIds: (json['tagIds'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -32,8 +38,11 @@ IbQuestion _$IbQuestionFromJson(Map<String, dynamic> json) => IbQuestion(
 Map<String, dynamic> _$IbQuestionToJson(IbQuestion instance) =>
     <String, dynamic>{
       'tagIds': instance.tagIds,
+      'privacyBounds': instance.privacyBounds,
       'question': instance.question,
       'description': instance.description,
+      'isAnonymous': instance.isAnonymous,
+      'isCommentEnabled': instance.isCommentEnabled,
       'comments': instance.comments,
       'pollSize': instance.pollSize,
       'likes': instance.likes,

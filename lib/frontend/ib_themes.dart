@@ -13,6 +13,7 @@ class IbThemes {
   ThemeData buildDarkTheme() {
     final dark = ThemeData.dark().copyWith(
         primaryColor: const Color(0xff424242),
+        iconTheme: const IconThemeData(color: Colors.white),
         toggleableActiveColor: IbColors.primaryColor,
         tabBarTheme: const TabBarTheme(
           indicatorSize: TabBarIndicatorSize.tab,
@@ -47,6 +48,7 @@ class IbThemes {
     final light = ThemeData.light().copyWith(
         toggleableActiveColor: IbColors.primaryColor,
         primaryColor: IbColors.white,
+        iconTheme: const IconThemeData(color: Colors.black),
         appBarTheme: AppBarTheme(
             iconTheme: const IconThemeData(color: Colors.black),
             backgroundColor: IbColors.lightBlue,

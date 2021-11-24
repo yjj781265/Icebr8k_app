@@ -12,6 +12,7 @@ class IbCreateQuestionController extends GetxController {
   String questionType = IbQuestion.kMultipleChoice;
   late TextEditingController? questionEditController;
   late TextEditingController? descriptionEditController;
+  final title = 'text only'.obs;
   final choiceList = <IbChoice>[].obs;
   final picChoiceList = <IbChoice>[].obs;
   final picList = <IbChoice>[].obs;
