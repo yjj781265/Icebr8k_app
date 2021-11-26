@@ -18,11 +18,11 @@ class IbQuestionStatsBar extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: SingleChildScrollView(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Obx(
-                () => InkWell(
+          child: Obx(
+            () => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                InkWell(
                   onTap: () {},
                   child: Row(
                     children: [
@@ -41,37 +41,35 @@ class IbQuestionStatsBar extends StatelessWidget {
                     ],
                   ),
                 ),
-              ),
-              const SizedBox(
-                width: 8,
-              ),
-              Obx(
-                () => InkWell(
-                  onTap: () {},
-                  child: Row(
-                    children: [
-                      const FaIcon(
-                        FontAwesomeIcons.comment,
-                        color: IbColors.lightGrey,
-                        size: 16,
-                      ),
-                      const SizedBox(
-                        width: 3,
-                      ),
-                      Text(
-                        _statsShortString(_itemController.comments.value),
-                        style: const TextStyle(
-                            fontSize: IbConfig.kDescriptionTextSize),
-                      ),
-                    ],
+                if (_itemController.rxIbQuestion.value.isCommentEnabled)
+                  const SizedBox(
+                    width: 8,
                   ),
+                if (_itemController.rxIbQuestion.value.isCommentEnabled)
+                  InkWell(
+                    onTap: () {},
+                    child: Row(
+                      children: [
+                        const FaIcon(
+                          FontAwesomeIcons.comment,
+                          color: IbColors.lightGrey,
+                          size: 16,
+                        ),
+                        const SizedBox(
+                          width: 3,
+                        ),
+                        Text(
+                          _statsShortString(_itemController.comments.value),
+                          style: const TextStyle(
+                              fontSize: IbConfig.kDescriptionTextSize),
+                        ),
+                      ],
+                    ),
+                  ),
+                const SizedBox(
+                  width: 8,
                 ),
-              ),
-              const SizedBox(
-                width: 8,
-              ),
-              Obx(
-                () => InkWell(
+                InkWell(
                   onTap: () {
                     _itemController.updateLike();
                   },
@@ -95,8 +93,8 @@ class IbQuestionStatsBar extends StatelessWidget {
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

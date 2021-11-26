@@ -56,10 +56,43 @@ class IbQuestion {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is IbQuestion && runtimeType == other.runtimeType && id == other.id;
+      other is IbQuestion &&
+          runtimeType == other.runtimeType &&
+          tagIds == other.tagIds &&
+          privacyBounds == other.privacyBounds &&
+          question == other.question &&
+          description == other.description &&
+          isAnonymous == other.isAnonymous &&
+          isCommentEnabled == other.isCommentEnabled &&
+          comments == other.comments &&
+          pollSize == other.pollSize &&
+          likes == other.likes &&
+          id == other.id &&
+          creatorId == other.creatorId &&
+          askedTimeInMs == other.askedTimeInMs &&
+          endTimeInMs == other.endTimeInMs &&
+          choices == other.choices &&
+          endpoints == other.endpoints &&
+          questionType == other.questionType;
 
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode =>
+      tagIds.hashCode ^
+      privacyBounds.hashCode ^
+      question.hashCode ^
+      description.hashCode ^
+      isAnonymous.hashCode ^
+      isCommentEnabled.hashCode ^
+      comments.hashCode ^
+      pollSize.hashCode ^
+      likes.hashCode ^
+      id.hashCode ^
+      creatorId.hashCode ^
+      askedTimeInMs.hashCode ^
+      endTimeInMs.hashCode ^
+      choices.hashCode ^
+      endpoints.hashCode ^
+      questionType.hashCode;
 
   @override
   String toString() {

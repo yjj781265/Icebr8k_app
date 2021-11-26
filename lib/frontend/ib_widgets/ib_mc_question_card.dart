@@ -84,11 +84,12 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                   controller: _scrollController,
                   itemBuilder: (context, index) {
                     final IbChoice _choice =
-                        widget._controller.ibQuestion.choices[index];
+                        widget._controller.rxIbQuestion.value.choices[index];
                     return IbQuestionMcItem(_choice, widget._controller);
                   },
                   shrinkWrap: true,
-                  itemCount: widget._controller.ibQuestion.choices.length,
+                  itemCount:
+                      widget._controller.rxIbQuestion.value.choices.length,
                 ),
               ),
             ),
@@ -110,20 +111,21 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                   Padding(
                     padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
                     child: Text(
-                      widget._controller.ibQuestion.question,
+                      widget._controller.rxIbQuestion.value.question,
                       style: const TextStyle(
                           fontSize: IbConfig.kPageTitleSize,
                           fontWeight: FontWeight.bold),
                     ),
                   ),
-                  if (widget._controller.ibQuestion.description
+                  if (widget._controller.rxIbQuestion.value.description
                       .trim()
                       .isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(left: 16, right: 16),
                       child: Obx(
                         () => Text(
-                          widget._controller.ibQuestion.description.trim(),
+                          widget._controller.rxIbQuestion.value.description
+                              .trim(),
                           overflow: widget._controller.isExpanded.value
                               ? null
                               : TextOverflow.ellipsis,
@@ -147,7 +149,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
 
                   /// show current user answer is available
                   if (Get.find<MyAnsweredQuestionsController>().retrieveAnswer(
-                              widget._controller.ibQuestion.id) !=
+                              widget._controller.rxIbQuestion.value.id) !=
                           null &&
                       widget._controller.showMyAnswer)
                     Padding(
@@ -159,7 +161,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                             radius: 8,
                           ),
                           Text(
-                              ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.ibQuestion.id)!.answer}')
+                              ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.rxIbQuestion.value.id)!.answer}')
                         ],
                       ),
                     ),

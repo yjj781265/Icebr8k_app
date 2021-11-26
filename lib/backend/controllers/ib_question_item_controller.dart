@@ -10,7 +10,7 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 class IbQuestionItemController extends GetxController {
-  final IbQuestion ibQuestion;
+  final Rx<IbQuestion> rxIbQuestion;
   final showResult = false.obs;
   final isAnswering = false.obs;
   final isCalculating = false.obs;
@@ -48,7 +48,7 @@ class IbQuestionItemController extends GetxController {
   final resultMap = <String, double>{}.obs;
 
   IbQuestionItemController(
-      {required this.ibQuestion,
+      {required this.rxIbQuestion,
       this.showActionButtons = true,
       this.isExpandable = false,
       this.isSample = false,
@@ -60,19 +60,20 @@ class IbQuestionItemController extends GetxController {
   @override
   Future<void> onInit() async {
     /// query question author user info
-    ibUser = await IbUserDbService().queryIbUser(ibQuestion.creatorId);
+    ibUser = await IbUserDbService().queryIbUser(rxIbQuestion.value.creatorId);
 
     if (ibUser != null) {
       /// populate title ..etc
       title.value = ibUser!.username;
       subtitle.value = IbUtils.getAgoDateTimeString(
-          DateTime.fromMillisecondsSinceEpoch(ibQuestion.askedTimeInMs));
+          DateTime.fromMillisecondsSinceEpoch(
+              rxIbQuestion.value.askedTimeInMs));
       avatarUrl.value = ibUser!.avatarUrl;
     }
 
-    calculateResult(ibQuestion);
+    calculateResult(rxIbQuestion.value);
 
-    totalPolled.value = ibQuestion.pollSize;
+    totalPolled.value = rxIbQuestion.value.pollSize;
 
     isLoading.value = false;
     super.onInit();
@@ -118,7 +119,7 @@ class IbQuestionItemController extends GetxController {
   Future<void> determineUserAnswer() async {
     /// check if user has already answered this question
     ibAnswer ??= await IbQuestionDbService()
-        .queryIbAnswer(IbUtils.getCurrentUid()!, ibQuestion.id);
+        .queryIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id);
 
     if (ibAnswer != null) {
       votedDateTime.value =
@@ -127,7 +128,7 @@ class IbQuestionItemController extends GetxController {
           (await IbUserDbService().queryIbUser(ibAnswer!.uid))!.username;
     }
     selectedChoice.value = ibAnswer == null
-        ? ibQuestion.questionType == IbQuestion.kMultipleChoice
+        ? rxIbQuestion.value.questionType == IbQuestion.kMultipleChoice
             ? ''
             : '1'
         : ibAnswer!.answer;
@@ -153,23 +154,23 @@ class IbQuestionItemController extends GetxController {
     final IbAnswer tempAnswer = IbAnswer(
         answer: selectedChoice.value,
         answeredTimeInMs: DateTime.now().millisecondsSinceEpoch,
-        askedTimeInMs: ibQuestion.askedTimeInMs,
+        askedTimeInMs: rxIbQuestion.value.askedTimeInMs,
         uid: IbUtils.getCurrentUid()!,
-        questionId: ibQuestion.id,
-        questionType: ibQuestion.questionType);
+        questionId: rxIbQuestion.value.id,
+        questionType: rxIbQuestion.value.questionType);
 
     await IbQuestionDbService().answerQuestion(tempAnswer);
-    IbLocalStorageService().removeUnAnsweredIbQid(ibQuestion.id);
-    ibQuestion.pollSize++;
+    IbLocalStorageService().removeUnAnsweredIbQid(rxIbQuestion.value.id);
+    rxIbQuestion.value.pollSize++;
     // final int size = ibQuestion.statMap![tempAnswer.answer] ?? 0;
     // ibQuestion.statMap![tempAnswer.answer] = size + 1;
-    await calculateResult(ibQuestion);
+    await calculateResult(rxIbQuestion.value);
     updateQuestionTab();
   }
 
   Future<void> onSubmit() async {
     isAnswering.value = true;
-    await IbQuestionDbService().uploadQuestion(ibQuestion);
+    await IbQuestionDbService().uploadQuestion(rxIbQuestion.value);
     isAnswering.value = false;
     Navigator.of(Get.context!).popUntil((route) => route.isFirst);
     IbUtils.showSimpleSnackBar(
@@ -178,9 +179,10 @@ class IbQuestionItemController extends GetxController {
   }
 
   Future<void> updateQuestionTab() async {
-    if (Get.isRegistered<IbQuestionItemController>(tag: ibQuestion.id)) {
-      await Get.find<IbQuestionItemController>(tag: ibQuestion.id)
-          .calculateResult(ibQuestion);
+    if (Get.isRegistered<IbQuestionItemController>(
+        tag: rxIbQuestion.value.id)) {
+      await Get.find<IbQuestionItemController>(tag: rxIbQuestion.value.id)
+          .calculateResult(rxIbQuestion.value);
     }
   }
 

@@ -82,7 +82,7 @@ class QuestionTab extends StatelessWidget {
           if (_ibQuestion.questionType == IbQuestion.kScale) {
             return IbScQuestionCard(Get.put(
                 IbQuestionItemController(
-                    ibQuestion: _ibQuestion,
+                    rxIbQuestion: _ibQuestion.obs,
                     disableAvatarOnTouch:
                         IbUtils.getCurrentUid()! == _ibQuestion.creatorId),
                 tag: _ibQuestion.id));
@@ -92,7 +92,7 @@ class QuestionTab extends StatelessWidget {
               IbQuestionItemController(
                 disableAvatarOnTouch:
                     IbUtils.getCurrentUid()! == _ibQuestion.creatorId,
-                ibQuestion: _ibQuestion,
+                rxIbQuestion: _ibQuestion.obs,
               ),
               tag: _ibQuestion.id));
         });

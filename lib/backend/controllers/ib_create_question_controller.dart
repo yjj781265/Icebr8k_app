@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_pages/review_question_page.dart';
@@ -113,37 +114,49 @@ class IbCreateQuestionController extends GetxController {
     }
 
     IbUtils.hideKeyboard();
-
+    final String id = IbUtils.getUniqueId();
     if (questionType == IbQuestion.kScale) {
-      Get.to(
-        () => ReviewQuestionPage(
-          question: IbQuestion(
+      final _controller = IbQuestionItemController(
+          rxIbQuestion: IbQuestion(
             question: question.trim(),
-            id: IbUtils.getUniqueId(),
+            id: id,
             creatorId: Get.find<AuthController>().firebaseUser!.uid,
             description: description.trim(),
             questionType: questionType.trim(),
             askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
             endpoints: scaleEndPoints,
             choices: _generateScaleChoiceList(),
-          ),
+          ).obs,
+          isSample: true,
+          isExpandable: true,
+          disableAvatarOnTouch: true);
+      _controller.isExpanded.value = false;
+      Get.to(
+        () => ReviewQuestionPage(
+          itemController: Get.put(_controller, tag: 'sample_$id'),
         ),
       );
       return;
     }
 
     if (questionType == IbQuestion.kMultipleChoice) {
-      Get.to(
-        () => ReviewQuestionPage(
-          question: IbQuestion(
+      final _controller = IbQuestionItemController(
+          rxIbQuestion: IbQuestion(
             question: question.trim(),
-            id: IbUtils.getUniqueId(),
-            creatorId: IbUtils.getCurrentUid()!,
+            id: id,
+            creatorId: Get.find<AuthController>().firebaseUser!.uid,
             description: description.trim(),
             questionType: questionType.trim(),
             askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
-            choices: choiceList,
-          ),
+            choices: _generateScaleChoiceList(),
+          ).obs,
+          isSample: true,
+          isExpandable: true,
+          disableAvatarOnTouch: true);
+      _controller.isExpanded.value = false;
+      Get.to(
+        () => ReviewQuestionPage(
+          itemController: Get.put(_controller, tag: 'sample_$id'),
         ),
       );
       return;

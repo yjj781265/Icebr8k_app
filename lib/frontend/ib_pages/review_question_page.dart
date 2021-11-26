@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get/get.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -9,8 +9,8 @@ import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 
 class ReviewQuestionPage extends StatelessWidget {
-  final IbQuestion question;
-  const ReviewQuestionPage({Key? key, required this.question})
+  final IbQuestionItemController itemController;
+  const ReviewQuestionPage({Key? key, required this.itemController})
       : super(key: key);
 
   @override
@@ -42,19 +42,24 @@ class ReviewQuestionPage extends StatelessWidget {
                 title: const Text('Time Limit'),
                 trailing: const Text('Tomorrow'),
               ),
-              SwitchListTile(
-                tileColor: Theme.of(context).primaryColor,
-                value: true,
-                onChanged: (value) {},
-                title: const Text('Comment'),
-                secondary: const Icon(
-                  FontAwesomeIcons.comment,
-                  color: IbColors.primaryColor,
+              Obx(
+                () => SwitchListTile(
+                  tileColor: Theme.of(context).primaryColor,
+                  value: itemController.rxIbQuestion.value.isCommentEnabled,
+                  onChanged: (value) {
+                    itemController.rxIbQuestion.value.isCommentEnabled = value;
+                    itemController.rxIbQuestion.refresh();
+                  },
+                  title: const Text('Comment'),
+                  secondary: const Icon(
+                    FontAwesomeIcons.comment,
+                    color: IbColors.primaryColor,
+                  ),
                 ),
               ),
               ListTile(
                 tileColor: Theme.of(context).primaryColor,
-                trailing: Text('ALL'),
+                trailing: const Text('ALL'),
                 title: const Text(
                   'Privacy Bonds',
                 ),
@@ -63,14 +68,19 @@ class ReviewQuestionPage extends StatelessWidget {
                   color: IbColors.primaryColor,
                 ),
               ),
-              SwitchListTile(
-                tileColor: Theme.of(context).primaryColor,
-                value: true,
-                onChanged: (value) {},
-                title: const Text('Anonymous'),
-                secondary: const Icon(
-                  Icons.person,
-                  color: IbColors.lightGrey,
+              Obx(
+                () => SwitchListTile(
+                  tileColor: Theme.of(context).primaryColor,
+                  value: itemController.rxIbQuestion.value.isAnonymous,
+                  onChanged: (value) {
+                    itemController.rxIbQuestion.value.isAnonymous = value;
+                    itemController.rxIbQuestion.refresh();
+                  },
+                  title: const Text('Anonymous'),
+                  secondary: const Icon(
+                    Icons.person,
+                    color: IbColors.lightGrey,
+                  ),
                 ),
               )
             ],
@@ -81,23 +91,12 @@ class ReviewQuestionPage extends StatelessWidget {
   }
 
   Widget _handleQuestionType() {
-    if (question.questionType == IbQuestion.kMultipleChoice) {
-      return IbMcQuestionCard(
-        Get.put(
-            IbQuestionItemController(
-              ibQuestion: question,
-              isSample: true,
-            ),
-            tag: 'sample${question.id}'),
-      );
+    if (itemController.rxIbQuestion.value.questionType ==
+        IbQuestion.kMultipleChoice) {
+      return IbMcQuestionCard(itemController);
     }
     return IbScQuestionCard(
-      Get.put(
-          IbQuestionItemController(
-            ibQuestion: question,
-            isSample: true,
-          ),
-          tag: 'sample${question.id}'),
+      itemController,
     );
   }
 }

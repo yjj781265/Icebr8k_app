@@ -98,7 +98,7 @@ class ScreenThree extends StatelessWidget {
                   if (_ibQuestion.questionType == IbQuestion.kScale) {
                     return IbScQuestionCard(Get.put(
                         IbQuestionItemController(
-                          ibQuestion: _ibQuestion,
+                          rxIbQuestion: _ibQuestion.obs,
                           disableAvatarOnTouch: true,
                         ),
                         tag: _ibQuestion.id));
@@ -107,7 +107,7 @@ class ScreenThree extends StatelessWidget {
                   return IbMcQuestionCard(Get.put(
                       IbQuestionItemController(
                         disableAvatarOnTouch: true,
-                        ibQuestion: _ibQuestion,
+                        rxIbQuestion: _ibQuestion.obs,
                       ),
                       tag: _ibQuestion.id));
                 },

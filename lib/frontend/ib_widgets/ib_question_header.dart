@@ -21,39 +21,37 @@ class IbQuestionHeader extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _handleAvatarImage(),
-              const SizedBox(
-                width: 8,
-              ),
-              SizedBox(
-                width: 200,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Obx(
-                      () => Text(
-                        _itemController.title.value,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: const TextStyle(
-                            fontSize: IbConfig.kSecondaryTextSize,
-                            fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                    Text(
-                      '${IbUtils.getAgoDateTimeString(DateTime.fromMillisecondsSinceEpoch(_itemController.ibQuestion.askedTimeInMs))} - closed - 2000 polled',
-                      style: const TextStyle(
-                          fontSize: IbConfig.kDescriptionTextSize,
-                          color: IbColors.lightGrey),
-                    ),
-                  ],
+          Obx(
+            () => Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (!_itemController.rxIbQuestion.value.isAnonymous)
+                  _handleAvatarImage(),
+                if (!_itemController.rxIbQuestion.value.isAnonymous)
+                  const SizedBox(
+                    width: 8,
+                  ),
+                SizedBox(
+                  width: 200,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (!_itemController.rxIbQuestion.value.isAnonymous)
+                        Text(
+                          _itemController.title.value,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: const TextStyle(
+                              fontSize: IbConfig.kSecondaryTextSize,
+                              fontWeight: FontWeight.w700),
+                        ),
+                      _handleSubString(),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const Spacer(),
           Row(
@@ -61,9 +59,7 @@ class IbQuestionHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               IconButton(
-                  onPressed: () {
-                    //Todo add like question
-                  },
+                  onPressed: () {},
                   icon: const FaIcon(Icons.more_vert_outlined))
             ],
           )
@@ -79,6 +75,28 @@ class IbQuestionHeader extends StatelessWidget {
         avatarUrl: _itemController.avatarUrl.value,
         uid: _itemController.ibUser == null ? '' : _itemController.ibUser!.id,
         radius: 16,
+      );
+    });
+  }
+
+  Widget _handleSubString() {
+    return Obx(() {
+      if (_itemController.rxIbQuestion.value.isAnonymous) {
+        return Text(
+            'Anonymous • ${IbUtils.getAgoDateTimeString(
+              DateTime.fromMillisecondsSinceEpoch(
+                  _itemController.rxIbQuestion.value.askedTimeInMs),
+            )}',
+            style: const TextStyle(
+                fontSize: IbConfig.kDescriptionTextSize,
+                color: IbColors.lightGrey));
+      }
+
+      return Text(
+        IbUtils.getAgoDateTimeString(DateTime.fromMillisecondsSinceEpoch(
+            _itemController.rxIbQuestion.value.askedTimeInMs)),
+        style: const TextStyle(
+            fontSize: IbConfig.kDescriptionTextSize, color: IbColors.lightGrey),
       );
     });
   }

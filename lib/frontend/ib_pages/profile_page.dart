@@ -698,7 +698,7 @@ class _CommonAnswersTabState extends State<CommonAnswersTab>
                     IbQuestionItemController(
                         ibAnswer: widget._commonAnswersController
                             .retrieveAnswer(item.id),
-                        ibQuestion: item,
+                        rxIbQuestion: item.obs,
                         isExpandable: true,
                         disableAvatarOnTouch:
                             item.creatorId == widget.widget.uid),
@@ -794,7 +794,7 @@ class _DifferentAnswersTabState extends State<DifferentAnswersTab>
                             .retrieveAnswer(item.id),
                         showMyAnswer: true,
                         isExpandable: true,
-                        ibQuestion: item,
+                        rxIbQuestion: item.obs,
                         disableAvatarOnTouch:
                             item.creatorId == widget.widget.uid),
                     tag: tag);
@@ -876,7 +876,7 @@ class _AskedQTabState extends State<AskedQTab>
                 _controller = Get.put(
                     IbQuestionItemController(
                         isExpandable: true,
-                        ibQuestion: item,
+                        rxIbQuestion: item.obs,
                         disableAvatarOnTouch:
                             item.creatorId == widget.widget.uid),
                     tag: tag);
@@ -963,7 +963,7 @@ class _AnsweredQTabState extends State<AnsweredQTab>
                     IbQuestionItemController(
                         isExpandable: true,
                         ibAnswer: item.ibAnswer,
-                        ibQuestion: item.ibQuestion,
+                        rxIbQuestion: item.ibQuestion.obs,
                         disableAvatarOnTouch:
                             item.ibQuestion.creatorId == widget.widget.uid),
                     tag: tag);

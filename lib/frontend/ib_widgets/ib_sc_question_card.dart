@@ -122,7 +122,8 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                                           IbUtils.getAgoDateTimeString(DateTime
                                               .fromMillisecondsSinceEpoch(widget
                                                   ._controller
-                                                  .ibQuestion
+                                                  .rxIbQuestion
+                                                  .value
                                                   .askedTimeInMs)),
                                           style: const TextStyle(
                                               fontSize:
@@ -137,16 +138,19 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                                   height: 8,
                                 ),
                                 Text(
-                                  widget._controller.ibQuestion.question,
+                                  widget
+                                      ._controller.rxIbQuestion.value.question,
                                   style: const TextStyle(
                                       fontSize: IbConfig.kPageTitleSize,
                                       fontWeight: FontWeight.bold),
                                 ),
-                                if (widget._controller.ibQuestion.description
+                                if (widget
+                                    ._controller.rxIbQuestion.value.description
                                     .trim()
                                     .isNotEmpty)
                                   Text(
-                                    widget._controller.ibQuestion.description,
+                                    widget._controller.rxIbQuestion.value
+                                        .description,
                                     style: const TextStyle(
                                         fontSize: IbConfig.kSecondaryTextSize,
                                         color: Colors.black),
@@ -166,8 +170,8 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
 
                                 /// show current user answer is available
                                 if (Get.find<MyAnsweredQuestionsController>()
-                                            .retrieveAnswer(widget
-                                                ._controller.ibQuestion.id) !=
+                                            .retrieveAnswer(widget._controller
+                                                .rxIbQuestion.value.id) !=
                                         null &&
                                     widget._controller.showMyAnswer)
                                   Padding(
@@ -180,7 +184,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                                           radius: 8,
                                         ),
                                         Text(
-                                            ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.ibQuestion.id)!.answer}')
+                                            ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.rxIbQuestion.value.id)!.answer}')
                                       ],
                                     ),
                                   ),
@@ -494,11 +498,12 @@ class IbQuestionScItem extends StatelessWidget {
           children: [
             SizedBox(
                 width: 100,
-                child: Text(_controller.ibQuestion.choices.first.content!)),
+                child: Text(
+                    _controller.rxIbQuestion.value.choices.first.content!)),
             SizedBox(
               width: 100,
               child: Text(
-                _controller.ibQuestion.choices[1].content!,
+                _controller.rxIbQuestion.value.choices[1].content!,
                 textAlign: TextAlign.end,
               ),
             )
