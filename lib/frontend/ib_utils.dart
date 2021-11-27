@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
-import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -341,15 +341,21 @@ class IbUtils {
     return _colors[random.nextInt(_colors.length)];
   }
 
-  static Map<String, int> populateStatMap(List<String> choices, String type) {
-    if (IbQuestion.kScale == type) {
-      return {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0};
-    } else {
-      final map = <String, int>{};
-      for (final choice in choices) {
-        map[choice] = 0;
-      }
-      return map;
+  static String leftTimeString(int millsSinceEpoch) {
+    final futureDateTime = DateTime.fromMillisecondsSinceEpoch(millsSinceEpoch);
+    final diff = futureDateTime.difference(DateTime.now());
+    if (diff.isNegative) {
+      return 'closed';
     }
+
+    if (diff.inMinutes < 60) {
+      return '${diff.inMinutes} min left';
+    }
+
+    if (diff.inHours < 24) {
+      return '${diff.inHours} hr left';
+    }
+
+    return '${diff.inDays} days left';
   }
 }

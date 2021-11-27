@@ -12,7 +12,6 @@ import '../ib_colors.dart';
 import '../ib_config.dart';
 import '../ib_utils.dart';
 import 'ib_card.dart';
-import 'ib_elevated_button.dart';
 
 class IbScQuestionCard extends StatefulWidget {
   final IbQuestionItemController _controller;
@@ -54,7 +53,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
   }
 
   void _runExpandCheck() {
-    if (widget._controller.isExpanded.isTrue) {
+    if (widget._controller.rxIsExpanded.isTrue) {
       expandController.forward();
     } else {
       expandController.reverse();
@@ -158,15 +157,10 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                                 const SizedBox(
                                   height: 16,
                                 ),
-                                if (widget._controller.isExpandable)
-                                  SizeTransition(
-                                    sizeFactor: animation,
-                                    child: expandableInfo,
-                                  )
-                                else
-                                  widget._controller.isExpanded.isTrue
-                                      ? expandableInfo
-                                      : const SizedBox(),
+                                SizeTransition(
+                                  sizeFactor: animation,
+                                  child: expandableInfo,
+                                ),
 
                                 /// show current user answer is available
                                 if (Get.find<MyAnsweredQuestionsController>()
@@ -200,28 +194,27 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                                                 IbConfig.kDescriptionTextSize,
                                             color: IbColors.lightGrey),
                                       ),
-                                      if (widget._controller.isExpandable)
-                                        IconButton(
-                                          padding: EdgeInsets.zero,
-                                          onPressed: () {
-                                            widget._controller.isExpanded
-                                                    .value =
-                                                !widget._controller.isExpanded
-                                                    .value;
+                                      IconButton(
+                                        padding: EdgeInsets.zero,
+                                        onPressed: () {
+                                          widget._controller.rxIsExpanded
+                                                  .value =
+                                              !widget._controller.rxIsExpanded
+                                                  .value;
 
-                                            _runExpandCheck();
-                                          },
-                                          icon: widget
-                                                  ._controller.isExpanded.isTrue
-                                              ? const Icon(
-                                                  Icons.expand_less_outlined,
-                                                  color: IbColors.primaryColor,
-                                                )
-                                              : const Icon(
-                                                  Icons.expand_more_outlined,
-                                                  color: IbColors.primaryColor,
-                                                ),
-                                        )
+                                          _runExpandCheck();
+                                        },
+                                        icon: widget
+                                                ._controller.rxIsExpanded.isTrue
+                                            ? const Icon(
+                                                Icons.expand_less_outlined,
+                                                color: IbColors.primaryColor,
+                                              )
+                                            : const Icon(
+                                                Icons.expand_more_outlined,
+                                                color: IbColors.primaryColor,
+                                              ),
+                                      )
                                     ],
                                   );
                                 }),
@@ -241,97 +234,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     );
   }
 
-  Widget? _handleButtons() {
-    if (!widget._controller.showActionButtons &&
-        widget._controller.showResult.isFalse) {
-      return null;
-    }
-
-    if (!widget._controller.showActionButtons &&
-        widget._controller.showResult.isTrue) {
-      return TextButton(
-          onPressed: () {
-            cardKey.currentState!.flip();
-          },
-          child: const Text(
-            'Show Result',
-            style: TextStyle(
-                color: IbColors.primaryColor,
-                fontSize: IbConfig.kSecondaryTextSize),
-          ));
-    }
-    return Obx(() {
-      if (widget._controller.isAnswering.isTrue) {
-        return const IbProgressIndicator(
-          width: 20,
-          height: 20,
-        );
-      }
-
-      if (widget._controller.showResult.isTrue) {
-        return Padding(
-          padding: const EdgeInsets.only(top: 24),
-          child: Wrap(
-            direction: Axis.vertical,
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Row(
-                children: [
-                  const Icon(
-                    Icons.check_circle_outline,
-                    color: IbColors.accentColor,
-                    size: 16,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Text(
-                      '${widget._controller.answeredUsername.value} voted ${IbUtils.getSuffixDateTimeString(widget._controller.votedDateTime.value)}',
-                      style: const TextStyle(
-                          fontSize: IbConfig.kSecondaryTextSize),
-                    ),
-                  ),
-                ],
-              ),
-              TextButton(
-                  onPressed: () {
-                    cardKey.currentState!.flip();
-                  },
-                  child: const Text(
-                    'Show Result',
-                    style: TextStyle(
-                        color: IbColors.primaryColor,
-                        fontSize: IbConfig.kSecondaryTextSize),
-                  )),
-            ],
-          ),
-        );
-      }
-
-      if (!widget._controller.isSample) {
-        return Center(
-          child: IbElevatedButton(
-              textTrKey: 'vote',
-              color: IbColors.primaryColor,
-              onPressed: widget._controller.selectedChoice.isEmpty
-                  ? null
-                  : () async {
-                      await widget._controller.onVote();
-                      cardKey.currentState!.flip();
-                    }),
-        );
-      } else {
-        return Center(
-          child: IbElevatedButton(
-              textTrKey: 'submit',
-              color: IbColors.primaryColor,
-              onPressed: () async {
-                await widget._controller.onSubmit();
-              }),
-        );
-      }
-    });
-  }
+  Widget? _handleButtons() {}
 
   Widget _cardBackSide() {
     return SizedBox(

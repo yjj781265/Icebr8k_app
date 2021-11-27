@@ -12,6 +12,11 @@ class IbThemes {
 
   ThemeData buildDarkTheme() {
     final dark = ThemeData.dark().copyWith(
+        cupertinoOverrideTheme: const CupertinoThemeData(
+          textTheme: CupertinoTextThemeData(
+            dateTimePickerTextStyle: TextStyle(color: Colors.white),
+          ),
+        ),
         primaryColor: const Color(0xff424242),
         iconTheme: const IconThemeData(color: Colors.white),
         toggleableActiveColor: IbColors.primaryColor,
@@ -46,6 +51,11 @@ class IbThemes {
 
   ThemeData buildLightTheme() {
     final light = ThemeData.light().copyWith(
+        cupertinoOverrideTheme: const CupertinoThemeData(
+          textTheme: CupertinoTextThemeData(
+            dateTimePickerTextStyle: TextStyle(color: Colors.black),
+          ),
+        ),
         toggleableActiveColor: IbColors.primaryColor,
         primaryColor: IbColors.white,
         iconTheme: const IconThemeData(color: Colors.black),

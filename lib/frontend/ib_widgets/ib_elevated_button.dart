@@ -6,14 +6,16 @@ import '../ib_config.dart';
 
 class IbElevatedButton extends StatelessWidget {
   final String textTrKey;
-  final Function? onPressed;
+  final Function onPressed;
   final Color color;
   final Widget? icon;
+  final bool disabled;
   const IbElevatedButton(
       {Key? key,
       required this.textTrKey,
       required this.onPressed,
       this.icon,
+      this.disabled = false,
       this.color = IbColors.accentColor})
       : super(key: key);
 
@@ -37,7 +39,7 @@ class IbElevatedButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(IbConfig.kButtonCornerRadius),
           ),
           primary: color),
-      onPressed: onPressed == null ? null : () => onPressed!(),
+      onPressed: disabled ? null : () => onPressed(),
       child: Text(
         textTrKey.tr,
         style: const TextStyle(
@@ -57,13 +59,7 @@ class IbElevatedButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(IbConfig.kButtonCornerRadius),
           ),
           primary: color),
-      onPressed: () {
-        if (onPressed != null) {
-          onPressed!();
-        } else {
-          return;
-        }
-      },
+      onPressed: disabled ? null : () => onPressed(),
       icon: icon!,
       label: Text(
         textTrKey.tr,

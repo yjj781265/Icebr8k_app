@@ -24,73 +24,101 @@ class IbQuestionStatsBar extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () {},
-                  child: Row(
-                    children: [
-                      FaIcon(
-                        Icons.poll_outlined,
-                        color: _itemController.ibAnswer != null
-                            ? IbColors.primaryColor
-                            : IbColors.lightGrey,
-                        size: 18,
-                      ),
-                      Text(
-                        _itemController.totalPolled.value.toString(),
-                        style: const TextStyle(
-                            fontSize: IbConfig.kDescriptionTextSize),
-                      ),
-                    ],
-                  ),
-                ),
-                if (_itemController.rxIbQuestion.value.isCommentEnabled)
-                  const SizedBox(
-                    width: 8,
-                  ),
-                if (_itemController.rxIbQuestion.value.isCommentEnabled)
-                  InkWell(
-                    onTap: () {},
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8, top: 4, bottom: 4),
                     child: Row(
                       children: [
-                        const FaIcon(
-                          FontAwesomeIcons.comment,
-                          color: IbColors.lightGrey,
-                          size: 16,
-                        ),
-                        const SizedBox(
-                          width: 3,
+                        FaIcon(
+                          Icons.poll_outlined,
+                          color: _itemController.ibAnswer != null
+                              ? IbColors.primaryColor
+                              : IbColors.lightGrey,
+                          size: 18,
                         ),
                         Text(
-                          _statsShortString(_itemController.comments.value),
+                          _itemController.totalPolled.value.toString(),
                           style: const TextStyle(
                               fontSize: IbConfig.kDescriptionTextSize),
                         ),
                       ],
                     ),
                   ),
-                const SizedBox(
-                  width: 8,
                 ),
+                if (_itemController.rxIbQuestion.value.isCommentEnabled)
+                  InkWell(
+                    onTap: () {},
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      child: Row(
+                        children: [
+                          const FaIcon(
+                            FontAwesomeIcons.comment,
+                            color: IbColors.lightGrey,
+                            size: 16,
+                          ),
+                          const SizedBox(
+                            width: 3,
+                          ),
+                          Text(
+                            _statsShortString(_itemController.comments.value),
+                            style: const TextStyle(
+                                fontSize: IbConfig.kDescriptionTextSize),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 InkWell(
                   onTap: () {
                     _itemController.updateLike();
                   },
-                  child: Row(
-                    children: [
-                      FaIcon(
-                        FontAwesomeIcons.thumbsUp,
-                        color: _itemController.liked.isTrue
-                            ? IbColors.accentColor
-                            : IbColors.lightGrey,
-                        size: 16,
-                      ),
-                      const SizedBox(
-                        width: 3,
-                      ),
-                      Text(
-                        _itemController.likes.value.toString(),
-                        style: const TextStyle(
-                            fontSize: IbConfig.kDescriptionTextSize),
-                      ),
-                    ],
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Row(
+                      children: [
+                        FaIcon(
+                          FontAwesomeIcons.thumbsUp,
+                          color: _itemController.liked.isTrue
+                              ? IbColors.accentColor
+                              : IbColors.lightGrey,
+                          size: 16,
+                        ),
+                        const SizedBox(
+                          width: 3,
+                        ),
+                        Text(
+                          _itemController.likes.value.toString(),
+                          style: const TextStyle(
+                              fontSize: IbConfig.kDescriptionTextSize),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {},
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          FontAwesomeIcons.tag,
+                          size: 16,
+                          color: IbColors.lightGrey,
+                        ),
+                        const SizedBox(
+                          width: 3,
+                        ),
+                        Text(
+                          '${_itemController.totalTags.value}',
+                          style: const TextStyle(
+                              fontSize: IbConfig.kDescriptionTextSize),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

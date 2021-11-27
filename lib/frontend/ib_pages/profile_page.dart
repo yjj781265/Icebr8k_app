@@ -696,14 +696,14 @@ class _CommonAnswersTabState extends State<CommonAnswersTab>
               } else {
                 _controller = Get.put(
                     IbQuestionItemController(
+                        rxIsExpanded: false.obs,
                         ibAnswer: widget._commonAnswersController
                             .retrieveAnswer(item.id),
                         rxIbQuestion: item.obs,
-                        isExpandable: true,
                         disableAvatarOnTouch:
                             item.creatorId == widget.widget.uid),
                     tag: tag);
-                _controller.isExpanded.value = index == 0;
+                _controller.rxIsExpanded.value = index == 0;
               }
 
               if (item.questionType == IbQuestion.kMultipleChoice) {
@@ -790,15 +790,15 @@ class _DifferentAnswersTabState extends State<DifferentAnswersTab>
               } else {
                 _controller = Get.put(
                     IbQuestionItemController(
+                        rxIsExpanded: false.obs,
                         ibAnswer: widget._uncommonAnswersController
                             .retrieveAnswer(item.id),
                         showMyAnswer: true,
-                        isExpandable: true,
                         rxIbQuestion: item.obs,
                         disableAvatarOnTouch:
                             item.creatorId == widget.widget.uid),
                     tag: tag);
-                _controller.isExpanded.value = index == 0;
+                _controller.rxIsExpanded.value = index == 0;
               }
 
               if (item.questionType == IbQuestion.kMultipleChoice) {
@@ -875,12 +875,12 @@ class _AskedQTabState extends State<AskedQTab>
               } else {
                 _controller = Get.put(
                     IbQuestionItemController(
-                        isExpandable: true,
                         rxIbQuestion: item.obs,
+                        rxIsExpanded: false.obs,
                         disableAvatarOnTouch:
                             item.creatorId == widget.widget.uid),
                     tag: tag);
-                _controller.isExpanded.value = index == 0;
+                _controller.rxIsExpanded.value = index == 0;
               }
 
               if (item.questionType == IbQuestion.kMultipleChoice) {
@@ -961,13 +961,13 @@ class _AnsweredQTabState extends State<AnsweredQTab>
               } else {
                 _controller = Get.put(
                     IbQuestionItemController(
-                        isExpandable: true,
                         ibAnswer: item.ibAnswer,
                         rxIbQuestion: item.ibQuestion.obs,
+                        rxIsExpanded: false.obs,
                         disableAvatarOnTouch:
                             item.ibQuestion.creatorId == widget.widget.uid),
                     tag: tag);
-                _controller.isExpanded.value = index == 0;
+                _controller.rxIsExpanded.value = index == 0;
               }
 
               if (item.ibQuestion.questionType == IbQuestion.kMultipleChoice) {

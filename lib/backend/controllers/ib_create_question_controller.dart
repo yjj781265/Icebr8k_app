@@ -107,6 +107,26 @@ class IbCreateQuestionController extends GetxController {
       return;
     }
 
+    if (questionType == IbQuestion.kMultipleChoicePic &&
+        picChoiceList.length < 2) {
+      Get.dialog(IbSimpleDialog(
+          message: 'mc_question_not_valid'.tr, positiveBtnTrKey: 'ok'));
+      return;
+    }
+
+    if (questionType == IbQuestion.kMultipleChoicePic) {
+      for (final IbChoice ibChoice in picChoiceList) {
+        if (ibChoice.url == null ||
+            ibChoice.url!.isEmpty ||
+            ibChoice.content == null ||
+            ibChoice.content!.isEmpty) {
+          Get.dialog(IbSimpleDialog(
+              message: 'mc_pic_question_not_valid'.tr, positiveBtnTrKey: 'ok'));
+          return;
+        }
+      }
+    }
+
     if (questionType == IbQuestion.kScale && scaleEndPoints.length != 2) {
       Get.dialog(IbSimpleDialog(
           message: 'sc_question_not_valid'.tr, positiveBtnTrKey: 'ok'));
@@ -128,9 +148,31 @@ class IbCreateQuestionController extends GetxController {
             choices: _generateScaleChoiceList(),
           ).obs,
           isSample: true,
-          isExpandable: true,
+          disableAvatarOnTouch: true,
+          rxIsExpanded: false.obs);
+      Get.to(
+        () => ReviewQuestionPage(
+          itemController: Get.put(_controller, tag: 'sample_$id'),
+        ),
+      );
+      return;
+    }
+
+    if (questionType == IbQuestion.kMultipleChoicePic) {
+      final _controller = IbQuestionItemController(
+          rxIbQuestion: IbQuestion(
+            question: question.trim(),
+            id: id,
+            creatorId: Get.find<AuthController>().firebaseUser!.uid,
+            description: description.trim(),
+            questionType: questionType.trim(),
+            askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
+            choices: picChoiceList,
+          ).obs,
+          isSample: true,
+          isLocalFile: true,
+          rxIsExpanded: false.obs,
           disableAvatarOnTouch: true);
-      _controller.isExpanded.value = false;
       Get.to(
         () => ReviewQuestionPage(
           itemController: Get.put(_controller, tag: 'sample_$id'),
@@ -148,12 +190,11 @@ class IbCreateQuestionController extends GetxController {
             description: description.trim(),
             questionType: questionType.trim(),
             askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
-            choices: _generateScaleChoiceList(),
+            choices: choiceList,
           ).obs,
           isSample: true,
-          isExpandable: true,
+          rxIsExpanded: false.obs,
           disableAvatarOnTouch: true);
-      _controller.isExpanded.value = false;
       Get.to(
         () => ReviewQuestionPage(
           itemController: Get.put(_controller, tag: 'sample_$id'),

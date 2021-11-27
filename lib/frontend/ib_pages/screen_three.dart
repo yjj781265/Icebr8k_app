@@ -98,6 +98,7 @@ class ScreenThree extends StatelessWidget {
                   if (_ibQuestion.questionType == IbQuestion.kScale) {
                     return IbScQuestionCard(Get.put(
                         IbQuestionItemController(
+                          rxIsExpanded: false.obs,
                           rxIbQuestion: _ibQuestion.obs,
                           disableAvatarOnTouch: true,
                         ),
@@ -106,6 +107,7 @@ class ScreenThree extends StatelessWidget {
 
                   return IbMcQuestionCard(Get.put(
                       IbQuestionItemController(
+                        rxIsExpanded: false.obs,
                         disableAvatarOnTouch: true,
                         rxIbQuestion: _ibQuestion.obs,
                       ),

@@ -1,11 +1,13 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
-import 'package:icebr8k/backend/mock.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
+import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_question_buttons.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_header.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_stats_bar.dart';
 
@@ -13,7 +15,6 @@ import '../ib_colors.dart';
 import '../ib_config.dart';
 import '../ib_utils.dart';
 import 'ib_card.dart';
-import 'ib_elevated_button.dart';
 import 'ib_user_avatar.dart';
 
 class IbMcQuestionCard extends StatefulWidget {
@@ -50,11 +51,9 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   }
 
   void _runExpandCheck() {
-    if (widget._controller.isExpanded.isTrue &&
-        widget._controller.isExpandable) {
+    if (widget._controller.rxIsExpanded.isTrue) {
       expandController.forward();
-    } else if (widget._controller.isExpanded.isFalse &&
-        widget._controller.isExpandable) {
+    } else {
       expandController.reverse();
     }
   }
@@ -72,6 +71,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
     final Widget expandableInfo = Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Scrollbar(
             controller: _scrollController,
@@ -94,7 +94,15 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
               ),
             ),
           ),
-          Center(child: _handleButtons()),
+          if (IbQuestion.kMultipleChoicePic ==
+              widget._controller.rxIbQuestion.value.questionType)
+            const Text(
+              'Double click on the picture to enlarge',
+              style: TextStyle(
+                  color: IbColors.lightGrey,
+                  fontSize: IbConfig.kDescriptionTextSize),
+            ),
+          Center(child: IbQuestionButtons(widget._controller)),
         ],
       ),
     );
@@ -126,7 +134,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                         () => Text(
                           widget._controller.rxIbQuestion.value.description
                               .trim(),
-                          overflow: widget._controller.isExpanded.value
+                          overflow: widget._controller.rxIsExpanded.value
                               ? null
                               : TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -137,15 +145,10 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                   const SizedBox(
                     height: 8,
                   ),
-                  if (widget._controller.isExpandable)
-                    SizeTransition(
-                      sizeFactor: animation,
-                      child: expandableInfo,
-                    )
-                  else
-                    widget._controller.isExpanded.isTrue
-                        ? expandableInfo
-                        : const SizedBox(),
+                  SizeTransition(
+                    sizeFactor: animation,
+                    child: expandableInfo,
+                  ),
 
                   /// show current user answer is available
                   if (Get.find<MyAnsweredQuestionsController>().retrieveAnswer(
@@ -169,89 +172,31 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IbQuestionStatsBar(widget._controller),
-                      if (widget._controller.isExpandable)
-                        IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            widget._controller.isExpanded.value =
-                                !widget._controller.isExpanded.value;
-                            _runExpandCheck();
-                          },
-                          icon: Obx(
-                            () => widget._controller.isExpanded.isTrue
-                                ? const Icon(
-                                    Icons.expand_less_rounded,
-                                    color: IbColors.primaryColor,
-                                  )
-                                : const Icon(
-                                    Icons.expand_more_outlined,
-                                    color: IbColors.primaryColor,
-                                  ),
-                          ),
+                      IconButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          widget._controller.rxIsExpanded.value =
+                              !widget._controller.rxIsExpanded.isTrue;
+                          _runExpandCheck();
+                        },
+                        icon: Obx(
+                          () => widget._controller.rxIsExpanded.isTrue
+                              ? const Icon(
+                                  Icons.expand_less_rounded,
+                                  color: IbColors.primaryColor,
+                                )
+                              : const Icon(
+                                  Icons.expand_more_outlined,
+                                  color: IbColors.primaryColor,
+                                ),
                         ),
+                      ),
                     ],
                   ),
                 ],
               ),
             )),
       ),
-    );
-  }
-
-  Widget _handleButtons() {
-    if (!widget._controller.showActionButtons) {
-      return const SizedBox();
-    }
-    return SizedBox(
-      height: 56,
-      child: Obx(() {
-        if (widget._controller.isAnswering.isTrue) {
-          return const IbProgressIndicator(
-            width: 20,
-            height: 20,
-          );
-        }
-
-        if (widget._controller.showResult.isTrue) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.check_circle_outline,
-                color: IbColors.accentColor,
-                size: 16,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                    '${widget._controller.answeredUsername.value} voted ${IbUtils.getSuffixDateTimeString(widget._controller.votedDateTime.value)}'),
-              )
-            ],
-          );
-        }
-
-        if (!widget._controller.isSample) {
-          return Center(
-            child: IbElevatedButton(
-                textTrKey: 'vote',
-                color: IbColors.primaryColor,
-                onPressed: widget._controller.selectedChoice.isEmpty
-                    ? null
-                    : () {
-                        widget._controller.onVote();
-                      }),
-          );
-        } else {
-          return Center(
-            child: IbElevatedButton(
-                textTrKey: 'submit',
-                color: IbColors.primaryColor,
-                onPressed: () async {
-                  await widget._controller.onSubmit();
-                }),
-          );
-        }
-      }),
     );
   }
 
@@ -320,21 +265,28 @@ class IbQuestionMcItem extends StatelessWidget {
                 height: IbConfig.kMcItemHeight,
                 child: Row(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(3.0),
-                      child: GestureDetector(
-                        onTap: () {},
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                              IbConfig.kMcItemCornerRadius),
-                          child: CachedNetworkImage(
-                            width: IbConfig.kMcItemHeight,
-                            height: IbConfig.kMcItemHeight,
-                            imageUrl: Mock.kImageUrl3,
+                    if (choice.url != null && choice.url!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.all(3.0),
+                        child: GestureDetector(
+                          onTap: () {},
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                                IbConfig.kMcItemCornerRadius),
+                            child: _controller.isLocalFile
+                                ? Image.file(
+                                    File(choice.url!),
+                                    width: IbConfig.kMcItemHeight,
+                                    height: IbConfig.kMcItemHeight,
+                                  )
+                                : CachedNetworkImage(
+                                    width: IbConfig.kMcItemHeight,
+                                    height: IbConfig.kMcItemHeight,
+                                    imageUrl: choice.url!,
+                                  ),
                           ),
                         ),
                       ),
-                    ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
@@ -348,15 +300,17 @@ class IbQuestionMcItem extends StatelessWidget {
                   ],
                 ),
               ),
-              const Positioned(
-                bottom: 2,
-                right: 2,
-                child: Icon(
-                  Icons.check_circle_rounded,
-                  color: IbColors.accentColor,
-                  size: 16,
+              //Todo show 3 users who voted this question in stack
+              if (_controller.showResult.value)
+                const Positioned(
+                  bottom: 2,
+                  right: 2,
+                  child: Icon(
+                    Icons.check_circle_rounded,
+                    color: IbColors.accentColor,
+                    size: 16,
+                  ),
                 ),
-              ),
               if (_controller.showResult.value)
                 TweenAnimationBuilder(
                   builder:

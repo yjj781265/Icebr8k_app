@@ -26,13 +26,12 @@ class IbQuestionItemController extends GetxController {
   final title = ''.obs;
   final subtitle = ''.obs;
   final avatarUrl = ''.obs;
-  final bool isExpandable;
   final bool isSample;
+  final bool isLocalFile;
   final bool disableAvatarOnTouch;
   final bool showMyAnswer;
   final bool disableChoiceOnTouch;
-  final bool showActionButtons;
-  final isExpanded = true.obs;
+  final RxBool rxIsExpanded;
 
   /// if user already answered, pass the answer here
   IbAnswer? ibAnswer;
@@ -42,18 +41,19 @@ class IbQuestionItemController extends GetxController {
   final dislikes = 0.obs;
   final liked = false.obs;
   final disliked = false.obs;
-  final comments = 1001.obs;
+  final comments = 0.obs;
   final commented = false.obs;
+  final totalTags = 0.obs;
   final selectedChoice = ''.obs;
   final resultMap = <String, double>{}.obs;
 
   IbQuestionItemController(
       {required this.rxIbQuestion,
-      this.showActionButtons = true,
-      this.isExpandable = false,
+      required this.rxIsExpanded,
       this.isSample = false,
       this.disableChoiceOnTouch = false,
       this.disableAvatarOnTouch = false,
+      this.isLocalFile = false,
       this.showMyAnswer = false,
       this.ibAnswer});
 
@@ -74,6 +74,8 @@ class IbQuestionItemController extends GetxController {
     calculateResult(rxIbQuestion.value);
 
     totalPolled.value = rxIbQuestion.value.pollSize;
+    totalTags.value = rxIbQuestion.value.tagIds.length;
+    likes.value = rxIbQuestion.value.likes;
 
     isLoading.value = false;
     super.onInit();

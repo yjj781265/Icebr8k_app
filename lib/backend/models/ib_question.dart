@@ -43,7 +43,7 @@ class IbQuestion {
       this.comments = 0,
       this.pollSize = 0,
       required this.askedTimeInMs,
-      this.endTimeInMs = 0}) {
+      this.endTimeInMs = -1}) {
     if (kScale == questionType && endpoints == null) {
       throw Exception('Scale question need end points to be defined');
     }

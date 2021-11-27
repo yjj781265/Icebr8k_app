@@ -912,6 +912,10 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                 return;
               }
 
+              if (value.trim().isEmpty) {
+                return;
+              }
+
               setState(() {
                 ibChoice.content = value.trim();
                 Get.back();
@@ -933,6 +937,10 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
               if (_controller.questionType == IbQuestion.kScale &&
                   _controller.isChoiceDuplicated(_txtController.text.trim())) {
                 Get.back();
+                return;
+              }
+
+              if (_txtController.text.trim().isEmpty) {
                 return;
               }
 

@@ -86,18 +86,20 @@ class IbQuestionHeader extends StatelessWidget {
             'Anonymous • ${IbUtils.getAgoDateTimeString(
               DateTime.fromMillisecondsSinceEpoch(
                   _itemController.rxIbQuestion.value.askedTimeInMs),
-            )}',
+            )} ${_itemController.rxIbQuestion.value.endTimeInMs == -1 ? '' : ' • ${IbUtils.leftTimeString(_itemController.rxIbQuestion.value.endTimeInMs)}'}',
             style: const TextStyle(
                 fontSize: IbConfig.kDescriptionTextSize,
                 color: IbColors.lightGrey));
       }
 
       return Text(
-        IbUtils.getAgoDateTimeString(DateTime.fromMillisecondsSinceEpoch(
-            _itemController.rxIbQuestion.value.askedTimeInMs)),
-        style: const TextStyle(
-            fontSize: IbConfig.kDescriptionTextSize, color: IbColors.lightGrey),
-      );
+          '${IbUtils.getAgoDateTimeString(
+            DateTime.fromMillisecondsSinceEpoch(
+                _itemController.rxIbQuestion.value.askedTimeInMs),
+          )} ${_itemController.rxIbQuestion.value.endTimeInMs == -1 ? '' : ' • ${IbUtils.leftTimeString(_itemController.rxIbQuestion.value.endTimeInMs)}'}',
+          style: const TextStyle(
+              fontSize: IbConfig.kDescriptionTextSize,
+              color: IbColors.lightGrey));
     });
   }
 }

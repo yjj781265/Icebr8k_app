@@ -81,6 +81,8 @@ class IbStrings extends Translations {
           'sc_question_not_valid': 'You need 2 endpoints for a scale question',
           'mc_question_not_valid':
               'You need at least 2 choices for a multiple choice question',
+          'mc_pic_question_not_valid':
+              'All choices need to both have a image and a text',
           'description_option': 'Description(optional)',
           'create_question': 'Create a @type question',
           'mc': 'Multiple Choice',
@@ -89,6 +91,8 @@ class IbStrings extends Translations {
           'sc': 'Scale',
           'question_empty': 'Question field is empty',
           'vote': 'Vote',
+          'comment': 'Comment',
+          'change_vote': 'Change Vote',
           'voting': 'Voting...',
           'voted': 'Voted',
           'submit': 'Submit',
