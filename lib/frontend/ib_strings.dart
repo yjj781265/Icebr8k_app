@@ -107,6 +107,7 @@ class IbStrings extends Translations {
           'send_friend_request': 'Send a friend request',
           'send_friend_request_success': 'Friend request sent',
           'send_you_a_friend_request': 'Send you a friend request',
+          'no_tag': 'Need to add at least one tag',
           'score_page_tab_1_title': 'Friends',
           'score_page_tab_2_title': 'Friend Requests',
           'score_page_tab_3_title': 'People Nearby',
@@ -114,7 +115,8 @@ class IbStrings extends Translations {
           'friend_request_declined': 'Friend request declined',
           'show_result': 'Show result',
           'bio': 'Bio',
-          'bio_hint': 'Enter your bio here'
+          'bio_hint': 'Enter your bio here',
+          'double_tap_pic': 'Double tap on the picture to enlarge'
         }
       };
 }

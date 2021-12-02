@@ -101,6 +101,11 @@ class IbCreateQuestionController extends GetxController {
           IbSimpleDialog(message: 'question_empty'.tr, positiveBtnTrKey: 'ok'));
       return;
     }
+
+    if (pickedTags.isEmpty) {
+      Get.dialog(IbSimpleDialog(message: 'no_tag'.tr, positiveBtnTrKey: 'ok'));
+      return;
+    }
     if (questionType == IbQuestion.kMultipleChoice && choiceList.length < 2) {
       Get.dialog(IbSimpleDialog(
           message: 'mc_question_not_valid'.tr, positiveBtnTrKey: 'ok'));
@@ -142,6 +147,7 @@ class IbCreateQuestionController extends GetxController {
             id: id,
             creatorId: Get.find<AuthController>().firebaseUser!.uid,
             description: description.trim(),
+            tagIds: pickedTags,
             questionType: questionType.trim(),
             askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
             endpoints: scaleEndPoints,
@@ -166,6 +172,7 @@ class IbCreateQuestionController extends GetxController {
             creatorId: Get.find<AuthController>().firebaseUser!.uid,
             description: description.trim(),
             questionType: questionType.trim(),
+            tagIds: pickedTags,
             askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
             choices: picChoiceList,
           ).obs,
@@ -186,6 +193,7 @@ class IbCreateQuestionController extends GetxController {
           rxIbQuestion: IbQuestion(
             question: question.trim(),
             id: id,
+            tagIds: pickedTags,
             creatorId: Get.find<AuthController>().firebaseUser!.uid,
             description: description.trim(),
             questionType: questionType.trim(),
@@ -194,6 +202,30 @@ class IbCreateQuestionController extends GetxController {
           ).obs,
           isSample: true,
           rxIsExpanded: false.obs,
+          disableAvatarOnTouch: true);
+      Get.to(
+        () => ReviewQuestionPage(
+          itemController: Get.put(_controller, tag: 'sample_$id'),
+        ),
+      );
+      return;
+    }
+
+    if (questionType == IbQuestion.kPic) {
+      final _controller = IbQuestionItemController(
+          rxIbQuestion: IbQuestion(
+            question: question.trim(),
+            id: id,
+            tagIds: pickedTags,
+            creatorId: Get.find<AuthController>().firebaseUser!.uid,
+            description: description.trim(),
+            questionType: questionType.trim(),
+            askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
+            choices: picList,
+          ).obs,
+          isSample: true,
+          rxIsExpanded: false.obs,
+          isLocalFile: true,
           disableAvatarOnTouch: true);
       Get.to(
         () => ReviewQuestionPage(

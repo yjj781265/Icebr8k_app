@@ -40,6 +40,5 @@ class IbQuestionButtons extends StatelessWidget {
             ],
           ));
     });
-    ;
   }
 }

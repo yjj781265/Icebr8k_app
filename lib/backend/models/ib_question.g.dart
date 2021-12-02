@@ -32,7 +32,7 @@ IbQuestion _$IbQuestionFromJson(Map<String, dynamic> json) => IbQuestion(
       comments: json['comments'] as int? ?? 0,
       pollSize: json['pollSize'] as int? ?? 0,
       askedTimeInMs: json['askedTimeInMs'] as int,
-      endTimeInMs: json['endTimeInMs'] as int? ?? 0,
+      endTimeInMs: json['endTimeInMs'] as int? ?? -1,
     );
 
 Map<String, dynamic> _$IbQuestionToJson(IbQuestion instance) =>

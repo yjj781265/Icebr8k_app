@@ -45,8 +45,8 @@ class AnsweredQuestionController extends GetxController {
             myAnsweredQuestions[myAnsweredQuestions.indexOf(item)] = item;
             print('modified answered question');
             Get.find<IbQuestionItemController>(tag: 'answered_${ibQuestion.id}')
-                .selectedChoice
-                .value = ibAnswer.answer;
+                .selectedChoiceId
+                .value = ibAnswer.choiceId;
           }
         }
 
@@ -144,7 +144,7 @@ class AnsweredQuestionItem {
 
   @override
   String toString() {
-    final String str = '${ibQuestion.question} : ${ibAnswer.answer}';
+    final String str = '${ibQuestion.question} : ${ibAnswer.choiceId}';
     return str;
   }
 }

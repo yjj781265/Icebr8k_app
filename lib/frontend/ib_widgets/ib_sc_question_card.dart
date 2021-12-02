@@ -5,6 +5,9 @@ import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_question_buttons.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_question_header.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_question_stats_bar.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:page_flip_builder/page_flip_builder.dart';
 
@@ -12,6 +15,7 @@ import '../ib_colors.dart';
 import '../ib_config.dart';
 import '../ib_utils.dart';
 import 'ib_card.dart';
+import 'ib_question_info.dart';
 
 class IbScQuestionCard extends StatefulWidget {
   final IbQuestionItemController _controller;
@@ -66,8 +70,11 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     _runExpandCheck();
     final expandableInfo = Column(
       children: [
-        IbQuestionScItem(widget._controller),
-        Center(child: _handleButtons()),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: IbQuestionScItem(widget._controller),
+        ),
+        IbQuestionButtons(widget._controller),
       ],
     );
     return SingleChildScrollView(
@@ -81,145 +88,71 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                       interactiveFlipEnabled: false,
                       key: cardKey,
                       frontBuilder: (_) => IbCard(
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            left: 16,
-                            right: 16,
-                            top: 16,
-                            bottom: 8,
-                          ),
-                          child: SingleChildScrollView(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    _handleAvatarImage(),
-                                    const SizedBox(
-                                      width: 8,
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Obx(
-                                          () => SizedBox(
-                                            width: 200,
-                                            child: Text(
-                                              widget._controller.title.value,
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                              style: const TextStyle(
-                                                  fontSize: IbConfig
-                                                      .kSecondaryTextSize,
-                                                  fontWeight: FontWeight.w700),
-                                            ),
-                                          ),
-                                        ),
-                                        Text(
-                                          IbUtils.getAgoDateTimeString(DateTime
-                                              .fromMillisecondsSinceEpoch(widget
-                                                  ._controller
-                                                  .rxIbQuestion
-                                                  .value
-                                                  .askedTimeInMs)),
-                                          style: const TextStyle(
-                                              fontSize:
-                                                  IbConfig.kDescriptionTextSize,
-                                              color: IbColors.lightGrey),
-                                        )
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 8,
-                                ),
-                                Text(
-                                  widget
-                                      ._controller.rxIbQuestion.value.question,
-                                  style: const TextStyle(
-                                      fontSize: IbConfig.kPageTitleSize,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                if (widget
-                                    ._controller.rxIbQuestion.value.description
-                                    .trim()
-                                    .isNotEmpty)
-                                  Text(
-                                    widget._controller.rxIbQuestion.value
-                                        .description,
-                                    style: const TextStyle(
-                                        fontSize: IbConfig.kSecondaryTextSize,
-                                        color: Colors.black),
-                                  ),
-                                const SizedBox(
-                                  height: 16,
-                                ),
-                                SizeTransition(
-                                  sizeFactor: animation,
-                                  child: expandableInfo,
-                                ),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              IbQuestionHeader(widget._controller),
+                              IbQuestionInfo(widget._controller),
+                              const SizedBox(
+                                height: 16,
+                              ),
+                              SizeTransition(
+                                sizeFactor: animation,
+                                child: expandableInfo,
+                              ),
 
-                                /// show current user answer is available
-                                if (Get.find<MyAnsweredQuestionsController>()
-                                            .retrieveAnswer(widget._controller
-                                                .rxIbQuestion.value.id) !=
-                                        null &&
-                                    widget._controller.showMyAnswer)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: Row(
-                                      children: [
-                                        IbUserAvatar(
-                                          avatarUrl: IbUtils.getCurrentIbUser()!
-                                              .avatarUrl,
-                                          radius: 8,
-                                        ),
-                                        Text(
-                                            ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.rxIbQuestion.value.id)!.answer}')
-                                      ],
-                                    ),
-                                  ),
-                                Obx(() {
-                                  return Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                              /// show current user answer is available
+                              if (Get.find<MyAnsweredQuestionsController>()
+                                          .retrieveAnswer(widget._controller
+                                              .rxIbQuestion.value.id) !=
+                                      null &&
+                                  widget._controller.showMyAnswer)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: Row(
                                     children: [
-                                      Text(
-                                        '${widget._controller.totalPolled.value} polled',
-                                        style: const TextStyle(
-                                            fontSize:
-                                                IbConfig.kDescriptionTextSize,
-                                            color: IbColors.lightGrey),
+                                      IbUserAvatar(
+                                        avatarUrl: IbUtils.getCurrentIbUser()!
+                                            .avatarUrl,
+                                        radius: 8,
                                       ),
-                                      IconButton(
-                                        padding: EdgeInsets.zero,
-                                        onPressed: () {
-                                          widget._controller.rxIsExpanded
-                                                  .value =
-                                              !widget._controller.rxIsExpanded
-                                                  .value;
-
-                                          _runExpandCheck();
-                                        },
-                                        icon: widget
-                                                ._controller.rxIsExpanded.isTrue
-                                            ? const Icon(
-                                                Icons.expand_less_outlined,
-                                                color: IbColors.primaryColor,
-                                              )
-                                            : const Icon(
-                                                Icons.expand_more_outlined,
-                                                color: IbColors.primaryColor,
-                                              ),
-                                      )
+                                      Text(
+                                          ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.rxIbQuestion.value.id)!.choiceId}')
                                     ],
-                                  );
-                                }),
-                              ],
-                            ),
+                                  ),
+                                ),
+                              Obx(() {
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    IbQuestionStatsBar(widget._controller),
+                                    IconButton(
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () {
+                                        widget._controller.rxIsExpanded.value =
+                                            !widget
+                                                ._controller.rxIsExpanded.value;
+
+                                        _runExpandCheck();
+                                      },
+                                      icon:
+                                          widget._controller.rxIsExpanded.isTrue
+                                              ? const Icon(
+                                                  Icons.expand_less_outlined,
+                                                  color: IbColors.primaryColor,
+                                                )
+                                              : const Icon(
+                                                  Icons.expand_more_outlined,
+                                                  color: IbColors.primaryColor,
+                                                ),
+                                    )
+                                  ],
+                                );
+                              }),
+                            ],
                           ),
                         ),
                       ),
@@ -233,8 +166,6 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
       ),
     );
   }
-
-  Widget? _handleButtons() {}
 
   Widget _cardBackSide() {
     return SizedBox(
@@ -335,17 +266,6 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     return _pieChartDataList;
   }
 
-  Widget _handleAvatarImage() {
-    return IbUserAvatar(
-      disableOnTap: widget._controller.disableAvatarOnTouch,
-      avatarUrl: widget._controller.avatarUrl.value,
-      uid: widget._controller.ibUser == null
-          ? ''
-          : widget._controller.ibUser!.id,
-      radius: 16,
-    );
-  }
-
   @override
   bool get wantKeepAlive => true;
 }
@@ -381,36 +301,40 @@ class IbQuestionScItem extends StatelessWidget {
               child: Slider(
                   min: 1,
                   max: 5,
-                  label: _controller.selectedChoice.value,
+                  label: _controller.selectedChoiceId.value,
                   divisions: 4,
-                  value: _controller.selectedChoice.isEmpty
+                  value: _controller.selectedChoiceId.isEmpty
                       ? 1
-                      : double.parse(_controller.selectedChoice.value),
+                      : double.parse(_controller.selectedChoiceId.value),
                   onChanged: (value) {
                     if (_controller.showResult.isFalse) {
-                      _controller.selectedChoice.value =
+                      _controller.selectedChoiceId.value =
                           value.toInt().toString();
                     }
                   }),
             ),
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-                width: 100,
-                child: Text(
-                    _controller.rxIbQuestion.value.choices.first.content!)),
-            SizedBox(
-              width: 100,
-              child: Text(
-                _controller.rxIbQuestion.value.choices[1].content!,
-                textAlign: TextAlign.end,
-              ),
-            )
-          ],
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                  width: 100,
+                  child: Text(
+                    _controller.rxIbQuestion.value.endpoints!.first.content!,
+                    textAlign: TextAlign.start,
+                  )),
+              SizedBox(
+                  width: 100,
+                  child: Text(
+                    _controller.rxIbQuestion.value.endpoints![1].content!,
+                    textAlign: TextAlign.end,
+                  ))
+            ],
+          ),
         )
       ],
     );

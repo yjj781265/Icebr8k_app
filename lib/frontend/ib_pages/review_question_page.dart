@@ -8,6 +8,7 @@ import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/ib_pic_question_card.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
@@ -110,6 +111,9 @@ class ReviewQuestionPage extends StatelessWidget {
         itemController.rxIbQuestion.value.questionType ==
             IbQuestion.kMultipleChoicePic) {
       return IbMcQuestionCard(itemController);
+    }
+    if (itemController.rxIbQuestion.value.questionType == IbQuestion.kPic) {
+      return IbPicQuestionCard(itemController);
     }
     return IbScQuestionCard(
       itemController,

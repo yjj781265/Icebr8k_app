@@ -44,7 +44,7 @@ class IbQuestionItemController extends GetxController {
   final comments = 0.obs;
   final commented = false.obs;
   final totalTags = 0.obs;
-  final selectedChoice = ''.obs;
+  final selectedChoiceId = ''.obs;
   final resultMap = <String, double>{}.obs;
 
   IbQuestionItemController(
@@ -129,11 +129,11 @@ class IbQuestionItemController extends GetxController {
       answeredUsername.value =
           (await IbUserDbService().queryIbUser(ibAnswer!.uid))!.username;
     }
-    selectedChoice.value = ibAnswer == null
+    selectedChoiceId.value = ibAnswer == null
         ? rxIbQuestion.value.questionType == IbQuestion.kMultipleChoice
             ? ''
             : '1'
-        : ibAnswer!.answer;
+        : ibAnswer!.choiceId;
     showResult.value = ibAnswer != null;
   }
 
@@ -142,7 +142,7 @@ class IbQuestionItemController extends GetxController {
       return;
     }
 
-    if (selectedChoice.value.isEmpty) {
+    if (selectedChoiceId.value.isEmpty) {
       return;
     }
 
@@ -154,7 +154,7 @@ class IbQuestionItemController extends GetxController {
 
     isAnswering.value = true;
     final IbAnswer tempAnswer = IbAnswer(
-        answer: selectedChoice.value,
+        choiceId: selectedChoiceId.value,
         answeredTimeInMs: DateTime.now().millisecondsSinceEpoch,
         askedTimeInMs: rxIbQuestion.value.askedTimeInMs,
         uid: IbUtils.getCurrentUid()!,

@@ -194,21 +194,28 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                         ),
                         Obx(() {
                           if (_controller.pickedTags.length < 8) {
-                            return Chip(
-                              backgroundColor: Theme.of(context).primaryColor,
-                              label: const Text(
-                                'Add a tag 🏷️',
-                                style: TextStyle(color: IbColors.lightGrey),
-                              ),
-                              deleteIcon: const Tooltip(
-                                message: 'Add a tag',
-                                child: Icon(Icons.add_circle_outline),
-                              ),
-                              onDeleted: () {
+                            return GestureDetector(
+                              onTap: () {
                                 _customTagController.clear();
                                 _controller.isCustomTagSelected.value = false;
                                 _showTagsBottomSheet();
                               },
+                              child: Chip(
+                                backgroundColor: Theme.of(context).primaryColor,
+                                label: const Text(
+                                  'Add a tag 🏷️',
+                                  style: TextStyle(color: IbColors.lightGrey),
+                                ),
+                                deleteIcon: const Tooltip(
+                                  message: 'Add a tag',
+                                  child: Icon(Icons.add_circle_outline),
+                                ),
+                                onDeleted: () {
+                                  _customTagController.clear();
+                                  _controller.isCustomTagSelected.value = false;
+                                  _showTagsBottomSheet();
+                                },
+                              ),
                             );
                           }
                           return const SizedBox();
@@ -372,7 +379,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
           alignment: WrapAlignment.center,
           children: [
             Obx(() {
-              if (_controller.picList.length < 8) {
+              if (_controller.picList.length < 9) {
                 return GestureDetector(
                   onTap: () {
                     showMediaBottomSheet(context, null, _controller.picList);
@@ -383,8 +390,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                       decoration: BoxDecoration(
                           color: IbColors.lightGrey,
                           borderRadius: BorderRadius.circular(8)),
-                      width: Get.width / 4,
-                      height: Get.width / 4,
+                      width: Get.width / 5,
+                      height: Get.width / 5,
                       child: const Icon(Icons.add),
                     ),
                   ),
@@ -417,15 +424,38 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                               showMediaBottomSheet(
                                   context, e, _controller.picList);
                             },
+                            onDoubleTap: () {
+                              final Widget img = Image.file(
+                                File(e.url!),
+                                width: IbConfig.kMcItemHeight,
+                                height: IbConfig.kMcItemHeight,
+                              );
+                              final Widget hero = Hero(
+                                tag: e.url!,
+                                child: Center(
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    child: img,
+                                  ),
+                                ),
+                              );
+
+                              /// show image preview
+                              IbUtils.showInteractiveViewer(hero, context);
+                            },
                             child: IbCard(
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.file(
-                                    File(e.url!),
-                                    width: Get.width / 4,
-                                    height: Get.width / 4,
+                                child: Hero(
+                                  tag: e.url!,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.file(
+                                      File(e.url!),
+                                      width: Get.width / 5,
+                                      height: Get.width / 5,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -543,16 +573,39 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                           children: [
                             if (item.url != null && item.url!.isNotEmpty)
                               GestureDetector(
+                                onDoubleTap: () {
+                                  final Widget img = Image.file(
+                                    File(item.url!),
+                                    width: IbConfig.kMcItemHeight,
+                                    height: IbConfig.kMcItemHeight,
+                                  );
+                                  final Widget hero = Hero(
+                                    tag: item.url!,
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                        child: img,
+                                      ),
+                                    ),
+                                  );
+
+                                  /// show image preview
+                                  IbUtils.showInteractiveViewer(hero, context);
+                                },
                                 onTap: () {
                                   showMediaBottomSheet(
                                       context, item, _controller.picChoiceList);
                                 },
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.file(
-                                    File(item.url!),
-                                    width: 56,
-                                    height: 56,
+                                child: Hero(
+                                  tag: item.url!,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.file(
+                                      File(item.url!),
+                                      width: 56,
+                                      height: 56,
+                                    ),
                                   ),
                                 ),
                               )
@@ -620,12 +673,13 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                 }
               },
               child: Container(
-                margin: const EdgeInsets.all(8),
                 padding: const EdgeInsets.all(8),
-                height: 46,
+                width: Get.width * 0.95,
+                height: 40,
                 decoration: BoxDecoration(
-                    color: IbColors.white,
-                    borderRadius: BorderRadius.circular(8)),
+                  borderRadius: BorderRadius.circular(8),
+                  color: Theme.of(context).primaryColor,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -633,11 +687,17 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                       'tap_to_add_sc'.tr,
                       style: const TextStyle(color: IbColors.lightGrey),
                     ),
-                    const Icon(Icons.add_outlined),
+                    const Padding(
+                      padding: EdgeInsets.only(right: 10),
+                      child: Icon(Icons.add_outlined),
+                    ),
                   ],
                 ),
               ),
             ),
+          ),
+          const SizedBox(
+            height: 8,
           ),
           Obx(
             () => ReorderableListView(
@@ -647,28 +707,32 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
               },
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              primary: false,
               children: [
                 for (final item in _controller.scaleEndPoints)
-                  IbCard(
+                  GestureDetector(
                     key: UniqueKey(),
+                    onTap: () {
+                      _showEditTextFiledBtmSheet(item);
+                    },
                     child: Container(
                       margin: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
                       padding: const EdgeInsets.all(8),
                       height: 46,
-                      decoration:
-                          BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Theme.of(context).primaryColor),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(item.content!),
                           IconButton(
+                              padding: EdgeInsets.zero,
                               onPressed: () {
                                 _controller.scaleEndPoints.remove(item);
                               },
                               icon: const Icon(
-                                Icons.delete_outlined,
+                                Icons.remove,
                                 color: IbColors.errorRed,
                               ))
                         ],

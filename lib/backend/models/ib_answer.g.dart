@@ -7,7 +7,7 @@ part of 'ib_answer.dart';
 // **************************************************************************
 
 IbAnswer _$IbAnswerFromJson(Map<String, dynamic> json) => IbAnswer(
-      answer: json['answer'] as String,
+      choiceId: json['choiceId'] as String,
       answeredTimeInMs: json['answeredTimeInMs'] as int,
       askedTimeInMs: json['askedTimeInMs'] as int,
       questionId: json['questionId'] as String,
@@ -16,7 +16,7 @@ IbAnswer _$IbAnswerFromJson(Map<String, dynamic> json) => IbAnswer(
     );
 
 Map<String, dynamic> _$IbAnswerToJson(IbAnswer instance) => <String, dynamic>{
-      'answer': instance.answer,
+      'choiceId': instance.choiceId,
       'answeredTimeInMs': instance.answeredTimeInMs,
       'uid': instance.uid,
       'askedTimeInMs': instance.askedTimeInMs,

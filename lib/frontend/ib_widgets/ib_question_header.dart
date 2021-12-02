@@ -59,7 +59,7 @@ class IbQuestionHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               IconButton(
-                  onPressed: () {},
+                  onPressed: _itemController.isSample ? null : () {},
                   icon: const FaIcon(Icons.more_vert_outlined))
             ],
           )

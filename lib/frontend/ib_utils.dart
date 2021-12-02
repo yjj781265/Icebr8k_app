@@ -311,10 +311,10 @@ class IbUtils {
     for (final id in commonQ) {
       if (uid1QuestionAnswers
               .firstWhere((element) => element.questionId == id)
-              .answer !=
+              .choiceId !=
           uid2QuestionAnswers
               .firstWhere((element) => element.questionId == id)
-              .answer) {
+              .choiceId) {
         print(
             'add uncommon answer ${uid2QuestionAnswers.firstWhere((element) => element.questionId == id)}');
         uncommonAnswers.add(uid2QuestionAnswers
@@ -357,5 +357,39 @@ class IbUtils {
     }
 
     return '${diff.inDays} days left';
+  }
+
+  static void showInteractiveViewer(Widget widget, BuildContext context) {
+    /// show image preview
+    Navigator.of(context).push(PageRouteBuilder(
+        opaque: false,
+        barrierColor: Colors.black.withOpacity(0.8),
+        barrierDismissible: true,
+        pageBuilder: (BuildContext context, _, __) => Stack(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Get.back();
+                  },
+                  child: InteractiveViewer(
+                      boundaryMargin: const EdgeInsets.all(8), child: widget),
+                ),
+                Positioned(
+                  right: 8,
+                  top: 64,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: IconButton(
+                        onPressed: () {
+                          Get.back();
+                        },
+                        icon: const Icon(
+                          Icons.cancel,
+                          color: IbColors.errorRed,
+                        )),
+                  ),
+                ),
+              ],
+            )));
   }
 }

@@ -4,7 +4,7 @@ part 'ib_answer.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class IbAnswer {
-  final String answer;
+  final String choiceId;
   final int answeredTimeInMs;
   final String uid;
   final int askedTimeInMs;
@@ -12,7 +12,7 @@ class IbAnswer {
   final String questionType;
 
   IbAnswer(
-      {required this.answer,
+      {required this.choiceId,
       required this.answeredTimeInMs,
       required this.askedTimeInMs,
       required this.questionId,
@@ -28,14 +28,14 @@ class IbAnswer {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is IbAnswer &&
-          answer == other.answer &&
+          choiceId == other.choiceId &&
           questionId == other.questionId;
 
   @override
-  int get hashCode => answer.hashCode ^ questionId.hashCode;
+  int get hashCode => choiceId.hashCode ^ questionId.hashCode;
 
   @override
   String toString() {
-    return 'IbAnswer{answer: $answer, questionType: $questionType';
+    return 'IbAnswer{answer: $choiceId, questionType: $questionType';
   }
 }

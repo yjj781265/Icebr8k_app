@@ -23,7 +23,7 @@ class IbQuestionStatsBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 InkWell(
-                  onTap: () {},
+                  onTap: _itemController.isSample ? null : () {},
                   child: Padding(
                     padding: const EdgeInsets.only(right: 8, top: 4, bottom: 4),
                     child: Row(
@@ -46,7 +46,7 @@ class IbQuestionStatsBar extends StatelessWidget {
                 ),
                 if (_itemController.rxIbQuestion.value.isCommentEnabled)
                   InkWell(
-                    onTap: () {},
+                    onTap: _itemController.isSample ? null : () {},
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
@@ -70,9 +70,11 @@ class IbQuestionStatsBar extends StatelessWidget {
                     ),
                   ),
                 InkWell(
-                  onTap: () {
-                    _itemController.updateLike();
-                  },
+                  onTap: _itemController.isSample
+                      ? null
+                      : () {
+                          _itemController.updateLike();
+                        },
                   child: Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -98,7 +100,7 @@ class IbQuestionStatsBar extends StatelessWidget {
                   ),
                 ),
                 InkWell(
-                  onTap: () {},
+                  onTap: _itemController.isSample ? null : () {},
                   child: Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

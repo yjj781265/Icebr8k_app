@@ -9,6 +9,7 @@ import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_buttons.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_header.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_question_info.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_stats_bar.dart';
 
 import '../ib_colors.dart';
@@ -97,11 +98,14 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
           if (IbQuestion.kMultipleChoicePic ==
               widget._controller.rxIbQuestion.value.questionType)
             const Text(
-              'Double click on the picture to enlarge',
+              'Double tap on the picture to enlarge',
               style: TextStyle(
                   color: IbColors.lightGrey,
                   fontSize: IbConfig.kDescriptionTextSize),
             ),
+          const SizedBox(
+            height: 8,
+          ),
           Center(child: IbQuestionButtons(widget._controller)),
         ],
       ),
@@ -116,32 +120,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   IbQuestionHeader(widget._controller),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
-                    child: Text(
-                      widget._controller.rxIbQuestion.value.question,
-                      style: const TextStyle(
-                          fontSize: IbConfig.kPageTitleSize,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  if (widget._controller.rxIbQuestion.value.description
-                      .trim()
-                      .isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16, right: 16),
-                      child: Obx(
-                        () => Text(
-                          widget._controller.rxIbQuestion.value.description
-                              .trim(),
-                          overflow: widget._controller.rxIsExpanded.value
-                              ? null
-                              : TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: IbConfig.kSecondaryTextSize),
-                        ),
-                      ),
-                    ),
+                  IbQuestionInfo(widget._controller),
                   const SizedBox(
                     height: 8,
                   ),
@@ -150,7 +129,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                     child: expandableInfo,
                   ),
 
-                  /// show current user answer is available
+                  /// show current user answer if is available
                   if (Get.find<MyAnsweredQuestionsController>().retrieveAnswer(
                               widget._controller.rxIbQuestion.value.id) !=
                           null &&
@@ -164,7 +143,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                             radius: 8,
                           ),
                           Text(
-                              ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.rxIbQuestion.value.id)!.answer}')
+                              ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.rxIbQuestion.value.id)!.choiceId}')
                         ],
                       ),
                     ),
@@ -222,10 +201,10 @@ class IbQuestionMcItem extends StatelessWidget {
             return;
           }
 
-          if (_controller.selectedChoice.value == choice.content) {
-            _controller.selectedChoice.value = '';
+          if (_controller.selectedChoiceId.value == choice.content) {
+            _controller.selectedChoiceId.value = '';
           } else {
-            _controller.selectedChoice.value = choice.content.toString();
+            _controller.selectedChoiceId.value = choice.content.toString();
           }
         },
         child: Padding(
@@ -246,13 +225,13 @@ class IbQuestionMcItem extends StatelessWidget {
                 decoration: BoxDecoration(
                     color: _determineColor(
                         result: _controller.resultMap[choice.content] ?? 0,
-                        isSelected:
-                            _controller.selectedChoice.value == choice.content,
+                        isSelected: _controller.selectedChoiceId.value ==
+                            choice.content,
                         isVoted: _controller.showResult.value),
                     borderRadius: BorderRadius.circular(8)),
                 width: _determineWidth(
                     isSelected:
-                        _controller.selectedChoice.value == choice.content,
+                        _controller.selectedChoiceId.value == choice.content,
                     result: _controller.resultMap[choice.content] ?? 0,
                     isVoted: _controller.showResult.value),
                 duration: Duration(
@@ -269,11 +248,8 @@ class IbQuestionMcItem extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(3.0),
                         child: GestureDetector(
-                          onTap: () {},
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                                IbConfig.kMcItemCornerRadius),
-                            child: _controller.isLocalFile
+                          onDoubleTap: () {
+                            final Widget img = _controller.isLocalFile
                                 ? Image.file(
                                     File(choice.url!),
                                     width: IbConfig.kMcItemHeight,
@@ -283,7 +259,39 @@ class IbQuestionMcItem extends StatelessWidget {
                                     width: IbConfig.kMcItemHeight,
                                     height: IbConfig.kMcItemHeight,
                                     imageUrl: choice.url!,
-                                  ),
+                                  );
+
+                            final Widget hero = Hero(
+                              tag: choice.choiceId,
+                              child: Center(
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  child: img,
+                                ),
+                              ),
+                            );
+
+                            /// show image preview
+                            IbUtils.showInteractiveViewer(hero, context);
+                          },
+                          child: Hero(
+                            tag: choice.choiceId,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(
+                                  IbConfig.kMcItemCornerRadius),
+                              child: _controller.isLocalFile
+                                  ? Image.file(
+                                      File(choice.url!),
+                                      width: IbConfig.kMcItemHeight,
+                                      height: IbConfig.kMcItemHeight,
+                                    )
+                                  : CachedNetworkImage(
+                                      width: IbConfig.kMcItemHeight,
+                                      height: IbConfig.kMcItemHeight,
+                                      imageUrl: choice.url!,
+                                    ),
+                            ),
                           ),
                         ),
                       ),
