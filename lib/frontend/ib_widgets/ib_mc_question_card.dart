@@ -255,7 +255,7 @@ class IbQuestionMcItem extends StatelessWidget {
                   children: [
                     if (choice.url != null && choice.url!.isNotEmpty)
                       Padding(
-                        padding: const EdgeInsets.all(3.0),
+                        padding: const EdgeInsets.all(8.0),
                         child: GestureDetector(
                           onDoubleTap: () {
                             final Widget img = _controller.isLocalFile
@@ -290,12 +290,12 @@ class IbQuestionMcItem extends StatelessWidget {
                               child: _controller.isLocalFile
                                   ? Image.file(
                                       File(choice.url!),
-                                      width: IbConfig.kMcPicItemHeight,
-                                      height: IbConfig.kMcPicItemHeight,
+                                      width: IbConfig.kMcPicHeight,
+                                      height: IbConfig.kMcPicHeight,
                                     )
                                   : CachedNetworkImage(
-                                      width: IbConfig.kMcPicItemHeight,
-                                      height: IbConfig.kMcPicItemHeight,
+                                      width: IbConfig.kMcPicHeight,
+                                      height: IbConfig.kMcPicHeight,
                                       imageUrl: choice.url!,
                                     ),
                             ),
