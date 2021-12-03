@@ -18,6 +18,7 @@ import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
+import 'package:icebr8k/frontend/ib_pages/ib_pic_question_card.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
@@ -706,10 +707,13 @@ class _CommonAnswersTabState extends State<CommonAnswersTab>
                 _controller.rxIsExpanded.value = index == 0;
               }
 
-              if (item.questionType == IbQuestion.kMultipleChoice) {
+              if (item.questionType == IbQuestion.kPic) {
+                return IbPicQuestionCard(_controller);
+              } else if (item.questionType == IbQuestion.kScale) {
+                return IbScQuestionCard(_controller);
+              } else {
                 return IbMcQuestionCard(_controller);
               }
-              return IbScQuestionCard(_controller);
             },
             itemCount: widget._commonAnswersController.ibQuestions.length,
           ),
@@ -801,10 +805,13 @@ class _DifferentAnswersTabState extends State<DifferentAnswersTab>
                 _controller.rxIsExpanded.value = index == 0;
               }
 
-              if (item.questionType == IbQuestion.kMultipleChoice) {
+              if (item.questionType == IbQuestion.kPic) {
+                return IbPicQuestionCard(_controller);
+              } else if (item.questionType == IbQuestion.kScale) {
+                return IbScQuestionCard(_controller);
+              } else {
                 return IbMcQuestionCard(_controller);
               }
-              return IbScQuestionCard(_controller);
             },
             itemCount: widget._uncommonAnswersController.ibQuestions.length,
           ),
@@ -883,10 +890,13 @@ class _AskedQTabState extends State<AskedQTab>
                 _controller.rxIsExpanded.value = index == 0;
               }
 
-              if (item.questionType == IbQuestion.kMultipleChoice) {
+              if (item.questionType == IbQuestion.kPic) {
+                return IbPicQuestionCard(_controller);
+              } else if (item.questionType == IbQuestion.kScale) {
+                return IbScQuestionCard(_controller);
+              } else {
                 return IbMcQuestionCard(_controller);
               }
-              return IbScQuestionCard(_controller);
             },
             itemCount:
                 widget._createdQuestionController.createdQuestions.length,
@@ -970,10 +980,13 @@ class _AnsweredQTabState extends State<AnsweredQTab>
                 _controller.rxIsExpanded.value = index == 0;
               }
 
-              if (item.ibQuestion.questionType == IbQuestion.kMultipleChoice) {
+              if (item.ibQuestion.questionType == IbQuestion.kPic) {
+                return IbPicQuestionCard(_controller);
+              } else if (item.ibQuestion.questionType == IbQuestion.kScale) {
+                return IbScQuestionCard(_controller);
+              } else {
                 return IbMcQuestionCard(_controller);
               }
-              return IbScQuestionCard(_controller);
             },
             itemCount:
                 widget._answeredQuestionController.myAnsweredQuestions.length,

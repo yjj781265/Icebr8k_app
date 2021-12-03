@@ -132,6 +132,22 @@ class IbCreateQuestionController extends GetxController {
       }
     }
 
+    if (questionType == IbQuestion.kPic) {
+      if (picList.length < 2) {
+        Get.dialog(IbSimpleDialog(
+            message: 'pic_question_not_valid_min'.tr, positiveBtnTrKey: 'ok'));
+        return;
+      }
+
+      for (final IbChoice ibChoice in picList) {
+        if (ibChoice.url == null || ibChoice.url!.isEmpty) {
+          Get.dialog(IbSimpleDialog(
+              message: 'pic_question_not_valid'.tr, positiveBtnTrKey: 'ok'));
+          return;
+        }
+      }
+    }
+
     if (questionType == IbQuestion.kScale && scaleEndPoints.length != 2) {
       Get.dialog(IbSimpleDialog(
           message: 'sc_question_not_valid'.tr, positiveBtnTrKey: 'ok'));

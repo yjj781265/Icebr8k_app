@@ -30,7 +30,6 @@ class IbPicQuestionCard extends StatefulWidget {
 
 class _IbPicQuestionCardState extends State<IbPicQuestionCard>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  final _scrollController = ScrollController();
   late AnimationController expandController;
   late Animation<double> animation;
 
@@ -76,20 +75,13 @@ class _IbPicQuestionCardState extends State<IbPicQuestionCard>
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(
-            child: Scrollbar(
-              controller: _scrollController,
-              isAlwaysShown: true,
-              child: LimitedBox(
-                maxHeight: 500,
-                child: Obx(() => Wrap(
-                    children: widget._controller.rxIbQuestion.value.choices
-                        .map((e) => PicItem(
-                            ibChoice: e, itemController: widget._controller))
-                        .toList(growable: false))),
-              ),
-            ),
-          ),
+          Obx(() => Wrap(
+              spacing: 8,
+              runSpacing: 24,
+              children: widget._controller.rxIbQuestion.value.choices
+                  .map((e) =>
+                      PicItem(ibChoice: e, itemController: widget._controller))
+                  .toList(growable: false))),
           if (IbQuestion.kPic ==
               widget._controller.rxIbQuestion.value.questionType)
             const Text(
@@ -107,76 +99,74 @@ class _IbPicQuestionCardState extends State<IbPicQuestionCard>
     );
     return SingleChildScrollView(
       child: Center(
-        child: LimitedBox(
-            maxWidth: Get.width * 0.95,
+        child: SizedBox(
             child: IbCard(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  IbQuestionHeader(widget._controller),
-                  IbQuestionInfo(widget._controller),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  SizeTransition(
-                    sizeFactor: animation,
-                    child: expandableInfo,
-                  ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              IbQuestionHeader(widget._controller),
+              IbQuestionInfo(widget._controller),
+              const SizedBox(
+                height: 8,
+              ),
+              SizeTransition(
+                sizeFactor: animation,
+                child: expandableInfo,
+              ),
 
-                  /// show current user answer if is available
-                  if (Get.find<MyAnsweredQuestionsController>().retrieveAnswer(
-                              widget._controller.rxIbQuestion.value.id) !=
-                          null &&
-                      widget._controller.showMyAnswer)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Row(
-                        children: [
-                          IbUserAvatar(
-                            avatarUrl: IbUtils.getCurrentIbUser()!.avatarUrl,
-                            radius: 8,
-                          ),
-                          Text(
-                              ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.rxIbQuestion.value.id)!.choiceId}')
-                        ],
-                      ),
-                    ),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              /// show current user answer if is available
+              if (Get.find<MyAnsweredQuestionsController>().retrieveAnswer(
+                          widget._controller.rxIbQuestion.value.id) !=
+                      null &&
+                  widget._controller.showMyAnswer)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Row(
                     children: [
-                      IbQuestionStatsBar(widget._controller),
-                      IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          widget._controller.rxIsExpanded.value =
-                              !widget._controller.rxIsExpanded.isTrue;
-                          _runExpandCheck();
-                        },
-                        icon: Obx(
-                          () => widget._controller.rxIsExpanded.isTrue
-                              ? const Icon(
-                                  Icons.expand_less_rounded,
-                                  color: IbColors.primaryColor,
-                                )
-                              : const Icon(
-                                  Icons.expand_more_outlined,
-                                  color: IbColors.primaryColor,
-                                ),
-                        ),
+                      IbUserAvatar(
+                        avatarUrl: IbUtils.getCurrentIbUser()!.avatarUrl,
+                        radius: 8,
                       ),
+                      Text(
+                          ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.rxIbQuestion.value.id)!.choiceId}')
                     ],
+                  ),
+                ),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IbQuestionStatsBar(widget._controller),
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      widget._controller.rxIsExpanded.value =
+                          !widget._controller.rxIsExpanded.isTrue;
+                      _runExpandCheck();
+                    },
+                    icon: Obx(
+                      () => widget._controller.rxIsExpanded.isTrue
+                          ? const Icon(
+                              Icons.expand_less_rounded,
+                              color: IbColors.primaryColor,
+                            )
+                          : const Icon(
+                              Icons.expand_more_outlined,
+                              color: IbColors.primaryColor,
+                            ),
+                    ),
                   ),
                 ],
               ),
-            )),
+            ],
+          ),
+        )),
       ),
     );
   }
 
   @override
-  // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 }
 
@@ -193,7 +183,14 @@ class PicItem extends StatelessWidget {
     }
     return GestureDetector(
       onTap: () {
-        // Todo
+        if (itemController.isSample) {
+          return;
+        }
+        if (itemController.selectedChoiceId.value == ibChoice.choiceId) {
+          itemController.selectedChoiceId.value = '';
+        } else {
+          itemController.selectedChoiceId.value = ibChoice.choiceId;
+        }
       },
       onDoubleTap: () {
         final Widget img = itemController.isLocalFile
@@ -203,7 +200,7 @@ class PicItem extends StatelessWidget {
             : CachedNetworkImage(imageUrl: ibChoice.url!);
 
         final Widget hero = Hero(
-          tag: ibChoice.choiceId,
+          tag: '${itemController.controllerId}${ibChoice.choiceId}',
           child: Center(
             child: SizedBox(
               width: double.infinity,
@@ -216,22 +213,69 @@ class PicItem extends StatelessWidget {
         /// show image preview
         IbUtils.showInteractiveViewer(hero, context);
       },
-      child: IbCard(
-        color: IbColors.lightBlue,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Hero(
-            tag: ibChoice.choiceId,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.file(
-                File(ibChoice.url!),
-                width: Get.width / 5,
-                height: Get.width / 5,
-              ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: AlignmentDirectional.center,
+        children: [
+          Obx(
+            () => Container(
+              width: IbConfig.kMcPicItemHeight,
+              height: IbConfig.kMcPicItemHeight,
+              decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(
+                      Radius.circular(IbConfig.kMcItemCornerRadius)),
+                  color:
+                      itemController.selectedChoiceId.value == ibChoice.choiceId
+                          ? IbColors.primaryColor
+                          : IbColors.lightBlue),
             ),
           ),
-        ),
+          if (!itemController.isSample && itemController.showResult.isTrue)
+            Positioned(
+                top: -24,
+                child: Chip(
+                  backgroundColor: IbUtils.handleIndicatorColor(0.2),
+                  padding: EdgeInsets.zero,
+                  label: Text('${ibChoice.count}',
+                      style: const TextStyle(
+                          fontSize: IbConfig.kDescriptionTextSize)),
+                )),
+          Hero(
+            tag: '${itemController.controllerId}${ibChoice.choiceId}',
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: itemController.isLocalFile
+                  ? Image.file(
+                      File(ibChoice.url!),
+                      height: IbConfig.kMcPicHeight,
+                      width: IbConfig.kMcPicHeight,
+                    )
+                  : CachedNetworkImage(
+                      imageUrl: ibChoice.url!,
+                      height: IbConfig.kMcPicHeight,
+                      width: IbConfig.kMcPicHeight,
+                    ),
+            ),
+          ),
+          Obx(() {
+            if (itemController.selectedChoiceId.value == ibChoice.choiceId) {
+              return const Positioned(
+                bottom: 2,
+                right: 2,
+                child: CircleAvatar(
+                  radius: 8,
+                  backgroundColor: IbColors.white,
+                  child: Icon(
+                    Icons.check_circle_rounded,
+                    color: IbColors.accentColor,
+                    size: 16,
+                  ),
+                ),
+              );
+            }
+            return const SizedBox();
+          })
+        ],
       ),
     );
   }

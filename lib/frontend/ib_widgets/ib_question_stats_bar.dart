@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 
 import '../ib_config.dart';
 
@@ -19,49 +20,27 @@ class IbQuestionStatsBar extends StatelessWidget {
         color: Colors.transparent,
         child: SingleChildScrollView(
           child: Obx(
-            () => Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                InkWell(
-                  onTap: _itemController.isSample ? null : () {},
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 8, top: 4, bottom: 4),
-                    child: Row(
-                      children: [
-                        FaIcon(
-                          Icons.poll_outlined,
-                          color: _itemController.ibAnswer != null
-                              ? IbColors.primaryColor
-                              : IbColors.lightGrey,
-                          size: 18,
-                        ),
-                        Text(
-                          _itemController.totalPolled.value.toString(),
-                          style: const TextStyle(
-                              fontSize: IbConfig.kDescriptionTextSize),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                if (_itemController.rxIbQuestion.value.isCommentEnabled)
+            () => AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
                   InkWell(
                     onTap: _itemController.isSample ? null : () {},
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                      padding:
+                          const EdgeInsets.only(right: 8, top: 4, bottom: 4),
                       child: Row(
                         children: [
-                          const FaIcon(
-                            FontAwesomeIcons.comment,
-                            color: IbColors.lightGrey,
-                            size: 16,
-                          ),
-                          const SizedBox(
-                            width: 3,
+                          FaIcon(
+                            Icons.poll_outlined,
+                            color: _itemController.ibAnswer != null
+                                ? IbColors.primaryColor
+                                : IbColors.lightGrey,
+                            size: 18,
                           ),
                           Text(
-                            _statsShortString(_itemController.comments.value),
+                            _itemController.totalPolled.value.toString(),
                             style: const TextStyle(
                                 fontSize: IbConfig.kDescriptionTextSize),
                           ),
@@ -69,61 +48,91 @@ class IbQuestionStatsBar extends StatelessWidget {
                       ),
                     ),
                   ),
-                InkWell(
-                  onTap: _itemController.isSample
-                      ? null
-                      : () {
-                          _itemController.updateLike();
-                        },
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: Row(
-                      children: [
-                        FaIcon(
-                          FontAwesomeIcons.thumbsUp,
-                          color: _itemController.liked.isTrue
-                              ? IbColors.accentColor
-                              : IbColors.lightGrey,
-                          size: 16,
+                  if (_itemController.rxIbQuestion.value.isCommentEnabled)
+                    InkWell(
+                      onTap: _itemController.isSample ? null : () {},
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        child: Row(
+                          children: [
+                            const FaIcon(
+                              FontAwesomeIcons.comment,
+                              color: IbColors.lightGrey,
+                              size: 16,
+                            ),
+                            const SizedBox(
+                              width: 3,
+                            ),
+                            Text(
+                              _statsShortString(_itemController.comments.value),
+                              style: const TextStyle(
+                                  fontSize: IbConfig.kDescriptionTextSize),
+                            ),
+                          ],
                         ),
-                        const SizedBox(
-                          width: 3,
-                        ),
-                        Text(
-                          _itemController.likes.value.toString(),
-                          style: const TextStyle(
-                              fontSize: IbConfig.kDescriptionTextSize),
-                        ),
-                      ],
+                      ),
+                    ),
+                  InkWell(
+                    onTap: _itemController.isSample
+                        ? null
+                        : () {
+                            _itemController.updateLike();
+                          },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      child: Row(
+                        children: [
+                          FaIcon(
+                            FontAwesomeIcons.thumbsUp,
+                            color: _itemController.liked.isTrue
+                                ? IbColors.accentColor
+                                : IbColors.lightGrey,
+                            size: 16,
+                          ),
+                          const SizedBox(
+                            width: 3,
+                          ),
+                          Text(
+                            _itemController.likes.value.toString(),
+                            style: const TextStyle(
+                                fontSize: IbConfig.kDescriptionTextSize),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                InkWell(
-                  onTap: _itemController.isSample ? null : () {},
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          FontAwesomeIcons.tag,
-                          size: 16,
-                          color: IbColors.lightGrey,
-                        ),
-                        const SizedBox(
-                          width: 3,
-                        ),
-                        Text(
-                          '${_itemController.totalTags.value}',
-                          style: const TextStyle(
-                              fontSize: IbConfig.kDescriptionTextSize),
-                        ),
-                      ],
+                  InkWell(
+                    onTap: _itemController.isSample
+                        ? null
+                        : () {
+                            showTagBtmSheet();
+                          },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            FontAwesomeIcons.tag,
+                            size: 16,
+                            color: IbColors.lightGrey,
+                          ),
+                          const SizedBox(
+                            width: 3,
+                          ),
+                          Text(
+                            '${_itemController.totalTags.value}',
+                            style: const TextStyle(
+                                fontSize: IbConfig.kDescriptionTextSize),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -152,5 +161,26 @@ class IbQuestionStatsBar extends StatelessWidget {
     }
 
     return '10B+';
+  }
+
+  void showTagBtmSheet() {
+    final Widget widget = IbCard(
+        child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: _itemController.ibTags
+            .map((e) => Chip(
+                  label: Text(e.text),
+                ))
+            .toList(),
+      ),
+    ));
+
+    Get.bottomSheet(SizedBox(
+      height: 333,
+      child: widget,
+    ));
   }
 }

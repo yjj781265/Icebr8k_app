@@ -9,7 +9,11 @@ class IbTag {
   int? questionCount;
   String creatorId;
 
-  IbTag({required this.text, required this.id, required this.creatorId});
+  IbTag(
+      {required this.text,
+      required this.id,
+      required this.creatorId,
+      this.questionCount});
 
   factory IbTag.fromJson(Map<String, dynamic> json) => _$IbTagFromJson(json);
 

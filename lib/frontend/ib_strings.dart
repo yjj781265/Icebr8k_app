@@ -83,6 +83,8 @@ class IbStrings extends Translations {
               'You need at least 2 choices for a multiple choice question',
           'mc_pic_question_not_valid':
               'All choices need to both have a image and a text',
+          'pic_question_not_valid': 'All choices need to have a image',
+          'pic_question_not_valid_min': 'Need at least 2 picture choices',
           'description_option': 'Description(optional)',
           'create_question': 'Create a @type question',
           'mc': 'Multiple Choice',

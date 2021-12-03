@@ -300,7 +300,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
               child: Container(
                 padding: const EdgeInsets.all(8),
                 width: Get.width * 0.95,
-                height: 40,
+                height: IbConfig.kMcTxtItemHeight,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   color: Theme.of(context).primaryColor,
@@ -343,7 +343,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                         margin: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 4),
                         padding: const EdgeInsets.all(8),
-                        height: 46,
+                        height: IbConfig.kMcTxtItemHeight,
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             color: Theme.of(context).primaryColor),
@@ -375,11 +375,9 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     return AnimatedSize(
         duration: const Duration(milliseconds: 300),
         child: Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
-          alignment: WrapAlignment.center,
           children: [
             Obx(() {
-              if (_controller.picList.length < 9) {
+              if (_controller.picList.length < 8) {
                 return GestureDetector(
                   onTap: () {
                     showMediaBottomSheet(context, null, _controller.picList);
@@ -427,8 +425,6 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                             onDoubleTap: () {
                               final Widget img = Image.file(
                                 File(e.url!),
-                                width: IbConfig.kMcItemHeight,
-                                height: IbConfig.kMcItemHeight,
                               );
                               final Widget hero = Hero(
                                 tag: e.url!,
@@ -506,7 +502,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
               child: Container(
                 padding: const EdgeInsets.all(8),
                 width: Get.width * 0.95,
-                height: 72,
+                height: IbConfig.kMcPicItemHeight,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   color: Theme.of(context).primaryColor,
@@ -524,8 +520,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                           borderRadius: BorderRadius.circular(8),
                           color: IbColors.lightGrey,
                         ),
-                        width: 56,
-                        height: 56,
+                        width: IbConfig.kMcPicHeight,
+                        height: IbConfig.kMcPicHeight,
                         child: const Icon(Icons.add),
                       ),
                     ),
@@ -545,108 +541,104 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
           const SizedBox(
             height: 8,
           ),
-          Obx(() => ReorderableListView(
+          Obx(() => ReorderableColumn(
+                ignorePrimaryScrollController: true,
                 onReorder: (oldIndex, newIndex) {
                   print('$oldIndex to $newIndex');
                   _controller.swapIndex(oldIndex, newIndex);
                 },
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                primary: false,
-                children: [
-                  for (final item in _controller.picChoiceList)
-                    GestureDetector(
-                      key: UniqueKey(),
-                      onTap: () {
-                        _showEditTextFiledBtmSheet(item);
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        padding: const EdgeInsets.all(8),
-                        height: 72,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: Theme.of(context).primaryColor),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            if (item.url != null && item.url!.isNotEmpty)
-                              GestureDetector(
-                                onDoubleTap: () {
-                                  final Widget img = Image.file(
-                                    File(item.url!),
-                                    width: IbConfig.kMcItemHeight,
-                                    height: IbConfig.kMcItemHeight,
-                                  );
-                                  final Widget hero = Hero(
-                                    tag: item.url!,
-                                    child: Center(
-                                      child: SizedBox(
-                                        width: double.infinity,
-                                        height: double.infinity,
-                                        child: img,
+                children: _controller.picChoiceList
+                    .map((item) => GestureDetector(
+                          key: UniqueKey(),
+                          onTap: () {
+                            _showEditTextFiledBtmSheet(item);
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.all(8),
+                            height: IbConfig.kMcPicItemHeight,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Theme.of(context).primaryColor),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                if (item.url != null && item.url!.isNotEmpty)
+                                  GestureDetector(
+                                    onDoubleTap: () {
+                                      final Widget img = Image.file(
+                                        File(item.url!),
+                                      );
+                                      final Widget hero = Hero(
+                                        tag: item.url!,
+                                        child: Center(
+                                          child: SizedBox(
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                            child: img,
+                                          ),
+                                        ),
+                                      );
+
+                                      /// show image preview
+                                      IbUtils.showInteractiveViewer(
+                                          hero, context);
+                                    },
+                                    onTap: () {
+                                      showMediaBottomSheet(context, item,
+                                          _controller.picChoiceList);
+                                    },
+                                    child: Hero(
+                                      tag: item.url!,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.file(
+                                          File(item.url!),
+                                          height: IbConfig.kMcPicHeight,
+                                          width: IbConfig.kMcPicHeight,
+                                        ),
                                       ),
                                     ),
-                                  );
-
-                                  /// show image preview
-                                  IbUtils.showInteractiveViewer(hero, context);
-                                },
-                                onTap: () {
-                                  showMediaBottomSheet(
-                                      context, item, _controller.picChoiceList);
-                                },
-                                child: Hero(
-                                  tag: item.url!,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Image.file(
-                                      File(item.url!),
-                                      width: 56,
-                                      height: 56,
+                                  )
+                                else
+                                  GestureDetector(
+                                    onTap: () {
+                                      showMediaBottomSheet(context, item,
+                                          _controller.picChoiceList);
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        color: IbColors.lightGrey,
+                                      ),
+                                      width: IbConfig.kMcPicHeight,
+                                      height: IbConfig.kMcPicHeight,
+                                      child: const Icon(Icons.add),
                                     ),
                                   ),
-                                ),
-                              )
-                            else
-                              GestureDetector(
-                                onTap: () {
-                                  showMediaBottomSheet(
-                                      context, item, _controller.picChoiceList);
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    color: IbColors.lightGrey,
+                                if (item.content != null &&
+                                    item.content!.isNotEmpty)
+                                  Text(item.content!)
+                                else
+                                  const Text(
+                                    'Add text here',
+                                    style: TextStyle(color: IbColors.lightGrey),
                                   ),
-                                  width: 56,
-                                  height: 56,
-                                  child: const Icon(Icons.add),
-                                ),
-                              ),
-                            if (item.content != null &&
-                                item.content!.isNotEmpty)
-                              Text(item.content!)
-                            else
-                              const Text(
-                                'Add text here',
-                                style: TextStyle(color: IbColors.lightGrey),
-                              ),
-                            IconButton(
-                                padding: EdgeInsets.zero,
-                                onPressed: () {
-                                  _controller.picChoiceList.remove(item);
-                                },
-                                icon: const Icon(
-                                  Icons.remove,
-                                  color: IbColors.errorRed,
-                                ))
-                          ],
-                        ),
-                      ),
-                    )
-                ],
+                                IconButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () {
+                                      _controller.picChoiceList.remove(item);
+                                    },
+                                    icon: const Icon(
+                                      Icons.remove,
+                                      color: IbColors.errorRed,
+                                    ))
+                              ],
+                            ),
+                          ),
+                        ))
+                    .toList(),
               ))
         ],
       ),
@@ -813,6 +805,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
   }
 
   void _showTagsBottomSheet() {
+    IbUtils.hideKeyboard();
     final Widget tagsBtmSheet = IbCard(
         child: Obx(
       () => Column(
@@ -1027,6 +1020,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
 
 void showMediaBottomSheet(
     BuildContext context, IbChoice? ibChoice, RxList<IbChoice> list) {
+  IbUtils.hideKeyboard();
   final Widget options = ListView(
     shrinkWrap: true,
     children: [

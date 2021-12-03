@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/backend/models/ib_tag.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
+import 'package:icebr8k/backend/services/ib_storage_service.dart';
+import 'package:icebr8k/backend/services/ib_tag_db_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -14,6 +17,7 @@ class IbQuestionItemController extends GetxController {
   final showResult = false.obs;
   final isAnswering = false.obs;
   final isCalculating = false.obs;
+  final controllerId = IbUtils.getUniqueId();
 
   /// this flag is for sc question only
   final isLoading = false.obs;
@@ -46,6 +50,7 @@ class IbQuestionItemController extends GetxController {
   final totalTags = 0.obs;
   final selectedChoiceId = ''.obs;
   final resultMap = <String, double>{}.obs;
+  final List<IbTag> ibTags = [];
 
   IbQuestionItemController(
       {required this.rxIbQuestion,
@@ -70,6 +75,8 @@ class IbQuestionItemController extends GetxController {
               rxIbQuestion.value.askedTimeInMs));
       avatarUrl.value = ibUser!.avatarUrl;
     }
+
+    await generateIbTags();
 
     calculateResult(rxIbQuestion.value);
 
@@ -116,6 +123,15 @@ class IbQuestionItemController extends GetxController {
     await determineUserAnswer();
     isCalculating.value = false;
     isAnswering.value = false;*/
+  }
+
+  Future<void> generateIbTags() async {
+    for (String id in rxIbQuestion.value.tagIds) {
+      final IbTag? tag = await IbTagDbService().retrieveIbTag(id);
+      if (tag != null) {
+        ibTags.add(tag);
+      }
+    }
   }
 
   Future<void> determineUserAnswer() async {
@@ -172,6 +188,36 @@ class IbQuestionItemController extends GetxController {
 
   Future<void> onSubmit() async {
     isAnswering.value = true;
+    if (isLocalFile &&
+        rxIbQuestion.value.choices.isNotEmpty &&
+        (rxIbQuestion.value.questionType == IbQuestion.kPic ||
+            rxIbQuestion.value.questionType == IbQuestion.kMultipleChoicePic)) {
+      for (final ibChoice in rxIbQuestion.value.choices) {
+        if (ibChoice.url != null && ibChoice.url!.isNotEmpty) {
+          final String? url =
+              await IbStorageService().uploadAndRetrieveImgUrl(ibChoice.url!);
+          if (url != null) {
+            ibChoice.url = url;
+          } else {
+            IbUtils.showSimpleSnackBar(
+                msg:
+                    'Failed to upload images, ensure you have internet connection',
+                backgroundColor: IbColors.errorRed);
+          }
+        } else {
+          continue;
+        }
+      }
+    }
+
+    if (rxIbQuestion.value.tagIds.isNotEmpty) {
+      for (int i = 0; i < rxIbQuestion.value.tagIds.length; i++) {
+        final String id = await IbTagDbService()
+            .uploadTagAndReturnId(rxIbQuestion.value.tagIds[i]);
+        rxIbQuestion.value.tagIds[i] = id;
+      }
+    }
+
     await IbQuestionDbService().uploadQuestion(rxIbQuestion.value);
     isAnswering.value = false;
     Navigator.of(Get.context!).popUntil((route) => route.isFirst);

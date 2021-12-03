@@ -359,10 +359,39 @@ class IbUtils {
     return '${diff.inDays} days left';
   }
 
+  static Color handleIndicatorColor(double percentageInDecimal) {
+    if (percentageInDecimal > 0 && percentageInDecimal <= 0.2) {
+      return const Color(0xFFFF0000);
+    }
+
+    if (percentageInDecimal > 0.2 && percentageInDecimal <= 0.4) {
+      return const Color(0xFFFF6600);
+    }
+
+    if (percentageInDecimal > 0.4 && percentageInDecimal <= 0.6) {
+      return const Color(0xFFFFB700);
+    }
+
+    if (percentageInDecimal > 0.6 && percentageInDecimal <= 0.7) {
+      return const Color(0xFFB1E423);
+    }
+
+    if (percentageInDecimal >= 0.7 && percentageInDecimal <= 0.9) {
+      return const Color(0xFF23E480);
+    }
+
+    if (percentageInDecimal > 0.9 && percentageInDecimal <= 1.0) {
+      return IbColors.accentColor;
+    }
+    return IbColors.errorRed;
+  }
+
   static void showInteractiveViewer(Widget widget, BuildContext context) {
     /// show image preview
     Navigator.of(context).push(PageRouteBuilder(
         opaque: false,
+        transitionDuration:
+            const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
         barrierColor: Colors.black.withOpacity(0.8),
         barrierDismissible: true,
         pageBuilder: (BuildContext context, _, __) => Stack(

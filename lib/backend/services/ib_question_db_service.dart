@@ -340,32 +340,4 @@ class IbQuestionDbService {
         .doc(uid)
         .delete();
   }
-
-  /* /// CAUTION!! for test purpose only, remove this in production
-  Future<void> populateStatMap() async {
-    print('populateStatMap');
-    final snapshot = await _collectionRef.get();
-    for (final doc in snapshot.docs) {
-      final IbQuestion question = IbQuestion.fromJson(doc.data());
-      if (question.questionType == IbQuestion.kScale) {
-        for (int i = 1; i < 6; i++) {
-          final int pollSize = await IbQuestionDbService()
-              .querySpecificAnswerPollSize(
-                  questionId: question.id, answer: i.toString());
-          await _collectionRef.doc(question.id).set({
-            'statMap': {i.toString(): pollSize}
-          }, SetOptions(merge: true));
-        }
-      } else {
-        for (final choice in question.choices) {
-          final int pollSize = await IbQuestionDbService()
-              .querySpecificAnswerPollSize(
-                  questionId: question.id, answer: choice);
-          await _collectionRef.doc(question.id).set({
-            'statMap': {choice: pollSize}
-          }, SetOptions(merge: true));
-        }
-      }
-    }
-  }*/
 }

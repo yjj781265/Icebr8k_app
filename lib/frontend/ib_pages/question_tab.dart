@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/frontend/ib_pages/ib_pic_question_card.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
@@ -82,7 +83,17 @@ class QuestionTab extends StatelessWidget {
           if (_ibQuestion.questionType == IbQuestion.kScale) {
             return IbScQuestionCard(Get.put(
                 IbQuestionItemController(
-                    rxIsExpanded: false.obs,
+                    rxIsExpanded: true.obs,
+                    rxIbQuestion: _ibQuestion.obs,
+                    disableAvatarOnTouch:
+                        IbUtils.getCurrentUid()! == _ibQuestion.creatorId),
+                tag: _ibQuestion.id));
+          }
+
+          if (_ibQuestion.questionType == IbQuestion.kPic) {
+            return IbPicQuestionCard(Get.put(
+                IbQuestionItemController(
+                    rxIsExpanded: true.obs,
                     rxIbQuestion: _ibQuestion.obs,
                     disableAvatarOnTouch:
                         IbUtils.getCurrentUid()! == _ibQuestion.creatorId),
@@ -91,7 +102,7 @@ class QuestionTab extends StatelessWidget {
 
           return IbMcQuestionCard(Get.put(
               IbQuestionItemController(
-                rxIsExpanded: false.obs,
+                rxIsExpanded: true.obs,
                 disableAvatarOnTouch:
                     IbUtils.getCurrentUid()! == _ibQuestion.creatorId,
                 rxIbQuestion: _ibQuestion.obs,

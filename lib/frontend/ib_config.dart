@@ -28,7 +28,9 @@ class IbConfig {
   static const double kInitChatMessagesLoadSize = 16;
   static const double kChatMessagesTextSize = 18;
   static const int kImageQuality = 70;
-  static const double kMcItemHeight = 56;
+  static const double kMcTxtItemHeight = 48;
+  static const double kMcPicItemHeight = 88;
+  static const double kMcPicHeight = 72;
   static const double kMcItemCornerRadius = 8;
   static const String kVersion = '0.1.1${DbConfig.dbSuffix}';
 

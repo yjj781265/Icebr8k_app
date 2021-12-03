@@ -201,10 +201,10 @@ class IbQuestionMcItem extends StatelessWidget {
             return;
           }
 
-          if (_controller.selectedChoiceId.value == choice.content) {
+          if (_controller.selectedChoiceId.value == choice.choiceId) {
             _controller.selectedChoiceId.value = '';
           } else {
-            _controller.selectedChoiceId.value = choice.content.toString();
+            _controller.selectedChoiceId.value = choice.choiceId;
           }
         },
         child: Padding(
@@ -213,15 +213,21 @@ class IbQuestionMcItem extends StatelessWidget {
             alignment: Alignment.centerLeft,
             children: [
               Container(
-                width: Get.width * 0.9,
-                height: IbConfig.kMcItemHeight,
+                width: Get.width * 0.95,
+                height: _controller.rxIbQuestion.value.questionType ==
+                        IbQuestion.kMultipleChoice
+                    ? IbConfig.kMcTxtItemHeight
+                    : IbConfig.kMcPicItemHeight,
                 decoration: BoxDecoration(
                     color: IbColors.lightBlue,
                     borderRadius:
                         BorderRadius.circular(IbConfig.kMcItemCornerRadius)),
               ),
               AnimatedContainer(
-                height: IbConfig.kMcItemHeight,
+                height: _controller.rxIbQuestion.value.questionType ==
+                        IbQuestion.kMultipleChoice
+                    ? IbConfig.kMcTxtItemHeight
+                    : IbConfig.kMcPicItemHeight,
                 decoration: BoxDecoration(
                     color: _determineColor(
                         result: _controller.resultMap[choice.content] ?? 0,
@@ -241,7 +247,10 @@ class IbQuestionMcItem extends StatelessWidget {
               ),
               SizedBox(
                 width: Get.width * 0.9,
-                height: IbConfig.kMcItemHeight,
+                height: _controller.rxIbQuestion.value.questionType ==
+                        IbQuestion.kMultipleChoice
+                    ? IbConfig.kMcTxtItemHeight
+                    : IbConfig.kMcPicItemHeight,
                 child: Row(
                   children: [
                     if (choice.url != null && choice.url!.isNotEmpty)
@@ -252,17 +261,14 @@ class IbQuestionMcItem extends StatelessWidget {
                             final Widget img = _controller.isLocalFile
                                 ? Image.file(
                                     File(choice.url!),
-                                    width: IbConfig.kMcItemHeight,
-                                    height: IbConfig.kMcItemHeight,
                                   )
                                 : CachedNetworkImage(
-                                    width: IbConfig.kMcItemHeight,
-                                    height: IbConfig.kMcItemHeight,
                                     imageUrl: choice.url!,
                                   );
 
                             final Widget hero = Hero(
-                              tag: choice.choiceId,
+                              tag:
+                                  '${_controller.controllerId}${choice.choiceId}',
                               child: Center(
                                 child: SizedBox(
                                   width: double.infinity,
@@ -276,19 +282,20 @@ class IbQuestionMcItem extends StatelessWidget {
                             IbUtils.showInteractiveViewer(hero, context);
                           },
                           child: Hero(
-                            tag: choice.choiceId,
+                            tag:
+                                '${_controller.controllerId}${choice.choiceId}',
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(
                                   IbConfig.kMcItemCornerRadius),
                               child: _controller.isLocalFile
                                   ? Image.file(
                                       File(choice.url!),
-                                      width: IbConfig.kMcItemHeight,
-                                      height: IbConfig.kMcItemHeight,
+                                      width: IbConfig.kMcPicItemHeight,
+                                      height: IbConfig.kMcPicItemHeight,
                                     )
                                   : CachedNetworkImage(
-                                      width: IbConfig.kMcItemHeight,
-                                      height: IbConfig.kMcItemHeight,
+                                      width: IbConfig.kMcPicItemHeight,
+                                      height: IbConfig.kMcPicItemHeight,
                                       imageUrl: choice.url!,
                                     ),
                             ),
@@ -313,10 +320,14 @@ class IbQuestionMcItem extends StatelessWidget {
                 const Positioned(
                   bottom: 2,
                   right: 2,
-                  child: Icon(
-                    Icons.check_circle_rounded,
-                    color: IbColors.accentColor,
-                    size: 16,
+                  child: CircleAvatar(
+                    radius: 8,
+                    backgroundColor: IbColors.white,
+                    child: Icon(
+                      Icons.check_circle_rounded,
+                      color: IbColors.accentColor,
+                      size: 16,
+                    ),
                   ),
                 ),
               if (_controller.showResult.value)

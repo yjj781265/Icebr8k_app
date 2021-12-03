@@ -24,6 +24,18 @@ class ReviewQuestionPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Review your question'),
+        actions: [
+          Obx(() => TextButton(
+                onPressed: () async {
+                  await itemController.onSubmit();
+                },
+                child: Text(
+                    itemController.isAnswering.isTrue
+                        ? 'submitting'.tr
+                        : 'submit'.tr,
+                    style: const TextStyle(fontSize: IbConfig.kNormalTextSize)),
+              )),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
