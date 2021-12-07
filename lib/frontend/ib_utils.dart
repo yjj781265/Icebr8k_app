@@ -30,6 +30,8 @@ class IbUtils {
       {CropStyle cropStyle = CropStyle.circle,
       List<CropAspectRatioPreset> ratios = const [],
       bool resetAspectRatioEnabled = true,
+      double? width,
+      double? height,
       CropAspectRatioPreset initAspectRatio = CropAspectRatioPreset.original,
       bool lockAspectRatio = false,
       double? minimumAspectRatio}) async {
@@ -43,10 +45,10 @@ class IbUtils {
             initAspectRatio: initAspectRatio,
             lockAspectRatio: lockAspectRatio),
         iosUiSettings: IOSUiSettings(
-          rectHeight: cropStyle == CropStyle.circle ? null : 900,
-          rectWidth: cropStyle == CropStyle.circle ? null : 1600,
-          rectX: cropStyle == CropStyle.circle ? null : 1600,
-          rectY: cropStyle == CropStyle.circle ? null : 900,
+          rectHeight: height ?? 900,
+          rectWidth: width ?? 1600,
+          rectX: width ?? 1600,
+          rectY: height ?? 900,
           aspectRatioLockEnabled: true,
           aspectRatioLockDimensionSwapEnabled: true,
           resetAspectRatioEnabled: resetAspectRatioEnabled,

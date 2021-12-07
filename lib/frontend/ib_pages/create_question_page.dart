@@ -1036,6 +1036,8 @@ void showMediaBottomSheet(
           if (pickedFile != null) {
             final File? croppedFile = await IbUtils.showImageCropper(
                 pickedFile.path,
+                width: 900,
+                height: 900,
                 cropStyle: CropStyle.rectangle,
                 initAspectRatio: CropAspectRatioPreset.square,
                 lockAspectRatio: true,
@@ -1091,6 +1093,8 @@ void showMediaBottomSheet(
           if (pickedFile != null) {
             final File? croppedFile = await IbUtils.showImageCropper(
               pickedFile.path,
+              width: 900,
+              height: 900,
               cropStyle: CropStyle.rectangle,
               ratios: [CropAspectRatioPreset.square],
               initAspectRatio: CropAspectRatioPreset.square,

@@ -186,7 +186,7 @@ class ReviewQuestionPage extends StatelessWidget {
               maximumDate: DateTime.now().add(const Duration(days: 365)),
               maximumYear: 1,
               onDateTimeChanged: (value) async {
-                await HapticFeedback.vibrate();
+                await HapticFeedback.selectionClick();
                 itemController.rxIbQuestion.value.endTimeInMs =
                     value.millisecondsSinceEpoch;
                 itemController.rxIbQuestion.refresh();
