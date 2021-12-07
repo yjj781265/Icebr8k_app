@@ -232,11 +232,13 @@ class PicItem extends StatelessWidget {
               ),
               if (!itemController.isSample && itemController.showResult.isTrue)
                 Positioned(
-                    top: -24,
+                    top: -22,
                     child: Chip(
-                      backgroundColor: IbUtils.handleIndicatorColor(0.2),
+                      backgroundColor: IbUtils.handleIndicatorColor(
+                          itemController.resultMap[ibChoice.choiceId] ?? 0),
                       padding: EdgeInsets.zero,
-                      label: Text('100%',
+                      label: Text(
+                          '${((itemController.resultMap[ibChoice.choiceId] ?? 0) * 100).toStringAsFixed(1)}%',
                           style: const TextStyle(
                               fontSize: IbConfig.kDescriptionTextSize)),
                     )),
@@ -258,18 +260,19 @@ class PicItem extends StatelessWidget {
                 ),
               ),
               Obx(() {
-                if (itemController.selectedChoiceId.value ==
-                    ibChoice.choiceId) {
+                if (itemController.showResult.value &&
+                    itemController.rxIbAnswer!.value.choiceId ==
+                        ibChoice.choiceId) {
                   return const Positioned(
                     bottom: 2,
                     right: 2,
                     child: CircleAvatar(
-                      radius: 8,
+                      radius: 6,
                       backgroundColor: IbColors.white,
                       child: Icon(
                         Icons.check_circle_rounded,
                         color: IbColors.accentColor,
-                        size: 16,
+                        size: 12,
                       ),
                     ),
                   );

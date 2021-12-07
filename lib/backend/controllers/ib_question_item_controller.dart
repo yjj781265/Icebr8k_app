@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
+import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -35,7 +36,7 @@ class IbQuestionItemController extends GetxController {
   final RxBool rxIsExpanded;
 
   /// if user already answered, pass the answer here
-  Rx<IbAnswer>? myRxIbAnswer;
+  Rx<IbAnswer>? rxIbAnswer;
   final answeredUsername = ''.obs;
   final totalPolled = 0.obs;
   final likes = 0.obs;
@@ -46,7 +47,7 @@ class IbQuestionItemController extends GetxController {
   final commented = false.obs;
   final totalTags = 0.obs;
   final selectedChoiceId = ''.obs;
-  final resultMap = <String, int>{}.obs;
+  final resultMap = <String, double>{}.obs;
   final List<IbTag> ibTags = [];
 
   IbQuestionItemController(
@@ -56,7 +57,7 @@ class IbQuestionItemController extends GetxController {
       this.disableChoiceOnTouch = false,
       this.disableAvatarOnTouch = false,
       this.isLocalFile = false,
-      this.myRxIbAnswer,
+      this.rxIbAnswer,
       this.showMyAnswer = false});
 
   @override
@@ -64,19 +65,21 @@ class IbQuestionItemController extends GetxController {
     /// query question author user info
     ibUser = await IbUserDbService().queryIbUser(rxIbQuestion.value.creatorId);
 
-    if (myRxIbAnswer == null) {
+    if (rxIbAnswer == null) {
       /// query my answer to this question
       final myAnswer = await IbQuestionDbService()
           .queryIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id);
 
       if (myAnswer != null) {
-        myRxIbAnswer = myAnswer.obs;
-        selectedChoiceId.value = myRxIbAnswer!.value.choiceId;
-        myRxIbAnswer!.refresh();
+        rxIbAnswer = myAnswer.obs;
+        selectedChoiceId.value = rxIbAnswer!.value.choiceId;
+        rxIbAnswer!.refresh();
       }
+    } else {
+      selectedChoiceId.value = rxIbAnswer!.value.choiceId;
     }
 
-    showResult.value = myRxIbAnswer != null;
+    showResult.value = rxIbAnswer != null;
 
     if (ibUser != null) {
       /// populate title ..etc
@@ -105,10 +108,18 @@ class IbQuestionItemController extends GetxController {
 
   Future<void> generatePollStats() async {
     int counter = 0;
-    resultMap.value = await IbUtils.getChoiceCountMap(rxIbQuestion.value.id);
-    for (final int i in resultMap.values) {
-      counter = counter + i;
+    final countMap = await IbUtils.getChoiceCountMap(rxIbQuestion.value.id);
+
+    for (final key in countMap.keys) {
+      counter = counter + countMap[key]!;
     }
+
+    for (final IbChoice ibChoice in rxIbQuestion.value.choices) {
+      resultMap[ibChoice.choiceId] =
+          (countMap[ibChoice.choiceId] ?? 0).toDouble() / counter.toDouble();
+      print(resultMap[ibChoice.choiceId]);
+    }
+
     totalPolled.value = counter;
   }
 
@@ -116,8 +127,8 @@ class IbQuestionItemController extends GetxController {
     if (selectedChoiceId.value.isEmpty) {
       return;
     }
-    if (myRxIbAnswer != null &&
-        selectedChoiceId.value == myRxIbAnswer!.value.choiceId) {
+    if (rxIbAnswer != null &&
+        selectedChoiceId.value == rxIbAnswer!.value.choiceId) {
       return;
     }
 
@@ -132,23 +143,23 @@ class IbQuestionItemController extends GetxController {
 
     await IbQuestionDbService().answerQuestion(tempAnswer);
 
-    if (myRxIbAnswer != null) {
+    if (rxIbAnswer != null) {
       await IbQuestionDbService().updatePollSize(
           questionId: rxIbQuestion.value.id,
-          oldChoiceId: myRxIbAnswer!.value.choiceId,
+          oldChoiceId: rxIbAnswer!.value.choiceId,
           newChoiceId: selectedChoiceId.value);
     } else {
       await IbQuestionDbService().increasePollSize(
           questionId: rxIbQuestion.value.id, choiceId: selectedChoiceId.value);
     }
 
-    myRxIbAnswer = (await IbQuestionDbService()
+    rxIbAnswer = (await IbQuestionDbService()
             .queryIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id))!
         .obs;
-    myRxIbAnswer!.refresh();
+    rxIbAnswer!.refresh();
 
     IbLocalStorageService().removeUnAnsweredIbQid(rxIbQuestion.value.id);
-    generatePollStats();
+    await generatePollStats();
     showResult.value = true;
     isAnswering.value = false;
   }

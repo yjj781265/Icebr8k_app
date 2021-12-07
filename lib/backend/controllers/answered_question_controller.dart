@@ -38,16 +38,10 @@ class AnsweredQuestionController extends GetxController {
         if (docChange.type == DocumentChangeType.added) {
           myAnsweredQuestions.addIf(!myAnsweredQuestions.contains(item), item);
           print('added new answered question');
-        }
-
-        if (docChange.type == DocumentChangeType.modified) {
-          if (myAnsweredQuestions.contains(item)) {
-            myAnsweredQuestions[myAnsweredQuestions.indexOf(item)] = item;
-            print('modified answered question');
-            Get.find<IbQuestionItemController>(tag: 'answered_${ibQuestion.id}')
-                .selectedChoiceId
-                .value = ibAnswer.choiceId;
-          }
+          myAnsweredQuestions.sort(
+            (a, b) => b.ibAnswer.answeredTimeInMs
+                .compareTo(a.ibAnswer.answeredTimeInMs),
+          );
         }
 
         if (docChange.type == DocumentChangeType.removed) {
@@ -62,10 +56,6 @@ class AnsweredQuestionController extends GetxController {
       }
 
       isLoading.value = false;
-      myAnsweredQuestions.sort(
-        (a, b) =>
-            b.ibAnswer.answeredTimeInMs.compareTo(a.ibAnswer.answeredTimeInMs),
-      );
     });
     super.onInit();
   }

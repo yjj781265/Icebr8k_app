@@ -195,9 +195,7 @@ class IbQuestionMcItem extends StatelessWidget {
       return IbColors.primaryColor;
     }
     if (_controller.totalPolled.value > 0 &&
-        (_controller.resultMap[choice.choiceId] ?? 0).toDouble() /
-                (_controller.totalPolled.toDouble()) ==
-            0 &&
+        (_controller.resultMap[choice.choiceId] ?? 0) == 0 &&
         _controller.showResult.isTrue) {
       return IbColors.lightBlue;
     }
@@ -214,16 +212,12 @@ class IbQuestionMcItem extends StatelessWidget {
       return Get.width * 0.95;
     }
 
-    if ((_controller.resultMap[choice.choiceId] ?? 0).toDouble() /
-            (_controller.totalPolled.toDouble()) ==
-        0) {
+    if ((_controller.resultMap[choice.choiceId] ?? 0) == 0) {
       return Get.width * 0.95;
     }
 
     if (_controller.showResult.isTrue) {
-      return (Get.width * 0.95) *
-          ((_controller.resultMap[choice.choiceId] ?? 0).toDouble() /
-              (_controller.totalPolled.toDouble()));
+      return (_controller.resultMap[choice.choiceId] ?? 0) * (Get.width * 0.95);
     }
 
     return 0;
@@ -238,7 +232,11 @@ class IbQuestionMcItem extends StatelessWidget {
           radius: IbConfig.kMcItemCornerRadius,
           borderRadius: BorderRadius.circular(IbConfig.kMcItemCornerRadius),
           onTap: () {
-            if (_controller.isSample || _controller.disableChoiceOnTouch) {
+            if (_controller.isSample ||
+                _controller.disableChoiceOnTouch ||
+                (_controller.rxIbAnswer != null &&
+                    _controller.rxIbAnswer!.value.uid !=
+                        IbUtils.getCurrentUid())) {
               return;
             }
 
@@ -349,7 +347,7 @@ class IbQuestionMcItem extends StatelessWidget {
               ),
               //Todo show 3 users who voted this question in stack
               if (_controller.showResult.value &&
-                  _controller.myRxIbAnswer!.value.choiceId == choice.choiceId)
+                  _controller.rxIbAnswer!.value.choiceId == choice.choiceId)
                 const Positioned(
                   bottom: 2,
                   right: 2,

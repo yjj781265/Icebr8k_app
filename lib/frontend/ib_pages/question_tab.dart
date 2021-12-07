@@ -87,7 +87,7 @@ class QuestionTab extends StatelessWidget {
                     rxIbQuestion: _ibQuestion.obs,
                     disableAvatarOnTouch:
                         IbUtils.getCurrentUid()! == _ibQuestion.creatorId),
-                tag: _ibQuestion.id));
+                tag: "${_ibQuestion.id}${IbUtils.getCurrentUid()}"));
           }
 
           if (_ibQuestion.questionType == IbQuestion.kPic) {
@@ -97,7 +97,7 @@ class QuestionTab extends StatelessWidget {
                     rxIbQuestion: _ibQuestion.obs,
                     disableAvatarOnTouch:
                         IbUtils.getCurrentUid()! == _ibQuestion.creatorId),
-                tag: _ibQuestion.id));
+                tag: "${_ibQuestion.id}${IbUtils.getCurrentUid()}"));
           }
 
           return IbMcQuestionCard(Get.put(
@@ -107,7 +107,7 @@ class QuestionTab extends StatelessWidget {
                     IbUtils.getCurrentUid()! == _ibQuestion.creatorId,
                 rxIbQuestion: _ibQuestion.obs,
               ),
-              tag: _ibQuestion.id));
+              tag: "${_ibQuestion.id}${IbUtils.getCurrentUid()}"));
         });
   }
 }

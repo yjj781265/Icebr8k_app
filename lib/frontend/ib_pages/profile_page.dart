@@ -698,7 +698,7 @@ class _CommonAnswersTabState extends State<CommonAnswersTab>
                 _controller = Get.put(
                     IbQuestionItemController(
                         rxIsExpanded: false.obs,
-                        myRxIbAnswer: widget._commonAnswersController
+                        rxIbAnswer: widget._commonAnswersController
                             .retrieveAnswer(item.id)!
                             .obs,
                         rxIbQuestion: item.obs,
@@ -796,7 +796,7 @@ class _DifferentAnswersTabState extends State<DifferentAnswersTab>
                 _controller = Get.put(
                     IbQuestionItemController(
                         rxIsExpanded: false.obs,
-                        myRxIbAnswer: widget._uncommonAnswersController
+                        rxIbAnswer: widget._uncommonAnswersController
                             .retrieveAnswer(item.id)!
                             .obs,
                         showMyAnswer: true,
@@ -877,7 +877,7 @@ class _AskedQTabState extends State<AskedQTab>
             itemBuilder: (context, index) {
               final IbQuestion item =
                   widget._createdQuestionController.createdQuestions[index];
-              final tag = 'asked_${item.id}';
+              final tag = "${item.id}${widget.widget.uid}";
               late IbQuestionItemController _controller;
               if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
                 _controller = Get.find(tag: tag);
@@ -966,14 +966,14 @@ class _AnsweredQTabState extends State<AnsweredQTab>
               final AnsweredQuestionItem item =
                   widget._answeredQuestionController.myAnsweredQuestions[index];
 
-              final tag = 'answered_${item.ibQuestion.id}';
+              final tag = "${item.ibQuestion.id}${IbUtils.getCurrentUid()}";
               late IbQuestionItemController _controller;
               if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
                 _controller = Get.find(tag: tag);
               } else {
                 _controller = Get.put(
                     IbQuestionItemController(
-                        myRxIbAnswer: item.ibAnswer.obs,
+                        rxIbAnswer: item.ibAnswer.obs,
                         rxIbQuestion: item.ibQuestion.obs,
                         rxIsExpanded: false.obs,
                         disableAvatarOnTouch:

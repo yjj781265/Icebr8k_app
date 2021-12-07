@@ -490,6 +490,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
               customBorder: ContinuousRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
               onTap: () {
+                IbUtils.hideKeyboard();
                 if (_controller.picChoiceList.length < IbConfig.kChoiceLimit) {
                   _showTextFiledBottomSheet(
                       'add_choice', _controller.picChoiceList);
@@ -1042,7 +1043,10 @@ void showMediaBottomSheet(
                 initAspectRatio: CropAspectRatioPreset.square,
                 lockAspectRatio: true,
                 minimumAspectRatio: 1,
-                ratios: [CropAspectRatioPreset.square]);
+                ratios: [
+                  CropAspectRatioPreset.square,
+                  CropAspectRatioPreset.original
+                ]);
             if (croppedFile != null) {
               if (ibChoice != null) {
                 // ignore: parameter_assignments
@@ -1096,7 +1100,10 @@ void showMediaBottomSheet(
               width: 900,
               height: 900,
               cropStyle: CropStyle.rectangle,
-              ratios: [CropAspectRatioPreset.square],
+              ratios: [
+                CropAspectRatioPreset.square,
+                CropAspectRatioPreset.original
+              ],
               initAspectRatio: CropAspectRatioPreset.square,
               lockAspectRatio: true,
               minimumAspectRatio: 1,

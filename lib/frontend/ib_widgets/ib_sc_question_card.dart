@@ -68,14 +68,14 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
   Widget build(BuildContext context) {
     super.build(context);
     _runExpandCheck();
-    final expandableInfo = Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: IbQuestionScItem(widget._controller),
-        ),
-        IbQuestionButtons(widget._controller),
-      ],
+    final Widget expandableInfo = Padding(
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
+      child: Column(
+        children: [
+          IbQuestionScItem(widget._controller),
+          IbQuestionButtons(widget._controller),
+        ],
+      ),
     );
     return SingleChildScrollView(
       child: InkWell(

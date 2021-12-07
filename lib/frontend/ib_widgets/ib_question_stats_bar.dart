@@ -34,7 +34,7 @@ class IbQuestionStatsBar extends StatelessWidget {
                         children: [
                           FaIcon(
                             Icons.poll_outlined,
-                            color: _itemController.myRxIbAnswer != null
+                            color: _itemController.rxIbAnswer != null
                                 ? IbColors.primaryColor
                                 : IbColors.lightGrey,
                             size: 18,

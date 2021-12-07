@@ -207,7 +207,10 @@ class IbUserSearchPage extends StatelessWidget {
           onPressed: () {
             showFriendRequestDialog();
           },
-          icon: const Icon(Icons.person_add_alt_1_outlined),
+          icon: const Icon(
+            Icons.person_add_alt_1_outlined,
+            color: IbColors.accentColor,
+          ),
         );
       }
 
@@ -216,7 +219,10 @@ class IbUserSearchPage extends StatelessWidget {
         return IconButton(
           onPressed: null,
           tooltip: _controller.friendshipStatus.value,
-          icon: const Icon(Icons.pending_outlined),
+          icon: const Icon(
+            Icons.pending_outlined,
+            color: IbColors.primaryColor,
+          ),
         );
       }
 
@@ -225,7 +231,8 @@ class IbUserSearchPage extends StatelessWidget {
         return IconButton(
           onPressed: null,
           tooltip: _controller.friendshipStatus.value,
-          icon: const Icon(Icons.pending_outlined),
+          icon:
+              const Icon(Icons.pending_outlined, color: IbColors.primaryColor),
         );
       }
 
