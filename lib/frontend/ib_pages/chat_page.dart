@@ -189,8 +189,9 @@ class MyMessageItemView extends StatelessWidget {
                       },
                       text: item.message.content,
                       linkStyle: const TextStyle(color: Colors.white),
-                      style:
-                          const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                      style: const TextStyle(
+                          fontSize: IbConfig.kNormalTextSize,
+                          color: Colors.black),
                     ),
                   ),
                 ),
@@ -266,7 +267,8 @@ class MessageItemView extends StatelessWidget {
                     }
                   },
                   linkStyle: const TextStyle(color: Colors.white),
-                  style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                  style: const TextStyle(
+                      fontSize: IbConfig.kNormalTextSize, color: Colors.black),
                 ),
               ),
             ),

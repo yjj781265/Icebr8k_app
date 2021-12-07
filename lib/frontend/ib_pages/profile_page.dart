@@ -698,8 +698,9 @@ class _CommonAnswersTabState extends State<CommonAnswersTab>
                 _controller = Get.put(
                     IbQuestionItemController(
                         rxIsExpanded: false.obs,
-                        ibAnswer: widget._commonAnswersController
-                            .retrieveAnswer(item.id),
+                        myRxIbAnswer: widget._commonAnswersController
+                            .retrieveAnswer(item.id)!
+                            .obs,
                         rxIbQuestion: item.obs,
                         disableAvatarOnTouch:
                             item.creatorId == widget.widget.uid),
@@ -795,8 +796,9 @@ class _DifferentAnswersTabState extends State<DifferentAnswersTab>
                 _controller = Get.put(
                     IbQuestionItemController(
                         rxIsExpanded: false.obs,
-                        ibAnswer: widget._uncommonAnswersController
-                            .retrieveAnswer(item.id),
+                        myRxIbAnswer: widget._uncommonAnswersController
+                            .retrieveAnswer(item.id)!
+                            .obs,
                         showMyAnswer: true,
                         rxIbQuestion: item.obs,
                         disableAvatarOnTouch:
@@ -971,7 +973,7 @@ class _AnsweredQTabState extends State<AnsweredQTab>
               } else {
                 _controller = Get.put(
                     IbQuestionItemController(
-                        ibAnswer: item.ibAnswer,
+                        myRxIbAnswer: item.ibAnswer.obs,
                         rxIbQuestion: item.ibQuestion.obs,
                         rxIsExpanded: false.obs,
                         disableAvatarOnTouch:

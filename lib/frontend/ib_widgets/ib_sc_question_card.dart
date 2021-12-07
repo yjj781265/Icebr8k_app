@@ -80,86 +80,79 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     return SingleChildScrollView(
       child: InkWell(
         child: Ink(
-          child: Obx(
-            () => Center(
-              child: widget._controller.isLoading.isTrue
-                  ? const IbProgressIndicator()
-                  : PageFlipBuilder(
-                      interactiveFlipEnabled: false,
-                      key: cardKey,
-                      frontBuilder: (_) => IbCard(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Center(
+            child: PageFlipBuilder(
+              interactiveFlipEnabled: false,
+              key: cardKey,
+              frontBuilder: (_) => IbCard(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      IbQuestionHeader(widget._controller),
+                      IbQuestionInfo(widget._controller),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      SizeTransition(
+                        sizeFactor: animation,
+                        child: expandableInfo,
+                      ),
+
+                      /// show current user answer is available
+                      if (Get.find<MyAnsweredQuestionsController>()
+                                  .retrieveAnswer(widget
+                                      ._controller.rxIbQuestion.value.id) !=
+                              null &&
+                          widget._controller.showMyAnswer)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Row(
                             children: [
-                              IbQuestionHeader(widget._controller),
-                              IbQuestionInfo(widget._controller),
-                              const SizedBox(
-                                height: 16,
+                              IbUserAvatar(
+                                avatarUrl:
+                                    IbUtils.getCurrentIbUser()!.avatarUrl,
+                                radius: 8,
                               ),
-                              SizeTransition(
-                                sizeFactor: animation,
-                                child: expandableInfo,
-                              ),
-
-                              /// show current user answer is available
-                              if (Get.find<MyAnsweredQuestionsController>()
-                                          .retrieveAnswer(widget._controller
-                                              .rxIbQuestion.value.id) !=
-                                      null &&
-                                  widget._controller.showMyAnswer)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8),
-                                  child: Row(
-                                    children: [
-                                      IbUserAvatar(
-                                        avatarUrl: IbUtils.getCurrentIbUser()!
-                                            .avatarUrl,
-                                        radius: 8,
-                                      ),
-                                      Text(
-                                          ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.rxIbQuestion.value.id)!.choiceId}')
-                                    ],
-                                  ),
-                                ),
-                              Obx(() {
-                                return Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    IbQuestionStatsBar(widget._controller),
-                                    IconButton(
-                                      padding: EdgeInsets.zero,
-                                      onPressed: () {
-                                        widget._controller.rxIsExpanded.value =
-                                            !widget
-                                                ._controller.rxIsExpanded.value;
-
-                                        _runExpandCheck();
-                                      },
-                                      icon:
-                                          widget._controller.rxIsExpanded.isTrue
-                                              ? const Icon(
-                                                  Icons.expand_less_outlined,
-                                                  color: IbColors.primaryColor,
-                                                )
-                                              : const Icon(
-                                                  Icons.expand_more_outlined,
-                                                  color: IbColors.primaryColor,
-                                                ),
-                                    )
-                                  ],
-                                );
-                              }),
+                              Text(
+                                  ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.rxIbQuestion.value.id)!.choiceId}')
                             ],
                           ),
                         ),
-                      ),
-                      backBuilder: (BuildContext context) {
-                        return _cardBackSide();
-                      },
-                    ),
+                      Obx(() {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IbQuestionStatsBar(widget._controller),
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              onPressed: () {
+                                widget._controller.rxIsExpanded.value =
+                                    !widget._controller.rxIsExpanded.value;
+
+                                _runExpandCheck();
+                              },
+                              icon: widget._controller.rxIsExpanded.isTrue
+                                  ? const Icon(
+                                      Icons.expand_less_outlined,
+                                      color: IbColors.primaryColor,
+                                    )
+                                  : const Icon(
+                                      Icons.expand_more_outlined,
+                                      color: IbColors.primaryColor,
+                                    ),
+                            )
+                          ],
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+              ),
+              backBuilder: (BuildContext context) {
+                return _cardBackSide();
+              },
             ),
           ),
         ),
@@ -187,7 +180,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
               ),
               Expanded(
                 flex: 8,
-                child: widget._controller.isCalculating.isTrue
+                child: widget._controller.isAnswering.isTrue
                     ? const Center(
                         child: IbProgressIndicator(),
                       )

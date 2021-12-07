@@ -6,10 +6,9 @@ part 'ib_choice.g.dart';
 class IbChoice {
   String? content;
   String? url;
-  int count;
   String choiceId;
 
-  IbChoice({this.content, this.url, this.count = 0, required this.choiceId})
+  IbChoice({this.content, this.url, required this.choiceId})
       : assert(content != null || url != null);
 
   factory IbChoice.fromJson(Map<String, dynamic> json) =>

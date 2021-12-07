@@ -111,10 +111,7 @@ class AnsweredQuestionController extends GetxController {
       if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
         final ibQuestion =
             await IbQuestionDbService().querySingleQuestion(item.ibQuestion.id);
-        if (ibQuestion != null) {
-          Get.find<IbQuestionItemController>(tag: tag)
-              .calculateResult(ibQuestion);
-        }
+        if (ibQuestion != null) {}
       }
     }
   }

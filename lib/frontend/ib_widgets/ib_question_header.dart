@@ -43,7 +43,7 @@ class IbQuestionHeader extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                           style: const TextStyle(
-                              fontSize: IbConfig.kSecondaryTextSize,
+                              fontSize: IbConfig.kNormalTextSize,
                               fontWeight: FontWeight.w700),
                         ),
                       _handleSubString(),
@@ -89,7 +89,7 @@ class IbQuestionHeader extends StatelessWidget {
             )} ${_itemController.rxIbQuestion.value.endTimeInMs == -1 ? '' : ' • ${IbUtils.leftTimeString(_itemController.rxIbQuestion.value.endTimeInMs)}'}',
             style: const TextStyle(
                 fontSize: IbConfig.kDescriptionTextSize,
-                color: IbColors.lightGrey));
+                fontWeight: FontWeight.bold));
       }
 
       return Text(

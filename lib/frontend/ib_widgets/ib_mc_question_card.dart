@@ -190,29 +190,69 @@ class IbQuestionMcItem extends StatelessWidget {
   const IbQuestionMcItem(this.choice, this._controller, {Key? key})
       : super(key: key);
 
+  Color getItemColor() {
+    if (choice.choiceId == _controller.selectedChoiceId.value) {
+      return IbColors.primaryColor;
+    }
+    if (_controller.totalPolled.value > 0 &&
+        (_controller.resultMap[choice.choiceId] ?? 0).toDouble() /
+                (_controller.totalPolled.toDouble()) ==
+            0 &&
+        _controller.showResult.isTrue) {
+      return IbColors.lightBlue;
+    }
+    return IbColors.lightGrey;
+  }
+
+  double getItemWidth() {
+    if (choice.choiceId == _controller.selectedChoiceId.value &&
+        _controller.showResult.isFalse) {
+      return Get.width * 0.95;
+    }
+
+    if (_controller.totalPolled.value <= 0 && _controller.showResult.isTrue) {
+      return Get.width * 0.95;
+    }
+
+    if ((_controller.resultMap[choice.choiceId] ?? 0).toDouble() /
+            (_controller.totalPolled.toDouble()) ==
+        0) {
+      return Get.width * 0.95;
+    }
+
+    if (_controller.showResult.isTrue) {
+      return (Get.width * 0.95) *
+          ((_controller.resultMap[choice.choiceId] ?? 0).toDouble() /
+              (_controller.totalPolled.toDouble()));
+    }
+
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => GestureDetector(
-        onTap: () {
-          if (_controller.isSample ||
-              _controller.showResult.isTrue ||
-              _controller.disableChoiceOnTouch) {
-            return;
-          }
+      () => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4.0),
+        child: InkWell(
+          radius: IbConfig.kMcItemCornerRadius,
+          borderRadius: BorderRadius.circular(IbConfig.kMcItemCornerRadius),
+          onTap: () {
+            if (_controller.isSample || _controller.disableChoiceOnTouch) {
+              return;
+            }
 
-          if (_controller.selectedChoiceId.value == choice.choiceId) {
-            _controller.selectedChoiceId.value = '';
-          } else {
-            _controller.selectedChoiceId.value = choice.choiceId;
-          }
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4.0),
+            if (_controller.selectedChoiceId.value == choice.choiceId) {
+              _controller.selectedChoiceId.value = '';
+            } else {
+              _controller.selectedChoiceId.value = choice.choiceId;
+            }
+          },
           child: Stack(
             alignment: Alignment.centerLeft,
             children: [
               Container(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
                 width: Get.width * 0.95,
                 height: _controller.rxIbQuestion.value.questionType ==
                         IbQuestion.kMultipleChoice
@@ -229,17 +269,9 @@ class IbQuestionMcItem extends StatelessWidget {
                     ? IbConfig.kMcTxtItemHeight
                     : IbConfig.kMcPicItemHeight,
                 decoration: BoxDecoration(
-                    color: _determineColor(
-                        result: _controller.resultMap[choice.content] ?? 0,
-                        isSelected: _controller.selectedChoiceId.value ==
-                            choice.content,
-                        isVoted: _controller.showResult.value),
+                    color: getItemColor(),
                     borderRadius: BorderRadius.circular(8)),
-                width: _determineWidth(
-                    isSelected:
-                        _controller.selectedChoiceId.value == choice.content,
-                    result: _controller.resultMap[choice.content] ?? 0,
-                    isVoted: _controller.showResult.value),
+                width: getItemWidth(),
                 duration: Duration(
                     milliseconds: _controller.showResult.value
                         ? IbConfig.kEventTriggerDelayInMillis
@@ -316,74 +348,45 @@ class IbQuestionMcItem extends StatelessWidget {
                 ),
               ),
               //Todo show 3 users who voted this question in stack
-              if (_controller.showResult.value)
+              if (_controller.showResult.value &&
+                  _controller.myRxIbAnswer!.value.choiceId == choice.choiceId)
                 const Positioned(
                   bottom: 2,
                   right: 2,
                   child: CircleAvatar(
-                    radius: 8,
+                    radius: 6,
                     backgroundColor: IbColors.white,
                     child: Icon(
                       Icons.check_circle_rounded,
                       color: IbColors.accentColor,
-                      size: 16,
+                      size: 12,
                     ),
                   ),
                 ),
-              if (_controller.showResult.value)
+              if (_controller.showResult.value &&
+                  _controller.totalPolled.value > 0)
                 TweenAnimationBuilder(
                   builder:
                       (BuildContext context, Object? value, Widget? child) {
                     return Positioned(
                       right: 8,
                       child: Text(
-                          '${((_controller.resultMap[choice.content] ?? 0) * 100).toStringAsFixed(1)}%'),
+                        '${((_controller.resultMap[choice.choiceId] ?? 0.toDouble() / _controller.totalPolled.value.toDouble()) * 100).toStringAsFixed(1)}%',
+                        style: const TextStyle(color: Colors.black),
+                      ),
                     );
                   },
                   duration: const Duration(
                       milliseconds: IbConfig.kEventTriggerDelayInMillis),
                   tween: Tween<double>(
                       begin: 0,
-                      end: _controller.resultMap[choice.content] ?? 0),
+                      end: _controller.resultMap[choice.choiceId]!.toDouble() /
+                          _controller.totalPolled.value.toDouble()),
                 ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  double _determineWidth(
-      {required bool isSelected,
-      required bool isVoted,
-      required double result}) {
-    if (isVoted) {
-      return Get.width * 0.9 * result;
-    }
-
-    if (isSelected) {
-      return Get.width * 0.9;
-    }
-
-    return 0;
-  }
-
-  Color _determineColor(
-      {required bool isSelected,
-      required bool isVoted,
-      required double result}) {
-    if (isSelected) {
-      return IbColors.primaryColor;
-    }
-
-    if (isVoted && !isSelected) {
-      return IbColors.lightGrey.withOpacity(0.3);
-    }
-
-    if (!isVoted && !isSelected) {
-      return Colors.transparent;
-    }
-
-    return Colors.transparent;
   }
 }

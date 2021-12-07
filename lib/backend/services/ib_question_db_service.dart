@@ -268,6 +268,26 @@ class IbQuestionDbService {
         .set(ibAnswer.toJson(), SetOptions(merge: true));
   }
 
+  Future<void> increasePollSize(
+      {required String questionId, required String choiceId}) async {
+    await _collectionRef
+        .doc(questionId)
+        .update({'pollSize': FieldValue.increment(1)});
+    await _collectionRef
+        .doc(questionId)
+        .set({choiceId: FieldValue.increment(1)}, SetOptions(merge: true));
+  }
+
+  Future<void> updatePollSize(
+      {required String questionId,
+      required String oldChoiceId,
+      required String newChoiceId}) async {
+    await _collectionRef.doc(questionId).set({
+      newChoiceId: FieldValue.increment(1),
+      oldChoiceId: FieldValue.increment(-1)
+    }, SetOptions(merge: true));
+  }
+
   Future<int> queryPollSize(String questionId) async {
     final _snapshot = await _collectionRef.doc(questionId).get();
 
@@ -288,13 +308,14 @@ class IbQuestionDbService {
   }
 
   Future<int> querySpecificAnswerPollSize(
-      {required String questionId, required String answer}) async {
-    final _snapshot = await _collectionRef
-        .doc(questionId)
-        .collection(_kAnswerCollectionGroup)
-        .where('answer', isEqualTo: answer)
-        .get();
-    return _snapshot.size;
+      {required String questionId, required String choiceId}) async {
+    final _snapshot = await _collectionRef.doc(questionId).get();
+    if (_snapshot.exists &&
+        _snapshot.data() != null &&
+        _snapshot.data()![choiceId] != null) {
+      return _snapshot.data()![choiceId] as int;
+    }
+    return 0;
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> listenToIbQuestionsChange(

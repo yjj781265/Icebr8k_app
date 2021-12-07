@@ -386,6 +386,24 @@ class IbUtils {
     return IbColors.errorRed;
   }
 
+  static Future<Map<String, int>> getChoiceCountMap(String questionId) async {
+    final map = <String, int>{};
+    final ibQuestion =
+        await IbQuestionDbService().querySingleQuestion(questionId);
+
+    if (ibQuestion == null) {
+      return map;
+    }
+
+    for (final ibChoice in ibQuestion.choices) {
+      map[ibChoice.choiceId] = await IbQuestionDbService()
+          .querySpecificAnswerPollSize(
+              questionId: questionId, choiceId: ibChoice.choiceId);
+    }
+
+    return map;
+  }
+
   static void showInteractiveViewer(Widget widget, BuildContext context) {
     /// show image preview
     Navigator.of(context).push(PageRouteBuilder(

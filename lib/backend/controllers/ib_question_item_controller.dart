@@ -16,11 +16,8 @@ class IbQuestionItemController extends GetxController {
   final Rx<IbQuestion> rxIbQuestion;
   final showResult = false.obs;
   final isAnswering = false.obs;
-  final isCalculating = false.obs;
+  final isSubmitting = false.obs;
   final controllerId = IbUtils.getUniqueId();
-
-  /// this flag is for sc question only
-  final isLoading = false.obs;
 
   ///user who created the question
   IbUser? ibUser;
@@ -38,7 +35,7 @@ class IbQuestionItemController extends GetxController {
   final RxBool rxIsExpanded;
 
   /// if user already answered, pass the answer here
-  IbAnswer? ibAnswer;
+  Rx<IbAnswer>? myRxIbAnswer;
   final answeredUsername = ''.obs;
   final totalPolled = 0.obs;
   final likes = 0.obs;
@@ -49,7 +46,7 @@ class IbQuestionItemController extends GetxController {
   final commented = false.obs;
   final totalTags = 0.obs;
   final selectedChoiceId = ''.obs;
-  final resultMap = <String, double>{}.obs;
+  final resultMap = <String, int>{}.obs;
   final List<IbTag> ibTags = [];
 
   IbQuestionItemController(
@@ -59,13 +56,27 @@ class IbQuestionItemController extends GetxController {
       this.disableChoiceOnTouch = false,
       this.disableAvatarOnTouch = false,
       this.isLocalFile = false,
-      this.showMyAnswer = false,
-      this.ibAnswer});
+      this.myRxIbAnswer,
+      this.showMyAnswer = false});
 
   @override
   Future<void> onInit() async {
     /// query question author user info
     ibUser = await IbUserDbService().queryIbUser(rxIbQuestion.value.creatorId);
+
+    if (myRxIbAnswer == null) {
+      /// query my answer to this question
+      final myAnswer = await IbQuestionDbService()
+          .queryIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id);
+
+      if (myAnswer != null) {
+        myRxIbAnswer = myAnswer.obs;
+        selectedChoiceId.value = myRxIbAnswer!.value.choiceId;
+        myRxIbAnswer!.refresh();
+      }
+    }
+
+    showResult.value = myRxIbAnswer != null;
 
     if (ibUser != null) {
       /// populate title ..etc
@@ -77,56 +88,14 @@ class IbQuestionItemController extends GetxController {
     }
 
     await generateIbTags();
-
-    calculateResult(rxIbQuestion.value);
-
-    totalPolled.value = rxIbQuestion.value.pollSize;
+    await generatePollStats();
     totalTags.value = rxIbQuestion.value.tagIds.length;
     likes.value = rxIbQuestion.value.likes;
-
-    isLoading.value = false;
     super.onInit();
   }
 
-  Future<void> calculateResult(IbQuestion ibQuestion) async {
-    print("calculateResult for ${ibQuestion.question}");
-    /* isCalculating.value = true;
-    int pollSize = 0;
-    if (ibQuestion.statMap == null) {
-      return;
-    }
-    for (final element in ibQuestion.statMap!.values) {
-      pollSize = pollSize + element;
-    }
-
-    if (pollSize == 0) {
-      return;
-    }
-
-    totalPolled.value = pollSize;
-    if (IbQuestion.kScale == ibQuestion.questionType) {
-      for (int i = 1; i < 6; i++) {
-        final int size = ibQuestion.statMap![i.toString()] ?? 0;
-        if (size == 0) {
-          continue;
-        }
-        final double result = (size.toDouble()) / (pollSize.toDouble());
-        resultMap[i.toString()] = result;
-      }
-    } else {
-      for (final choice in ibQuestion.choices) {
-        final int size = ibQuestion.statMap![choice] ?? 0;
-        final double result = (size.toDouble()) / (pollSize.toDouble());
-        resultMap[choice] = result;
-      }
-    }
-    await determineUserAnswer();
-    isCalculating.value = false;
-    isAnswering.value = false;*/
-  }
-
   Future<void> generateIbTags() async {
-    for (String id in rxIbQuestion.value.tagIds) {
+    for (final String id in rxIbQuestion.value.tagIds) {
       final IbTag? tag = await IbTagDbService().retrieveIbTag(id);
       if (tag != null) {
         ibTags.add(tag);
@@ -134,37 +103,21 @@ class IbQuestionItemController extends GetxController {
     }
   }
 
-  Future<void> determineUserAnswer() async {
-    /// check if user has already answered this question
-    ibAnswer ??= await IbQuestionDbService()
-        .queryIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id);
-
-    if (ibAnswer != null) {
-      votedDateTime.value =
-          DateTime.fromMillisecondsSinceEpoch(ibAnswer!.answeredTimeInMs);
-      answeredUsername.value =
-          (await IbUserDbService().queryIbUser(ibAnswer!.uid))!.username;
+  Future<void> generatePollStats() async {
+    int counter = 0;
+    resultMap.value = await IbUtils.getChoiceCountMap(rxIbQuestion.value.id);
+    for (final int i in resultMap.values) {
+      counter = counter + i;
     }
-    selectedChoiceId.value = ibAnswer == null
-        ? rxIbQuestion.value.questionType == IbQuestion.kMultipleChoice
-            ? ''
-            : '1'
-        : ibAnswer!.choiceId;
-    showResult.value = ibAnswer != null;
+    totalPolled.value = counter;
   }
 
   Future<void> onVote() async {
-    if (showResult.isTrue) {
-      return;
-    }
-
     if (selectedChoiceId.value.isEmpty) {
       return;
     }
-
-    determineUserAnswer();
-
-    if (ibAnswer != null) {
+    if (myRxIbAnswer != null &&
+        selectedChoiceId.value == myRxIbAnswer!.value.choiceId) {
       return;
     }
 
@@ -178,16 +131,30 @@ class IbQuestionItemController extends GetxController {
         questionType: rxIbQuestion.value.questionType);
 
     await IbQuestionDbService().answerQuestion(tempAnswer);
+
+    if (myRxIbAnswer != null) {
+      await IbQuestionDbService().updatePollSize(
+          questionId: rxIbQuestion.value.id,
+          oldChoiceId: myRxIbAnswer!.value.choiceId,
+          newChoiceId: selectedChoiceId.value);
+    } else {
+      await IbQuestionDbService().increasePollSize(
+          questionId: rxIbQuestion.value.id, choiceId: selectedChoiceId.value);
+    }
+
+    myRxIbAnswer = (await IbQuestionDbService()
+            .queryIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id))!
+        .obs;
+    myRxIbAnswer!.refresh();
+
     IbLocalStorageService().removeUnAnsweredIbQid(rxIbQuestion.value.id);
-    rxIbQuestion.value.pollSize++;
-    // final int size = ibQuestion.statMap![tempAnswer.answer] ?? 0;
-    // ibQuestion.statMap![tempAnswer.answer] = size + 1;
-    await calculateResult(rxIbQuestion.value);
-    updateQuestionTab();
+    generatePollStats();
+    showResult.value = true;
+    isAnswering.value = false;
   }
 
   Future<void> onSubmit() async {
-    isAnswering.value = true;
+    isSubmitting.value = true;
     if (isLocalFile &&
         rxIbQuestion.value.choices.isNotEmpty &&
         (rxIbQuestion.value.questionType == IbQuestion.kPic ||
@@ -219,19 +186,11 @@ class IbQuestionItemController extends GetxController {
     }
 
     await IbQuestionDbService().uploadQuestion(rxIbQuestion.value);
-    isAnswering.value = false;
+    isSubmitting.value = false;
     Navigator.of(Get.context!).popUntil((route) => route.isFirst);
     IbUtils.showSimpleSnackBar(
         msg: 'Question submitted successfully',
         backgroundColor: IbColors.accentColor);
-  }
-
-  Future<void> updateQuestionTab() async {
-    if (Get.isRegistered<IbQuestionItemController>(
-        tag: rxIbQuestion.value.id)) {
-      await Get.find<IbQuestionItemController>(tag: rxIbQuestion.value.id)
-          .calculateResult(rxIbQuestion.value);
-    }
   }
 
   Future<void> updateLike() async {

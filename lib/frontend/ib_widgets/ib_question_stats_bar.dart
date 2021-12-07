@@ -34,7 +34,7 @@ class IbQuestionStatsBar extends StatelessWidget {
                         children: [
                           FaIcon(
                             Icons.poll_outlined,
-                            color: _itemController.ibAnswer != null
+                            color: _itemController.myRxIbAnswer != null
                                 ? IbColors.primaryColor
                                 : IbColors.lightGrey,
                             size: 18,
@@ -107,7 +107,7 @@ class IbQuestionStatsBar extends StatelessWidget {
                     onTap: _itemController.isSample
                         ? null
                         : () {
-                            showTagBtmSheet();
+                            showTagBtmSheet(context);
                           },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -163,7 +163,7 @@ class IbQuestionStatsBar extends StatelessWidget {
     return '10B+';
   }
 
-  void showTagBtmSheet() {
+  void showTagBtmSheet(BuildContext context) {
     final Widget widget = IbCard(
         child: Padding(
       padding: const EdgeInsets.all(8.0),
@@ -171,9 +171,12 @@ class IbQuestionStatsBar extends StatelessWidget {
         spacing: 8,
         runSpacing: 8,
         children: _itemController.ibTags
-            .map((e) => Chip(
-                  label: Text(e.text),
-                ))
+            .map(
+              (e) => Chip(
+                backgroundColor: Theme.of(context).backgroundColor,
+                label: Text(e.text),
+              ),
+            )
             .toList(),
       ),
     ));

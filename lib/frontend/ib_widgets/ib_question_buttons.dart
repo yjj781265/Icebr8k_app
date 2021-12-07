@@ -14,31 +14,35 @@ class IbQuestionButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       return SizedBox(
-          height: 56,
-          child: Row(
-            children: [
+        height: 56,
+        child: Row(
+          children: [
+            Expanded(
+              child: IbElevatedButton(
+                disabled: _controller.isSample ||
+                    _controller.selectedChoiceId.isEmpty,
+                onPressed: () async {
+                  await _controller.onVote();
+                },
+                textTrKey: _controller.isAnswering.isTrue
+                    ? 'voting'
+                    : _controller.showResult.isTrue
+                        ? 'change_vote'
+                        : 'vote',
+              ),
+            ),
+            if (_controller.rxIbQuestion.value.isCommentEnabled)
               Expanded(
                 child: IbElevatedButton(
                   disabled: _controller.isSample,
+                  color: IbColors.primaryColor,
                   onPressed: () {},
-                  textTrKey: _controller.isAnswering.isFalse
-                      ? 'vote'
-                      : _controller.showResult.isTrue
-                          ? 'change_vote'
-                          : 'voting',
+                  textTrKey: 'comment',
                 ),
-              ),
-              if (_controller.rxIbQuestion.value.isCommentEnabled)
-                Expanded(
-                  child: IbElevatedButton(
-                    disabled: _controller.isSample,
-                    color: IbColors.primaryColor,
-                    onPressed: () {},
-                    textTrKey: 'comment',
-                  ),
-                )
-            ],
-          ));
+              )
+          ],
+        ),
+      );
     });
   }
 }
