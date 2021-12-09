@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
+import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -221,7 +221,7 @@ class IbUtils {
   static void showSimpleSnackBar(
       {required String msg, required Color backgroundColor}) {
     hideKeyboard();
-    Get.showSnackbar(GetBar(
+    Get.showSnackbar(GetSnackBar(
       snackPosition: SnackPosition.TOP,
       borderRadius: IbConfig.kCardCornerRadius,
       margin: const EdgeInsets.only(left: 8, right: 8, top: 32),
@@ -388,8 +388,8 @@ class IbUtils {
     return IbColors.errorRed;
   }
 
-  static Future<Map<String, int>> getChoiceCountMap(String questionId) async {
-    final map = <String, int>{};
+  static Future<Map<IbChoice, int>> getChoiceCountMap(String questionId) async {
+    final map = <IbChoice, int>{};
     final ibQuestion =
         await IbQuestionDbService().querySingleQuestion(questionId);
 
@@ -398,9 +398,8 @@ class IbUtils {
     }
 
     for (final ibChoice in ibQuestion.choices) {
-      map[ibChoice.choiceId] = await IbQuestionDbService()
-          .querySpecificAnswerPollSize(
-              questionId: questionId, choiceId: ibChoice.choiceId);
+      map[ibChoice] = await IbQuestionDbService().querySpecificAnswerPollSize(
+          questionId: questionId, choiceId: ibChoice.choiceId);
     }
 
     return map;
@@ -408,37 +407,40 @@ class IbUtils {
 
   static void showInteractiveViewer(Widget widget, BuildContext context) {
     /// show image preview
-    Navigator.of(context).push(PageRouteBuilder(
+    Navigator.of(context).push(
+      PageRouteBuilder(
         opaque: false,
         transitionDuration:
             const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
         barrierColor: Colors.black.withOpacity(0.8),
         barrierDismissible: true,
         pageBuilder: (BuildContext context, _, __) => Stack(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Get.back();
-                  },
-                  child: InteractiveViewer(
-                      boundaryMargin: const EdgeInsets.all(8), child: widget),
-                ),
-                Positioned(
-                  right: 8,
-                  top: 64,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: IconButton(
-                        onPressed: () {
-                          Get.back();
-                        },
-                        icon: const Icon(
-                          Icons.cancel,
-                          color: IbColors.errorRed,
-                        )),
-                  ),
-                ),
-              ],
-            )));
+          children: [
+            GestureDetector(
+              onTap: () {
+                Get.back();
+              },
+              child: InteractiveViewer(
+                  boundaryMargin: const EdgeInsets.all(8), child: widget),
+            ),
+            Positioned(
+              right: 8,
+              top: 64,
+              child: Material(
+                color: Colors.transparent,
+                child: IconButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    icon: const Icon(
+                      Icons.cancel,
+                      color: IbColors.errorRed,
+                    )),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

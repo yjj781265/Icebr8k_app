@@ -6,6 +6,7 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 
 import '../ib_config.dart';
+import '../ib_utils.dart';
 
 class IbQuestionStatsBar extends StatelessWidget {
   final IbQuestionItemController _itemController;
@@ -74,7 +75,11 @@ class IbQuestionStatsBar extends StatelessWidget {
                       ),
                     ),
                   InkWell(
-                    onTap: _itemController.isSample
+                    onTap: _itemController.isSample ||
+                            _itemController.selectedChoiceId.isEmpty ||
+                            (_itemController.rxIbAnswer != null &&
+                                _itemController.rxIbAnswer!.value.uid !=
+                                    IbUtils.getCurrentUid())
                         ? null
                         : () {
                             _itemController.updateLike();

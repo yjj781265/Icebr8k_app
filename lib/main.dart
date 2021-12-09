@@ -63,7 +63,6 @@ class MainApp extends StatelessWidget {
           FirebaseAnalyticsObserver(analytics: analytics),
         ],
         defaultTransition: Transition.cupertino,
-        enableLog: true,
         debugShowCheckedModeBanner: false,
         home: SplashPage(),
         translations: IbStrings(),

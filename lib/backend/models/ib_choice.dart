@@ -17,13 +17,17 @@ class IbChoice {
   Map<String, dynamic> toJson() => _$IbChoiceToJson(this);
 
   @override
+  String toString() {
+    return 'IbChoice{content: $content, url: $url, choiceId: $choiceId}';
+  }
+
+  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is IbChoice &&
           runtimeType == other.runtimeType &&
-          content == other.content &&
-          url == other.url;
+          choiceId == other.choiceId;
 
   @override
-  int get hashCode => content.hashCode ^ url.hashCode ^ choiceId.hashCode;
+  int get hashCode => choiceId.hashCode;
 }

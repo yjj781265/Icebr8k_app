@@ -21,20 +21,20 @@ environment:
   sdk: ">=2.14.0-2.0.dev <3.0.0"
 
 dependencies:
-  cached_network_image: ^3.1.0
+  cached_network_image: ^3.2.0
   cloud_firestore: ^2.5.3
-  cloud_functions: ^3.0.3
+  cloud_functions: ^3.2.3
   crypto: ^3.0.1
   cupertino_icons: ^1.0.2
   extended_nested_scroll_view: ^5.0.0
   firebase_analytics: ^8.3.3
-  firebase_auth: ^3.1.1
-  firebase_core: ^1.6.0
-  firebase_crashlytics: ^2.2.2
-  firebase_messaging: ^10.0.7
-  firebase_performance: ^0.7.1+1
+  firebase_auth: ^3.3.3
+  firebase_core: ^1.10.5
+  firebase_crashlytics: ^2.4.3
+  firebase_messaging: ^11.2.3
+  firebase_performance: ^0.8.0+2
   firebase_storage: ^10.0.5
-  fl_chart: ^0.40.0
+  fl_chart: ^0.40.6
   flutter:
     sdk: flutter
   flutter_html: ^2.1.3
@@ -44,7 +44,7 @@ dependencies:
   flutter_signin_button: ^2.0.0
   font_awesome_flutter: ^9.2.0
   geoflutterfire: ^3.0.1
-  get: ^4.3.8
+  get: ^4.5.1
   get_storage: ^2.0.3
   google_fonts: ^2.1.0
   google_sign_in: ^5.1.0
@@ -53,14 +53,13 @@ dependencies:
   intl: ^0.17.0
   json_annotation: ^4.1.0
   location: ^4.3.0
-  lottie: ^1.1.0
+  lottie: ^1.2.1
   move_to_background: ^1.0.2
-  page_flip_builder: ^0.1.3
   pull_to_refresh: ^2.0.0
   reorderables: ^0.4.1
   scroll_to_index: ^2.1.0
   showcaseview: ^1.1.1
-  sign_in_with_apple: ^3.0.0
+  sign_in_with_apple: ^3.3.0
   syncfusion_flutter_datepicker: ^19.2.62
   url_launcher: ^6.0.12
   uuid: ^3.0.4

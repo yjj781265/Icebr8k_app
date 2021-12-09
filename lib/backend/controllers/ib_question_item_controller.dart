@@ -18,7 +18,9 @@ class IbQuestionItemController extends GetxController {
   final showResult = false.obs;
   final isAnswering = false.obs;
   final isSubmitting = false.obs;
-  final controllerId = IbUtils.getUniqueId();
+
+  /// for sc question only
+  final isSwitched = false.obs;
 
   ///user who created the question
   IbUser? ibUser;
@@ -40,14 +42,12 @@ class IbQuestionItemController extends GetxController {
   final answeredUsername = ''.obs;
   final totalPolled = 0.obs;
   final likes = 0.obs;
-  final dislikes = 0.obs;
   final liked = false.obs;
-  final disliked = false.obs;
   final comments = 0.obs;
   final commented = false.obs;
   final totalTags = 0.obs;
   final selectedChoiceId = ''.obs;
-  final resultMap = <String, double>{}.obs;
+  final resultMap = <IbChoice, double>{}.obs;
   final List<IbTag> ibTags = [];
 
   IbQuestionItemController(
@@ -94,6 +94,7 @@ class IbQuestionItemController extends GetxController {
     await generatePollStats();
     totalTags.value = rxIbQuestion.value.tagIds.length;
     likes.value = rxIbQuestion.value.likes;
+    print(rxIbQuestion.value.choices);
     super.onInit();
   }
 
@@ -115,9 +116,8 @@ class IbQuestionItemController extends GetxController {
     }
 
     for (final IbChoice ibChoice in rxIbQuestion.value.choices) {
-      resultMap[ibChoice.choiceId] =
-          (countMap[ibChoice.choiceId] ?? 0).toDouble() / counter.toDouble();
-      print(resultMap[ibChoice.choiceId]);
+      resultMap[ibChoice] =
+          (countMap[ibChoice] ?? 0).toDouble() / counter.toDouble();
     }
 
     totalPolled.value = counter;
@@ -132,7 +132,12 @@ class IbQuestionItemController extends GetxController {
       return;
     }
 
+    if (isAnswering.value) {
+      return;
+    }
+
     isAnswering.value = true;
+    isSwitched.value = false;
     final IbAnswer tempAnswer = IbAnswer(
         choiceId: selectedChoiceId.value,
         answeredTimeInMs: DateTime.now().millisecondsSinceEpoch,
@@ -161,6 +166,7 @@ class IbQuestionItemController extends GetxController {
     IbLocalStorageService().removeUnAnsweredIbQid(rxIbQuestion.value.id);
     await generatePollStats();
     showResult.value = true;
+    isSwitched.value = true;
     isAnswering.value = false;
   }
 
@@ -208,26 +214,9 @@ class IbQuestionItemController extends GetxController {
     liked.value = !liked.value;
     if (liked.isTrue) {
       likes.value++;
+      await IbQuestionDbService().updateLikes(rxIbQuestion.value.id);
     } else {
-      likes.value--;
-    }
-
-    if (disliked.isTrue && liked.isTrue) {
-      disliked.value = false;
-      dislikes.value--;
-    }
-  }
-
-  Future<void> updateDislike() async {
-    disliked.value = !disliked.value;
-    if (disliked.isTrue) {
-      dislikes.value++;
-    } else {
-      dislikes.value--;
-    }
-
-    if (liked.isTrue && disliked.isTrue) {
-      liked.value = false;
+      await IbQuestionDbService().removeLikes(rxIbQuestion.value.id);
       likes.value--;
     }
   }

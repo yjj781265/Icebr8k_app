@@ -24,7 +24,8 @@ class IbQuestionButtons extends StatelessWidget {
                     _controller.selectedChoiceId.isEmpty ||
                     (_controller.rxIbAnswer != null &&
                         _controller.rxIbAnswer!.value.uid !=
-                            IbUtils.getCurrentUid()),
+                            IbUtils.getCurrentUid()) ||
+                    _controller.isAnswering.isTrue,
                 onPressed: () async {
                   await _controller.onVote();
                 },
@@ -33,13 +34,13 @@ class IbQuestionButtons extends StatelessWidget {
                     : _controller.showResult.isTrue
                         ? 'change_vote'
                         : 'vote',
+                color: IbColors.primaryColor,
               ),
             ),
             if (_controller.rxIbQuestion.value.isCommentEnabled)
               Expanded(
                 child: IbElevatedButton(
                   disabled: _controller.isSample,
-                  color: IbColors.primaryColor,
                   onPressed: () {},
                   textTrKey: 'comment',
                 ),

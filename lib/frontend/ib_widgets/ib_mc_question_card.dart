@@ -68,6 +68,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     _runExpandCheck();
     final Widget expandableInfo = Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
@@ -156,10 +157,10 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                         onPressed: () {
                           widget._controller.rxIsExpanded.value =
                               !widget._controller.rxIsExpanded.isTrue;
-                          _runExpandCheck();
                         },
-                        icon: Obx(
-                          () => widget._controller.rxIsExpanded.isTrue
+                        icon: Obx(() {
+                          _runExpandCheck();
+                          return widget._controller.rxIsExpanded.isTrue
                               ? const Icon(
                                   Icons.expand_less_rounded,
                                   color: IbColors.primaryColor,
@@ -167,8 +168,8 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                               : const Icon(
                                   Icons.expand_more_outlined,
                                   color: IbColors.primaryColor,
-                                ),
-                        ),
+                                );
+                        }),
                       ),
                     ],
                   ),
@@ -195,7 +196,7 @@ class IbQuestionMcItem extends StatelessWidget {
       return IbColors.primaryColor;
     }
     if (_controller.totalPolled.value > 0 &&
-        (_controller.resultMap[choice.choiceId] ?? 0) == 0 &&
+        (_controller.resultMap[choice] ?? 0) == 0 &&
         _controller.showResult.isTrue) {
       return IbColors.lightBlue;
     }
@@ -212,12 +213,12 @@ class IbQuestionMcItem extends StatelessWidget {
       return Get.width * 0.95;
     }
 
-    if ((_controller.resultMap[choice.choiceId] ?? 0) == 0) {
+    if ((_controller.resultMap[choice] ?? 0) == 0) {
       return Get.width * 0.95;
     }
 
     if (_controller.showResult.isTrue) {
-      return (_controller.resultMap[choice.choiceId] ?? 0) * (Get.width * 0.95);
+      return (_controller.resultMap[choice] ?? 0) * (Get.width * 0.95);
     }
 
     return 0;
@@ -225,6 +226,7 @@ class IbQuestionMcItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String heroTag = IbUtils.getUniqueId();
     return Obx(
       () => Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -297,8 +299,7 @@ class IbQuestionMcItem extends StatelessWidget {
                                   );
 
                             final Widget hero = Hero(
-                              tag:
-                                  '${_controller.controllerId}${choice.choiceId}',
+                              tag: '$heroTag${choice.choiceId}',
                               child: Center(
                                 child: SizedBox(
                                   width: double.infinity,
@@ -312,8 +313,7 @@ class IbQuestionMcItem extends StatelessWidget {
                             IbUtils.showInteractiveViewer(hero, context);
                           },
                           child: Hero(
-                            tag:
-                                '${_controller.controllerId}${choice.choiceId}',
+                            tag: '$heroTag${choice.choiceId}',
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(
                                   IbConfig.kMcItemCornerRadius),
@@ -369,7 +369,7 @@ class IbQuestionMcItem extends StatelessWidget {
                     return Positioned(
                       right: 8,
                       child: Text(
-                        '${((_controller.resultMap[choice.choiceId] ?? 0.toDouble() / _controller.totalPolled.value.toDouble()) * 100).toStringAsFixed(1)}%',
+                        '${((_controller.resultMap[choice] ?? 0 / _controller.totalPolled.value.toDouble()) * 100).toStringAsFixed(1)}%',
                         style: const TextStyle(color: Colors.black),
                       ),
                     );
@@ -378,7 +378,7 @@ class IbQuestionMcItem extends StatelessWidget {
                       milliseconds: IbConfig.kEventTriggerDelayInMillis),
                   tween: Tween<double>(
                       begin: 0,
-                      end: _controller.resultMap[choice.choiceId]!.toDouble() /
+                      end: _controller.resultMap[choice]! /
                           _controller.totalPolled.value.toDouble()),
                 ),
             ],

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
@@ -143,10 +142,10 @@ class _IbPicQuestionCardState extends State<IbPicQuestionCard>
                     onPressed: () {
                       widget._controller.rxIsExpanded.value =
                           !widget._controller.rxIsExpanded.isTrue;
-                      _runExpandCheck();
                     },
-                    icon: Obx(
-                      () => widget._controller.rxIsExpanded.isTrue
+                    icon: Obx(() {
+                      _runExpandCheck();
+                      return widget._controller.rxIsExpanded.isTrue
                           ? const Icon(
                               Icons.expand_less_rounded,
                               color: IbColors.primaryColor,
@@ -154,8 +153,8 @@ class _IbPicQuestionCardState extends State<IbPicQuestionCard>
                           : const Icon(
                               Icons.expand_more_outlined,
                               color: IbColors.primaryColor,
-                            ),
-                    ),
+                            );
+                    }),
                   ),
                 ],
               ),
@@ -178,6 +177,7 @@ class PicItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String heroTag = IbUtils.getUniqueId();
     if (ibChoice.url == null || ibChoice.url!.isEmpty) {
       return const SizedBox();
     }
@@ -202,7 +202,7 @@ class PicItem extends StatelessWidget {
                 : CachedNetworkImage(imageUrl: ibChoice.url!);
 
             final Widget hero = Hero(
-              tag: '${itemController.controllerId}${ibChoice.choiceId}',
+              tag: '$heroTag${ibChoice.choiceId}',
               child: Center(
                 child: SizedBox(
                   width: double.infinity,
@@ -235,15 +235,15 @@ class PicItem extends StatelessWidget {
                     top: -22,
                     child: Chip(
                       backgroundColor: IbUtils.handleIndicatorColor(
-                          itemController.resultMap[ibChoice.choiceId] ?? 0),
+                          itemController.resultMap[ibChoice] ?? 0),
                       padding: EdgeInsets.zero,
                       label: Text(
-                          '${((itemController.resultMap[ibChoice.choiceId] ?? 0) * 100).toStringAsFixed(1)}%',
+                          '${((itemController.resultMap[ibChoice] ?? 0) * 100).toStringAsFixed(1)}%',
                           style: const TextStyle(
                               fontSize: IbConfig.kDescriptionTextSize)),
                     )),
               Hero(
-                tag: '${itemController.controllerId}${ibChoice.choiceId}',
+                tag: '$heroTag${ibChoice.choiceId}',
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: itemController.isLocalFile

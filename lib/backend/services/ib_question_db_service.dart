@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 
 import '../db_config.dart';
 
@@ -9,6 +12,7 @@ class IbQuestionDbService {
   static final _db = FirebaseFirestore.instance;
   static const _kQuestionCollection = 'IbQuestions${DbConfig.dbSuffix}';
   static const _kAnswerCollectionGroup = 'Answers${DbConfig.dbSuffix}';
+  static const _kLikesCollectionGroup = 'Likes${DbConfig.dbSuffix}';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
 
   factory IbQuestionDbService() => _ibQuestionDbService;
@@ -272,9 +276,6 @@ class IbQuestionDbService {
       {required String questionId, required String choiceId}) async {
     await _collectionRef
         .doc(questionId)
-        .update({'pollSize': FieldValue.increment(1)});
-    await _collectionRef
-        .doc(questionId)
         .set({choiceId: FieldValue.increment(1)}, SetOptions(merge: true));
   }
 
@@ -335,6 +336,37 @@ class IbQuestionDbService {
         .doc(uid)
         .get();
     return _snapshot.exists;
+  }
+
+  Future<void> updateLikes(String questionId) async {
+    await _collectionRef
+        .doc(questionId)
+        .collection(_kLikesCollectionGroup)
+        .doc(IbUtils.getCurrentUid())
+        .set(
+      {
+        'uid': IbUtils.getCurrentUid(),
+        'timestampInMs': DateTime.now().millisecondsSinceEpoch,
+        'questionId': questionId,
+      },
+      SetOptions(merge: true),
+    );
+
+    await _collectionRef
+        .doc(questionId)
+        .set({'likes': FieldValue.increment(1)}, SetOptions(merge: true));
+  }
+
+  Future<void> removeLikes(String questionId) async {
+    await _collectionRef
+        .doc(questionId)
+        .collection(_kLikesCollectionGroup)
+        .doc(IbUtils.getCurrentUid())
+        .delete();
+
+    await _collectionRef
+        .doc(questionId)
+        .set({'likes': FieldValue.increment(-1)}, SetOptions(merge: true));
   }
 
   Future<void> eraseAllAnsweredQuestions(String uid) async {

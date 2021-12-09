@@ -23,7 +23,7 @@ class IbLinearIndicator extends StatelessWidget {
               child: LinearProgressIndicator(
                 color: IbUtils.handleIndicatorColor(endValue),
                 backgroundColor: IbColors.lightGrey,
-                minHeight: 5,
+                minHeight: 8,
                 value: endValue,
               ),
             ),
@@ -58,7 +58,7 @@ class IbLinearIndicator extends StatelessWidget {
                   child: LinearProgressIndicator(
                     color: IbUtils.handleIndicatorColor(value),
                     backgroundColor: IbColors.lightGrey,
-                    minHeight: 5,
+                    minHeight: 8,
                     value: value,
                   ),
                 ),
