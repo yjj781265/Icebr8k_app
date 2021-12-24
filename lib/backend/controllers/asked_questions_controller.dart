@@ -51,6 +51,8 @@ class AskedQuestionsController extends GetxController {
         lastDoc = event.docs.last;
       }
 
+      createdQuestions.removeWhere((element) => element.isAnonymous);
+
       createdQuestions
           .sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
       isLoading.value = false;
@@ -71,7 +73,8 @@ class AskedQuestionsController extends GetxController {
       for (final doc in _snapshot.docs) {
         final IbQuestion ibQuestion = IbQuestion.fromJson(doc.data());
         createdQuestions.addIf(
-            !createdQuestions.contains(ibQuestion), ibQuestion);
+            !createdQuestions.contains(ibQuestion) && !ibQuestion.isAnonymous,
+            ibQuestion);
       }
     } else {
       lastDoc = null;

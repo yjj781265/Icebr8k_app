@@ -4,15 +4,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
-import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
+import 'package:icebr8k/backend/controllers/ib_question_stats_controller.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_buttons.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_header.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_info.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_question_stats.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_stats_bar.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
@@ -68,32 +68,40 @@ class _IbPicQuestionCardState extends State<IbPicQuestionCard>
   Widget build(BuildContext context) {
     super.build(context);
     _runExpandCheck();
-    final Widget expandableInfo = Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Obx(() => Wrap(
-              spacing: 8,
-              runSpacing: 24,
-              children: widget._controller.rxIbQuestion.value.choices
-                  .map((e) =>
-                      PicItem(ibChoice: e, itemController: widget._controller))
-                  .toList(growable: false))),
-          if (IbQuestion.kPic ==
-              widget._controller.rxIbQuestion.value.questionType)
-            const Text(
-              'Double tap on the picture to enlarge',
-              style: TextStyle(
-                  color: IbColors.lightGrey,
-                  fontSize: IbConfig.kDescriptionTextSize),
+    final Widget expandableInfo = Obx(
+      () => Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (widget._controller.showStats.isTrue)
+              IbQuestionStats(Get.put(IbQuestionStatsController(
+                  questionId: widget._controller.rxIbQuestion.value.id,
+                  ibAnswers: widget._controller.ibAnswers!))),
+            if (widget._controller.showStats.isFalse)
+              Wrap(
+                  spacing: 8,
+                  runSpacing: 24,
+                  children: widget._controller.rxIbQuestion.value.choices
+                      .map((e) => PicItem(
+                          ibChoice: e, itemController: widget._controller))
+                      .toList(growable: false)),
+            if (IbQuestion.kPic ==
+                widget._controller.rxIbQuestion.value.questionType)
+              const Text(
+                'Double tap on the picture to enlarge',
+                style: TextStyle(
+                    color: IbColors.lightGrey,
+                    fontSize: IbConfig.kDescriptionTextSize),
+              ),
+            const SizedBox(
+              height: 8,
             ),
-          const SizedBox(
-            height: 8,
-          ),
-          Center(child: IbQuestionButtons(widget._controller)),
-        ],
+            if (widget._controller.showStats.isFalse)
+              Center(child: IbQuestionButtons(widget._controller)),
+          ],
+        ),
       ),
     );
     return SingleChildScrollView(
@@ -113,26 +121,6 @@ class _IbPicQuestionCardState extends State<IbPicQuestionCard>
                 sizeFactor: animation,
                 child: expandableInfo,
               ),
-
-              /// show current user answer if is available
-              if (Get.find<MyAnsweredQuestionsController>().retrieveAnswer(
-                          widget._controller.rxIbQuestion.value.id) !=
-                      null &&
-                  widget._controller.showMyAnswer)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Row(
-                    children: [
-                      IbUserAvatar(
-                        avatarUrl: IbUtils.getCurrentIbUser()!.avatarUrl,
-                        radius: 8,
-                      ),
-                      Text(
-                          ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.rxIbQuestion.value.id)!.choiceId}')
-                    ],
-                  ),
-                ),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -220,8 +208,8 @@ class PicItem extends StatelessWidget {
             alignment: AlignmentDirectional.center,
             children: [
               Container(
-                width: IbConfig.kMcPicItemHeight,
-                height: IbConfig.kMcPicItemHeight,
+                width: IbConfig.kPicHeight + 16,
+                height: IbConfig.kPicHeight + 16,
                 decoration: BoxDecoration(
                     borderRadius: const BorderRadius.all(
                         Radius.circular(IbConfig.kMcItemCornerRadius)),
@@ -230,18 +218,6 @@ class PicItem extends StatelessWidget {
                         ? IbColors.primaryColor
                         : IbColors.lightBlue),
               ),
-              if (!itemController.isSample && itemController.showResult.isTrue)
-                Positioned(
-                    top: -22,
-                    child: Chip(
-                      backgroundColor: IbUtils.handleIndicatorColor(
-                          itemController.resultMap[ibChoice] ?? 0),
-                      padding: EdgeInsets.zero,
-                      label: Text(
-                          '${((itemController.resultMap[ibChoice] ?? 0) * 100).toStringAsFixed(1)}%',
-                          style: const TextStyle(
-                              fontSize: IbConfig.kDescriptionTextSize)),
-                    )),
               Hero(
                 tag: '$heroTag${ibChoice.choiceId}',
                 child: ClipRRect(
@@ -249,13 +225,13 @@ class PicItem extends StatelessWidget {
                   child: itemController.isLocalFile
                       ? Image.file(
                           File(ibChoice.url!),
-                          height: IbConfig.kMcPicHeight,
-                          width: IbConfig.kMcPicHeight,
+                          height: IbConfig.kPicHeight,
+                          width: IbConfig.kPicHeight,
                         )
                       : CachedNetworkImage(
                           imageUrl: ibChoice.url!,
-                          height: IbConfig.kMcPicHeight,
-                          width: IbConfig.kMcPicHeight,
+                          height: IbConfig.kPicHeight,
+                          width: IbConfig.kPicHeight,
                         ),
                 ),
               ),

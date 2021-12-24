@@ -338,7 +338,20 @@ class IbQuestionDbService {
     return _snapshot.exists;
   }
 
+  Future<bool> isLiked(String questionId) async {
+    final snapshot = await _collectionRef
+        .doc(questionId)
+        .collection(_kLikesCollectionGroup)
+        .doc(IbUtils.getCurrentUid())
+        .get();
+
+    return snapshot.exists;
+  }
+
   Future<void> updateLikes(String questionId) async {
+    if (await isLiked(questionId)) {
+      return;
+    }
     await _collectionRef
         .doc(questionId)
         .collection(_kLikesCollectionGroup)
@@ -358,6 +371,9 @@ class IbQuestionDbService {
   }
 
   Future<void> removeLikes(String questionId) async {
+    if (!await isLiked(questionId)) {
+      return;
+    }
     await _collectionRef
         .doc(questionId)
         .collection(_kLikesCollectionGroup)

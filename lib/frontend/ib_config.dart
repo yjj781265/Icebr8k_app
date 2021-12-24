@@ -31,6 +31,8 @@ class IbConfig {
   static const double kMcTxtItemHeight = 48;
   static const double kMcPicItemHeight = 88;
   static const double kMcPicHeight = 72;
+  static const double kPicHeight = 88;
+
   static const double kMcItemCornerRadius = 8;
   static const String kVersion = '0.1.1${DbConfig.dbSuffix}';
 

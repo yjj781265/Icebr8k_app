@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
-import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
+import 'package:icebr8k/backend/controllers/ib_question_stats_controller.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_buttons.dart';
@@ -16,7 +16,7 @@ import '../ib_colors.dart';
 import '../ib_config.dart';
 import '../ib_utils.dart';
 import 'ib_card.dart';
-import 'ib_user_avatar.dart';
+import 'ib_question_stats.dart';
 
 class IbMcQuestionCard extends StatefulWidget {
   final IbQuestionItemController _controller;
@@ -68,47 +68,56 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
     _runExpandCheck();
     final Widget expandableInfo = Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Scrollbar(
-            controller: _scrollController,
-            isAlwaysShown: true,
-            child: LimitedBox(
-              maxHeight: 300,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: ListView.builder(
-                  controller: _scrollController,
-                  itemBuilder: (context, index) {
-                    final IbChoice _choice =
-                        widget._controller.rxIbQuestion.value.choices[index];
-                    return IbQuestionMcItem(_choice, widget._controller);
-                  },
-                  shrinkWrap: true,
-                  itemCount:
-                      widget._controller.rxIbQuestion.value.choices.length,
-                ),
+      child: Obx(
+        () => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Scrollbar(
+              isAlwaysShown: true,
+              controller: _scrollController,
+              child: widget._controller.showStats.isTrue
+                  ? IbQuestionStats(Get.put(
+                      IbQuestionStatsController(
+                          ibAnswers: widget._controller.ibAnswers!,
+                          questionId: widget._controller.rxIbQuestion.value.id),
+                      tag: widget._controller.rxIbQuestion.value.id))
+                  : LimitedBox(
+                      maxHeight: 300,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemBuilder: (context, index) {
+                            final IbChoice _choice = widget
+                                ._controller.rxIbQuestion.value.choices[index];
+                            return IbQuestionMcItem(
+                                _choice, widget._controller);
+                          },
+                          shrinkWrap: true,
+                          itemCount: widget
+                              ._controller.rxIbQuestion.value.choices.length,
+                        ),
+                      ),
+                    ),
+            ),
+            if (IbQuestion.kMultipleChoicePic ==
+                widget._controller.rxIbQuestion.value.questionType)
+              const Text(
+                'Double tap on the picture to enlarge',
+                style: TextStyle(
+                    color: IbColors.lightGrey,
+                    fontSize: IbConfig.kDescriptionTextSize),
               ),
+            const SizedBox(
+              height: 8,
             ),
-          ),
-          if (IbQuestion.kMultipleChoicePic ==
-              widget._controller.rxIbQuestion.value.questionType)
-            const Text(
-              'Double tap on the picture to enlarge',
-              style: TextStyle(
-                  color: IbColors.lightGrey,
-                  fontSize: IbConfig.kDescriptionTextSize),
-            ),
-          const SizedBox(
-            height: 8,
-          ),
-          Center(child: IbQuestionButtons(widget._controller)),
-        ],
+            if (!widget._controller.showStats.value)
+              Center(child: IbQuestionButtons(widget._controller)),
+          ],
+        ),
       ),
     );
     return SingleChildScrollView(
@@ -129,25 +138,6 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                     sizeFactor: animation,
                     child: expandableInfo,
                   ),
-
-                  /// show current user answer if is available
-                  if (Get.find<MyAnsweredQuestionsController>().retrieveAnswer(
-                              widget._controller.rxIbQuestion.value.id) !=
-                          null &&
-                      widget._controller.showMyAnswer)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Row(
-                        children: [
-                          IbUserAvatar(
-                            avatarUrl: IbUtils.getCurrentIbUser()!.avatarUrl,
-                            radius: 8,
-                          ),
-                          Text(
-                              ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.rxIbQuestion.value.id)!.choiceId}')
-                        ],
-                      ),
-                    ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -195,12 +185,13 @@ class IbQuestionMcItem extends StatelessWidget {
     if (choice.choiceId == _controller.selectedChoiceId.value) {
       return IbColors.primaryColor;
     }
-    if (_controller.totalPolled.value > 0 &&
-        (_controller.resultMap[choice] ?? 0) == 0 &&
-        _controller.showResult.isTrue) {
-      return IbColors.lightBlue;
+
+    if (_controller.showResult.isTrue &&
+        (_controller.resultMap[choice] ?? 0) != 0) {
+      return IbColors.lightGrey;
     }
-    return IbColors.lightGrey;
+
+    return IbColors.lightBlue;
   }
 
   double getItemWidth() {

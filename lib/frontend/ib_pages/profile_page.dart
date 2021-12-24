@@ -173,12 +173,6 @@ class _ProfilePageState extends State<ProfilePage>
                                 style: const TextStyle(
                                     fontSize: IbConfig.kNormalTextSize),
                               ),
-                              /*  Text(
-                                      '🎂 ${_profileController.isMe.isTrue ? IbUtils.readableDateTime(DateTime.fromMillisecondsSinceEpoch(_homeController.currentBirthdate.value)) : IbUtils.readableDateTime(DateTime.fromMillisecondsSinceEpoch(_profileController.birthdateInMs.value))}',
-                                      style: const TextStyle(
-                                          fontSize:
-                                              IbConfig.kNormalTextSize),
-                                    ),*/
                               if (_profileController.isMe.isFalse)
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,11 +267,11 @@ class _ProfilePageState extends State<ProfilePage>
                           if (_profileController.isMe.isFalse)
                             Tab(
                                 text:
-                                    'Common Answers(${_commonAnswersController.commonAnswers.length})'),
+                                    'Common Answers(${_commonAnswersController.ibQuestions.length})'),
                           if (_profileController.isMe.isFalse)
                             Tab(
                                 text:
-                                    'Different Answers(${_uncommonAnswersController.uncommonAnswers.length})'),
+                                    'Different Answers(${_uncommonAnswersController.ibQuestions.length})'),
                           Tab(
                               text:
                                   'Asked Questions(${_profileController.isMe.isTrue ? _homeController.askedSize.value : _profileController.totalAsked.value})'),
@@ -679,7 +673,7 @@ class _CommonAnswersTabState extends State<CommonAnswersTab>
           enablePullDown: false,
           enablePullUp: true,
           onLoading: () async {
-            if (widget._commonAnswersController.lastIbAnswer == null) {
+            if (widget._commonAnswersController.lastIndex == 0) {
               widget.refreshController.loadNoData();
               return;
             }
@@ -698,10 +692,9 @@ class _CommonAnswersTabState extends State<CommonAnswersTab>
               } else {
                 _controller = Get.put(
                     IbQuestionItemController(
+                        ibAnswers: widget._commonAnswersController
+                            .retrieveAnswers(item.id),
                         rxIsExpanded: false.obs,
-                        rxIbAnswer: widget._commonAnswersController
-                            .retrieveAnswer(item.id)!
-                            .obs,
                         rxIbQuestion: item.obs,
                         disableAvatarOnTouch:
                             item.creatorId == widget.widget.uid),
@@ -776,7 +769,7 @@ class _DifferentAnswersTabState extends State<DifferentAnswersTab>
           enablePullDown: false,
           enablePullUp: true,
           onLoading: () async {
-            if (widget._uncommonAnswersController.lastIbAnswer == null) {
+            if (widget._uncommonAnswersController.lastIndex == 0) {
               widget.refreshController.loadNoData();
               return;
             }
@@ -797,10 +790,8 @@ class _DifferentAnswersTabState extends State<DifferentAnswersTab>
                 _controller = Get.put(
                     IbQuestionItemController(
                         rxIsExpanded: false.obs,
-                        rxIbAnswer: widget._uncommonAnswersController
-                            .retrieveAnswer(item.id)!
-                            .obs,
-                        showMyAnswer: true,
+                        ibAnswers: widget._uncommonAnswersController
+                            .retrieveAnswers(item.id),
                         rxIbQuestion: item.obs,
                         disableAvatarOnTouch:
                             item.creatorId == widget.widget.uid),

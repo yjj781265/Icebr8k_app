@@ -25,7 +25,7 @@ class _DescriptionTextWidgetState extends State<IbDescriptionText>
 
   @override
   Widget build(BuildContext context) {
-    isOverFlow = widget.text.length >= 30;
+    isOverFlow = widget.text.length >= 100;
     return AnimatedSize(
       duration:
           const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
@@ -34,8 +34,9 @@ class _DescriptionTextWidgetState extends State<IbDescriptionText>
         children: <Widget>[
           Text(
             widget.text,
-            overflow: isExpanded ? null : TextOverflow.ellipsis,
-            style: const TextStyle(
+            softWrap: true,
+            style: TextStyle(
+              overflow: isExpanded ? null : TextOverflow.ellipsis,
               fontSize: IbConfig.kNormalTextSize,
             ),
           ),

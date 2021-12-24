@@ -22,9 +22,6 @@ class MyAnsweredQuestionsController extends GetxController {
     print("MyAnsweredQuestionsController init");
     super.onInit();
     myAnsweredQStream = broadcastStream.listen((event) async {
-      print(
-          "MyAnsweredQuestionsController total answered questions : ${event.size}");
-
       for (final docChange in event.docChanges) {
         final IbAnswer ibAnswer = IbAnswer.fromJson(docChange.doc.data()!);
         if (docChange.type == DocumentChangeType.added) {
@@ -41,6 +38,14 @@ class MyAnsweredQuestionsController extends GetxController {
               IbLocalStorageService().appendUnAnsweredIbQidList(ibQuestion);
             }
           }
+        } else if (docChange.type == DocumentChangeType.modified) {
+          final int index = ibAnswers.indexWhere(
+              (element) => element.questionId == ibAnswer.questionId);
+          if (index == -1) {
+            return;
+          }
+          ibAnswers[index] = ibAnswer;
+          print("MyAnsweredQuestionsController modified");
         }
       }
     }, onDone: () {

@@ -40,7 +40,7 @@ class IbUtils {
         cropStyle: cropStyle,
         aspectRatioPresets: ratios,
         androidUiSettings: AndroidUiSettings(
-            toolbarColor: IbColors.lightBlue,
+            toolbarColor: IbColors.darkPrimaryColor,
             toolbarTitle: 'Image Cropper',
             initAspectRatio: initAspectRatio,
             lockAspectRatio: lockAspectRatio),
@@ -278,13 +278,20 @@ class IbUtils {
     final List<IbAnswer> uid1QuestionAnswers = [];
     uid1QuestionAnswers
         .addAll(Get.find<MyAnsweredQuestionsController>().ibAnswers);
+    print(uid1QuestionAnswers);
     final List<IbAnswer> uid2QuestionAnswers =
         await IbQuestionDbService().queryUserAnswers(uid);
 
-    return uid2QuestionAnswers
+    final List<IbAnswer> common1 = uid2QuestionAnswers
         .toSet()
         .intersection(uid1QuestionAnswers.toSet())
         .toList();
+    final List<IbAnswer> common2 = uid1QuestionAnswers
+        .toSet()
+        .intersection(uid2QuestionAnswers.toSet())
+        .toList();
+    common1.addAll(common2);
+    return common1;
   }
 
   static Future<List<IbAnswer>> getUncommonAnswersQ(String uid) async {
@@ -306,20 +313,20 @@ class IbUtils {
       uid2QuestionIds.add(answer.questionId);
     }
 
-    final List<String> commonQ =
+    final List<String> commonQuestionId =
         uid1QuestionIds.toSet().intersection(uid2QuestionIds.toSet()).toList();
     final List<IbAnswer> uncommonAnswers = [];
 
-    for (final id in commonQ) {
+    for (final id in commonQuestionId) {
       if (uid1QuestionAnswers
               .firstWhere((element) => element.questionId == id)
               .choiceId !=
           uid2QuestionAnswers
               .firstWhere((element) => element.questionId == id)
               .choiceId) {
-        print(
-            'add uncommon answer ${uid2QuestionAnswers.firstWhere((element) => element.questionId == id)}');
         uncommonAnswers.add(uid2QuestionAnswers
+            .firstWhere((element) => element.questionId == id));
+        uncommonAnswers.add(uid1QuestionAnswers
             .firstWhere((element) => element.questionId == id));
       }
     }

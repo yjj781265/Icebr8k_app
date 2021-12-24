@@ -26,16 +26,15 @@ class IbAnswer {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
       other is IbAnswer &&
-          choiceId == other.choiceId &&
-          questionId == other.questionId;
+      choiceId == other.choiceId &&
+      questionId == other.questionId;
 
   @override
   int get hashCode => choiceId.hashCode ^ questionId.hashCode;
 
   @override
   String toString() {
-    return 'IbAnswer{answer: $choiceId, questionType: $questionType';
+    return 'IbAnswer{choiceId: $choiceId, uid: $uid, questionId: $questionId, questionType: $questionType}';
   }
 }

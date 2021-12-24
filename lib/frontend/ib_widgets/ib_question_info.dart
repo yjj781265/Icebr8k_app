@@ -10,31 +10,34 @@ class IbQuestionInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
-          child: Text(
-            _controller.rxIbQuestion.value.question,
-            style: const TextStyle(
-                fontSize: IbConfig.kPageTitleSize, fontWeight: FontWeight.bold),
-          ),
-        ),
-        if (_controller.rxIbQuestion.value.description.trim().isNotEmpty)
+    return Obx(
+      () => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16),
-            child: Obx(
-              () => Text(
-                _controller.rxIbQuestion.value.description.trim(),
+            padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
+            child: Text(
+              _controller.rxIbQuestion.value.question,
+              style: const TextStyle(
+                  fontSize: IbConfig.kPageTitleSize,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
+          if (_controller.rxIbQuestion.value.endpoints != null &&
+              _controller.rxIbQuestion.value.endpoints!.length == 2 &&
+              _controller.showStats.isTrue)
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16),
+              child: Text(
+                '1: ${_controller.rxIbQuestion.value.endpoints?.first.content}  5:${_controller.rxIbQuestion.value.endpoints?.last.content}',
                 overflow: _controller.rxIsExpanded.value
                     ? null
                     : TextOverflow.ellipsis,
                 style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
               ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -10,8 +10,9 @@ import 'ib_user_avatar.dart';
 
 class IbQuestionHeader extends StatelessWidget {
   final IbQuestionItemController _itemController;
-
-  const IbQuestionHeader(this._itemController);
+  const IbQuestionHeader(
+    this._itemController,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -25,27 +26,26 @@ class IbQuestionHeader extends StatelessWidget {
             () => Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (!_itemController.rxIbQuestion.value.isAnonymous)
-                  _handleAvatarImage(),
-                if (!_itemController.rxIbQuestion.value.isAnonymous)
-                  const SizedBox(
-                    width: 8,
-                  ),
+                _handleAvatarImage(),
+                const SizedBox(
+                  width: 8,
+                ),
                 SizedBox(
                   width: 200,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (!_itemController.rxIbQuestion.value.isAnonymous)
-                        Text(
-                          _itemController.title.value,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: const TextStyle(
-                              fontSize: IbConfig.kNormalTextSize,
-                              fontWeight: FontWeight.w700),
-                        ),
+                      Text(
+                        _itemController.rxIbQuestion.value.isAnonymous
+                            ? 'Anonymous'
+                            : _itemController.title.value,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: const TextStyle(
+                            fontSize: IbConfig.kNormalTextSize,
+                            fontWeight: FontWeight.w700),
+                      ),
                       _handleSubString(),
                     ],
                   ),
@@ -70,28 +70,28 @@ class IbQuestionHeader extends StatelessWidget {
 
   Widget _handleAvatarImage() {
     return Obx(() {
-      return IbUserAvatar(
-        disableOnTap: _itemController.disableAvatarOnTouch,
-        avatarUrl: _itemController.avatarUrl.value,
-        uid: _itemController.ibUser == null ? '' : _itemController.ibUser!.id,
+      if (!_itemController.rxIbQuestion.value.isAnonymous) {
+        return IbUserAvatar(
+          disableOnTap: _itemController.disableAvatarOnTouch,
+          avatarUrl: _itemController.avatarUrl.value,
+          uid: _itemController.ibUser == null ? '' : _itemController.ibUser!.id,
+          radius: 16,
+        );
+      }
+
+      return const CircleAvatar(
+        backgroundColor: IbColors.primaryColor,
         radius: 16,
+        child: Text(
+          'A',
+          style: TextStyle(color: Colors.black),
+        ),
       );
     });
   }
 
   Widget _handleSubString() {
     return Obx(() {
-      if (_itemController.rxIbQuestion.value.isAnonymous) {
-        return Text(
-            'Anonymous • ${IbUtils.getAgoDateTimeString(
-              DateTime.fromMillisecondsSinceEpoch(
-                  _itemController.rxIbQuestion.value.askedTimeInMs),
-            )} ${_itemController.rxIbQuestion.value.endTimeInMs == -1 ? '' : ' • ${IbUtils.leftTimeString(_itemController.rxIbQuestion.value.endTimeInMs)}'}',
-            style: const TextStyle(
-                fontSize: IbConfig.kDescriptionTextSize,
-                fontWeight: FontWeight.bold));
-      }
-
       return Text(
           '${IbUtils.getAgoDateTimeString(
             DateTime.fromMillisecondsSinceEpoch(

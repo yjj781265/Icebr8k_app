@@ -65,6 +65,7 @@ class MainApp extends StatelessWidget {
         defaultTransition: Transition.cupertino,
         debugShowCheckedModeBanner: false,
         home: SplashPage(),
+        enableLog: false,
         translations: IbStrings(),
         locale: const Locale('en', 'US'),
         themeMode: ThemeMode.light,

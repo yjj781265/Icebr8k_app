@@ -25,6 +25,9 @@ class IbQuestionButtons extends StatelessWidget {
                     (_controller.rxIbAnswer != null &&
                         _controller.rxIbAnswer!.value.uid !=
                             IbUtils.getCurrentUid()) ||
+                    _controller.rxIbAnswer != null &&
+                        _controller.rxIbAnswer!.value.choiceId ==
+                            _controller.selectedChoiceId.value ||
                     _controller.isAnswering.isTrue,
                 onPressed: () async {
                   await _controller.onVote();

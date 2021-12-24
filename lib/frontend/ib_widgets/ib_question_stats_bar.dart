@@ -8,6 +8,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import '../ib_config.dart';
 import '../ib_utils.dart';
 
+/// show action icons with like, poll size, comment
 class IbQuestionStatsBar extends StatelessWidget {
   final IbQuestionItemController _itemController;
 
@@ -38,7 +39,10 @@ class IbQuestionStatsBar extends StatelessWidget {
                             color: _itemController.rxIbAnswer != null
                                 ? IbColors.primaryColor
                                 : IbColors.lightGrey,
-                            size: 18,
+                            size: 22,
+                          ),
+                          const SizedBox(
+                            width: 8,
                           ),
                           Text(
                             _itemController.totalPolled.value.toString(),
@@ -60,10 +64,10 @@ class IbQuestionStatsBar extends StatelessWidget {
                             const FaIcon(
                               FontAwesomeIcons.comment,
                               color: IbColors.lightGrey,
-                              size: 16,
+                              size: 19,
                             ),
                             const SizedBox(
-                              width: 3,
+                              width: 8,
                             ),
                             Text(
                               _statsShortString(_itemController.comments.value),
@@ -76,7 +80,6 @@ class IbQuestionStatsBar extends StatelessWidget {
                     ),
                   InkWell(
                     onTap: _itemController.isSample ||
-                            _itemController.selectedChoiceId.isEmpty ||
                             (_itemController.rxIbAnswer != null &&
                                 _itemController.rxIbAnswer!.value.uid !=
                                     IbUtils.getCurrentUid())
@@ -94,10 +97,10 @@ class IbQuestionStatsBar extends StatelessWidget {
                             color: _itemController.liked.isTrue
                                 ? IbColors.accentColor
                                 : IbColors.lightGrey,
-                            size: 16,
+                            size: 19,
                           ),
                           const SizedBox(
-                            width: 3,
+                            width: 8,
                           ),
                           Text(
                             _itemController.likes.value.toString(),
@@ -109,11 +112,9 @@ class IbQuestionStatsBar extends StatelessWidget {
                     ),
                   ),
                   InkWell(
-                    onTap: _itemController.isSample
-                        ? null
-                        : () {
-                            showTagBtmSheet(context);
-                          },
+                    onTap: () {
+                      showTagBtmSheet(context);
+                    },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
@@ -121,11 +122,11 @@ class IbQuestionStatsBar extends StatelessWidget {
                         children: [
                           const Icon(
                             FontAwesomeIcons.tag,
-                            size: 16,
+                            size: 19,
                             color: IbColors.lightGrey,
                           ),
                           const SizedBox(
-                            width: 3,
+                            width: 8,
                           ),
                           Text(
                             '${_itemController.totalTags.value}',
@@ -175,20 +176,26 @@ class IbQuestionStatsBar extends StatelessWidget {
       child: Wrap(
         spacing: 8,
         runSpacing: 8,
-        children: _itemController.ibTags
-            .map(
-              (e) => Chip(
-                backgroundColor: Theme.of(context).backgroundColor,
-                label: Text(e.text),
-              ),
-            )
-            .toList(),
+        children: _itemController.isSample
+            ? _itemController.rxIbQuestion.value.tagIds
+                .map(
+                  (e) => Chip(
+                    backgroundColor: Theme.of(context).backgroundColor,
+                    label: Text(e),
+                  ),
+                )
+                .toList()
+            : _itemController.ibTags
+                .map(
+                  (e) => Chip(
+                    backgroundColor: Theme.of(context).backgroundColor,
+                    label: Text(e.text),
+                  ),
+                )
+                .toList(),
       ),
     ));
 
-    Get.bottomSheet(SizedBox(
-      height: 333,
-      child: widget,
-    ));
+    Get.bottomSheet(widget, isScrollControlled: true);
   }
 }

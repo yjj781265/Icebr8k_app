@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/backend/models/ib_tag.dart';
+import 'package:icebr8k/backend/services/ib_tag_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/review_question_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
@@ -18,36 +20,23 @@ class IbCreateQuestionController extends GetxController {
   final picChoiceList = <IbChoice>[].obs;
   final picList = <IbChoice>[].obs;
   final scaleEndPoints = <IbChoice>[].obs;
-  final ibTagCheckBoxModels = <IbTagCheckBoxModel>[].obs;
+  final ibTagModels = <IbTagModel>[].obs;
   final filePath = ''.obs;
   String question = '';
   String description = '';
   final isCustomTagSelected = false.obs;
-  final tags = [
-    'General 🤔',
-    'Food & Drink 🌭 ',
-    'Entertainment 📽️',
-    'Sports ⚽',
-    'Nature 🌳',
-    'Photography 📸 ',
-    'Animal 🐕',
-    'Science 🔬 ',
-    'Funny 😂',
-    'Love ❤ ',
-    'Fashion 👚 ',
-    'Literature 📖 ',
-    'Technology 🤖'
-  ].obs;
-
   final pickedTags = <String>[].obs;
 
   @override
-  void onInit() {
-    super.onInit();
-    tags.sort();
-    for (final element in tags) {
-      ibTagCheckBoxModels
-          .add(IbTagCheckBoxModel(tag: element, selected: false.obs));
+  Future<void> onReady() async {
+    super.onReady();
+    await initTrendingTags();
+  }
+
+  Future<void> initTrendingTags() async {
+    final List<IbTag> ibTags = await IbTagDbService().retrieveTrendingIbTags();
+    for (final tag in ibTags) {
+      ibTagModels.add(IbTagModel(tag: tag, selected: false));
     }
   }
 
@@ -158,20 +147,21 @@ class IbCreateQuestionController extends GetxController {
     final String id = IbUtils.getUniqueId();
     if (questionType == IbQuestion.kScale) {
       final _controller = IbQuestionItemController(
-          rxIbQuestion: IbQuestion(
-            question: question.trim(),
-            id: id,
-            creatorId: Get.find<AuthController>().firebaseUser!.uid,
-            description: description.trim(),
-            tagIds: pickedTags,
-            questionType: questionType.trim(),
-            askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
-            endpoints: scaleEndPoints,
-            choices: _generateScaleChoiceList(),
-          ).obs,
-          isSample: true,
-          disableAvatarOnTouch: true,
-          rxIsExpanded: false.obs);
+        rxIbQuestion: IbQuestion(
+          question: question.trim(),
+          id: id,
+          creatorId: Get.find<AuthController>().firebaseUser!.uid,
+          description: description.trim(),
+          tagIds: pickedTags,
+          questionType: questionType.trim(),
+          askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
+          endpoints: scaleEndPoints,
+          choices: _generateScaleChoiceList(),
+        ).obs,
+        isSample: true,
+        disableAvatarOnTouch: true,
+        rxIsExpanded: true.obs,
+      );
       Get.to(
         () => ReviewQuestionPage(
           itemController: Get.put(_controller, tag: 'sample_$id'),
@@ -194,7 +184,7 @@ class IbCreateQuestionController extends GetxController {
           ).obs,
           isSample: true,
           isLocalFile: true,
-          rxIsExpanded: false.obs,
+          rxIsExpanded: true.obs,
           disableAvatarOnTouch: true);
       Get.to(
         () => ReviewQuestionPage(
@@ -217,7 +207,7 @@ class IbCreateQuestionController extends GetxController {
             choices: choiceList,
           ).obs,
           isSample: true,
-          rxIsExpanded: false.obs,
+          rxIsExpanded: true.obs,
           disableAvatarOnTouch: true);
       Get.to(
         () => ReviewQuestionPage(
@@ -240,7 +230,7 @@ class IbCreateQuestionController extends GetxController {
             choices: picList,
           ).obs,
           isSample: true,
-          rxIsExpanded: false.obs,
+          rxIsExpanded: true.obs,
           isLocalFile: true,
           disableAvatarOnTouch: true);
       Get.to(
@@ -277,9 +267,9 @@ class IbCreateQuestionController extends GetxController {
   }
 }
 
-class IbTagCheckBoxModel {
-  String tag;
-  RxBool selected;
+class IbTagModel {
+  IbTag tag;
+  bool selected;
 
-  IbTagCheckBoxModel({required this.tag, required this.selected});
+  IbTagModel({required this.tag, required this.selected});
 }

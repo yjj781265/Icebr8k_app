@@ -25,17 +25,18 @@ class IbQuestionItemController extends GetxController {
   ///user who created the question
   IbUser? ibUser;
 
-  /// voted timestamp in dateTime
-  final votedDateTime = DateTime.now().obs;
   final title = ''.obs;
   final subtitle = ''.obs;
   final avatarUrl = ''.obs;
   final bool isSample;
+  final List<IbAnswer>? ibAnswers;
   final bool isLocalFile;
   final bool disableAvatarOnTouch;
-  final bool showMyAnswer;
   final bool disableChoiceOnTouch;
   final RxBool rxIsExpanded;
+
+  /// show the picked option from multiple people
+  final showStats = false.obs;
 
   /// if user already answered, pass the answer here
   Rx<IbAnswer>? rxIbAnswer;
@@ -50,20 +51,23 @@ class IbQuestionItemController extends GetxController {
   final resultMap = <IbChoice, double>{}.obs;
   final List<IbTag> ibTags = [];
 
-  IbQuestionItemController(
-      {required this.rxIbQuestion,
-      required this.rxIsExpanded,
-      this.isSample = false,
-      this.disableChoiceOnTouch = false,
-      this.disableAvatarOnTouch = false,
-      this.isLocalFile = false,
-      this.rxIbAnswer,
-      this.showMyAnswer = false});
+  IbQuestionItemController({
+    required this.rxIbQuestion,
+    required this.rxIsExpanded,
+    this.isSample = false,
+    this.disableChoiceOnTouch = false,
+    this.disableAvatarOnTouch = false,
+    this.isLocalFile = false,
+    this.rxIbAnswer,
+    this.ibAnswers,
+  });
 
   @override
   Future<void> onInit() async {
     /// query question author user info
     ibUser = await IbUserDbService().queryIbUser(rxIbQuestion.value.creatorId);
+
+    showStats.value = ibAnswers != null && ibAnswers!.isNotEmpty;
 
     if (rxIbAnswer == null) {
       /// query my answer to this question
@@ -83,7 +87,8 @@ class IbQuestionItemController extends GetxController {
 
     if (ibUser != null) {
       /// populate title ..etc
-      title.value = ibUser!.username;
+      title.value =
+          rxIbQuestion.value.isAnonymous ? 'Anonymous' : ibUser!.username;
       subtitle.value = IbUtils.getAgoDateTimeString(
           DateTime.fromMillisecondsSinceEpoch(
               rxIbQuestion.value.askedTimeInMs));
@@ -93,8 +98,8 @@ class IbQuestionItemController extends GetxController {
     await generateIbTags();
     await generatePollStats();
     totalTags.value = rxIbQuestion.value.tagIds.length;
+    liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
     likes.value = rxIbQuestion.value.likes;
-    print(rxIbQuestion.value.choices);
     super.onInit();
   }
 
@@ -116,9 +121,12 @@ class IbQuestionItemController extends GetxController {
     }
 
     for (final IbChoice ibChoice in rxIbQuestion.value.choices) {
-      resultMap[ibChoice] =
-          (countMap[ibChoice] ?? 0).toDouble() / counter.toDouble();
+      resultMap[ibChoice] = double.parse(
+          ((countMap[ibChoice] ?? counter).toDouble() / counter.toDouble())
+              .toStringAsFixed(1));
     }
+
+    print(resultMap);
 
     totalPolled.value = counter;
   }

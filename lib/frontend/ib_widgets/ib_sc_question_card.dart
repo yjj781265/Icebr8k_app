@@ -2,20 +2,19 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
-import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
-import 'package:icebr8k/backend/models/ib_choice.dart';
+import 'package:icebr8k/backend/controllers/ib_question_stats_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_buttons.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_header.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_stats_bar.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
 import '../ib_utils.dart';
 import 'ib_card.dart';
 import 'ib_question_info.dart';
+import 'ib_question_stats.dart';
 
 class IbScQuestionCard extends StatefulWidget {
   final IbQuestionItemController _controller;
@@ -76,42 +75,134 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     _runExpandCheck();
     final Widget expandableInfo = Obx(
       () => Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
+        padding: const EdgeInsets.only(left: 16, right: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GestureDetector(
               onDoubleTap: () {
+                if (widget._controller.isSample ||
+                    widget._controller.showResult.isFalse) {
+                  return;
+                }
                 widget._controller.isSwitched.value =
                     !widget._controller.isSwitched.value;
               },
-              child: AnimatedSwitcher(
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  return ScaleTransition(scale: animation, child: child);
-                },
-                duration: const Duration(
-                    milliseconds: IbConfig.kEventTriggerDelayInMillis),
-                child: widget._controller.isSwitched.value
-                    ? Center(
-                        child: SizedBox(
-                          height: 100,
-                          child: _cardBackSide(),
-                        ),
-                      )
-                    : SizedBox(
-                        key: const ValueKey(1),
-                        height: 100,
-                        child: Center(
-                            child: IbQuestionScItem(widget._controller))),
-              ),
+              child: widget._controller.showStats.value
+                  ? IbQuestionStats(Get.put(
+                      IbQuestionStatsController(
+                          ibAnswers: widget._controller.ibAnswers!,
+                          questionId: widget._controller.rxIbQuestion.value.id),
+                      tag: widget._controller.rxIbQuestion.value.id))
+                  : AnimatedSwitcher(
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
+                        return ScaleTransition(scale: animation, child: child);
+                      },
+                      duration: const Duration(
+                          milliseconds: IbConfig.kEventTriggerDelayInMillis),
+                      child: widget._controller.isSwitched.value
+                          ? SizedBox(
+                              height: 150,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _showBarChart(),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                            width: 150,
+                                            child: Text(
+                                              widget
+                                                  ._controller
+                                                  .rxIbQuestion
+                                                  .value
+                                                  .endpoints!
+                                                  .first
+                                                  .content!,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              textAlign: TextAlign.start,
+                                            )),
+                                        SizedBox(
+                                            width: 150,
+                                            child: Text(
+                                              widget._controller.rxIbQuestion
+                                                  .value.endpoints![1].content!,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              textAlign: TextAlign.end,
+                                            ))
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : SizedBox(
+                              key: const ValueKey(1),
+                              height: 150,
+                              child: Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IbQuestionScItem(widget._controller),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          SizedBox(
+                                              width: 150,
+                                              child: Text(
+                                                widget
+                                                    ._controller
+                                                    .rxIbQuestion
+                                                    .value
+                                                    .endpoints!
+                                                    .first
+                                                    .content!,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                textAlign: TextAlign.start,
+                                              )),
+                                          SizedBox(
+                                              width: 150,
+                                              child: Text(
+                                                widget
+                                                    ._controller
+                                                    .rxIbQuestion
+                                                    .value
+                                                    .endpoints![1]
+                                                    .content!,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                textAlign: TextAlign.end,
+                                              ))
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )),
+                    ),
             ),
-            const SizedBox(
-              height: 8,
-            ),
-            if (widget._controller.showResult.isTrue)
+            if (widget._controller.showResult.isTrue &&
+                !widget._controller.showStats.value)
               widget._controller.isSwitched.isTrue
                   ? const Text(
-                      'Double tap pie chart to show slider',
+                      'Double tap bar chart to show slider',
                       style: TextStyle(
                           fontSize: IbConfig.kDescriptionTextSize,
                           color: IbColors.lightGrey),
@@ -121,9 +212,10 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                           fontSize: IbConfig.kDescriptionTextSize,
                           color: IbColors.lightGrey)),
             const SizedBox(
-              height: 16,
+              height: 8,
             ),
-            IbQuestionButtons(widget._controller),
+            if (!widget._controller.showStats.value)
+              IbQuestionButtons(widget._controller),
           ],
         ),
       ),
@@ -137,29 +229,13 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
             children: [
               IbQuestionHeader(widget._controller),
               IbQuestionInfo(widget._controller),
+              const SizedBox(
+                height: 16,
+              ),
               SizeTransition(
                 sizeFactor: animation,
                 child: expandableInfo,
               ),
-
-              /// show current user answer is available
-              if (Get.find<MyAnsweredQuestionsController>().retrieveAnswer(
-                          widget._controller.rxIbQuestion.value.id) !=
-                      null &&
-                  widget._controller.showMyAnswer)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Row(
-                    children: [
-                      IbUserAvatar(
-                        avatarUrl: IbUtils.getCurrentIbUser()!.avatarUrl,
-                        radius: 8,
-                      ),
-                      Text(
-                          ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.rxIbQuestion.value.id)!.choiceId}')
-                    ],
-                  ),
-                ),
               Obx(() {
                 _runExpandCheck();
                 return Row(
@@ -192,116 +268,70 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     );
   }
 
-  Widget _cardBackSide() {
+  Widget _showBarChart() {
     return Obx(
       () => widget._controller.isAnswering.isTrue
           ? const Center(
               child: IbProgressIndicator(),
             )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 100,
-                  width: 100,
-                  child: PieChart(
-                    PieChartData(
-                      sectionsSpace: 2,
-                      centerSpaceRadius: 20,
-                      startDegreeOffset: 45,
-                      sections: _getSectionData(),
+          : SizedBox(
+              height: 120,
+              width: 300,
+              child: BarChart(
+                BarChartData(
+                    groupsSpace: 16,
+                    backgroundColor: IbColors.lightBlue,
+                    borderData: FlBorderData(
+                      show: false,
                     ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 16,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: _getIndicators(),
-                ),
-              ],
-            ),
-    );
-  }
-
-  List<Widget> _getIndicators() {
-    final List<IbChoice> choices = widget._controller.resultMap.keys.toList();
-    final List<Widget> widgets = [];
-    choices.sort((a, b) =>
-        int.parse(a.content ?? '1').compareTo(int.parse(b.content ?? '1')));
-
-    for (int i = 0; i < choices.length; i++) {
-      if ((widget._controller.resultMap[choices[i]] ?? 0) == 0) {
-        continue;
-      }
-      widgets.add(Row(
-        children: [
-          Container(
-            width: 12,
-            height: 12,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: colors[i],
-            ),
-          ),
-          const SizedBox(
-            width: 4,
-          ),
-          Text(
-            choices[i].content ?? '',
-            style: const TextStyle(
-                fontSize: IbConfig.kNormalTextSize,
-                color: IbColors.primaryColor),
-          ),
-          if (widget._controller.showResult.value &&
-              widget._controller.rxIbAnswer!.value.choiceId ==
-                  choices[i].choiceId)
-            const Padding(
-              padding: EdgeInsets.only(left: 8.0),
-              child: CircleAvatar(
-                radius: 6,
-                backgroundColor: IbColors.white,
-                child: Icon(
-                  Icons.check_circle_rounded,
-                  color: IbColors.accentColor,
-                  size: 12,
-                ),
+                    gridData: FlGridData(show: false),
+                    barTouchData: BarTouchData(
+                        enabled: false,
+                        touchTooltipData: BarTouchTooltipData(
+                            tooltipMargin: 0,
+                            getTooltipItem: (
+                              BarChartGroupData group,
+                              int groupIndex,
+                              BarChartRodData rod,
+                              int rodIndex,
+                            ) {
+                              return BarTooltipItem(
+                                '${rod.y}%',
+                                const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              );
+                            },
+                            tooltipBgColor: Colors.transparent)),
+                    maxY: 150,
+                    barGroups: widget._controller.rxIbQuestion.value.choices
+                        .map((e) => BarChartGroupData(
+                            barsSpace: 16,
+                            showingTooltipIndicators: [0],
+                            x: int.parse(e.content ?? '0'),
+                            barRods: [
+                              BarChartRodData(
+                                  width: 16,
+                                  colors: [
+                                    IbUtils.handleIndicatorColor(
+                                        widget._controller.resultMap[e] ?? 0)
+                                  ],
+                                  y: (widget._controller.resultMap[e] ?? 0) *
+                                      100),
+                            ]))
+                        .toList(),
+                    titlesData: FlTitlesData(
+                        show: true,
+                        topTitles: SideTitles(showTitles: false),
+                        rightTitles: SideTitles(showTitles: false),
+                        bottomTitles: SideTitles(
+                          showTitles: true,
+                        ),
+                        leftTitles: SideTitles(showTitles: false))),
               ),
             ),
-        ],
-      ));
-    }
-
-    return widgets;
-  }
-
-  List<PieChartSectionData> _getSectionData() {
-    final List<PieChartSectionData> _pieChartDataList = [];
-
-    for (final IbChoice choice in widget._controller.resultMap.keys) {
-      if ((widget._controller.resultMap[choice] ?? 0) == 0) {
-        continue;
-      }
-      final String percentage =
-          ((widget._controller.resultMap[choice] ?? 0) * 100)
-              .toStringAsFixed(1);
-
-      final PieChartSectionData data = PieChartSectionData(
-          color: colors[int.parse(choice.content ?? '1') - 1],
-          badgePositionPercentageOffset: 1,
-          titlePositionPercentageOffset: 0.5,
-          value: double.parse(percentage),
-          radius: 32,
-          titleStyle: const TextStyle(
-              color: Colors.black,
-              fontSize: IbConfig.kSecondaryTextSize,
-              fontWeight: FontWeight.bold),
-          title: '$percentage%');
-      _pieChartDataList.add(data);
-    }
-    return _pieChartDataList;
+    );
   }
 
   @override
@@ -331,7 +361,6 @@ class IbQuestionScItem extends StatelessWidget {
   }
 
   void _onValueChange(double value) {
-    print(value);
     if (_controller.rxIbQuestion.value.choices.indexWhere(
             (element) => element.content == value.toInt().toString()) !=
         -1) {
@@ -347,78 +376,68 @@ class IbQuestionScItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SliderTheme(
-          data: SliderTheme.of(context).copyWith(
-            showValueIndicator: ShowValueIndicator.always,
-            activeTrackColor: IbColors.primaryColor,
-            inactiveTrackColor: IbColors.lightBlue,
-            trackShape: const RoundedRectSliderTrackShape(),
-            trackHeight: 16,
-            valueIndicatorShape:
-                const _CustomSliderThumbCircle(thumbRadius: 24, min: 1, max: 5),
-            thumbColor: IbColors.primaryColor,
-            thumbShape:
-                const _CustomSliderThumbCircle(thumbRadius: 24, min: 1, max: 5),
-            overlayColor: IbColors.primaryColor.withAlpha(80),
-            overlayShape: const RoundSliderOverlayShape(overlayRadius: 26.0),
-          ),
-          child: Obx(
-            () => SizedBox(
-              width: Get.width * 0.9,
-              child: Slider(
-                  min: 1,
-                  max: 5,
-                  label: _getSliderValue().toString(),
-                  divisions: 4,
-                  value: _getSliderValue(),
-                  onChanged: (value) {
-                    if (_controller.isSample ||
-                        _controller.disableChoiceOnTouch ||
-                        (_controller.rxIbAnswer != null &&
-                            _controller.rxIbAnswer!.value.uid !=
-                                IbUtils.getCurrentUid())) {
-                      return;
-                    }
-                    _onValueChange(value);
-                  }),
-            ),
-          ),
+    return Obx(
+      () => SliderTheme(
+        data: SliderTheme.of(context).copyWith(
+          showValueIndicator: ShowValueIndicator.always,
+          activeTrackColor: IbColors.primaryColor,
+          inactiveTrackColor: IbColors.lightBlue,
+          trackShape: const RoundedRectSliderTrackShape(),
+          trackHeight: 16,
+          valueIndicatorShape: _CustomSliderThumbCircle(
+              thumbRadius: 24,
+              min: 1,
+              max: 5,
+              bgColor: (_controller.rxIbAnswer != null &&
+                      _controller.rxIbAnswer!.value.choiceId ==
+                          _controller.selectedChoiceId.value)
+                  ? IbColors.accentColor.withOpacity(0.8)
+                  : IbColors.lightBlue),
+          thumbColor: IbColors.primaryColor,
+          thumbShape: _CustomSliderThumbCircle(
+              thumbRadius: 24,
+              min: 1,
+              max: 5,
+              bgColor: (_controller.rxIbAnswer != null &&
+                      _controller.rxIbAnswer!.value.choiceId ==
+                          _controller.selectedChoiceId.value)
+                  ? IbColors.accentColor
+                  : IbColors.lightBlue),
+          overlayColor: IbColors.primaryColor.withAlpha(80),
+          overlayShape: const RoundSliderOverlayShape(overlayRadius: 26.0),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                  width: 100,
-                  child: Text(
-                    _controller.rxIbQuestion.value.endpoints!.first.content!,
-                    textAlign: TextAlign.start,
-                  )),
-              SizedBox(
-                  width: 100,
-                  child: Text(
-                    _controller.rxIbQuestion.value.endpoints![1].content!,
-                    textAlign: TextAlign.end,
-                  ))
-            ],
-          ),
-        )
-      ],
+        child: SizedBox(
+          width: Get.width * 0.9,
+          child: Slider(
+              min: 1,
+              max: 5,
+              label: _getSliderValue().toString(),
+              divisions: 4,
+              value: _getSliderValue(),
+              onChanged: (value) {
+                if (_controller.isSample ||
+                    _controller.disableChoiceOnTouch ||
+                    (_controller.rxIbAnswer != null &&
+                        _controller.rxIbAnswer!.value.uid !=
+                            IbUtils.getCurrentUid())) {
+                  return;
+                }
+                _onValueChange(value);
+              }),
+        ),
+      ),
     );
   }
 }
 
 class _CustomSliderThumbCircle extends SliderComponentShape {
   final double thumbRadius;
+  final Color bgColor;
   final int min;
   final int max;
 
   const _CustomSliderThumbCircle({
+    this.bgColor = IbColors.lightBlue,
     this.thumbRadius = 6,
     this.min = 0,
     this.max = 10,
@@ -447,7 +466,7 @@ class _CustomSliderThumbCircle extends SliderComponentShape {
     final Canvas canvas = context.canvas;
 
     final paint = Paint()
-      ..color = IbColors.lightBlue //Thumb Background Color
+      ..color = bgColor //Thumb Background Color
       ..style = PaintingStyle.fill;
 
     final TextSpan span = TextSpan(

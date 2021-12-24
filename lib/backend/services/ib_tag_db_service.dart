@@ -45,4 +45,22 @@ class IbTagDbService {
     }
     return null;
   }
+
+  Future<List<IbTag>> retrieveTrendingIbTags() async {
+    final snapshot = await _db
+        .collection(_kTagCollection)
+        .orderBy('questionCount', descending: true)
+        .limit(8)
+        .get();
+    final list = <IbTag>[];
+    if (snapshot.size == 0) {
+      return list;
+    }
+
+    for (var element in snapshot.docs) {
+      list.add(IbTag.fromJson(element.data()));
+    }
+
+    return list;
+  }
 }
