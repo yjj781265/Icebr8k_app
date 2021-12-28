@@ -15,6 +15,7 @@ import '../ib_utils.dart';
 import 'ib_card.dart';
 import 'ib_question_info.dart';
 import 'ib_question_stats.dart';
+import 'ib_question_tags.dart';
 
 class IbScQuestionCard extends StatefulWidget {
   final IbQuestionItemController _controller;
@@ -213,6 +214,14 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                           color: IbColors.lightGrey)),
             const SizedBox(
               height: 8,
+            ),
+            IbQuestionTags(widget._controller),
+            const SizedBox(
+              height: 8,
+            ),
+            const Divider(
+              height: 1,
+              thickness: 1,
             ),
             if (!widget._controller.showStats.value)
               IbQuestionButtons(widget._controller),

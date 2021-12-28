@@ -11,6 +11,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_question_buttons.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_header.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_info.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_stats_bar.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_question_tags.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
@@ -73,6 +74,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
       padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
       child: Obx(
         () => Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Scrollbar(
@@ -85,7 +87,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                           questionId: widget._controller.rxIbQuestion.value.id),
                       tag: widget._controller.rxIbQuestion.value.id))
                   : LimitedBox(
-                      maxHeight: 300,
+                      maxHeight: 280,
                       child: Padding(
                         padding: const EdgeInsets.only(right: 8.0),
                         child: ListView.builder(
@@ -114,8 +116,16 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
             const SizedBox(
               height: 8,
             ),
+            IbQuestionTags(widget._controller),
+            const SizedBox(
+              height: 8,
+            ),
+            const Divider(
+              height: 1,
+              thickness: 1,
+            ),
             if (!widget._controller.showStats.value)
-              Center(child: IbQuestionButtons(widget._controller)),
+              Center(child: IbQuestionButtons(widget._controller))
           ],
         ),
       ),
@@ -336,7 +346,6 @@ class IbQuestionMcItem extends StatelessWidget {
                   ],
                 ),
               ),
-              //Todo show 3 users who voted this question in stack
               if (_controller.showResult.value &&
                   _controller.rxIbAnswer!.value.choiceId == choice.choiceId)
                 const Positioned(

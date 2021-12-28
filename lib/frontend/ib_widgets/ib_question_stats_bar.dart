@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 
 import '../ib_config.dart';
 import '../ib_utils.dart';
@@ -111,32 +110,6 @@ class IbQuestionStatsBar extends StatelessWidget {
                       ),
                     ),
                   ),
-                  InkWell(
-                    onTap: () {
-                      showTagBtmSheet(context);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            FontAwesomeIcons.tag,
-                            size: 19,
-                            color: IbColors.lightGrey,
-                          ),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            '${_itemController.totalTags.value}',
-                            style: const TextStyle(
-                                fontSize: IbConfig.kDescriptionTextSize),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -167,35 +140,5 @@ class IbQuestionStatsBar extends StatelessWidget {
     }
 
     return '10B+';
-  }
-
-  void showTagBtmSheet(BuildContext context) {
-    final Widget widget = IbCard(
-        child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: _itemController.isSample
-            ? _itemController.rxIbQuestion.value.tagIds
-                .map(
-                  (e) => Chip(
-                    backgroundColor: Theme.of(context).backgroundColor,
-                    label: Text(e),
-                  ),
-                )
-                .toList()
-            : _itemController.ibTags
-                .map(
-                  (e) => Chip(
-                    backgroundColor: Theme.of(context).backgroundColor,
-                    label: Text(e.text),
-                  ),
-                )
-                .toList(),
-      ),
-    ));
-
-    Get.bottomSheet(widget, isScrollControlled: true);
   }
 }

@@ -58,6 +58,7 @@ class IbThemes {
         ),
         toggleableActiveColor: IbColors.primaryColor,
         primaryColor: IbColors.white,
+        backgroundColor: IbColors.creamYellow,
         iconTheme: const IconThemeData(color: Colors.black),
         appBarTheme: AppBarTheme(
             iconTheme: const IconThemeData(color: Colors.black),

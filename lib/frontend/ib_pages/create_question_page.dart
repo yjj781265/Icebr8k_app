@@ -144,11 +144,12 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 4.0),
                                       child: Chip(
+                                        elevation: 1,
                                         label: Text(
                                           e,
                                         ),
                                         backgroundColor:
-                                            Theme.of(context).primaryColor,
+                                            Theme.of(context).backgroundColor,
                                         onDeleted: () {
                                           _controller.pickedTags.remove(e);
                                           final int index = _controller

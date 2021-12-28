@@ -119,7 +119,7 @@ class _MyFriendsTabState extends State<MyFriendsTab>
       }
 
       return SmartRefresher(
-        physics: const BouncingScrollPhysics(),
+        physics: const ClampingScrollPhysics(),
         controller: _refreshController,
         header: const ClassicHeader(
           textStyle: TextStyle(color: IbColors.primaryColor),
@@ -146,7 +146,8 @@ class _MyFriendsTabState extends State<MyFriendsTab>
           _refreshController.refreshCompleted();
         },
         child: ListView.builder(
-          physics: const BouncingScrollPhysics(),
+          shrinkWrap: true,
+          physics: const ClampingScrollPhysics(),
           itemBuilder: (context, index) {
             final FriendListItem _item = _controller.friendItems[index];
             return FriendItemView(friendListItem: _item);
@@ -214,7 +215,7 @@ class _PeopleNearByTabState extends State<PeopleNearByTab>
   Widget build(BuildContext context) {
     super.build(context);
     return NestedScrollView(
-      physics: const NeverScrollableScrollPhysics(),
+      physics: const ClampingScrollPhysics(),
       headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
         return [
           SliverToBoxAdapter(
@@ -261,7 +262,7 @@ class _PeopleNearByTabState extends State<PeopleNearByTab>
         }
 
         return SmartRefresher(
-          physics: const BouncingScrollPhysics(),
+          physics: const ClampingScrollPhysics(),
           controller: _refreshController,
           onRefresh: () async {
             await _controller.searchPeopleNearby();

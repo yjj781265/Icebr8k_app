@@ -30,7 +30,7 @@ class ReviewQuestionPage extends StatelessWidget {
                   await itemController.onSubmit();
                 },
                 child: Text(
-                    itemController.isAnswering.isTrue
+                    itemController.isSubmitting.isTrue
                         ? 'submitting'.tr
                         : 'submit'.tr,
                     style: const TextStyle(fontSize: IbConfig.kNormalTextSize)),
@@ -48,7 +48,9 @@ class ReviewQuestionPage extends StatelessWidget {
                 padding: EdgeInsets.all(8.0),
                 child: Text(
                   'Options',
-                  style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                  style: TextStyle(
+                      fontSize: IbConfig.kNormalTextSize,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
               ListTile(
@@ -139,6 +141,17 @@ class ReviewQuestionPage extends StatelessWidget {
         children: [
           ListTile(
             leading: const Icon(
+              Icons.calendar_today,
+              color: IbColors.primaryColor,
+            ),
+            title: const Text('Pick a date and time'),
+            onTap: () {
+              Get.back();
+              _showDateTimePicker();
+            },
+          ),
+          ListTile(
+            leading: const Icon(
               Icons.loop_outlined,
               color: IbColors.accentColor,
             ),
@@ -149,17 +162,6 @@ class ReviewQuestionPage extends StatelessWidget {
               Get.back();
             },
           ),
-          ListTile(
-            leading: const Icon(
-              Icons.calendar_today,
-              color: IbColors.primaryColor,
-            ),
-            title: const Text('Pick a date and time'),
-            onTap: () {
-              Get.back();
-              _showDateTimePicker();
-            },
-          )
         ],
       ),
     ));
@@ -167,7 +169,7 @@ class ReviewQuestionPage extends StatelessWidget {
 
   void _showDateTimePicker() {
     itemController.rxIbQuestion.value.endTimeInMs =
-        DateTime.now().add(const Duration(hours: 24)).millisecondsSinceEpoch;
+        DateTime.now().add(const Duration(minutes: 15)).millisecondsSinceEpoch;
     Get.bottomSheet(IbCard(
         child: SingleChildScrollView(
       child: Column(
@@ -191,8 +193,8 @@ class ReviewQuestionPage extends StatelessWidget {
                     value.millisecondsSinceEpoch;
                 itemController.rxIbQuestion.refresh();
               },
-              initialDateTime: DateTime.now().add(const Duration(hours: 24)),
-              minimumDate: DateTime.now().add(const Duration(hours: 1)),
+              initialDateTime: DateTime.now().add(const Duration(minutes: 20)),
+              minimumDate: DateTime.now().add(const Duration(minutes: 15)),
               dateOrder: DatePickerDateOrder.ymd,
             ),
           ),

@@ -49,7 +49,7 @@ class IbQuestionItemController extends GetxController {
   final totalTags = 0.obs;
   final selectedChoiceId = ''.obs;
   final resultMap = <IbChoice, double>{}.obs;
-  final List<IbTag> ibTags = [];
+  final RxList<IbTag> ibTags = <IbTag>[].obs;
 
   IbQuestionItemController({
     required this.rxIbQuestion,
@@ -170,6 +170,7 @@ class IbQuestionItemController extends GetxController {
             .queryIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id))!
         .obs;
     rxIbAnswer!.refresh();
+    rxIbQuestion.refresh();
 
     IbLocalStorageService().removeUnAnsweredIbQid(rxIbQuestion.value.id);
     await generatePollStats();

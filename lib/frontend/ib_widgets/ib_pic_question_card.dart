@@ -13,6 +13,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_question_header.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_info.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_stats.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_stats_bar.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_question_tags.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
@@ -98,6 +99,14 @@ class _IbPicQuestionCardState extends State<IbPicQuestionCard>
             const SizedBox(
               height: 8,
             ),
+            IbQuestionTags(widget._controller),
+            const SizedBox(
+              height: 8,
+            ),
+            const Divider(
+              height: 1,
+              thickness: 1,
+            ),
             if (widget._controller.showStats.isFalse)
               Center(child: IbQuestionButtons(widget._controller)),
           ],
@@ -169,94 +178,111 @@ class PicItem extends StatelessWidget {
     if (ibChoice.url == null || ibChoice.url!.isEmpty) {
       return const SizedBox();
     }
-    return Obx(() => InkWell(
-          borderRadius: const BorderRadius.all(
-              Radius.circular(IbConfig.kMcItemCornerRadius)),
-          onTap: () {
-            if (itemController.isSample) {
-              return;
-            }
-            if (itemController.selectedChoiceId.value == ibChoice.choiceId) {
-              itemController.selectedChoiceId.value = '';
-            } else {
-              itemController.selectedChoiceId.value = ibChoice.choiceId;
-            }
-          },
-          onDoubleTap: () {
-            final Widget img = itemController.isLocalFile
-                ? Image.file(
-                    File(ibChoice.url!),
-                  )
-                : CachedNetworkImage(imageUrl: ibChoice.url!);
+    return Obx(
+      () => InkWell(
+        borderRadius: const BorderRadius.all(
+            Radius.circular(IbConfig.kMcItemCornerRadius)),
+        onTap: () {
+          if (itemController.isSample) {
+            return;
+          }
+          if (itemController.selectedChoiceId.value == ibChoice.choiceId) {
+            itemController.selectedChoiceId.value = '';
+          } else {
+            itemController.selectedChoiceId.value = ibChoice.choiceId;
+          }
+        },
+        onDoubleTap: () {
+          final Widget img = itemController.isLocalFile
+              ? Image.file(
+                  File(ibChoice.url!),
+                )
+              : CachedNetworkImage(imageUrl: ibChoice.url!);
 
-            final Widget hero = Hero(
+          final Widget hero = Hero(
+            tag: '$heroTag${ibChoice.choiceId}',
+            child: Center(
+              child: SizedBox(
+                width: double.infinity,
+                height: double.infinity,
+                child: img,
+              ),
+            ),
+          );
+
+          /// show image preview
+          IbUtils.showInteractiveViewer(hero, context);
+        },
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: AlignmentDirectional.center,
+          children: [
+            Container(
+              width: IbConfig.kPicHeight + 16,
+              height: IbConfig.kPicHeight + 16,
+              decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(
+                      Radius.circular(IbConfig.kMcItemCornerRadius)),
+                  color:
+                      itemController.selectedChoiceId.value == ibChoice.choiceId
+                          ? IbColors.primaryColor
+                          : IbColors.lightBlue),
+            ),
+            Hero(
               tag: '$heroTag${ibChoice.choiceId}',
-              child: Center(
-                child: SizedBox(
-                  width: double.infinity,
-                  height: double.infinity,
-                  child: img,
-                ),
-              ),
-            );
-
-            /// show image preview
-            IbUtils.showInteractiveViewer(hero, context);
-          },
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: AlignmentDirectional.center,
-            children: [
-              Container(
-                width: IbConfig.kPicHeight + 16,
-                height: IbConfig.kPicHeight + 16,
-                decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(
-                        Radius.circular(IbConfig.kMcItemCornerRadius)),
-                    color: itemController.selectedChoiceId.value ==
-                            ibChoice.choiceId
-                        ? IbColors.primaryColor
-                        : IbColors.lightBlue),
-              ),
-              Hero(
-                tag: '$heroTag${ibChoice.choiceId}',
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: itemController.isLocalFile
-                      ? Image.file(
-                          File(ibChoice.url!),
-                          height: IbConfig.kPicHeight,
-                          width: IbConfig.kPicHeight,
-                        )
-                      : CachedNetworkImage(
-                          imageUrl: ibChoice.url!,
-                          height: IbConfig.kPicHeight,
-                          width: IbConfig.kPicHeight,
-                        ),
-                ),
-              ),
-              Obx(() {
-                if (itemController.showResult.value &&
-                    itemController.rxIbAnswer!.value.choiceId ==
-                        ibChoice.choiceId) {
-                  return const Positioned(
-                    bottom: 2,
-                    right: 2,
-                    child: CircleAvatar(
-                      radius: 6,
-                      backgroundColor: IbColors.white,
-                      child: Icon(
-                        Icons.check_circle_rounded,
-                        color: IbColors.accentColor,
-                        size: 12,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: itemController.isLocalFile
+                    ? Image.file(
+                        File(ibChoice.url!),
+                        height: IbConfig.kPicHeight,
+                        width: IbConfig.kPicHeight,
+                      )
+                    : CachedNetworkImage(
+                        imageUrl: ibChoice.url!,
+                        height: IbConfig.kPicHeight,
+                        width: IbConfig.kPicHeight,
                       ),
-                    ),
-                  );
-                }
-                return const SizedBox();
-              })
-            ],
-          ),
-        ));
+              ),
+            ),
+            if (itemController.showResult.isTrue)
+              Positioned(
+                bottom: 8,
+                child: AnimatedContainer(
+                  alignment: Alignment.bottomCenter,
+                  width: IbConfig.kPicHeight,
+                  height: IbConfig.kPicHeight *
+                      (itemController.resultMap[ibChoice] ?? 0),
+                  decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(
+                          Radius.circular(IbConfig.kMcItemCornerRadius)),
+                      color: IbColors.lightGrey.withOpacity(0.6)),
+                  duration: const Duration(
+                      milliseconds: IbConfig.kEventTriggerDelayInMillis),
+                  child: Text(
+                    '${(itemController.resultMap[ibChoice] ?? 0) * 100}%',
+                    style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
+                  ),
+                ),
+              ),
+            if (itemController.showResult.isTrue &&
+                itemController.rxIbAnswer!.value.choiceId == ibChoice.choiceId)
+              const Positioned(
+                bottom: 2,
+                right: 2,
+                child: CircleAvatar(
+                  radius: 6,
+                  backgroundColor: IbColors.white,
+                  child: Icon(
+                    Icons.check_circle_rounded,
+                    color: IbColors.accentColor,
+                    size: 12,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }
