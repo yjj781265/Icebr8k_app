@@ -495,7 +495,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
         child: Wrap(
           children: [
             Obx(() {
-              if (_controller.picList.length < 3) {
+              if (_controller.picList.length < IbConfig.kChoiceLimit) {
                 return GestureDetector(
                   onTap: () {
                     showMediaBottomSheet(context, null, _controller.picList);

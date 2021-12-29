@@ -169,14 +169,13 @@ class IbQuestionItemController extends GetxController {
     rxIbAnswer = (await IbQuestionDbService()
             .queryIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id))!
         .obs;
-    rxIbAnswer!.refresh();
-    rxIbQuestion.refresh();
-
     IbLocalStorageService().removeUnAnsweredIbQid(rxIbQuestion.value.id);
     await generatePollStats();
     showResult.value = true;
     isSwitched.value = true;
     isAnswering.value = false;
+    rxIbAnswer!.refresh();
+    rxIbQuestion.refresh();
   }
 
   Future<void> onSubmit() async {

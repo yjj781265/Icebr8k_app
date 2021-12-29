@@ -83,7 +83,7 @@ class _IbPicQuestionCardState extends State<IbPicQuestionCard>
             if (widget._controller.showStats.isFalse)
               Wrap(
                   spacing: 8,
-                  runSpacing: 24,
+                  runSpacing: 8,
                   children: widget._controller.rxIbQuestion.value.choices
                       .map((e) => PicItem(
                           ibChoice: e, itemController: widget._controller))
@@ -186,6 +186,7 @@ class PicItem extends StatelessWidget {
           if (itemController.isSample) {
             return;
           }
+
           if (itemController.selectedChoiceId.value == ibChoice.choiceId) {
             itemController.selectedChoiceId.value = '';
           } else {
@@ -217,7 +218,7 @@ class PicItem extends StatelessWidget {
           clipBehavior: Clip.none,
           alignment: AlignmentDirectional.center,
           children: [
-            Container(
+            AnimatedContainer(
               width: IbConfig.kPicHeight + 16,
               height: IbConfig.kPicHeight + 16,
               decoration: BoxDecoration(
@@ -227,6 +228,8 @@ class PicItem extends StatelessWidget {
                       itemController.selectedChoiceId.value == ibChoice.choiceId
                           ? IbColors.primaryColor
                           : IbColors.lightBlue),
+              duration: const Duration(
+                  milliseconds: IbConfig.kEventTriggerDelayInMillis),
             ),
             Hero(
               tag: '$heroTag${ibChoice.choiceId}',
@@ -248,17 +251,15 @@ class PicItem extends StatelessWidget {
             if (itemController.showResult.isTrue)
               Positioned(
                 bottom: 8,
-                child: AnimatedContainer(
+                child: Container(
                   alignment: Alignment.bottomCenter,
                   width: IbConfig.kPicHeight,
-                  height: IbConfig.kPicHeight *
-                      (itemController.resultMap[ibChoice] ?? 0),
                   decoration: BoxDecoration(
                       borderRadius: const BorderRadius.all(
                           Radius.circular(IbConfig.kMcItemCornerRadius)),
-                      color: IbColors.lightGrey.withOpacity(0.6)),
-                  duration: const Duration(
-                      milliseconds: IbConfig.kEventTriggerDelayInMillis),
+                      color: IbUtils.handleIndicatorColor(
+                              itemController.resultMap[ibChoice] ?? 0)
+                          .withOpacity(0.8)),
                   child: Text(
                     '${(itemController.resultMap[ibChoice] ?? 0) * 100}%',
                     style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
@@ -271,12 +272,12 @@ class PicItem extends StatelessWidget {
                 bottom: 2,
                 right: 2,
                 child: CircleAvatar(
-                  radius: 6,
+                  radius: 10,
                   backgroundColor: IbColors.white,
                   child: Icon(
                     Icons.check_circle_rounded,
                     color: IbColors.accentColor,
-                    size: 12,
+                    size: 20,
                   ),
                 ),
               ),

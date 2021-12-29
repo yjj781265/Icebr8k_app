@@ -17,7 +17,7 @@ class IbUserDbService {
 
   factory IbUserDbService() => _ibUserService;
   IbUserDbService._() {
-    _db.settings = const Settings(persistenceEnabled: true);
+    _db.settings = const Settings(persistenceEnabled: false);
     _collectionRef = _db.collection(_kUserCollection);
   }
 

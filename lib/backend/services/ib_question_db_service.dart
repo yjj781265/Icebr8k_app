@@ -18,7 +18,7 @@ class IbQuestionDbService {
   factory IbQuestionDbService() => _ibQuestionDbService;
 
   IbQuestionDbService._() {
-    _db.settings = const Settings(persistenceEnabled: true);
+    _db.settings = const Settings(persistenceEnabled: false);
     _collectionRef = _db.collection(_kQuestionCollection);
   }
 

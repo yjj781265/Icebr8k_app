@@ -87,7 +87,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                           questionId: widget._controller.rxIbQuestion.value.id),
                       tag: widget._controller.rxIbQuestion.value.id))
                   : LimitedBox(
-                      maxHeight: 280,
+                      maxHeight: 300,
                       child: Padding(
                         padding: const EdgeInsets.only(right: 8.0),
                         child: ListView.builder(

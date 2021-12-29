@@ -12,7 +12,7 @@ class IbChatDbService {
   factory IbChatDbService() => _ibChatDbService;
 
   IbChatDbService._() {
-    _db.settings = const Settings(persistenceEnabled: true);
+    _db.settings = const Settings(persistenceEnabled: false);
     _collectionRef = _db.collection(_kChatRoomCollection);
   }
 
