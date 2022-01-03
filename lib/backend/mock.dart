@@ -25,4 +25,20 @@ class Mock {
         questionType: 'mc',
         uid: 'HNwANcBUTpY6L2L3AZYU6x3OIBG3')
   ];
+
+  static List<String> gifUrls = [
+    'https://media.tenor.com/images/0299b55a1c548d4af747a30af607f3a1/tenor.gif',
+    'https://media.tenor.com/images/f76d1ef44fc71ace3d8d0bc2f185abbb/tenor.gif',
+    'https://media.tenor.com/images/fbeb18f6d22b7201118db0b414511ec2/tenor.gif',
+    'https://media.tenor.com/images/a24f005e1420efa65c8edea4ac02222b/tenor.gif',
+    'https://media.tenor.com/images/f76d1ef44fc71ace3d8d0bc2f185abbb/tenor.gif',
+    'https://media.tenor.com/images/fbeb18f6d22b7201118db0b414511ec2/tenor.gif',
+    'https://media.tenor.com/images/a24f005e1420efa65c8edea4ac02222b/tenor.gif',
+    'https://media.tenor.com/images/f76d1ef44fc71ace3d8d0bc2f185abbb/tenor.gif',
+    'https://media.tenor.com/images/fbeb18f6d22b7201118db0b414511ec2/tenor.gif',
+    'https://media.tenor.com/images/a24f005e1420efa65c8edea4ac02222b/tenor.gif',
+    'https://media.tenor.com/images/f76d1ef44fc71ace3d8d0bc2f185abbb/tenor.gif',
+    'https://media.tenor.com/images/fbeb18f6d22b7201118db0b414511ec2/tenor.gif',
+    'https://media.tenor.com/images/a24f005e1420efa65c8edea4ac02222b/tenor.gif',
+  ];
 }

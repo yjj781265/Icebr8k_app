@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:animations/animations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,6 +18,7 @@ import '../ib_colors.dart';
 import '../ib_config.dart';
 import '../ib_utils.dart';
 import 'ib_card.dart';
+import 'ib_media_viewer.dart';
 import 'ib_question_stats.dart';
 
 class IbMcQuestionCard extends StatefulWidget {
@@ -227,163 +229,165 @@ class IbQuestionMcItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String heroTag = IbUtils.getUniqueId();
-    return Obx(
-      () => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0),
-        child: InkWell(
-          radius: IbConfig.kMcItemCornerRadius,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: OpenContainer(
+        openElevation: 0,
+        closedElevation: 0,
+        closedShape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(IbConfig.kMcItemCornerRadius),
-          onTap: () {
-            if (_controller.isSample ||
-                _controller.disableChoiceOnTouch ||
-                (_controller.rxIbAnswer != null &&
-                    _controller.rxIbAnswer!.value.uid !=
-                        IbUtils.getCurrentUid())) {
-              return;
-            }
+        ),
+        openColor: Colors.black,
+        middleColor: Colors.black,
+        closedColor: Colors.transparent,
+        transitionType: ContainerTransitionType.fadeThrough,
+        openBuilder: (BuildContext context,
+            void Function({Object? returnValue}) action) {
+          return IbMediaViewer(
+            urls: _controller.rxIbQuestion.value.choices
+                .map((e) => e.url!)
+                .toList(),
+            currentIndex: _controller.rxIbQuestion.value.choices
+                .map((e) => e.url!)
+                .toList()
+                .indexWhere((element) => choice.url! == element),
+          );
+        },
+        closedBuilder: (_, openContainer) {
+          return Obx(
+            () => InkWell(
+              radius: IbConfig.kMcItemCornerRadius,
+              borderRadius: BorderRadius.circular(IbConfig.kMcItemCornerRadius),
+              onTap: () {
+                if (_controller.isSample ||
+                    _controller.disableChoiceOnTouch ||
+                    (_controller.rxIbAnswer != null &&
+                        _controller.rxIbAnswer!.value.uid !=
+                            IbUtils.getCurrentUid())) {
+                  return;
+                }
 
-            if (_controller.selectedChoiceId.value == choice.choiceId) {
-              _controller.selectedChoiceId.value = '';
-            } else {
-              _controller.selectedChoiceId.value = choice.choiceId;
-            }
-          },
-          child: Stack(
-            alignment: Alignment.centerLeft,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                width: Get.width * 0.95,
-                height: _controller.rxIbQuestion.value.questionType ==
-                        IbQuestion.kMultipleChoice
-                    ? IbConfig.kMcTxtItemHeight
-                    : IbConfig.kMcPicItemHeight,
-                decoration: BoxDecoration(
-                    color: IbColors.lightBlue,
-                    borderRadius:
-                        BorderRadius.circular(IbConfig.kMcItemCornerRadius)),
-              ),
-              AnimatedContainer(
-                height: _controller.rxIbQuestion.value.questionType ==
-                        IbQuestion.kMultipleChoice
-                    ? IbConfig.kMcTxtItemHeight
-                    : IbConfig.kMcPicItemHeight,
-                decoration: BoxDecoration(
-                    color: getItemColor(),
-                    borderRadius: BorderRadius.circular(8)),
-                width: getItemWidth(),
-                duration: Duration(
-                    milliseconds: _controller.showResult.value
-                        ? IbConfig.kEventTriggerDelayInMillis
-                        : 0),
-              ),
-              SizedBox(
-                width: Get.width * 0.9,
-                height: _controller.rxIbQuestion.value.questionType ==
-                        IbQuestion.kMultipleChoice
-                    ? IbConfig.kMcTxtItemHeight
-                    : IbConfig.kMcPicItemHeight,
-                child: Row(
-                  children: [
-                    if (choice.url != null && choice.url!.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: GestureDetector(
-                          onDoubleTap: () {
-                            final Widget img = _controller.isLocalFile
-                                ? Image.file(
-                                    File(choice.url!),
-                                  )
-                                : CachedNetworkImage(
-                                    imageUrl: choice.url!,
-                                  );
-
-                            final Widget hero = Hero(
-                              tag: '$heroTag${choice.choiceId}',
-                              child: Center(
-                                child: SizedBox(
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  child: img,
-                                ),
+                if (_controller.selectedChoiceId.value == choice.choiceId) {
+                  _controller.selectedChoiceId.value = '';
+                } else {
+                  _controller.selectedChoiceId.value = choice.choiceId;
+                }
+              },
+              child: Stack(
+                alignment: Alignment.centerLeft,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    width: Get.width * 0.95,
+                    height: _controller.rxIbQuestion.value.questionType ==
+                            IbQuestion.kMultipleChoice
+                        ? IbConfig.kMcTxtItemHeight
+                        : IbConfig.kMcPicItemHeight,
+                    decoration: BoxDecoration(
+                        color: IbColors.lightBlue,
+                        borderRadius: BorderRadius.circular(
+                            IbConfig.kMcItemCornerRadius)),
+                  ),
+                  AnimatedContainer(
+                    height: _controller.rxIbQuestion.value.questionType ==
+                            IbQuestion.kMultipleChoice
+                        ? IbConfig.kMcTxtItemHeight
+                        : IbConfig.kMcPicItemHeight,
+                    decoration: BoxDecoration(
+                        color: getItemColor(),
+                        borderRadius: BorderRadius.circular(8)),
+                    width: getItemWidth(),
+                    duration: Duration(
+                        milliseconds: _controller.showResult.value
+                            ? IbConfig.kEventTriggerDelayInMillis
+                            : 0),
+                  ),
+                  SizedBox(
+                    width: Get.width * 0.9,
+                    height: _controller.rxIbQuestion.value.questionType ==
+                            IbQuestion.kMultipleChoice
+                        ? IbConfig.kMcTxtItemHeight
+                        : IbConfig.kMcPicItemHeight,
+                    child: Row(
+                      children: [
+                        if (choice.url != null && choice.url!.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                              onDoubleTap: openContainer,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                    IbConfig.kMcItemCornerRadius),
+                                child: !choice.url!.contains('http')
+                                    ? Image.file(
+                                        File(choice.url!),
+                                        width: IbConfig.kMcPicHeight,
+                                        height: IbConfig.kMcPicHeight,
+                                      )
+                                    : CachedNetworkImage(
+                                        fit: BoxFit.fill,
+                                        fadeInDuration:
+                                            const Duration(milliseconds: 300),
+                                        width: IbConfig.kMcPicHeight,
+                                        height: IbConfig.kMcPicHeight,
+                                        imageUrl: choice.url!,
+                                      ),
                               ),
-                            );
-
-                            /// show image preview
-                            IbUtils.showInteractiveViewer(hero, context);
-                          },
-                          child: Hero(
-                            tag: '$heroTag${choice.choiceId}',
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(
-                                  IbConfig.kMcItemCornerRadius),
-                              child: _controller.isLocalFile
-                                  ? Image.file(
-                                      File(choice.url!),
-                                      width: IbConfig.kMcPicHeight,
-                                      height: IbConfig.kMcPicHeight,
-                                    )
-                                  : CachedNetworkImage(
-                                      width: IbConfig.kMcPicHeight,
-                                      height: IbConfig.kMcPicHeight,
-                                      imageUrl: choice.url!,
-                                    ),
                             ),
                           ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            choice.content.toString(),
+                            maxLines: 1,
+                            style: const TextStyle(
+                                fontSize: IbConfig.kNormalTextSize,
+                                color: Colors.black),
+                          ),
                         ),
-                      ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        choice.content.toString(),
-                        maxLines: 1,
-                        style: const TextStyle(
-                            fontSize: IbConfig.kNormalTextSize,
-                            color: Colors.black),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (_controller.showResult.value &&
-                  _controller.rxIbAnswer!.value.choiceId == choice.choiceId)
-                const Positioned(
-                  bottom: 2,
-                  right: 2,
-                  child: CircleAvatar(
-                    radius: 6,
-                    backgroundColor: IbColors.white,
-                    child: Icon(
-                      Icons.check_circle_rounded,
-                      color: IbColors.accentColor,
-                      size: 12,
+                      ],
                     ),
                   ),
-                ),
-              if (_controller.showResult.value &&
-                  _controller.totalPolled.value > 0)
-                TweenAnimationBuilder(
-                  builder:
-                      (BuildContext context, Object? value, Widget? child) {
-                    return Positioned(
-                      right: 8,
-                      child: Text(
-                        '${((_controller.resultMap[choice] ?? 0 / _controller.totalPolled.value.toDouble()) * 100).toStringAsFixed(1)}%',
-                        style: const TextStyle(color: Colors.black),
+                  if (_controller.showResult.value &&
+                      _controller.rxIbAnswer!.value.choiceId == choice.choiceId)
+                    const Positioned(
+                      bottom: 2,
+                      right: 2,
+                      child: CircleAvatar(
+                        radius: 6,
+                        backgroundColor: IbColors.white,
+                        child: Icon(
+                          Icons.check_circle_rounded,
+                          color: IbColors.accentColor,
+                          size: 12,
+                        ),
                       ),
-                    );
-                  },
-                  duration: const Duration(
-                      milliseconds: IbConfig.kEventTriggerDelayInMillis),
-                  tween: Tween<double>(
-                      begin: 0,
-                      end: _controller.resultMap[choice]! /
-                          _controller.totalPolled.value.toDouble()),
-                ),
-            ],
-          ),
-        ),
+                    ),
+                  if (_controller.showResult.value &&
+                      _controller.totalPolled.value > 0)
+                    TweenAnimationBuilder(
+                      builder:
+                          (BuildContext context, Object? value, Widget? child) {
+                        return Positioned(
+                          right: 8,
+                          child: Text(
+                            '${((_controller.resultMap[choice] ?? 0 / _controller.totalPolled.value.toDouble()) * 100).toStringAsFixed(1)}%',
+                            style: const TextStyle(color: Colors.black),
+                          ),
+                        );
+                      },
+                      duration: const Duration(
+                          milliseconds: IbConfig.kEventTriggerDelayInMillis),
+                      tween: Tween<double>(
+                          begin: 0,
+                          end: _controller.resultMap[choice]! /
+                              _controller.totalPolled.value.toDouble()),
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

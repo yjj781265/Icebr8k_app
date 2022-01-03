@@ -170,6 +170,7 @@ class IbQuestionItemController extends GetxController {
             .queryIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id))!
         .obs;
     IbLocalStorageService().removeUnAnsweredIbQid(rxIbQuestion.value.id);
+
     await generatePollStats();
     showResult.value = true;
     isSwitched.value = true;

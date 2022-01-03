@@ -57,7 +57,7 @@ class IbTagDbService {
       return list;
     }
 
-    for (var element in snapshot.docs) {
+    for (final element in snapshot.docs) {
       list.add(IbTag.fromJson(element.data()));
     }
 

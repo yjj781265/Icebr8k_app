@@ -412,7 +412,8 @@ class IbUtils {
     return map;
   }
 
-  static void showInteractiveViewer(Widget widget, BuildContext context) {
+  static void showInteractiveViewer(
+      List<String> urls, Widget widget, BuildContext context) {
     /// show image preview
     Navigator.of(context).push(
       PageRouteBuilder(

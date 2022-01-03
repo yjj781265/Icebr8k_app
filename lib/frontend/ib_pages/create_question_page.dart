@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:icebr8k/backend/controllers/ib_create_question_controller.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_pages/ib_tenor_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/tag_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -437,9 +439,18 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                                       child: SizedBox(
                                         width: IbConfig.kMcPicHeight,
                                         height: IbConfig.kMcPicHeight,
-                                        child: Image.file(
-                                          File(item.url!),
-                                        ),
+                                        child: item.url!.contains('http')
+                                            ? CachedNetworkImage(
+                                                fadeInDuration: const Duration(
+                                                    milliseconds: 300),
+                                                fit: BoxFit.fill,
+                                                imageUrl: item.url!,
+                                                height: IbConfig.kPicHeight,
+                                                width: IbConfig.kPicHeight,
+                                              )
+                                            : Image.file(
+                                                File(item.url!),
+                                              ),
                                       ),
                                     ),
                                   )
@@ -548,9 +559,12 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                                   height: IbConfig.kPicHeight,
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
-                                    child: Image.file(
-                                      File(e.url!),
-                                    ),
+                                    child: e.url!.contains('http')
+                                        ? CachedNetworkImage(
+                                            imageUrl: e.url!, fit: BoxFit.fill)
+                                        : Image.file(
+                                            File(e.url!),
+                                          ),
                                   ),
                                 ),
                               ),
@@ -951,6 +965,48 @@ void showMediaBottomSheet(
                 ),
                 Text(
                   'Choose from gallery',
+                  style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      InkWell(
+        onTap: () async {
+          Get.back();
+          final url = await Get.to(
+            () => IbTenorPage(),
+          );
+          if (url != null && url.toString().isNotEmpty) {
+            // ignore: parameter_assignments
+            ibChoice = IbChoice(
+              choiceId: IbUtils.getUniqueId(),
+              url: url.toString(),
+            );
+            // ignore: parameter_assignments
+            list.add(ibChoice!);
+            list.refresh();
+          }
+        },
+        child: Ink(
+          height: 56,
+          width: double.infinity,
+          color: Theme.of(context).primaryColor,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: const [
+                Icon(
+                  Icons.gif,
+                  color: IbColors.accentColor,
+                  size: 24,
+                ),
+                SizedBox(
+                  width: 8,
+                ),
+                Text(
+                  'Choose GIF from Tenor',
                   style: TextStyle(fontSize: IbConfig.kNormalTextSize),
                 ),
               ],

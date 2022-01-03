@@ -8,6 +8,7 @@ import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
 import '../ib_utils.dart';
+import 'ib_media_viewer.dart';
 
 /// show who voted stats
 class IbQuestionStats extends StatelessWidget {
@@ -66,42 +67,28 @@ class IbQuestionStats extends StatelessWidget {
       {required IbChoice choice,
       required BuildContext context,
       required bool isMe}) {
-    final String heroTag = IbUtils.getUniqueId();
     return Row(
       children: [
         if (choice.url != null && choice.url!.isNotEmpty)
           GestureDetector(
             onDoubleTap: () {
-              final Widget img = CachedNetworkImage(imageUrl: choice.url!);
-              final Widget hero = Hero(
-                tag: '$heroTag${choice.choiceId}',
-                child: Center(
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: double.infinity,
-                    child: img,
-                  ),
-                ),
-              );
-
-              /// show image preview
-              IbUtils.showInteractiveViewer(hero, context);
+              Get.dialog(IbMediaViewer(
+                urls: [choice.url!],
+                currentIndex: 0,
+              ));
             },
-            child: Hero(
-              tag: '$heroTag${choice.choiceId}',
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: CachedNetworkImage(
-                  imageUrl: choice.url!,
-                  imageBuilder: (context, imageProvider) => Container(
-                    width: IbConfig.kPicHeight,
-                    height: IbConfig.kPicHeight,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        opacity: isMe ? 1.0 : 0.6,
-                        image: imageProvider,
-                        fit: BoxFit.scaleDown,
-                      ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: CachedNetworkImage(
+                imageUrl: choice.url!,
+                imageBuilder: (context, imageProvider) => Container(
+                  width: IbConfig.kPicHeight,
+                  height: IbConfig.kPicHeight,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      opacity: isMe ? 1.0 : 0.6,
+                      image: imageProvider,
+                      fit: BoxFit.scaleDown,
                     ),
                   ),
                 ),
