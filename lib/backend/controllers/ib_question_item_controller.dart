@@ -186,7 +186,9 @@ class IbQuestionItemController extends GetxController {
         (rxIbQuestion.value.questionType == IbQuestion.kPic ||
             rxIbQuestion.value.questionType == IbQuestion.kMultipleChoicePic)) {
       for (final ibChoice in rxIbQuestion.value.choices) {
-        if (ibChoice.url != null && ibChoice.url!.isNotEmpty) {
+        if (ibChoice.url != null &&
+            ibChoice.url!.isNotEmpty &&
+            !ibChoice.url!.contains('http')) {
           final String? url =
               await IbStorageService().uploadAndRetrieveImgUrl(ibChoice.url!);
           if (url != null) {

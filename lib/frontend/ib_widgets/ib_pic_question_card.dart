@@ -231,7 +231,10 @@ class PicItem extends StatelessWidget {
                           width: IbConfig.kPicHeight,
                         )
                       : CachedNetworkImage(
-                          fadeInDuration: const Duration(milliseconds: 300),
+                          fadeOutDuration: const Duration(milliseconds: 100),
+                          placeholderFadeInDuration:
+                              const Duration(milliseconds: 100),
+                          fadeInDuration: const Duration(milliseconds: 100),
                           fit: BoxFit.fill,
                           imageUrl: ibChoice.url!,
                           height: IbConfig.kPicHeight,
