@@ -21,6 +21,7 @@ import 'frontend/ib_strings.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  PaintingBinding.instance!.imageCache?.maximumSizeBytes = 1000 << 20; //1GB
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
         statusBarColor: !IbLocalStorageService()
