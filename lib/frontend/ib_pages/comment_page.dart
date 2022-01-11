@@ -39,18 +39,20 @@ class CommentPage extends StatelessWidget {
                       height: 56,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          DropdownButton<String>(
-                            value: 'A',
-                            items: <String>['A', 'B', 'C', 'D']
-                                .map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (_) {},
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: DropdownButton<String>(
+                              value: 'Top Comments',
+                              items: <String>['Top Comments', 'Newest First']
+                                  .map((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              onChanged: (_) {},
+                            ),
                           ),
                         ],
                       ),

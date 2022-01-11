@@ -449,6 +449,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                                               )
                                             : Image.file(
                                                 File(item.url!),
+                                                fit: BoxFit.fill,
                                               ),
                                       ),
                                     ),
@@ -563,6 +564,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                                             imageUrl: e.url!, fit: BoxFit.fill)
                                         : Image.file(
                                             File(e.url!),
+                                            fit: BoxFit.fill,
                                           ),
                                   ),
                                 ),

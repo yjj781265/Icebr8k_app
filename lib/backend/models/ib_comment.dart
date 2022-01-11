@@ -34,7 +34,9 @@ class IbComment {
 
   @override
   String toString() {
-    return 'IbComment{commentId: $commentId, uid: $uid, isAnonymous: $isAnonymous, content: $content, type: $type, replies: $replies, timestampInMs: $timestampInMs}';
+    return 'IbComment{commentId: $commentId, uid: $uid, isAnonymous: '
+        '$isAnonymous, content: $content, type: $type, '
+        'replies: $replies, timestampInMs: $timestampInMs}';
   }
 
   @override
