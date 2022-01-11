@@ -88,6 +88,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                 child: Container(
                   margin: const EdgeInsets.all(5),
                   decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
                     borderRadius: const BorderRadius.all(
                         Radius.circular(IbConfig.kTextBoxCornerRadius)),
                     border: Border.all(

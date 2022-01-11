@@ -230,88 +230,90 @@ class IbQuestionMcItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: OpenContainer(
-        openElevation: 0,
-        closedElevation: 0,
-        closedShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(IbConfig.kMcItemCornerRadius),
-        ),
-        openColor: Colors.black,
-        middleColor: Colors.black,
-        closedColor: Colors.transparent,
-        transitionType: ContainerTransitionType.fadeThrough,
-        openBuilder: (BuildContext context,
-            void Function({Object? returnValue}) action) {
-          return IbMediaViewer(
-            urls: _controller.rxIbQuestion.value.choices
-                .map((e) => e.url!)
-                .toList(),
-            currentIndex: _controller.rxIbQuestion.value.choices
-                .map((e) => e.url!)
-                .toList()
-                .indexWhere((element) => choice.url! == element),
-          );
-        },
-        closedBuilder: (_, openContainer) {
-          return Obx(
-            () => InkWell(
-              radius: IbConfig.kMcItemCornerRadius,
-              borderRadius: BorderRadius.circular(IbConfig.kMcItemCornerRadius),
-              onTap: () {
-                if (_controller.isSample ||
-                    _controller.disableChoiceOnTouch ||
-                    (_controller.rxIbAnswer != null &&
-                        _controller.rxIbAnswer!.value.uid !=
-                            IbUtils.getCurrentUid())) {
-                  return;
-                }
+        padding: const EdgeInsets.symmetric(vertical: 4.0),
+        child: Obx(
+          () => InkWell(
+            radius: IbConfig.kMcItemCornerRadius,
+            borderRadius: BorderRadius.circular(IbConfig.kMcItemCornerRadius),
+            onTap: () {
+              if (_controller.isSample ||
+                  _controller.disableChoiceOnTouch ||
+                  (_controller.rxIbAnswer != null &&
+                      _controller.rxIbAnswer!.value.uid !=
+                          IbUtils.getCurrentUid())) {
+                return;
+              }
 
-                if (_controller.selectedChoiceId.value == choice.choiceId) {
-                  _controller.selectedChoiceId.value = '';
-                } else {
-                  _controller.selectedChoiceId.value = choice.choiceId;
-                }
-              },
-              child: Stack(
-                alignment: Alignment.centerLeft,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    width: Get.width * 0.95,
-                    height: _controller.rxIbQuestion.value.questionType ==
-                            IbQuestion.kMultipleChoice
-                        ? IbConfig.kMcTxtItemHeight
-                        : IbConfig.kMcPicItemHeight,
-                    decoration: BoxDecoration(
-                        color: IbColors.lightBlue,
-                        borderRadius: BorderRadius.circular(
-                            IbConfig.kMcItemCornerRadius)),
-                  ),
-                  AnimatedContainer(
-                    height: _controller.rxIbQuestion.value.questionType ==
-                            IbQuestion.kMultipleChoice
-                        ? IbConfig.kMcTxtItemHeight
-                        : IbConfig.kMcPicItemHeight,
-                    decoration: BoxDecoration(
-                        color: getItemColor(),
-                        borderRadius: BorderRadius.circular(8)),
-                    width: getItemWidth(),
-                    duration: Duration(
-                        milliseconds: _controller.showResult.value
-                            ? IbConfig.kEventTriggerDelayInMillis
-                            : 0),
-                  ),
-                  SizedBox(
-                    width: Get.width * 0.9,
-                    height: _controller.rxIbQuestion.value.questionType ==
-                            IbQuestion.kMultipleChoice
-                        ? IbConfig.kMcTxtItemHeight
-                        : IbConfig.kMcPicItemHeight,
-                    child: Row(
-                      children: [
-                        if (choice.url != null && choice.url!.isNotEmpty)
-                          Padding(
+              if (_controller.selectedChoiceId.value == choice.choiceId) {
+                _controller.selectedChoiceId.value = '';
+              } else {
+                _controller.selectedChoiceId.value = choice.choiceId;
+              }
+            },
+            child: Stack(
+              alignment: Alignment.centerLeft,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  width: Get.width * 0.95,
+                  height: _controller.rxIbQuestion.value.questionType ==
+                          IbQuestion.kMultipleChoice
+                      ? IbConfig.kMcTxtItemHeight
+                      : IbConfig.kMcPicItemHeight,
+                  decoration: BoxDecoration(
+                      color: IbColors.lightBlue,
+                      borderRadius:
+                          BorderRadius.circular(IbConfig.kMcItemCornerRadius)),
+                ),
+                AnimatedContainer(
+                  height: _controller.rxIbQuestion.value.questionType ==
+                          IbQuestion.kMultipleChoice
+                      ? IbConfig.kMcTxtItemHeight
+                      : IbConfig.kMcPicItemHeight,
+                  decoration: BoxDecoration(
+                      color: getItemColor(),
+                      borderRadius: BorderRadius.circular(8)),
+                  width: getItemWidth(),
+                  duration: Duration(
+                      milliseconds: _controller.showResult.value
+                          ? IbConfig.kEventTriggerDelayInMillis
+                          : 0),
+                ),
+                SizedBox(
+                  width: Get.width * 0.9,
+                  height: _controller.rxIbQuestion.value.questionType ==
+                          IbQuestion.kMultipleChoice
+                      ? IbConfig.kMcTxtItemHeight
+                      : IbConfig.kMcPicItemHeight,
+                  child: Row(
+                    children: [
+                      if (choice.url != null && choice.url!.isNotEmpty)
+                        OpenContainer(
+                          openElevation: 0,
+                          closedElevation: 0,
+                          closedShape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                IbConfig.kMcItemCornerRadius),
+                          ),
+                          openColor: Colors.black,
+                          middleColor: Colors.black,
+                          closedColor: Colors.transparent,
+                          transitionType: ContainerTransitionType.fadeThrough,
+                          openBuilder: (BuildContext context,
+                              void Function({Object? returnValue}) action) {
+                            return IbMediaViewer(
+                              urls: _controller.rxIbQuestion.value.choices
+                                  .map((e) => e.url!)
+                                  .toList(),
+                              currentIndex: _controller
+                                  .rxIbQuestion.value.choices
+                                  .map((e) => e.url!)
+                                  .toList()
+                                  .indexWhere(
+                                      (element) => choice.url! == element),
+                            );
+                          },
+                          closedBuilder: (_, openContainer) => Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: GestureDetector(
                               onDoubleTap: openContainer,
@@ -321,6 +323,7 @@ class IbQuestionMcItem extends StatelessWidget {
                                 child: !choice.url!.contains('http')
                                     ? Image.file(
                                         File(choice.url!),
+                                        fit: BoxFit.fill,
                                         width: IbConfig.kMcPicHeight,
                                         height: IbConfig.kMcPicHeight,
                                       )
@@ -335,60 +338,58 @@ class IbQuestionMcItem extends StatelessWidget {
                               ),
                             ),
                           ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            choice.content.toString(),
-                            maxLines: 1,
-                            style: const TextStyle(
-                                fontSize: IbConfig.kNormalTextSize,
-                                color: Colors.black),
-                          ),
                         ),
-                      ],
-                    ),
-                  ),
-                  if (_controller.showResult.value &&
-                      _controller.rxIbAnswer!.value.choiceId == choice.choiceId)
-                    const Positioned(
-                      bottom: 2,
-                      right: 2,
-                      child: CircleAvatar(
-                        radius: 6,
-                        backgroundColor: IbColors.white,
-                        child: Icon(
-                          Icons.check_circle_rounded,
-                          color: IbColors.accentColor,
-                          size: 12,
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          choice.content.toString(),
+                          maxLines: 1,
+                          style: const TextStyle(
+                              fontSize: IbConfig.kNormalTextSize,
+                              color: Colors.black),
                         ),
                       ),
+                    ],
+                  ),
+                ),
+                if (_controller.showResult.value &&
+                    _controller.rxIbAnswer!.value.choiceId == choice.choiceId)
+                  const Positioned(
+                    bottom: 2,
+                    right: 2,
+                    child: CircleAvatar(
+                      radius: 6,
+                      backgroundColor: IbColors.white,
+                      child: Icon(
+                        Icons.check_circle_rounded,
+                        color: IbColors.accentColor,
+                        size: 12,
+                      ),
                     ),
-                  if (_controller.showResult.value &&
-                      _controller.totalPolled.value > 0)
-                    TweenAnimationBuilder(
-                      builder:
-                          (BuildContext context, Object? value, Widget? child) {
-                        return Positioned(
-                          right: 8,
-                          child: Text(
-                            '${((_controller.resultMap[choice] ?? 0 / _controller.totalPolled.value.toDouble()) * 100).toStringAsFixed(1)}%',
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                        );
-                      },
-                      duration: const Duration(
-                          milliseconds: IbConfig.kEventTriggerDelayInMillis),
-                      tween: Tween<double>(
-                          begin: 0,
-                          end: _controller.resultMap[choice]! /
-                              _controller.totalPolled.value.toDouble()),
-                    ),
-                ],
-              ),
+                  ),
+                if (_controller.showResult.value &&
+                    _controller.totalPolled.value > 0)
+                  TweenAnimationBuilder(
+                    builder:
+                        (BuildContext context, Object? value, Widget? child) {
+                      return Positioned(
+                        right: 8,
+                        child: Text(
+                          '${((_controller.resultMap[choice] ?? 0 / _controller.totalPolled.value.toDouble()) * 100).toStringAsFixed(1)}%',
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                      );
+                    },
+                    duration: const Duration(
+                        milliseconds: IbConfig.kEventTriggerDelayInMillis),
+                    tween: Tween<double>(
+                        begin: 0,
+                        end: _controller.resultMap[choice]! /
+                            _controller.totalPolled.value.toDouble()),
+                  ),
+              ],
             ),
-          );
-        },
-      ),
-    );
+          ),
+        ));
   }
 }

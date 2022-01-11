@@ -15,7 +15,6 @@ import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/tag_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:reorderables/reorderables.dart';
 
@@ -859,31 +858,18 @@ void showMediaBottomSheet(
           );
 
           if (pickedFile != null) {
-            final File? croppedFile = await IbUtils.showImageCropper(
-                pickedFile.path,
-                width: 900,
-                height: 900,
-                cropStyle: CropStyle.rectangle,
-                initAspectRatio: CropAspectRatioPreset.square,
-                lockAspectRatio: true,
-                minimumAspectRatio: 1,
-                ratios: [
-                  CropAspectRatioPreset.square,
-                ]);
-            if (croppedFile != null) {
-              if (ibChoice != null) {
-                // ignore: parameter_assignments
-                ibChoice!.url = croppedFile.path;
-              } else {
-                // ignore: parameter_assignments
-                ibChoice = IbChoice(
-                    choiceId: IbUtils.getUniqueId(), url: croppedFile.path);
-                // ignore: parameter_assignments
-                list.add(ibChoice!);
-              }
-
-              list.refresh();
+            if (ibChoice != null) {
+              // ignore: parameter_assignments
+              ibChoice!.url = pickedFile.path;
+            } else {
+              // ignore: parameter_assignments
+              ibChoice = IbChoice(
+                  choiceId: IbUtils.getUniqueId(), url: pickedFile.path);
+              // ignore: parameter_assignments
+              list.add(ibChoice!);
             }
+
+            list.refresh();
           }
         },
         child: Ink(
@@ -918,34 +904,19 @@ void showMediaBottomSheet(
           );
 
           if (pickedFile != null) {
-            final File? croppedFile = await IbUtils.showImageCropper(
-              pickedFile.path,
-              width: 900,
-              height: 900,
-              cropStyle: CropStyle.rectangle,
-              ratios: [
-                CropAspectRatioPreset.square,
-              ],
-              initAspectRatio: CropAspectRatioPreset.square,
-              lockAspectRatio: true,
-              minimumAspectRatio: 1,
-            );
-
-            if (croppedFile != null) {
-              if (ibChoice != null) {
-                // ignore: parameter_assignments
-                ibChoice!.url = croppedFile.path;
-              } else {
-                // ignore: parameter_assignments
-                ibChoice = IbChoice(
-                  choiceId: IbUtils.getUniqueId(),
-                  url: croppedFile.path,
-                );
-                // ignore: parameter_assignments
-                list.add(ibChoice!);
-              }
-              list.refresh();
+            if (ibChoice != null) {
+              // ignore: parameter_assignments
+              ibChoice!.url = pickedFile.path;
+            } else {
+              // ignore: parameter_assignments
+              ibChoice = IbChoice(
+                choiceId: IbUtils.getUniqueId(),
+                url: pickedFile.path,
+              );
+              // ignore: parameter_assignments
+              list.add(ibChoice!);
             }
+            list.refresh();
           }
         },
         child: Ink(

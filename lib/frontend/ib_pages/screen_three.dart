@@ -41,7 +41,8 @@ class ScreenThree extends StatelessWidget {
                       const EdgeInsets.only(left: 16, right: 24, bottom: 16),
                   child: Obx(
                     () => Text(
-                      'Answer the following ${_setUpController.ibQuestions.length} questions to get your Icebr8k journey started',
+                      'Answer the following ${_setUpController.ibQuestions.length} '
+                      'questions to get your Icebr8k journey started',
                       style: const TextStyle(
                           fontSize: 24, fontWeight: FontWeight.bold),
                     ),

@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_pages/comment_page.dart';
 
 import '../ib_config.dart';
 import '../ib_utils.dart';
@@ -54,7 +55,12 @@ class IbQuestionStatsBar extends StatelessWidget {
                   ),
                   if (_itemController.rxIbQuestion.value.isCommentEnabled)
                     InkWell(
-                      onTap: _itemController.isSample ? null : () {},
+                      onTap: _itemController.isSample
+                          ? null
+                          : () {
+                              Get.to(() => CommentPage(
+                                  _itemController.rxIbQuestion.value));
+                            },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 4),
