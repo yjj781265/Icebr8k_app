@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/comment_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/comment_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -46,7 +47,8 @@ class IbQuestionButtons extends StatelessWidget {
                 child: IbElevatedButton(
                   disabled: _controller.isSample,
                   onPressed: () {
-                    Get.to(() => CommentPage(_controller.rxIbQuestion.value));
+                    Get.to(() => CommentPage(Get.put(
+                        CommentController(_controller.rxIbQuestion.value))));
                   },
                   textTrKey: 'comment',
                 ),

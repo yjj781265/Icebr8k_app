@@ -23,15 +23,15 @@ class IbTenorService extends GetConnect {
     if (response.isOk && response.bodyString != null) {
       final myMap = jsonDecode(response.bodyString!);
       final next = myMap['next'].toString();
-      List<dynamic>? tempList = myMap['results'] as List;
-      for (var item in tempList) {
+      final List<dynamic> tempList = myMap['results'] as List;
+      for (final item in tempList) {
         final String id = item['id'].toString();
         final String description = item['content_description'].toString();
         final url = item['media'][0]['tinygif']['url'].toString();
         final int width = item['media'][0]['tinygif']['dims'][0] as int;
         final int height = item['media'][0]['tinygif']['dims'][1] as int;
         final double timeStampInSec = item['created'] as double;
-        IbGif ibGif = IbGif(
+        final IbGif ibGif = IbGif(
             url: url,
             width: width,
             height: height,
@@ -62,15 +62,15 @@ class IbTenorService extends GetConnect {
     if (response.isOk && response.bodyString != null) {
       final myMap = jsonDecode(response.bodyString!);
       final next = myMap['next'].toString();
-      List<dynamic>? tempList = myMap['results'] as List;
-      for (var item in tempList) {
+      final List<dynamic> tempList = myMap['results'] as List;
+      for (final item in tempList) {
         final String id = item['id'].toString();
         final String description = item['content_description'].toString();
         final url = item['media'][0]['tinygif']['url'].toString();
         final int width = item['media'][0]['tinygif']['dims'][0] as int;
         final int height = item['media'][0]['tinygif']['dims'][1] as int;
         final double timeStampInSec = item['created'] as double;
-        IbGif ibGif = IbGif(
+        final IbGif ibGif = IbGif(
             url: url,
             width: width,
             height: height,

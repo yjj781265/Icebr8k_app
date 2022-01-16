@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/comment_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_pages/comment_page.dart';
@@ -58,17 +59,20 @@ class IbQuestionStatsBar extends StatelessWidget {
                       onTap: _itemController.isSample
                           ? null
                           : () {
-                              Get.to(() => CommentPage(
-                                  _itemController.rxIbQuestion.value));
+                              Get.to(() => CommentPage(Get.put(
+                                  CommentController(
+                                      _itemController.rxIbQuestion.value))));
                             },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 4),
                         child: Row(
                           children: [
-                            const FaIcon(
+                            FaIcon(
                               FontAwesomeIcons.comment,
-                              color: IbColors.lightGrey,
+                              color: _itemController.commented.isTrue
+                                  ? IbColors.darkPrimaryColor
+                                  : Colors.grey,
                               size: 19,
                             ),
                             const SizedBox(

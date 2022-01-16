@@ -7,6 +7,7 @@ class IbComment {
   String commentId;
   String questionId;
   String uid;
+  int likes;
   bool isAnonymous;
   String content;
   String type;
@@ -22,6 +23,7 @@ class IbComment {
       required this.uid,
       required this.questionId,
       this.isAnonymous = false,
+      this.likes = 0,
       required this.content,
       required this.type,
       required this.timestampInMs,

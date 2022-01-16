@@ -221,6 +221,7 @@ class _PeopleNearByTabState extends State<PeopleNearByTab>
           SliverToBoxAdapter(
             child: Obx(
               () => SwitchListTile(
+                inactiveTrackColor: IbColors.lightGrey,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                 value: _controller.shareLoc.value,
                 onChanged: (value) async {

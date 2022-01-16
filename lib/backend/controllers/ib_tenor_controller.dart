@@ -55,7 +55,7 @@ class IbTenorController extends GetxController {
         resultGifs.addAll(tempList);
       }
       refreshController.loadComplete();
-    } on Exception catch (e) {
+    } on Exception catch (_) {
       refreshController.loadFailed();
     }
   }

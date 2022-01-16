@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_tenor_controller.dart';
+import 'package:icebr8k/backend/models/ib_gif.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -23,6 +23,9 @@ class IbTenorPage extends StatelessWidget {
             Expanded(
               flex: 8,
               child: TextField(
+                onSubmitted: (value) async {
+                  await _controller.search();
+                },
                 controller: _controller.editingController,
                 autofocus: true,
                 decoration: InputDecoration(
@@ -35,7 +38,7 @@ class IbTenorPage extends StatelessWidget {
                             },
                             icon: const Icon(Icons.cancel)),
                   ),
-                  hintText: 'Search Tenor',
+                  hintText: '🔍 Search Tenor',
                 ),
               ),
             ),
@@ -166,41 +169,7 @@ class IbTenorPage extends StatelessWidget {
                           crossAxisSpacing: 8,
                           children: _controller.trendingGifs
                               .map(
-                                (e) => ClipRRect(
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(8),
-                                  ),
-                                  child: Stack(
-                                    children: [
-                                      CachedNetworkImage(
-                                        placeholder: (context, str) =>
-                                            Container(
-                                          decoration: BoxDecoration(
-                                            color: IbColors.lightGrey
-                                                .withOpacity(0.8),
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                              Radius.circular(8),
-                                            ),
-                                          ),
-                                          width: e.width.toDouble(),
-                                          height: e.height.toDouble(),
-                                        ),
-                                        imageUrl: e.url,
-                                        fit: BoxFit.fill,
-                                      ),
-                                      Positioned.fill(
-                                        child: Material(
-                                          color: Colors.transparent,
-                                          child: InkWell(
-                                            onTap: () =>
-                                                _handleItemClick(e.url),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                (e) => iBGifItem(e),
                               )
                               .toList(),
                         ),
@@ -237,41 +206,7 @@ class IbTenorPage extends StatelessWidget {
                           crossAxisSpacing: 8,
                           children: _controller.resultGifs
                               .map(
-                                (e) => ClipRRect(
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(8),
-                                  ),
-                                  child: Stack(
-                                    children: [
-                                      CachedNetworkImage(
-                                        placeholder: (context, str) =>
-                                            Container(
-                                          width: e.width.toDouble(),
-                                          height: e.height.toDouble(),
-                                          decoration: BoxDecoration(
-                                            color: IbColors.lightGrey
-                                                .withOpacity(0.8),
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                              Radius.circular(8),
-                                            ),
-                                          ),
-                                        ),
-                                        imageUrl: e.url,
-                                        fit: BoxFit.fill,
-                                      ),
-                                      Positioned.fill(
-                                        child: Material(
-                                          color: Colors.transparent,
-                                          child: InkWell(
-                                            onTap: () =>
-                                                _handleItemClick(e.url),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                (e) => iBGifItem(e),
                               )
                               .toList(),
                         ),
@@ -288,5 +223,40 @@ class IbTenorPage extends StatelessWidget {
 
   void _handleItemClick(String url) {
     Get.back(result: url);
+  }
+
+  Widget iBGifItem(IbGif e) {
+    return Stack(
+      children: [
+        SizedBox(
+          height: e.height.toDouble(),
+          width: e.width.toDouble(),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.all(
+              Radius.circular(8),
+            ),
+            child: CachedNetworkImage(
+              placeholder: (context, str) => Container(
+                decoration: BoxDecoration(
+                  color: IbColors.lightGrey.withOpacity(0.8),
+                ),
+                height: e.height.toDouble(),
+                width: e.width.toDouble(),
+              ),
+              imageUrl: e.url,
+              fit: BoxFit.fill,
+            ),
+          ),
+        ),
+        Positioned.fill(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => _handleItemClick(e.url),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

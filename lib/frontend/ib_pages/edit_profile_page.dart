@@ -194,8 +194,10 @@ class EditProfilePage extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final File? croppedFile =
-                  await IbUtils.showImageCropper(pickedFile.path);
+              final File? croppedFile = await IbUtils.showImageCropper(
+                  pickedFile.path,
+                  height: 1600,
+                  width: 1600);
               if (croppedFile != null) {
                 _controller.avatarUrl.value = croppedFile.path;
                 _controller.isProfilePicPicked.value = true;
@@ -234,8 +236,10 @@ class EditProfilePage extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final File? croppedFile =
-                  await IbUtils.showImageCropper(pickedFile.path);
+              final File? croppedFile = await IbUtils.showImageCropper(
+                  pickedFile.path,
+                  height: 1600,
+                  width: 1600);
               if (croppedFile != null) {
                 _controller.avatarUrl.value = croppedFile.path;
                 _controller.isProfilePicPicked.value = true;
@@ -271,43 +275,4 @@ class EditProfilePage extends StatelessWidget {
 
     Get.bottomSheet(SafeArea(child: options));
   }
-
-  /*String _readableDateTime(DateTime _dateTime) {
-    final f = DateFormat('MM/dd/yyyy');
-    return f.format(_dateTime);
-  }*/
-
-  /* Widget _getDatePicker() {
-    _controller.birthdatePickerInstructionKey.value = 'date_picker_instruction';
-    return Obx(
-      () => IbSingleDatePicker(
-        onSelectionChanged: (arg) {
-          _controller.birthdateInMs.value =
-              (arg.value as DateTime).millisecondsSinceEpoch;
-          _controller.birthdatePickerInstructionKey.value = '';
-        },
-        titleTrKey: _controller.birthdatePickerInstructionKey.value,
-        buttons: [
-          TextButton(onPressed: () => Get.back(), child: Text('cancel'.tr)),
-          TextButton(
-              onPressed: () {
-                if (_controller
-                    .birthdatePickerInstructionKey.value.isNotEmpty) {
-                  return;
-                }
-
-                final _dateTime = DateTime.fromMillisecondsSinceEpoch(
-                    _controller.birthdateInMs.value);
-                _controller.readableBirthdate.value =
-                    _readableDateTime(_dateTime);
-                _birthdateEditController.text =
-                    _controller.readableBirthdate.value;
-
-                Get.back();
-              },
-              child: Text('confirm'.tr)),
-        ],
-      ),
-    );
-  }*/
 }

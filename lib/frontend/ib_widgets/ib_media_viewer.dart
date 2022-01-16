@@ -26,57 +26,60 @@ class _IbMediaViewerState extends State<IbMediaViewer>
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: AlignmentDirectional.center,
-      children: [
-        TabBarView(
-            controller: controller,
-            children: widget.urls.map((e) {
-              Widget img = const SizedBox();
-              if (!e.contains('http')) {
-                img = Image.file(
-                  File(e),
-                );
-              } else {
-                img = CachedNetworkImage(imageUrl: e);
-              }
+    return Container(
+      color: Colors.black,
+      child: Stack(
+        alignment: AlignmentDirectional.center,
+        children: [
+          TabBarView(
+              controller: controller,
+              children: widget.urls.map((e) {
+                Widget img = const SizedBox();
+                if (!e.contains('http')) {
+                  img = Image.file(
+                    File(e),
+                  );
+                } else {
+                  img = CachedNetworkImage(imageUrl: e);
+                }
 
-              return GestureDetector(
-                onTap: () {
+                return GestureDetector(
+                  onTap: () {
+                    Get.back(canPop: false);
+                  },
+                  child: InteractiveViewer(
+                    boundaryMargin: const EdgeInsets.all(8),
+                    child: img,
+                  ),
+                );
+              }).toList()),
+          Positioned(
+              bottom: 16,
+              child: SafeArea(
+                child: Center(
+                  child: TabPageSelector(
+                    controller: controller,
+                  ),
+                ),
+              )),
+          Positioned(
+            top: 64,
+            right: 16,
+            child: Material(
+              color: Colors.transparent,
+              child: IconButton(
+                onPressed: () {
                   Get.back(canPop: false);
                 },
-                child: InteractiveViewer(
-                  boundaryMargin: const EdgeInsets.all(8),
-                  child: img,
+                icon: const Icon(
+                  Icons.cancel,
+                  color: IbColors.errorRed,
                 ),
-              );
-            }).toList()),
-        Positioned(
-            bottom: 16,
-            child: SafeArea(
-              child: Center(
-                child: TabPageSelector(
-                  controller: controller,
-                ),
-              ),
-            )),
-        Positioned(
-          top: 64,
-          right: 16,
-          child: Material(
-            color: Colors.transparent,
-            child: IconButton(
-              onPressed: () {
-                Get.back(canPop: false);
-              },
-              icon: const Icon(
-                Icons.cancel,
-                color: IbColors.errorRed,
               ),
             ),
-          ),
-        )
-      ],
+          )
+        ],
+      ),
     );
   }
 }

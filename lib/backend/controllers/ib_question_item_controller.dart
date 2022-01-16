@@ -97,9 +97,7 @@ class IbQuestionItemController extends GetxController {
 
     await generateIbTags();
     await generatePollStats();
-    totalTags.value = rxIbQuestion.value.tagIds.length;
-    liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
-    likes.value = rxIbQuestion.value.likes;
+
     super.onInit();
   }
 
@@ -127,8 +125,13 @@ class IbQuestionItemController extends GetxController {
     }
 
     print(resultMap);
-
     totalPolled.value = counter;
+    commented.value =
+        await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
+    comments.value = rxIbQuestion.value.comments;
+    totalTags.value = rxIbQuestion.value.tagIds.length;
+    liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
+    likes.value = rxIbQuestion.value.likes;
   }
 
   Future<void> onVote() async {

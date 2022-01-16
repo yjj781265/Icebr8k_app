@@ -235,21 +235,7 @@ class IbQuestionMcItem extends StatelessWidget {
           () => InkWell(
             radius: IbConfig.kMcItemCornerRadius,
             borderRadius: BorderRadius.circular(IbConfig.kMcItemCornerRadius),
-            onTap: () {
-              if (_controller.isSample ||
-                  _controller.disableChoiceOnTouch ||
-                  (_controller.rxIbAnswer != null &&
-                      _controller.rxIbAnswer!.value.uid !=
-                          IbUtils.getCurrentUid())) {
-                return;
-              }
-
-              if (_controller.selectedChoiceId.value == choice.choiceId) {
-                _controller.selectedChoiceId.value = '';
-              } else {
-                _controller.selectedChoiceId.value = choice.choiceId;
-              }
-            },
+            onTap: onItemTap,
             child: Stack(
               alignment: Alignment.centerLeft,
               children: [
@@ -315,8 +301,9 @@ class IbQuestionMcItem extends StatelessWidget {
                           },
                           closedBuilder: (_, openContainer) => Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: GestureDetector(
+                            child: InkWell(
                               onDoubleTap: openContainer,
+                              onTap: onItemTap,
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(
                                     IbConfig.kMcItemCornerRadius),
@@ -391,5 +378,20 @@ class IbQuestionMcItem extends StatelessWidget {
             ),
           ),
         ));
+  }
+
+  void onItemTap() {
+    if (_controller.isSample ||
+        _controller.disableChoiceOnTouch ||
+        (_controller.rxIbAnswer != null &&
+            _controller.rxIbAnswer!.value.uid != IbUtils.getCurrentUid())) {
+      return;
+    }
+
+    if (_controller.selectedChoiceId.value == choice.choiceId) {
+      _controller.selectedChoiceId.value = '';
+    } else {
+      _controller.selectedChoiceId.value = choice.choiceId;
+    }
   }
 }

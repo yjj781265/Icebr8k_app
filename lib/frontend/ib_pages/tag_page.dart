@@ -157,6 +157,7 @@ class TagPage extends StatelessWidget {
   }
 
   void showCreateTagBtmSheet() {
+    _editingController.clear();
     Get.bottomSheet(SizedBox(
       height: 200,
       child: IbCard(
@@ -166,6 +167,13 @@ class TagPage extends StatelessWidget {
               child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
+              onSubmitted: (value) {
+                if (value.trim().isNotEmpty &&
+                    !_controller.pickedTags.contains(value.trim())) {
+                  _controller.pickedTags.add(value.trim());
+                }
+                Get.back();
+              },
               controller: _editingController,
               autofocus: true,
               decoration: const InputDecoration(
@@ -178,7 +186,9 @@ class TagPage extends StatelessWidget {
               width: double.infinity,
               child: TextButton(
                   onPressed: () {
-                    if (_editingController.text.trim().isNotEmpty) {
+                    if (_editingController.text.trim().isNotEmpty &&
+                        !_controller.pickedTags
+                            .contains(_editingController.text.trim())) {
                       _controller.pickedTags
                           .add(_editingController.text.trim());
                     }

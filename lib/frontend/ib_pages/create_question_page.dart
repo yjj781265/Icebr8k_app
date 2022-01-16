@@ -952,13 +952,19 @@ void showMediaBottomSheet(
             () => IbTenorPage(),
           );
           if (url != null && url.toString().isNotEmpty) {
-            // ignore: parameter_assignments
-            ibChoice = IbChoice(
-              choiceId: IbUtils.getUniqueId(),
-              url: url.toString(),
-            );
-            // ignore: parameter_assignments
-            list.add(ibChoice!);
+            if (ibChoice != null) {
+              // ignore: parameter_assignments
+              ibChoice!.url = url.toString();
+            } else {
+              // ignore: parameter_assignments
+              ibChoice = IbChoice(
+                choiceId: IbUtils.getUniqueId(),
+                url: url.toString(),
+              );
+              // ignore: parameter_assignments
+              list.add(ibChoice!);
+            }
+
             list.refresh();
           }
         },

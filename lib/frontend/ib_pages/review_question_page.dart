@@ -170,53 +170,56 @@ class ReviewQuestionPage extends StatelessWidget {
   void _showDateTimePicker() {
     itemController.rxIbQuestion.value.endTimeInMs =
         DateTime.now().add(const Duration(minutes: 15)).millisecondsSinceEpoch;
-    Get.bottomSheet(IbCard(
-        child: SingleChildScrollView(
-      child: Column(
-        children: [
-          Obx(
-            () => Center(
-              child: Text(
-                '${DateTime.fromMillisecondsSinceEpoch(itemController.rxIbQuestion.value.endTimeInMs).year}',
-                style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
+    Get.bottomSheet(SafeArea(
+      child: IbCard(
+          child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Obx(
+              () => Center(
+                child: Text(
+                  '${DateTime.fromMillisecondsSinceEpoch(itemController.rxIbQuestion.value.endTimeInMs).year}',
+                  style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
+                ),
               ),
             ),
-          ),
-          SizedBox(
-            height: 300,
-            child: CupertinoDatePicker(
-              maximumDate: DateTime.now().add(const Duration(days: 365)),
-              maximumYear: 1,
-              onDateTimeChanged: (value) async {
-                await HapticFeedback.selectionClick();
-                itemController.rxIbQuestion.value.endTimeInMs =
-                    value.millisecondsSinceEpoch;
-                itemController.rxIbQuestion.refresh();
-              },
-              initialDateTime: DateTime.now().add(const Duration(minutes: 20)),
-              minimumDate: DateTime.now().add(const Duration(minutes: 15)),
-              dateOrder: DatePickerDateOrder.ymd,
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: () {
-                  Get.back();
+            SizedBox(
+              height: 300,
+              child: CupertinoDatePicker(
+                maximumDate: DateTime.now().add(const Duration(days: 365)),
+                maximumYear: 1,
+                onDateTimeChanged: (value) async {
+                  await HapticFeedback.selectionClick();
+                  itemController.rxIbQuestion.value.endTimeInMs =
+                      value.millisecondsSinceEpoch;
+                  itemController.rxIbQuestion.refresh();
                 },
-                child: const Text('Cancel'),
+                initialDateTime:
+                    DateTime.now().add(const Duration(minutes: 20)),
+                minimumDate: DateTime.now().add(const Duration(minutes: 15)),
+                dateOrder: DatePickerDateOrder.ymd,
               ),
-              TextButton(
-                onPressed: () {
-                  Get.back();
-                },
-                child: const Text('Confirm'),
-              )
-            ],
-          )
-        ],
-      ),
-    )));
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Get.back();
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Get.back();
+                  },
+                  child: const Text('Confirm'),
+                )
+              ],
+            )
+          ],
+        ),
+      )),
+    ));
   }
 }

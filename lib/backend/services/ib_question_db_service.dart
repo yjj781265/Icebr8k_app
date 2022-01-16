@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
+import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
@@ -13,6 +14,7 @@ class IbQuestionDbService {
   static const _kQuestionCollection = 'IbQuestions${DbConfig.dbSuffix}';
   static const _kAnswerCollectionGroup = 'Answers${DbConfig.dbSuffix}';
   static const _kLikesCollectionGroup = 'Likes${DbConfig.dbSuffix}';
+  static const _kCommentCollectionGroup = 'Comments${DbConfig.dbSuffix}';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
 
   factory IbQuestionDbService() => _ibQuestionDbService;
@@ -408,5 +410,103 @@ class IbQuestionDbService {
         .collection(_kAnswerCollectionGroup)
         .doc(uid)
         .delete();
+  }
+
+  /// comments sub collections query and listeners
+
+  Future<void> addComment(IbComment comment) async {
+    await _collectionRef
+        .doc(comment.questionId)
+        .collection(_kCommentCollectionGroup)
+        .doc(comment.commentId)
+        .set(comment.toJson(), SetOptions(merge: true));
+
+    await _collectionRef
+        .doc(comment.questionId)
+        .set({'comments': FieldValue.increment(1)}, SetOptions(merge: true));
+  }
+
+  Future<void> likeComment(IbComment comment) async {
+    await _collectionRef
+        .doc(comment.questionId)
+        .collection(_kCommentCollectionGroup)
+        .doc(comment.commentId)
+        .set({'likes': FieldValue.increment(1)}, SetOptions(merge: true));
+  }
+
+  Future<void> dislikeComment(IbComment comment) async {
+    final snapshot = await _collectionRef
+        .doc(comment.questionId)
+        .collection(_kCommentCollectionGroup)
+        .doc(comment.commentId)
+        .get();
+
+    if (!snapshot.exists) {
+      return;
+    }
+
+    final tempComment = IbComment.fromJson(snapshot.data()!);
+
+    if (tempComment.likes == 0) {
+      return;
+    }
+
+    if (tempComment.likes < 0) {
+      await _collectionRef
+          .doc(tempComment.questionId)
+          .collection(_kCommentCollectionGroup)
+          .doc(tempComment.commentId)
+          .set({'likes': 0}, SetOptions(merge: true));
+      return;
+    }
+
+    await _collectionRef
+        .doc(tempComment.questionId)
+        .collection(_kCommentCollectionGroup)
+        .doc(tempComment.commentId)
+        .set({'likes': FieldValue.increment(-1)}, SetOptions(merge: true));
+  }
+
+  Future<List<IbComment>> queryNewestComments(String questionId,
+      {int? timestampInMs}) async {
+    final List<IbComment> ibComments = [];
+
+    QuerySnapshot<Map<String, dynamic>> snapshot = await _collectionRef
+        .doc(questionId)
+        .collection(_kCommentCollectionGroup)
+        .orderBy('timestampInMs', descending: true)
+        .limit(16)
+        .get();
+
+    if (timestampInMs != null) {
+      snapshot = await _collectionRef
+          .doc(questionId)
+          .collection(_kCommentCollectionGroup)
+          .orderBy('timestampInMs', descending: true)
+          .where('timestampInMs', isLessThan: timestampInMs)
+          .limit(16)
+          .get();
+    }
+
+    if (snapshot.size == 0) {
+      return ibComments;
+    }
+
+    for (final doc in snapshot.docs) {
+      ibComments.add(IbComment.fromJson(doc.data()));
+    }
+
+    ibComments.sort((a, b) => b.timestampInMs.compareTo(a.timestampInMs));
+    return ibComments;
+  }
+
+  Future<bool> isCommented(String questionId) async {
+    final snapshot = await _collectionRef
+        .doc(questionId)
+        .collection(_kCommentCollectionGroup)
+        .where('uid', isEqualTo: IbUtils.getCurrentUid())
+        .get();
+
+    return snapshot.size >= 1;
   }
 }
