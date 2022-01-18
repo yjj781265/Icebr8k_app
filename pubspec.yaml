@@ -59,7 +59,7 @@ dependencies:
   move_to_background: ^1.0.2
   pull_to_refresh: ^2.0.0
   reorderables: ^0.4.2
-  scroll_to_index: ^2.1.0
+  scroll_to_index: ^2.1.1
   showcaseview: ^1.1.1
   sign_in_with_apple: ^3.3.0
   syncfusion_flutter_datepicker: ^19.2.62

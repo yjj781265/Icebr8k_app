@@ -160,26 +160,26 @@ class IbUtils {
     }
   }
 
-  static String getChatDateTimeString(DateTime _dateTime) {
+  static String getChatTabDateString(DateTime _dateTime) {
     final Duration diffDt = DateTime.now().difference(_dateTime);
     if (diffDt.inSeconds == 0) {
       return 'now';
     }
 
     if (diffDt.inSeconds < 60) {
-      return '${diffDt.inSeconds} s';
+      return '${diffDt.inSeconds} s ago';
     }
 
     if (diffDt.inMinutes >= 1 && diffDt.inMinutes < 60) {
-      return '${diffDt.inMinutes} min';
+      return '${diffDt.inMinutes} min ago';
     }
 
     if (diffDt.inHours >= 1 && diffDt.inHours < 24) {
-      return '${diffDt.inHours} hr';
+      return '${diffDt.inHours} hr ago';
     }
 
     if (diffDt.inDays >= 1 && diffDt.inDays < 30) {
-      return '${diffDt.inDays} d';
+      return '${diffDt.inDays} d ago';
     }
 
     if (diffDt.inDays >= 30 && diffDt.inDays < 365) {

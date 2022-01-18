@@ -87,7 +87,7 @@ class ChatTab extends StatelessWidget {
                           children: [
                             if (item.ibMessage.timestamp != null)
                               Text(
-                                IbUtils.getChatDateTimeString(
+                                IbUtils.getChatTabDateString(
                                     (item.ibMessage.timestamp as Timestamp)
                                         .toDate()),
                                 style: const TextStyle(

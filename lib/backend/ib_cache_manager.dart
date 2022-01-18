@@ -8,7 +8,10 @@ class IbCacheManager {
 
   IbCacheManager._();
 
-  void cacheIbUser(IbUser user) {
+  void cacheIbUser(IbUser? user) {
+    if (user == null) {
+      return;
+    }
     ibUsersMap[user.id] = user;
   }
 

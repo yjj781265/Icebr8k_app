@@ -66,10 +66,11 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: false,
         title: Obx(
           () => Text(
             'create_question'.trParams({'type': _controller.title.value}),
-            style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
+            style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
           ),
         ),
         actions: [
@@ -512,7 +513,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                     showMediaBottomSheet(context, null, _controller.picList);
                   },
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Container(
                       decoration: BoxDecoration(
                           color: IbColors.lightGrey,

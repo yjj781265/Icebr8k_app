@@ -15,6 +15,8 @@ class IbQuestionDbService {
   static const _kAnswerCollectionGroup = 'Answers${DbConfig.dbSuffix}';
   static const _kLikesCollectionGroup = 'Likes${DbConfig.dbSuffix}';
   static const _kCommentCollectionGroup = 'Comments${DbConfig.dbSuffix}';
+  static const _kCommentLikesCollectionGroup =
+      'Comments-Likes${DbConfig.dbSuffix}';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
 
   factory IbQuestionDbService() => _ibQuestionDbService;
@@ -432,6 +434,17 @@ class IbQuestionDbService {
         .collection(_kCommentCollectionGroup)
         .doc(comment.commentId)
         .set({'likes': FieldValue.increment(1)}, SetOptions(merge: true));
+    await _collectionRef
+        .doc(comment.questionId)
+        .collection(_kCommentCollectionGroup)
+        .doc(comment.commentId)
+        .collection(_kCommentLikesCollectionGroup)
+        .doc(IbUtils.getCurrentUid())
+        .set({
+      'uid': IbUtils.getCurrentUid()!,
+      'commentId': comment.commentId,
+      'questionId': comment.questionId
+    });
   }
 
   Future<void> dislikeComment(IbComment comment) async {
@@ -465,6 +478,24 @@ class IbQuestionDbService {
         .collection(_kCommentCollectionGroup)
         .doc(tempComment.commentId)
         .set({'likes': FieldValue.increment(-1)}, SetOptions(merge: true));
+    await _collectionRef
+        .doc(tempComment.questionId)
+        .collection(_kCommentCollectionGroup)
+        .doc(tempComment.commentId)
+        .collection(_kCommentLikesCollectionGroup)
+        .doc(IbUtils.getCurrentUid())
+        .delete();
+  }
+
+  Future<bool> isCommentLiked(IbComment ibComment) async {
+    final snapshot = await _collectionRef
+        .doc(ibComment.questionId)
+        .collection(_kCommentCollectionGroup)
+        .doc(ibComment.commentId)
+        .collection(_kCommentLikesCollectionGroup)
+        .doc(IbUtils.getCurrentUid())
+        .get();
+    return snapshot.exists;
   }
 
   Future<List<IbComment>> queryNewestComments(String questionId,
@@ -475,7 +506,7 @@ class IbQuestionDbService {
         .doc(questionId)
         .collection(_kCommentCollectionGroup)
         .orderBy('timestampInMs', descending: true)
-        .limit(16)
+        .limit(8)
         .get();
 
     if (timestampInMs != null) {
@@ -484,7 +515,7 @@ class IbQuestionDbService {
           .collection(_kCommentCollectionGroup)
           .orderBy('timestampInMs', descending: true)
           .where('timestampInMs', isLessThan: timestampInMs)
-          .limit(16)
+          .limit(8)
           .get();
     }
 
@@ -508,5 +539,31 @@ class IbQuestionDbService {
         .get();
 
     return snapshot.size >= 1;
+  }
+
+  Future<void> addReply(
+      {required String questionId,
+      required String commentId,
+      required IbComment reply}) async {
+    await _collectionRef
+        .doc(questionId)
+        .collection(_kCommentCollectionGroup)
+        .doc(commentId)
+        .set({
+      'replies': FieldValue.arrayUnion([reply.toJson()])
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> removeReply(
+      {required String questionId,
+      required String commentId,
+      required IbComment reply}) async {
+    await _collectionRef
+        .doc(questionId)
+        .collection(_kCommentCollectionGroup)
+        .doc(commentId)
+        .set({
+      'replies': FieldValue.arrayRemove([reply.toJson()])
+    }, SetOptions(merge: true));
   }
 }
