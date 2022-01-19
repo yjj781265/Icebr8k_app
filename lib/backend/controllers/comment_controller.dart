@@ -14,6 +14,8 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 class CommentController extends GetxController {
   final comments = <CommentItem?>[null].obs;
   final FocusNode focusNode = FocusNode();
+  final List<String> dropDownOptions = ['Top Comments', 'Newest First'];
+  final currentOption = 'Top Comments'.obs;
   final Map<String, IbAnswer> answerMap = {};
   final hintText = 'Add a creative comment here'.obs;
   final replyCommentId = ''.obs;
@@ -28,53 +30,66 @@ class CommentController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
-    editingController.addListener(() {
-      if (editingController.text.isEmpty) {
-        hintText.value = 'Add a creative comment here';
-        replyCommentId.value = '';
-      }
-    });
-
     commentCount.value = ibQuestion.comments;
-    final tempList =
-        await IbQuestionDbService().queryNewestComments(ibQuestion.id);
+    await loadList(dropDownOptions[0]);
+  }
+
+  Future<void> loadList(String dropDownValue) async {
+    currentOption.value = dropDownValue;
+    isLoading.value = true;
+    comments.clear();
+    late List<IbComment> tempList;
+    if (dropDownValue == dropDownOptions[0]) {
+      tempList = await IbQuestionDbService().queryTopComments(ibQuestion.id);
+    } else {
+      tempList = await IbQuestionDbService().queryNewestComments(ibQuestion.id);
+    }
 
     for (final comment in tempList) {
       final IbUser? user;
       final IbAnswer? ibAnswer;
 
-      user = await _retrieveUser(comment);
+      user = await retrieveUser(comment);
+      ibAnswer = await retrieveIbAnswer(comment);
       if (user == null) {
         continue;
       }
 
-      /// cache ibAnswer
-      if (answerMap[comment.uid] == null) {
-        ibAnswer = await IbQuestionDbService()
-            .queryIbAnswer(comment.uid, comment.questionId);
-        if (ibAnswer != null) {
-          answerMap[comment.uid] = ibAnswer;
-        }
-      } else {
-        ibAnswer = answerMap[comment.uid];
-      }
       final isLiked = await IbQuestionDbService().isCommentLiked(comment);
 
       /// retrieve first three replies if available
       final List<CommentItem> replies =
           await _retrieveFirstThreeReplies(comment.replies);
+
       comments.add(CommentItem(
           ibComment: comment,
           user: user,
           firstThreeReplies: replies,
           ibAnswer: ibAnswer,
           isLiked: isLiked));
+      print('add a comment');
     }
     sortList();
+    comments.refresh();
     isLoading.value = false;
   }
 
-  Future<IbUser?> _retrieveUser(IbComment comment) async {
+  Future<IbAnswer?> retrieveIbAnswer(IbComment comment) async {
+    /// cache ibAnswer
+    final IbAnswer? ibAnswer;
+    if (answerMap[comment.uid] == null) {
+      ibAnswer = await IbQuestionDbService()
+          .queryIbAnswer(comment.uid, comment.questionId);
+      if (ibAnswer != null) {
+        answerMap[comment.uid] = ibAnswer;
+      }
+    } else {
+      ibAnswer = answerMap[comment.uid];
+    }
+    return ibAnswer;
+  }
+
+  Future<IbUser?> retrieveUser(IbComment comment) async {
     final IbUser? user;
     if (IbCacheManager().getIbUser(comment.uid) == null) {
       user = await IbUserDbService().queryIbUser(comment.uid);
@@ -99,45 +114,6 @@ class CommentController extends GetxController {
         timestampInMs: DateTime.now().millisecondsSinceEpoch);
     try {
       isAddingComment.value = true;
-
-      /// add a reply if replyCommentId is valid
-      if (replyCommentId.isNotEmpty) {
-        final user = await _retrieveUser(ibComment);
-        if (user != null) {
-          final CommentItem? item = comments.firstWhere((element) {
-            if (element != null &&
-                element.ibComment.commentId == replyCommentId.value) {
-              return true;
-            }
-            return false;
-          });
-          final IbAnswer? ibAnswer = await IbQuestionDbService()
-              .queryIbAnswer(ibComment.uid, ibComment.questionId);
-          await IbQuestionDbService().addReply(
-              questionId: ibQuestion.id,
-              commentId: replyCommentId.value,
-              reply: ibComment);
-          item!.ibComment.replies.add(ibComment);
-          item.firstThreeReplies.add(CommentItem(
-              ibComment: ibComment, user: user, ibAnswer: ibAnswer));
-          item.firstThreeReplies.sort((a, b) {
-            return b.ibComment.timestampInMs
-                .compareTo(a.ibComment.timestampInMs);
-          });
-          item.firstThreeReplies = item.firstThreeReplies.sublist(
-              0,
-              item.firstThreeReplies.length >= 3
-                  ? 3
-                  : item.firstThreeReplies.length);
-        }
-        editingController.clear();
-        IbUtils.showSimpleSnackBar(
-            msg: 'Adding a reply successfully!',
-            backgroundColor: IbColors.accentColor);
-        comments.refresh();
-        return;
-      }
-
       await IbQuestionDbService().addComment(ibComment);
       final IbAnswer? ibAnswer = await IbQuestionDbService()
           .queryIbAnswer(ibComment.uid, ibComment.questionId);
@@ -148,7 +124,6 @@ class CommentController extends GetxController {
           ibAnswer: ibAnswer));
 
       updateCommentCount();
-      sortList();
       IbUtils.showSimpleSnackBar(
           msg: 'Adding a comment successfully!',
           backgroundColor: IbColors.accentColor);
@@ -165,6 +140,7 @@ class CommentController extends GetxController {
       List<IbComment> replies) async {
     late List<IbComment> firstThreeList;
     final List<CommentItem> replyItems = [];
+    replies.sort((a, b) => b.timestampInMs.compareTo(a.timestampInMs));
 
     if (replies.length >= 3) {
       firstThreeList = replies.sublist(0, 3);
@@ -213,11 +189,41 @@ class CommentController extends GetxController {
     itemController.rxIbQuestion.refresh();
   }
 
+  void updateFirstThreeReplies(
+      {required CommentItem reply, required String originCommentId}) {
+    final CommentItem? item = comments.firstWhere((element) {
+      if (element != null) {
+        return element.ibComment.commentId == originCommentId;
+      }
+      return false;
+    });
+
+    if (item != null) {
+      item.firstThreeReplies.add(reply);
+      item.firstThreeReplies.sort((a, b) =>
+          b.ibComment.timestampInMs.compareTo(a.ibComment.timestampInMs));
+      item.firstThreeReplies = item.firstThreeReplies.sublist(
+          0,
+          item.firstThreeReplies.length > 3
+              ? 3
+              : item.firstThreeReplies.length);
+      item.ibComment.replies.add(reply.ibComment);
+      comments.refresh();
+    }
+  }
+
   void sortList() {
-    if (sortByDate.isTrue) {
+    if (currentOption.value == dropDownOptions[1]) {
       comments.sort((a, b) {
         if (a != null && b != null) {
           return b.ibComment.timestampInMs.compareTo(a.ibComment.timestampInMs);
+        }
+        return 0;
+      });
+    } else {
+      comments.sort((a, b) {
+        if (a != null && b != null) {
+          return b.ibComment.likes.compareTo(a.ibComment.likes);
         }
         return 0;
       });

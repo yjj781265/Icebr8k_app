@@ -524,10 +524,48 @@ class IbQuestionDbService {
     }
 
     for (final doc in snapshot.docs) {
-      ibComments.add(IbComment.fromJson(doc.data()));
+      final IbComment comment = IbComment.fromJson(doc.data());
+      comment.replies.sort((a, b) {
+        return b.timestampInMs.compareTo(a.timestampInMs);
+      });
+      ibComments.add(comment);
+    }
+    return ibComments;
+  }
+
+  Future<List<IbComment>> queryTopComments(String questionId,
+      {int? likes}) async {
+    final List<IbComment> ibComments = [];
+
+    QuerySnapshot<Map<String, dynamic>> snapshot = await _collectionRef
+        .doc(questionId)
+        .collection(_kCommentCollectionGroup)
+        .orderBy('likes', descending: true)
+        .limit(8)
+        .get();
+
+    if (likes != null) {
+      snapshot = await _collectionRef
+          .doc(questionId)
+          .collection(_kCommentCollectionGroup)
+          .orderBy('likes', descending: true)
+          .orderBy('timestampInMs', descending: true)
+          .where('likes', isLessThanOrEqualTo: likes)
+          .limit(8)
+          .get();
     }
 
-    ibComments.sort((a, b) => b.timestampInMs.compareTo(a.timestampInMs));
+    if (snapshot.size == 0) {
+      return ibComments;
+    }
+
+    for (final doc in snapshot.docs) {
+      final IbComment comment = IbComment.fromJson(doc.data());
+      comment.replies.sort((a, b) {
+        return b.timestampInMs.compareTo(a.timestampInMs);
+      });
+      ibComments.add(comment);
+    }
     return ibComments;
   }
 

@@ -79,7 +79,8 @@ class IbQuestionStatsBar extends StatelessWidget {
                               width: 8,
                             ),
                             Text(
-                              _statsShortString(_itemController.comments.value),
+                              IbUtils.statsShortString(
+                                  _itemController.comments.value),
                               style: const TextStyle(
                                   fontSize: IbConfig.kDescriptionTextSize),
                             ),
@@ -127,28 +128,5 @@ class IbQuestionStatsBar extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _statsShortString(int number) {
-    if (number < 1000) {
-      return number.toString();
-    }
-
-    if (number >= 1000 && number < 999999) {
-      final double num = number.toDouble() / 1000;
-      return '${num.toStringAsFixed(1)}K';
-    }
-
-    if (number >= 999999 && number < 9999999) {
-      final double num = number.toDouble() / 1000000;
-      return '${num.toStringAsFixed(1)}M';
-    }
-
-    if (number >= 9999999 && number < 9999999999) {
-      final double num = number.toDouble() / 10000000;
-      return '${num.toStringAsFixed(1)}B';
-    }
-
-    return '10B+';
   }
 }

@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/comment_controller.dart';
+import 'package:icebr8k/backend/controllers/reply_controller.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/reply_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
@@ -28,7 +30,7 @@ class CommentPage extends StatelessWidget {
             children: [
               Text(_controller.ibQuestion.question),
               Text(
-                '${_controller.commentCount.value} '
+                '${IbUtils.statsShortString(_controller.commentCount.value)} '
                 '${_controller.commentCount.value <= 1 ? 'comment' : 'comments'}',
                 style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
               ),
@@ -37,6 +39,7 @@ class CommentPage extends StatelessWidget {
         ),
       ),
       body: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Expanded(
             child: Obx(() {
@@ -47,7 +50,7 @@ class CommentPage extends StatelessWidget {
               }
 
               if (_controller.isLoading.isFalse &&
-                  _controller.comments.length == 1) {
+                  _controller.comments.isEmpty) {
                 return const Center(
                   child: Text(
                     '😞 No comments to see here',
@@ -73,23 +76,27 @@ class CommentPage extends StatelessWidget {
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: DropdownButton<String>(
-                                value: 'Top Comments',
-                                items: <String>['Top Comments', 'Newest First']
-                                    .map((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                                onChanged: (_) {},
+                              child: Obx(
+                                () => DropdownButton<String>(
+                                  value: _controller.currentOption.value,
+                                  items: _controller.dropDownOptions
+                                      .map((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) async {
+                                    await _controller.loadList(value!);
+                                  },
+                                ),
                               ),
                             ),
                           ],
                         ),
                       );
                     }
-
+                    index -= 1;
                     return Column(
                       children: [
                         CommentItemWidget(_controller.comments[index]!),
@@ -101,12 +108,13 @@ class CommentPage extends StatelessWidget {
                     );
                   });
                 },
-                itemCount: _controller.comments.length,
+                itemCount: _controller.comments.length + 1,
               );
             }),
           ),
           SafeArea(
             child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
               margin: const EdgeInsets.all(5),
               decoration: BoxDecoration(
                 color: Theme.of(context).primaryColor,
@@ -116,44 +124,41 @@ class CommentPage extends StatelessWidget {
                   color: IbColors.primaryColor,
                 ),
               ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 3),
-                child: Obx(
-                  () => TextField(
-                    minLines: 1,
-                    maxLines: 5,
-                    focusNode: _controller.focusNode,
-                    controller: _controller.editingController,
-                    textInputAction: TextInputAction.newline,
-                    style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
-                    keyboardType: TextInputType.multiline,
-                    decoration: InputDecoration(
-                      hintStyle: const TextStyle(
-                          color: IbColors.lightGrey,
-                          fontSize: IbConfig.kNormalTextSize),
-                      hintText: _controller.hintText.value,
-                      border: InputBorder.none,
-                      suffixIcon: _controller.isAddingComment.isTrue
-                          ? const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: SizedBox(
-                                  height: 16,
-                                  width: 16,
-                                  child: CircularProgressIndicator()),
-                            )
-                          : IconButton(
-                              icon: const Icon(
-                                Icons.send_outlined,
-                                color: IbColors.primaryColor,
-                              ),
-                              onPressed: () async {
-                                await _controller.addComment(
-                                    text: _controller.editingController.text
-                                        .trim(),
-                                    type: IbComment.kCommentTypeText);
-                              },
+              child: Obx(
+                () => TextField(
+                  minLines: 1,
+                  maxLines: 5,
+                  focusNode: _controller.focusNode,
+                  controller: _controller.editingController,
+                  textInputAction: TextInputAction.newline,
+                  style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                  keyboardType: TextInputType.multiline,
+                  decoration: InputDecoration(
+                    hintStyle: const TextStyle(
+                        color: IbColors.lightGrey,
+                        fontSize: IbConfig.kNormalTextSize),
+                    hintText: _controller.hintText.value,
+                    border: InputBorder.none,
+                    suffixIcon: _controller.isAddingComment.isTrue
+                        ? const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: SizedBox(
+                                height: 16,
+                                width: 16,
+                                child: CircularProgressIndicator()),
+                          )
+                        : IconButton(
+                            icon: const Icon(
+                              Icons.send_outlined,
+                              color: IbColors.primaryColor,
                             ),
-                    ),
+                            onPressed: () async {
+                              await _controller.addComment(
+                                  text:
+                                      _controller.editingController.text.trim(),
+                                  type: IbComment.kCommentTypeText);
+                            },
+                          ),
                   ),
                 ),
               ),
@@ -175,7 +180,10 @@ class CommentItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          Get.to(() => ReplyPage(Get.put(ReplyController(
+              replyComment: item, commentController: _controller))));
+        },
         child: Ink(
           color: Theme.of(context).primaryColor,
           child: Padding(
@@ -240,11 +248,9 @@ class CommentItemWidget extends StatelessWidget {
                         children: [
                           TextButton.icon(
                             onPressed: () {
-                              _controller.replyCommentId.value =
-                                  item.ibComment.commentId;
-                              _controller.editingController.text =
-                                  '@${item.user.username}:';
-                              _controller.focusNode.requestFocus();
+                              Get.to(() => ReplyPage(Get.put(ReplyController(
+                                  replyComment: item,
+                                  commentController: _controller))));
                             },
                             icon: const Icon(
                               FontAwesomeIcons.reply,
@@ -253,7 +259,8 @@ class CommentItemWidget extends StatelessWidget {
                             label: Text(
                               item.ibComment.replies.isEmpty
                                   ? '0'
-                                  : item.ibComment.replies.length.toString(),
+                                  : IbUtils.statsShortString(
+                                      item.ibComment.replies.length),
                               style: const TextStyle(
                                   fontSize: IbConfig.kSecondaryTextSize),
                             ),
@@ -271,7 +278,8 @@ class CommentItemWidget extends StatelessWidget {
                               color: item.isLiked ? IbColors.accentColor : null,
                               size: 16,
                             ),
-                            label: Text(item.ibComment.likes.toString(),
+                            label: Text(
+                                IbUtils.statsShortString(item.ibComment.likes),
                                 style: const TextStyle(
                                     fontSize: IbConfig.kSecondaryTextSize)),
                           ),
@@ -291,7 +299,13 @@ class CommentItemWidget extends StatelessWidget {
                                     child: TextButton(
                                       child: Text(
                                           'And ${item.ibComment.replies.length - 3} more'),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        Get.to(() => ReplyPage(Get.put(
+                                            ReplyController(
+                                                replyComment: item,
+                                                commentController:
+                                                    _controller))));
+                                      },
                                     )),
                             ],
                           )),

@@ -451,4 +451,27 @@ class IbUtils {
       ),
     );
   }
+
+  static String statsShortString(int number) {
+    if (number < 1000) {
+      return number.toString();
+    }
+
+    if (number >= 1000 && number < 999999) {
+      final double num = number.toDouble() / 1000;
+      return '${num.toStringAsFixed(1)}K';
+    }
+
+    if (number >= 999999 && number < 9999999) {
+      final double num = number.toDouble() / 1000000;
+      return '${num.toStringAsFixed(1)}M';
+    }
+
+    if (number >= 9999999 && number < 9999999999) {
+      final double num = number.toDouble() / 10000000;
+      return '${num.toStringAsFixed(1)}B';
+    }
+
+    return '10B+';
+  }
 }
