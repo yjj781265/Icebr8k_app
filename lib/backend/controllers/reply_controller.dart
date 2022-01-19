@@ -5,6 +5,7 @@ import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
+import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 class ReplyController extends GetxController {
@@ -71,26 +72,35 @@ class ReplyController extends GetxController {
     final user = IbUtils.getCurrentIbUser();
 
     if (user != null) {
-      final IbAnswer? ibAnswer =
-          await commentController.retrieveIbAnswer(reply);
-      await IbQuestionDbService().addReply(
-          questionId: replyComment.ibComment.questionId,
-          commentId: replyComment.ibComment.commentId,
-          reply: reply);
-      final item =
-          CommentItem(ibComment: reply, user: user, ibAnswer: ibAnswer);
-      replies.add(item);
-      replyCounts.value++;
-      replies.sort((a, b) {
-        if (a != null && b != null) {
-          return a.ibComment.timestampInMs.compareTo(b.ibComment.timestampInMs);
-        }
-        return 0;
-      });
-      commentController.updateFirstThreeReplies(
-          reply: item, originCommentId: replyComment.ibComment.commentId);
-      editingController.clear();
-      isAddingReply.value = false;
+      try {
+        final IbAnswer? ibAnswer =
+            await commentController.retrieveIbAnswer(reply);
+        await IbQuestionDbService().addReply(
+            questionId: replyComment.ibComment.questionId,
+            commentId: replyComment.ibComment.commentId,
+            reply: reply);
+        final item =
+            CommentItem(ibComment: reply, user: user, ibAnswer: ibAnswer);
+        replies.add(item);
+        replyCounts.value++;
+        replies.sort((a, b) {
+          if (a != null && b != null) {
+            return a.ibComment.timestampInMs
+                .compareTo(b.ibComment.timestampInMs);
+          }
+          return 0;
+        });
+        commentController.updateFirstThreeReplies(
+            reply: item, originCommentId: replyComment.ibComment.commentId);
+        editingController.clear();
+        isAddingReply.value = false;
+        IbUtils.hideKeyboard();
+        IbUtils.showSimpleSnackBar(
+            msg: 'Reply added!', backgroundColor: IbColors.accentColor);
+      } on Exception catch (e) {
+        IbUtils.showSimpleSnackBar(
+            msg: 'Fail to add a reply $e!', backgroundColor: IbColors.errorRed);
+      }
     }
   }
 }

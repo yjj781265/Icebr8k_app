@@ -220,7 +220,6 @@ class IbUtils {
 
   static void showSimpleSnackBar(
       {required String msg, required Color backgroundColor}) {
-    hideKeyboard();
     Get.showSnackbar(GetSnackBar(
       snackPosition: SnackPosition.TOP,
       borderRadius: IbConfig.kCardCornerRadius,
@@ -229,7 +228,8 @@ class IbUtils {
       backgroundColor: backgroundColor,
       messageText: Text(
         msg,
-        style: const TextStyle(color: Colors.black),
+        style: const TextStyle(
+            color: Colors.black, fontSize: IbConfig.kNormalTextSize),
       ),
     ));
   }

@@ -125,14 +125,14 @@ class CommentController extends GetxController {
 
       updateCommentCount();
       IbUtils.showSimpleSnackBar(
-          msg: 'Adding a comment successfully!',
-          backgroundColor: IbColors.accentColor);
+          msg: 'Comment added!', backgroundColor: IbColors.accentColor);
     } on Exception catch (e) {
       IbUtils.showSimpleSnackBar(
           msg: 'Adding a comment failed $e',
           backgroundColor: IbColors.errorRed);
     } finally {
       isAddingComment.value = false;
+      IbUtils.hideKeyboard();
     }
   }
 
@@ -186,6 +186,7 @@ class CommentController extends GetxController {
         Get.find(tag: "${ibQuestion.id}${IbUtils.getCurrentUid()}");
     itemController.comments.value = commentCount.value;
     itemController.rxIbQuestion.value.comments = commentCount.value;
+    itemController.commented.value = true;
     itemController.rxIbQuestion.refresh();
   }
 
