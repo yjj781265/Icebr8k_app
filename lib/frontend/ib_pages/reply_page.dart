@@ -9,6 +9,7 @@ import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
@@ -88,201 +89,222 @@ class ReplyPage extends StatelessWidget {
 
   Widget _handleReplyCommentUI() {
     return Obx(
-      () => ListView.builder(
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            return Obx(
-              () => Container(
-                padding: const EdgeInsets.all(8.0),
-                margin: const EdgeInsets.only(bottom: 4),
-                color: Theme.of(context).primaryColor,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    IbUserAvatar(
-                      avatarUrl: _controller.replyComment.user.avatarUrl,
-                      radius: 16,
-                      uid: _controller.replyComment.ibComment.uid,
-                    ),
-                    const SizedBox(
-                      width: 16,
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                _controller.replyComment.user.username,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: IbConfig.kNormalTextSize),
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text(
-                                    'Vote: ',
-                                    style: TextStyle(
-                                        color: IbColors.lightGrey,
-                                        fontSize:
-                                            IbConfig.kDescriptionTextSize),
-                                  ),
-                                  _handleIbAnswerUI(_controller.replyComment),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Text(
-                            IbUtils.getAgoDateTimeString(
-                                DateTime.fromMillisecondsSinceEpoch(_controller
-                                    .replyComment.ibComment.timestampInMs)),
-                            style: const TextStyle(
-                                fontSize: IbConfig.kDescriptionTextSize,
-                                color: IbColors.lightGrey),
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Text(
-                            _controller.replyComment.ibComment.content,
-                            style: const TextStyle(
-                                fontSize: IbConfig.kNormalTextSize),
-                          ),
-                          Row(
-                            children: [
-                              TextButton.icon(
-                                onPressed: () {
-                                  _controller.focusNode.requestFocus();
-                                },
-                                icon: const Icon(
-                                  FontAwesomeIcons.reply,
-                                  size: 16,
-                                ),
-                                label: Text(
-                                  IbUtils.statsShortString(
-                                      _controller.replyCounts.value),
-                                  style: const TextStyle(
-                                      fontSize: IbConfig.kSecondaryTextSize),
-                                ),
-                              ),
-                              TextButton.icon(
-                                onPressed: () async {
-                                  if (_controller.isLiked.isTrue) {
-                                    await _controller.commentController
-                                        .dislikeComment(
-                                            _controller.replyComment);
-                                    _controller.isLiked.value = false;
-                                  } else {
-                                    await _controller.commentController
-                                        .likeComment(_controller.replyComment);
-                                    _controller.isLiked.value = true;
-                                  }
-                                },
-                                icon: Icon(
-                                  FontAwesomeIcons.thumbsUp,
-                                  color: _controller.isLiked.isTrue
-                                      ? IbColors.accentColor
-                                      : null,
-                                  size: 16,
-                                ),
-                                label: Text(
-                                    IbUtils.statsShortString(_controller
-                                        .replyComment.ibComment.likes),
-                                    style: const TextStyle(
-                                        fontSize: IbConfig.kSecondaryTextSize)),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-          final CommentItem item = _controller.replies[index]!;
-
-          return Material(
-            child: InkWell(
-              onTap: () {
-                _controller.editingController.text = '@${item.user.username} ';
-                _controller.focusNode.requestFocus();
-              },
-              child: Ink(
-                color: Theme.of(context).backgroundColor,
-                padding: const EdgeInsets.only(
-                    left: 16, right: 8, top: 8, bottom: 10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    IbUserAvatar(
-                      avatarUrl: item.user.avatarUrl,
-                      radius: 16,
-                      uid: item.user.id,
-                    ),
-                    const SizedBox(
-                      width: 16,
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                item.user.username,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: IbConfig.kNormalTextSize),
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text(
-                                    'Vote: ',
-                                    style: TextStyle(
-                                        color: IbColors.lightGrey,
-                                        fontSize:
-                                            IbConfig.kDescriptionTextSize),
-                                  ),
-                                  _handleIbAnswerUI(item),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Text(
-                            IbUtils.getChatTabDateString(
-                                DateTime.fromMillisecondsSinceEpoch(
-                                    item.ibComment.timestampInMs)),
-                            style: const TextStyle(
-                                fontSize: IbConfig.kDescriptionTextSize,
-                                color: IbColors.lightGrey),
-                          ),
-                          Text(
-                            item.ibComment.content,
-                            style: const TextStyle(
-                                fontSize: IbConfig.kNormalTextSize),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
+      () => SmartRefresher(
+        controller: _controller.refreshController,
+        enablePullDown: false,
+        enablePullUp: true,
+        onLoading: () async {
+          await _controller.loadMore();
         },
-        itemCount: _controller.replies.length,
+        child: ListView.builder(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return _handleFirstIndexUI(context);
+            }
+            index -= 1;
+            final CommentItem item = _controller.replies[index]!;
+            return _handleReplyItemUI(item, context);
+          },
+          itemCount: _controller.replies.length + 1,
+        ),
+      ),
+    );
+  }
+
+  Material _handleReplyItemUI(CommentItem item, BuildContext context) {
+    return Material(
+      child: InkWell(
+        onTap: () {
+          _controller.editingController.text = '@${item.user.username} ';
+          _controller.focusNode.requestFocus();
+        },
+        child: Ink(
+          color: Theme.of(context).backgroundColor,
+          padding:
+              const EdgeInsets.only(left: 16, right: 8, top: 8, bottom: 10),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              IbUserAvatar(
+                avatarUrl: item.user.avatarUrl,
+                radius: 16,
+                uid: item.user.id,
+              ),
+              const SizedBox(
+                width: 16,
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          item.user.username,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: IbConfig.kNormalTextSize),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'Vote: ',
+                              style: TextStyle(
+                                  color: IbColors.lightGrey,
+                                  fontSize: IbConfig.kDescriptionTextSize),
+                            ),
+                            _handleIbAnswerUI(item),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Text(
+                      IbUtils.getChatTabDateString(
+                          DateTime.fromMillisecondsSinceEpoch(
+                              item.ibComment.timestampInMs)),
+                      style: const TextStyle(
+                          fontSize: IbConfig.kDescriptionTextSize,
+                          color: IbColors.lightGrey),
+                    ),
+                    Text(
+                      item.ibComment.content,
+                      style:
+                          const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _handleFirstIndexUI(BuildContext context) {
+    return Obx(
+      () => Hero(
+        tag: _controller.replyComment.ibComment.commentId,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            margin: const EdgeInsets.only(bottom: 4),
+            color: Theme.of(context).primaryColor,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                IbUserAvatar(
+                  avatarUrl: _controller.replyComment.user.avatarUrl,
+                  radius: 16,
+                  uid: _controller.replyComment.ibComment.uid,
+                ),
+                const SizedBox(
+                  width: 16,
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _controller.replyComment.user.username,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: IbConfig.kNormalTextSize),
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text(
+                                  'Vote: ',
+                                  style: TextStyle(
+                                      color: IbColors.lightGrey,
+                                      fontSize: IbConfig.kDescriptionTextSize),
+                                ),
+                                _handleIbAnswerUI(_controller.replyComment),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Text(
+                          IbUtils.getAgoDateTimeString(
+                              DateTime.fromMillisecondsSinceEpoch(_controller
+                                  .replyComment.ibComment.timestampInMs)),
+                          style: const TextStyle(
+                              fontSize: IbConfig.kDescriptionTextSize,
+                              color: IbColors.lightGrey),
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        Text(
+                          _controller.replyComment.ibComment.content,
+                          style: const TextStyle(
+                              fontSize: IbConfig.kNormalTextSize),
+                        ),
+                        Row(
+                          children: [
+                            TextButton.icon(
+                              onPressed: () {
+                                _controller.focusNode.requestFocus();
+                              },
+                              icon: const Icon(
+                                FontAwesomeIcons.reply,
+                                size: 16,
+                              ),
+                              label: Text(
+                                IbUtils.statsShortString(
+                                    _controller.replyCounts.value),
+                                style: const TextStyle(
+                                    fontSize: IbConfig.kSecondaryTextSize),
+                              ),
+                            ),
+                            TextButton.icon(
+                              onPressed: () async {
+                                if (_controller.isLiked.isTrue) {
+                                  await _controller.commentController
+                                      .dislikeComment(_controller.replyComment);
+                                  _controller.isLiked.value = false;
+                                } else {
+                                  await _controller.commentController
+                                      .likeComment(_controller.replyComment);
+                                  _controller.isLiked.value = true;
+                                }
+                              },
+                              icon: Icon(
+                                FontAwesomeIcons.thumbsUp,
+                                color: _controller.isLiked.isTrue
+                                    ? IbColors.accentColor
+                                    : null,
+                                size: 16,
+                              ),
+                              label: Text(
+                                  IbUtils.statsShortString(
+                                      _controller.replyComment.ibComment.likes),
+                                  style: const TextStyle(
+                                      fontSize: IbConfig.kSecondaryTextSize)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
@@ -10,9 +11,10 @@ import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class CommentController extends GetxController {
-  final comments = <CommentItem?>[null].obs;
+  final comments = <CommentItem?>[].obs;
   final FocusNode focusNode = FocusNode();
   final List<String> dropDownOptions = ['Top Comments', 'Newest First'];
   final currentOption = 'Top Comments'.obs;
@@ -25,6 +27,8 @@ class CommentController extends GetxController {
   final sortByDate = true.obs;
   final isAddingComment = false.obs;
   final TextEditingController editingController = TextEditingController();
+  final RefreshController refreshController = RefreshController();
+  DocumentSnapshot<Map<String, dynamic>>? lastSnap;
   CommentController(this.ibQuestion);
 
   @override
@@ -38,12 +42,20 @@ class CommentController extends GetxController {
     currentOption.value = dropDownValue;
     isLoading.value = true;
     comments.clear();
-    late List<IbComment> tempList;
+    refreshController.resetNoData();
+    final List<IbComment> tempList = [];
+    late QuerySnapshot<Map<String, dynamic>> snapshot;
     if (dropDownValue == dropDownOptions[0]) {
-      tempList = await IbQuestionDbService().queryTopComments(ibQuestion.id);
+      snapshot = await IbQuestionDbService().queryTopComments(ibQuestion.id);
     } else {
-      tempList = await IbQuestionDbService().queryNewestComments(ibQuestion.id);
+      snapshot = await IbQuestionDbService().queryNewestComments(ibQuestion.id);
     }
+
+    for (final doc in snapshot.docs) {
+      tempList.add(IbComment.fromJson(doc.data()));
+    }
+
+    lastSnap = tempList.isEmpty ? null : snapshot.docs.last;
 
     for (final comment in tempList) {
       final IbUser? user;
@@ -67,11 +79,63 @@ class CommentController extends GetxController {
           firstThreeReplies: replies,
           ibAnswer: ibAnswer,
           isLiked: isLiked));
-      print('add a comment');
     }
-    sortList();
     comments.refresh();
     isLoading.value = false;
+  }
+
+  Future<void> loadMore() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>>? snapshot;
+      final List<IbComment> tempList = [];
+      if (lastSnap != null && currentOption.value == dropDownOptions[0]) {
+        snapshot = await IbQuestionDbService()
+            .queryTopComments(ibQuestion.id, lastSnap: lastSnap);
+      } else if (lastSnap != null &&
+          currentOption.value == dropDownOptions[1]) {
+        snapshot = await IbQuestionDbService()
+            .queryNewestComments(ibQuestion.id, lastSnap: lastSnap);
+      }
+
+      if (snapshot != null &&
+          snapshot.docs.isNotEmpty &&
+          lastSnap != snapshot.docs.last) {
+        lastSnap = snapshot.docs.last;
+        for (final doc in snapshot.docs) {
+          tempList.add(IbComment.fromJson(doc.data()));
+        }
+
+        for (final comment in tempList) {
+          final IbUser? user;
+          final IbAnswer? ibAnswer;
+
+          user = await retrieveUser(comment);
+          ibAnswer = await retrieveIbAnswer(comment);
+
+          if (user == null) {
+            continue;
+          }
+
+          final isLiked = await IbQuestionDbService().isCommentLiked(comment);
+
+          /// retrieve first three replies if available
+          final List<CommentItem> replies =
+              await _retrieveFirstThreeReplies(comment.replies);
+
+          comments.add(CommentItem(
+              ibComment: comment,
+              user: user,
+              firstThreeReplies: replies,
+              ibAnswer: ibAnswer,
+              isLiked: isLiked));
+        }
+        refreshController.loadComplete();
+      } else {
+        refreshController.loadNoData();
+      }
+    } catch (e) {
+      refreshController.loadFailed();
+    }
   }
 
   Future<IbAnswer?> retrieveIbAnswer(IbComment comment) async {
@@ -118,15 +182,17 @@ class CommentController extends GetxController {
       final IbAnswer? ibAnswer = await IbQuestionDbService()
           .queryIbAnswer(ibComment.uid, ibComment.questionId);
       editingController.clear();
-      comments.add(CommentItem(
-          ibComment: ibComment,
-          user: IbUtils.getCurrentIbUser()!,
-          ibAnswer: ibAnswer));
+      comments.insert(
+          0,
+          CommentItem(
+              ibComment: ibComment,
+              user: IbUtils.getCurrentIbUser()!,
+              ibAnswer: ibAnswer));
 
       updateCommentCount();
       IbUtils.showSimpleSnackBar(
           msg: 'Comment added!', backgroundColor: IbColors.accentColor);
-    } on Exception catch (e) {
+    } catch (e) {
       IbUtils.showSimpleSnackBar(
           msg: 'Adding a comment failed $e',
           backgroundColor: IbColors.errorRed);

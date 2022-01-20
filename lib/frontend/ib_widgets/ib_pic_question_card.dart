@@ -267,12 +267,12 @@ class PicItem extends StatelessWidget {
                     bottom: 2,
                     right: 2,
                     child: CircleAvatar(
-                      radius: 10,
+                      radius: 8,
                       backgroundColor: IbColors.white,
                       child: Icon(
                         Icons.check_circle_rounded,
                         color: IbColors.accentColor,
-                        size: 20,
+                        size: 16,
                       ),
                     ),
                   ),

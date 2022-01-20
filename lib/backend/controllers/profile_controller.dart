@@ -103,7 +103,7 @@ class ProfileController extends GetxController {
       IbUtils.showSimpleSnackBar(
           msg: 'send_friend_request_success'.tr,
           backgroundColor: IbColors.accentColor);
-    } on Exception catch (e) {
+    } catch (e) {
       print(e.toString());
     }
   }

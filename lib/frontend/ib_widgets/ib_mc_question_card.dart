@@ -345,12 +345,12 @@ class IbQuestionMcItem extends StatelessWidget {
                     bottom: 2,
                     right: 2,
                     child: CircleAvatar(
-                      radius: 6,
+                      radius: 8,
                       backgroundColor: IbColors.white,
                       child: Icon(
                         Icons.check_circle_rounded,
                         color: IbColors.accentColor,
-                        size: 12,
+                        size: 16,
                       ),
                     ),
                   ),

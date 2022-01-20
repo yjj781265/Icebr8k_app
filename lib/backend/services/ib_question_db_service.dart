@@ -498,10 +498,9 @@ class IbQuestionDbService {
     return snapshot.exists;
   }
 
-  Future<List<IbComment>> queryNewestComments(String questionId,
-      {int? timestampInMs}) async {
-    final List<IbComment> ibComments = [];
-
+  Future<QuerySnapshot<Map<String, dynamic>>> queryNewestComments(
+      String questionId,
+      {DocumentSnapshot<Map<String, dynamic>>? lastSnap}) async {
     QuerySnapshot<Map<String, dynamic>> snapshot = await _collectionRef
         .doc(questionId)
         .collection(_kCommentCollectionGroup)
@@ -509,34 +508,21 @@ class IbQuestionDbService {
         .limit(8)
         .get();
 
-    if (timestampInMs != null) {
+    if (lastSnap != null) {
       snapshot = await _collectionRef
           .doc(questionId)
           .collection(_kCommentCollectionGroup)
           .orderBy('timestampInMs', descending: true)
-          .where('timestampInMs', isLessThan: timestampInMs)
+          .startAfterDocument(lastSnap)
           .limit(8)
           .get();
     }
-
-    if (snapshot.size == 0) {
-      return ibComments;
-    }
-
-    for (final doc in snapshot.docs) {
-      final IbComment comment = IbComment.fromJson(doc.data());
-      comment.replies.sort((a, b) {
-        return b.timestampInMs.compareTo(a.timestampInMs);
-      });
-      ibComments.add(comment);
-    }
-    return ibComments;
+    return snapshot;
   }
 
-  Future<List<IbComment>> queryTopComments(String questionId,
-      {int? likes}) async {
-    final List<IbComment> ibComments = [];
-
+  Future<QuerySnapshot<Map<String, dynamic>>> queryTopComments(
+      String questionId,
+      {DocumentSnapshot<Map<String, dynamic>>? lastSnap}) async {
     QuerySnapshot<Map<String, dynamic>> snapshot = await _collectionRef
         .doc(questionId)
         .collection(_kCommentCollectionGroup)
@@ -544,29 +530,17 @@ class IbQuestionDbService {
         .limit(8)
         .get();
 
-    if (likes != null) {
+    if (lastSnap != null) {
       snapshot = await _collectionRef
           .doc(questionId)
           .collection(_kCommentCollectionGroup)
           .orderBy('likes', descending: true)
-          .orderBy('timestampInMs', descending: true)
-          .where('likes', isLessThanOrEqualTo: likes)
+          .startAfterDocument(lastSnap)
           .limit(8)
           .get();
     }
 
-    if (snapshot.size == 0) {
-      return ibComments;
-    }
-
-    for (final doc in snapshot.docs) {
-      final IbComment comment = IbComment.fromJson(doc.data());
-      comment.replies.sort((a, b) {
-        return b.timestampInMs.compareTo(a.timestampInMs);
-      });
-      ibComments.add(comment);
-    }
-    return ibComments;
+    return snapshot;
   }
 
   Future<bool> isCommented(String questionId) async {

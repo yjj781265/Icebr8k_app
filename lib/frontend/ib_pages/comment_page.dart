@@ -13,6 +13,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class CommentPage extends StatelessWidget {
   final CommentController _controller;
@@ -62,53 +63,61 @@ class CommentPage extends StatelessWidget {
                 );
               }
 
-              return ListView.builder(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                itemBuilder: (context, index) {
-                  return Builder(builder: (context) {
-                    if (index == 0) {
-                      return SizedBox(
-                        height: 56,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Obx(
-                                () => DropdownButton<String>(
-                                  value: _controller.currentOption.value,
-                                  items: _controller.dropDownOptions
-                                      .map((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) async {
-                                    await _controller.loadList(value!);
-                                  },
+              return SmartRefresher(
+                controller: _controller.refreshController,
+                enablePullUp: true,
+                enablePullDown: false,
+                onLoading: () async {
+                  await _controller.loadMore();
+                },
+                child: ListView.builder(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  itemBuilder: (context, index) {
+                    return Builder(builder: (context) {
+                      if (index == 0) {
+                        return SizedBox(
+                          height: 56,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Obx(
+                                  () => DropdownButton<String>(
+                                    value: _controller.currentOption.value,
+                                    items: _controller.dropDownOptions
+                                        .map((String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(value),
+                                      );
+                                    }).toList(),
+                                    onChanged: (value) async {
+                                      await _controller.loadList(value!);
+                                    },
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
+                        );
+                      }
+                      index -= 1;
+                      return Column(
+                        children: [
+                          CommentItemWidget(_controller.comments[index]!),
+                          const Divider(
+                            height: 1,
+                            thickness: 1,
+                          ),
+                        ],
                       );
-                    }
-                    index -= 1;
-                    return Column(
-                      children: [
-                        CommentItemWidget(_controller.comments[index]!),
-                        const Divider(
-                          height: 1,
-                          thickness: 1,
-                        ),
-                      ],
-                    );
-                  });
-                },
-                itemCount: _controller.comments.length + 1,
+                    });
+                  },
+                  itemCount: _controller.comments.length + 1,
+                ),
               );
             }),
           ),
@@ -178,141 +187,151 @@ class CommentItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: InkWell(
-        onTap: () {
-          Get.to(() => ReplyPage(Get.put(ReplyController(
-              replyComment: item, commentController: _controller))));
-        },
-        child: Ink(
-          color: Theme.of(context).primaryColor,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                IbUserAvatar(
-                  avatarUrl: item.user.avatarUrl,
-                  radius: 16,
-                  uid: item.ibComment.uid,
-                ),
-                const SizedBox(
-                  width: 16,
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Hero(
+      tag: item.ibComment.commentId,
+      child: Material(
+        child: InkWell(
+          onTap: () {
+            Get.to(() => ReplyPage(Get.put(ReplyController(
+                replyComment: item, commentController: _controller))));
+          },
+          child: Ink(
+            color: Theme.of(context).primaryColor,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  IbUserAvatar(
+                    avatarUrl: item.user.avatarUrl,
+                    radius: 16,
+                    uid: item.ibComment.uid,
+                  ),
+                  const SizedBox(
+                    width: 16,
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                item.user.username,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: IbConfig.kNormalTextSize),
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text(
+                                    'Vote: ',
+                                    style: TextStyle(
+                                        color: IbColors.lightGrey,
+                                        fontSize:
+                                            IbConfig.kDescriptionTextSize),
+                                  ),
+                                  _handleIbAnswerUI(item),
+                                ],
+                              ),
+                            ],
+                          ),
                           Text(
-                            item.user.username,
+                            IbUtils.getAgoDateTimeString(
+                                DateTime.fromMillisecondsSinceEpoch(
+                                    item.ibComment.timestampInMs)),
                             style: const TextStyle(
-                                fontWeight: FontWeight.bold,
+                                fontSize: IbConfig.kDescriptionTextSize,
+                                color: IbColors.lightGrey),
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            item.ibComment.content,
+                            style: const TextStyle(
                                 fontSize: IbConfig.kNormalTextSize),
                           ),
                           Row(
-                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text(
-                                'Vote: ',
-                                style: TextStyle(
-                                    color: IbColors.lightGrey,
-                                    fontSize: IbConfig.kDescriptionTextSize),
+                              TextButton.icon(
+                                onPressed: () {
+                                  Get.to(() => ReplyPage(Get.put(
+                                      ReplyController(
+                                          replyComment: item,
+                                          commentController: _controller))));
+                                },
+                                icon: const Icon(
+                                  FontAwesomeIcons.reply,
+                                  size: 16,
+                                ),
+                                label: Text(
+                                  item.ibComment.replies.isEmpty
+                                      ? '0'
+                                      : IbUtils.statsShortString(
+                                          item.ibComment.replies.length),
+                                  style: const TextStyle(
+                                      fontSize: IbConfig.kSecondaryTextSize),
+                                ),
                               ),
-                              _handleIbAnswerUI(item),
+                              TextButton.icon(
+                                onPressed: () async {
+                                  if (item.isLiked) {
+                                    await _controller.dislikeComment(item);
+                                  } else {
+                                    await _controller.likeComment(item);
+                                  }
+                                },
+                                icon: Icon(
+                                  FontAwesomeIcons.thumbsUp,
+                                  color: item.isLiked
+                                      ? IbColors.accentColor
+                                      : null,
+                                  size: 16,
+                                ),
+                                label: Text(
+                                    IbUtils.statsShortString(
+                                        item.ibComment.likes),
+                                    style: const TextStyle(
+                                        fontSize: IbConfig.kSecondaryTextSize)),
+                              ),
                             ],
                           ),
+                          Container(
+                              width: Get.width * 0.8,
+                              color: Theme.of(context).backgroundColor,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _handleReplies(item.firstThreeReplies),
+                                  if (item.ibComment.replies.length > 3)
+                                    SizedBox(
+                                        height: 40,
+                                        width: double.maxFinite,
+                                        child: TextButton(
+                                          child: Text(
+                                              'And ${item.ibComment.replies.length - 3} more'),
+                                          onPressed: () {
+                                            Get.to(() => ReplyPage(Get.put(
+                                                ReplyController(
+                                                    replyComment: item,
+                                                    commentController:
+                                                        _controller))));
+                                          },
+                                        )),
+                                ],
+                              )),
                         ],
                       ),
-                      Text(
-                        IbUtils.getAgoDateTimeString(
-                            DateTime.fromMillisecondsSinceEpoch(
-                                item.ibComment.timestampInMs)),
-                        style: const TextStyle(
-                            fontSize: IbConfig.kDescriptionTextSize,
-                            color: IbColors.lightGrey),
-                      ),
-                      const SizedBox(
-                        height: 8,
-                      ),
-                      Text(
-                        item.ibComment.content,
-                        style:
-                            const TextStyle(fontSize: IbConfig.kNormalTextSize),
-                      ),
-                      Row(
-                        children: [
-                          TextButton.icon(
-                            onPressed: () {
-                              Get.to(() => ReplyPage(Get.put(ReplyController(
-                                  replyComment: item,
-                                  commentController: _controller))));
-                            },
-                            icon: const Icon(
-                              FontAwesomeIcons.reply,
-                              size: 16,
-                            ),
-                            label: Text(
-                              item.ibComment.replies.isEmpty
-                                  ? '0'
-                                  : IbUtils.statsShortString(
-                                      item.ibComment.replies.length),
-                              style: const TextStyle(
-                                  fontSize: IbConfig.kSecondaryTextSize),
-                            ),
-                          ),
-                          TextButton.icon(
-                            onPressed: () async {
-                              if (item.isLiked) {
-                                await _controller.dislikeComment(item);
-                              } else {
-                                await _controller.likeComment(item);
-                              }
-                            },
-                            icon: Icon(
-                              FontAwesomeIcons.thumbsUp,
-                              color: item.isLiked ? IbColors.accentColor : null,
-                              size: 16,
-                            ),
-                            label: Text(
-                                IbUtils.statsShortString(item.ibComment.likes),
-                                style: const TextStyle(
-                                    fontSize: IbConfig.kSecondaryTextSize)),
-                          ),
-                        ],
-                      ),
-                      Container(
-                          width: Get.width * 0.8,
-                          color: Theme.of(context).backgroundColor,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _handleReplies(item.firstThreeReplies),
-                              if (item.ibComment.replies.length > 3)
-                                SizedBox(
-                                    height: 40,
-                                    width: double.maxFinite,
-                                    child: TextButton(
-                                      child: Text(
-                                          'And ${item.ibComment.replies.length - 3} more'),
-                                      onPressed: () {
-                                        Get.to(() => ReplyPage(Get.put(
-                                            ReplyController(
-                                                replyComment: item,
-                                                commentController:
-                                                    _controller))));
-                                      },
-                                    )),
-                            ],
-                          )),
-                    ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
