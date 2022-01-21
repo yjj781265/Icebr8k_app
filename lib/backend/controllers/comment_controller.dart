@@ -143,7 +143,7 @@ class CommentController extends GetxController {
     final IbAnswer? ibAnswer;
     if (answerMap[comment.uid] == null) {
       ibAnswer = await IbQuestionDbService()
-          .queryIbAnswer(comment.uid, comment.questionId);
+          .querySingleIbAnswer(comment.uid, comment.questionId);
       if (ibAnswer != null) {
         answerMap[comment.uid] = ibAnswer;
       }
@@ -180,7 +180,7 @@ class CommentController extends GetxController {
       isAddingComment.value = true;
       await IbQuestionDbService().addComment(ibComment);
       final IbAnswer? ibAnswer = await IbQuestionDbService()
-          .queryIbAnswer(ibComment.uid, ibComment.questionId);
+          .querySingleIbAnswer(ibComment.uid, ibComment.questionId);
       editingController.clear();
       comments.insert(
           0,
@@ -231,7 +231,7 @@ class CommentController extends GetxController {
       /// cache ibAnswer
       if (answerMap[reply.uid] == null) {
         ibAnswer = await IbQuestionDbService()
-            .queryIbAnswer(reply.uid, reply.questionId);
+            .querySingleIbAnswer(reply.uid, reply.questionId);
         if (ibAnswer != null) {
           answerMap[reply.uid] = ibAnswer;
         }

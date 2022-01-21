@@ -3,17 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
 class IbUserAvatar extends StatelessWidget {
   final String avatarUrl;
   final String? uid;
+  final double? compScore;
   final bool showOnlineStatus;
   final bool disableOnTap;
   final double radius;
   const IbUserAvatar(
       {Key? key,
       required this.avatarUrl,
+      this.compScore,
       this.uid,
       this.disableOnTap = false,
       this.showOnlineStatus = false,
@@ -25,35 +28,67 @@ class IbUserAvatar extends StatelessWidget {
     if (avatarUrl.isEmpty) {
       return CircleAvatar(radius: radius, child: const IbProgressIndicator());
     }
-    return GestureDetector(
-      onTap: (disableOnTap || uid == null || uid!.isEmpty)
-          ? null
-          : () {
-              Get.to(
-                  () => ProfilePage(
-                        uid!,
-                        showAppBar: true,
-                      ),
-                  preventDuplicates: false);
-            },
-      child: CachedNetworkImage(
-        errorWidget: (context, str, value) =>
-            CircleAvatar(radius: radius, backgroundColor: IbColors.lightBlue),
-        imageUrl: avatarUrl,
-        imageBuilder: (context, imageProvider) => Container(
-          height: radius * 2,
-          width: radius * 2,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            image: DecorationImage(
-              image: imageProvider,
-              fit: BoxFit.cover,
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        if (compScore != null && uid != IbUtils.getCurrentUid())
+          SizedBox(
+              height: radius * 2 + 4,
+              width: radius * 2 + 4,
+              child: CircularProgressIndicator(
+                color: IbUtils.handleIndicatorColor(compScore!),
+                value: compScore,
+              )),
+        GestureDetector(
+          onTap: (disableOnTap || uid == null || uid!.isEmpty)
+              ? null
+              : () {
+                  Get.to(
+                      () => ProfilePage(
+                            uid!,
+                            showAppBar: true,
+                          ),
+                      preventDuplicates: false);
+                },
+          child: CachedNetworkImage(
+            errorWidget: (context, str, value) => CircleAvatar(
+                radius: radius, backgroundColor: IbColors.lightBlue),
+            imageUrl: avatarUrl,
+            imageBuilder: (context, imageProvider) => Container(
+              height: radius * 2,
+              width: radius * 2,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: imageProvider,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
+            placeholder: (context, url) => CircleAvatar(
+                radius: radius, child: const IbProgressIndicator()),
           ),
         ),
-        placeholder: (context, url) =>
-            CircleAvatar(radius: radius, child: const IbProgressIndicator()),
-      ),
+        if (compScore != null && uid != IbUtils.getCurrentUid())
+          Positioned(
+            bottom: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                color:
+                    IbUtils.handleIndicatorColor(compScore!).withOpacity(0.8),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              width: 32,
+              alignment: Alignment.center,
+              child: Text(
+                '${(compScore! * 100).toInt()}%',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 10),
+              ),
+            ),
+          )
+      ],
     );
   }
 }

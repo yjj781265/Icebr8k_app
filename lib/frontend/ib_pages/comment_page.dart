@@ -226,19 +226,20 @@ class CommentItemWidget extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                     fontSize: IbConfig.kNormalTextSize),
                               ),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text(
-                                    'Vote: ',
-                                    style: TextStyle(
-                                        color: IbColors.lightGrey,
-                                        fontSize:
-                                            IbConfig.kDescriptionTextSize),
-                                  ),
-                                  _handleIbAnswerUI(item),
-                                ],
-                              ),
+                              if (item.ibAnswer != null)
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Text(
+                                      'Vote: ',
+                                      style: TextStyle(
+                                          color: IbColors.lightGrey,
+                                          fontSize:
+                                              IbConfig.kDescriptionTextSize),
+                                    ),
+                                    _handleIbAnswerUI(item),
+                                  ],
+                                ),
                             ],
                           ),
                           Text(
@@ -360,7 +361,8 @@ class CommentItemWidget extends StatelessWidget {
       );
     }
 
-    if (_controller.ibQuestion.questionType == IbQuestion.kMultipleChoice) {
+    if (_controller.ibQuestion.questionType == IbQuestion.kMultipleChoice ||
+        _controller.ibQuestion.questionType == IbQuestion.kMultipleChoicePic) {
       return Text(
         _controller.ibQuestion.choices
             .firstWhere(
@@ -414,18 +416,19 @@ class CommentItemWidget extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                                 fontSize: IbConfig.kNormalTextSize),
                           ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text(
-                                'Vote: ',
-                                style: TextStyle(
-                                    color: IbColors.lightGrey,
-                                    fontSize: IbConfig.kDescriptionTextSize),
-                              ),
-                              _handleIbAnswerUI(e),
-                            ],
-                          ),
+                          if (e.ibAnswer != null)
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text(
+                                  'Vote: ',
+                                  style: TextStyle(
+                                      color: IbColors.lightGrey,
+                                      fontSize: IbConfig.kDescriptionTextSize),
+                                ),
+                                _handleIbAnswerUI(e),
+                              ],
+                            ),
                         ],
                       ),
                       Text(

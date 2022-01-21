@@ -85,11 +85,6 @@ class IbQuestionDbService {
         .get();
   }
 
-  Future<int> queryTotalQuestionSize() async {
-    final _snapshot = await _collectionRef.get();
-    return _snapshot.size;
-  }
-
   Future<List<String>> queryAnsweredQuestionIds(String uid) async {
     final List<String> _list = [];
     final _snapshot = await _db
@@ -255,7 +250,7 @@ class IbQuestionDbService {
     return answers;
   }
 
-  Future<IbAnswer?> queryIbAnswer(String uid, String questionId) async {
+  Future<IbAnswer?> querySingleIbAnswer(String uid, String questionId) async {
     final _snapshot = await _collectionRef
         .doc(questionId)
         .collection(_kAnswerCollectionGroup)
@@ -266,6 +261,28 @@ class IbQuestionDbService {
     }
 
     return IbAnswer.fromJson(_snapshot.data()!);
+  }
+
+  /// get list of ibAnswers with the same choice id but different choice id
+  Future<List<IbAnswer>> queryIbAnswers(
+      {required String choiceId,
+      required String questionId,
+      int? lastTimestampInMs}) async {
+    final List<IbAnswer> answers = [];
+
+    final _snapshot = await _collectionRef
+        .doc(questionId)
+        .collection(_kAnswerCollectionGroup)
+        .where('choiceId', isEqualTo: choiceId)
+        .orderBy('answeredTimeInMs', descending: true)
+        .limit(8)
+        .get();
+
+    for (final doc in _snapshot.docs) {
+      answers.add(IbAnswer.fromJson(doc.data()));
+    }
+
+    return answers;
   }
 
   Future<void> answerQuestion(IbAnswer ibAnswer) async {

@@ -149,18 +149,19 @@ class ReplyPage extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               fontSize: IbConfig.kNormalTextSize),
                         ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text(
-                              'Vote: ',
-                              style: TextStyle(
-                                  color: IbColors.lightGrey,
-                                  fontSize: IbConfig.kDescriptionTextSize),
-                            ),
-                            _handleIbAnswerUI(item),
-                          ],
-                        ),
+                        if (item.ibAnswer != null)
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text(
+                                'Vote: ',
+                                style: TextStyle(
+                                    color: IbColors.lightGrey,
+                                    fontSize: IbConfig.kDescriptionTextSize),
+                              ),
+                              _handleIbAnswerUI(item),
+                            ],
+                          ),
                       ],
                     ),
                     Text(
@@ -332,7 +333,9 @@ class ReplyPage extends StatelessWidget {
     }
 
     if (_controller.commentController.ibQuestion.questionType ==
-        IbQuestion.kMultipleChoice) {
+            IbQuestion.kMultipleChoice ||
+        _controller.commentController.ibQuestion.questionType ==
+            IbQuestion.kMultipleChoicePic) {
       return Text(
         _controller.commentController.ibQuestion.choices
             .firstWhere(

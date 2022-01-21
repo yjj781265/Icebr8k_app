@@ -50,6 +50,7 @@ class IbQuestionItemController extends GetxController {
   final selectedChoiceId = ''.obs;
   final resultMap = <IbChoice, double>{}.obs;
   final RxList<IbTag> ibTags = <IbTag>[].obs;
+  Map<IbChoice, int>? countMap;
 
   IbQuestionItemController({
     required this.rxIbQuestion,
@@ -72,7 +73,7 @@ class IbQuestionItemController extends GetxController {
     if (rxIbAnswer == null) {
       /// query my answer to this question
       final myAnswer = await IbQuestionDbService()
-          .queryIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id);
+          .querySingleIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id);
 
       if (myAnswer != null) {
         rxIbAnswer = myAnswer.obs;
@@ -112,15 +113,15 @@ class IbQuestionItemController extends GetxController {
 
   Future<void> generatePollStats() async {
     int counter = 0;
-    final countMap = await IbUtils.getChoiceCountMap(rxIbQuestion.value.id);
+    countMap = await IbUtils.getChoiceCountMap(rxIbQuestion.value.id);
 
-    for (final key in countMap.keys) {
-      counter = counter + countMap[key]!;
+    for (final key in countMap!.keys) {
+      counter = counter + countMap![key]!;
     }
 
     for (final IbChoice ibChoice in rxIbQuestion.value.choices) {
       resultMap[ibChoice] = double.parse(
-          ((countMap[ibChoice] ?? counter).toDouble() / counter.toDouble())
+          ((countMap![ibChoice] ?? counter).toDouble() / counter.toDouble())
               .toStringAsFixed(1));
     }
 
@@ -169,8 +170,8 @@ class IbQuestionItemController extends GetxController {
           questionId: rxIbQuestion.value.id, choiceId: selectedChoiceId.value);
     }
 
-    rxIbAnswer = (await IbQuestionDbService()
-            .queryIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id))!
+    rxIbAnswer = (await IbQuestionDbService().querySingleIbAnswer(
+            IbUtils.getCurrentUid()!, rxIbQuestion.value.id))!
         .obs;
     IbLocalStorageService().removeUnAnsweredIbQid(rxIbQuestion.value.id);
 
