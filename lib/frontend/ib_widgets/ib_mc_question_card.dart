@@ -79,34 +79,32 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Scrollbar(
-              isAlwaysShown: true,
-              controller: _scrollController,
-              child: widget._controller.showStats.isTrue
-                  ? IbQuestionStats(Get.put(
-                      IbQuestionStatsController(
-                          ibAnswers: widget._controller.ibAnswers!,
-                          questionId: widget._controller.rxIbQuestion.value.id),
-                      tag: widget._controller.rxIbQuestion.value.id))
-                  : LimitedBox(
-                      maxHeight: 300,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          itemBuilder: (context, index) {
-                            final IbChoice _choice = widget
-                                ._controller.rxIbQuestion.value.choices[index];
-                            return IbQuestionMcItem(
-                                _choice, widget._controller);
-                          },
-                          shrinkWrap: true,
-                          itemCount: widget
-                              ._controller.rxIbQuestion.value.choices.length,
-                        ),
-                      ),
-                    ),
-            ),
+            if (widget._controller.showStats.isTrue)
+              IbQuestionStats(Get.put(
+                  IbQuestionStatsController(
+                      ibAnswers: widget._controller.ibAnswers!,
+                      questionId: widget._controller.rxIbQuestion.value.id),
+                  tag: widget._controller.rxIbQuestion.value.id))
+            else
+              LimitedBox(
+                maxHeight: 300,
+                child: Scrollbar(
+                  isAlwaysShown: true,
+                  controller: _scrollController,
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    controller: _scrollController,
+                    itemBuilder: (context, index) {
+                      final IbChoice _choice =
+                          widget._controller.rxIbQuestion.value.choices[index];
+                      return IbQuestionMcItem(_choice, widget._controller);
+                    },
+                    shrinkWrap: true,
+                    itemCount:
+                        widget._controller.rxIbQuestion.value.choices.length,
+                  ),
+                ),
+              ),
             if (IbQuestion.kMultipleChoicePic ==
                 widget._controller.rxIbQuestion.value.questionType)
               const Text(
@@ -115,9 +113,6 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                     color: IbColors.lightGrey,
                     fontSize: IbConfig.kDescriptionTextSize),
               ),
-            const SizedBox(
-              height: 8,
-            ),
             IbQuestionTags(widget._controller),
             const SizedBox(
               height: 8,
@@ -134,8 +129,8 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
     );
     return SingleChildScrollView(
       child: Center(
-        child: LimitedBox(
-            maxWidth: Get.width * 0.95,
+        child: SizedBox(
+            width: Get.width * 0.95,
             child: IbCard(
               child: Column(
                 mainAxisSize: MainAxisSize.min,

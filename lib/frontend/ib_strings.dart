@@ -70,12 +70,10 @@ class IbStrings extends Translations {
           'profile': 'Profile',
           'add_choice': 'Add a choice',
           'add_endpoint': 'Add an endpoint',
-          'tap_to_add': 'Tap to add up to ${IbConfig.kChoiceLimit} choices',
+          'tap_to_add': 'Tap to add choices',
           'tap_to_add_sc': 'Tap to add 2 end points',
           'match_interests': 'Match Interests',
           'add': 'Add',
-          'choice_limit':
-              'You can only have max ${IbConfig.kChoiceLimit} choices per question.',
           'choice_limit_sc':
               'You can only have max ${IbConfig.kScChoiceLimit} endpoints per scale question.',
           'sc_question_not_valid': 'You need 2 endpoints for a scale question',

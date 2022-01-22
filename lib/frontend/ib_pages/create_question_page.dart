@@ -84,162 +84,166 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
               )),
         ],
       ),
-      body: ExtendedNestedScrollView(
-        onlyOneScrollInBody: true,
-        dragStartBehavior: DragStartBehavior.down,
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return [
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: 150,
-                child: IbCard(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: TextField(
-                      onChanged: (question) {
-                        _controller.question = question;
-                      },
-                      keyboardType: TextInputType.text,
-                      controller: _questionEditingController,
-                      minLines: 3,
-                      maxLines: 8,
-                      maxLength: IbConfig.kQuestionTitleMaxLength,
-                      style: const TextStyle(
-                          fontSize: IbConfig.kPageTitleSize,
-                          fontWeight: FontWeight.bold),
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'question'.tr,
-                          hintStyle: const TextStyle(
-                            color: IbColors.lightGrey,
-                          )),
+      body: SafeArea(
+        bottom: false,
+        child: ExtendedNestedScrollView(
+          onlyOneScrollInBody: true,
+          dragStartBehavior: DragStartBehavior.down,
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return [
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 150,
+                  child: IbCard(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: TextField(
+                        onChanged: (question) {
+                          _controller.question = question;
+                        },
+                        keyboardType: TextInputType.text,
+                        controller: _questionEditingController,
+                        minLines: 3,
+                        maxLines: 8,
+                        maxLength: IbConfig.kQuestionTitleMaxLength,
+                        style: const TextStyle(
+                            fontSize: IbConfig.kPageTitleSize,
+                            fontWeight: FontWeight.bold),
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'question'.tr,
+                            hintStyle: const TextStyle(
+                              color: IbColors.lightGrey,
+                            )),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: AnimatedSize(
-                    duration: const Duration(milliseconds: 300),
-                    child: Wrap(
-                      runAlignment: WrapAlignment.end,
-                      crossAxisAlignment: WrapCrossAlignment.end,
-                      children: [
-                        Obx(
-                          () => ReorderableWrap(
-                            onReorder: (int oldIndex, int newIndex) {
-                              final String tag =
-                                  _controller.pickedTags.removeAt(oldIndex);
-                              _controller.pickedTags.insert(newIndex, tag);
-                            },
-                            buildDraggableFeedback: (context, axis, item) {
-                              return Material(
-                                color: Colors.transparent,
-                                child: item,
-                              );
-                            },
-                            controller: ScrollController(),
-                            children: _controller.pickedTags
-                                .map((e) => Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 4.0),
-                                      child: Chip(
-                                        elevation: 1,
-                                        label: Text(
-                                          e,
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: AnimatedSize(
+                      duration: const Duration(milliseconds: 300),
+                      child: Wrap(
+                        runAlignment: WrapAlignment.end,
+                        crossAxisAlignment: WrapCrossAlignment.end,
+                        children: [
+                          Obx(
+                            () => ReorderableWrap(
+                              onReorder: (int oldIndex, int newIndex) {
+                                final String tag =
+                                    _controller.pickedTags.removeAt(oldIndex);
+                                _controller.pickedTags.insert(newIndex, tag);
+                              },
+                              buildDraggableFeedback: (context, axis, item) {
+                                return Material(
+                                  color: Colors.transparent,
+                                  child: item,
+                                );
+                              },
+                              controller: ScrollController(),
+                              children: _controller.pickedTags
+                                  .map((e) => Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 4.0),
+                                        child: Chip(
+                                          elevation: 1,
+                                          label: Text(
+                                            e,
+                                          ),
+                                          backgroundColor:
+                                              Theme.of(context).backgroundColor,
+                                          onDeleted: () {
+                                            _controller.pickedTags.remove(e);
+                                            final int index = _controller
+                                                .ibTagModels
+                                                .indexWhere((element) =>
+                                                    element.tag.text == e);
+                                            if (index != -1) {
+                                              _controller.ibTagModels[index]
+                                                  .selected = false;
+                                            }
+                                          },
+                                          deleteIcon: const Icon(
+                                            Icons.highlight_remove,
+                                            color: IbColors.lightGrey,
+                                          ),
                                         ),
-                                        backgroundColor:
-                                            Theme.of(context).backgroundColor,
-                                        onDeleted: () {
-                                          _controller.pickedTags.remove(e);
-                                          final int index = _controller
-                                              .ibTagModels
-                                              .indexWhere((element) =>
-                                                  element.tag.text == e);
-                                          if (index != -1) {
-                                            _controller.ibTagModels[index]
-                                                .selected = false;
-                                          }
-                                        },
-                                        deleteIcon: const Icon(
-                                          Icons.highlight_remove,
-                                          color: IbColors.lightGrey,
-                                        ),
-                                      ),
-                                    ))
-                                .toList(),
+                                      ))
+                                  .toList(),
+                            ),
                           ),
-                        ),
-                        Obx(() {
-                          if (_controller.pickedTags.length < 8) {
-                            return TextButton.icon(
-                                onPressed: () {
-                                  _customTagController.clear();
-                                  _controller.isCustomTagSelected.value = false;
-                                  _showTagsDialog();
-                                },
-                                icon: const Tooltip(
-                                  message: 'Add Tags',
-                                  child: Icon(Icons.add_circle_outline),
-                                ),
-                                label: const Text(
-                                  'Add Tags 🏷️',
-                                ));
-                          }
-                          return const SizedBox();
-                        }),
-                      ],
-                    )),
+                          Obx(() {
+                            if (_controller.pickedTags.length < 8) {
+                              return TextButton.icon(
+                                  onPressed: () {
+                                    _customTagController.clear();
+                                    _controller.isCustomTagSelected.value =
+                                        false;
+                                    _showTagsDialog();
+                                  },
+                                  icon: const Tooltip(
+                                    message: 'Add Tags',
+                                    child: Icon(Icons.add_circle_outline),
+                                  ),
+                                  label: const Text(
+                                    'Add Tags 🏷️',
+                                  ));
+                            }
+                            return const SizedBox();
+                          }),
+                        ],
+                      )),
+                ),
               ),
-            ),
-            SliverOverlapAbsorber(
-              handle: ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
-                  context),
-              sliver: SliverPersistentHeader(
-                pinned: true,
-                delegate: PersistentHeader(
-                  widget: IbCard(
-                    child: TabBar(
-                      controller: _tabController,
-                      tabs: [
-                        Tooltip(
-                            message: 'mc'.tr,
-                            child: const Tab(
-                                icon: Icon(
-                              FontAwesomeIcons.bars,
-                            ))),
-                        Tooltip(
-                            message: 'mc_p'.tr,
-                            child:
-                                const Tab(icon: Icon(FontAwesomeIcons.listUl))),
-                        Tooltip(
-                            message: 'pic'.tr,
-                            child:
-                                const Tab(icon: Icon(FontAwesomeIcons.square))),
-                        Tooltip(
-                            message: 'sc'.tr,
-                            child: const Tab(
-                                icon: Icon(FontAwesomeIcons.slidersH))),
-                      ],
+              SliverOverlapAbsorber(
+                handle: ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
+                    context),
+                sliver: SliverPersistentHeader(
+                  pinned: true,
+                  delegate: PersistentHeader(
+                    widget: IbCard(
+                      child: TabBar(
+                        controller: _tabController,
+                        tabs: [
+                          Tooltip(
+                              message: 'mc'.tr,
+                              child: const Tab(
+                                  icon: Icon(
+                                FontAwesomeIcons.bars,
+                              ))),
+                          Tooltip(
+                              message: 'mc_p'.tr,
+                              child: const Tab(
+                                  icon: Icon(FontAwesomeIcons.listUl))),
+                          Tooltip(
+                              message: 'pic'.tr,
+                              child: const Tab(
+                                  icon: Icon(FontAwesomeIcons.square))),
+                          Tooltip(
+                              message: 'sc'.tr,
+                              child: const Tab(
+                                  icon: Icon(FontAwesomeIcons.slidersH))),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            )
-          ];
-        },
-        body: Padding(
-          padding: const EdgeInsets.only(top: 56),
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              _mCTab(),
-              _mCWithPicTab(),
-              _picTab(),
-              _sCTab(),
-            ],
+              )
+            ];
+          },
+          body: Padding(
+            padding: const EdgeInsets.only(top: 56),
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _mCTab(),
+                _mCWithPicTab(),
+                _picTab(),
+                _sCTab(),
+              ],
+            ),
           ),
         ),
       ),
@@ -252,20 +256,16 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       child: Column(
         children: [
+          const SizedBox(
+            height: 8,
+          ),
           Material(
             color: Colors.transparent,
             child: InkWell(
               customBorder: ContinuousRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
               onTap: () {
-                if (_controller.choiceList.length < IbConfig.kChoiceLimit) {
-                  _showTextFiledBottomSheet(
-                      'add_choice', _controller.choiceList);
-                } else {
-                  IbUtils.showSimpleSnackBar(
-                      msg: 'choice_limit'.tr,
-                      backgroundColor: IbColors.errorRed);
-                }
+                _showTextFiledBottomSheet('add_choice', _controller.choiceList);
               },
               child: Container(
                 padding: const EdgeInsets.all(8),
@@ -347,6 +347,9 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       child: Column(
         children: [
+          const SizedBox(
+            height: 8,
+          ),
           Material(
             color: Colors.transparent,
             child: InkWell(
@@ -354,14 +357,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                   borderRadius: BorderRadius.circular(16)),
               onTap: () {
                 IbUtils.hideKeyboard();
-                if (_controller.picChoiceList.length < IbConfig.kChoiceLimit) {
-                  _showTextFiledBottomSheet(
-                      'add_choice', _controller.picChoiceList);
-                } else {
-                  IbUtils.showSimpleSnackBar(
-                      msg: 'choice_limit'.tr,
-                      backgroundColor: IbColors.errorRed);
-                }
+                _showTextFiledBottomSheet(
+                    'add_choice', _controller.picChoiceList);
               },
               child: Container(
                 padding: const EdgeInsets.all(8),
@@ -502,95 +499,98 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
   }
 
   Widget _picTab() {
-    return AnimatedSize(
-        duration: const Duration(milliseconds: 300),
-        child: Wrap(
-          children: [
-            Obx(() {
-              if (_controller.picList.length < IbConfig.kChoiceLimit) {
-                return GestureDetector(
-                  onTap: () {
-                    showMediaBottomSheet(context, null, _controller.picList);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+    return SingleChildScrollView(
+      child: AnimatedSize(
+          duration: const Duration(milliseconds: 300),
+          child: Wrap(
+            children: [
+              Obx(() {
+                if (_controller.picList.length < IbConfig.kPicChoiceLimit) {
+                  return GestureDetector(
+                    onTap: () {
+                      showMediaBottomSheet(context, null, _controller.picList);
+                    },
                     child: Container(
+                      margin: const EdgeInsets.all(8.0),
                       decoration: BoxDecoration(
                           color: IbColors.lightGrey,
                           borderRadius: BorderRadius.circular(8)),
-                      width: IbConfig.kPicHeight,
-                      height: IbConfig.kPicHeight,
+                      width: IbConfig.kPicHeight + 8,
+                      height: IbConfig.kPicHeight + 8,
                       child: const Icon(Icons.add),
                     ),
-                  ),
-                );
-              }
-              return const SizedBox();
-            }),
-            Obx(
-              () => ReorderableWrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                runAlignment: WrapAlignment.center,
-                onReorder: (int oldIndex, int newIndex) {
-                  final IbChoice ibChoice =
-                      _controller.picList.removeAt(oldIndex);
-                  _controller.picList.insert(newIndex, ibChoice);
-                },
-                buildDraggableFeedback: (context, axis, item) {
-                  return Material(
-                    color: Colors.transparent,
-                    child: item,
                   );
-                },
-                controller: ScrollController(),
-                children: _controller.picList
-                    .map(
-                      (e) => Stack(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              showMediaBottomSheet(
-                                  context, e, _controller.picList);
-                            },
-                            child: IbCard(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                  width: IbConfig.kPicHeight,
-                                  height: IbConfig.kPicHeight,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: e.url!.contains('http')
-                                        ? CachedNetworkImage(
-                                            imageUrl: e.url!, fit: BoxFit.fill)
-                                        : Image.file(
-                                            File(e.url!),
-                                            fit: BoxFit.fill,
-                                          ),
+                }
+                return const SizedBox();
+              }),
+              Obx(
+                () => ReorderableWrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  runAlignment: WrapAlignment.center,
+                  onReorder: (int oldIndex, int newIndex) {
+                    final IbChoice ibChoice =
+                        _controller.picList.removeAt(oldIndex);
+                    _controller.picList.insert(newIndex, ibChoice);
+                  },
+                  buildDraggableFeedback: (context, axis, item) {
+                    return Material(
+                      color: Colors.transparent,
+                      child: item,
+                    );
+                  },
+                  controller: ScrollController(),
+                  children: _controller.picList
+                      .map(
+                        (e) => Stack(
+                          children: [
+                            InkWell(
+                              customBorder: ContinuousRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16)),
+                              onTap: () {
+                                showMediaBottomSheet(
+                                    context, e, _controller.picList);
+                              },
+                              child: IbCard(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                    width: IbConfig.kPicHeight,
+                                    height: IbConfig.kPicHeight,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: e.url!.contains('http')
+                                          ? CachedNetworkImage(
+                                              imageUrl: e.url!,
+                                              fit: BoxFit.fill)
+                                          : Image.file(
+                                              File(e.url!),
+                                              fit: BoxFit.fill,
+                                            ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          Positioned(
-                            right: -14,
-                            top: -14,
-                            child: IconButton(
-                              color: IbColors.errorRed.withOpacity(1.0),
-                              onPressed: () {
-                                _controller.picList.remove(e);
-                              },
-                              icon: const Icon(Icons.remove_circle),
+                            Positioned(
+                              right: -14,
+                              top: -14,
+                              child: IconButton(
+                                color: IbColors.errorRed.withOpacity(1.0),
+                                onPressed: () {
+                                  _controller.picList.remove(e);
+                                },
+                                icon: const Icon(Icons.remove_circle),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    )
-                    .toList(),
+                          ],
+                        ),
+                      )
+                      .toList(),
+                ),
               ),
-            ),
-          ],
-        ));
+            ],
+          )),
+    );
   }
 
   Widget _sCTab() {
@@ -598,6 +598,9 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       child: Column(
         children: [
+          const SizedBox(
+            height: 8,
+          ),
           Material(
             color: Colors.transparent,
             child: InkWell(
@@ -746,10 +749,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
         ],
       ),
     ));
-    Get.bottomSheet(
-      SizedBox(height: 200, child: _widget),
-      persistent: true,
-    );
+    Get.bottomSheet(SizedBox(height: 200, child: _widget),
+        persistent: true, ignoreSafeArea: false);
   }
 
   void _showTagsDialog() {
@@ -997,5 +998,5 @@ void showMediaBottomSheet(
     ],
   );
 
-  Get.bottomSheet(SafeArea(child: options));
+  Get.bottomSheet(options, ignoreSafeArea: false);
 }

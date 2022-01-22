@@ -14,7 +14,7 @@ class IbConfig {
   static const int kEventTriggerDelayInMillis = 300;
   static const int kUpdateResultMinCadenceInMillis = 8000;
   static const int kAgeLimitInDays = 4745;
-  static const int kChoiceLimit = 8;
+  static const int kPicChoiceLimit = 9;
   static const int kScChoiceLimit = 2;
   static const int kPasswordMinLength = 6;
   static const int kUsernameMinLength = 3;

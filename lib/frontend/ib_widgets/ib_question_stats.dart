@@ -67,28 +67,36 @@ class IbQuestionStats extends StatelessWidget {
       {required IbChoice choice,
       required BuildContext context,
       required bool isMe}) {
+    final String heroTag = IbUtils.getUniqueId();
     return Row(
       children: [
         if (choice.url != null && choice.url!.isNotEmpty)
           GestureDetector(
             onDoubleTap: () {
-              Get.dialog(IbMediaViewer(
-                urls: [choice.url!],
-                currentIndex: 0,
-              ));
+              Get.to(
+                  () => IbMediaViewer(
+                        urls: [choice.url!],
+                        currentIndex: 0,
+                        heroTag: heroTag,
+                      ),
+                  transition: Transition.fade);
             },
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: CachedNetworkImage(
-                imageUrl: choice.url!,
-                imageBuilder: (context, imageProvider) => Container(
-                  width: IbConfig.kPicHeight,
-                  height: IbConfig.kPicHeight,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      opacity: isMe ? 1.0 : 0.6,
-                      image: imageProvider,
-                      fit: BoxFit.scaleDown,
+            child: Hero(
+              transitionOnUserGestures: true,
+              tag: heroTag,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: CachedNetworkImage(
+                  imageUrl: choice.url!,
+                  imageBuilder: (context, imageProvider) => Container(
+                    width: IbConfig.kPicHeight,
+                    height: IbConfig.kPicHeight,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        opacity: isMe ? 1.0 : 0.6,
+                        image: imageProvider,
+                        fit: BoxFit.scaleDown,
+                      ),
                     ),
                   ),
                 ),

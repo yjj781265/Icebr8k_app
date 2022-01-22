@@ -11,7 +11,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 
 class IbQuestionResultController extends GetxController {
   final IbQuestionItemController itemController;
-  final resultMap = <IbChoice, RxList<ResultItemModel>>{}.obs;
+  final results = <ResultItemModel>[].obs;
   final isLoading = false.obs;
 
   IbQuestionResultController(this.itemController);
@@ -24,14 +24,14 @@ class IbQuestionResultController extends GetxController {
 
   Future<void> initResultMap() async {
     isLoading.value = true;
-    resultMap.clear();
+    results.clear();
     final ibQuestion = itemController.rxIbQuestion.value;
     try {
       for (final ibChoice in ibQuestion.choices) {
         final List<IbAnswer> answers = await IbQuestionDbService()
             .queryIbAnswers(
                 choiceId: ibChoice.choiceId, questionId: ibQuestion.id);
-        final List<ResultItemModel> resultItem = [];
+        final List<ResultItemUserModel> resultItem = [];
 
         for (final ibAnswer in answers) {
           final IbUser? user;
@@ -48,14 +48,25 @@ class IbQuestionResultController extends GetxController {
           final double compScore = await IbUtils.getCompScore(user.id);
           if (user.id == IbUtils.getCurrentUid()) {
             resultItem.insert(
-                0, ResultItemModel(user: user, compScore: compScore));
+                0,
+                ResultItemUserModel(
+                    user: user,
+                    compScore: compScore,
+                    answeredTimestampInMs: ibAnswer.answeredTimeInMs));
             continue;
           }
-          resultItem.add(ResultItemModel(user: user, compScore: compScore));
+
+          resultItem.add(ResultItemUserModel(
+              user: user,
+              compScore: compScore,
+              answeredTimestampInMs: ibAnswer.answeredTimeInMs));
         }
 
-        resultMap[ibChoice] = resultItem.obs;
+        final int count = itemController.countMap![ibChoice] ?? 0;
+        results.add(ResultItemModel(
+            list: resultItem.obs, ibChoice: ibChoice, count: count));
       }
+      results.sort((a, b) => b.count.compareTo(a.count));
     } catch (e) {
       IbUtils.showSimpleSnackBar(
           msg: "Failed to load results $e", backgroundColor: IbColors.errorRed);
@@ -66,15 +77,38 @@ class IbQuestionResultController extends GetxController {
 }
 
 class ResultItemModel {
-  IbUser user;
-  double compScore;
+  final RxList<ResultItemUserModel> list;
+  final IbChoice ibChoice;
+  final int count;
 
-  ResultItemModel({required this.user, required this.compScore});
+  ResultItemModel(
+      {required this.list, required this.ibChoice, required this.count});
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ResultItemModel &&
+          runtimeType == other.runtimeType &&
+          ibChoice == other.ibChoice;
+
+  @override
+  int get hashCode => ibChoice.hashCode;
+}
+
+class ResultItemUserModel {
+  IbUser user;
+  double compScore;
+  int answeredTimestampInMs;
+
+  ResultItemUserModel(
+      {required this.user,
+      required this.compScore,
+      required this.answeredTimestampInMs});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ResultItemUserModel &&
           runtimeType == other.runtimeType &&
           user == other.user;
 

@@ -18,7 +18,7 @@ class IbQuestionTags extends StatelessWidget {
 
   Widget tagList(BuildContext context) {
     return Obx(() {
-      if (_itemController.isSample && _itemController.isSubmitting.isTrue) {
+      if (_itemController.isSample) {
         return Row(
             children: _itemController.rxIbQuestion.value.tagIds
                 .map(

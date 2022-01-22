@@ -21,10 +21,6 @@ class TagPage extends StatelessWidget {
             icon: const Icon(Icons.cancel),
             onPressed: () {
               Get.back();
-              for (final tagModel in _controller.ibTagModels) {
-                tagModel.selected = false;
-              }
-              _controller.pickedTags.clear();
             },
           ),
           actions: [
