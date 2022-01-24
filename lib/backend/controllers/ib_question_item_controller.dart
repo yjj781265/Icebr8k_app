@@ -96,6 +96,13 @@ class IbQuestionItemController extends GetxController {
       avatarUrl.value = ibUser!.avatarUrl;
     }
 
+    commented.value =
+        await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
+    comments.value = rxIbQuestion.value.comments;
+    totalTags.value = rxIbQuestion.value.tagIds.length;
+    liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
+    likes.value = rxIbQuestion.value.likes;
+
     await generateIbTags();
     await generatePollStats();
 
@@ -121,18 +128,10 @@ class IbQuestionItemController extends GetxController {
 
     for (final IbChoice ibChoice in rxIbQuestion.value.choices) {
       resultMap[ibChoice] = double.parse(
-          ((countMap![ibChoice] ?? counter).toDouble() / counter.toDouble())
+          ((countMap![ibChoice] ?? 0).toDouble() / counter.toDouble())
               .toStringAsFixed(1));
     }
-
-    print(resultMap);
     totalPolled.value = counter;
-    commented.value =
-        await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
-    comments.value = rxIbQuestion.value.comments;
-    totalTags.value = rxIbQuestion.value.tagIds.length;
-    liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
-    likes.value = rxIbQuestion.value.likes;
   }
 
   Future<void> onVote() async {
@@ -150,37 +149,90 @@ class IbQuestionItemController extends GetxController {
 
     isAnswering.value = true;
     isSwitched.value = false;
-    final IbAnswer tempAnswer = IbAnswer(
-        choiceId: selectedChoiceId.value,
-        answeredTimeInMs: DateTime.now().millisecondsSinceEpoch,
-        askedTimeInMs: rxIbQuestion.value.askedTimeInMs,
-        uid: IbUtils.getCurrentUid()!,
-        questionId: rxIbQuestion.value.id,
-        questionType: rxIbQuestion.value.questionType);
-
-    await IbQuestionDbService().answerQuestion(tempAnswer);
-
-    if (rxIbAnswer != null) {
-      await IbQuestionDbService().updatePollSize(
+    try {
+      final IbAnswer tempAnswer = IbAnswer(
+          choiceId: selectedChoiceId.value,
+          answeredTimeInMs: DateTime.now().millisecondsSinceEpoch,
+          askedTimeInMs: rxIbQuestion.value.askedTimeInMs,
+          uid: IbUtils.getCurrentUid()!,
           questionId: rxIbQuestion.value.id,
-          oldChoiceId: rxIbAnswer!.value.choiceId,
-          newChoiceId: selectedChoiceId.value);
-    } else {
-      await IbQuestionDbService().increasePollSize(
-          questionId: rxIbQuestion.value.id, choiceId: selectedChoiceId.value);
+          questionType: rxIbQuestion.value.questionType);
+
+      await IbQuestionDbService().answerQuestion(tempAnswer);
+
+      if (rxIbAnswer != null) {
+        await IbQuestionDbService().updatePollSize(
+            questionId: rxIbQuestion.value.id,
+            oldChoiceId: rxIbAnswer!.value.choiceId,
+            newChoiceId: selectedChoiceId.value);
+
+        int counter = 0;
+        int count1 = countMap![rxIbQuestion.value.choices.firstWhere(
+                (element) => element.choiceId == rxIbAnswer!.value.choiceId)] ??
+            0;
+        count1 = count1 - 1 < 0 ? 0 : count1 - 1;
+        countMap![rxIbQuestion.value.choices.firstWhere(
+                (element) => element.choiceId == rxIbAnswer!.value.choiceId)] =
+            count1;
+
+        int count2 = countMap![rxIbQuestion.value.choices.firstWhere(
+                (element) => element.choiceId == selectedChoiceId.value)] ??
+            0;
+        count2 = count2 + 1;
+        countMap![rxIbQuestion.value.choices.firstWhere(
+            (element) => element.choiceId == selectedChoiceId.value)] = count2;
+
+        //update result map
+        for (final key in countMap!.keys) {
+          counter = counter + countMap![key]!;
+        }
+
+        for (final IbChoice ibChoice in rxIbQuestion.value.choices) {
+          resultMap[ibChoice] = double.parse(
+              ((countMap![ibChoice] ?? 0).toDouble() / counter.toDouble())
+                  .toStringAsFixed(1));
+        }
+        totalPolled.value = counter;
+      } else {
+        await IbQuestionDbService().increasePollSize(
+            questionId: rxIbQuestion.value.id,
+            choiceId: selectedChoiceId.value);
+
+        int counter = 0;
+        int count = countMap![rxIbQuestion.value.choices.firstWhere(
+                (element) => element.choiceId == selectedChoiceId.value)] ??
+            0;
+        count = count + 1;
+        countMap![rxIbQuestion.value.choices.firstWhere(
+            (element) => element.choiceId == selectedChoiceId.value)] = count;
+
+        //update result map
+        for (final key in countMap!.keys) {
+          counter = counter + countMap![key]!;
+        }
+
+        for (final IbChoice ibChoice in rxIbQuestion.value.choices) {
+          resultMap[ibChoice] = double.parse(
+              ((countMap![ibChoice] ?? 0).toDouble() / counter.toDouble())
+                  .toStringAsFixed(1));
+        }
+        totalPolled.value = counter;
+      }
+
+      rxIbAnswer = (await IbQuestionDbService().querySingleIbAnswer(
+              IbUtils.getCurrentUid()!, rxIbQuestion.value.id))!
+          .obs;
+      IbLocalStorageService().removeUnAnsweredIbQid(rxIbQuestion.value.id);
+    } catch (e) {
+      IbUtils.showSimpleSnackBar(
+          msg: "Failed to vote $e", backgroundColor: IbColors.errorRed);
+    } finally {
+      showResult.value = true;
+      isSwitched.value = true;
+      isAnswering.value = false;
+      rxIbAnswer!.refresh();
+      rxIbQuestion.refresh();
     }
-
-    rxIbAnswer = (await IbQuestionDbService().querySingleIbAnswer(
-            IbUtils.getCurrentUid()!, rxIbQuestion.value.id))!
-        .obs;
-    IbLocalStorageService().removeUnAnsweredIbQid(rxIbQuestion.value.id);
-
-    await generatePollStats();
-    showResult.value = true;
-    isSwitched.value = true;
-    isAnswering.value = false;
-    rxIbAnswer!.refresh();
-    rxIbQuestion.refresh();
   }
 
   Future<void> onSubmit() async {
@@ -229,6 +281,7 @@ class IbQuestionItemController extends GetxController {
     liked.value = !liked.value;
     if (liked.isTrue) {
       likes.value++;
+      //TODO use cloud function
       await IbQuestionDbService().updateLikes(rxIbQuestion.value.id);
     } else {
       await IbQuestionDbService().removeLikes(rxIbQuestion.value.id);

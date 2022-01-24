@@ -77,7 +77,6 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
       child: Obx(
         () => Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (widget._controller.showStats.isTrue)
               IbQuestionStats(Get.put(
@@ -113,7 +112,10 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                     color: IbColors.lightGrey,
                     fontSize: IbConfig.kDescriptionTextSize),
               ),
-            IbQuestionTags(widget._controller),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: IbQuestionTags(widget._controller),
+            ),
             const SizedBox(
               height: 8,
             ),
