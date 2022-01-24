@@ -170,6 +170,7 @@ class _HomepageViewState extends State<HomepageView>
     ];
     return Obx(
       () => IndexedStack(
+        alignment: Alignment.center,
         index: _homeController.currentIndex.value,
         children: pages,
       ),

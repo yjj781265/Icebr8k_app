@@ -31,10 +31,10 @@ class ReplyController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
-    await _initReplies();
     likes.value = replyComment.ibComment.likes;
     isLiked.value = replyComment.isLiked;
     replyCounts.value = replyComment.ibComment.replies.length;
+    await _initReplies();
   }
 
   Future<void> _initReplies() async {

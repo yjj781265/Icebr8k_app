@@ -121,26 +121,6 @@ class _MyFriendsTabState extends State<MyFriendsTab>
       return SmartRefresher(
         physics: const ClampingScrollPhysics(),
         controller: _refreshController,
-        header: const ClassicHeader(
-          textStyle: TextStyle(color: IbColors.primaryColor),
-          failedIcon: Icon(
-            Icons.error_outline,
-            color: IbColors.errorRed,
-          ),
-          completeIcon: Icon(
-            Icons.check_circle_outline,
-            color: IbColors.accentColor,
-          ),
-          refreshingIcon: IbProgressIndicator(
-            width: 24,
-            height: 24,
-            padding: 0,
-          ),
-        ),
-        cacheExtent: Get.height * 2,
-        onLoading: () {
-          print('onLoading');
-        },
         onRefresh: () async {
           await _controller.refreshEverything();
           _refreshController.refreshCompleted();
@@ -168,35 +148,37 @@ class FriendItemView extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () => Get.to(
-          () => ProfilePage(
-                friendListItem.uid,
-                showAppBar: true,
-              ),
-          preventDuplicates: false),
-      tileColor: Theme.of(context).primaryColor,
-      leading: IbUserAvatar(
-        uid: friendListItem.uid,
-        avatarUrl: friendListItem.avatarUrl,
-      ),
-      title: Text(
-        friendListItem.username,
-        style: const TextStyle(
-            fontSize: IbConfig.kNormalTextSize, fontWeight: FontWeight.bold),
-      ),
-      subtitle: IbLinearIndicator(endValue: friendListItem.score),
-      trailing: IconButton(
-        icon: const Icon(
-          Icons.message_outlined,
-          color: IbColors.primaryColor,
+    return Material(
+      child: ListTile(
+        onTap: () => Get.to(
+            () => ProfilePage(
+                  friendListItem.uid,
+                  showAppBar: true,
+                ),
+            preventDuplicates: false),
+        tileColor: Theme.of(context).primaryColor,
+        leading: IbUserAvatar(
+          uid: friendListItem.uid,
+          avatarUrl: friendListItem.avatarUrl,
         ),
-        onPressed: () {
-          final String mUid = Get.find<AuthController>().firebaseUser!.uid;
-          final List<String> memberUids = [mUid, friendListItem.uid];
-          Get.to(() => ChatPage(Get.put(ChatPageController(memberUids),
-              tag: memberUids.toString())));
-        },
+        title: Text(
+          friendListItem.username,
+          style: const TextStyle(
+              fontSize: IbConfig.kNormalTextSize, fontWeight: FontWeight.bold),
+        ),
+        subtitle: IbLinearIndicator(endValue: friendListItem.score),
+        trailing: IconButton(
+          icon: const Icon(
+            Icons.message_outlined,
+            color: IbColors.primaryColor,
+          ),
+          onPressed: () {
+            final String mUid = Get.find<AuthController>().firebaseUser!.uid;
+            final List<String> memberUids = [mUid, friendListItem.uid];
+            Get.to(() => ChatPage(Get.put(ChatPageController(memberUids),
+                tag: memberUids.toString())));
+          },
+        ),
       ),
     );
   }
