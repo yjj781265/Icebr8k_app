@@ -42,17 +42,13 @@ class IbTenorPage extends StatelessWidget {
                 ),
               ),
             ),
-            Obx(
-              () => TextButton(
-                onPressed: _controller.isSearchBoxEmpty.isTrue
-                    ? null
-                    : () async {
-                        await _controller.search();
-                      },
-                child: const Text(
-                  'Search',
-                  style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                ),
+            TextButton(
+              onPressed: () async {
+                await _controller.search();
+              },
+              child: const Text(
+                'Search',
+                style: TextStyle(fontSize: IbConfig.kNormalTextSize),
               ),
             ),
           ],

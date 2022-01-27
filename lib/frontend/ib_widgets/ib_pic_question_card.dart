@@ -75,6 +75,7 @@ class _IbPicQuestionCardState extends State<IbPicQuestionCard>
       () => Padding(
         padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             if (widget._controller.showStats.isTrue)
@@ -100,9 +101,7 @@ class _IbPicQuestionCardState extends State<IbPicQuestionCard>
             const SizedBox(
               height: 8,
             ),
-            Align(
-                alignment: Alignment.centerLeft,
-                child: IbQuestionTags(widget._controller)),
+            IbQuestionTags(widget._controller),
             const SizedBox(
               height: 8,
             ),

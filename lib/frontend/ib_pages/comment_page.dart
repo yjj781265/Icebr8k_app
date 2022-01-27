@@ -221,7 +221,7 @@ class CommentItemWidget extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                item.user.username,
+                                '${item.user.username} ${item.user.id == _controller.ibQuestion.creatorId ? ' 👑' : ''}',
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: IbConfig.kNormalTextSize),

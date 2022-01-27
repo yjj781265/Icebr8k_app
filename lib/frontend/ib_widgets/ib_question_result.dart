@@ -162,7 +162,7 @@ class IbQuestionResultItem extends StatelessWidget {
               ),
             );
           },
-          itemCount: list.length * 100,
+          itemCount: list.length,
         ));
   }
 }

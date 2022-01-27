@@ -76,6 +76,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
       padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
       child: Obx(
         () => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             if (widget._controller.showStats.isTrue)
@@ -112,10 +113,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                     color: IbColors.lightGrey,
                     fontSize: IbConfig.kDescriptionTextSize),
               ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: IbQuestionTags(widget._controller),
-            ),
+            IbQuestionTags(widget._controller),
             const SizedBox(
               height: 8,
             ),

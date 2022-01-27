@@ -61,6 +61,9 @@ class IbTenorController extends GetxController {
   }
 
   Future<void> search() async {
+    if (editingController.text.isEmpty) {
+      return;
+    }
     isSearching.value = true;
     IbUtils.hideKeyboard();
     showSearchResult.value = true;

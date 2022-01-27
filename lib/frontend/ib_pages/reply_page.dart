@@ -144,7 +144,8 @@ class ReplyPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          item.user.username,
+                          '${item.user.username} '
+                          '${item.user.id == _controller.commentController.ibQuestion.creatorId ? ' 👑' : ''}',
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: IbConfig.kNormalTextSize),
@@ -219,7 +220,8 @@ class ReplyPage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              _controller.replyComment.user.username,
+                              '${_controller.replyComment.user.username} '
+                              '${_controller.replyComment.user.id == _controller.commentController.ibQuestion.creatorId ? ' 👑' : ''}',
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: IbConfig.kNormalTextSize),

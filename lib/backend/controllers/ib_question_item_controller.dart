@@ -105,7 +105,6 @@ class IbQuestionItemController extends GetxController {
 
     await generateIbTags();
     await generatePollStats();
-
     super.onInit();
   }
 
