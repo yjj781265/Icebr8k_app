@@ -72,7 +72,7 @@ class HomeController extends GetxController {
                 .queryAskedQuestions(uid: currentIbUser!.id))
             .size;
       } else {
-        askedSize.value = currentIbUser!.askedSize!;
+        askedSize.value = currentIbUser!.askedSize;
       }
 
       if (currentIbUser!.answeredSize == 0) {
@@ -80,7 +80,7 @@ class HomeController extends GetxController {
                 .queryAnsweredQuestionIds(currentIbUser!.id))
             .length;
       } else {
-        answeredSize.value = currentIbUser!.answeredSize!;
+        answeredSize.value = currentIbUser!.answeredSize;
       }
     }
   }

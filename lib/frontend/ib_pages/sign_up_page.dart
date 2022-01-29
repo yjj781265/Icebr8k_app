@@ -168,6 +168,7 @@ class SignUpPage extends GetView<SignUpController> {
                           ),
                           Obx(
                             () => Hero(
+                              transitionOnUserGestures: true,
                               tag: 'sign_up',
                               child: Container(
                                 height: 88,
