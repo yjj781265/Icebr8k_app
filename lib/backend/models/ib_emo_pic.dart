@@ -9,7 +9,11 @@ class IbEmoPic {
   String? description;
   String id;
 
-  IbEmoPic({required this.url, required this.emoji, required this.id});
+  IbEmoPic({
+    required this.url,
+    required this.emoji,
+    required this.id,
+  });
 
   factory IbEmoPic.fromJson(Map<String, dynamic> json) =>
       _$IbEmoPicFromJson(json);

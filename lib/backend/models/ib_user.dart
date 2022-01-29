@@ -11,6 +11,9 @@ class IbUser {
   String email;
   String username;
   String avatarUrl;
+  String gender;
+  String status;
+  int banedEndTimeInMs;
   int? loginTimeInMs;
   int? joinTimeInMs;
   int? birthdateInMs;
@@ -25,6 +28,10 @@ class IbUser {
 
   static String kAdminRole = 'admin';
   static String kUserRole = 'user';
+  static String kUserStatusBanned = 'banned';
+  static String kUserStatusApproved = 'approved';
+  static String kUserStatusPending = 'pending';
+  static List<String> kGenders = ['Male', 'Female', 'Other'];
 
   IbUser({
     this.avatarUrl = '',
@@ -32,7 +39,10 @@ class IbUser {
     this.loginTimeInMs = -1,
     this.joinTimeInMs = -1,
     this.birthdateInMs = -1,
+    this.banedEndTimeInMs = -1,
     this.isOnline = false,
+    this.gender = '',
+    this.status = '',
     this.voiceMemoUrl = '',
     this.emoPics = const [],
     this.roles = const ['user'],
