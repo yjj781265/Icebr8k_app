@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
-import 'package:icebr8k/backend/controllers/sign_in_controller.dart';
 import 'package:icebr8k/backend/controllers/sign_up_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_auth_service.dart';
@@ -13,7 +12,7 @@ import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/home_page.dart';
 import 'package:icebr8k/frontend/ib_pages/set_up_page.dart';
-import 'package:icebr8k/frontend/ib_pages/sign_in_page.dart';
+import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
 
@@ -188,49 +187,6 @@ class AuthController extends GetxService {
     }
   }
 
-  Future<void> signInViaGoogle() async {
-    Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_in'));
-    final credential = await _ibAuthService.signInWithGoogle();
-    if (credential == null) {
-      Get.back();
-      return;
-    }
-    _handleUserCredential(credential);
-  }
-
-  Future<void> signInViaApple() async {
-    Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_in'));
-    final credential = await _ibAuthService.signInWithApple();
-    if (credential == null) {
-      Get.back();
-      return;
-    }
-
-    _handleUserCredential(credential);
-  }
-
-  Future<void> _handleUserCredential(UserCredential _credential) async {
-    final user = _credential.user;
-    if (user != null) {
-      final _controller = Get.find<SignInController>();
-      if (await IbUserDbService().isIbUserExist(user.uid)) {
-        await IbUserDbService().loginIbUser(
-          uid: user.uid,
-          loginTimeInMs: DateTime.now().millisecondsSinceEpoch,
-        );
-      } else {
-        await IbUserDbService().updateIbUser(IbUser(
-          id: user.uid,
-          email: _credential.user!.email ?? '',
-          birthdateInMs: _controller.birthdateInMs.value,
-          joinTimeInMs: DateTime.now().millisecondsSinceEpoch,
-          loginTimeInMs: DateTime.now().millisecondsSinceEpoch,
-        ));
-      }
-      await _handleUserFirstLogin(user.uid);
-    }
-  }
-
   Future<void> _handleUserFirstLogin(String uid) async {
     final bool isUserNameMissing =
         await IbUserDbService().isUsernameMissing(uid);
@@ -276,6 +232,6 @@ class AuthController extends GetxService {
     }
     await _ibAuthService.signOut();
     Get.back();
-    Get.offAll(() => SignInPage(), transition: Transition.fadeIn);
+    Get.offAll(() => WelcomePage(), transition: Transition.fadeIn);
   }
 }

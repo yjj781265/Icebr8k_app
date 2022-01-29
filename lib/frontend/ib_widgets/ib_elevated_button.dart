@@ -23,10 +23,7 @@ class IbElevatedButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: SizedBox(
-        width: Get.width * 0.6,
-        child: icon == null ? _regularButton() : _iconButton(),
-      ),
+      child: icon == null ? _regularButton() : _iconButton(),
     );
   }
 

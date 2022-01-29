@@ -9,22 +9,32 @@ part of 'ib_user.dart';
 IbUser _$IbUserFromJson(Map<String, dynamic> json) => IbUser(
       avatarUrl: json['avatarUrl'] as String? ?? '',
       coverPhotoUrl: json['coverPhotoUrl'] as String? ?? '',
-      loginTimeInMs: json['loginTimeInMs'] as int? ?? 0,
-      joinTimeInMs: json['joinTimeInMs'] as int? ?? 0,
-      birthdateInMs: json['birthdateInMs'] as int? ?? 0,
+      loginTimeInMs: json['loginTimeInMs'] as int? ?? -1,
+      joinTimeInMs: json['joinTimeInMs'] as int? ?? -1,
+      birthdateInMs: json['birthdateInMs'] as int? ?? -1,
       isOnline: json['isOnline'] as bool? ?? false,
-      description: json['description'] as String? ?? '',
-      name: json['name'] as String? ?? '',
+      voiceMemoUrl: json['voiceMemoUrl'] as String? ?? '',
+      emoPics: (json['emoPics'] as List<dynamic>?)
+              ?.map((e) => IbEmoPic.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      roles:
+          (json['roles'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+              const ['user'],
+      bio: json['bio'] as String? ?? '',
+      fName: json['fName'] as String? ?? '',
+      lName: json['lName'] as String? ?? '',
       email: json['email'] as String? ?? '',
+      answeredSize: json['answeredSize'] as int? ?? 0,
+      askedSize: json['askedSize'] as int? ?? 0,
       id: json['id'] as String,
       username: json['username'] as String? ?? '',
-    )
-      ..answeredSize = json['answeredSize'] as int?
-      ..askedSize = json['askedSize'] as int?;
+    );
 
 Map<String, dynamic> _$IbUserToJson(IbUser instance) => <String, dynamic>{
       'id': instance.id,
-      'name': instance.name,
+      'fName': instance.fName,
+      'lName': instance.lName,
       'email': instance.email,
       'username': instance.username,
       'avatarUrl': instance.avatarUrl,
@@ -35,5 +45,8 @@ Map<String, dynamic> _$IbUserToJson(IbUser instance) => <String, dynamic>{
       'askedSize': instance.askedSize,
       'isOnline': instance.isOnline,
       'coverPhotoUrl': instance.coverPhotoUrl,
-      'description': instance.description,
+      'bio': instance.bio,
+      'voiceMemoUrl': instance.voiceMemoUrl,
+      'roles': instance.roles,
+      'emoPics': instance.emoPics.map((e) => e.toJson()).toList(),
     };

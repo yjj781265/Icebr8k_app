@@ -67,9 +67,9 @@ class ProfileController extends GetxController {
     avatarUrl.value = user.avatarUrl;
     coverPhotoUrl.value = user.coverPhotoUrl;
     username.value = user.username;
-    name.value = user.name;
-    description.value = user.description;
-    birthdateInMs.value = user.birthdateInMs;
+    name.value = '${user.fName} ${user.lName}';
+    description.value = user.bio;
+    birthdateInMs.value = user.birthdateInMs ?? -1;
     isLoading.value = false;
     super.onInit();
   }

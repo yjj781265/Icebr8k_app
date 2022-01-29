@@ -61,13 +61,13 @@ class HomeController extends GetxController {
   Future<void> _populateUserInfo() async {
     if (currentIbUser != null) {
       isIbUserOnline.value = currentIbUser!.isOnline;
-      currentIbName.value = currentIbUser!.name;
       currentIbUsername.value = currentIbUser!.username;
       currentIbAvatarUrl.value = currentIbUser!.avatarUrl;
       currentIbCoverPhotoUrl.value = currentIbUser!.coverPhotoUrl;
-      currentBio.value = currentIbUser!.description;
-      currentBirthdate.value = currentIbUser!.birthdateInMs;
-      if (currentIbUser!.askedSize == null) {
+      currentBio.value = currentIbUser!.bio;
+      currentBirthdate.value = currentIbUser!.birthdateInMs!;
+      // ignore: unnecessary_null_comparison
+      if (currentIbUser!.askedSize == 0) {
         askedSize.value = (await IbQuestionDbService()
                 .queryAskedQuestions(uid: currentIbUser!.id))
             .size;
@@ -75,7 +75,7 @@ class HomeController extends GetxController {
         askedSize.value = currentIbUser!.askedSize!;
       }
 
-      if (currentIbUser!.answeredSize == null) {
+      if (currentIbUser!.answeredSize == 0) {
         answeredSize.value = (await IbQuestionDbService()
                 .queryAnsweredQuestionIds(currentIbUser!.id))
             .length;

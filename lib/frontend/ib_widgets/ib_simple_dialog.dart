@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 
 class IbSimpleDialog extends StatelessWidget {
@@ -41,17 +42,35 @@ class IbSimpleDialog extends StatelessWidget {
                         children: actionButtons,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 16, left: 8),
-                      child: TextButton(
-                        onPressed: () {
-                          Get.back();
-                          if (positiveBtnEvent != null) {
-                            positiveBtnEvent?.call();
-                          }
-                        },
-                        child: Text(positiveBtnTrKey.tr),
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 16, left: 8),
+                          child: TextButton(
+                            onPressed: () {
+                              Get.back();
+                            },
+                            child: Text(
+                              'cancel'.tr,
+                              style: const TextStyle(color: IbColors.errorRed),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 16, left: 8),
+                          child: TextButton(
+                            onPressed: () {
+                              Get.back();
+                              if (positiveBtnEvent != null) {
+                                positiveBtnEvent?.call();
+                              }
+                            },
+                            child: Text(positiveBtnTrKey.tr),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 )

@@ -36,10 +36,10 @@ class EditProfilePage extends StatelessWidget {
                 ibUser.birthdateInMs = _controller.birthdateInMs.value == 0
                     ? _homeController.currentBirthdate.value
                     : _controller.birthdateInMs.value;
-                ibUser.name = _nameEditController.text.trim();
+                //ibUser.name = _nameEditController.text.trim();
                 ibUser.username =
                     _usernameEditController.text.trim().toLowerCase();
-                ibUser.description = _bioEditController.text.trim();
+                // ibUser.description = _bioEditController.text.trim();
                 _controller.updateUserInfo(ibUser);
               }
             },

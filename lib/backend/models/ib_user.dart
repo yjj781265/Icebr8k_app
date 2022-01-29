@@ -1,47 +1,53 @@
+import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'ib_user.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class IbUser {
   String id;
-  String name;
+  String fName;
+  String lName;
   String email;
   String username;
   String avatarUrl;
-  int loginTimeInMs;
-  int joinTimeInMs;
-  int birthdateInMs;
-  int? answeredSize;
-  int? askedSize;
+  int? loginTimeInMs;
+  int? joinTimeInMs;
+  int? birthdateInMs;
+  int answeredSize;
+  int askedSize;
   bool isOnline;
   String coverPhotoUrl;
-  String description;
+  String bio;
+  String voiceMemoUrl;
+  List<String> roles;
+  List<IbEmoPic> emoPics;
+
+  static String kAdminRole = 'admin';
+  static String kUserRole = 'user';
 
   IbUser({
     this.avatarUrl = '',
     this.coverPhotoUrl = '',
-    this.loginTimeInMs = 0,
-    this.joinTimeInMs = 0,
-    this.birthdateInMs = 0,
+    this.loginTimeInMs = -1,
+    this.joinTimeInMs = -1,
+    this.birthdateInMs = -1,
     this.isOnline = false,
-    this.description = '',
-    this.name = '',
+    this.voiceMemoUrl = '',
+    this.emoPics = const [],
+    this.roles = const ['user'],
+    this.bio = '',
+    this.fName = '',
+    this.lName = '',
     this.email = '',
+    this.answeredSize = 0,
+    this.askedSize = 0,
     required this.id,
     this.username = '',
   });
 
   factory IbUser.fromJson(Map<String, dynamic> json) => _$IbUserFromJson(json);
   Map<String, dynamic> toJson() => _$IbUserToJson(this);
-
-  @override
-  String toString() {
-    return 'IbUser{id: $id, name: $name, email: $email, username: $username, '
-        'avatarUrl: $avatarUrl, loginTimeInMs: $loginTimeInMs, joinTimeInMs: '
-        '$joinTimeInMs, birthdateInMs: $birthdateInMs, isOnline: $isOnline, '
-        'description: $description}';
-  }
 
   @override
   bool operator ==(Object other) =>

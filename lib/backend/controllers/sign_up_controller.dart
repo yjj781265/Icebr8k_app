@@ -1,6 +1,9 @@
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
+
+import 'auth_controller.dart';
 
 class SignUpController extends GetxController {
   final birthdateInMs = 0.obs;
@@ -70,6 +73,23 @@ class SignUpController extends GetxController {
     birthdateErrorTrKey.value = '';
   }
 
+  int calculateAge(DateTime birthDate) {
+    final DateTime currentDate = DateTime.now();
+    int age = currentDate.year - birthDate.year;
+    final int month1 = currentDate.month;
+    final int month2 = birthDate.month;
+    if (month2 > month1) {
+      age--;
+    } else if (month1 == month2) {
+      final int day1 = currentDate.day;
+      final int day2 = birthDate.day;
+      if (day2 > day1) {
+        age--;
+      }
+    }
+    return age;
+  }
+
   void _validatePassword() {
     isPwdFirstTime.value = false;
     isPasswordValid.value = password.value.isNotEmpty &&
@@ -137,6 +157,22 @@ class SignUpController extends GetxController {
         isEmailValid.isTrue &&
         isCfPwdValid.isTrue &&
         isPasswordValid.isTrue;
+  }
+
+  void signUp() {
+    IbUtils.hideKeyboard();
+    validateAllFields();
+    if (isEverythingValid()) {
+      Get.dialog(IbSimpleDialog(
+        message:
+            "Confirm your current age: ${calculateAge(DateTime.fromMillisecondsSinceEpoch(birthdateInMs.value))} \n You can't change your birthdate once you signed up",
+        positiveBtnTrKey: 'confirm',
+        positiveBtnEvent: () async {
+          await Get.find<AuthController>()
+              .signUpViaEmail(email.value, password.value);
+        },
+      ));
+    }
   }
 
   @override

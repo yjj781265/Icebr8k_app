@@ -14,7 +14,10 @@ class IbThemes {
     final dark = ThemeData.dark().copyWith(
         cupertinoOverrideTheme: const CupertinoThemeData(
           textTheme: CupertinoTextThemeData(
-            dateTimePickerTextStyle: TextStyle(color: Colors.white),
+            dateTimePickerTextStyle: TextStyle(
+              color: Colors.white,
+              fontSize: IbConfig.kNormalTextSize,
+            ),
           ),
         ),
         primaryColor: const Color(0xff424242),
