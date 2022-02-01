@@ -9,14 +9,11 @@ import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
-import 'package:intl/intl.dart';
 
 import '../ib_utils.dart';
 
 class SignUpPage extends GetView<SignUpController> {
-  SignUpPage({Key? key}) : super(key: key);
-  final TextEditingController _birthdateTeController = TextEditingController();
-
+  const SignUpPage({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     Get.put(SignUpController());
@@ -35,6 +32,7 @@ class SignUpPage extends GetView<SignUpController> {
                         const Radius.circular(IbConfig.kScrollbarCornerRadius),
                     child: SingleChildScrollView(
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Row(
                             children: [
@@ -57,7 +55,7 @@ class SignUpPage extends GetView<SignUpController> {
                           const SizedBox(
                             height: 16,
                           ),
-                          Obx(
+                          /* Obx(
                             () => InkWell(
                               onTap: _showDateTimePicker,
                               child: IbTextField(
@@ -82,7 +80,7 @@ class SignUpPage extends GetView<SignUpController> {
                                 onChanged: (birthdate) {},
                               ),
                             ),
-                          ),
+                          ),*/
                           Obx(
                             () => IbTextField(
                               titleIcon: const Icon(
@@ -167,11 +165,39 @@ class SignUpPage extends GetView<SignUpController> {
                             ),
                           ),
                           Obx(
+                            () => CheckboxListTile(
+                              controlAffinity: ListTileControlAffinity.leading,
+                              value: controller.isOver13.value,
+                              onChanged: (value) {
+                                controller.isOver13.value = value ?? false;
+                              },
+                              title: const Text(
+                                'I am at least 13 years old',
+                                style: TextStyle(
+                                    fontSize: IbConfig.kSecondaryTextSize),
+                              ),
+                            ),
+                          ),
+                          Obx(
+                            () => CheckboxListTile(
+                              controlAffinity: ListTileControlAffinity.leading,
+                              value: controller.isTermRead.value,
+                              onChanged: (value) {
+                                controller.isTermRead.value = value ?? false;
+                              },
+                              title: const Text(
+                                'I have read and agree to the Terms of Service and Privacy Policy',
+                                style: TextStyle(
+                                    fontSize: IbConfig.kSecondaryTextSize),
+                              ),
+                            ),
+                          ),
+                          Obx(
                             () => Hero(
                               transitionOnUserGestures: true,
                               tag: 'sign_up',
                               child: Container(
-                                height: 88,
+                                height: 80,
                                 width: Get.width,
                                 padding: const EdgeInsets.all(8),
                                 child: IbElevatedButton(
@@ -200,7 +226,7 @@ class SignUpPage extends GetView<SignUpController> {
     );
   }
 
-  void _showDateTimePicker() {
+  /*void _showDateTimePicker() {
     Get.bottomSheet(
         IbCard(
             child: SingleChildScrollView(
@@ -245,5 +271,6 @@ class SignUpPage extends GetView<SignUpController> {
   String _readableDateTime(DateTime _dateTime) {
     final f = DateFormat('MM/dd/yyyy');
     return f.format(_dateTime);
-  }
+  }*/
+
 }

@@ -1,15 +1,11 @@
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 
 import 'auth_controller.dart';
 
 class SignUpController extends GetxController {
-  final birthdateInMs = 0.obs;
-  final readableBirthdate = ''.obs;
-  final birthdatePickerInstructionKey = 'birthdate_instruction'.obs;
-  final birthdateErrorTrKey = ''.obs;
   final email = ''.obs;
   final emailErrorTrKey = ''.obs;
   final password = ''.obs;
@@ -22,12 +18,12 @@ class SignUpController extends GetxController {
   final isPwdFirstTime = true.obs;
   final isCfPwdFirstTime = true.obs;
   final isEmailFirstTime = true.obs;
-  final isBirthDateFirstTime = true.obs;
   final isPasswordValid = false.obs;
   final isCfPwdValid = false.obs;
   final isEmailValid = false.obs;
   final isNameValid = false.obs;
-  final isBirthdateValid = false.obs;
+  final isOver13 = false.obs;
+  final isTermRead = false.obs;
 
   @override
   void onInit() {
@@ -42,35 +38,10 @@ class SignUpController extends GetxController {
     );
 
     debounce(
-      readableBirthdate,
-      (_) => _validateBirthdate(),
-      time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
-    );
-    debounce(
       confirmPassword,
       (_) => _validateCfPassword(),
       time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
     );
-  }
-
-  void _validateBirthdate() {
-    final date = DateTime.fromMillisecondsSinceEpoch(birthdateInMs.value);
-    // 13 years is roughly 4745 days
-    final bool isOver13 = IbUtils.isOver13(date);
-    isBirthDateFirstTime.value = false;
-    isBirthdateValid.value = readableBirthdate.value.isNotEmpty && isOver13;
-
-    if (readableBirthdate.value.isEmpty) {
-      birthdateErrorTrKey.value = 'field_is_empty';
-      return;
-    }
-
-    if (!isOver13) {
-      birthdateErrorTrKey.value = 'age_limit_msg';
-      return;
-    }
-
-    birthdateErrorTrKey.value = '';
   }
 
   int calculateAge(DateTime birthDate) {
@@ -145,39 +116,54 @@ class SignUpController extends GetxController {
     emailErrorTrKey.value = '';
   }
 
+  void _validateCheckBox() {
+    if (isOver13.isFalse) {
+      Get.dialog(const IbDialog(
+        showNegativeBtn: false,
+        title: 'Age Check',
+        subtitle:
+            "Please check the checkbox to confirm you are over 13 years old",
+        positiveTextKey: 'ok',
+      ));
+      return;
+    }
+
+    if (isTermRead.isFalse) {
+      Get.dialog(const IbDialog(
+        showNegativeBtn: false,
+        title: 'Terms of Service and Privacy Policy',
+        subtitle:
+            "Please check the checkbox to agree our Term of Service and Privacy Policy",
+        positiveTextKey: 'ok',
+      ));
+      return;
+    }
+
+    isOver13.value = true;
+    isTermRead.value = true;
+  }
+
   void validateAllFields() {
     _validateCfPassword();
     _validateEmail();
     _validatePassword();
-    _validateBirthdate();
+    _validateCheckBox();
   }
 
   bool isEverythingValid() {
-    return isBirthdateValid.isTrue &&
-        isEmailValid.isTrue &&
+    return isEmailValid.isTrue &&
         isCfPwdValid.isTrue &&
-        isPasswordValid.isTrue;
+        isPasswordValid.isTrue &&
+        isTermRead.isTrue &&
+        isOver13.isTrue;
   }
 
-  void signUp() {
+  Future<void> signUp() async {
     IbUtils.hideKeyboard();
     validateAllFields();
     if (isEverythingValid()) {
-      Get.dialog(IbSimpleDialog(
-        message:
-            "Confirm your current age: ${calculateAge(DateTime.fromMillisecondsSinceEpoch(birthdateInMs.value))} \n You can't change your birthdate once you signed up",
-        positiveBtnTrKey: 'confirm',
-        positiveBtnEvent: () async {
-          await Get.find<AuthController>()
-              .signUpViaEmail(email.value, password.value);
-        },
-      ));
+      await Get.find<AuthController>()
+          .signUpViaEmail(email.value, password.value);
     }
-  }
-
-  @override
-  String toString() {
-    return 'SignUpController{ birthdateInMillis: $birthdateInMs, '
-        'email: $email, password: $password, confirmPassword: $confirmPassword}';
   }
 }

@@ -3,18 +3,13 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
-import 'package:icebr8k/backend/controllers/sign_up_controller.dart';
-import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_auth_service.dart';
 import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
-import 'package:icebr8k/frontend/ib_pages/home_page.dart';
-import 'package:icebr8k/frontend/ib_pages/set_up_page.dart';
 import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
 
 class AuthController extends GetxService {
   late StreamSubscription _fbAuthSub;
@@ -65,38 +60,43 @@ class AuthController extends GetxService {
       if (user != null && !user.emailVerified) {
         Get.back();
         Get.dialog(
-          IbSimpleDialog(
-            message: 'sign_in_email_verification'.tr,
-            positiveBtnTrKey: 'ok',
-            positiveBtnEvent: () {
+          IbDialog(
+            title: 'Email is not verified',
+            subtitle: 'sign_in_email_verification'.tr,
+            positiveTextKey: 'ok',
+            onPositiveTap: () {
               _ibAuthService.signOut();
             },
-            actionButtons: [
-              TextButton(
-                onPressed: () async {
-                  try {
-                    await user.sendEmailVerification();
-                    _ibAuthService.signOut();
-                    Get.back();
-                    Get.dialog(
-                      IbSimpleDialog(
-                        message: 'verification_email_sent'.tr,
-                        positiveBtnTrKey: 'ok',
-                      ),
-                    );
-                  } on FirebaseException catch (e) {
-                    Get.back();
-                    Get.dialog(
-                      IbSimpleDialog(
-                        message: e.message!,
-                        positiveBtnTrKey: 'ok',
-                      ),
-                    );
-                  }
-                },
-                child: Text('resend_verification_email'.tr),
-              )
-            ],
+            actionButtons: TextButton(
+              onPressed: () async {
+                try {
+                  await user.sendEmailVerification();
+                  _ibAuthService.signOut();
+                  Get.back();
+                  Get.dialog(
+                    IbDialog(
+                      title: 'Info',
+                      subtitle: 'verification_email_sent'.tr,
+                      positiveTextKey: 'ok',
+                      showNegativeBtn: false,
+                      onPositiveTap: () => Get.back(),
+                    ),
+                  );
+                } on FirebaseException catch (e) {
+                  Get.back();
+                  Get.dialog(
+                    IbDialog(
+                      title: 'OOPS',
+                      subtitle: e.message ?? 'Something is wrong...',
+                      positiveTextKey: 'ok',
+                      showNegativeBtn: false,
+                      onPositiveTap: () => Get.back(),
+                    ),
+                  );
+                }
+              },
+              child: Text('resend_verification_email'.tr),
+            ),
           ),
           barrierDismissible: false,
         );
@@ -107,20 +107,29 @@ class AuthController extends GetxService {
             uid: user.uid,
             loginTimeInMs: DateTime.now().millisecondsSinceEpoch,
           );
-
-          _handleUserFirstLogin(user.uid);
+          // Todo
         } else {
-          _handleUserFirstLogin(user.uid);
+          // Todo
         }
       }
     } on FirebaseAuthException catch (e) {
       Get.back();
-      print(e.message);
-      Get.dialog(IbSimpleDialog(
-          message: e.message.toString(), positiveBtnTrKey: 'ok'));
+      Get.dialog(IbDialog(
+        showNegativeBtn: false,
+        onPositiveTap: () => Get.back(),
+        title: 'OOPS!',
+        subtitle: e.message ?? 'Something went wrong...',
+        positiveTextKey: 'ok',
+      ));
     } catch (e) {
       Get.back();
-      Get.dialog(IbSimpleDialog(message: e.toString(), positiveBtnTrKey: 'ok'));
+      Get.dialog(IbDialog(
+        showNegativeBtn: false,
+        onPositiveTap: () => Get.back(),
+        title: 'OOPS!',
+        subtitle: e.toString(),
+        positiveTextKey: 'ok',
+      ));
     } finally {
       isSigningIn.value = false;
     }
@@ -135,59 +144,43 @@ class AuthController extends GetxService {
           await _ibAuthService.signUpViaEmail(email.trim(), password);
       final user = userCredential.user;
 
-      if (user != null) {
-        final isIbUserExist = await IbUserDbService().isIbUserExist(user.uid);
-        final _controller = Get.find<SignUpController>();
-
-        if (isIbUserExist) {
-          Get.back();
-          Get.dialog(const IbSimpleDialog(
-              message: 'User already registered', positiveBtnTrKey: 'ok'));
-        } else {
-          await IbUserDbService().updateIbUser(
-            IbUser(
-              id: user.uid,
-              birthdateInMs: _controller.birthdateInMs.value,
-              joinTimeInMs: DateTime.now().millisecondsSinceEpoch,
-              email: _controller.email.value.trim(),
-            ),
-          );
-        }
-      }
-
       if (user != null && !user.emailVerified) {
-        try {
-          await user.sendEmailVerification();
-          _ibAuthService.signOut();
-          Get.back();
-          Get.dialog(
-              IbSimpleDialog(
-                message: 'sign_up_email_verification'.tr,
-                positiveBtnTrKey: 'ok',
-                positiveBtnEvent: () {
-                  Get.back(result: [email, password]);
-                },
-              ),
-              barrierDismissible: false);
-        } on FirebaseException catch (e) {
-          print(e.message);
-        }
+        await user.sendEmailVerification();
+        _ibAuthService.signOut();
+        Get.back();
+        Get.dialog(IbDialog(
+          title: "Verify your email",
+          subtitle: 'sign_up_email_verification'.tr,
+          positiveTextKey: 'ok',
+          showNegativeBtn: false,
+        ));
       } else {
-        throw UnimplementedError('this should not happen !!');
+        Get.offAll(() => WelcomePage());
       }
     } on FirebaseAuthException catch (e) {
       Get.back();
-      Get.dialog(IbSimpleDialog(
-          message: e.message.toString(), positiveBtnTrKey: 'ok'));
+      Get.dialog(IbDialog(
+        showNegativeBtn: false,
+        onPositiveTap: () => Get.back(),
+        title: 'OOPS!',
+        subtitle: e.message ?? 'Something went wrong...',
+        positiveTextKey: 'ok',
+      ));
     } catch (e) {
       Get.back();
-      Get.dialog(IbSimpleDialog(message: e.toString(), positiveBtnTrKey: 'ok'));
+      Get.dialog(IbDialog(
+        showNegativeBtn: false,
+        onPositiveTap: () => Get.back(),
+        title: 'OOPS!',
+        subtitle: e.toString(),
+        positiveTextKey: 'ok',
+      ));
     } finally {
       isSigningUp.value = false;
     }
   }
 
-  Future<void> _handleUserFirstLogin(String uid) async {
+/*  Future<void> _handleUserFirstLogin(String uid) async {
     final bool isUserNameMissing =
         await IbUserDbService().isUsernameMissing(uid);
     final bool isAvatarUrlMissing =
@@ -207,7 +200,7 @@ class AuthController extends GetxService {
         transition: Transition.fadeIn,
       );
     }
-  }
+  }*/
 
   Future<void> resetPassword(String email) async {
     Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));
@@ -215,12 +208,26 @@ class AuthController extends GetxService {
       await _ibAuthService.resetPassword(email);
       Get.back();
       final String msg = 'reset_email_msg'.trParams({'email': email});
-      Get.dialog(IbSimpleDialog(message: msg, positiveBtnTrKey: 'ok'));
+      Get.dialog(IbDialog(
+          title: 'Reset Password', subtitle: msg, positiveTextKey: 'ok'));
     } on FirebaseAuthException catch (e) {
       Get.back();
-      Get.dialog(
-        IbSimpleDialog(message: e.message ?? 'error', positiveBtnTrKey: 'ok'),
-      );
+      Get.dialog(IbDialog(
+        showNegativeBtn: false,
+        onPositiveTap: () => Get.back(),
+        title: 'OOPS!',
+        subtitle: e.message ?? 'Something went wrong...',
+        positiveTextKey: 'ok',
+      ));
+    } catch (e) {
+      Get.back();
+      Get.dialog(IbDialog(
+        showNegativeBtn: false,
+        onPositiveTap: () => Get.back(),
+        title: 'OOPS!',
+        subtitle: e.toString(),
+        positiveTextKey: 'ok',
+      ));
     }
   }
 

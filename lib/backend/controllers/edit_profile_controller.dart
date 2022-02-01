@@ -8,8 +8,8 @@ import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
 
 class EditProfileController extends GetxController {
   final birthdatePickerInstructionKey = ''.obs;
@@ -92,9 +92,10 @@ class EditProfileController extends GetxController {
   Future<void> updateUserInfo(IbUser ibUser) async {
     await validateUsername();
     if (isUsernameValid.isFalse) {
-      Get.dialog(IbSimpleDialog(
-        message: '$usernameErrorTrKey'.tr,
-        positiveBtnTrKey: 'ok',
+      Get.dialog(IbDialog(
+        title: 'Error',
+        subtitle: '$usernameErrorTrKey'.tr,
+        positiveTextKey: 'ok',
       ));
       return;
     }

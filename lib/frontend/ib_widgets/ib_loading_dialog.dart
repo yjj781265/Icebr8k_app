@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
@@ -18,7 +19,10 @@ class IbLoadingDialog extends StatelessWidget {
           child: Row(
             children: [
               const IbProgressIndicator(),
-              Text(messageTrKey.tr),
+              Text(
+                messageTrKey.tr,
+                style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+              ),
             ],
           ),
         ),

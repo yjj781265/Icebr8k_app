@@ -7,7 +7,7 @@ import 'package:icebr8k/backend/models/ib_tag.dart';
 import 'package:icebr8k/backend/services/ib_tag_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/review_question_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_simple_dialog.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 
 import 'auth_controller.dart';
 
@@ -86,25 +86,32 @@ class IbCreateQuestionController extends GetxController {
 
   void validQuestion() {
     if (question.trim().isEmpty) {
-      Get.dialog(
-          IbSimpleDialog(message: 'question_empty'.tr, positiveBtnTrKey: 'ok'));
+      Get.dialog(IbDialog(
+          title: 'Error',
+          subtitle: 'question_empty'.tr,
+          positiveTextKey: 'ok'));
       return;
     }
 
     if (pickedTags.isEmpty) {
-      Get.dialog(IbSimpleDialog(message: 'no_tag'.tr, positiveBtnTrKey: 'ok'));
+      Get.dialog(IbDialog(
+          title: 'Error', subtitle: 'no_tag'.tr, positiveTextKey: 'ok'));
       return;
     }
     if (questionType == IbQuestion.kMultipleChoice && choiceList.length < 2) {
-      Get.dialog(IbSimpleDialog(
-          message: 'mc_question_not_valid'.tr, positiveBtnTrKey: 'ok'));
+      Get.dialog(IbDialog(
+          subtitle: 'mc_question_not_valid'.tr,
+          title: 'Error',
+          positiveTextKey: 'ok'));
       return;
     }
 
     if (questionType == IbQuestion.kMultipleChoicePic &&
         picChoiceList.length < 2) {
-      Get.dialog(IbSimpleDialog(
-          message: 'mc_question_not_valid'.tr, positiveBtnTrKey: 'ok'));
+      Get.dialog(IbDialog(
+          subtitle: 'mc_question_not_valid'.tr,
+          title: 'Error',
+          positiveTextKey: 'ok'));
       return;
     }
 
@@ -114,8 +121,10 @@ class IbCreateQuestionController extends GetxController {
             ibChoice.url!.isEmpty ||
             ibChoice.content == null ||
             ibChoice.content!.isEmpty) {
-          Get.dialog(IbSimpleDialog(
-              message: 'mc_pic_question_not_valid'.tr, positiveBtnTrKey: 'ok'));
+          Get.dialog(IbDialog(
+              subtitle: 'mc_pic_question_not_valid'.tr,
+              title: 'Error',
+              positiveTextKey: 'ok'));
           return;
         }
       }
@@ -123,23 +132,30 @@ class IbCreateQuestionController extends GetxController {
 
     if (questionType == IbQuestion.kPic) {
       if (picList.length < 2) {
-        Get.dialog(IbSimpleDialog(
-            message: 'pic_question_not_valid_min'.tr, positiveBtnTrKey: 'ok'));
+        Get.dialog(IbDialog(
+            subtitle: 'pic_question_not_valid_min'.tr,
+            title: 'Error',
+            positiveTextKey: 'ok'));
         return;
       }
 
       for (final IbChoice ibChoice in picList) {
         if (ibChoice.url == null || ibChoice.url!.isEmpty) {
-          Get.dialog(IbSimpleDialog(
-              message: 'pic_question_not_valid'.tr, positiveBtnTrKey: 'ok'));
+          Get.dialog(IbDialog(
+            subtitle: 'pic_question_not_valid'.tr,
+            positiveTextKey: 'ok',
+            title: '',
+          ));
           return;
         }
       }
     }
 
     if (questionType == IbQuestion.kScale && scaleEndPoints.length != 2) {
-      Get.dialog(IbSimpleDialog(
-          message: 'sc_question_not_valid'.tr, positiveBtnTrKey: 'ok'));
+      Get.dialog(IbDialog(
+          subtitle: 'sc_question_not_valid'.tr,
+          title: 'Error',
+          positiveTextKey: 'ok'));
       return;
     }
 

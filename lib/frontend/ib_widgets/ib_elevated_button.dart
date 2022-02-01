@@ -22,7 +22,7 @@ class IbElevatedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: icon == null ? _regularButton() : _iconButton(),
     );
   }
@@ -39,6 +39,8 @@ class IbElevatedButton extends StatelessWidget {
       onPressed: disabled ? null : () => onPressed(),
       child: Text(
         textTrKey.tr,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: const TextStyle(
             fontSize: IbConfig.kNormalTextSize,
             color: IbColors.white,
@@ -60,6 +62,8 @@ class IbElevatedButton extends StatelessWidget {
       icon: icon!,
       label: Text(
         textTrKey.tr,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: const TextStyle(
             fontSize: IbConfig.kNormalTextSize,
             color: IbColors.white,
