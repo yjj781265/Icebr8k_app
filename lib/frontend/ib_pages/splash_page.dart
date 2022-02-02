@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
 import '../ib_colors.dart';
-import 'home_page.dart';
 
 class SplashPage extends StatelessWidget {
   SplashPage({Key? key}) : super(key: key);
-  final controller = Get.find<AuthController>();
+  final controller = Get.put(AuthController());
 
   @override
   Widget build(BuildContext context) {
@@ -24,41 +21,25 @@ class SplashPage extends StatelessWidget {
               ? Colors.black
               : IbColors.lightBlue),
     );
-    Future.delayed(
-        const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
-        () => navigateToCorrectPage());
 
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/icons/logo_android.png',
-              width: IbConfig.kAppLogoSize,
-              height: IbConfig.kAppLogoSize,
-            ),
-            const IbProgressIndicator(),
-          ],
-        ),
-      ),
+      body: Obx(() {
+        if (controller.isInitializing.isTrue) {
+          return Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/icons/logo_android.png',
+                width: IbConfig.kAppLogoSize,
+                height: IbConfig.kAppLogoSize,
+              ),
+              const IbProgressIndicator(),
+            ],
+          ));
+        }
+        return const SizedBox();
+      }),
     );
-  }
-
-  Future<void> navigateToCorrectPage() async {
-    if (controller.firebaseUser != null) {
-      print('SplashPage: nav to homepage, setup is done');
-      Get.offAll(
-        () => HomePage(),
-        binding: HomeBinding(),
-        transition: Transition.fadeIn,
-      );
-    } else {
-      print('SplashPage: firebase is null, nav to sign in page');
-      Get.offAll(() => WelcomePage(),
-          transition: Transition.fadeIn,
-          duration: const Duration(
-              milliseconds: IbConfig.kEventTriggerDelayInMillis));
-    }
   }
 }

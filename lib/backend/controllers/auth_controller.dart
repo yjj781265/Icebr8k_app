@@ -3,15 +3,16 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/backend/services/ib_auth_service.dart';
 import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
 class AuthController extends GetxService {
+  final isInitializing = true.obs;
   late StreamSubscription _fbAuthSub;
   final isSigningIn = false.obs;
   final isSigningUp = false.obs;
@@ -27,15 +28,9 @@ class AuthController extends GetxService {
         print('User is signed out!');
       } else {
         firebaseUser = user;
-        // get user answered questions and update the login time
-        Get.lazyPut(() => MyAnsweredQuestionsController(), fenix: true);
-        if (await IbUserDbService().isIbUserExist(firebaseUser!.uid)) {
-          IbUserDbService().loginIbUser(
-              uid: firebaseUser!.uid,
-              loginTimeInMs: DateTime.now().millisecondsSinceEpoch);
-        }
-        print('User is signed in! ${firebaseUser!.uid}');
+        print('User is signed in!');
       }
+      _navigateToCorrectPage();
     });
   }
 
@@ -64,8 +59,10 @@ class AuthController extends GetxService {
             title: 'Email is not verified',
             subtitle: 'sign_in_email_verification'.tr,
             positiveTextKey: 'ok',
+            showNegativeBtn: false,
             onPositiveTap: () {
               _ibAuthService.signOut();
+              Get.back();
             },
             actionButtons: TextButton(
               onPressed: () async {
@@ -152,6 +149,10 @@ class AuthController extends GetxService {
           title: "Verify your email",
           subtitle: 'sign_up_email_verification'.tr,
           positiveTextKey: 'ok',
+          onPositiveTap: () {
+            Get.offAll(() => WelcomePage(),
+                transition: Transition.circularReveal);
+          },
           showNegativeBtn: false,
         ));
       } else {
@@ -180,27 +181,26 @@ class AuthController extends GetxService {
     }
   }
 
-/*  Future<void> _handleUserFirstLogin(String uid) async {
-    final bool isUserNameMissing =
-        await IbUserDbService().isUsernameMissing(uid);
-    final bool isAvatarUrlMissing =
-        await IbUserDbService().isAvatarUrlMissing(uid);
-    final questions = await IbUserDbService().queryUnAnsweredFirst8Q(uid);
-
-    Get.back();
-    if (questions.isNotEmpty || isUserNameMissing || isAvatarUrlMissing) {
-      Get.offAll(
-        () => SetupPage(),
-        transition: Transition.fadeIn,
-      );
-    } else {
-      Get.offAll(
-        () => HomePage(),
-        binding: HomeBinding(),
-        transition: Transition.fadeIn,
-      );
+  Future<void> _navigateToCorrectPage() async {
+    if (isInitializing.isFalse) {
+      return;
     }
-  }*/
+    try {
+      if (firebaseUser != null) {
+        print('AuthController nav to homepage, setup is done');
+      } else {
+        print('AuthController nav to welcome page');
+        Get.offAll(() => WelcomePage(),
+            transition: Transition.fade,
+            duration: const Duration(
+                milliseconds: IbConfig.kEventTriggerDelayInMillis));
+      }
+    } catch (e) {
+      printError(info: e.toString());
+    } finally {
+      isInitializing.value = false;
+    }
+  }
 
   Future<void> resetPassword(String email) async {
     Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));
@@ -209,7 +209,11 @@ class AuthController extends GetxService {
       Get.back();
       final String msg = 'reset_email_msg'.trParams({'email': email});
       Get.dialog(IbDialog(
-          title: 'Reset Password', subtitle: msg, positiveTextKey: 'ok'));
+        title: 'Reset Password',
+        subtitle: msg,
+        positiveTextKey: 'ok',
+        showNegativeBtn: false,
+      ));
     } on FirebaseAuthException catch (e) {
       Get.back();
       Get.dialog(IbDialog(

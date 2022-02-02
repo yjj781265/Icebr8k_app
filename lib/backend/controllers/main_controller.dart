@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:icebr8k/backend/controllers/auth_controller.dart';
 
 class MainController extends GetxController {
   final isLoading = true.obs;
@@ -13,7 +12,7 @@ class MainController extends GetxController {
   @override
   Future<void> onInit() async {
     isLoading.value = true;
-    print('init....');
+    print('MainController init....');
     try {
       await GetStorage.init();
       await Firebase.initializeApp();
@@ -41,8 +40,7 @@ class MainController extends GetxController {
 
       // remove all notifications while opening the app
       await FlutterLocalNotificationsPlugin().cancelAll();
-      Get.put(AuthController());
-    } on Exception catch (e) {
+    } catch (e) {
       print('MainController $e');
       hasError.value = true;
     } finally {

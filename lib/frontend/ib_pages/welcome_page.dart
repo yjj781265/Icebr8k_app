@@ -15,7 +15,7 @@ class WelcomePage extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Padding(
               padding: const EdgeInsets.only(top: 32),
@@ -77,7 +77,7 @@ class WelcomePage extends StatelessWidget {
                       icon: const Icon(Icons.person_add_alt_1),
                       textTrKey: 'sign_up',
                       onPressed: () {
-                        Get.to(() => SignUpPage());
+                        Get.to(() => const SignUpPage());
                       },
                     ),
                   ),

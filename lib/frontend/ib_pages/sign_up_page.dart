@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -185,11 +186,7 @@ class SignUpPage extends GetView<SignUpController> {
                               onChanged: (value) {
                                 controller.isTermRead.value = value ?? false;
                               },
-                              title: const Text(
-                                'I have read and agree to the Terms of Service and Privacy Policy',
-                                style: TextStyle(
-                                    fontSize: IbConfig.kSecondaryTextSize),
-                              ),
+                              title: _termPrivacyString(),
                             ),
                           ),
                           Obx(
@@ -273,4 +270,29 @@ class SignUpPage extends GetView<SignUpController> {
     return f.format(_dateTime);
   }*/
 
+  Widget _termPrivacyString() {
+    const TextStyle linkStyle = TextStyle(color: Colors.blue);
+    return RichText(
+      text: TextSpan(
+        children: <TextSpan>[
+          const TextSpan(text: 'I have read and agree to the '),
+          TextSpan(
+              text: 'Terms of Service',
+              style: linkStyle,
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  print('Terms of Service"');
+                }),
+          const TextSpan(text: ' and '),
+          TextSpan(
+              text: 'Privacy Policy',
+              style: linkStyle,
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  print('Privacy Policy"');
+                }),
+        ],
+      ),
+    );
+  }
 }

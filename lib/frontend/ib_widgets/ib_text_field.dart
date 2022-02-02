@@ -100,7 +100,9 @@ class IbTextField extends StatelessWidget {
         SizedBox(
           width: Get.width * 0.9,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 16, 8),
+            padding: errorTrKey.isEmpty
+                ? EdgeInsets.zero
+                : const EdgeInsets.fromLTRB(8, 0, 16, 8),
             child: Text(
               errorTrKey.tr,
               maxLines: 2,

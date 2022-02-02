@@ -81,7 +81,10 @@ class MainApp extends StatelessWidget {
 
   Widget _loading() {
     return Container(
-      color: IbColors.lightBlue,
+      color: !IbLocalStorageService()
+              .isCustomKeyTrue(IbLocalStorageService.isLightModeCustomKey)
+          ? Colors.black
+          : IbColors.lightBlue,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
