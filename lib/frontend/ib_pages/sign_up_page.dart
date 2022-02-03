@@ -10,6 +10,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
 
 import '../ib_utils.dart';
+import 'menu_page.dart';
 
 class SignUpPage extends GetView<SignUpController> {
   const SignUpPage({Key? key}) : super(key: key);
@@ -286,6 +287,7 @@ class SignUpPage extends GetView<SignUpController> {
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
                   print('Privacy Policy"');
+                  Get.to(() => PrivacyPolicyPage());
                 }),
         ],
       ),

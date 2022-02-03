@@ -80,13 +80,13 @@ class _MenuPageState extends State<MenuPage> {
                   color: IbColors.accentColor,
                 ),
                 title: const Text(
-                  "Term of Use",
+                  "Privacy Policy",
                   style: TextStyle(
                       fontSize: IbConfig.kNormalTextSize,
                       fontWeight: FontWeight.bold),
                 ),
                 onTap: () {
-                  Get.to(() => TermOfUsePage());
+                  Get.to(() => PrivacyPolicyPage());
                 },
               ),
               ListTile(
@@ -132,18 +132,21 @@ class _MenuPageState extends State<MenuPage> {
   }
 }
 
-class TermOfUsePage extends StatelessWidget {
+class PrivacyPolicyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Term of Use'),
+        title: const Text('Privacy Policy'),
       ),
-      body: SingleChildScrollView(
-        child: Html(
-          // ignore: leading_newlines_in_multiline_strings
-          data: """<div>
-         
+      body: Scrollbar(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Html(
+              // ignore: leading_newlines_in_multiline_strings
+              data: """<div>
+             
      <h1>Privacy Policy</h1>
 <p>Last updated: October 03, 2021</p>
 <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.</p>
@@ -295,7 +298,9 @@ class TermOfUsePage extends StatelessWidget {
 <ul>
 <li>By email: icebr8kdev@gmail.com</li>
 </ul>
-        </div>""",
+            </div>""",
+            ),
+          ),
         ),
       ),
     );

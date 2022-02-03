@@ -30,6 +30,7 @@ class SignInController extends GetxController {
     if (rememberLoginEmail.value) {
       emailTxtC.text =
           IbLocalDataService().retrieveStringValue(StorageKey.loginEmail);
+      email.value = emailTxtC.text;
     }
 
     debounce(password, (_) => validatePassword(),
