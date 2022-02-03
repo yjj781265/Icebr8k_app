@@ -6,7 +6,7 @@ import 'package:icebr8k/backend/controllers/friend_list_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_request_controller.dart';
 import 'package:icebr8k/backend/controllers/people_nearby_controller.dart';
 import 'package:icebr8k/backend/controllers/social_tab_controller.dart';
-import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
+import 'package:icebr8k/backend/services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
@@ -209,7 +209,8 @@ class _PeopleNearByTabState extends State<PeopleNearByTab>
                 onChanged: (value) async {
                   print(value);
                   _controller.shareLoc.value = value;
-                  IbLocalStorageService().updateLocSharingFlag(value);
+                  IbLocalDataService().updateBoolValue(
+                      key: StorageKey.isLocSharingOn, value: value);
                   if (value) {
                     _controller.isSearching.value = true;
                     await _controller.searchPeopleNearby();

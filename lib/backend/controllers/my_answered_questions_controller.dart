@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
-import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
@@ -34,9 +33,6 @@ class MyAnsweredQuestionsController extends GetxController {
             ibAnswers.removeAt(index);
             final ibQuestion = await IbQuestionDbService()
                 .querySingleQuestion(ibAnswer.questionId);
-            if (ibQuestion != null) {
-              IbLocalStorageService().appendUnAnsweredIbQidList(ibQuestion);
-            }
           }
         } else if (docChange.type == DocumentChangeType.modified) {
           final int index = ibAnswers.indexWhere(

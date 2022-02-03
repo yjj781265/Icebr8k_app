@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -6,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/reset_pwd_controller.dart';
 import 'package:icebr8k/backend/controllers/sign_in_controller.dart';
-import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
+import 'package:icebr8k/backend/services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -17,19 +16,17 @@ import 'package:icebr8k/frontend/ib_widgets/ib_text_field_dialog.dart';
 
 class SignInPage extends StatelessWidget {
   SignInPage({Key? key}) : super(key: key);
-  final TextEditingController _emailTxtC = TextEditingController();
-  final TextEditingController _passwordTxtC = TextEditingController();
-  final ResetPwdController _resetPwdController = Get.put(ResetPwdController());
   final SignInController _controller = Get.put(SignInController());
   final AuthController _authController = Get.find();
+  final ResetPwdController _resetPwdController = Get.put(ResetPwdController());
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
-          statusBarColor: !IbLocalStorageService()
-                  .isCustomKeyTrue(IbLocalStorageService.isLightModeCustomKey)
-              ? Colors.black
-              : IbColors.lightBlue),
+          statusBarColor:
+              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkMode)
+                  ? Colors.black
+                  : IbColors.lightBlue),
     );
     return SafeArea(
       child: Scaffold(
@@ -41,9 +38,10 @@ class SignInPage extends StatelessWidget {
               child: SingleChildScrollView(
                 child: AutofillGroup(
                   child: IbCard(
-                    child: SizedBox(
-                      width: Get.width * 0.95,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Row(
                             children: [
@@ -78,7 +76,7 @@ class SignInPage extends StatelessWidget {
                                 AutofillHints.email,
                                 AutofillHints.username
                               ],
-                              controller: _emailTxtC,
+                              controller: _controller.emailTxtC,
                               onChanged: (text) {
                                 _controller.email.value = text;
                               },
@@ -92,36 +90,54 @@ class SignInPage extends StatelessWidget {
                               errorTrKey: _controller.emailErrorTrKey.value)),
 
                           /********* password textInputBox **********/
-                          Obx(() => IbTextField(
-                              titleIcon: const Icon(
-                                Icons.lock_outline,
-                                color: IbColors.primaryColor,
-                              ),
-                              controller: _passwordTxtC,
-                              autofillHints: const [AutofillHints.password],
-                              obscureText: _controller.isPwdObscured.value,
-                              onChanged: (text) {
-                                _controller.password.value = text;
-                              },
-                              borderColor: _controller.isPasswordFirstTime.value
-                                  ? IbColors.lightGrey
-                                  : (_controller.isPasswordValid.value
-                                      ? IbColors.accentColor
-                                      : IbColors.errorRed),
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  final bool isObscured =
-                                      _controller.isPwdObscured.value;
-                                  _controller.isPwdObscured.value = !isObscured;
+                          Obx(
+                            () => IbTextField(
+                                titleIcon: const Icon(
+                                  Icons.lock_outline,
+                                  color: IbColors.primaryColor,
+                                ),
+                                controller: _controller.passwordTxtC,
+                                autofillHints: const [AutofillHints.password],
+                                obscureText: _controller.isPwdObscured.value,
+                                onChanged: (text) {
+                                  _controller.password.value = text;
                                 },
-                                icon: Icon(_controller.isPwdObscured.value
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined),
-                              ),
-                              titleTrKey: 'password',
-                              hintTrKey: 'password_hint',
-                              errorTrKey:
-                                  _controller.passwordErrorTrKey.value)),
+                                borderColor:
+                                    _controller.isPasswordFirstTime.value
+                                        ? IbColors.lightGrey
+                                        : (_controller.isPasswordValid.value
+                                            ? IbColors.accentColor
+                                            : IbColors.errorRed),
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    final bool isObscured =
+                                        _controller.isPwdObscured.value;
+                                    _controller.isPwdObscured.value =
+                                        !isObscured;
+                                  },
+                                  icon: Icon(_controller.isPwdObscured.value
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined),
+                                ),
+                                titleTrKey: 'password',
+                                hintTrKey: 'password_hint',
+                                errorTrKey:
+                                    _controller.passwordErrorTrKey.value),
+                          ),
+                          Obx(
+                            () => CheckboxListTile(
+                              value: _controller.rememberLoginEmail.value,
+                              controlAffinity: ListTileControlAffinity.leading,
+                              onChanged: (value) {
+                                _controller.rememberLoginEmail.value =
+                                    value ?? false;
+                                IbLocalDataService().updateBoolValue(
+                                    key: StorageKey.rememberLoginEmail,
+                                    value: value ?? false);
+                              },
+                              title: const Text('Remember my login email'),
+                            ),
+                          ),
 
                           /**** forgot password ****/
                           Padding(
@@ -194,7 +210,8 @@ class SignInPage extends StatelessWidget {
                               child: Container(
                                 height: 80,
                                 width: Get.width,
-                                padding: const EdgeInsets.all(8),
+                                padding: const EdgeInsets.only(
+                                    left: 8, right: 8, bottom: 16, top: 8),
                                 child: IbElevatedButton(
                                   icon: const Icon(FontAwesomeIcons.signInAlt),
                                   color: IbColors.primaryColor,
@@ -202,15 +219,7 @@ class SignInPage extends StatelessWidget {
                                       ? 'signing_in'
                                       : 'login',
                                   onPressed: () async {
-                                    IbUtils.hideKeyboard();
-                                    _controller.validateEmail();
-                                    _controller.validatePassword();
-                                    if (_controller.isPasswordValid.isTrue &&
-                                        _controller.isEmailValid.isTrue) {
-                                      await _authController.signInViaEmail(
-                                          _controller.email.value,
-                                          _controller.password.value);
-                                    }
+                                    await _controller.signInViaEmail();
                                   },
                                 ),
                               ),

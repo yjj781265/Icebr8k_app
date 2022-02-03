@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/services/ib_auth_service.dart';
 import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
+import 'package:icebr8k/backend/services/ib_local_data_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
@@ -41,13 +42,24 @@ class AuthController extends GetxService {
     print('auth controller onClose');
   }
 
-  Future signInViaEmail(String email, String password) async {
+  Future signInViaEmail(
+      {required String email,
+      required String password,
+      required bool rememberEmail}) async {
     Get.dialog(
       const IbLoadingDialog(messageTrKey: 'signing_in'),
       barrierDismissible: false,
     );
     try {
       isSigningIn.value = true;
+
+      if (rememberEmail) {
+        IbLocalDataService()
+            .updateStringValue(key: StorageKey.loginEmail, value: email);
+      } else {
+        IbLocalDataService().removeKey(StorageKey.loginEmail);
+      }
+
       final UserCredential userCredential =
           await _ibAuthService.signInViaEmail(email, password);
       final user = userCredential.user;

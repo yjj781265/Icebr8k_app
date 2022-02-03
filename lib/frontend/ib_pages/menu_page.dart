@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
-import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
+import 'package:icebr8k/backend/services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_themes.dart';
@@ -20,8 +20,8 @@ class MenuPage extends StatefulWidget {
 class _MenuPageState extends State<MenuPage> {
   final kBetaSurveyLink = 'https://forms.gle/xuYbYcsWGC6WtT7h7';
 
-  bool isDarkMode = !IbLocalStorageService()
-      .isCustomKeyTrue(IbLocalStorageService.isLightModeCustomKey);
+  bool isDarkMode =
+      IbLocalDataService().retrieveBoolValue(StorageKey.isDarkMode);
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +36,8 @@ class _MenuPageState extends State<MenuPage> {
                 value: isDarkMode,
                 onChanged: (value) {
                   print('dark mode to $value');
-                  IbLocalStorageService().updateCustomFlag(
-                      !value, IbLocalStorageService.isLightModeCustomKey);
+                  IbLocalDataService().updateBoolValue(
+                      key: StorageKey.isDarkMode, value: value);
                   setState(() {
                     isDarkMode = value;
                     Get.changeTheme(value

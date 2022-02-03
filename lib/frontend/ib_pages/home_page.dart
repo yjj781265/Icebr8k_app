@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/chat_tab_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_request_controller.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
-import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
+import 'package:icebr8k/backend/services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/edit_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/ib_user_search_page.dart';
@@ -27,20 +27,7 @@ import 'create_question_page.dart';
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ShowCaseWidget(
-        onComplete: (number, key) {
-          if (key == Get.find<HomeController>().key1 ||
-              key == Get.find<HomeController>().key2) {
-            IbLocalStorageService().updateCustomFlag(
-                false, IbLocalStorageService.firstTimeCustomKey);
-          } else if (key == Get.find<HomeController>().key3) {
-            IbLocalStorageService().updateCustomFlag(
-                false, IbLocalStorageService.usernameSearchCustomKey);
-          }
-        },
-        builder: Builder(
-          builder: (context) => const HomepageView(),
-        ));
+    return const HomepageView();
   }
 }
 
@@ -61,14 +48,6 @@ class _HomepageViewState extends State<HomepageView>
   void initState() {
     super.initState();
     WidgetsBinding.instance!.addObserver(this);
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      if (IbLocalStorageService()
-          .isCustomKeyTrue(IbLocalStorageService.firstTimeCustomKey)) {
-        ShowCaseWidget.of(context)!
-            .startShowCase([_homeController.key1, _homeController.key2]);
-      }
-    });
-
     _actionsList = [
       [
         Showcase(
@@ -133,10 +112,10 @@ class _HomepageViewState extends State<HomepageView>
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
-          statusBarColor: !IbLocalStorageService()
-                  .isCustomKeyTrue(IbLocalStorageService.isLightModeCustomKey)
-              ? Colors.black
-              : IbColors.lightBlue),
+          statusBarColor:
+              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkMode)
+                  ? Colors.black
+                  : IbColors.lightBlue),
     );
     return WillPopScope(
       onWillPop: () async {
@@ -186,11 +165,6 @@ class _HomepageViewState extends State<HomepageView>
         animationDuration: const Duration(milliseconds: 1000),
         curve: Curves.fastLinearToSlowEaseIn,
         onItemSelected: (index) async {
-          if (index == 2 &&
-              IbLocalStorageService().isCustomKeyTrue(
-                  IbLocalStorageService.usernameSearchCustomKey)) {
-            ShowCaseWidget.of(context)!.startShowCase([_homeController.key3]);
-          }
           _homeController.currentIndex.value = index;
           _homeController.handleIndex(index);
         },

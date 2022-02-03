@@ -20,6 +20,7 @@ class IbThemes {
             ),
           ),
         ),
+        indicatorColor: Colors.white,
         primaryColor: const Color(0xff424242),
         iconTheme: const IconThemeData(color: Colors.white),
         toggleableActiveColor: IbColors.primaryColor,
@@ -61,6 +62,7 @@ class IbThemes {
         ),
         toggleableActiveColor: IbColors.primaryColor,
         primaryColor: IbColors.white,
+        indicatorColor: Colors.black,
         backgroundColor: IbColors.creamYellow,
         iconTheme: const IconThemeData(color: Colors.black),
         appBarTheme: AppBarTheme(

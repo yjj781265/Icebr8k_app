@@ -5,7 +5,6 @@ import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/ib_tag_db_service.dart';
@@ -221,7 +220,6 @@ class IbQuestionItemController extends GetxController {
       rxIbAnswer = (await IbQuestionDbService().querySingleIbAnswer(
               IbUtils.getCurrentUid()!, rxIbQuestion.value.id))!
           .obs;
-      IbLocalStorageService().removeUnAnsweredIbQid(rxIbQuestion.value.id);
     } catch (e) {
       IbUtils.showSimpleSnackBar(
           msg: "Failed to vote $e", backgroundColor: IbColors.errorRed);

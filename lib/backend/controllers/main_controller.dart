@@ -14,8 +14,8 @@ class MainController extends GetxController {
     isLoading.value = true;
     print('MainController init....');
     try {
-      await GetStorage.init();
       await Firebase.initializeApp();
+      await GetStorage.init();
 
       //SetUp Crashlytics
       if (kDebugMode) {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';

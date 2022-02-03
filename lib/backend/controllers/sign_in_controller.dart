@@ -1,7 +1,15 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
+
+import 'auth_controller.dart';
 
 class SignInController extends GetxController {
+  final TextEditingController emailTxtC = TextEditingController();
+  final TextEditingController passwordTxtC = TextEditingController();
+
   final email = ''.obs;
   final isEmailFirstTime = true.obs;
   final isPasswordFirstTime = true.obs;
@@ -11,9 +19,19 @@ class SignInController extends GetxController {
   final password = ''.obs;
   final emailErrorTrKey = ''.obs;
   final passwordErrorTrKey = ''.obs;
+  final rememberLoginEmail = false.obs;
+
   @override
   void onInit() {
     super.onInit();
+    rememberLoginEmail.value =
+        IbLocalDataService().retrieveBoolValue(StorageKey.rememberLoginEmail);
+
+    if (rememberLoginEmail.value) {
+      emailTxtC.text =
+          IbLocalDataService().retrieveStringValue(StorageKey.loginEmail);
+    }
+
     debounce(password, (_) => validatePassword(),
         time:
             const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis));
@@ -55,5 +73,18 @@ class SignInController extends GetxController {
       return;
     }
     emailErrorTrKey.value = '';
+  }
+
+  Future<void> signInViaEmail() async {
+    final AuthController _authController = Get.find();
+    IbUtils.hideKeyboard();
+    validateEmail();
+    validatePassword();
+    if (isPasswordValid.isTrue && isEmailValid.isTrue) {
+      await _authController.signInViaEmail(
+          email: email.value,
+          password: password.value,
+          rememberEmail: rememberLoginEmail.value);
+    }
   }
 }

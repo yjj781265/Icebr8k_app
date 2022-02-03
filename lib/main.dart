@@ -13,7 +13,7 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_themes.dart';
 import 'package:lottie/lottie.dart';
 
-import 'backend/services/ib_local_storage_service.dart';
+import 'backend/services/ib_local_data_service.dart';
 import 'frontend/ib_config.dart';
 import 'frontend/ib_pages/splash_page.dart';
 import 'frontend/ib_strings.dart';
@@ -26,10 +26,10 @@ Future<void> main() async {
   PaintingBinding.instance!.imageCache?.maximumSizeBytes = 1000 << 20; //1GB
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
-        statusBarColor: !IbLocalStorageService()
-                .isCustomKeyTrue(IbLocalStorageService.isLightModeCustomKey)
-            ? Colors.black
-            : IbColors.lightBlue),
+        statusBarColor:
+            IbLocalDataService().retrieveBoolValue(StorageKey.isDarkMode)
+                ? Colors.black
+                : IbColors.lightBlue),
   );
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -71,18 +71,16 @@ class MainApp extends StatelessWidget {
         translations: IbStrings(),
         locale: const Locale('en', 'US'),
         themeMode: ThemeMode.light,
-        theme: IbLocalStorageService()
-                .isCustomKeyTrue(IbLocalStorageService.isLightModeCustomKey)
-            ? IbThemes(context).buildLightTheme()
-            : IbThemes(context).buildDarkTheme(),
+        theme: IbLocalDataService().retrieveBoolValue(StorageKey.isDarkMode)
+            ? IbThemes(context).buildDarkTheme()
+            : IbThemes(context).buildLightTheme(),
       );
     });
   }
 
   Widget _loading() {
     return Container(
-      color: !IbLocalStorageService()
-              .isCustomKeyTrue(IbLocalStorageService.isLightModeCustomKey)
+      color: IbLocalDataService().retrieveBoolValue(StorageKey.isDarkMode)
           ? Colors.black
           : IbColors.lightBlue,
       child: Center(

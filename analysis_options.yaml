@@ -6,3 +6,4 @@ linter:
     avoid_print: false
     require_trailing_commas: false
     cancel_subscriptions: false
+    avoid_positional_boolean_parameters: false
