@@ -3,11 +3,14 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/bindings/home_binding.dart';
+import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_auth_service.dart';
 import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
 import 'package:icebr8k/backend/services/ib_local_data_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/home_page.dart';
 import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
@@ -23,15 +26,23 @@ class AuthController extends GetxService {
   @override
   void onInit() {
     super.onInit();
-    _fbAuthSub = _ibAuthService.listenToAuthStateChanges().listen((user) async {
+    _fbAuthSub = _ibAuthService.listenToUserChanges().listen((user) async {
       if (user == null) {
         firebaseUser = null;
         print('User is signed out!');
+        Get.offAll(() => WelcomePage(),
+            transition: Transition.circularReveal,
+            duration: const Duration(
+                milliseconds: IbConfig.kEventTriggerDelayInMillis));
+        isInitializing.value = false;
+        return;
       } else {
         firebaseUser = user;
         print('User is signed in!');
+        if (isInitializing.isTrue) {
+          _navigateToCorrectPage();
+        }
       }
-      _navigateToCorrectPage();
     });
   }
 
@@ -72,15 +83,10 @@ class AuthController extends GetxService {
             subtitle: 'sign_in_email_verification'.tr,
             positiveTextKey: 'ok',
             showNegativeBtn: false,
-            onPositiveTap: () {
-              _ibAuthService.signOut();
-              Get.back();
-            },
             actionButtons: TextButton(
               onPressed: () async {
                 try {
                   await user.sendEmailVerification();
-                  _ibAuthService.signOut();
                   Get.back();
                   Get.dialog(
                     IbDialog(
@@ -109,17 +115,8 @@ class AuthController extends GetxService {
           ),
           barrierDismissible: false,
         );
-      } else if (user != null && user.emailVerified) {
-        final isIbUserExist = await IbUserDbService().isIbUserExist(user.uid);
-        if (isIbUserExist) {
-          await IbUserDbService().loginIbUser(
-            uid: user.uid,
-            loginTimeInMs: DateTime.now().millisecondsSinceEpoch,
-          );
-          // Todo
-        } else {
-          // Todo
-        }
+      } else if (firebaseUser != null && firebaseUser!.emailVerified) {
+        _navigateToCorrectPage();
       }
     } on FirebaseAuthException catch (e) {
       Get.back();
@@ -155,7 +152,6 @@ class AuthController extends GetxService {
 
       if (user != null && !user.emailVerified) {
         await user.sendEmailVerification();
-        _ibAuthService.signOut();
         Get.back();
         Get.dialog(IbDialog(
           title: "Verify your email",
@@ -167,8 +163,6 @@ class AuthController extends GetxService {
           },
           showNegativeBtn: false,
         ));
-      } else {
-        Get.offAll(() => WelcomePage());
       }
     } on FirebaseAuthException catch (e) {
       Get.back();
@@ -194,21 +188,59 @@ class AuthController extends GetxService {
   }
 
   Future<void> _navigateToCorrectPage() async {
-    if (isInitializing.isFalse) {
-      return;
-    }
     try {
-      if (firebaseUser != null) {
-        print('AuthController nav to homepage, setup is done');
+      if (firebaseUser != null && firebaseUser!.emailVerified) {
+        final String? status =
+            await IbUserDbService().queryIbUserStatus(firebaseUser!.uid);
+
+        switch (status) {
+          case IbUser.kUserStatusApproved:
+            Get.offAll(() => HomePage(), binding: HomeBinding());
+            break;
+
+          case IbUser.kUserStatusBanned:
+            //Todo Go to CounterDown Page
+            print('Go to CounterDown Page');
+            break;
+
+          case IbUser.kUserStatusPending:
+            //Todo Go to InReview Page
+            print('Go to InReview Page');
+            break;
+
+          case IbUser.kUserStatusRejected:
+            //Todo Go to Setup Page with note dialog
+            print('Go to Setup Page with note dialog');
+            break;
+
+          case null:
+            // Todo Go to Setup page
+            print('Go to Setup page');
+            break;
+        }
       } else {
-        print('AuthController nav to welcome page');
+        print('AuthController firebase user email is not verified ');
         Get.offAll(() => WelcomePage(),
-            transition: Transition.fade,
+            transition: Transition.circularReveal,
             duration: const Duration(
                 milliseconds: IbConfig.kEventTriggerDelayInMillis));
       }
+    } on FirebaseAuthException catch (e) {
+      Get.dialog(IbDialog(
+        showNegativeBtn: false,
+        onPositiveTap: () => Get.back(),
+        title: 'OOPS!',
+        subtitle: e.message ?? '',
+        positiveTextKey: 'ok',
+      ));
     } catch (e) {
-      printError(info: e.toString());
+      Get.dialog(IbDialog(
+        showNegativeBtn: false,
+        onPositiveTap: () => Get.back(),
+        title: 'OOPS!',
+        subtitle: e.toString(),
+        positiveTextKey: 'ok',
+      ));
     } finally {
       isInitializing.value = false;
     }
@@ -249,12 +281,11 @@ class AuthController extends GetxService {
 
   Future<void> signOut() async {
     Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_out'));
+
     if (firebaseUser != null) {
       await IbCloudMessagingService().removeMyToken();
-      await IbUserDbService().signOutIbUser(firebaseUser!.uid);
     }
+
     await _ibAuthService.signOut();
-    Get.back();
-    Get.offAll(() => WelcomePage(), transition: Transition.fadeIn);
   }
 }

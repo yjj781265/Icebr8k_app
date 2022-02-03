@@ -18,7 +18,6 @@ import 'package:icebr8k/frontend/ib_pages/social_tab.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
 import 'package:move_to_background/move_to_background.dart';
-import 'package:showcaseview/showcaseview.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
@@ -50,35 +49,22 @@ class _HomepageViewState extends State<HomepageView>
     WidgetsBinding.instance!.addObserver(this);
     _actionsList = [
       [
-        Showcase(
-          overlayOpacity: 0.2,
-          key: _homeController.key1,
-          title: 'Ask away',
-          description: 'Click here to ask a question',
-          shapeBorder: const CircleBorder(),
-          child: IconButton(
-              tooltip: 'Ask a question',
-              onPressed: () {
-                Get.to(() => const CreateQuestionPage());
-              },
-              icon: const Icon(Icons.add_circle_outline)),
-        ),
+        IconButton(
+            tooltip: 'Ask a question',
+            onPressed: () {
+              Get.to(() => const CreateQuestionPage());
+            },
+            icon: const Icon(Icons.add_circle_outline)),
       ],
       List<Widget>.generate(1, (index) => const SizedBox()),
       List<Widget>.generate(
           1,
-          (index) => Showcase(
-                key: _homeController.key3,
-                description: 'Click here search other users by their username',
-                overlayOpacity: 0.2,
-                shapeBorder: const CircleBorder(),
-                child: IconButton(
-                    tooltip: 'Search username',
-                    onPressed: () {
-                      Get.to(() => IbUserSearchPage());
-                    },
-                    icon: const Icon(Icons.person_search_outlined)),
-              )),
+          (index) => IconButton(
+              tooltip: 'Search username',
+              onPressed: () {
+                Get.to(() => IbUserSearchPage());
+              },
+              icon: const Icon(Icons.person_search_outlined))),
       List<Widget>.generate(
           1,
           (index) => IconButton(
@@ -183,14 +169,7 @@ class _HomepageViewState extends State<HomepageView>
             textAlign: TextAlign.center,
           ),
           BottomNavyBarItem(
-              icon: Showcase(
-                  overlayOpacity: 0.2,
-                  overlayPadding: const EdgeInsets.all(8),
-                  shapeBorder: const CircleBorder(),
-                  description:
-                      'Click here to discover people nearby with common interests',
-                  key: _homeController.key2,
-                  child: const Icon(Icons.group_outlined)),
+              icon: const Icon(Icons.group_outlined),
               title: Text('social'.tr),
               inactiveColor: _inactiveColor,
               textAlign: TextAlign.center,

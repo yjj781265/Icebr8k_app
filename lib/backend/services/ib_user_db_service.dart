@@ -37,12 +37,12 @@ class IbUserDbService {
         .update({'loginTimeInMs': loginTimeInMs, 'id': uid});
   }
 
-  Future<void> signOutIbUser(String _uid) async {
-    final snapshot = await _collectionRef.doc(_uid).get();
-    if (snapshot.exists) {
-      print('signOutIbUser');
-      _collectionRef.doc(_uid).update({'isOnline': false});
+  Future<String?> queryIbUserStatus(String uid) async {
+    final snapshot = await _collectionRef.doc(uid).get();
+    if (!snapshot.exists) {
+      return null;
     }
+    return snapshot['status'].toString();
   }
 
   Future<bool> isIbUserExist(String _uid) async {

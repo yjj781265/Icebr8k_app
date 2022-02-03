@@ -24,8 +24,8 @@ class IbAuthService {
     );
   }
 
-  Stream<User?> listenToAuthStateChanges() {
-    return _firebaseAuth.authStateChanges();
+  Stream<User?> listenToUserChanges() {
+    return _firebaseAuth.userChanges();
   }
 
   Future<void> signOut() async {

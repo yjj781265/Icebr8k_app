@@ -28,9 +28,10 @@ class IbUser {
 
   static String kAdminRole = 'admin';
   static String kUserRole = 'user';
-  static String kUserStatusBanned = 'banned';
-  static String kUserStatusApproved = 'approved';
-  static String kUserStatusPending = 'pending';
+  static const String kUserStatusRejected = 'rejected';
+  static const String kUserStatusBanned = 'banned';
+  static const String kUserStatusApproved = 'approved';
+  static const String kUserStatusPending = 'pending';
   static List<String> kGenders = ['Male', 'Female', 'Other'];
 
   IbUser({

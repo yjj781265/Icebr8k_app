@@ -148,6 +148,7 @@ class SignInPage extends StatelessWidget {
                                   style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero),
                                   onPressed: () {
+                                    IbUtils.hideKeyboard();
                                     _resetPwdController.reset();
                                     Get.bottomSheet(
                                       Obx(
@@ -207,20 +208,29 @@ class SignInPage extends StatelessWidget {
                             () => Hero(
                               transitionOnUserGestures: true,
                               tag: 'login',
-                              child: Container(
-                                height: 80,
-                                width: Get.width,
-                                padding: const EdgeInsets.only(
-                                    left: 8, right: 8, bottom: 16, top: 8),
-                                child: IbElevatedButton(
-                                  icon: const Icon(FontAwesomeIcons.signInAlt),
-                                  color: IbColors.primaryColor,
-                                  textTrKey: _authController.isSigningIn.isTrue
-                                      ? 'signing_in'
-                                      : 'login',
-                                  onPressed: () async {
-                                    await _controller.signInViaEmail();
-                                  },
+                              child: GestureDetector(
+                                onLongPress: () async {
+                                  IbUtils.hideKeyboard();
+                                  await _authController.signOut();
+                                },
+                                child: Container(
+                                  height: 80,
+                                  width: Get.width,
+                                  padding: const EdgeInsets.only(
+                                      left: 8, right: 8, bottom: 16, top: 8),
+                                  child: IbElevatedButton(
+                                    icon:
+                                        const Icon(FontAwesomeIcons.signInAlt),
+                                    color: IbColors.primaryColor,
+                                    textTrKey:
+                                        _authController.isSigningIn.isTrue
+                                            ? 'signing_in'
+                                            : 'login',
+                                    onPressed: () async {
+                                      IbUtils.hideKeyboard();
+                                      await _controller.signInViaEmail();
+                                    },
+                                  ),
                                 ),
                               ),
                             ),

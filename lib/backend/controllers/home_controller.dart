@@ -37,10 +37,6 @@ class HomeController extends GetxController {
     '${'profile'.tr} 👤'
   ];
 
-  final key1 = GlobalKey();
-  final key2 = GlobalKey();
-  final key3 = GlobalKey();
-
   @override
   Future<void> onInit() async {
     super.onInit();
