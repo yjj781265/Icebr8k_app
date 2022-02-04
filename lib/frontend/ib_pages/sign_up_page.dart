@@ -53,32 +53,6 @@ class SignUpPage extends GetView<SignUpController> {
                         const SizedBox(
                           height: 16,
                         ),
-                        /* Obx(
-                          () => InkWell(
-                            onTap: _showDateTimePicker,
-                            child: IbTextField(
-                              titleIcon: const Icon(
-                                Icons.cake_outlined,
-                                color: IbColors.primaryColor,
-                              ),
-                              borderColor:
-                                  controller.isBirthDateFirstTime.value
-                                      ? IbColors.lightGrey
-                                      : (controller.isBirthdateValid.value
-                                          ? IbColors.accentColor
-                                          : IbColors.errorRed),
-                              errorTrKey:
-                                  controller.birthdateErrorTrKey.value,
-                              controller: _birthdateTeController,
-                              suffixIcon:
-                                  const Icon(Icons.calendar_today_outlined),
-                              titleTrKey: 'birthdate',
-                              hintTrKey: 'birthdate_hint',
-                              enabled: false,
-                              onChanged: (birthdate) {},
-                            ),
-                          ),
-                        ),*/
                         Obx(
                           () => IbTextField(
                             titleIcon: const Icon(
@@ -215,53 +189,6 @@ class SignUpPage extends GetView<SignUpController> {
       ),
     );
   }
-
-  /*void _showDateTimePicker() {
-    Get.bottomSheet(
-        IbCard(
-            child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(
-                height: 256,
-                width: Get.width,
-                child: CupertinoDatePicker(
-                  initialDateTime:
-                      DateTime.fromMillisecondsSinceEpoch(631170000000),
-                  mode: CupertinoDatePickerMode.date,
-                  onDateTimeChanged: (value) async {
-                    await HapticFeedback.selectionClick();
-                    _birthdateTeController.text = _readableDateTime(value);
-                    controller.readableBirthdate.value =
-                        _birthdateTeController.text;
-                    controller.birthdateInMs.value =
-                        value.millisecondsSinceEpoch;
-                  },
-                  dateOrder: DatePickerDateOrder.mdy,
-                ),
-              ),
-              SizedBox(
-                width: Get.width,
-                child: TextButton(
-                  onPressed: () {
-                    Get.back();
-                  },
-                  child: Text('ok'.tr),
-                ),
-              ),
-              const SizedBox(
-                height: 16,
-              ),
-            ],
-          ),
-        )),
-        ignoreSafeArea: false);
-  }
-
-  String _readableDateTime(DateTime _dateTime) {
-    final f = DateFormat('MM/dd/yyyy');
-    return f.format(_dateTime);
-  }*/
 
   Widget _termPrivacyString(BuildContext context) {
     const TextStyle linkStyle = TextStyle(color: Colors.blue);

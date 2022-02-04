@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
+import 'package:icebr8k/backend/controllers/setup_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_auth_service.dart';
 import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
@@ -11,6 +12,7 @@ import 'package:icebr8k/backend/services/ib_local_data_service.dart';
 import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/home_page.dart';
+import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_one.dart';
 import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
@@ -26,7 +28,7 @@ class AuthController extends GetxService {
   @override
   void onInit() {
     super.onInit();
-    _fbAuthSub = _ibAuthService.listenToUserChanges().listen((user) async {
+    _fbAuthSub = _ibAuthService.listenToAuthStateChanges().listen((user) async {
       if (user == null) {
         firebaseUser = null;
         print('User is signed out!');
@@ -216,7 +218,9 @@ class AuthController extends GetxService {
           case null:
             // Todo Go to Setup page
             print('Go to Setup page');
+            Get.offAll(() => SetupPageOne(Get.put(SetupController())));
             break;
+          default:
         }
       } else {
         print('AuthController firebase user email is not verified ');

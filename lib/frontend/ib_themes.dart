@@ -22,6 +22,7 @@ class IbThemes {
         ),
         indicatorColor: Colors.white,
         primaryColor: const Color(0xff424242),
+        primaryColorLight: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
         toggleableActiveColor: IbColors.primaryColor,
         tabBarTheme: const TabBarTheme(
@@ -57,11 +58,15 @@ class IbThemes {
     final light = ThemeData.light().copyWith(
         cupertinoOverrideTheme: const CupertinoThemeData(
           textTheme: CupertinoTextThemeData(
-            dateTimePickerTextStyle: TextStyle(color: Colors.black),
+            dateTimePickerTextStyle: TextStyle(
+              color: Colors.black,
+              fontSize: IbConfig.kNormalTextSize,
+            ),
           ),
         ),
         toggleableActiveColor: IbColors.primaryColor,
         primaryColor: IbColors.white,
+        primaryColorLight: IbColors.lightBlue,
         indicatorColor: Colors.black,
         backgroundColor: IbColors.creamYellow,
         iconTheme: const IconThemeData(color: Colors.black),

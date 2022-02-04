@@ -32,7 +32,7 @@ class IbUser {
   static const String kUserStatusBanned = 'banned';
   static const String kUserStatusApproved = 'approved';
   static const String kUserStatusPending = 'pending';
-  static List<String> kGenders = ['Male', 'Female', 'Other'];
+  static List<String> kGenders = ['🧑 Male', '👩 Female', '🌈 Other'];
 
   IbUser({
     this.avatarUrl = '',

@@ -116,7 +116,11 @@ class IbStrings extends Translations {
           'show_result': 'Show result',
           'bio': 'Bio',
           'bio_hint': 'Enter your bio here',
-          'double_tap_pic': 'Double tap on the picture to enlarge'
+          'double_tap_pic': 'Double tap on the picture to enlarge',
+          'fName': 'First Name',
+          'lName': 'Last Name',
+          'fNameHint': 'Enter first name here',
+          'lNameHint': 'Enter last name here(optional)',
         }
       };
 }
