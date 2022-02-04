@@ -99,7 +99,7 @@ class SetupPageOne extends StatelessWidget {
               ),
             ),
             const SizedBox(
-              height: 32,
+              height: 48,
             ),
             IbCard(
                 child: Padding(
