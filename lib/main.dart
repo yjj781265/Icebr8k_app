@@ -73,7 +73,7 @@ class MainApp extends StatelessWidget {
         themeMode: ThemeMode.light,
         theme: IbLocalDataService().retrieveBoolValue(StorageKey.isDarkMode)
             ? IbThemes(context).buildDarkTheme()
-            : IbThemes(context).buildLightTheme(),
+            : IbThemes(context).buildDarkTheme(),
       );
     });
   }

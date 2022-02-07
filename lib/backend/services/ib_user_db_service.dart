@@ -9,7 +9,7 @@ import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
-import '../ib_cache_manager.dart';
+import '../managers/ib_cache_manager.dart';
 
 class IbUserDbService {
   static final _ibUserService = IbUserDbService._();

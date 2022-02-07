@@ -12,7 +12,10 @@ IbUser _$IbUserFromJson(Map<String, dynamic> json) => IbUser(
       loginTimeInMs: json['loginTimeInMs'] as int? ?? -1,
       joinTimeInMs: json['joinTimeInMs'] as int? ?? -1,
       birthdateInMs: json['birthdateInMs'] as int? ?? -1,
+      banedEndTimeInMs: json['banedEndTimeInMs'] as int? ?? -1,
       isOnline: json['isOnline'] as bool? ?? false,
+      gender: json['gender'] as String? ?? '',
+      status: json['status'] as String? ?? '',
       voiceMemoUrl: json['voiceMemoUrl'] as String? ?? '',
       emoPics: (json['emoPics'] as List<dynamic>?)
               ?.map((e) => IbEmoPic.fromJson(e as Map<String, dynamic>))
@@ -38,6 +41,9 @@ Map<String, dynamic> _$IbUserToJson(IbUser instance) => <String, dynamic>{
       'email': instance.email,
       'username': instance.username,
       'avatarUrl': instance.avatarUrl,
+      'gender': instance.gender,
+      'status': instance.status,
+      'banedEndTimeInMs': instance.banedEndTimeInMs,
       'loginTimeInMs': instance.loginTimeInMs,
       'joinTimeInMs': instance.joinTimeInMs,
       'birthdateInMs': instance.birthdateInMs,

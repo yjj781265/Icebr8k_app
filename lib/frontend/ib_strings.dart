@@ -55,7 +55,7 @@ class IbStrings extends Translations {
           'camera': 'Camera',
           'gallery': 'Gallery',
           'username': 'Username',
-          'username_hint': 'Create your unique username',
+          'username_hint': 'All lower case, can include numbers, _ and .',
           'username_exist_error': 'Username already exists',
           'username_not_valid': 'Username is not valid',
           'username_empty':
@@ -115,12 +115,14 @@ class IbStrings extends Translations {
           'friend_request_declined': 'Friend request declined',
           'show_result': 'Show result',
           'bio': 'Bio',
-          'bio_hint': 'Enter your bio here',
+          'bio_hint':
+              'Interests, hobbies, what do you do for fun, what do you want to get out of life? etc',
           'double_tap_pic': 'Double tap on the picture to enlarge',
           'fName': 'First Name',
           'lName': 'Last Name',
           'fNameHint': 'Enter first name here',
           'lNameHint': 'Enter last name here(optional)',
+          'back': 'Back',
         }
       };
 }

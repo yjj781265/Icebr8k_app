@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../ib_colors.dart';
@@ -14,9 +15,11 @@ class IbTextField extends StatelessWidget {
   final String prefixText;
   final Color borderColor;
   final bool obscureText;
+  final List<TextInputFormatter>? inputFormatter;
   final int? charLimit;
   final int maxLines;
   final String? text;
+  final bool hideCounterText;
   final Iterable<String> autofillHints;
   final TextInputType textInputType;
   final Function(String) onChanged;
@@ -26,12 +29,14 @@ class IbTextField extends StatelessWidget {
     required this.titleIcon,
     required this.titleTrKey,
     required this.hintTrKey,
+    this.inputFormatter,
     this.suffixIcon,
     this.errorTrKey = '',
     this.borderColor = IbColors.lightGrey,
     this.enabled = true,
     this.charLimit,
     this.maxLines = 1,
+    this.hideCounterText = false,
     this.text,
     required this.onChanged,
     this.textInputType = TextInputType.text,
@@ -51,11 +56,13 @@ class IbTextField extends StatelessWidget {
       maxLength: charLimit,
       maxLines: maxLines,
       minLines: 1,
+      inputFormatters: inputFormatter,
       onChanged: (text) {
         onChanged(text);
       },
       controller: controller,
       decoration: InputDecoration(
+          counterText: hideCounterText ? '' : null,
           prefixText: prefixText,
           enabled: enabled,
           hintStyle: const TextStyle(color: IbColors.lightGrey),

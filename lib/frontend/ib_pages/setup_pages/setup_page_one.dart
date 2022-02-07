@@ -10,7 +10,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' as intl;
 
 import '../../ib_colors.dart';
 
@@ -21,39 +21,45 @@ class SetupPageOne extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: IbUtils.hideKeyboard,
-        child: SafeArea(
-            child: Container(
-          color: Theme.of(context).primaryColorLight,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(child: bodyWidget(context)),
-              const SizedBox(
-                height: 16,
-              ),
-              Container(
-                height: 80,
-                width: Get.width,
-                padding: const EdgeInsets.only(
-                    left: 8, right: 8, bottom: 16, top: 8),
-                child: IbElevatedButton(
-                  color: IbColors.primaryColor,
-                  textTrKey: 'Next',
-                  onPressed: () {
-                    IbUtils.hideKeyboard();
-                    _controller.validatePageOne();
-                  },
-                  icon: const Icon(Icons.navigate_next),
+    return Scaffold(
+      body: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: IbUtils.hideKeyboard,
+          child: SafeArea(
+              child: Container(
+            color: Theme.of(context).primaryColorLight,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(child: bodyWidget(context)),
+                const SizedBox(
+                  height: 16,
                 ),
-              )
-            ],
-          ),
-        )),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: SizedBox(
+                      height: 56,
+                      width: double.infinity,
+                      child: IbElevatedButton(
+                        color: IbColors.primaryColor,
+                        textTrKey: 'Next',
+                        onPressed: () {
+                          IbUtils.hideKeyboard();
+                          _controller.validatePageOne();
+                        },
+                        icon: const Icon(Icons.arrow_back_ios),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          )),
+        ),
       ),
     );
   }
@@ -65,7 +71,7 @@ class SetupPageOne extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(
-              height: 32,
+              height: 20,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -81,6 +87,9 @@ class SetupPageOne extends StatelessWidget {
                             fontSize: IbConfig.kSloganSize,
                             fontWeight: FontWeight.bold),
                       )),
+                  const SizedBox(
+                    width: 8,
+                  ),
                   Expanded(
                       flex: 2,
                       child: Container(
@@ -99,7 +108,7 @@ class SetupPageOne extends StatelessWidget {
               ),
             ),
             const SizedBox(
-              height: 48,
+              height: 32,
             ),
             IbCard(
                 child: Padding(
@@ -114,6 +123,7 @@ class SetupPageOne extends StatelessWidget {
                           Icons.person_rounded,
                           color: IbColors.primaryColor,
                         ),
+                        textInputType: TextInputType.name,
                         titleTrKey: 'fName',
                         hintTrKey: 'fNameHint',
                         onChanged: (text) {}),
@@ -123,6 +133,7 @@ class SetupPageOne extends StatelessWidget {
                           Icons.person_rounded,
                           color: IbColors.primaryColor,
                         ),
+                        textInputType: TextInputType.name,
                         titleTrKey: 'lName',
                         hintTrKey: 'lNameHint',
                         onChanged: (text) {}),
@@ -155,15 +166,27 @@ class SetupPageOne extends StatelessWidget {
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(IbUser.kGenders[0]),
+                              child: Text(
+                                IbUser.kGenders[0],
+                                style: TextStyle(
+                                    color: Theme.of(context).indicatorColor),
+                              ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(IbUser.kGenders[1]),
+                              child: Text(
+                                IbUser.kGenders[1],
+                                style: TextStyle(
+                                    color: Theme.of(context).indicatorColor),
+                              ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(IbUser.kGenders[2]),
+                              child: Text(
+                                IbUser.kGenders[2],
+                                style: TextStyle(
+                                    color: Theme.of(context).indicatorColor),
+                              ),
                             )
                           ]),
                     ),
@@ -185,6 +208,15 @@ class SetupPageOne extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(
+                width: Get.width,
+                child: TextButton(
+                  onPressed: () {
+                    Get.back();
+                  },
+                  child: Text('ok'.tr),
+                ),
+              ),
+              SizedBox(
                 height: 256,
                 width: Get.width,
                 child: CupertinoDatePicker(
@@ -202,18 +234,6 @@ class SetupPageOne extends StatelessWidget {
                   dateOrder: DatePickerDateOrder.mdy,
                 ),
               ),
-              SizedBox(
-                width: Get.width,
-                child: TextButton(
-                  onPressed: () {
-                    Get.back();
-                  },
-                  child: Text('ok'.tr),
-                ),
-              ),
-              const SizedBox(
-                height: 16,
-              ),
             ],
           ),
         )),
@@ -221,7 +241,7 @@ class SetupPageOne extends StatelessWidget {
   }
 
   String _readableDateTime(DateTime _dateTime) {
-    final f = DateFormat('MM/dd/yyyy');
+    final f = intl.DateFormat('MM/dd/yyyy');
     return f.format(_dateTime);
   }
 }

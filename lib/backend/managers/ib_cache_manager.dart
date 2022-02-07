@@ -1,4 +1,4 @@
-import 'models/ib_user.dart';
+import '../models/ib_user.dart';
 
 class IbCacheManager {
   static final IbCacheManager _manager = IbCacheManager._();

@@ -77,7 +77,7 @@ class _IbMediaViewerState extends State<IbMediaViewer>
                 )),
             Positioned(
               top: 64,
-              right: 16,
+              right: 0,
               child: Material(
                 color: Colors.transparent,
                 child: IconButton(
