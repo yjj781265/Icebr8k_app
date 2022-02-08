@@ -4,9 +4,10 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
-import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+
+import '../services/user_services/ib_question_db_service.dart';
 
 /// controller for Question tab in Homepage
 class IbQuestionController extends GetxController {
@@ -51,17 +52,14 @@ class IbQuestionController extends GetxController {
       ibQuestions.addAll(list);
     }
 
-
     if (ibQuestions.isNotEmpty) {
       ibQuestions.removeWhere((element) =>
           _myAnsweredQuestionsController.retrieveAnswer(element.id) != null);
-
     }
     ibQuestions.shuffle();
     isLoading.value = false;
     refreshController.refreshCompleted(resetFooterState: true);
   }
-
 
   bool containQuestionId(String id) {
     for (final q in ibQuestions) {

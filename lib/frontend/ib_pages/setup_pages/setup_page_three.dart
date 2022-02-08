@@ -88,7 +88,6 @@ class SetupPageThree extends StatelessWidget {
   Widget bodyWidget(BuildContext context) {
     return Scrollbar(
       child: SingleChildScrollView(
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: Column(
           children: [
             const SizedBox(

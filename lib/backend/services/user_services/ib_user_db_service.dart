@@ -6,10 +6,10 @@ import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
-import '../managers/ib_cache_manager.dart';
+import '../../managers/ib_cache_manager.dart';
+import 'ib_question_db_service.dart';
 
 class IbUserDbService {
   static final _ibUserService = IbUserDbService._();
@@ -21,6 +21,14 @@ class IbUserDbService {
   IbUserDbService._() {
     _db.settings = const Settings(persistenceEnabled: false);
     _collectionRef = _db.collection(_kUserCollection);
+  }
+
+  Future<void> registerNewUser(IbUser _ibUser) {
+    _ibUser.joinTime = FieldValue.serverTimestamp();
+    print('IbUserDbService registerNewUser');
+    return _collectionRef
+        .doc(_ibUser.id)
+        .set(_ibUser.toJson(), SetOptions(merge: true));
   }
 
   Future<void> updateIbUser(IbUser _ibUser) {
@@ -39,10 +47,15 @@ class IbUserDbService {
 
   Future<String?> queryIbUserStatus(String uid) async {
     final snapshot = await _collectionRef.doc(uid).get();
+
     if (!snapshot.exists) {
       return null;
     }
-    return snapshot['status'].toString();
+    try {
+      return snapshot['status'].toString();
+    } on Exception catch (e) {
+      return null;
+    }
   }
 
   Future<bool> isIbUserExist(String _uid) async {

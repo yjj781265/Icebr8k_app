@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/models/ib_message.dart';
 
-import '../db_config.dart';
+import '../../db_config.dart';
 
 class IbChatDbService {
   static final _ibChatDbService = IbChatDbService._();

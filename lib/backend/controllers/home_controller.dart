@@ -8,12 +8,13 @@ import 'package:icebr8k/backend/controllers/asked_questions_controller.dart';
 import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/backend/services/ib_chat_db_service.dart';
-import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
-import 'package:icebr8k/backend/services/ib_question_db_service.dart';
-import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+
+import '../services/user_services/ib_chat_db_service.dart';
+import '../services/user_services/ib_cloud_messaging_service.dart';
+import '../services/user_services/ib_question_db_service.dart';
+import '../services/user_services/ib_user_db_service.dart';
 
 /// this controller control info of current IbUser, and index current home page tab
 class HomeController extends GetxController {

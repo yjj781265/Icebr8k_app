@@ -3,7 +3,7 @@ import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:location/location.dart';
 
-import '../db_config.dart';
+import '../../db_config.dart';
 
 class IbLocationService {
   static final IbLocationService _ibLocationService =

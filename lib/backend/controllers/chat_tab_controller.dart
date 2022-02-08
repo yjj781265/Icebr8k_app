@@ -4,9 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/backend/services/ib_chat_db_service.dart';
-import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+
+import '../services/user_services/ib_chat_db_service.dart';
+import '../services/user_services/ib_user_db_service.dart';
 
 /// controller for the Chat tab in Homepage
 class ChatTabController extends GetxController {

@@ -6,16 +6,19 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/setup_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/backend/services/ib_auth_service.dart';
-import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
-import 'package:icebr8k/backend/services/ib_local_data_service.dart';
-import 'package:icebr8k/backend/services/ib_user_db_service.dart';
+import 'package:icebr8k/frontend/admin/role_select_page.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/home_page.dart';
+import 'package:icebr8k/frontend/ib_pages/review_page.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_one.dart';
 import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
+
+import '../services/user_services/ib_auth_service.dart';
+import '../services/user_services/ib_cloud_messaging_service.dart';
+import '../services/user_services/ib_local_data_service.dart';
+import '../services/user_services/ib_user_db_service.dart';
 
 class AuthController extends GetxService {
   final isInitializing = true.obs;
@@ -192,8 +195,25 @@ class AuthController extends GetxService {
   Future<void> _navigateToCorrectPage() async {
     try {
       if (firebaseUser != null && firebaseUser!.emailVerified) {
-        final String? status =
-            await IbUserDbService().queryIbUserStatus(firebaseUser!.uid);
+        final IbUser? ibUser =
+            await IbUserDbService().queryIbUser(firebaseUser!.uid);
+
+        /// check roles of the user
+        if (ibUser != null &&
+            ibUser.roles.contains(IbUser.kAdminRole) &&
+            ibUser.roles.contains(IbUser.kUserRole)) {
+          Get.offAll(() => RoleSelectPage());
+          return;
+        } else if (ibUser != null && ibUser.roles.contains(IbUser.kAdminRole)) {
+          //TODO GO TO ADMIN MAIN PAGE
+        }
+
+        String? status = '';
+        if (ibUser == null) {
+          status = null;
+        } else {
+          status = ibUser.status;
+        }
 
         switch (status) {
           case IbUser.kUserStatusApproved:
@@ -206,8 +226,9 @@ class AuthController extends GetxService {
             break;
 
           case IbUser.kUserStatusPending:
-            //Todo Go to InReview Page
             print('Go to InReview Page');
+            Get.offAll(() => ReviewPage(),
+                transition: Transition.circularReveal);
             break;
 
           case IbUser.kUserStatusRejected:
@@ -218,9 +239,15 @@ class AuthController extends GetxService {
           case null:
             // Todo Go to Setup page
             print('Go to Setup page');
-            Get.offAll(() => SetupPageOne(Get.put(SetupController())));
+            Get.offAll(() => SetupPageOne(Get.put(SetupController())),
+                transition: Transition.circularReveal);
             break;
+
           default:
+            print('default Go to Setup page');
+            Get.offAll(() => SetupPageOne(Get.put(SetupController())),
+                transition: Transition.circularReveal);
+            break;
         }
       } else {
         print('AuthController firebase user email is not verified ');
@@ -289,7 +316,6 @@ class AuthController extends GetxService {
     if (firebaseUser != null) {
       await IbCloudMessagingService().removeMyToken();
     }
-
     await _ibAuthService.signOut();
   }
 }

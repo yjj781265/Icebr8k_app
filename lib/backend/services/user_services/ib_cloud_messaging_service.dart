@@ -1,7 +1,8 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/services/ib_user_db_service.dart';
+
+import 'ib_user_db_service.dart';
 
 class IbCloudMessagingService extends GetConnect {
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
@@ -47,7 +48,8 @@ class IbCloudMessagingService extends GetConnect {
 
   Future<void> removeMyToken() async {
     await _fcm.deleteToken();
-    await IbUserDbService().removeTokenFromDatabase();
+    //todo notification token
+    //await IbUserDbService().removeTokenFromDatabase();
   }
 
   Future<String?> retrieveToken(String uid) async {

@@ -15,7 +15,9 @@ class IbUser {
   String status;
   int banedEndTimeInMs;
   int? loginTimeInMs;
-  int? joinTimeInMs;
+
+  /// covert to FireStore Timestamp
+  dynamic joinTime;
   int? birthdateInMs;
   int answeredSize;
   int askedSize;
@@ -38,7 +40,7 @@ class IbUser {
     this.avatarUrl = '',
     this.coverPhotoUrl = '',
     this.loginTimeInMs = -1,
-    this.joinTimeInMs = -1,
+    this.joinTime,
     this.birthdateInMs = -1,
     this.banedEndTimeInMs = -1,
     this.isOnline = false,

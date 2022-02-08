@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/controllers/setup_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -10,7 +11,6 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
-import 'package:intl/intl.dart' as intl;
 
 import '../../ib_colors.dart';
 
@@ -38,22 +38,41 @@ class SetupPageOne extends StatelessWidget {
                   height: 16,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Directionality(
-                    textDirection: TextDirection.rtl,
-                    child: SizedBox(
-                      height: 56,
-                      width: double.infinity,
-                      child: IbElevatedButton(
-                        color: IbColors.primaryColor,
-                        textTrKey: 'Next',
-                        onPressed: () {
-                          IbUtils.hideKeyboard();
-                          _controller.validatePageOne();
-                        },
-                        icon: const Icon(Icons.arrow_back_ios),
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 4,
+                        child: SizedBox(
+                          height: 56,
+                          child: IbElevatedButton(
+                            color: IbColors.errorRed,
+                            textTrKey: 'sign_out',
+                            onPressed: () {
+                              Get.find<AuthController>().signOut();
+                            },
+                            icon: const Icon(Icons.arrow_back_ios),
+                          ),
+                        ),
                       ),
-                    ),
+                      Expanded(
+                        flex: 6,
+                        child: SizedBox(
+                          height: 56,
+                          child: Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: IbElevatedButton(
+                              color: IbColors.primaryColor,
+                              textTrKey: 'next',
+                              onPressed: () {
+                                _controller.validatePageOne();
+                              },
+                              icon: const Icon(Icons.arrow_back_ios),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 )
               ],
@@ -202,6 +221,8 @@ class SetupPageOne extends StatelessWidget {
 
   void _showDateTimePicker() {
     IbUtils.hideKeyboard();
+    _controller.birthdateTeController.text = IbUtils.readableDateTime(
+        DateTime.fromMillisecondsSinceEpoch(_controller.birthdateInMs.value));
     Get.bottomSheet(
         IbCard(
             child: SingleChildScrollView(
@@ -220,13 +241,13 @@ class SetupPageOne extends StatelessWidget {
                 height: 256,
                 width: Get.width,
                 child: CupertinoDatePicker(
-                  initialDateTime:
-                      DateTime.fromMillisecondsSinceEpoch(631170000000),
+                  initialDateTime: DateTime.fromMillisecondsSinceEpoch(
+                      _controller.birthdateInMs.value),
                   mode: CupertinoDatePickerMode.date,
                   onDateTimeChanged: (value) async {
                     await HapticFeedback.selectionClick();
                     _controller.birthdateTeController.text =
-                        _readableDateTime(value);
+                        IbUtils.readableDateTime(value);
                     _controller.birthdateTeController.text;
                     _controller.birthdateInMs.value =
                         value.millisecondsSinceEpoch;
@@ -238,10 +259,5 @@ class SetupPageOne extends StatelessWidget {
           ),
         )),
         ignoreSafeArea: false);
-  }
-
-  String _readableDateTime(DateTime _dateTime) {
-    final f = intl.DateFormat('MM/dd/yyyy');
-    return f.format(_dateTime);
   }
 }

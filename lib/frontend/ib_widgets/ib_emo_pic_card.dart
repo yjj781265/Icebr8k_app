@@ -58,6 +58,7 @@ class IbEmoPicCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8.0),
                     child: CachedNetworkImage(
                       imageUrl: emoPic.url,
+                      fit: BoxFit.cover,
                       width: 160,
                       height: 260,
                     ),

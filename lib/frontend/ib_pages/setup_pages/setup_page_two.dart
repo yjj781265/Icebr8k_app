@@ -201,6 +201,7 @@ class SetupPageTwo extends StatelessWidget {
             final _picker = ImagePicker();
             final XFile? pickedFile = await _picker.pickImage(
               source: ImageSource.camera,
+              preferredCameraDevice: CameraDevice.front,
               imageQuality: IbConfig.kImageQuality,
             );
 

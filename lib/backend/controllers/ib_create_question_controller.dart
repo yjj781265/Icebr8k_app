@@ -4,11 +4,11 @@ import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
-import 'package:icebr8k/backend/services/ib_tag_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/review_question_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 
+import '../services/user_services/ib_tag_db_service.dart';
 import 'auth_controller.dart';
 
 class IbCreateQuestionController extends GetxController {

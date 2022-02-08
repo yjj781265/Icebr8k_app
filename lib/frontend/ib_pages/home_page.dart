@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/chat_tab_controller.dart';
 import 'package:icebr8k/backend/controllers/friend_request_controller.dart';
 import 'package:icebr8k/backend/controllers/home_controller.dart';
-import 'package:icebr8k/backend/services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/edit_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/ib_user_search_page.dart';
@@ -19,6 +18,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
 import 'package:move_to_background/move_to_background.dart';
 
+import '../../backend/services/user_services/ib_local_data_service.dart';
 import '../ib_colors.dart';
 import '../ib_config.dart';
 import 'create_question_page.dart';

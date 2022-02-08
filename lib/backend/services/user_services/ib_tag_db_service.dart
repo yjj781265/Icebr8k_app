@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
-import '../db_config.dart';
+import '../../db_config.dart';
 
 class IbTagDbService {
   static final _ibTagDbService = IbTagDbService._();

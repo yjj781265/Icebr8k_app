@@ -2,12 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/backend/services/ib_user_db_service.dart';
+import 'package:icebr8k/frontend/ib_pages/review_page.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_three.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_two.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
+
+import '../services/user_services/ib_storage_service.dart';
+import '../services/user_services/ib_user_db_service.dart';
 
 class SetupController extends GetxController {
   final TextEditingController birthdateTeController = TextEditingController();
@@ -141,7 +144,18 @@ class SetupController extends GetxController {
       return;
     }
 
-    Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));
+    if (bioTeController.text.trim().length < 30) {
+      Get.dialog(const IbDialog(
+        title: 'Missing Info',
+        subtitle: "Bio needs to be at least 30 characters long",
+        showNegativeBtn: false,
+        positiveTextKey: 'ok',
+      ));
+      return;
+    }
+
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'),
+        barrierDismissible: false);
     if (await IbUserDbService()
         .isUsernameTaken(usernameTeController.text.trim())) {
       Get.back();
@@ -153,9 +167,46 @@ class SetupController extends GetxController {
       ));
       return;
     } else {
-      Get.back();
+      print('Setup Page Three is valid!');
+      try {
+        final String? url =
+            await IbStorageService().uploadAndRetrieveImgUrl(avatarUrl.value);
+        if (url == null) {
+          throw Exception('failed to upload message');
+        }
+
+        for (final emoPic in emoPics) {
+          final emoPicUrl =
+              await IbStorageService().uploadAndRetrieveImgUrl(emoPic.url);
+
+          if (emoPicUrl == null) {
+            throw Exception('failed to upload message');
+          }
+          emoPic.url = emoPicUrl;
+        }
+        final IbUser user = IbUser(
+            id: IbUtils.getCurrentUid()!,
+            avatarUrl: url,
+            email: IbUtils.getCurrentFbUser()!.email ?? '',
+            status: IbUser.kUserStatusPending,
+            fName: fNameTeController.text.trim(),
+            lName: lNameTeController.text.trim(),
+            username: usernameTeController.text.trim(),
+            gender: gender.value,
+            birthdateInMs: birthdateInMs.value,
+            bio: bioTeController.text.trim(),
+            emoPics: emoPics);
+        await IbUserDbService().registerNewUser(user);
+        Get.back();
+        Get.offAll(() => ReviewPage());
+      } catch (e) {
+        Get.back();
+        Get.dialog(const IbDialog(
+          title: 'Error',
+          subtitle: "Failed to upload images..",
+          showNegativeBtn: false,
+        ));
+      }
     }
-    //TODO GO TO REVIEW PAGE
-    print('Setup Page Three is valid!');
   }
 }

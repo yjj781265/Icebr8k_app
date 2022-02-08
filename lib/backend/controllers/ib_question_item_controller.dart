@@ -5,12 +5,13 @@ import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/backend/services/ib_question_db_service.dart';
-import 'package:icebr8k/backend/services/ib_storage_service.dart';
-import 'package:icebr8k/backend/services/ib_tag_db_service.dart';
-import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+
+import '../services/user_services/ib_question_db_service.dart';
+import '../services/user_services/ib_storage_service.dart';
+import '../services/user_services/ib_tag_db_service.dart';
+import '../services/user_services/ib_user_db_service.dart';
 
 class IbQuestionItemController extends GetxController {
   final Rx<IbQuestion> rxIbQuestion;

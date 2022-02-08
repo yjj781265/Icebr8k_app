@@ -13,7 +13,7 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_themes.dart';
 import 'package:lottie/lottie.dart';
 
-import 'backend/services/ib_local_data_service.dart';
+import 'backend/services/user_services/ib_local_data_service.dart';
 import 'frontend/ib_config.dart';
 import 'frontend/ib_pages/splash_page.dart';
 import 'frontend/ib_strings.dart';
@@ -73,7 +73,7 @@ class MainApp extends StatelessWidget {
         themeMode: ThemeMode.light,
         theme: IbLocalDataService().retrieveBoolValue(StorageKey.isDarkMode)
             ? IbThemes(context).buildDarkTheme()
-            : IbThemes(context).buildDarkTheme(),
+            : IbThemes(context).buildLightTheme(),
       );
     });
   }

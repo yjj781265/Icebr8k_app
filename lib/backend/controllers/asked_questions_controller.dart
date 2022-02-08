@@ -4,8 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
-import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+
+import '../services/user_services/ib_question_db_service.dart';
 
 class AskedQuestionsController extends GetxController {
   final String uid;

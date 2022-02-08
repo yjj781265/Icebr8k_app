@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
@@ -9,12 +10,12 @@ import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dar
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+import '../backend/services/user_services/ib_question_db_service.dart';
 import 'ib_config.dart';
 
 class IbUtils {
@@ -216,6 +217,13 @@ class IbUtils {
       return null;
     }
     return Get.find<HomeController>().currentIbUser;
+  }
+
+  static User? getCurrentFbUser() {
+    if (Get.find<AuthController>().firebaseUser == null) {
+      return null;
+    }
+    return Get.find<AuthController>().firebaseUser;
   }
 
   static void showSimpleSnackBar(

@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
-import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+
+import '../services/user_services/ib_question_db_service.dart';
 
 class MyAnsweredQuestionsController extends GetxController {
   late StreamSubscription myAnsweredQStream;

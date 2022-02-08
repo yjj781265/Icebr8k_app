@@ -6,7 +6,7 @@ import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
-import '../db_config.dart';
+import '../../db_config.dart';
 
 class IbQuestionDbService {
   static final _ibQuestionDbService = IbQuestionDbService._();

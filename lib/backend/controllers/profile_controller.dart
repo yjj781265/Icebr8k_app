@@ -3,13 +3,14 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/backend/services/ib_cloud_messaging_service.dart';
-import 'package:icebr8k/backend/services/ib_storage_service.dart';
-import 'package:icebr8k/backend/services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+
+import '../services/user_services/ib_cloud_messaging_service.dart';
+import '../services/user_services/ib_storage_service.dart';
+import '../services/user_services/ib_user_db_service.dart';
 
 class ProfileController extends GetxController {
   final isLoading = true.obs;
