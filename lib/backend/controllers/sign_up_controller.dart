@@ -28,9 +28,10 @@ class SignUpController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    debounce(password, (_) => _validatePassword(),
-        time:
-            const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis));
+    debounce(password, (_) {
+      _validateCfPassword();
+      _validatePassword();
+    }, time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis));
     debounce(
       email,
       (_) => _validateEmail(),
@@ -39,7 +40,10 @@ class SignUpController extends GetxController {
 
     debounce(
       confirmPassword,
-      (_) => _validateCfPassword(),
+      (_) {
+        _validateCfPassword();
+        _validatePassword();
+      },
       time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
     );
   }
