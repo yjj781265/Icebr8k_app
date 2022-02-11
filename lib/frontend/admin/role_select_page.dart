@@ -29,7 +29,9 @@ class RoleSelectPage extends StatelessWidget {
                   text: "Admin",
                   size: 48,
                 ),
-                Obx(() => Positioned(
+                Obx(() {
+                  if (_controller.totalMessages > 0) {
+                    return Positioned(
                       top: 2,
                       right: 0,
                       child: CircleAvatar(
@@ -47,7 +49,10 @@ class RoleSelectPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                    )),
+                    );
+                  }
+                  return const SizedBox();
+                }),
               ],
             ),
             const SizedBox(
@@ -56,7 +61,9 @@ class RoleSelectPage extends StatelessWidget {
             IbActionButton(
               color: IbColors.accentColor,
               iconData: FontAwesomeIcons.user,
-              onPressed: () {},
+              onPressed: () async {
+                _controller.onUserRoleTap();
+              },
               text: "User",
               size: 48,
             ),

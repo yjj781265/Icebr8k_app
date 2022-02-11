@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/setup_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/frontend/admin/admin_main_page.dart';
 import 'package:icebr8k/frontend/admin/role_select_page.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/home_page.dart';
@@ -205,7 +206,7 @@ class AuthController extends GetxService {
           Get.offAll(() => RoleSelectPage());
           return;
         } else if (ibUser != null && ibUser.roles.contains(IbUser.kAdminRole)) {
-          //TODO GO TO ADMIN MAIN PAGE
+          Get.offAll(() => AdminMainPage());
         }
 
         String? status = '';
@@ -232,12 +233,14 @@ class AuthController extends GetxService {
             break;
 
           case IbUser.kUserStatusRejected:
-            //Todo Go to Setup Page with note dialog
             print('Go to Setup Page with note dialog');
+            Get.offAll(
+                () => SetupPageOne(Get.put(
+                    SetupController(status: IbUser.kUserStatusRejected))),
+                transition: Transition.circularReveal);
             break;
 
           case null:
-            // Todo Go to Setup page
             print('Go to Setup page');
             Get.offAll(() => SetupPageOne(Get.put(SetupController())),
                 transition: Transition.circularReveal);

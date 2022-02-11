@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:icebr8k/backend/db_config.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 
@@ -17,5 +18,46 @@ class IbAdminService {
         .where('status', isEqualTo: IbUser.kUserStatusPending)
         .orderBy('joinTime')
         .snapshots();
+  }
+
+  Future<void> updateUserStatus(
+      {required String status, required String uid, String note = ''}) async {
+    if (status == IbUser.kUserStatusRejected) {
+      _db
+          .collection(_kUsersCollection)
+          .doc(uid)
+          .update({'status': status, 'note': note, 'username': ''});
+    } else {
+      _db
+          .collection(_kUsersCollection)
+          .doc(uid)
+          .update({'status': status, 'note': note});
+    }
+  }
+
+  Future<void> sendStatusEmail(
+      {required String email,
+      required String fName,
+      required String status,
+      String note = ""}) async {
+    final Map<String, dynamic> payload = {
+      'fName': fName,
+      'status': status,
+      'email': email,
+      'note': note,
+    };
+    if (DbConfig.dbSuffix == '-dev') {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('sendStatusEmailDev');
+      await callable.call(payload);
+    } else if (DbConfig.dbSuffix == '-beta') {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('sendStatusEmailBeta');
+      await callable.call(payload);
+    } else {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('sendStatusEmailProd');
+      await callable.call(payload);
+    }
   }
 }

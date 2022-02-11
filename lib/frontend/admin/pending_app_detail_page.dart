@@ -79,7 +79,9 @@ class PendingAppDetailPage extends StatelessWidget {
                 height: 48,
                 width: double.infinity,
                 child: InkWell(
-                  onLongPress: () {},
+                  onLongPress: () async {
+                    await _controller.approveApplication(user);
+                  },
                   child: IbElevatedButton(
                     textTrKey: 'Approve',
                     onPressed: () {
@@ -98,7 +100,9 @@ class PendingAppDetailPage extends StatelessWidget {
                 height: 48,
                 width: double.infinity,
                 child: InkWell(
-                  onLongPress: () {},
+                  onLongPress: () async {
+                    await _controller.rejectApplication(user);
+                  },
                   child: IbElevatedButton(
                     textTrKey: 'Reject',
                     color: IbColors.errorRed,

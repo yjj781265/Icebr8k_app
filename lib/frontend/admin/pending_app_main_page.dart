@@ -22,7 +22,7 @@ class PendingAppMainPage extends StatelessWidget {
             return ListTile(
               tileColor: Theme.of(context).backgroundColor,
               onTap: () {
-                Get.to(PendingAppDetailPage(user));
+                Get.to(() => PendingAppDetailPage(user));
               },
               leading: IbUserAvatar(
                 avatarUrl: user.avatarUrl,

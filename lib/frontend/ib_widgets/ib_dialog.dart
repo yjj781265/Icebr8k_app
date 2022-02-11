@@ -29,64 +29,67 @@ class IbDialog extends StatelessWidget {
       child: IbCard(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                    fontSize: IbConfig.kPageTitleSize,
-                    fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(
-                height: 16,
-              ),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                    fontSize: IbConfig.kNormalTextSize,
-                    color: IbColors.lightGrey),
-              ),
-              const SizedBox(
-                height: 24,
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  actionButtons ?? const SizedBox(),
-                  if (actionButtons != null)
-                    const SizedBox(
-                      width: 32,
-                    ),
-                  if (showNegativeBtn)
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                      fontSize: IbConfig.kPageTitleSize,
+                      fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  height: 16,
+                ),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                      fontSize: IbConfig.kNormalTextSize,
+                      color: IbColors.lightGrey),
+                ),
+                content ?? const SizedBox(),
+                const SizedBox(
+                  height: 24,
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    actionButtons ?? const SizedBox(),
+                    if (actionButtons != null)
+                      const SizedBox(
+                        width: 32,
+                      ),
+                    if (showNegativeBtn)
+                      Expanded(
+                        flex: 4,
+                        child: IbElevatedButton(
+                          icon: const Icon(
+                            Icons.cancel,
+                            size: 16,
+                          ),
+                          textTrKey: 'cancel'.tr,
+                          onPressed: Get.back,
+                          color: IbColors.lightGrey,
+                        ),
+                      ),
                     Expanded(
-                      flex: 4,
+                      flex: 5,
                       child: IbElevatedButton(
                         icon: const Icon(
-                          Icons.cancel,
+                          Icons.check_circle_rounded,
                           size: 16,
                         ),
-                        textTrKey: 'cancel'.tr,
-                        onPressed: Get.back,
-                        color: IbColors.lightGrey,
+                        textTrKey: positiveTextKey.tr,
+                        color: IbColors.primaryColor,
+                        onPressed: onPositiveTap ?? Get.back,
                       ),
                     ),
-                  Expanded(
-                    flex: 5,
-                    child: IbElevatedButton(
-                      icon: const Icon(
-                        Icons.check_circle_rounded,
-                        size: 16,
-                      ),
-                      textTrKey: positiveTextKey.tr,
-                      color: IbColors.primaryColor,
-                      onPressed: onPositiveTap ?? Get.back,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

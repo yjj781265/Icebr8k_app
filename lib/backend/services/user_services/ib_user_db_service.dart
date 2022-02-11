@@ -31,6 +31,11 @@ class IbUserDbService {
         .set(_ibUser.toJson(), SetOptions(merge: true));
   }
 
+  Future<String> queryUserNotes(String uid) async {
+    final snapshot = await _collectionRef.doc(uid).get();
+    return snapshot.data()!['note'].toString();
+  }
+
   Future<void> updateIbUser(IbUser _ibUser) {
     print('updateIbUser');
     return _collectionRef

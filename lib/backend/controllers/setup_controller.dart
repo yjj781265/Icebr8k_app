@@ -23,6 +23,9 @@ class SetupController extends GetxController {
   final birthdateInMs = DateTime.now().millisecondsSinceEpoch.obs;
   final emoPics = <IbEmoPic>[].obs;
   final avatarUrl = ''.obs;
+  final String status;
+
+  SetupController({this.status = ''});
 
   @override
   void onInit() {
@@ -35,6 +38,35 @@ class SetupController extends GetxController {
     );
     emoPics.add(IbEmoPic(
         url: '', emoji: "😱", id: IbUtils.getUniqueId(), description: 'Wow'));
+  }
+
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    if (status == IbUser.kUserStatusRejected) {
+      final String note =
+          await IbUserDbService().queryUserNotes(IbUtils.getCurrentUid()!);
+      if (note.isNotEmpty) {
+        Get.dialog(IbDialog(
+          title: 'Your profile was rejected',
+          subtitle: 'Reasons:\n$note',
+          content:
+              const Text('You can try it again by resubmitting your profile'),
+          positiveTextKey: 'ok',
+          showNegativeBtn: false,
+        ));
+      }
+    }
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+    bioTeController.dispose();
+    fNameTeController.dispose();
+    lNameTeController.dispose();
+    usernameTeController.dispose();
+    birthdateTeController.dispose();
   }
 
   void updateEmoPic(IbEmoPic emoPic) {
