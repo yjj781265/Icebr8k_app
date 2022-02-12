@@ -13,8 +13,9 @@ import 'auth_controller.dart';
 
 class IbCreateQuestionController extends GetxController {
   String questionType = IbQuestion.kMultipleChoice;
-  late TextEditingController? questionEditController;
-  late TextEditingController? descriptionEditController;
+  final TextEditingController questionEditController = TextEditingController();
+  final TextEditingController descriptionEditController =
+      TextEditingController();
   final title = 'text only'.obs;
   final choiceList = <IbChoice>[].obs;
   final picChoiceList = <IbChoice>[].obs;
@@ -22,8 +23,6 @@ class IbCreateQuestionController extends GetxController {
   final scaleEndPoints = <IbChoice>[].obs;
   final ibTagModels = <IbTagModel>[].obs;
   final filePath = ''.obs;
-  String question = '';
-  String description = '';
   final isCustomTagSelected = false.obs;
   final pickedTags = <String>[].obs;
 
@@ -85,9 +84,10 @@ class IbCreateQuestionController extends GetxController {
   }
 
   void validQuestion() {
-    if (question.trim().isEmpty) {
+    if (questionEditController.text.trim().isEmpty) {
       Get.dialog(IbDialog(
           title: 'Error',
+          showNegativeBtn: false,
           subtitle: 'question_empty'.tr,
           positiveTextKey: 'ok'));
       return;
@@ -95,13 +95,18 @@ class IbCreateQuestionController extends GetxController {
 
     if (pickedTags.isEmpty) {
       Get.dialog(IbDialog(
-          title: 'Error', subtitle: 'no_tag'.tr, positiveTextKey: 'ok'));
+        title: 'Error',
+        subtitle: 'no_tag'.tr,
+        positiveTextKey: 'ok',
+        showNegativeBtn: false,
+      ));
       return;
     }
     if (questionType == IbQuestion.kMultipleChoice && choiceList.length < 2) {
       Get.dialog(IbDialog(
           subtitle: 'mc_question_not_valid'.tr,
           title: 'Error',
+          showNegativeBtn: false,
           positiveTextKey: 'ok'));
       return;
     }
@@ -109,6 +114,7 @@ class IbCreateQuestionController extends GetxController {
     if (questionType == IbQuestion.kMultipleChoicePic &&
         picChoiceList.length < 2) {
       Get.dialog(IbDialog(
+          showNegativeBtn: false,
           subtitle: 'mc_question_not_valid'.tr,
           title: 'Error',
           positiveTextKey: 'ok'));
@@ -123,6 +129,7 @@ class IbCreateQuestionController extends GetxController {
             ibChoice.content!.isEmpty) {
           Get.dialog(IbDialog(
               subtitle: 'mc_pic_question_not_valid'.tr,
+              showNegativeBtn: false,
               title: 'Error',
               positiveTextKey: 'ok'));
           return;
@@ -135,6 +142,7 @@ class IbCreateQuestionController extends GetxController {
         Get.dialog(IbDialog(
             subtitle: 'pic_question_not_valid_min'.tr,
             title: 'Error',
+            showNegativeBtn: false,
             positiveTextKey: 'ok'));
         return;
       }
@@ -144,7 +152,8 @@ class IbCreateQuestionController extends GetxController {
           Get.dialog(IbDialog(
             subtitle: 'pic_question_not_valid'.tr,
             positiveTextKey: 'ok',
-            title: '',
+            title: 'Error',
+            showNegativeBtn: false,
           ));
           return;
         }
@@ -155,6 +164,7 @@ class IbCreateQuestionController extends GetxController {
       Get.dialog(IbDialog(
           subtitle: 'sc_question_not_valid'.tr,
           title: 'Error',
+          showNegativeBtn: false,
           positiveTextKey: 'ok'));
       return;
     }
@@ -164,10 +174,10 @@ class IbCreateQuestionController extends GetxController {
     if (questionType == IbQuestion.kScale) {
       final _controller = IbQuestionItemController(
         rxIbQuestion: IbQuestion(
-          question: question.trim(),
+          question: questionEditController.text.trim(),
           id: id,
           creatorId: Get.find<AuthController>().firebaseUser!.uid,
-          description: description.trim(),
+          description: descriptionEditController.text.trim(),
           tagIds: pickedTags,
           questionType: questionType.trim(),
           askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
@@ -189,10 +199,10 @@ class IbCreateQuestionController extends GetxController {
     if (questionType == IbQuestion.kMultipleChoicePic) {
       final _controller = IbQuestionItemController(
           rxIbQuestion: IbQuestion(
-            question: question.trim(),
+            question: questionEditController.text.trim(),
             id: id,
             creatorId: Get.find<AuthController>().firebaseUser!.uid,
-            description: description.trim(),
+            description: descriptionEditController.text.trim(),
             questionType: questionType.trim(),
             tagIds: pickedTags,
             askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
@@ -213,11 +223,11 @@ class IbCreateQuestionController extends GetxController {
     if (questionType == IbQuestion.kMultipleChoice) {
       final _controller = IbQuestionItemController(
           rxIbQuestion: IbQuestion(
-            question: question.trim(),
+            question: questionEditController.text.trim(),
             id: id,
             tagIds: pickedTags,
             creatorId: Get.find<AuthController>().firebaseUser!.uid,
-            description: description.trim(),
+            description: descriptionEditController.text.trim(),
             questionType: questionType.trim(),
             askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
             choices: choiceList,
@@ -236,11 +246,11 @@ class IbCreateQuestionController extends GetxController {
     if (questionType == IbQuestion.kPic) {
       final _controller = IbQuestionItemController(
           rxIbQuestion: IbQuestion(
-            question: question.trim(),
+            question: questionEditController.text.trim(),
             id: id,
             tagIds: pickedTags,
             creatorId: Get.find<AuthController>().firebaseUser!.uid,
-            description: description.trim(),
+            description: descriptionEditController.text.trim(),
             questionType: questionType.trim(),
             askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
             choices: picList,
@@ -265,21 +275,6 @@ class IbCreateQuestionController extends GetxController {
           IbChoice(content: i.toString(), choiceId: IbUtils.getUniqueId()));
     }
     return choices;
-  }
-
-  void reset() {
-    question = '';
-    description = '';
-    choiceList.clear();
-    scaleEndPoints.clear();
-
-    if (questionEditController != null) {
-      questionEditController!.clear();
-    }
-
-    if (descriptionEditController != null) {
-      descriptionEditController!.clear();
-    }
   }
 }
 

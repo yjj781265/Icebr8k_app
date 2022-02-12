@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/review_page.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_three.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_two.dart';
@@ -229,6 +230,10 @@ class SetupController extends GetxController {
             bio: bioTeController.text.trim(),
             emoPics: emoPics);
         await IbUserDbService().registerNewUser(user);
+        await IbAdminService().sendStatusEmail(
+            email: user.email,
+            fName: user.fName,
+            status: IbUser.kUserStatusPending);
         Get.back();
         Get.offAll(() => ReviewPage());
       } catch (e) {

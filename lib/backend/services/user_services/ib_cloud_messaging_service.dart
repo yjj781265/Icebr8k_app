@@ -18,7 +18,7 @@ class IbCloudMessagingService extends GetConnect {
 
   IbCloudMessagingService._();
 
-  Future init() async {
+  Future<void> init() async {
     final NotificationSettings settings = await _fcm.requestPermission();
     print(
         'User granted notification permission: ${settings.authorizationStatus}');

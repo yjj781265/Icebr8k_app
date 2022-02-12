@@ -123,6 +123,8 @@ class IbStrings extends Translations {
           'fNameHint': 'Enter first name here',
           'lNameHint': 'Enter last name here(optional)',
           'back': 'Back',
+          'home': 'Home',
+          'alert': 'Alert',
         }
       };
 }

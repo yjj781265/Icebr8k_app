@@ -8,7 +8,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/main_controller.dart';
+import 'package:icebr8k/backend/controllers/init_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_themes.dart';
 import 'package:lottie/lottie.dart';
@@ -46,7 +46,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class MainApp extends StatelessWidget {
-  final MainController _controller = Get.put(MainController());
+  final InitController _controller = Get.put(InitController());
   final FirebaseAnalytics analytics = FirebaseAnalytics();
 
   @override

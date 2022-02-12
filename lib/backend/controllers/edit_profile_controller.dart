@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -26,21 +25,12 @@ class EditProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    username.value = Get.find<HomeController>().currentIbUsername.value;
-    avatarUrl.value = Get.find<HomeController>().currentIbAvatarUrl.value;
   }
 
   Future<void> validateUsername() async {
     final bool isValid =
         GetUtils.isUsername(username.value.trim().toLowerCase());
     isUsernameFirstTime.value = false;
-
-    if (username.value.trim().toLowerCase() ==
-        Get.find<HomeController>().currentIbUsername.value) {
-      usernameErrorTrKey.value = '';
-      isUsernameValid.value = true;
-      return;
-    }
 
     if (username.value.isEmpty) {
       usernameErrorTrKey.value = 'username is empty';

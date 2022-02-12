@@ -26,6 +26,7 @@ class IbTenorPage extends StatelessWidget {
                 onSubmitted: (value) async {
                   await _controller.search();
                 },
+                textInputAction: TextInputAction.search,
                 controller: _controller.editingController,
                 autofocus: true,
                 decoration: InputDecoration(

@@ -9,7 +9,7 @@ import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/admin/admin_main_page.dart';
 import 'package:icebr8k/frontend/admin/role_select_page.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/home_page.dart';
+import 'package:icebr8k/frontend/ib_pages/main_page.dart';
 import 'package:icebr8k/frontend/ib_pages/review_page.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_one.dart';
 import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
@@ -218,7 +218,7 @@ class AuthController extends GetxService {
 
         switch (status) {
           case IbUser.kUserStatusApproved:
-            Get.offAll(() => HomePage(), binding: HomeBinding());
+            Get.offAll(() => MainPage(), binding: HomeBinding());
             break;
 
           case IbUser.kUserStatusBanned:

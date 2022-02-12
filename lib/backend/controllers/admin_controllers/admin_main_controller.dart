@@ -8,9 +8,11 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart';
+import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
+import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/home_page.dart';
+import 'package:icebr8k/frontend/ib_pages/main_page.dart';
 import 'package:icebr8k/frontend/ib_pages/review_page.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_one.dart';
 import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
@@ -86,7 +88,7 @@ class AdminMainController extends GetxController {
 
         switch (status) {
           case IbUser.kUserStatusApproved:
-            Get.offAll(() => HomePage(), binding: HomeBinding());
+            Get.offAll(() => MainPage(), binding: HomeBinding());
             break;
 
           case IbUser.kUserStatusBanned:
@@ -111,7 +113,6 @@ class AdminMainController extends GetxController {
                 transition: Transition.circularReveal);
             break;
           case null:
-            // Todo Go to Setup page
             print('Go to Setup page');
             Get.offAll(() => SetupPageOne(Get.put(SetupController())),
                 transition: Transition.circularReveal);
@@ -159,11 +160,9 @@ class AdminMainController extends GetxController {
           email: user.email,
           fName: user.fName,
           status: IbUser.kUserStatusApproved);
-      Get.dialog(const IbDialog(
-        title: 'Info',
-        subtitle: 'Profile approved!',
-        showNegativeBtn: false,
-      ));
+      Get.back();
+      IbUtils.showSimpleSnackBar(
+          msg: 'Profile Approved!', backgroundColor: IbColors.accentColor);
     } catch (e) {
       Get.dialog(IbDialog(
         title: 'Oops',
@@ -202,13 +201,13 @@ class AdminMainController extends GetxController {
                 fName: user.fName,
                 note: editingController.text.trim(),
                 status: IbUser.kUserStatusRejected);
+            await IbAdminService().deleteAllEmoPics(user);
+            await IbStorageService().deleteFile(user.avatarUrl);
             Get.back();
             Get.back();
-            Get.dialog(const IbDialog(
-              title: 'Info',
-              subtitle: 'Profile rejected!',
-              showNegativeBtn: false,
-            ));
+            IbUtils.showSimpleSnackBar(
+                msg: 'Profile rejected!', backgroundColor: IbColors.errorRed);
+            ;
           },
         ),
       );

@@ -11,7 +11,7 @@ import '../../db_config.dart';
 class IbQuestionDbService {
   static final _ibQuestionDbService = IbQuestionDbService._();
   static final _db = FirebaseFirestore.instance;
-  static const _kQuestionCollection = 'IbQuestions${DbConfig.dbSuffix}';
+  static const _kQuestionCollection = 'IbQuestion${DbConfig.dbSuffix}';
   static const _kAnswerCollectionGroup = 'Answers${DbConfig.dbSuffix}';
   static const _kLikesCollectionGroup = 'Likes${DbConfig.dbSuffix}';
   static const _kCommentCollectionGroup = 'Comments${DbConfig.dbSuffix}';
@@ -594,5 +594,12 @@ class IbQuestionDbService {
         .set({
       'replies': FieldValue.arrayRemove([reply.toJson()])
     }, SetOptions(merge: true));
+  }
+
+  Future<void> copyCollection(String collection1, String collection2) async {
+    final snapshot = await _db.collection(collection1).get();
+    for (final doc in snapshot.docs) {
+      await _db.collection(collection2).doc(doc.id).set(doc.data());
+    }
   }
 }

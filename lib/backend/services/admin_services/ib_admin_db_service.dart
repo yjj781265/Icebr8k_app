@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:icebr8k/backend/db_config.dart';
+import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 
 class IbAdminService {
   static final _ibAdminDbService = IbAdminService._();
@@ -33,6 +35,16 @@ class IbAdminService {
           .doc(uid)
           .update({'status': status, 'note': note});
     }
+  }
+
+  Future<void> deleteAllEmoPics(IbUser user) async {
+    for (final IbEmoPic emoPic in user.emoPics) {
+      await IbStorageService().deleteFile(emoPic.url);
+    }
+    await _db
+        .collection(_kUsersCollection)
+        .doc(user.id)
+        .update({'emoPics': <IbEmoPic>[]});
   }
 
   Future<void> sendStatusEmail(

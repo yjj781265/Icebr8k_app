@@ -1,8 +1,5 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/answered_question_controller.dart';
@@ -10,8 +7,8 @@ import 'package:icebr8k/backend/controllers/asked_questions_controller.dart';
 import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/common_answers_controller.dart';
 import 'package:icebr8k/backend/controllers/different_answers_controller.dart';
-import 'package:icebr8k/backend/controllers/home_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
+import 'package:icebr8k/backend/controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/profile_controller.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
@@ -21,13 +18,10 @@ import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_description_text.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_stats.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -53,7 +47,7 @@ class _ProfilePageState extends State<ProfilePage>
   late CommonAnswersController _commonAnswersController;
   late DifferentAnswersController _uncommonAnswersController;
   late ProfileController _profileController;
-  late HomeController _homeController;
+  late MainPageController _homeController;
 
   @override
   void initState() {
@@ -100,12 +94,12 @@ class _ProfilePageState extends State<ProfilePage>
         if (_profileController.isLoading.isTrue) {
           return const Center(child: IbProgressIndicator());
         }
-        return buildExtendedNestedScrollView();
+        return const SizedBox();
       }),
     );
   }
 
-  ExtendedNestedScrollView buildExtendedNestedScrollView() {
+  /* ExtendedNestedScrollView buildExtendedNestedScrollView() {
     return ExtendedNestedScrollView(
       onlyOneScrollInBody: true,
       dragStartBehavior: DragStartBehavior.down,
@@ -134,7 +128,7 @@ class _ProfilePageState extends State<ProfilePage>
                     ),
 
                     /// avatar
-                    Obx(
+               */ /*     Obx(
                       () => Positioned(
                         left: 16,
                         bottom: -40,
@@ -146,7 +140,7 @@ class _ProfilePageState extends State<ProfilePage>
                                 ? _homeController.currentIbAvatarUrl.value
                                 : _profileController.avatarUrl.value),
                       ),
-                    ),
+                    ),*/ /*
                   ],
                 ),
 
@@ -166,13 +160,13 @@ class _ProfilePageState extends State<ProfilePage>
                                   style: const TextStyle(
                                       fontSize: IbConfig.kPageTitleSize,
                                       fontWeight: FontWeight.bold)),
-                              Text(
+                          */ /*    Text(
                                 _profileController.isMe.isTrue
                                     ? _homeController.currentIbName.value
                                     : _profileController.name.value,
                                 style: const TextStyle(
                                     fontSize: IbConfig.kNormalTextSize),
-                              ),
+                              ),*/ /*
                               if (_profileController.isMe.isFalse)
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -202,7 +196,7 @@ class _ProfilePageState extends State<ProfilePage>
                         child: Obx(
                           () => Wrap(
                             children: [
-                              IbStats(
+                           */ /*   IbStats(
                                   title: 'Answered',
                                   num: _profileController.isMe.isTrue
                                       ? _homeController.answeredSize.value
@@ -211,7 +205,7 @@ class _ProfilePageState extends State<ProfilePage>
                                   title: 'Asked',
                                   num: _profileController.isMe.isTrue
                                       ? _homeController.askedSize.value
-                                      : _profileController.totalAsked.value),
+                                      : _profileController.totalAsked.value),*/ /*
                             ],
                           ),
                         ),
@@ -301,9 +295,9 @@ class _ProfilePageState extends State<ProfilePage>
         ),
       ),
     );
-  }
+  }*/
 
-  Widget handleCoverPhoto() {
+/*  Widget handleCoverPhoto() {
     if (_profileController.isMe.isTrue) {
       final Widget coverPhoto = _homeController.currentIbCoverPhotoUrl.isEmpty
           ? Image.asset(
@@ -360,7 +354,7 @@ class _ProfilePageState extends State<ProfilePage>
             fit: BoxFit.fitHeight,
             imageUrl: _profileController.coverPhotoUrl.value,
           );
-  }
+  }*/
 
   Widget buildAnsweredQTab() {
     return AnsweredQTab(

@@ -5,14 +5,14 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
-class MainController extends GetxController {
+class InitController extends GetxController {
   final isLoading = true.obs;
   final hasError = false.obs;
 
   @override
   Future<void> onInit() async {
     isLoading.value = true;
-    print('MainController init....');
+    print('InitController init....');
     try {
       await Firebase.initializeApp();
       await GetStorage.init();

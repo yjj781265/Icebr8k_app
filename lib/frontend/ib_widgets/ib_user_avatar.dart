@@ -26,7 +26,11 @@ class IbUserAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (avatarUrl.isEmpty) {
-      return CircleAvatar(radius: radius, child: const IbProgressIndicator());
+      return SizedBox(
+        height: radius * 2,
+        width: radius * 2,
+        child: const IbProgressIndicator(),
+      );
     }
     return Stack(
       alignment: Alignment.center,
@@ -66,7 +70,10 @@ class IbUserAvatar extends StatelessWidget {
               ),
             ),
             placeholder: (context, url) => CircleAvatar(
-                radius: radius, child: const IbProgressIndicator()),
+              radius: radius,
+              backgroundColor: IbColors.lightBlue,
+              child: const IbProgressIndicator(),
+            ),
           ),
         ),
         if (compScore != null && uid != IbUtils.getCurrentUid())

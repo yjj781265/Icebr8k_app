@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_create_question_controller.dart';
@@ -31,10 +32,6 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     with SingleTickerProviderStateMixin {
   final IbCreateQuestionController _controller =
       Get.put(IbCreateQuestionController());
-  final TextEditingController _questionEditingController =
-      TextEditingController();
-  final TextEditingController _descriptionEditingController =
-      TextEditingController();
   final TextEditingController _customTagController = TextEditingController();
   late TabController _tabController;
   late List<Widget> chips;
@@ -42,8 +39,6 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
   @override
   void initState() {
     super.initState();
-    _controller.questionEditController = _questionEditingController;
-    _controller.descriptionEditController = _descriptionEditingController;
     _tabController = TabController(vsync: this, length: 4);
     _tabController.addListener(() {
       if (_tabController.index == 0) {
@@ -92,30 +87,48 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return [
               SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 150,
-                  child: IbCard(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextField(
-                        onChanged: (question) {
-                          _controller.question = question;
-                        },
-                        keyboardType: TextInputType.text,
-                        controller: _questionEditingController,
-                        minLines: 3,
-                        maxLines: 8,
-                        maxLength: IbConfig.kQuestionTitleMaxLength,
-                        style: const TextStyle(
-                            fontSize: IbConfig.kPageTitleSize,
-                            fontWeight: FontWeight.bold),
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'question'.tr,
-                            hintStyle: const TextStyle(
-                              color: IbColors.lightGrey,
-                            )),
-                      ),
+                child: IbCard(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: TextField(
+                      keyboardType: TextInputType.text,
+                      controller: _controller.questionEditController,
+                      minLines: 3,
+                      maxLines: 8,
+                      maxLength: IbConfig.kQuestionTitleMaxLength,
+                      style: const TextStyle(
+                          fontSize: IbConfig.kPageTitleSize,
+                          fontWeight: FontWeight.bold),
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'question'.tr,
+                          hintStyle: const TextStyle(
+                            color: IbColors.lightGrey,
+                          )),
+                    ),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: IbCard(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: TextField(
+                      keyboardType: TextInputType.text,
+                      controller: _controller.descriptionEditController,
+                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                      minLines: 3,
+                      maxLines: 8,
+                      maxLength: IbConfig.kQuestionDescMaxLength,
+                      style: const TextStyle(
+                          fontSize: IbConfig.kNormalTextSize,
+                          fontWeight: FontWeight.normal),
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'description_option'.tr,
+                          hintStyle: const TextStyle(
+                            color: IbColors.lightGrey,
+                          )),
                     ),
                   ),
                 ),

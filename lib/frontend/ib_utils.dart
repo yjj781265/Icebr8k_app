@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/auth_controller.dart';
-import 'package:icebr8k/backend/controllers/home_controller.dart';
+import 'package:icebr8k/backend/controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
@@ -213,10 +213,10 @@ class IbUtils {
   }
 
   static IbUser? getCurrentIbUser() {
-    if (!Get.isRegistered<HomeController>()) {
+    if (!Get.isRegistered<MainPageController>()) {
       return null;
     }
-    return Get.find<HomeController>().currentIbUser;
+    return Get.find<MainPageController>().currentIbUser;
   }
 
   static User? getCurrentFbUser() {
