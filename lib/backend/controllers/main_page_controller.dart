@@ -17,6 +17,7 @@ class MainPageController extends GetxController {
   final currentIndex = 0.obs;
   final Stream<IbUser?> ibUserBroadcastStream =
       IbUserDbService().listenToIbUserChanges(IbUtils.getCurrentFbUser()!.uid);
+  final isNavBarVisible = true.obs;
   late IbUser? currentIbUser;
 
   @override
@@ -45,6 +46,20 @@ class MainPageController extends GetxController {
     // Also handle any interaction when the app is in the background via a
     // Stream listener
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+  }
+
+  void showNavBar() {
+    if (isNavBarVisible.isTrue) {
+      return;
+    }
+    isNavBarVisible.value = true;
+  }
+
+  void hideNavBar() {
+    if (isNavBarVisible.isFalse) {
+      return;
+    }
+    isNavBarVisible.value = false;
   }
 
   void _handleMessage(RemoteMessage message) {

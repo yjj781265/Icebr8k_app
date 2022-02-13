@@ -151,6 +151,7 @@ class IbTenorPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SmartRefresher(
+                      scrollController: _controller.scrollController,
                       controller: _controller.refreshController,
                       enablePullUp: true,
                       enablePullDown: false,
@@ -188,6 +189,7 @@ class IbTenorPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SmartRefresher(
+                      scrollController: _controller.scrollController,
                       controller: _controller.refreshController,
                       enablePullUp: true,
                       enablePullDown: false,

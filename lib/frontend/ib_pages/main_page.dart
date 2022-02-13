@@ -97,6 +97,7 @@ class _MainPageViewState extends State<MainPageView>
     const _inactiveColor = IbColors.lightGrey;
     return Obx(
       () => IbAnimatedBottomBar(
+        containerHeight: _mainPageController.isNavBarVisible.isTrue ? 56 : 0,
         selectedIndex: _mainPageController.currentIndex.value,
         onItemSelected: (index) async {
           if (index == 2) {

@@ -30,7 +30,10 @@ class IbAnimatedBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final bgColor = backgroundColor ?? Theme.of(context).bottomAppBarColor;
 
-    return Container(
+    return AnimatedContainer(
+      curve: Curves.linear,
+      height: containerHeight,
+      width: double.infinity,
       decoration: BoxDecoration(
         color: bgColor,
         boxShadow: [
@@ -41,11 +44,13 @@ class IbAnimatedBottomBar extends StatelessWidget {
             ),
         ],
       ),
-      child: SafeArea(
-        child: SizedBox(
-          width: double.infinity,
-          height: containerHeight,
-          child: Row(
+      duration: const Duration(milliseconds: 200),
+
+      /// user wrap to prevent overflow at the bottom when nav is not visible
+      child: Wrap(
+        runAlignment: WrapAlignment.center,
+        children: [
+          Row(
             mainAxisAlignment: mainAxisAlignment,
             children: items.map((item) {
               final index = items.indexOf(item);
@@ -60,7 +65,7 @@ class IbAnimatedBottomBar extends StatelessWidget {
               );
             }).toList(),
           ),
-        ),
+        ],
       ),
     );
   }

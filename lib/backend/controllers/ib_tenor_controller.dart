@@ -16,11 +16,15 @@ class IbTenorController extends GetxController {
   final isSearching = false.obs;
 
   final RefreshController refreshController = RefreshController();
+  final ScrollController scrollController = ScrollController();
   final TextEditingController editingController = TextEditingController();
 
   @override
   Future<void> onInit() async {
     super.onInit();
+    scrollController.addListener(() {
+      IbUtils.hideKeyboard();
+    });
 
     /// loading top 20 trending gif from tenor
     final tempList = await IbTenorService().getTrendingGifs();
