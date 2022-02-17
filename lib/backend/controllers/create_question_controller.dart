@@ -170,6 +170,7 @@ class CreateQuestionController extends GetxController {
     final String id = IbUtils.getUniqueId();
     final question = IbQuestion(
         question: questionEditController.text.trim(),
+        description: descriptionEditController.text.trim(),
         id: id,
         tagIds: pickedTags.map((element) => element.text).toList(),
         creatorId: IbUtils.getCurrentUid()!,

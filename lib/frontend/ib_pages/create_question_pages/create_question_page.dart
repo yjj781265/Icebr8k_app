@@ -127,7 +127,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                   child: Padding(
                     padding: const EdgeInsets.all(8),
                     child: TextField(
-                      keyboardType: TextInputType.text,
+                      keyboardType: TextInputType.multiline,
+                      textInputAction: TextInputAction.newline,
                       controller: _controller.descriptionEditController,
                       maxLengthEnforcement: MaxLengthEnforcement.enforced,
                       minLines: 3,

@@ -13,7 +13,7 @@ class IbQuestion {
 
   List<String> tagIds;
   List<IbMedia> medias;
-  List<String> externalLinks;
+  dynamic position;
   List<String> privacyBounds;
   String question;
   String description;
@@ -45,8 +45,8 @@ class IbQuestion {
       this.description = '',
       this.likes = 0,
       this.comments = 0,
+      this.position,
       this.medias = const [],
-      this.externalLinks = const [],
       this.pollSize = 0,
       required this.askedTimeInMs,
       this.endTimeInMs = -1}) {

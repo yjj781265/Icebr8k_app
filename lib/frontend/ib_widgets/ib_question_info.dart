@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class IbQuestionInfo extends StatelessWidget {
   final IbQuestionItemController _controller;
@@ -23,6 +25,17 @@ class IbQuestionInfo extends StatelessWidget {
                   fontWeight: FontWeight.bold),
             ),
           ),
+          if (_controller.rxIbQuestion.value.description.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 4),
+              child: Linkify(
+                style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
+                text: _controller.rxIbQuestion.value.description,
+                onOpen: (link) async {
+                  await launch(link.url);
+                },
+              ),
+            ),
           if (_controller.rxIbQuestion.value.endpoints != null &&
               _controller.rxIbQuestion.value.endpoints!.length == 2 &&
               _controller.showStats.isTrue)

@@ -63,30 +63,6 @@ class IbMediaBar extends StatelessWidget {
               IconButton(
                   onPressed: () {},
                   icon: const Icon(
-                    FontAwesomeIcons.link,
-                    color: IbColors.lightGrey,
-                    size: 20,
-                  )),
-              Positioned(
-                  bottom: 6,
-                  right: 0,
-                  child: Container(
-                    height: 16,
-                    width: 16,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: IbColors.accentColor,
-                    ),
-                    child: const Text('1'),
-                  ))
-            ],
-          ),
-          Stack(
-            children: [
-              IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
                     Icons.location_on_rounded,
                     color: IbColors.lightGrey,
                   )),

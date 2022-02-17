@@ -482,4 +482,27 @@ class IbUtils {
 
     return '10B+';
   }
+
+  static String convertStringToLink(String textData) {
+    //
+    final urlRegExp = RegExp(
+        r"((https?:www\.)|(https?:\/\/)|(www\.))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?");
+    final urlMatches = urlRegExp.allMatches(textData);
+    List<String> urls = urlMatches
+        .map((urlMatch) => textData.substring(urlMatch.start, urlMatch.end))
+        .toList();
+    List<String> linksString = [];
+    urls.forEach((String linkText) {
+      linksString.add(linkText);
+    });
+
+    if (linksString.length > 0) {
+      for (final linkTextData in linksString) {
+        // ignore: parameter_assignments
+        textData = textData.replaceAll(linkTextData,
+            '<a href="$linkTextData" target="_blank">$linkTextData</a>');
+      }
+    }
+    return textData;
+  }
 }
