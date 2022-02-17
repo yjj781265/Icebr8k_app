@@ -8,7 +8,6 @@ import 'package:get/route_manager.dart';
 import 'package:icebr8k/backend/controllers/chat_tab_controller.dart';
 import 'package:icebr8k/backend/controllers/main_page_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_tab.dart';
-import 'package:icebr8k/frontend/ib_pages/create_question_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/social_tab.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -17,6 +16,7 @@ import 'package:move_to_background/move_to_background.dart';
 
 import '../../backend/services/user_services/ib_local_data_service.dart';
 import '../ib_colors.dart';
+import 'create_question_pages/create_question_page.dart';
 import 'home_tab.dart';
 
 class MainPage extends StatelessWidget {

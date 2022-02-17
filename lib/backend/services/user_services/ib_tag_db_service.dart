@@ -13,22 +13,18 @@ class IbTagDbService {
 
   IbTagDbService._();
 
-  Future<String> uploadTagAndReturnId(String text) async {
+  Future<String> uploadTagAndReturnId(IbTag tag) async {
     final snapshot = await _db
         .collection(_kTagCollection)
-        .where('text', isEqualTo: text.trim())
+        .where('text', isEqualTo: tag.text.trim())
         .get();
     if (snapshot.size == 0) {
-      final IbTag ibTag = IbTag(
-          questionCount: 1,
-          text: text.trim(),
-          id: IbUtils.getUniqueId(),
-          creatorId: IbUtils.getCurrentUid()!);
-      await _db
-          .collection(_kTagCollection)
-          .doc(ibTag.id)
-          .set(ibTag.toJson(), SetOptions(merge: true));
-      return ibTag.id;
+      tag.timestamp = FieldValue.serverTimestamp();
+      await _db.collection(_kTagCollection).doc(tag.id).set(
+            tag.toJson(),
+            SetOptions(merge: true),
+          );
+      return tag.id;
     } else {
       final DocumentReference reference = snapshot.docs.first.reference;
       await reference.update({'questionCount': FieldValue.increment(1)});
@@ -46,21 +42,35 @@ class IbTagDbService {
     return null;
   }
 
-  Future<List<IbTag>> retrieveTrendingIbTags() async {
+  /// find if there are any tags in the database with the same text, if so return its id, otherwise generate a new one
+  Future<String> retrieveIbTagId(String text) async {
+    final snapshot = await _db
+        .collection(_kTagCollection)
+        .where('text', isEqualTo: text.trim())
+        .get();
+
+    if (snapshot.size == 0) {
+      return IbUtils.getUniqueId();
+    }
+    return snapshot.docs.first.id;
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> retrieveTrendingIbTags(
+      {DocumentSnapshot? lastDocSnapshot}) async {
+    if (lastDocSnapshot != null) {
+      return _db
+          .collection(_kTagCollection)
+          .orderBy('questionCount', descending: true)
+          .startAfterDocument(lastDocSnapshot)
+          .limit(16)
+          .get();
+    }
+
     final snapshot = await _db
         .collection(_kTagCollection)
         .orderBy('questionCount', descending: true)
-        .limit(8)
+        .limit(24)
         .get();
-    final list = <IbTag>[];
-    if (snapshot.size == 0) {
-      return list;
-    }
-
-    for (final element in snapshot.docs) {
-      list.add(IbTag.fromJson(element.data()));
-    }
-
-    return list;
+    return snapshot;
   }
 }

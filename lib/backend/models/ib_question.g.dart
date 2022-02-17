@@ -30,6 +30,14 @@ IbQuestion _$IbQuestionFromJson(Map<String, dynamic> json) => IbQuestion(
       description: json['description'] as String? ?? '',
       likes: json['likes'] as int? ?? 0,
       comments: json['comments'] as int? ?? 0,
+      medias: (json['medias'] as List<dynamic>?)
+              ?.map((e) => IbMedia.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      externalLinks: (json['externalLinks'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       pollSize: json['pollSize'] as int? ?? 0,
       askedTimeInMs: json['askedTimeInMs'] as int,
       endTimeInMs: json['endTimeInMs'] as int? ?? -1,
@@ -38,6 +46,8 @@ IbQuestion _$IbQuestionFromJson(Map<String, dynamic> json) => IbQuestion(
 Map<String, dynamic> _$IbQuestionToJson(IbQuestion instance) =>
     <String, dynamic>{
       'tagIds': instance.tagIds,
+      'medias': instance.medias.map((e) => e.toJson()).toList(),
+      'externalLinks': instance.externalLinks,
       'privacyBounds': instance.privacyBounds,
       'question': instance.question,
       'description': instance.description,

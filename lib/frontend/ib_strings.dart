@@ -72,8 +72,10 @@ class IbStrings extends Translations {
           'add_endpoint': 'Add an endpoint',
           'tap_to_add': 'Tap to add choices',
           'tap_to_add_sc': 'Tap to add 2 end points',
+          'edit_choice': 'Edit a choice',
           'match_interests': 'Match Interests',
           'add': 'Add',
+          'add_tag': 'Add a tag',
           'choice_limit_sc':
               'You can only have max ${IbConfig.kScChoiceLimit} endpoints per scale question.',
           'sc_question_not_valid': 'You need 2 endpoints for a scale question',
@@ -125,6 +127,11 @@ class IbStrings extends Translations {
           'back': 'Back',
           'home': 'Home',
           'alert': 'Alert',
+          'trending_tags': 'Trending Tags',
+          'picked_tags': 'Picked Tags',
+          'max_tag_info': 'You only can pick up to 8 tags',
+          'tag_picker_dialog_hint': 'Enter a tag here',
+          'tag_picker_dialog_title': 'Create Your Own Tag'
         }
       };
 }

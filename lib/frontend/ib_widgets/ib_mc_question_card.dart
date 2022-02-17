@@ -77,7 +77,6 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
       child: Obx(
         () => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
           children: [
             if (widget._controller.showStats.isTrue)
               IbQuestionStats(Get.put(
@@ -128,50 +127,47 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
       ),
     );
     return SingleChildScrollView(
-      child: SizedBox(
-          width: Get.width * 0.95,
-          child: IbCard(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: IbCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            IbQuestionHeader(widget._controller),
+            IbQuestionInfo(widget._controller),
+            const SizedBox(
+              height: 8,
+            ),
+            SizeTransition(
+              sizeFactor: animation,
+              child: expandableInfo,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IbQuestionHeader(widget._controller),
-                IbQuestionInfo(widget._controller),
-                const SizedBox(
-                  height: 8,
-                ),
-                SizeTransition(
-                  sizeFactor: animation,
-                  child: expandableInfo,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IbQuestionStatsBar(widget._controller),
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        widget._controller.rxIsExpanded.value =
-                            !widget._controller.rxIsExpanded.isTrue;
-                      },
-                      icon: Obx(() {
-                        _runExpandCheck();
-                        return widget._controller.rxIsExpanded.isTrue
-                            ? const Icon(
-                                Icons.expand_less_rounded,
-                                color: IbColors.primaryColor,
-                              )
-                            : const Icon(
-                                Icons.expand_more_outlined,
-                                color: IbColors.primaryColor,
-                              );
-                      }),
-                    ),
-                  ],
+                IbQuestionStatsBar(widget._controller),
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    widget._controller.rxIsExpanded.value =
+                        !widget._controller.rxIsExpanded.isTrue;
+                  },
+                  icon: Obx(() {
+                    _runExpandCheck();
+                    return widget._controller.rxIsExpanded.isTrue
+                        ? const Icon(
+                            Icons.expand_less_rounded,
+                            color: IbColors.primaryColor,
+                          )
+                        : const Icon(
+                            Icons.expand_more_outlined,
+                            color: IbColors.primaryColor,
+                          );
+                  }),
                 ),
               ],
             ),
-          )),
+          ],
+        ),
+      ),
     );
   }
 

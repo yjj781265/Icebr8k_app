@@ -17,6 +17,7 @@ class IbConfig {
   static const int kAgeLimitInDays = 4745;
   static const int kPicChoiceLimit = 9;
   static const int kScChoiceLimit = 2;
+  static const int kMaxImagesCount = 4;
   static const int kPasswordMinLength = 6;
   static const int kUsernameMinLength = 3;
   static const int kUsernameMaxLength = 20;
@@ -31,6 +32,7 @@ class IbConfig {
   static const int kImageQuality = 70;
   static const double kMcTxtItemHeight = 48;
   static const double kMcPicItemHeight = 88;
+  static const int kMaxTag = 8;
   static const double kMcPicHeight = 72;
   static const double kPicHeight = 88;
 

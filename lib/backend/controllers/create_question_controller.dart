@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
@@ -8,35 +9,31 @@ import 'package:icebr8k/frontend/ib_pages/review_question_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 
-import '../services/user_services/ib_tag_db_service.dart';
-import 'auth_controller.dart';
-
-class IbCreateQuestionController extends GetxController {
+class CreateQuestionController extends GetxController {
   String questionType = IbQuestion.kMultipleChoice;
   final TextEditingController questionEditController = TextEditingController();
   final TextEditingController descriptionEditController =
       TextEditingController();
   final title = 'text only'.obs;
+
   final choiceList = <IbChoice>[].obs;
   final picChoiceList = <IbChoice>[].obs;
   final picList = <IbChoice>[].obs;
   final scaleEndPoints = <IbChoice>[].obs;
+
+  final picMediaList = <String>[].obs;
+  final videoMediaList = <String>[].obs;
+  final extLinkList = <String>[].obs;
+  GeoFirePoint? geoFirePoint;
+
   final ibTagModels = <IbTagModel>[].obs;
   final filePath = ''.obs;
   final isCustomTagSelected = false.obs;
-  final pickedTags = <String>[].obs;
+  final pickedTags = <IbTag>[].obs;
 
   @override
   Future<void> onReady() async {
     super.onReady();
-    await initTrendingTags();
-  }
-
-  Future<void> initTrendingTags() async {
-    final List<IbTag> ibTags = await IbTagDbService().retrieveTrendingIbTags();
-    for (final tag in ibTags) {
-      ibTagModels.add(IbTagModel(tag: tag, selected: false));
-    }
   }
 
   void swapIndex(int oldIndex, int newIndex) {
@@ -171,101 +168,19 @@ class IbCreateQuestionController extends GetxController {
 
     IbUtils.hideKeyboard();
     final String id = IbUtils.getUniqueId();
-    if (questionType == IbQuestion.kScale) {
-      final _controller = IbQuestionItemController(
-        rxIbQuestion: IbQuestion(
-          question: questionEditController.text.trim(),
-          id: id,
-          creatorId: Get.find<AuthController>().firebaseUser!.uid,
-          description: descriptionEditController.text.trim(),
-          tagIds: pickedTags,
-          questionType: questionType.trim(),
-          askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
-          endpoints: scaleEndPoints,
-          choices: _generateScaleChoiceList(),
-        ).obs,
-        isSample: true,
-        disableAvatarOnTouch: true,
-        rxIsExpanded: true.obs,
-      );
-      Get.to(
-        () => ReviewQuestionPage(
-          itemController: Get.put(_controller, tag: 'sample_$id'),
-        ),
-      );
-      return;
-    }
-
-    if (questionType == IbQuestion.kMultipleChoicePic) {
-      final _controller = IbQuestionItemController(
-          rxIbQuestion: IbQuestion(
-            question: questionEditController.text.trim(),
-            id: id,
-            creatorId: Get.find<AuthController>().firebaseUser!.uid,
-            description: descriptionEditController.text.trim(),
-            questionType: questionType.trim(),
-            tagIds: pickedTags,
-            askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
-            choices: picChoiceList,
-          ).obs,
-          isSample: true,
-          isLocalFile: true,
-          rxIsExpanded: true.obs,
-          disableAvatarOnTouch: true);
-      Get.to(
-        () => ReviewQuestionPage(
-          itemController: Get.put(_controller, tag: 'sample_$id'),
-        ),
-      );
-      return;
-    }
-
-    if (questionType == IbQuestion.kMultipleChoice) {
-      final _controller = IbQuestionItemController(
-          rxIbQuestion: IbQuestion(
-            question: questionEditController.text.trim(),
-            id: id,
-            tagIds: pickedTags,
-            creatorId: Get.find<AuthController>().firebaseUser!.uid,
-            description: descriptionEditController.text.trim(),
-            questionType: questionType.trim(),
-            askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
-            choices: choiceList,
-          ).obs,
-          isSample: true,
-          rxIsExpanded: true.obs,
-          disableAvatarOnTouch: true);
-      Get.to(
-        () => ReviewQuestionPage(
-          itemController: Get.put(_controller, tag: 'sample_$id'),
-        ),
-      );
-      return;
-    }
-
-    if (questionType == IbQuestion.kPic) {
-      final _controller = IbQuestionItemController(
-          rxIbQuestion: IbQuestion(
-            question: questionEditController.text.trim(),
-            id: id,
-            tagIds: pickedTags,
-            creatorId: Get.find<AuthController>().firebaseUser!.uid,
-            description: descriptionEditController.text.trim(),
-            questionType: questionType.trim(),
-            askedTimeInMs: DateTime.now().millisecondsSinceEpoch,
-            choices: picList,
-          ).obs,
-          isSample: true,
-          rxIsExpanded: true.obs,
-          isLocalFile: true,
-          disableAvatarOnTouch: true);
-      Get.to(
-        () => ReviewQuestionPage(
-          itemController: Get.put(_controller, tag: 'sample_$id'),
-        ),
-      );
-      return;
-    }
+    final question = IbQuestion(
+        question: questionEditController.text.trim(),
+        id: id,
+        tagIds: pickedTags.map((element) => element.text).toList(),
+        creatorId: IbUtils.getCurrentUid()!,
+        choices: choiceList,
+        questionType: questionType,
+        askedTimeInMs: DateTime.now().millisecondsSinceEpoch);
+    Get.to(() => ReviewQuestionPage(
+        itemController: Get.put(IbQuestionItemController(
+            rxIbQuestion: question.obs,
+            rxIsExpanded: true.obs,
+            isSample: true))));
   }
 
   List<IbChoice> _generateScaleChoiceList() {

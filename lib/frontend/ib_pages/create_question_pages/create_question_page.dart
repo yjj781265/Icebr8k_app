@@ -7,19 +7,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/ib_create_question_controller.dart';
+import 'package:icebr8k/backend/controllers/create_question_controller.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_mc_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/ib_tenor_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
-import 'package:icebr8k/frontend/ib_pages/tag_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:reorderables/reorderables.dart';
 
-import '../ib_config.dart';
+import '../../ib_config.dart';
+import 'ib_media_bar.dart';
 
 class CreateQuestionPage extends StatefulWidget {
   const CreateQuestionPage({Key? key}) : super(key: key);
@@ -30,8 +31,8 @@ class CreateQuestionPage extends StatefulWidget {
 
 class _CreateQuestionPageState extends State<CreateQuestionPage>
     with SingleTickerProviderStateMixin {
-  final IbCreateQuestionController _controller =
-      Get.put(IbCreateQuestionController());
+  final CreateQuestionController _controller =
+      Get.put(CreateQuestionController());
   final TextEditingController _customTagController = TextEditingController();
   late TabController _tabController;
   late List<Widget> chips;
@@ -39,7 +40,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 4);
+    _tabController = TabController(vsync: this, length: 1);
     _tabController.addListener(() {
       if (_tabController.index == 0) {
         _controller.questionType = IbQuestion.kMultipleChoice;
@@ -79,8 +80,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
               )),
         ],
       ),
-      body: SafeArea(
-        bottom: false,
+      body: Scrollbar(
+        radius: const Radius.circular(8),
         child: ExtendedNestedScrollView(
           onlyOneScrollInBody: true,
           dragStartBehavior: DragStartBehavior.down,
@@ -90,21 +91,33 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                 child: IbCard(
                   child: Padding(
                     padding: const EdgeInsets.all(8),
-                    child: TextField(
-                      keyboardType: TextInputType.text,
-                      controller: _controller.questionEditController,
-                      minLines: 3,
-                      maxLines: 8,
-                      maxLength: IbConfig.kQuestionTitleMaxLength,
-                      style: const TextStyle(
-                          fontSize: IbConfig.kPageTitleSize,
-                          fontWeight: FontWeight.bold),
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'question'.tr,
-                          hintStyle: const TextStyle(
-                            color: IbColors.lightGrey,
-                          )),
+                    child: Column(
+                      children: [
+                        TextField(
+                          keyboardType: TextInputType.text,
+                          controller: _controller.questionEditController,
+                          minLines: 3,
+                          maxLines: 8,
+                          maxLength: IbConfig.kQuestionTitleMaxLength,
+                          style: const TextStyle(
+                              fontSize: IbConfig.kPageTitleSize,
+                              fontWeight: FontWeight.bold),
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'question'.tr,
+                              hintStyle: const TextStyle(
+                                color: IbColors.lightGrey,
+                              )),
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        const Divider(
+                          height: 0,
+                          thickness: 1,
+                        ),
+                        IbMediaBar(_controller),
+                      ],
                     ),
                   ),
                 ),
@@ -133,7 +146,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                   ),
                 ),
               ),
-              SliverToBoxAdapter(
+              /*SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: AnimatedSize(
@@ -165,8 +178,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                                           label: Text(
                                             e,
                                           ),
-                                          backgroundColor:
-                                              Theme.of(context).backgroundColor,
+                                          backgroundColor: Theme.of(context)
+                                              .backgroundColor,
                                           onDeleted: () {
                                             _controller.pickedTags.remove(e);
                                             final int index = _controller
@@ -209,7 +222,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                         ],
                       )),
                 ),
-              ),
+              ),*/
+
               SliverOverlapAbsorber(
                 handle: ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
                     context),
@@ -226,7 +240,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                                   icon: Icon(
                                 FontAwesomeIcons.bars,
                               ))),
-                          Tooltip(
+                          /*   Tooltip(
                               message: 'mc_p'.tr,
                               child: const Tab(
                                   icon: Icon(FontAwesomeIcons.listUl))),
@@ -237,7 +251,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                           Tooltip(
                               message: 'sc'.tr,
                               child: const Tab(
-                                  icon: Icon(FontAwesomeIcons.slidersH))),
+                                  icon: Icon(FontAwesomeIcons.slidersH))),*/
                         ],
                       ),
                     ),
@@ -251,105 +265,14 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
             child: TabBarView(
               controller: _tabController,
               children: [
-                _mCTab(),
-                _mCWithPicTab(),
+                CreateQuestionMcTab(_controller),
+                /*  _mCWithPicTab(),
                 _picTab(),
-                _sCTab(),
+                _sCTab(),*/
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _mCTab() {
-    return SingleChildScrollView(
-      physics: const PageScrollPhysics(),
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      child: Column(
-        children: [
-          const SizedBox(
-            height: 8,
-          ),
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              customBorder: ContinuousRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              onTap: () {
-                _showTextFiledBottomSheet('add_choice', _controller.choiceList);
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                width: Get.width * 0.95,
-                height: IbConfig.kMcTxtItemHeight,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Theme.of(context).primaryColor,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'tap_to_add'.tr,
-                      style: const TextStyle(color: IbColors.lightGrey),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.only(right: 10),
-                      child: Icon(Icons.add_outlined),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          Obx(() => ReorderableListView(
-                onReorder: (oldIndex, newIndex) {
-                  print('$oldIndex to $newIndex');
-                  _controller.swapIndex(oldIndex, newIndex);
-                },
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                primary: false,
-                children: [
-                  for (final item in _controller.choiceList)
-                    GestureDetector(
-                      key: UniqueKey(),
-                      onTap: () {
-                        _showEditTextFiledBtmSheet(item);
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        padding: const EdgeInsets.all(8),
-                        height: IbConfig.kMcTxtItemHeight,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: Theme.of(context).primaryColor),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(item.content!),
-                            IconButton(
-                                padding: EdgeInsets.zero,
-                                onPressed: () {
-                                  _controller.choiceList.remove(item);
-                                },
-                                icon: const Icon(
-                                  Icons.remove,
-                                  color: IbColors.errorRed,
-                                ))
-                          ],
-                        ),
-                      ),
-                    )
-                ],
-              ))
-        ],
       ),
     );
   }
@@ -370,8 +293,6 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                   borderRadius: BorderRadius.circular(16)),
               onTap: () {
                 IbUtils.hideKeyboard();
-                _showTextFiledBottomSheet(
-                    'add_choice', _controller.picChoiceList);
               },
               child: Container(
                 padding: const EdgeInsets.all(8),
@@ -415,8 +336,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
           const SizedBox(
             height: 8,
           ),
-          Obx(() => ReorderableListView(
-                shrinkWrap: true,
+          Obx(() => ReorderableColumn(
                 onReorder: (oldIndex, newIndex) {
                   print('$oldIndex to $newIndex');
                   _controller.swapIndex(oldIndex, newIndex);
@@ -425,7 +345,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                     .map((item) => GestureDetector(
                           key: UniqueKey(),
                           onTap: () {
-                            _showEditTextFiledBtmSheet(item);
+                            // _showEditTextFiledBtmSheet(item);
                           },
                           child: Container(
                             margin: const EdgeInsets.symmetric(
@@ -439,7 +359,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 if (item.url != null && item.url!.isNotEmpty)
-                                  GestureDetector(
+                                  InkWell(
                                     onTap: () {
                                       showMediaBottomSheet(context, item,
                                           _controller.picChoiceList);
@@ -466,7 +386,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                                     ),
                                   )
                                 else
-                                  GestureDetector(
+                                  InkWell(
                                     onTap: () {
                                       showMediaBottomSheet(context, item,
                                           _controller.picChoiceList);
@@ -513,96 +433,89 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
 
   Widget _picTab() {
     return SingleChildScrollView(
-      child: AnimatedSize(
-          duration: const Duration(milliseconds: 300),
-          child: Wrap(
-            children: [
-              Obx(() {
-                if (_controller.picList.length < IbConfig.kPicChoiceLimit) {
-                  return GestureDetector(
-                    onTap: () {
-                      showMediaBottomSheet(context, null, _controller.picList);
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                          color: IbColors.lightGrey,
-                          borderRadius: BorderRadius.circular(8)),
-                      width: IbConfig.kPicHeight + 8,
-                      height: IbConfig.kPicHeight + 8,
-                      child: const Icon(Icons.add),
-                    ),
-                  );
-                }
-                return const SizedBox();
-              }),
-              Obx(
-                () => ReorderableWrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  runAlignment: WrapAlignment.center,
-                  onReorder: (int oldIndex, int newIndex) {
-                    final IbChoice ibChoice =
-                        _controller.picList.removeAt(oldIndex);
-                    _controller.picList.insert(newIndex, ibChoice);
+      child: Obx(
+        () => ReorderableWrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          runAlignment: WrapAlignment.center,
+          onReorder: (int oldIndex, int newIndex) {
+            final IbChoice ibChoice = _controller.picList.removeAt(oldIndex);
+            _controller.picList.insert(newIndex, ibChoice);
+          },
+          buildDraggableFeedback: (context, axis, item) {
+            return Material(
+              color: Colors.transparent,
+              child: item,
+            );
+          },
+          header: [
+            Obx(() {
+              if (_controller.picList.length < IbConfig.kPicChoiceLimit) {
+                return GestureDetector(
+                  onTap: () {
+                    showMediaBottomSheet(context, null, _controller.picList);
                   },
-                  buildDraggableFeedback: (context, axis, item) {
-                    return Material(
-                      color: Colors.transparent,
-                      child: item,
-                    );
-                  },
-                  controller: ScrollController(),
-                  children: _controller.picList
-                      .map(
-                        (e) => Stack(
-                          children: [
-                            InkWell(
-                              customBorder: ContinuousRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16)),
-                              onTap: () {
-                                showMediaBottomSheet(
-                                    context, e, _controller.picList);
-                              },
-                              child: IbCard(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: SizedBox(
-                                    width: IbConfig.kPicHeight,
-                                    height: IbConfig.kPicHeight,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: e.url!.contains('http')
-                                          ? CachedNetworkImage(
-                                              imageUrl: e.url!,
-                                              fit: BoxFit.fill)
-                                          : Image.file(
-                                              File(e.url!),
-                                              fit: BoxFit.fill,
-                                            ),
+                  child: Container(
+                    margin: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                        color: IbColors.lightGrey,
+                        borderRadius: BorderRadius.circular(8)),
+                    width: IbConfig.kPicHeight + 8,
+                    height: IbConfig.kPicHeight + 8,
+                    child: const Icon(Icons.add),
+                  ),
+                );
+              }
+              return const SizedBox();
+            }),
+          ],
+          controller: ScrollController(),
+          children: _controller.picList
+              .map(
+                (e) => Stack(
+                  children: [
+                    InkWell(
+                      customBorder: ContinuousRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      onTap: () {
+                        showMediaBottomSheet(context, e, _controller.picList);
+                      },
+                      child: IbCard(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SizedBox(
+                            width: IbConfig.kPicHeight,
+                            height: IbConfig.kPicHeight,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: e.url!.contains('http')
+                                  ? CachedNetworkImage(
+                                      imageUrl: e.url!, fit: BoxFit.fill)
+                                  : Image.file(
+                                      File(e.url!),
+                                      fit: BoxFit.fill,
                                     ),
-                                  ),
-                                ),
-                              ),
                             ),
-                            Positioned(
-                              right: -14,
-                              top: -14,
-                              child: IconButton(
-                                color: IbColors.errorRed.withOpacity(1.0),
-                                onPressed: () {
-                                  _controller.picList.remove(e);
-                                },
-                                icon: const Icon(Icons.remove_circle),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      )
-                      .toList(),
+                      ),
+                    ),
+                    Positioned(
+                      right: -14,
+                      top: -14,
+                      child: IconButton(
+                        color: IbColors.errorRed.withOpacity(1.0),
+                        onPressed: () {
+                          _controller.picList.remove(e);
+                        },
+                        icon: const Icon(Icons.remove_circle),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          )),
+              )
+              .toList(),
+        ),
+      ),
     );
   }
 
@@ -620,8 +533,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
               onTap: () {
                 if (_controller.scaleEndPoints.length <
                     IbConfig.kScChoiceLimit) {
-                  _showTextFiledBottomSheet(
-                      'add_endpoint', _controller.scaleEndPoints);
+                  /*_showTextFiledBottomSheet(
+                      'add_endpoint', _controller.scaleEndPoints);*/
                 } else {
                   IbUtils.showSimpleSnackBar(
                       msg: 'choice_limit_sc'.tr,
@@ -668,7 +581,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                   GestureDetector(
                     key: UniqueKey(),
                     onTap: () {
-                      _showEditTextFiledBtmSheet(item);
+                      /* _showEditTextFiledBtmSheet(item);*/
                     },
                     child: Container(
                       margin: const EdgeInsets.symmetric(
@@ -700,161 +613,6 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
           )
         ],
       ),
-    );
-  }
-
-  void _showTextFiledBottomSheet(String strTrKey, List<IbChoice> list) {
-    final TextEditingController _txtController = TextEditingController();
-    final IbChoice ibChoice =
-        IbChoice(choiceId: IbUtils.getUniqueId(), content: '', url: '');
-    final Widget _widget = IbCard(
-        child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            strTrKey.tr,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: IbConfig.kPageTitleSize,
-            ),
-          ),
-          TextField(
-            textInputAction: TextInputAction.done,
-            maxLength: _controller.questionType == IbQuestion.kScale
-                ? IbConfig.kScAnswerMaxLength
-                : IbConfig.kAnswerMaxLength,
-            onSubmitted: (value) {
-              ibChoice.content = value.trim();
-              if (ibChoice.content!.isEmpty) {
-                return;
-              }
-
-              if (_controller.isChoiceDuplicated(ibChoice.content!)) {
-                Get.back();
-                return;
-              }
-
-              list.add(ibChoice);
-              Get.back();
-            },
-            controller: _txtController,
-            autofocus: true,
-            textAlign: TextAlign.center,
-            cursorColor: IbColors.primaryColor,
-          ),
-          TextButton(
-            onPressed: () {
-              ibChoice.content = _txtController.text.trim();
-              if (ibChoice.content!.isEmpty) {
-                return;
-              }
-              if (_controller.isChoiceDuplicated(ibChoice.content!)) {
-                Get.back();
-                return;
-              }
-              list.add(ibChoice);
-              Get.back();
-            },
-            child: Text('add'.tr),
-          ),
-        ],
-      ),
-    ));
-    Get.bottomSheet(SizedBox(height: 200, child: _widget),
-        persistent: true, ignoreSafeArea: false);
-  }
-
-  void _showTagsDialog() {
-    Get.to(() => TagPage(_controller),
-        fullscreenDialog: true, transition: Transition.fade);
-  }
-
-  void _showEditTextFiledBtmSheet(IbChoice ibChoice) {
-    final TextEditingController _txtController = TextEditingController();
-    _txtController.text = ibChoice.content == null ? '' : ibChoice.content!;
-
-    final Widget _widget = IbCard(
-        child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'Edit a choice',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: IbConfig.kPageTitleSize,
-            ),
-          ),
-          TextField(
-            textInputAction: TextInputAction.done,
-            maxLength: _controller.questionType == IbQuestion.kScale
-                ? IbConfig.kScAnswerMaxLength
-                : IbConfig.kAnswerMaxLength,
-            onSubmitted: (value) {
-              if (_controller.questionType == IbQuestion.kMultipleChoice &&
-                  _controller.isChoiceDuplicated(value.trim())) {
-                Get.back();
-                return;
-              }
-
-              if (_controller.questionType == IbQuestion.kScale &&
-                  _controller.isChoiceDuplicated(value.trim())) {
-                Get.back();
-                return;
-              }
-
-              if (value.trim().isEmpty &&
-                  (_controller.questionType == IbQuestion.kScale ||
-                      _controller.questionType == IbQuestion.kMultipleChoice)) {
-                return;
-              }
-
-              setState(() {
-                ibChoice.content = value.trim();
-                Get.back();
-              });
-            },
-            controller: _txtController,
-            autofocus: true,
-            textAlign: TextAlign.center,
-            cursorColor: IbColors.primaryColor,
-          ),
-          TextButton(
-            onPressed: () {
-              if (_controller.questionType == IbQuestion.kMultipleChoice &&
-                  _controller.isChoiceDuplicated(_txtController.text.trim())) {
-                Get.back();
-                return;
-              }
-
-              if (_controller.questionType == IbQuestion.kScale &&
-                  _controller.isChoiceDuplicated(_txtController.text.trim())) {
-                Get.back();
-                return;
-              }
-
-              if (_txtController.text.trim().isEmpty &&
-                  (_controller.questionType == IbQuestion.kScale ||
-                      _controller.questionType == IbQuestion.kMultipleChoice)) {
-                return;
-              }
-
-              setState(() {
-                ibChoice.content = _txtController.text.trim();
-                Get.back();
-              });
-            },
-            child: const Text('Apply'),
-          ),
-        ],
-      ),
-    ));
-    Get.bottomSheet(
-      SizedBox(height: 200, child: _widget),
-      persistent: true,
     );
   }
 }

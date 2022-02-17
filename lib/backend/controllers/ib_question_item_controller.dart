@@ -261,9 +261,9 @@ class IbQuestionItemController extends GetxController {
 
     if (rxIbQuestion.value.tagIds.isNotEmpty) {
       for (int i = 0; i < rxIbQuestion.value.tagIds.length; i++) {
-        final String id = await IbTagDbService()
+        /* final String id = await IbTagDbService()
             .uploadTagAndReturnId(rxIbQuestion.value.tagIds[i]);
-        rxIbQuestion.value.tagIds[i] = id;
+        rxIbQuestion.value.tagIds[i] = id;*/
       }
     }
 

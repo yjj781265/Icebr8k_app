@@ -66,9 +66,7 @@ class IbLocationService {
         latitude: centerLoc.latitude!, longitude: centerLoc.longitude!);
     final collectionRef = _firestore.collectionGroup(_kDbLocCollectionGroup);
 
-    return geo
-        .collection(collectionRef: collectionRef)
-        .within(center: loc, radius: 50, field: 'position', strictMode: true);
+    return null;
   }
 
   Future<bool> checkPermissionsAndDeviceService() async {

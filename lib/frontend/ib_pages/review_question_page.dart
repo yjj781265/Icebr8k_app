@@ -38,86 +38,83 @@ class ReviewQuestionPage extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _handleQuestionType(),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  'Options',
-                  style: TextStyle(
-                      fontSize: IbConfig.kNormalTextSize,
-                      fontWeight: FontWeight.bold),
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _handleQuestionType(),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'Options',
+                style: TextStyle(
+                    fontSize: IbConfig.kNormalTextSize,
+                    fontWeight: FontWeight.bold),
               ),
-              ListTile(
+            ),
+            ListTile(
+              tileColor: Theme.of(context).primaryColor,
+              leading: const Icon(
+                Icons.hourglass_top_outlined,
+                color: Colors.redAccent,
+              ),
+              onTap: () {
+                _timeLimitBtmSheet();
+              },
+              title: const Text('Time Limit'),
+              trailing: Obx(() {
+                if (itemController.rxIbQuestion.value.endTimeInMs == -1) {
+                  return const Text('No Time Limit');
+                }
+                return Text(IbUtils.leftTimeString(
+                    itemController.rxIbQuestion.value.endTimeInMs));
+              }),
+            ),
+            Obx(
+              () => SwitchListTile(
                 tileColor: Theme.of(context).primaryColor,
-                leading: const Icon(
-                  Icons.hourglass_top_outlined,
-                  color: Colors.redAccent,
-                ),
-                onTap: () {
-                  _timeLimitBtmSheet();
+                value: itemController.rxIbQuestion.value.isCommentEnabled,
+                onChanged: (value) {
+                  itemController.rxIbQuestion.value.isCommentEnabled = value;
+                  itemController.rxIbQuestion.refresh();
                 },
-                title: const Text('Time Limit'),
-                trailing: Obx(() {
-                  if (itemController.rxIbQuestion.value.endTimeInMs == -1) {
-                    return const Text('No Time Limit');
-                  }
-                  return Text(IbUtils.leftTimeString(
-                      itemController.rxIbQuestion.value.endTimeInMs));
-                }),
-              ),
-              Obx(
-                () => SwitchListTile(
-                  tileColor: Theme.of(context).primaryColor,
-                  value: itemController.rxIbQuestion.value.isCommentEnabled,
-                  onChanged: (value) {
-                    itemController.rxIbQuestion.value.isCommentEnabled = value;
-                    itemController.rxIbQuestion.refresh();
-                  },
-                  title: const Text('Comment'),
-                  secondary: const Icon(
-                    FontAwesomeIcons.comment,
-                    color: IbColors.primaryColor,
-                  ),
-                ),
-              ),
-              ListTile(
-                tileColor: Theme.of(context).primaryColor,
-                trailing: const Text('ALL'),
-                title: const Text(
-                  'Privacy Bonds',
-                ),
-                leading: const Icon(
-                  Icons.remove_red_eye,
+                title: const Text('Comment'),
+                secondary: const Icon(
+                  FontAwesomeIcons.comment,
                   color: IbColors.primaryColor,
                 ),
               ),
-              Obx(
-                () => SwitchListTile(
-                  tileColor: Theme.of(context).primaryColor,
-                  value: itemController.rxIbQuestion.value.isAnonymous,
-                  onChanged: (value) {
-                    itemController.rxIbQuestion.value.isAnonymous = value;
-                    itemController.rxIbQuestion.refresh();
-                  },
-                  title: const Text('Anonymous'),
-                  secondary: const Icon(
-                    Icons.person,
-                    color: IbColors.lightGrey,
-                  ),
+            ),
+            ListTile(
+              tileColor: Theme.of(context).primaryColor,
+              trailing: const Text('ALL'),
+              title: const Text(
+                'Privacy Bonds',
+              ),
+              leading: const Icon(
+                Icons.remove_red_eye,
+                color: IbColors.primaryColor,
+              ),
+            ),
+            Obx(
+              () => SwitchListTile(
+                tileColor: Theme.of(context).primaryColor,
+                value: itemController.rxIbQuestion.value.isAnonymous,
+                onChanged: (value) {
+                  itemController.rxIbQuestion.value.isAnonymous = value;
+                  itemController.rxIbQuestion.refresh();
+                },
+                title: const Text('Anonymous'),
+                secondary: const Icon(
+                  Icons.person,
+                  color: IbColors.lightGrey,
                 ),
               ),
-              const SizedBox(
-                height: 16,
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+          ],
         ),
       ),
     );

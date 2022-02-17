@@ -7,12 +7,14 @@ class IbTag {
   String text;
   String id;
   int? questionCount;
+  dynamic timestamp;
   String creatorId;
 
   IbTag(
       {required this.text,
       required this.id,
       required this.creatorId,
+      this.timestamp,
       this.questionCount});
 
   factory IbTag.fromJson(Map<String, dynamic> json) => _$IbTagFromJson(json);

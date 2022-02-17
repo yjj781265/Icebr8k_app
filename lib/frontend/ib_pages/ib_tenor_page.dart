@@ -22,24 +22,36 @@ class IbTenorPage extends StatelessWidget {
           children: [
             Expanded(
               flex: 8,
-              child: TextField(
-                onSubmitted: (value) async {
-                  await _controller.search();
-                },
-                textInputAction: TextInputAction.search,
-                controller: _controller.editingController,
-                autofocus: true,
-                decoration: InputDecoration(
-                  suffixIcon: Obx(
-                    () => _controller.isSearchBoxEmpty.value
-                        ? const SizedBox()
-                        : IconButton(
-                            onPressed: () {
-                              _controller.editingController.clear();
-                            },
-                            icon: const Icon(Icons.cancel)),
+              child: Container(
+                alignment: Alignment.center,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).backgroundColor,
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                ),
+                child: TextField(
+                  onSubmitted: (value) async {
+                    await _controller.search();
+                  },
+                  textInputAction: TextInputAction.search,
+                  controller: _controller.editingController,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    suffixIcon: Obx(
+                      () => _controller.isSearchBoxEmpty.value
+                          ? const SizedBox()
+                          : IconButton(
+                              onPressed: () {
+                                _controller.editingController.clear();
+                              },
+                              icon: const Icon(
+                                Icons.cancel,
+                                color: IbColors.lightGrey,
+                              )),
+                    ),
+                    hintText: '🔍 Search Tenor',
                   ),
-                  hintText: '🔍 Search Tenor',
                 ),
               ),
             ),
@@ -146,73 +158,47 @@ class IbTenorPage extends StatelessWidget {
               ),
 
               /// show trending gif when search box is empty
-              if (_controller.showSearchResult.isFalse)
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SmartRefresher(
-                      scrollController: _controller.scrollController,
-                      controller: _controller.refreshController,
-                      enablePullUp: true,
-                      enablePullDown: false,
-                      onLoading: () async {
-                        await _controller.loadMore();
-                      },
-                      child: SingleChildScrollView(
-                        keyboardDismissBehavior:
-                            ScrollViewKeyboardDismissBehavior.onDrag,
-                        child: StaggeredGrid.count(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 8,
-                          crossAxisSpacing: 8,
-                          children: _controller.trendingGifs
-                              .map(
-                                (e) => iBGifItem(e),
-                              )
-                              .toList(),
-                        ),
+              /// show search result gif when search is done
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SmartRefresher(
+                    scrollController: _controller.scrollController,
+                    controller: _controller.refreshController,
+                    enablePullUp: true,
+                    enablePullDown: false,
+                    onLoading: () async {
+                      await _controller.loadMore();
+                    },
+                    child: SingleChildScrollView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      child: StaggeredGrid.count(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                        children: _controller.showSearchResult.isFalse
+                            ? _controller.trendingGifs
+                                .map(
+                                  (e) => iBGifItem(e),
+                                )
+                                .toList()
+                            : _controller.resultGifs
+                                .map(
+                                  (e) => iBGifItem(e),
+                                )
+                                .toList(),
                       ),
                     ),
                   ),
                 ),
+              ),
               if (_controller.showSearchResult.isTrue &&
                   _controller.isSearching.isTrue)
                 const Expanded(
                     child: Center(
                   child: IbProgressIndicator(),
                 )),
-
-              /// show search result gif when search is done
-              if (_controller.showSearchResult.isTrue &&
-                  _controller.isSearching.isFalse)
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SmartRefresher(
-                      scrollController: _controller.scrollController,
-                      controller: _controller.refreshController,
-                      enablePullUp: true,
-                      enablePullDown: false,
-                      onLoading: () async {
-                        await _controller.loadMore();
-                      },
-                      child: SingleChildScrollView(
-                        keyboardDismissBehavior:
-                            ScrollViewKeyboardDismissBehavior.onDrag,
-                        child: StaggeredGrid.count(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 8,
-                          crossAxisSpacing: 8,
-                          children: _controller.resultGifs
-                              .map(
-                                (e) => iBGifItem(e),
-                              )
-                              .toList(),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
             ],
           ),
         ),
