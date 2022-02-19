@@ -211,7 +211,7 @@ class _PeopleNearByTabState extends State<PeopleNearByTab>
                   print(value);
                   _controller.shareLoc.value = value;
                   IbLocalDataService().updateBoolValue(
-                      key: StorageKey.isLocSharingOn, value: value);
+                      key: StorageKey.isLocSharingOnBool, value: value);
                   if (value) {
                     _controller.isSearching.value = true;
                     await _controller.searchPeopleNearby();

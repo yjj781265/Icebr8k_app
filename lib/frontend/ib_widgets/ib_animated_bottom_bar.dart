@@ -31,7 +31,6 @@ class IbAnimatedBottomBar extends StatelessWidget {
     final bgColor = backgroundColor ?? Theme.of(context).bottomAppBarColor;
 
     return AnimatedContainer(
-      curve: Curves.linear,
       height: containerHeight,
       width: double.infinity,
       decoration: BoxDecoration(
@@ -49,18 +48,26 @@ class IbAnimatedBottomBar extends StatelessWidget {
       /// user wrap to prevent overflow at the bottom when nav is not visible
       child: Wrap(
         runAlignment: WrapAlignment.center,
+        alignment: WrapAlignment.center,
         children: [
           Row(
             mainAxisAlignment: mainAxisAlignment,
             children: items.map((item) {
               final index = items.indexOf(item);
-              return InkWell(
-                onTap: () => onItemSelected(index),
-                child: _ItemWidget(
-                  item: item,
-                  iconSize: iconSize,
-                  isSelected: index == selectedIndex,
-                  backgroundColor: bgColor,
+              return Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () => onItemSelected(index),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: _ItemWidget(
+                      item: item,
+                      iconSize: iconSize,
+                      isSelected: index == selectedIndex,
+                      backgroundColor: bgColor,
+                    ),
+                  ),
                 ),
               );
             }).toList(),
@@ -128,7 +135,7 @@ class _ItemWidget extends StatelessWidget {
               ),
             ),
           ),
-        )
+        ),
     ]);
   }
 }

@@ -46,8 +46,8 @@ class IbDialog extends StatelessWidget {
                 Text(
                   subtitle,
                   style: const TextStyle(
-                      fontSize: IbConfig.kNormalTextSize,
-                      color: IbColors.lightGrey),
+                    fontSize: IbConfig.kNormalTextSize,
+                  ),
                 ),
                 content ?? const SizedBox(),
                 const SizedBox(

@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/create_question_controller.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_mc_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/ib_tenor_page.dart';
@@ -18,6 +19,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:reorderables/reorderables.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../../ib_config.dart';
 import 'ib_media_bar.dart';
@@ -33,7 +35,6 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     with SingleTickerProviderStateMixin {
   final CreateQuestionController _controller =
       Get.put(CreateQuestionController());
-  final TextEditingController _customTagController = TextEditingController();
   late TabController _tabController;
   late List<Widget> chips;
 
@@ -60,217 +61,227 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        title: Obx(
-          () => Text(
-            'create_question'.trParams({'type': _controller.title.value}),
-            style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+    return ShowCaseWidget(
+      onFinish: () {
+        IbLocalDataService().updateBoolValue(
+            key: StorageKey.pickTagForQuestionBool, value: true);
+      },
+      builder: Builder(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            centerTitle: false,
+            title: Obx(
+              () => Text(
+                'create_question'.trParams({'type': _controller.title.value}),
+                style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+              ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    _controller.validQuestion(context);
+                  },
+                  child: const Text(
+                    'Next',
+                    style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                  )),
+            ],
           ),
-        ),
-        actions: [
-          TextButton(
-              onPressed: () {
-                _controller.validQuestion();
-              },
-              child: const Text(
-                'Next',
-                style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-              )),
-        ],
-      ),
-      body: Scrollbar(
-        radius: const Radius.circular(8),
-        child: ExtendedNestedScrollView(
-          onlyOneScrollInBody: true,
-          dragStartBehavior: DragStartBehavior.down,
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return [
-              SliverToBoxAdapter(
-                child: IbCard(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      children: [
-                        TextField(
-                          keyboardType: TextInputType.text,
-                          controller: _controller.questionEditController,
+          body: Scrollbar(
+            radius: const Radius.circular(8),
+            child: ExtendedNestedScrollView(
+              onlyOneScrollInBody: true,
+              dragStartBehavior: DragStartBehavior.down,
+              headerSliverBuilder:
+                  (BuildContext context, bool innerBoxIsScrolled) {
+                return [
+                  SliverToBoxAdapter(
+                    child: IbCard(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
+                          children: [
+                            TextField(
+                              keyboardType: TextInputType.text,
+                              controller: _controller.questionEditController,
+                              minLines: 3,
+                              maxLines: 8,
+                              maxLength: IbConfig.kQuestionTitleMaxLength,
+                              style: const TextStyle(
+                                  fontSize: IbConfig.kPageTitleSize,
+                                  fontWeight: FontWeight.bold),
+                              decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: 'question'.tr,
+                                  hintStyle: const TextStyle(
+                                    color: IbColors.lightGrey,
+                                  )),
+                            ),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            const Divider(
+                              height: 0,
+                              thickness: 1,
+                            ),
+                            IbMediaBar(_controller),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: IbCard(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: TextField(
+                          keyboardType: TextInputType.multiline,
+                          textInputAction: TextInputAction.newline,
+                          controller: _controller.descriptionEditController,
+                          maxLengthEnforcement: MaxLengthEnforcement.enforced,
                           minLines: 3,
                           maxLines: 8,
-                          maxLength: IbConfig.kQuestionTitleMaxLength,
+                          maxLength: IbConfig.kQuestionDescMaxLength,
                           style: const TextStyle(
-                              fontSize: IbConfig.kPageTitleSize,
-                              fontWeight: FontWeight.bold),
+                              fontSize: IbConfig.kNormalTextSize,
+                              fontWeight: FontWeight.normal),
                           decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'question'.tr,
+                              hintText: 'description_option'.tr,
                               hintStyle: const TextStyle(
                                 color: IbColors.lightGrey,
                               )),
                         ),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        const Divider(
-                          height: 0,
-                          thickness: 1,
-                        ),
-                        IbMediaBar(_controller),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: IbCard(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: TextField(
-                      keyboardType: TextInputType.multiline,
-                      textInputAction: TextInputAction.newline,
-                      controller: _controller.descriptionEditController,
-                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                      minLines: 3,
-                      maxLines: 8,
-                      maxLength: IbConfig.kQuestionDescMaxLength,
-                      style: const TextStyle(
-                          fontSize: IbConfig.kNormalTextSize,
-                          fontWeight: FontWeight.normal),
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'description_option'.tr,
-                          hintStyle: const TextStyle(
-                            color: IbColors.lightGrey,
-                          )),
-                    ),
-                  ),
-                ),
-              ),
-              /*SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: AnimatedSize(
-                      duration: const Duration(milliseconds: 300),
-                      child: Wrap(
-                        runAlignment: WrapAlignment.end,
-                        crossAxisAlignment: WrapCrossAlignment.end,
-                        children: [
-                          Obx(
-                            () => ReorderableWrap(
-                              onReorder: (int oldIndex, int newIndex) {
-                                final String tag =
-                                    _controller.pickedTags.removeAt(oldIndex);
-                                _controller.pickedTags.insert(newIndex, tag);
-                              },
-                              buildDraggableFeedback: (context, axis, item) {
-                                return Material(
-                                  color: Colors.transparent,
-                                  child: item,
-                                );
-                              },
-                              controller: ScrollController(),
-                              children: _controller.pickedTags
-                                  .map((e) => Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 4.0),
-                                        child: Chip(
-                                          elevation: 1,
-                                          label: Text(
-                                            e,
-                                          ),
-                                          backgroundColor: Theme.of(context)
-                                              .backgroundColor,
-                                          onDeleted: () {
-                                            _controller.pickedTags.remove(e);
-                                            final int index = _controller
-                                                .ibTagModels
-                                                .indexWhere((element) =>
-                                                    element.tag.text == e);
-                                            if (index != -1) {
-                                              _controller.ibTagModels[index]
-                                                  .selected = false;
-                                            }
-                                          },
-                                          deleteIcon: const Icon(
-                                            Icons.highlight_remove,
-                                            color: IbColors.lightGrey,
-                                          ),
-                                        ),
-                                      ))
-                                  .toList(),
-                            ),
-                          ),
-                          Obx(() {
-                            if (_controller.pickedTags.length < 8) {
-                              return TextButton.icon(
-                                  onPressed: () {
-                                    _customTagController.clear();
-                                    _controller.isCustomTagSelected.value =
-                                        false;
-                                    _showTagsDialog();
-                                  },
-                                  icon: const Tooltip(
-                                    message: 'Add Tags',
-                                    child: Icon(Icons.add_circle_outline),
-                                  ),
-                                  label: const Text(
-                                    'Add Tags 🏷️',
-                                  ));
-                            }
-                            return const SizedBox();
-                          }),
-                        ],
-                      )),
-                ),
-              ),*/
-
-              SliverOverlapAbsorber(
-                handle: ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
-                    context),
-                sliver: SliverPersistentHeader(
-                  pinned: true,
-                  delegate: PersistentHeader(
-                    widget: IbCard(
-                      child: TabBar(
-                        controller: _tabController,
-                        tabs: [
-                          Tooltip(
-                              message: 'mc'.tr,
-                              child: const Tab(
-                                  icon: Icon(
-                                FontAwesomeIcons.bars,
-                              ))),
-                          /*   Tooltip(
-                              message: 'mc_p'.tr,
-                              child: const Tab(
-                                  icon: Icon(FontAwesomeIcons.listUl))),
-                          Tooltip(
-                              message: 'pic'.tr,
-                              child: const Tab(
-                                  icon: Icon(FontAwesomeIcons.square))),
-                          Tooltip(
-                              message: 'sc'.tr,
-                              child: const Tab(
-                                  icon: Icon(FontAwesomeIcons.slidersH))),*/
-                        ],
                       ),
                     ),
                   ),
+                  /*SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: AnimatedSize(
+                          duration: const Duration(milliseconds: 300),
+                          child: Wrap(
+                            runAlignment: WrapAlignment.end,
+                            crossAxisAlignment: WrapCrossAlignment.end,
+                            children: [
+                              Obx(
+                                () => ReorderableWrap(
+                                  onReorder: (int oldIndex, int newIndex) {
+                                    final String tag =
+                                        _controller.pickedTags.removeAt(oldIndex);
+                                    _controller.pickedTags.insert(newIndex, tag);
+                                  },
+                                  buildDraggableFeedback: (context, axis, item) {
+                                    return Material(
+                                      color: Colors.transparent,
+                                      child: item,
+                                    );
+                                  },
+                                  controller: ScrollController(),
+                                  children: _controller.pickedTags
+                                      .map((e) => Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 4.0),
+                                            child: Chip(
+                                              elevation: 1,
+                                              label: Text(
+                                                e,
+                                              ),
+                                              backgroundColor: Theme.of(context)
+                                                  .backgroundColor,
+                                              onDeleted: () {
+                                                _controller.pickedTags.remove(e);
+                                                final int index = _controller
+                                                    .ibTagModels
+                                                    .indexWhere((element) =>
+                                                        element.tag.text == e);
+                                                if (index != -1) {
+                                                  _controller.ibTagModels[index]
+                                                      .selected = false;
+                                                }
+                                              },
+                                              deleteIcon: const Icon(
+                                                Icons.highlight_remove,
+                                                color: IbColors.lightGrey,
+                                              ),
+                                            ),
+                                          ))
+                                      .toList(),
+                                ),
+                              ),
+                              Obx(() {
+                                if (_controller.pickedTags.length < 8) {
+                                  return TextButton.icon(
+                                      onPressed: () {
+                                        _customTagController.clear();
+                                        _controller.isCustomTagSelected.value =
+                                            false;
+                                        _showTagsDialog();
+                                      },
+                                      icon: const Tooltip(
+                                        message: 'Add Tags',
+                                        child: Icon(Icons.add_circle_outline),
+                                      ),
+                                      label: const Text(
+                                        'Add Tags 🏷️',
+                                      ));
+                                }
+                                return const SizedBox();
+                              }),
+                            ],
+                          )),
+                    ),
+                  ),*/
+
+                  SliverOverlapAbsorber(
+                    handle:
+                        ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
+                            context),
+                    sliver: SliverPersistentHeader(
+                      pinned: true,
+                      delegate: PersistentHeader(
+                        widget: IbCard(
+                          child: TabBar(
+                            controller: _tabController,
+                            tabs: [
+                              Tooltip(
+                                  message: 'mc'.tr,
+                                  child: const Tab(
+                                      icon: Icon(
+                                    FontAwesomeIcons.bars,
+                                  ))),
+                              /*   Tooltip(
+                                  message: 'mc_p'.tr,
+                                  child: const Tab(
+                                      icon: Icon(FontAwesomeIcons.listUl))),
+                              Tooltip(
+                                  message: 'pic'.tr,
+                                  child: const Tab(
+                                      icon: Icon(FontAwesomeIcons.square))),
+                              Tooltip(
+                                  message: 'sc'.tr,
+                                  child: const Tab(
+                                      icon: Icon(FontAwesomeIcons.slidersH))),*/
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                ];
+              },
+              body: Padding(
+                padding: const EdgeInsets.only(top: 56),
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    CreateQuestionMcTab(_controller),
+                    /*  _mCWithPicTab(),
+                    _picTab(),
+                    _sCTab(),*/
+                  ],
                 ),
-              )
-            ];
-          },
-          body: Padding(
-            padding: const EdgeInsets.only(top: 56),
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                CreateQuestionMcTab(_controller),
-                /*  _mCWithPicTab(),
-                _picTab(),
-                _sCTab(),*/
-              ],
+              ),
             ),
           ),
         ),

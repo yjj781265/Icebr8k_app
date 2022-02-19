@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/create_question_controller.dart';
+import 'package:icebr8k/backend/models/ib_media.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/ib_tenor_page.dart';
@@ -25,124 +26,140 @@ class CreateQuestionImagePicker extends StatelessWidget {
           () => Text(
               '${_controller.picMediaList.length}/${IbConfig.kMaxImagesCount} Images Picked'),
         ),
+        actions: [
+          TextButton(
+              onPressed: () {
+                Get.back();
+              },
+              child: Text('confirm'.tr))
+        ],
       ),
-      body: Obx(
-        () => Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ReorderableWrap(
-            spacing: 16,
-            runSpacing: 16,
-            footer: _controller.picMediaList.length < IbConfig.kMaxImagesCount
-                ? InkWell(
-                    onTap: () => showMediaBottomSheet(
-                        context, null, _controller.picMediaList),
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      decoration: const BoxDecoration(
-                        color: IbColors.lightGrey,
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(8),
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.add,
-                        size: 36,
-                      ),
-                    ),
-                  )
-                : null,
-            buildDraggableFeedback: (context, axis, item) {
-              return Material(
-                color: Colors.transparent,
-                child: item,
-              );
-            },
-            onReorder: (int oldIndex, int newIndex) {
-              final String url = _controller.picMediaList.removeAt(oldIndex);
-              _controller.picMediaList.insert(newIndex, url);
-            },
-            children: buildList(context, _controller.picMediaList),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'double_tap_pic'.tr,
+              style: const TextStyle(
+                  fontSize: IbConfig.kDescriptionTextSize,
+                  color: IbColors.lightGrey),
+            ),
           ),
-        ),
+          Obx(
+            () => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ReorderableWrap(
+                spacing: 16,
+                runSpacing: 16,
+                footer:
+                    _controller.picMediaList.length < IbConfig.kMaxImagesCount
+                        ? InkWell(
+                            onTap: () => showMediaBottomSheet(
+                                context, null, _controller.picMediaList),
+                            child: Container(
+                              width: 100,
+                              height: 100,
+                              decoration: const BoxDecoration(
+                                color: IbColors.lightGrey,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(8),
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.add,
+                                size: 36,
+                              ),
+                            ),
+                          )
+                        : null,
+                buildDraggableFeedback: (context, axis, item) {
+                  return Material(
+                    color: Colors.transparent,
+                    child: item,
+                  );
+                },
+                onReorder: (int oldIndex, int newIndex) {
+                  final IbMedia media =
+                      _controller.picMediaList.removeAt(oldIndex);
+                  _controller.picMediaList.insert(newIndex, media);
+                },
+                children: buildList(
+                    context: context, medias: _controller.picMediaList),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  List<Widget> buildList(BuildContext context, List<String> urls) {
+  List<Widget> buildList(
+      {required BuildContext context, required List<IbMedia> medias}) {
     final List<Widget> widgets = [];
-    for (int i = 0; i < urls.length; i++) {
-      final url = urls[i];
-      final String heroTag = IbUtils.getUniqueId();
+    for (int i = 0; i < medias.length; i++) {
+      final media = medias[i];
       widgets.add(
-        Hero(
-          tag: heroTag,
-          child: Material(
-            color: Colors.transparent,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  child: SizedBox(
-                    width: 100,
-                    height: 100,
-                    child: url.contains('http')
-                        ? CachedNetworkImage(
-                            imageUrl: url,
-                            fit: BoxFit.cover,
-                          )
-                        : Image.file(
-                            File(url),
-                            fit: BoxFit.cover,
-                          ),
-                  ),
-                ),
-                Positioned.fill(
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      customBorder: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                      onDoubleTap: () {
-                        if (url.isNotEmpty) {
-                          Get.to(
-                              () => IbMediaViewer(
-                                    urls: [url],
-                                    currentIndex: 0,
-                                    heroTag: heroTag,
-                                  ),
-                              transition: Transition.noTransition);
-                        }
-                      },
-                      onTap: () {
-                        showMediaBottomSheet(
-                            context, i, _controller.picMediaList);
-                      },
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: -8,
-                  right: -8,
-                  child: CircleAvatar(
-                    radius: 14,
-                    backgroundColor: Theme.of(context).backgroundColor,
-                    child: Center(
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          _controller.picMediaList.removeAt(i);
-                        },
-                        icon: const Icon(Icons.remove),
-                        color: IbColors.errorRed,
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              child: SizedBox(
+                width: 100,
+                height: 100,
+                child: media.url.contains('http')
+                    ? CachedNetworkImage(
+                        imageUrl: media.url,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.file(
+                        File(media.url),
+                        fit: BoxFit.cover,
                       ),
-                    ),
+              ),
+            ),
+            Positioned.fill(
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  customBorder: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                  onDoubleTap: () {
+                    if (media.url.isNotEmpty) {
+                      Get.to(
+                          () => IbMediaViewer(
+                                urls: [media.url],
+                                currentIndex: 0,
+                              ),
+                          transition: Transition.zoom);
+                    }
+                  },
+                  onTap: () {
+                    showMediaBottomSheet(context, i, _controller.picMediaList);
+                  },
+                ),
+              ),
+            ),
+            Positioned(
+              top: -8,
+              right: -8,
+              child: CircleAvatar(
+                radius: 14,
+                backgroundColor: Theme.of(context).backgroundColor,
+                child: Center(
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      _controller.picMediaList.removeAt(i);
+                    },
+                    icon: const Icon(Icons.remove),
+                    color: IbColors.errorRed,
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       );
     }
@@ -151,7 +168,7 @@ class CreateQuestionImagePicker extends StatelessWidget {
   }
 
   void showMediaBottomSheet(
-      BuildContext context, int? index, RxList<String> list) {
+      BuildContext context, int? index, RxList<IbMedia> list) {
     final Widget options = ListView(
       shrinkWrap: true,
       children: [
@@ -167,10 +184,16 @@ class CreateQuestionImagePicker extends StatelessWidget {
             if (pickedFile != null) {
               if (index != null) {
                 // ignore: parameter_assignments
-                list[index] = pickedFile.path;
+                list[index] = IbMedia(
+                    url: pickedFile.path,
+                    id: IbUtils.getUniqueId(),
+                    type: IbMedia.kPicType);
               } else {
                 // ignore: parameter_assignments
-                list.add(pickedFile.path);
+                list.add(IbMedia(
+                    url: pickedFile.path,
+                    id: IbUtils.getUniqueId(),
+                    type: IbMedia.kPicType));
               }
 
               list.refresh();
@@ -202,19 +225,40 @@ class CreateQuestionImagePicker extends StatelessWidget {
           onTap: () async {
             Get.back();
             final _picker = ImagePicker();
+            if (index == null) {
+              final List<XFile>? pickedFiles = await _picker.pickMultiImage(
+                imageQuality: IbConfig.kImageQuality,
+              );
+
+              if (pickedFiles != null) {
+                if (pickedFiles.length + _controller.picMediaList.length >
+                    IbConfig.kMaxImagesCount) {
+                  IbUtils.showSimpleSnackBar(
+                      msg: '4 Pictures Max',
+                      backgroundColor: IbColors.errorRed);
+                  return;
+                }
+
+                for (final xFile in pickedFiles) {
+                  list.add(IbMedia(
+                      url: xFile.path,
+                      id: IbUtils.getUniqueId(),
+                      type: IbMedia.kPicType));
+                }
+              }
+              return;
+            }
+
             final XFile? pickedFile = await _picker.pickImage(
               source: ImageSource.gallery,
               imageQuality: IbConfig.kImageQuality,
             );
 
             if (pickedFile != null) {
-              if (index != null) {
-                // ignore: parameter_assignments
-                list[index] = pickedFile.path;
-              } else {
-                // ignore: parameter_assignments
-                list.add(pickedFile.path);
-              }
+              list[index] = IbMedia(
+                  url: pickedFile.path,
+                  id: IbUtils.getUniqueId(),
+                  type: IbMedia.kPicType);
 
               list.refresh();
             }
@@ -252,9 +296,15 @@ class CreateQuestionImagePicker extends StatelessWidget {
             if (gifUrl != null && gifUrl.toString().isNotEmpty) {
               if (index != null) {
                 // ignore: parameter_assignments
-                list[index] = gifUrl.toString();
+                list[index] = IbMedia(
+                    url: gifUrl.toString(),
+                    id: IbUtils.getUniqueId(),
+                    type: IbMedia.kPicType);
               } else {
-                list.add(gifUrl.toString());
+                list.add(IbMedia(
+                    url: gifUrl.toString(),
+                    id: IbUtils.getUniqueId(),
+                    type: IbMedia.kPicType));
               }
 
               list.refresh();

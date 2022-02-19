@@ -22,23 +22,11 @@ class IbQuestionButtons extends StatelessWidget {
           children: [
             Expanded(
               child: IbElevatedButton(
-                disabled: _controller.isSample ||
-                    _controller.selectedChoiceId.isEmpty ||
-                    (_controller.rxIbAnswer != null &&
-                        _controller.rxIbAnswer!.value.uid !=
-                            IbUtils.getCurrentUid()) ||
-                    _controller.rxIbAnswer != null &&
-                        _controller.rxIbAnswer!.value.choiceId ==
-                            _controller.selectedChoiceId.value ||
-                    _controller.isAnswering.isTrue,
+                disabled: _handleVoteButtonDisableState(),
                 onPressed: () async {
                   await _controller.onVote();
                 },
-                textTrKey: _controller.isAnswering.isTrue
-                    ? 'voting'
-                    : _controller.showResult.isTrue
-                        ? 'change_vote'
-                        : 'vote',
+                textTrKey: _handleVoteButtonText(),
                 color: IbColors.primaryColor,
               ),
             ),
@@ -57,5 +45,29 @@ class IbQuestionButtons extends StatelessWidget {
         ),
       );
     });
+  }
+
+  String _handleVoteButtonText() {
+    if (_controller.rxIbQuestion.value.isQuiz) {
+      return _controller.isAnswering.isTrue ? 'voting' : 'answer';
+    } else {
+      return _controller.isAnswering.isTrue
+          ? 'voting'
+          : _controller.showResult.isTrue
+              ? 'change_vote'
+              : 'vote';
+    }
+  }
+
+  bool _handleVoteButtonDisableState() {
+    return _controller.isSample ||
+        _controller.selectedChoiceId.isEmpty ||
+        (_controller.rxIbAnswer != null &&
+            _controller.rxIbAnswer!.value.uid != IbUtils.getCurrentUid()) ||
+        _controller.rxIbAnswer != null &&
+            _controller.rxIbAnswer!.value.choiceId ==
+                _controller.selectedChoiceId.value ||
+        _controller.isAnswering.isTrue ||
+        _controller.showResult.isTrue && _controller.rxIbQuestion.value.isQuiz;
   }
 }

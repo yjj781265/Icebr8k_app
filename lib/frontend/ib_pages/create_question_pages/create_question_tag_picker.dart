@@ -103,15 +103,20 @@ class CreateQuestionTagPicker extends StatelessWidget {
             },
             footer: _controller.createQuestionController.pickedTags.length <
                     IbConfig.kMaxTag
-                ? Chip(
-                    label: Text(
-                      'add_tag'.tr,
-                    ),
-                    onDeleted: () {
+                ? InkWell(
+                    onTap: () {
                       showAddTagBtmSheet();
                     },
-                    deleteIcon: const Icon(
-                      Icons.add,
+                    child: Chip(
+                      label: Text(
+                        'add_tag'.tr,
+                      ),
+                      onDeleted: () {
+                        showAddTagBtmSheet();
+                      },
+                      deleteIcon: const Icon(
+                        Icons.add,
+                      ),
                     ),
                   )
                 : null,

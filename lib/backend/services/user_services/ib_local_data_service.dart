@@ -30,4 +30,11 @@ class IbLocalDataService {
   }
 }
 
-enum StorageKey { rememberLoginEmail, isDarkMode, isLocSharingOn, loginEmail }
+enum StorageKey {
+  rememberLoginEmailBool,
+  isDarkModeBool,
+  isLocSharingOnBool,
+  loginEmailString,
+  pickAnswerForQuizBool,
+  pickTagForQuestionBool,
+}

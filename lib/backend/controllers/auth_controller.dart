@@ -72,9 +72,9 @@ class AuthController extends GetxService {
 
       if (rememberEmail) {
         IbLocalDataService()
-            .updateStringValue(key: StorageKey.loginEmail, value: email);
+            .updateStringValue(key: StorageKey.loginEmailString, value: email);
       } else {
-        IbLocalDataService().removeKey(StorageKey.loginEmail);
+        IbLocalDataService().removeKey(StorageKey.loginEmailString);
       }
 
       final UserCredential userCredential =

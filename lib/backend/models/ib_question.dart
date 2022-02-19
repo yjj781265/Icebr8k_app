@@ -19,7 +19,8 @@ class IbQuestion {
   String description;
   bool isAnonymous;
   bool isCommentEnabled;
-
+  bool isQuiz;
+  String correctChoiceId;
   int comments;
   int pollSize;
   int likes;
@@ -37,6 +38,8 @@ class IbQuestion {
       required this.creatorId,
       required this.choices,
       required this.questionType,
+      this.correctChoiceId = '',
+      this.isQuiz = false,
       this.isAnonymous = false,
       this.isCommentEnabled = true,
       this.privacyBounds = const ['public'],
@@ -52,6 +55,9 @@ class IbQuestion {
       this.endTimeInMs = -1}) {
     if (kScale == questionType && endpoints == null) {
       throw Exception('Scale question need end points to be defined');
+    }
+    if (isQuiz && correctChoiceId.isEmpty) {
+      throw Exception('Quiz needs to have a correct choice id');
     }
   }
 

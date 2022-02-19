@@ -54,14 +54,23 @@ class IbQuestionHeader extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              IconButton(
-                  onPressed: _itemController.isSample ? null : () {},
-                  icon: const FaIcon(Icons.more_vert_outlined))
-            ],
+          Obx(
+            () => Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                if (_itemController.rxIbQuestion.value.isQuiz)
+                  const IconButton(
+                    iconSize: 16,
+                    icon: Icon(FontAwesomeIcons.question),
+                    disabledColor: IbColors.accentColor,
+                    onPressed: null,
+                  ),
+                IconButton(
+                    onPressed: _itemController.isSample ? null : () {},
+                    icon: const FaIcon(Icons.more_vert_outlined))
+              ],
+            ),
           )
         ],
       ),
@@ -72,9 +81,9 @@ class IbQuestionHeader extends StatelessWidget {
     return Obx(() {
       if (!_itemController.rxIbQuestion.value.isAnonymous) {
         return IbUserAvatar(
-          disableOnTap: _itemController.disableAvatarOnTouch,
+          disableOnTap: _itemController.isSample,
           avatarUrl: _itemController.avatarUrl.value,
-          uid: _itemController.ibUser == null ? '' : _itemController.ibUser!.id,
+          uid: _itemController.rxIbQuestion.value.creatorId,
           radius: 16,
         );
       }

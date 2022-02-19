@@ -157,7 +157,8 @@ class SetupController extends GetxController {
       return;
     }
 
-    if (!GetUtils.isUsername(usernameTeController.text.trim())) {
+    if (!GetUtils.isUsername(usernameTeController.text.trim()) ||
+        usernameTeController.text.trim().toLowerCase() == 'anonymous') {
       Get.dialog(const IbDialog(
         title: 'Error',
         subtitle: "Username is not valid",

@@ -78,11 +78,11 @@ class _IbPicQuestionCardState extends State<IbPicQuestionCard>
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (widget._controller.showStats.isTrue)
+            if (widget._controller.showComparison.isTrue)
               IbQuestionStats(Get.put(IbQuestionStatsController(
                   questionId: widget._controller.rxIbQuestion.value.id,
                   ibAnswers: widget._controller.ibAnswers!))),
-            if (widget._controller.showStats.isFalse)
+            if (widget._controller.showComparison.isFalse)
               Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -109,7 +109,7 @@ class _IbPicQuestionCardState extends State<IbPicQuestionCard>
               height: 1,
               thickness: 1,
             ),
-            if (widget._controller.showStats.isFalse)
+            if (widget._controller.showComparison.isFalse)
               Center(child: IbQuestionButtons(widget._controller)),
           ],
         ),

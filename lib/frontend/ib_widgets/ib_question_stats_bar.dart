@@ -20,114 +20,73 @@ class IbQuestionStatsBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Material(
-        color: Colors.transparent,
-        child: SingleChildScrollView(
-          child: Obx(
-            () => AnimatedSize(
-              duration: const Duration(milliseconds: 300),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  InkWell(
-                    onTap: _itemController.isSample ? null : _handleOnStatsTap,
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.only(right: 8, top: 4, bottom: 4),
-                      child: Row(
-                        children: [
-                          FaIcon(
-                            Icons.poll_outlined,
-                            color: _itemController.rxIbAnswer != null
-                                ? IbColors.primaryColor
-                                : IbColors.lightGrey,
-                            size: 22,
-                          ),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            _itemController.totalPolled.value.toString(),
-                            style: const TextStyle(
-                                fontSize: IbConfig.kDescriptionTextSize),
-                          ),
-                        ],
-                      ),
-                    ),
+    return Obx(
+      () => AnimatedSize(
+        duration: const Duration(milliseconds: 300),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton.icon(
+                onPressed: _itemController.isSample ? null : _handleOnStatsTap,
+                icon: FaIcon(
+                  FontAwesomeIcons.voteYea,
+                  color: _itemController.rxIbAnswer != null
+                      ? IbColors.primaryColor
+                      : IbColors.lightGrey,
+                  size: 16,
+                ),
+                label: Text(
+                  _itemController.totalPolled.value.toString(),
+                  style: TextStyle(
+                      color: Theme.of(context).indicatorColor,
+                      fontSize: IbConfig.kDescriptionTextSize),
+                )),
+            if (_itemController.rxIbQuestion.value.isCommentEnabled)
+              TextButton.icon(
+                  onPressed: _itemController.isSample
+                      ? null
+                      : () {
+                          Get.to(() => CommentPage(Get.put(CommentController(
+                              _itemController.rxIbQuestion.value))));
+                        },
+                  icon: FaIcon(
+                    FontAwesomeIcons.comment,
+                    color: _itemController.commented.isTrue
+                        ? IbColors.darkPrimaryColor
+                        : Colors.grey,
+                    size: 16,
                   ),
-                  if (_itemController.rxIbQuestion.value.isCommentEnabled)
-                    InkWell(
-                      onTap: _itemController.isSample
-                          ? null
-                          : () {
-                              Get.to(() => CommentPage(Get.put(
-                                  CommentController(
-                                      _itemController.rxIbQuestion.value))));
-                            },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        child: Row(
-                          children: [
-                            FaIcon(
-                              FontAwesomeIcons.comment,
-                              color: _itemController.commented.isTrue
-                                  ? IbColors.darkPrimaryColor
-                                  : Colors.grey,
-                              size: 19,
-                            ),
-                            const SizedBox(
-                              width: 8,
-                            ),
-                            Text(
-                              IbUtils.statsShortString(
-                                  _itemController.comments.value),
-                              style: const TextStyle(
-                                  fontSize: IbConfig.kDescriptionTextSize),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  InkWell(
-                    onTap: _itemController.isSample ||
-                            (_itemController.rxIbAnswer != null &&
-                                _itemController.rxIbAnswer!.value.uid !=
-                                    IbUtils.getCurrentUid())
-                        ? null
-                        : () {
-                            _itemController.updateLike();
-                          },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      child: Row(
-                        children: [
-                          FaIcon(
-                            FontAwesomeIcons.thumbsUp,
-                            color: _itemController.liked.isTrue
-                                ? IbColors.accentColor
-                                : IbColors.lightGrey,
-                            size: 19,
-                          ),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            _itemController.likes.value.toString(),
-                            style: const TextStyle(
-                                fontSize: IbConfig.kDescriptionTextSize),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                  label: Text(
+                    IbUtils.statsShortString(_itemController.comments.value),
+                    style: TextStyle(
+                        color: Theme.of(context).indicatorColor,
+                        fontSize: IbConfig.kDescriptionTextSize),
+                  )),
+            TextButton.icon(
+              onPressed: _itemController.isSample ||
+                      (_itemController.rxIbAnswer != null &&
+                          _itemController.rxIbAnswer!.value.uid !=
+                              IbUtils.getCurrentUid())
+                  ? null
+                  : () {
+                      _itemController.updateLike();
+                    },
+              icon: FaIcon(
+                FontAwesomeIcons.thumbsUp,
+                color: _itemController.liked.isTrue
+                    ? IbColors.accentColor
+                    : IbColors.lightGrey,
+                size: 16,
+              ),
+              label: Text(
+                _itemController.likes.value.toString(),
+                style: TextStyle(
+                    color: Theme.of(context).indicatorColor,
+                    fontSize: IbConfig.kDescriptionTextSize),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

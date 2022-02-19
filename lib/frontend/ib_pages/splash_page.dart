@@ -17,7 +17,7 @@ class SplashPage extends StatelessWidget {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
           statusBarColor:
-              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkMode)
+              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
                   ? Colors.black
                   : IbColors.lightBlue),
     );

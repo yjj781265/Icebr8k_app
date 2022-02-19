@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/social_tab_controller.dart';
+import 'package:icebr8k/backend/managers/ib_api_keys_manager.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
@@ -12,13 +13,14 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import '../services/user_services/ib_chat_db_service.dart';
 import '../services/user_services/ib_cloud_messaging_service.dart';
 
-/// this controller control info of current IbUser, and index current home page tab
+/// this controller control info of current IbUser, index current home page tab and api keys
 class MainPageController extends GetxController {
   final currentIndex = 0.obs;
   final Stream<IbUser?> ibUserBroadcastStream =
       IbUserDbService().listenToIbUserChanges(IbUtils.getCurrentFbUser()!.uid);
   final isNavBarVisible = true.obs;
   late IbUser? currentIbUser;
+  late String kGooglePlacesApiKey;
 
   @override
   Future<void> onInit() async {
@@ -26,7 +28,9 @@ class MainPageController extends GetxController {
     ibUserBroadcastStream.listen((ibUser) {
       currentIbUser = ibUser;
     });
+
     // todo add manager to handle this
+    await IbApiKeysManager.init();
     await setupInteractedMessage();
   }
 

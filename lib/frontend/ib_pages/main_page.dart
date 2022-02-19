@@ -61,7 +61,7 @@ class _MainPageViewState extends State<MainPageView>
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
           statusBarColor:
-              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkMode)
+              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
                   ? Colors.black
                   : IbColors.lightBlue),
     );
@@ -97,7 +97,7 @@ class _MainPageViewState extends State<MainPageView>
     const _inactiveColor = IbColors.lightGrey;
     return Obx(
       () => IbAnimatedBottomBar(
-        containerHeight: _mainPageController.isNavBarVisible.isTrue ? 56 : 0,
+        containerHeight: _mainPageController.isNavBarVisible.isTrue ? 64 : 0,
         selectedIndex: _mainPageController.currentIndex.value,
         onItemSelected: (index) async {
           if (index == 2) {

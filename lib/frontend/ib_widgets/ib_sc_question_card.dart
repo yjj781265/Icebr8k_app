@@ -2,20 +2,12 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
-import 'package:icebr8k/backend/controllers/ib_question_stats_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_question_buttons.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_question_header.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_question_stats_bar.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
 import '../ib_utils.dart';
-import 'ib_card.dart';
-import 'ib_question_info.dart';
-import 'ib_question_stats.dart';
-import 'ib_question_tags.dart';
 
 class IbScQuestionCard extends StatefulWidget {
   final IbQuestionItemController _controller;
@@ -74,207 +66,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
   Widget build(BuildContext context) {
     super.build(context);
     _runExpandCheck();
-    final Widget expandableInfo = Obx(
-      () => Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GestureDetector(
-              onDoubleTap: () {
-                if (widget._controller.isSample ||
-                    widget._controller.showResult.isFalse) {
-                  return;
-                }
-                widget._controller.isSwitched.value =
-                    !widget._controller.isSwitched.value;
-              },
-              child: widget._controller.showStats.value
-                  ? IbQuestionStats(Get.put(
-                      IbQuestionStatsController(
-                          ibAnswers: widget._controller.ibAnswers!,
-                          questionId: widget._controller.rxIbQuestion.value.id),
-                      tag: widget._controller.rxIbQuestion.value.id))
-                  : AnimatedSwitcher(
-                      transitionBuilder:
-                          (Widget child, Animation<double> animation) {
-                        return ScaleTransition(scale: animation, child: child);
-                      },
-                      duration: const Duration(
-                          milliseconds: IbConfig.kEventTriggerDelayInMillis),
-                      child: widget._controller.isSwitched.value
-                          ? SizedBox(
-                              height: 150,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  _showBarChart(),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                            width: 150,
-                                            child: Text(
-                                              widget
-                                                  ._controller
-                                                  .rxIbQuestion
-                                                  .value
-                                                  .endpoints!
-                                                  .first
-                                                  .content!,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              textAlign: TextAlign.start,
-                                            )),
-                                        SizedBox(
-                                            width: 150,
-                                            child: Text(
-                                              widget._controller.rxIbQuestion
-                                                  .value.endpoints![1].content!,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              textAlign: TextAlign.end,
-                                            ))
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : SizedBox(
-                              key: const ValueKey(1),
-                              height: 150,
-                              child: Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IbQuestionScItem(widget._controller),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          SizedBox(
-                                              width: 150,
-                                              child: Text(
-                                                widget
-                                                    ._controller
-                                                    .rxIbQuestion
-                                                    .value
-                                                    .endpoints!
-                                                    .first
-                                                    .content!,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                textAlign: TextAlign.start,
-                                              )),
-                                          SizedBox(
-                                              width: 150,
-                                              child: Text(
-                                                widget
-                                                    ._controller
-                                                    .rxIbQuestion
-                                                    .value
-                                                    .endpoints![1]
-                                                    .content!,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                textAlign: TextAlign.end,
-                                              ))
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )),
-                    ),
-            ),
-            if (widget._controller.showResult.isTrue &&
-                !widget._controller.showStats.value)
-              widget._controller.isSwitched.isTrue
-                  ? const Text(
-                      'Double tap bar chart to show slider',
-                      style: TextStyle(
-                          fontSize: IbConfig.kDescriptionTextSize,
-                          color: IbColors.lightGrey),
-                    )
-                  : const Text('Double tap slider to show result',
-                      style: TextStyle(
-                          fontSize: IbConfig.kDescriptionTextSize,
-                          color: IbColors.lightGrey)),
-            const SizedBox(
-              height: 8,
-            ),
-            IbQuestionTags(widget._controller),
-            const SizedBox(
-              height: 8,
-            ),
-            const Divider(
-              height: 1,
-              thickness: 1,
-            ),
-            if (!widget._controller.showStats.value)
-              IbQuestionButtons(widget._controller),
-          ],
-        ),
-      ),
-    );
-    return SingleChildScrollView(
-      child: IbCard(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              IbQuestionHeader(widget._controller),
-              IbQuestionInfo(widget._controller),
-              const SizedBox(
-                height: 16,
-              ),
-              SizeTransition(
-                sizeFactor: animation,
-                child: expandableInfo,
-              ),
-              Obx(() {
-                _runExpandCheck();
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IbQuestionStatsBar(widget._controller),
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        widget._controller.rxIsExpanded.value =
-                            !widget._controller.rxIsExpanded.value;
-                      },
-                      icon: widget._controller.rxIsExpanded.isTrue
-                          ? const Icon(
-                              Icons.expand_less_outlined,
-                              color: IbColors.primaryColor,
-                            )
-                          : const Icon(
-                              Icons.expand_more_outlined,
-                              color: IbColors.primaryColor,
-                            ),
-                    )
-                  ],
-                );
-              }),
-            ],
-          ),
-        ),
-      ),
-    );
+    return const SizedBox();
   }
 
   Widget _showBarChart() {
@@ -425,7 +217,6 @@ class IbQuestionScItem extends StatelessWidget {
               value: _getSliderValue(),
               onChanged: (value) {
                 if (_controller.isSample ||
-                    _controller.disableChoiceOnTouch ||
                     (_controller.rxIbAnswer != null &&
                         _controller.rxIbAnswer!.value.uid !=
                             IbUtils.getCurrentUid())) {

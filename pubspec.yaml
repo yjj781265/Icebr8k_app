@@ -61,6 +61,7 @@ dependencies:
   showcaseview: ^1.1.1
   url_launcher: ^6.0.12
   uuid: ^3.0.4
+  video_player: ^2.2.18
 
 
 

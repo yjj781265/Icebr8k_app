@@ -22,7 +22,7 @@ class _MenuPageState extends State<MenuPage> {
   final kBetaSurveyLink = 'https://forms.gle/xuYbYcsWGC6WtT7h7';
 
   bool isDarkMode =
-      IbLocalDataService().retrieveBoolValue(StorageKey.isDarkMode);
+      IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool);
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,7 @@ class _MenuPageState extends State<MenuPage> {
                 onChanged: (value) {
                   print('dark mode to $value');
                   IbLocalDataService().updateBoolValue(
-                      key: StorageKey.isDarkMode, value: value);
+                      key: StorageKey.isDarkModeBool, value: value);
                   setState(() {
                     isDarkMode = value;
                     Get.changeTheme(value
@@ -297,7 +297,7 @@ class PrivacyPolicyPage extends StatelessWidget {
 <h1>Contact Us</h1>
 <p>If you have any questions about this Privacy Policy, You can contact us:</p>
 <ul>
-<li>By email: icebr8kdev@gmail.com</li>
+<li>By email: support@icebr8k.com</li>
 </ul>
             </div>""",
             ),

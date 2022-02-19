@@ -27,7 +27,7 @@ Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
         statusBarColor:
-            IbLocalDataService().retrieveBoolValue(StorageKey.isDarkMode)
+            IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
                 ? Colors.black
                 : IbColors.lightBlue),
   );
@@ -71,7 +71,7 @@ class MainApp extends StatelessWidget {
         translations: IbStrings(),
         locale: const Locale('en', 'US'),
         themeMode: ThemeMode.light,
-        theme: IbLocalDataService().retrieveBoolValue(StorageKey.isDarkMode)
+        theme: IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
             ? IbThemes(context).buildDarkTheme()
             : IbThemes(context).buildLightTheme(),
       );
@@ -80,7 +80,7 @@ class MainApp extends StatelessWidget {
 
   Widget _loading() {
     return Container(
-      color: IbLocalDataService().retrieveBoolValue(StorageKey.isDarkMode)
+      color: IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
           ? Colors.black
           : IbColors.lightBlue,
       child: Center(

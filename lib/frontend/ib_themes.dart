@@ -20,9 +20,8 @@ class IbThemes {
             ),
           ),
         ),
+        primaryColor: Colors.black,
         indicatorColor: Colors.white,
-        primaryColor: const Color(0xff424242),
-        primaryColorLight: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
         toggleableActiveColor: IbColors.primaryColor,
         tabBarTheme: const TabBarTheme(
@@ -40,12 +39,14 @@ class IbThemes {
           backgroundColor: Colors.black,
           elevation: 0,
           titleSpacing: 0,
+          iconTheme: const IconThemeData(color: Colors.white),
           titleTextStyle: GoogleFonts.sourceSansPro(
               fontSize: IbConfig.kPageTitleSize,
               color: Colors.white,
               fontWeight: FontWeight.bold),
         ),
         scaffoldBackgroundColor: Colors.black,
+        brightness: Brightness.dark,
         textTheme: GoogleFonts.sourceSansProTextTheme(
           Theme.of(context).textTheme,
         ).apply(bodyColor: Colors.white, displayColor: Colors.white),
@@ -91,6 +92,7 @@ class IbThemes {
           unselectedLabelColor: IbColors.lightGrey,
         ),
         scaffoldBackgroundColor: IbColors.lightBlue,
+        brightness: Brightness.light,
         colorScheme:
             ColorScheme.fromSwatch().copyWith(secondary: IbColors.primaryColor),
         textTheme: GoogleFonts.sourceSansProTextTheme(

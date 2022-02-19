@@ -6,13 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_stats_controller.dart';
+import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_media_slide.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_buttons.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_header.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_info.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_stats_bar.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_tags.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
@@ -78,7 +82,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
         () => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (widget._controller.showStats.isTrue)
+            if (widget._controller.showComparison.isTrue)
               IbQuestionStats(Get.put(
                   IbQuestionStatsController(
                       ibAnswers: widget._controller.ibAnswers!,
@@ -86,7 +90,10 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                   tag: widget._controller.rxIbQuestion.value.id))
             else
               LimitedBox(
-                maxHeight: 300,
+                maxHeight: widget._controller.rxIbQuestion.value.questionType ==
+                        IbQuestion.kMultipleChoice
+                    ? 240
+                    : 350,
                 child: Scrollbar(
                   isAlwaysShown: true,
                   controller: _scrollController,
@@ -120,53 +127,52 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
               height: 1,
               thickness: 1,
             ),
-            if (!widget._controller.showStats.value)
+            if (!widget._controller.showComparison.value)
               Center(child: IbQuestionButtons(widget._controller))
           ],
         ),
       ),
     );
-    return SingleChildScrollView(
-      child: IbCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            IbQuestionHeader(widget._controller),
-            IbQuestionInfo(widget._controller),
-            const SizedBox(
-              height: 8,
-            ),
-            SizeTransition(
-              sizeFactor: animation,
-              child: expandableInfo,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IbQuestionStatsBar(widget._controller),
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    widget._controller.rxIsExpanded.value =
-                        !widget._controller.rxIsExpanded.isTrue;
-                  },
-                  icon: Obx(() {
-                    _runExpandCheck();
-                    return widget._controller.rxIsExpanded.isTrue
-                        ? const Icon(
-                            Icons.expand_less_rounded,
-                            color: IbColors.primaryColor,
-                          )
-                        : const Icon(
-                            Icons.expand_more_outlined,
-                            color: IbColors.primaryColor,
-                          );
-                  }),
-                ),
-              ],
-            ),
-          ],
-        ),
+    return IbCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          IbQuestionHeader(widget._controller),
+          IbMediaSlide(widget._controller.rxIbQuestion.value.medias),
+          IbQuestionInfo(widget._controller),
+          const SizedBox(
+            height: 8,
+          ),
+          SizeTransition(
+            sizeFactor: animation,
+            child: expandableInfo,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IbQuestionStatsBar(widget._controller),
+              IconButton(
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  widget._controller.rxIsExpanded.value =
+                      !widget._controller.rxIsExpanded.isTrue;
+                },
+                icon: Obx(() {
+                  _runExpandCheck();
+                  return widget._controller.rxIsExpanded.isTrue
+                      ? const Icon(
+                          Icons.expand_less_rounded,
+                          color: IbColors.primaryColor,
+                        )
+                      : const Icon(
+                          Icons.expand_more_outlined,
+                          color: IbColors.primaryColor,
+                        );
+                }),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -221,157 +227,203 @@ class IbQuestionMcItem extends StatelessWidget {
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0),
         child: Obx(
-          () => InkWell(
-            radius: IbConfig.kMcItemCornerRadius,
-            borderRadius: BorderRadius.circular(IbConfig.kMcItemCornerRadius),
-            onTap: onItemTap,
-            child: Stack(
-              alignment: Alignment.centerLeft,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  width: Get.width * 0.95,
-                  height: _controller.rxIbQuestion.value.questionType ==
-                          IbQuestion.kMultipleChoice
-                      ? IbConfig.kMcTxtItemHeight
-                      : IbConfig.kMcPicItemHeight,
-                  decoration: BoxDecoration(
-                      color: IbColors.lightBlue,
-                      borderRadius:
-                          BorderRadius.circular(IbConfig.kMcItemCornerRadius)),
-                ),
-                AnimatedContainer(
-                  height: _controller.rxIbQuestion.value.questionType ==
-                          IbQuestion.kMultipleChoice
-                      ? IbConfig.kMcTxtItemHeight
-                      : IbConfig.kMcPicItemHeight,
-                  decoration: BoxDecoration(
-                      color: getItemColor(),
-                      borderRadius: BorderRadius.circular(8)),
-                  width: getItemWidth(),
-                  duration: Duration(
-                      milliseconds: _controller.showResult.value
-                          ? IbConfig.kEventTriggerDelayInMillis
-                          : 0),
-                ),
-                SizedBox(
-                  width: Get.width * 0.9,
-                  height: _controller.rxIbQuestion.value.questionType ==
-                          IbQuestion.kMultipleChoice
-                      ? IbConfig.kMcTxtItemHeight
-                      : IbConfig.kMcPicItemHeight,
-                  child: Row(
+          () => Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                flex: 8,
+                child: InkWell(
+                  radius: IbConfig.kMcItemCornerRadius,
+                  borderRadius:
+                      BorderRadius.circular(IbConfig.kMcItemCornerRadius),
+                  onTap: onItemTap,
+                  child: Stack(
+                    alignment: Alignment.centerLeft,
                     children: [
-                      if (choice.url != null && choice.url!.isNotEmpty)
-                        OpenContainer(
-                          openElevation: 0,
-                          closedElevation: 0,
-                          closedShape: RoundedRectangleBorder(
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        width: Get.width * 0.95,
+                        height: _controller.rxIbQuestion.value.questionType ==
+                                IbQuestion.kMultipleChoice
+                            ? IbConfig.kMcTxtItemHeight
+                            : IbConfig.kMcPicItemHeight,
+                        decoration: BoxDecoration(
+                            color: IbColors.lightBlue,
                             borderRadius: BorderRadius.circular(
-                                IbConfig.kMcItemCornerRadius),
-                          ),
-                          openColor: Colors.black,
-                          middleColor: Colors.black,
-                          closedColor: Colors.transparent,
-                          transitionType: ContainerTransitionType.fadeThrough,
-                          openBuilder: (BuildContext context,
-                              void Function({Object? returnValue}) action) {
-                            return IbMediaViewer(
-                              urls: _controller.rxIbQuestion.value.choices
-                                  .map((e) => e.url!)
-                                  .toList(),
-                              currentIndex: _controller
-                                  .rxIbQuestion.value.choices
-                                  .map((e) => e.url!)
-                                  .toList()
-                                  .indexWhere(
-                                      (element) => choice.url! == element),
-                            );
-                          },
-                          closedBuilder: (_, openContainer) => Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: InkWell(
-                              onDoubleTap: openContainer,
-                              onTap: onItemTap,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                    IbConfig.kMcItemCornerRadius),
-                                child: !choice.url!.contains('http')
-                                    ? Image.file(
-                                        File(choice.url!),
-                                        fit: BoxFit.fill,
-                                        width: IbConfig.kMcPicHeight,
-                                        height: IbConfig.kMcPicHeight,
-                                      )
-                                    : CachedNetworkImage(
-                                        fit: BoxFit.fill,
-                                        fadeInDuration:
-                                            const Duration(milliseconds: 300),
-                                        width: IbConfig.kMcPicHeight,
-                                        height: IbConfig.kMcPicHeight,
-                                        imageUrl: choice.url!,
-                                      ),
+                                IbConfig.kMcItemCornerRadius)),
+                      ),
+                      AnimatedContainer(
+                        height: _controller.rxIbQuestion.value.questionType ==
+                                IbQuestion.kMultipleChoice
+                            ? IbConfig.kMcTxtItemHeight
+                            : IbConfig.kMcPicItemHeight,
+                        decoration: BoxDecoration(
+                            color: getItemColor(),
+                            borderRadius: BorderRadius.circular(8)),
+                        width: getItemWidth(),
+                        duration: Duration(
+                            milliseconds: _controller.showResult.value
+                                ? IbConfig.kEventTriggerDelayInMillis
+                                : 0),
+                      ),
+                      SizedBox(
+                        width: Get.width * 0.95,
+                        height: _controller.rxIbQuestion.value.questionType ==
+                                IbQuestion.kMultipleChoice
+                            ? IbConfig.kMcTxtItemHeight
+                            : IbConfig.kMcPicItemHeight,
+                        child: Row(
+                          children: [
+                            if (choice.url != null && choice.url!.isNotEmpty)
+                              OpenContainer(
+                                openElevation: 0,
+                                closedElevation: 0,
+                                closedShape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      IbConfig.kMcItemCornerRadius),
+                                ),
+                                openColor: Colors.black,
+                                middleColor: Colors.black,
+                                closedColor: Colors.transparent,
+                                transitionType:
+                                    ContainerTransitionType.fadeThrough,
+                                openBuilder: (BuildContext context,
+                                    void Function({Object? returnValue})
+                                        action) {
+                                  return IbMediaViewer(
+                                    urls: _controller.rxIbQuestion.value.choices
+                                        .map((e) => e.url!)
+                                        .toList(),
+                                    currentIndex: _controller
+                                        .rxIbQuestion.value.choices
+                                        .map((e) => e.url!)
+                                        .toList()
+                                        .indexWhere((element) =>
+                                            choice.url! == element),
+                                  );
+                                },
+                                closedBuilder: (_, openContainer) => Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: InkWell(
+                                    onDoubleTap: openContainer,
+                                    onTap: onItemTap,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                          IbConfig.kMcItemCornerRadius),
+                                      child: !choice.url!.contains('http')
+                                          ? Image.file(
+                                              File(choice.url!),
+                                              fit: BoxFit.fill,
+                                              width: IbConfig.kMcPicHeight,
+                                              height: IbConfig.kMcPicHeight,
+                                            )
+                                          : CachedNetworkImage(
+                                              fit: BoxFit.fill,
+                                              fadeInDuration: const Duration(
+                                                  milliseconds: 300),
+                                              width: IbConfig.kMcPicHeight,
+                                              height: IbConfig.kMcPicHeight,
+                                              imageUrl: choice.url!,
+                                            ),
+                                    ),
+                                  ),
+                                ),
                               ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                choice.content.toString(),
+                                maxLines: 1,
+                                style: const TextStyle(
+                                    fontSize: IbConfig.kNormalTextSize,
+                                    color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (_controller.showResult.value &&
+                          _controller.rxIbAnswer!.value.choiceId ==
+                              choice.choiceId)
+                        const Positioned(
+                          bottom: 2,
+                          right: 2,
+                          child: CircleAvatar(
+                            radius: 8,
+                            backgroundColor: IbColors.white,
+                            child: Icon(
+                              Icons.check_circle_rounded,
+                              color: IbColors.accentColor,
+                              size: 16,
                             ),
                           ),
                         ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          choice.content.toString(),
-                          maxLines: 1,
-                          style: const TextStyle(
-                              fontSize: IbConfig.kNormalTextSize,
-                              color: Colors.black),
+
+                      /// show percentage animation
+                      if (_controller.showResult.value &&
+                          _controller.totalPolled.value > 0)
+                        TweenAnimationBuilder(
+                          builder: (BuildContext context, Object? value,
+                              Widget? child) {
+                            return Positioned(
+                              right: 8,
+                              child: Text(
+                                '${((_controller.resultMap[choice] ?? 0 / _controller.totalPolled.value.toDouble()) * 100).toStringAsFixed(1)}%',
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                            );
+                          },
+                          duration: const Duration(
+                              milliseconds:
+                                  IbConfig.kEventTriggerDelayInMillis),
+                          tween: Tween<double>(
+                              begin: 0,
+                              end: _controller.resultMap[choice]! /
+                                  _controller.totalPolled.value.toDouble()),
                         ),
-                      ),
                     ],
                   ),
                 ),
-                if (_controller.showResult.value &&
-                    _controller.rxIbAnswer!.value.choiceId == choice.choiceId)
-                  const Positioned(
-                    bottom: 2,
-                    right: 2,
-                    child: CircleAvatar(
-                      radius: 8,
-                      backgroundColor: IbColors.white,
-                      child: Icon(
-                        Icons.check_circle_rounded,
-                        color: IbColors.accentColor,
-                        size: 16,
-                      ),
-                    ),
-                  ),
-                if (_controller.showResult.value &&
-                    _controller.totalPolled.value > 0)
-                  TweenAnimationBuilder(
-                    builder:
-                        (BuildContext context, Object? value, Widget? child) {
-                      return Positioned(
-                        right: 8,
-                        child: Text(
-                          '${((_controller.resultMap[choice] ?? 0 / _controller.totalPolled.value.toDouble()) * 100).toStringAsFixed(1)}%',
-                          style: const TextStyle(color: Colors.black),
-                        ),
-                      );
-                    },
-                    duration: const Duration(
-                        milliseconds: IbConfig.kEventTriggerDelayInMillis),
-                    tween: Tween<double>(
-                        begin: 0,
-                        end: _controller.resultMap[choice]! /
-                            _controller.totalPolled.value.toDouble()),
-                  ),
-              ],
-            ),
+              ),
+
+              /// show radios if is sample and quiz option is on
+              if (_controller.rxIbQuestion.value.isQuiz && _controller.isSample)
+                _handleShowCaseQuizWidget()
+            ],
           ),
         ));
   }
 
+  Widget _handleShowCaseQuizWidget() {
+    final radio = Radio(
+      activeColor: IbColors.accentColor,
+      value: choice.choiceId,
+      groupValue: _controller.rxIbQuestion.value.correctChoiceId,
+      onChanged: (id) {
+        _controller.rxIbQuestion.value.correctChoiceId = id.toString();
+        _controller.rxIbQuestion.refresh();
+      },
+    );
+    if (_controller.rxIbQuestion.value.choices.indexOf(choice) == 0 &&
+        !IbLocalDataService()
+            .retrieveBoolValue(StorageKey.pickAnswerForQuizBool)) {
+      //show showcase widget
+      return Expanded(
+        child: Showcase(
+          overlayColor: Colors.transparent,
+          shapeBorder: const CircleBorder(),
+          key: IbShowCaseManager.kPickAnswerForQuizKey,
+          description: 'show_case_quiz'.tr,
+          child: radio,
+        ),
+      );
+    }
+
+    return Expanded(child: radio);
+  }
+
   void onItemTap() {
     if (_controller.isSample ||
-        _controller.disableChoiceOnTouch ||
         (_controller.rxIbAnswer != null &&
             _controller.rxIbAnswer!.value.uid != IbUtils.getCurrentUid())) {
       return;

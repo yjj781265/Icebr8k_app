@@ -2,12 +2,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
+import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
+import 'package:icebr8k/backend/models/ib_media.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
+import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_pages/review_question_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 class CreateQuestionController extends GetxController {
   String questionType = IbQuestion.kMultipleChoice;
@@ -21,8 +25,8 @@ class CreateQuestionController extends GetxController {
   final picList = <IbChoice>[].obs;
   final scaleEndPoints = <IbChoice>[].obs;
 
-  final picMediaList = <String>[].obs;
-  final videoMediaList = <String>[].obs;
+  final picMediaList = <IbMedia>[].obs;
+  final videoMediaList = <IbMedia>[].obs;
   final extLinkList = <String>[].obs;
   GeoFirePoint? geoFirePoint;
 
@@ -80,7 +84,7 @@ class CreateQuestionController extends GetxController {
     return false;
   }
 
-  void validQuestion() {
+  void validQuestion(BuildContext context) {
     if (questionEditController.text.trim().isEmpty) {
       Get.dialog(IbDialog(
           title: 'Error',
@@ -96,6 +100,14 @@ class CreateQuestionController extends GetxController {
         subtitle: 'no_tag'.tr,
         positiveTextKey: 'ok',
         showNegativeBtn: false,
+        onPositiveTap: () {
+          Get.back();
+          if (!IbLocalDataService()
+              .retrieveBoolValue(StorageKey.pickTagForQuestionBool)) {
+            ShowCaseWidget.of(context)!
+                .startShowCase([IbShowCaseManager.kPickTagForQuestionKey]);
+          }
+        },
       ));
       return;
     }
@@ -174,13 +186,14 @@ class CreateQuestionController extends GetxController {
         id: id,
         tagIds: pickedTags.map((element) => element.text).toList(),
         creatorId: IbUtils.getCurrentUid()!,
+        medias: picMediaList.toSet().union(videoMediaList.toSet()).toList(),
         choices: choiceList,
         questionType: questionType,
         askedTimeInMs: DateTime.now().millisecondsSinceEpoch);
     Get.to(() => ReviewQuestionPage(
         itemController: Get.put(IbQuestionItemController(
             rxIbQuestion: question.obs,
-            rxIsExpanded: true.obs,
+            rxIsExpanded: false.obs,
             isSample: true))));
   }
 

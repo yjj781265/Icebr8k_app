@@ -85,7 +85,8 @@ class IbStrings extends Translations {
               'All choices need to both have a image and a text',
           'pic_question_not_valid': 'All choices need to have a image',
           'pic_question_not_valid_min': 'Need at least 2 picture choices',
-          'description_option': 'Description(optional)',
+          'answer': 'Answer',
+          'description_option': 'Description(optional), links',
           'create_question': 'Create a @type question',
           'mc': 'Multiple Choice',
           'mc_p': 'Multiple Choice with Pictures and Text',
@@ -131,7 +132,9 @@ class IbStrings extends Translations {
           'picked_tags': 'Picked Tags',
           'max_tag_info': 'You only can pick up to 8 tags',
           'tag_picker_dialog_hint': 'Enter a tag here',
-          'tag_picker_dialog_title': 'Create Your Own Tag'
+          'tag_picker_dialog_title': 'Create Your Own Tag',
+          'show_case_quiz': 'Pick the correct answer for your quiz!',
+          'show_case_tag': 'Click here to add tags!'
         }
       };
 }

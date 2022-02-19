@@ -24,12 +24,12 @@ class SignInController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    rememberLoginEmail.value =
-        IbLocalDataService().retrieveBoolValue(StorageKey.rememberLoginEmail);
+    rememberLoginEmail.value = IbLocalDataService()
+        .retrieveBoolValue(StorageKey.rememberLoginEmailBool);
 
     if (rememberLoginEmail.value) {
       emailTxtC.text =
-          IbLocalDataService().retrieveStringValue(StorageKey.loginEmail);
+          IbLocalDataService().retrieveStringValue(StorageKey.loginEmailString);
       email.value = emailTxtC.text;
     }
 

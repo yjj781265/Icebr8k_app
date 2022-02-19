@@ -25,7 +25,7 @@ class SignInPage extends StatelessWidget {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
           statusBarColor:
-              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkMode)
+              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
                   ? Colors.black
                   : IbColors.lightBlue),
     );
@@ -133,7 +133,7 @@ class SignInPage extends StatelessWidget {
                                 _controller.rememberLoginEmail.value =
                                     value ?? false;
                                 IbLocalDataService().updateBoolValue(
-                                    key: StorageKey.rememberLoginEmail,
+                                    key: StorageKey.rememberLoginEmailBool,
                                     value: value ?? false);
                               },
                               title: const Text('Remember my login email'),

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
@@ -9,7 +8,6 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 import '../services/user_services/ib_question_db_service.dart';
-import '../services/user_services/ib_storage_service.dart';
 import '../services/user_services/ib_tag_db_service.dart';
 import '../services/user_services/ib_user_db_service.dart';
 
@@ -17,26 +15,18 @@ class IbQuestionItemController extends GetxController {
   final Rx<IbQuestion> rxIbQuestion;
   final showResult = false.obs;
   final isAnswering = false.obs;
-  final isSubmitting = false.obs;
-
-  /// for sc question only
-  final isSwitched = false.obs;
-
-  ///user who created the question
-  IbUser? ibUser;
 
   final title = ''.obs;
   final subtitle = ''.obs;
   final avatarUrl = ''.obs;
   final bool isSample;
+
+  /// for compare two users answers
   final List<IbAnswer>? ibAnswers;
-  final bool isLocalFile;
-  final bool disableAvatarOnTouch;
-  final bool disableChoiceOnTouch;
   final RxBool rxIsExpanded;
 
   /// show the picked option from multiple people
-  final showStats = false.obs;
+  final showComparison = false.obs;
 
   /// if user already answered, pass the answer here
   Rx<IbAnswer>? rxIbAnswer;
@@ -56,9 +46,6 @@ class IbQuestionItemController extends GetxController {
     required this.rxIbQuestion,
     required this.rxIsExpanded,
     this.isSample = false,
-    this.disableChoiceOnTouch = false,
-    this.disableAvatarOnTouch = false,
-    this.isLocalFile = false,
     this.rxIbAnswer,
     this.ibAnswers,
   });
@@ -66,11 +53,21 @@ class IbQuestionItemController extends GetxController {
   @override
   Future<void> onInit() async {
     /// query question author user info
-    ibUser = await IbUserDbService().queryIbUser(rxIbQuestion.value.creatorId);
+    final IbUser? ibUser =
+        await IbUserDbService().queryIbUser(rxIbQuestion.value.creatorId);
+    if (ibUser != null) {
+      /// populate title ..etc
+      title.value =
+          rxIbQuestion.value.isAnonymous ? 'Anonymous' : ibUser.username;
+      subtitle.value = IbUtils.getAgoDateTimeString(
+          DateTime.fromMillisecondsSinceEpoch(
+              rxIbQuestion.value.askedTimeInMs));
+      avatarUrl.value = ibUser.avatarUrl;
+    }
 
-    showStats.value = ibAnswers != null && ibAnswers!.isNotEmpty;
+    showComparison.value = ibAnswers != null && ibAnswers!.isNotEmpty;
 
-    if (rxIbAnswer == null) {
+    if (rxIbAnswer == null && !isSample) {
       /// query my answer to this question
       final myAnswer = await IbQuestionDbService()
           .querySingleIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id);
@@ -80,31 +77,23 @@ class IbQuestionItemController extends GetxController {
         selectedChoiceId.value = rxIbAnswer!.value.choiceId;
         rxIbAnswer!.refresh();
       }
-    } else {
+    } else if (rxIbAnswer != null) {
       selectedChoiceId.value = rxIbAnswer!.value.choiceId;
     }
 
     showResult.value = rxIbAnswer != null;
 
-    if (ibUser != null) {
-      /// populate title ..etc
-      title.value =
-          rxIbQuestion.value.isAnonymous ? 'Anonymous' : ibUser!.username;
-      subtitle.value = IbUtils.getAgoDateTimeString(
-          DateTime.fromMillisecondsSinceEpoch(
-              rxIbQuestion.value.askedTimeInMs));
-      avatarUrl.value = ibUser!.avatarUrl;
+    if (!isSample) {
+      commented.value =
+          await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
+      comments.value = rxIbQuestion.value.comments;
+      totalTags.value = rxIbQuestion.value.tagIds.length;
+      liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
+      likes.value = rxIbQuestion.value.likes;
+
+      await generateIbTags();
+      await generatePollStats();
     }
-
-    commented.value =
-        await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
-    comments.value = rxIbQuestion.value.comments;
-    totalTags.value = rxIbQuestion.value.tagIds.length;
-    liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
-    likes.value = rxIbQuestion.value.likes;
-
-    await generateIbTags();
-    await generatePollStats();
     super.onInit();
   }
 
@@ -147,7 +136,7 @@ class IbQuestionItemController extends GetxController {
     }
 
     isAnswering.value = true;
-    isSwitched.value = false;
+
     try {
       final IbAnswer tempAnswer = IbAnswer(
           choiceId: selectedChoiceId.value,
@@ -193,6 +182,7 @@ class IbQuestionItemController extends GetxController {
         }
         totalPolled.value = counter;
       } else {
+        //Todo use cloud function
         await IbQuestionDbService().increasePollSize(
             questionId: rxIbQuestion.value.id,
             choiceId: selectedChoiceId.value);
@@ -226,53 +216,10 @@ class IbQuestionItemController extends GetxController {
           msg: "Failed to vote $e", backgroundColor: IbColors.errorRed);
     } finally {
       showResult.value = true;
-      isSwitched.value = true;
       isAnswering.value = false;
       rxIbAnswer!.refresh();
       rxIbQuestion.refresh();
     }
-  }
-
-  Future<void> onSubmit() async {
-    isSubmitting.value = true;
-    if (isLocalFile &&
-        rxIbQuestion.value.choices.isNotEmpty &&
-        (rxIbQuestion.value.questionType == IbQuestion.kPic ||
-            rxIbQuestion.value.questionType == IbQuestion.kMultipleChoicePic)) {
-      for (final ibChoice in rxIbQuestion.value.choices) {
-        if (ibChoice.url != null &&
-            ibChoice.url!.isNotEmpty &&
-            !ibChoice.url!.contains('http')) {
-          final String? url =
-              await IbStorageService().uploadAndRetrieveImgUrl(ibChoice.url!);
-          if (url != null) {
-            ibChoice.url = url;
-          } else {
-            IbUtils.showSimpleSnackBar(
-                msg:
-                    'Failed to upload images, ensure you have internet connection',
-                backgroundColor: IbColors.errorRed);
-          }
-        } else {
-          continue;
-        }
-      }
-    }
-
-    if (rxIbQuestion.value.tagIds.isNotEmpty) {
-      for (int i = 0; i < rxIbQuestion.value.tagIds.length; i++) {
-        /* final String id = await IbTagDbService()
-            .uploadTagAndReturnId(rxIbQuestion.value.tagIds[i]);
-        rxIbQuestion.value.tagIds[i] = id;*/
-      }
-    }
-
-    await IbQuestionDbService().uploadQuestion(rxIbQuestion.value);
-    isSubmitting.value = false;
-    Navigator.of(Get.context!).popUntil((route) => route.isFirst);
-    IbUtils.showSimpleSnackBar(
-        msg: 'Question submitted successfully',
-        backgroundColor: IbColors.accentColor);
   }
 
   Future<void> updateLike() async {

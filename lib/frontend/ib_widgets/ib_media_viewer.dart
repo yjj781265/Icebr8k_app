@@ -27,13 +27,21 @@ class _IbMediaViewerState extends State<IbMediaViewer>
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    if (controller != null) {
+      controller!.dispose();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Hero(
       tag: widget.heroTag,
       transitionOnUserGestures: true,
-      child: Container(
-        color: Colors.black,
-        child: Stack(
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
           alignment: AlignmentDirectional.center,
           children: [
             TabBarView(
@@ -59,22 +67,23 @@ class _IbMediaViewerState extends State<IbMediaViewer>
                     ),
                   );
                 }).toList()),
-            Positioned(
-                bottom: 16,
-                child: SafeArea(
-                  child: Center(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: TabPageSelector(
-                          indicatorSize: 8,
-                          controller: controller,
+            if (widget.urls.length > 1)
+              Positioned(
+                  bottom: 16,
+                  child: SafeArea(
+                    child: Center(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: TabPageSelector(
+                            indicatorSize: 8,
+                            controller: controller,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                )),
+                  )),
             Positioned(
               top: 64,
               right: 0,
