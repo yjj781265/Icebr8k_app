@@ -101,14 +101,21 @@ class IbQuestionHeader extends StatelessWidget {
 
   Widget _handleSubString() {
     return Obx(() {
-      return Text(
-          '${IbUtils.getAgoDateTimeString(
+      return Row(children: [
+        Text(
+          IbUtils.getAgoDateTimeString(
             DateTime.fromMillisecondsSinceEpoch(
                 _itemController.rxIbQuestion.value.askedTimeInMs),
-          )} ${_itemController.rxIbQuestion.value.endTimeInMs == -1 ? '' : ' • ${IbUtils.leftTimeString(_itemController.rxIbQuestion.value.endTimeInMs)}'}',
+          ),
           style: const TextStyle(
               fontSize: IbConfig.kDescriptionTextSize,
-              color: IbColors.lightGrey));
+              color: IbColors.lightGrey),
+        ),
+        if (_itemController.rxIbQuestion.value.endTimeInMs != -1)
+          const Text(' • '),
+        if (_itemController.rxIbQuestion.value.endTimeInMs != -1)
+          IbUtils.leftTimeText(_itemController.rxIbQuestion.value.endTimeInMs)
+      ]);
     });
   }
 }

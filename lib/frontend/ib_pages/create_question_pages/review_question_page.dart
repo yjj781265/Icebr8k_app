@@ -7,15 +7,20 @@ import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
+import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
+import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
+import 'package:icebr8k/backend/services/user_services/ib_tag_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_pic_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:showcaseview/showcaseview.dart';
-
-import '../ib_widgets/ib_pic_question_card.dart';
 
 class ReviewQuestionPage extends StatelessWidget {
   final IbQuestionItemController itemController;
@@ -30,7 +35,7 @@ class ReviewQuestionPage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () async {
-              //TODO
+              await submitQuestion(itemController.rxIbQuestion.value);
             },
             child: Text('submit'.tr,
                 style: const TextStyle(fontSize: IbConfig.kNormalTextSize)),
@@ -74,8 +79,8 @@ class ReviewQuestionPage extends StatelessWidget {
                       if (itemController.rxIbQuestion.value.endTimeInMs == -1) {
                         return const Text('No Time Limit');
                       }
-                      return Text(IbUtils.leftTimeString(
-                          itemController.rxIbQuestion.value.endTimeInMs));
+                      return IbUtils.leftTimeText(
+                          itemController.rxIbQuestion.value.endTimeInMs);
                     }),
                   ),
                   Obx(
@@ -237,22 +242,13 @@ class ReviewQuestionPage extends StatelessWidget {
                   dateOrder: DatePickerDateOrder.ymd,
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
+              SizedBox(
+                width: double.infinity,
+                child: IbElevatedButton(
+                    textTrKey: 'ok',
                     onPressed: () {
                       Get.back();
-                    },
-                    child: const Text('Cancel'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Get.back();
-                    },
-                    child: const Text('Confirm'),
-                  )
-                ],
+                    }),
               ),
               const SizedBox(
                 height: 16,
@@ -261,5 +257,71 @@ class ReviewQuestionPage extends StatelessWidget {
           ),
         )),
         ignoreSafeArea: false);
+  }
+
+  Future<void> submitQuestion(IbQuestion ibQuestion) async {
+    if (ibQuestion.id.isEmpty ||
+        ibQuestion.tagIds.isEmpty ||
+        ibQuestion.question.isEmpty ||
+        ibQuestion.choices.isEmpty) {
+      Get.dialog(const IbDialog(
+        title: 'Error',
+        subtitle:
+            'Question is not valid, make sure all required field are filled',
+        showNegativeBtn: false,
+      ));
+      return;
+    }
+
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'Uploading...'),
+        barrierDismissible: false);
+
+    /// upload all url in choices
+    for (final choice in ibQuestion.choices) {
+      if (choice.url == null || choice.url!.contains('http')) {
+        continue;
+      }
+
+      final String? url =
+          await IbStorageService().uploadAndRetrieveImgUrl(choice.url!);
+      if (url == null) {
+        IbUtils.showSimpleSnackBar(
+            msg: 'Failed to upload images...',
+            backgroundColor: IbColors.errorRed);
+        break;
+      } else {
+        choice.url = url;
+      }
+    }
+
+    /// upload all url in medias
+    for (final media in ibQuestion.medias) {
+      if (media.url.contains('http')) {
+        continue;
+      }
+
+      final String? url =
+          await IbStorageService().uploadAndRetrieveImgUrl(media.url);
+      if (url == null) {
+        IbUtils.showSimpleSnackBar(
+            msg: 'Failed to upload images...',
+            backgroundColor: IbColors.errorRed);
+        break;
+      } else {
+        media.url = url;
+      }
+    }
+
+    /// upload all the string in tagIds
+    for (final String text in ibQuestion.tagIds) {
+      final String id = await IbTagDbService().uploadTagAndReturnId(text);
+      ibQuestion.tagIds[ibQuestion.tagIds.indexOf(text)] = id;
+    }
+
+    await IbQuestionDbService().uploadQuestion(ibQuestion);
+    Navigator.of(Get.context!).popUntil((route) => route.isFirst);
+    IbUtils.showSimpleSnackBar(
+        msg: 'Question submitted successfully',
+        backgroundColor: IbColors.accentColor);
   }
 }

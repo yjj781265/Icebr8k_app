@@ -13,12 +13,16 @@ class IbTagDbService {
 
   IbTagDbService._();
 
-  Future<String> uploadTagAndReturnId(IbTag tag) async {
+  Future<String> uploadTagAndReturnId(String text) async {
     final snapshot = await _db
         .collection(_kTagCollection)
-        .where('text', isEqualTo: tag.text.trim())
+        .where('text', isEqualTo: text)
         .get();
     if (snapshot.size == 0) {
+      final IbTag tag = IbTag(
+          text: text,
+          id: IbUtils.getUniqueId(),
+          creatorId: IbUtils.getCurrentUid()!);
       tag.timestamp = FieldValue.serverTimestamp();
       await _db.collection(_kTagCollection).doc(tag.id).set(
             tag.toJson(),
@@ -26,10 +30,7 @@ class IbTagDbService {
           );
       return tag.id;
     } else {
-      final DocumentReference reference = snapshot.docs.first.reference;
-      await reference.update({'questionCount': FieldValue.increment(1)});
-      final tag = IbTag.fromJson(snapshot.docs.first.data());
-      return tag.id;
+      return snapshot.docs.first.id;
     }
   }
 

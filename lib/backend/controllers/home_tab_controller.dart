@@ -3,18 +3,21 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/main_page_controller.dart';
+import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 
 /// controller for Question tab in Homepage
 class HomeTabController extends GetxController {
   final avatarUrl = ''.obs;
   double _lastOffset = 0;
-  final double hideShowNavBarSensitivity = 3;
+  final double hideShowNavBarSensitivity = 10;
+  final currentList = <IbQuestion>[].obs;
 
   late StreamSubscription ibUserSub;
   ScrollController scrollController = ScrollController();
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
     ibUserSub =
         Get.find<MainPageController>().ibUserBroadcastStream.listen((ibUser) {
@@ -34,5 +37,7 @@ class HomeTabController extends GetxController {
       }
       _lastOffset = scrollController.offset;
     });
+
+    currentList.value = await IbQuestionDbService().queryIbQuestions(8);
   }
 }

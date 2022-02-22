@@ -11,7 +11,7 @@ import '../../db_config.dart';
 class IbQuestionDbService {
   static final _ibQuestionDbService = IbQuestionDbService._();
   static final _db = FirebaseFirestore.instance;
-  static const _kQuestionCollection = 'IbQuestion${DbConfig.dbSuffix}';
+  static const _kQuestionCollection = 'IbQuestions${DbConfig.dbSuffix}';
   static const _kAnswerCollectionGroup = 'Answers${DbConfig.dbSuffix}';
   static const _kLikesCollectionGroup = 'Likes${DbConfig.dbSuffix}';
   static const _kCommentCollectionGroup = 'Comments${DbConfig.dbSuffix}';
@@ -42,12 +42,8 @@ class IbQuestionDbService {
     return IbQuestion.fromJson(snapshot.data()!);
   }
 
-  Future<List<IbQuestion>> queryIcebr8kQ() async {
-    final snapshot = await _collectionRef
-        .where('creatorId', isEqualTo: 'tCH8AIqRxWM0eEQcmlnniUIfo6F3')
-        .orderBy('askedTimeInMs')
-        .limit(8)
-        .get();
+  Future<List<IbQuestion>> queryFirst8() async {
+    final snapshot = await _db.collection('First8${DbConfig.dbSuffix}').get();
 
     final List<IbQuestion> list = [];
     for (final doc in snapshot.docs) {

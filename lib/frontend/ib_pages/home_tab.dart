@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/home_tab_controller.dart';
+import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
+import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
 class HomeTab extends StatelessWidget {
@@ -39,35 +42,29 @@ class HomeTab extends StatelessWidget {
         ),
       ),
       drawer: const MenuPage(),
-      body: ListView(
-        controller: _controller.scrollController,
-        children: const [
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-          ListTile(leading: Text('a')),
-        ],
+      body: Obx(
+        () => ListView.builder(
+          controller: _controller.scrollController,
+          itemBuilder: (context, index) {
+            return _handleQuestionType(_controller.currentList[index]);
+          },
+          itemCount: _controller.currentList.length,
+        ),
       ),
     );
+  }
+
+  Widget _handleQuestionType(IbQuestion question) {
+    final IbQuestionItemController itemController = Get.put(
+        IbQuestionItemController(
+            rxIbQuestion: question.obs, rxIsExpanded: false.obs),
+        tag: question.id);
+
+    if (question.questionType == IbQuestion.kMultipleChoice ||
+        question.questionType == IbQuestion.kMultipleChoicePic) {
+      return IbMcQuestionCard(itemController);
+    }
+
+    return SizedBox();
   }
 }

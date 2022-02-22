@@ -8,7 +8,7 @@ import 'package:icebr8k/backend/models/ib_media.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
-import 'package:icebr8k/frontend/ib_pages/review_question_page.dart';
+import 'package:icebr8k/frontend/ib_pages/create_question_pages/review_question_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:showcaseview/showcaseview.dart';

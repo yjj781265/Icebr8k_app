@@ -98,7 +98,7 @@ class IbUserDbService {
     List<String> questionIds = [];
     final _controller = Get.find<MyAnsweredQuestionsController>();
     final List<IbQuestion> questions =
-        await IbQuestionDbService().queryIcebr8kQ();
+        await IbQuestionDbService().queryFirst8();
     if (_controller.isLoaded.isTrue && _controller.ibAnswers.isNotEmpty) {
       for (final IbAnswer ibAnswer in _controller.ibAnswers) {
         questionIds.add(ibAnswer.questionId);

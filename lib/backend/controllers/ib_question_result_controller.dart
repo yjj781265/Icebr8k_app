@@ -42,7 +42,6 @@ class IbQuestionResultController extends GetxController {
             user = IbCacheManager().getIbUser(ibAnswer.uid);
           }
 
-          /// self result item will be in index 0, will add later
           if (user == null) {
             continue;
           }

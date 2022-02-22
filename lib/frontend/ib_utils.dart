@@ -358,22 +358,53 @@ class IbUtils {
     return _colors[random.nextInt(_colors.length)];
   }
 
-  static String leftTimeString(int millsSinceEpoch) {
+  static Widget leftTimeText(int millsSinceEpoch) {
     final futureDateTime = DateTime.fromMillisecondsSinceEpoch(millsSinceEpoch);
     final diff = futureDateTime.difference(DateTime.now());
+
     if (diff.isNegative) {
-      return 'closed';
+      return const Text(
+        'Closed',
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+            fontSize: IbConfig.kDescriptionTextSize, color: IbColors.errorRed),
+      );
+    }
+
+    if (diff.inSeconds < 60) {
+      return Text(
+        '${diff.inSeconds} sec left',
+        style: const TextStyle(
+            fontSize: IbConfig.kDescriptionTextSize, color: Colors.deepOrange),
+        overflow: TextOverflow.ellipsis,
+      );
     }
 
     if (diff.inMinutes < 60) {
-      return '${diff.inMinutes} min left';
+      return Text(
+        '${diff.inMinutes} min left',
+        style: const TextStyle(
+            fontSize: IbConfig.kDescriptionTextSize, color: Colors.orange),
+        overflow: TextOverflow.ellipsis,
+      );
     }
 
     if (diff.inHours < 24) {
-      return '${diff.inHours} hr left';
+      return Text(
+        '${diff.inHours} hr left',
+        style: const TextStyle(
+            fontSize: IbConfig.kDescriptionTextSize,
+            color: Colors.orangeAccent),
+        overflow: TextOverflow.ellipsis,
+      );
     }
 
-    return '${diff.inDays} days left';
+    return Text(
+      '${diff.inDays} d left',
+      style: const TextStyle(
+          fontSize: IbConfig.kDescriptionTextSize, color: IbColors.accentColor),
+      overflow: TextOverflow.ellipsis,
+    );
   }
 
   static Color handleIndicatorColor(double percentageInDecimal) {
