@@ -65,6 +65,6 @@ class HomeTab extends StatelessWidget {
       return IbMcQuestionCard(itemController);
     }
 
-    return SizedBox();
+    return const SizedBox();
   }
 }

@@ -88,10 +88,10 @@ class IbQuestionHeader extends StatelessWidget {
         );
       }
 
-      return CircleAvatar(
-        backgroundColor: Theme.of(Get.context!).indicatorColor,
+      return const CircleAvatar(
+        backgroundColor: IbColors.creamYellow,
         radius: 16,
-        child: const Icon(
+        child: Icon(
           Icons.person_rounded,
           color: IbColors.lightGrey,
         ),

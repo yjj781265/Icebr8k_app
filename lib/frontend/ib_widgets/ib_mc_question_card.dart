@@ -92,22 +92,28 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
               LimitedBox(
                 maxHeight: widget._controller.rxIbQuestion.value.questionType ==
                         IbQuestion.kMultipleChoice
-                    ? 240
-                    : 350,
+                    ? 260
+                    : 400,
                 child: Scrollbar(
+                  thickness: 3,
+                  radius: const Radius.circular(8),
+                  showTrackOnHover: true,
                   isAlwaysShown: true,
                   controller: _scrollController,
-                  child: ListView.builder(
-                    padding: EdgeInsets.zero,
-                    controller: _scrollController,
-                    itemBuilder: (context, index) {
-                      final IbChoice _choice =
-                          widget._controller.rxIbQuestion.value.choices[index];
-                      return IbQuestionMcItem(_choice, widget._controller);
-                    },
-                    shrinkWrap: true,
-                    itemCount:
-                        widget._controller.rxIbQuestion.value.choices.length,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 4.0),
+                    child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      controller: _scrollController,
+                      itemBuilder: (context, index) {
+                        final IbChoice _choice = widget
+                            ._controller.rxIbQuestion.value.choices[index];
+                        return IbQuestionMcItem(_choice, widget._controller);
+                      },
+                      shrinkWrap: true,
+                      itemCount:
+                          widget._controller.rxIbQuestion.value.choices.length,
+                    ),
                   ),
                 ),
               ),
@@ -189,37 +195,92 @@ class IbQuestionMcItem extends StatelessWidget {
       : super(key: key);
 
   Color getItemColor() {
-    if (choice.choiceId == _controller.selectedChoiceId.value) {
-      return IbColors.primaryColor;
-    }
+    if (_controller.showResult.isFalse) {
+      if (choice.choiceId == _controller.selectedChoiceId.value) {
+        return IbColors.primaryColor;
+      } else {
+        return Colors.transparent;
+      }
+    } else {
+      if (_controller.rxIbQuestion.value.isQuiz) {
+        return _controller.selectedChoiceId.value ==
+                _controller.rxIbQuestion.value.correctChoiceId
+            ? IbColors.accentColor
+            : IbColors.errorRed;
+      }
 
-    if (_controller.showResult.isTrue &&
-        (_controller.resultMap[choice] ?? 0) != 0) {
-      return IbColors.lightGrey;
+      if (choice.choiceId == _controller.selectedChoiceId.value) {
+        return IbColors.primaryColor;
+      } else if ((_controller.resultMap[choice] ?? 0) == 0) {
+        return IbColors.lightBlue;
+      } else {
+        return IbColors.lightGrey;
+      }
     }
-
-    return IbColors.lightBlue;
   }
 
   double getItemWidth() {
-    if (choice.choiceId == _controller.selectedChoiceId.value &&
-        _controller.showResult.isFalse) {
-      return Get.width * 0.95;
+    if (_controller.showResult.isFalse) {
+      if (choice.choiceId == _controller.selectedChoiceId.value) {
+        return Get.width * 0.95;
+      } else {
+        return Get.width * 0.95;
+      }
+    } else {
+      if (_controller.rxIbQuestion.value.isQuiz) {
+        return Get.width * 0.95 * (_controller.resultMap[choice] ?? 0);
+      }
+      return Get.width * 0.95 * (_controller.resultMap[choice] ?? 0) == 0
+          ? Get.width * 0.95
+          : Get.width * 0.95 * (_controller.resultMap[choice] ?? 0);
+    }
+  }
+
+  Widget getItemIcon() {
+    if (!_controller.rxIbQuestion.value.isQuiz &&
+        _controller.showResult.isTrue &&
+        _controller.rxIbAnswer != null &&
+        choice.choiceId == _controller.rxIbAnswer!.value.choiceId) {
+      return const CircleAvatar(
+        radius: 8,
+        backgroundColor: IbColors.white,
+        child: Icon(
+          Icons.check_circle_rounded,
+          color: IbColors.accentColor,
+          size: 16,
+        ),
+      );
     }
 
-    if (_controller.totalPolled.value <= 0 && _controller.showResult.isTrue) {
-      return Get.width * 0.95;
+    if (_controller.rxIbQuestion.value.isQuiz &&
+        _controller.showResult.isTrue &&
+        choice.choiceId == _controller.rxIbQuestion.value.correctChoiceId) {
+      return const CircleAvatar(
+        radius: 8,
+        backgroundColor: IbColors.white,
+        child: Icon(
+          Icons.check_circle_rounded,
+          color: IbColors.accentColor,
+          size: 16,
+        ),
+      );
+    }
+    if (_controller.rxIbQuestion.value.isQuiz &&
+        _controller.showResult.isTrue &&
+        choice.choiceId == _controller.selectedChoiceId.value &&
+        choice.choiceId != _controller.rxIbQuestion.value.correctChoiceId) {
+      return const CircleAvatar(
+        radius: 8,
+        backgroundColor: IbColors.white,
+        child: Icon(
+          Icons.cancel,
+          color: IbColors.errorRed,
+          size: 16,
+        ),
+      );
     }
 
-    if ((_controller.resultMap[choice] ?? 0) == 0) {
-      return Get.width * 0.95;
-    }
-
-    if (_controller.showResult.isTrue) {
-      return (_controller.resultMap[choice] ?? 0) * (Get.width * 0.95);
-    }
-
-    return 0;
+    return const SizedBox();
   }
 
   @override
@@ -342,22 +403,12 @@ class IbQuestionMcItem extends StatelessWidget {
                           ],
                         ),
                       ),
-                      if (_controller.showResult.value &&
-                          _controller.rxIbAnswer!.value.choiceId ==
-                              choice.choiceId)
-                        const Positioned(
-                          bottom: 2,
-                          right: 2,
-                          child: CircleAvatar(
-                            radius: 8,
-                            backgroundColor: IbColors.white,
-                            child: Icon(
-                              Icons.check_circle_rounded,
-                              color: IbColors.accentColor,
-                              size: 16,
-                            ),
-                          ),
-                        ),
+
+                      Positioned(
+                        bottom: 0,
+                        right: 2,
+                        child: getItemIcon(),
+                      ),
 
                       /// show percentage animation
                       if (_controller.showResult.value &&
@@ -423,6 +474,11 @@ class IbQuestionMcItem extends StatelessWidget {
   }
 
   void onItemTap() {
+    if (_controller.rxIbQuestion.value.isQuiz &&
+        _controller.showResult.isTrue) {
+      return;
+    }
+
     if (_controller.isSample ||
         (_controller.rxIbAnswer != null &&
             _controller.rxIbAnswer!.value.uid != IbUtils.getCurrentUid())) {

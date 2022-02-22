@@ -59,9 +59,6 @@ class IbQuestionItemController extends GetxController {
       /// populate title ..etc
       title.value =
           rxIbQuestion.value.isAnonymous ? 'Anonymous' : ibUser.username;
-      subtitle.value = IbUtils.getAgoDateTimeString(
-          DateTime.fromMillisecondsSinceEpoch(
-              rxIbQuestion.value.askedTimeInMs));
       avatarUrl.value = ibUser.avatarUrl;
     }
 

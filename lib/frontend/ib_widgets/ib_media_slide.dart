@@ -44,8 +44,8 @@ class _IbMediaSlideState extends State<IbMediaSlide>
         children: [
           Container(
             decoration: const BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.all(Radius.circular(8))),
+              color: Colors.black,
+            ),
             height: (Get.width - 32) / 1.618,
             width: Get.width - 32,
             child: TabBarView(

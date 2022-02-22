@@ -20,16 +20,21 @@ class IbQuestionButtons extends StatelessWidget {
         height: 56,
         child: Row(
           children: [
-            Expanded(
-              child: IbElevatedButton(
-                disabled: _handleVoteButtonDisableState(),
-                onPressed: () async {
-                  await _controller.onVote();
-                },
-                textTrKey: _handleVoteButtonText(),
-                color: IbColors.primaryColor,
+            // don't show answer button once user is answered the quiz
+            if (_controller.rxIbQuestion.value.isQuiz &&
+                _controller.showResult.isTrue)
+              const SizedBox()
+            else
+              Expanded(
+                child: IbElevatedButton(
+                  disabled: _handleVoteButtonDisableState(),
+                  onPressed: () async {
+                    await _controller.onVote();
+                  },
+                  textTrKey: _handleVoteButtonText(),
+                  color: IbColors.primaryColor,
+                ),
               ),
-            ),
             if (_controller.rxIbQuestion.value.isCommentEnabled)
               Expanded(
                 child: IbElevatedButton(
