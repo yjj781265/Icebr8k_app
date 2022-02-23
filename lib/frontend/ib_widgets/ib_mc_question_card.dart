@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:animations/animations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/ib_question_stats_controller.dart';
@@ -197,22 +198,38 @@ class IbQuestionMcItem extends StatelessWidget {
         return IbColors.lightBlue;
       }
     } else {
+      if (_controller.rxIbQuestion.value.isQuiz &&
+          choice.choiceId == _controller.rxIbQuestion.value.correctChoiceId &&
+          (_controller.resultMap[choice] ?? 0) != 0) {
+        return IbColors.accentColor;
+      } else if (_controller.rxIbQuestion.value.isQuiz &&
+          choice.choiceId != _controller.rxIbQuestion.value.correctChoiceId &&
+          choice.choiceId == _controller.rxIbAnswer!.value.choiceId) {
+        return IbColors.errorRed;
+      } else if (_controller.rxIbQuestion.value.isQuiz &&
+          (_controller.resultMap[choice] ?? 0) == 0) {
+        return IbColors.lightBlue;
+      } else if (_controller.rxIbQuestion.value.isQuiz &&
+          (_controller.resultMap[choice] ?? 0) != 0) {
+        return IbColors.lightGrey;
+      }
+
       if (choice.choiceId == _controller.selectedChoiceId.value &&
           !_controller.rxIbQuestion.value.isQuiz) {
         return IbColors.primaryColor;
       } else if ((_controller.resultMap[choice] ?? 0) == 0) {
         return IbColors.lightBlue;
       } else {
-        return _controller.rxIbQuestion.value.isQuiz
-            ? choice.choiceId == _controller.rxIbQuestion.value.correctChoiceId
-                ? IbColors.accentColor
-                : IbColors.errorRed
-            : IbColors.lightGrey;
+        return IbColors.lightGrey;
       }
     }
   }
 
   double getItemWidth() {
+    if (_controller.showResult.isFalse) {
+      return Get.width * 0.95;
+    }
+
     return (Get.width * 0.95 * (_controller.resultMap[choice] ?? 0)) == 0
         ? Get.width * 0.95
         : Get.width * 0.95 * (_controller.resultMap[choice] ?? 0);
@@ -249,7 +266,7 @@ class IbQuestionMcItem extends StatelessWidget {
     }
     if (_controller.rxIbQuestion.value.isQuiz &&
         _controller.showResult.isTrue &&
-        choice.choiceId == _controller.selectedChoiceId.value &&
+        choice.choiceId == _controller.rxIbAnswer!.value.choiceId &&
         choice.choiceId != _controller.rxIbQuestion.value.correctChoiceId) {
       return const CircleAvatar(
         radius: 8,

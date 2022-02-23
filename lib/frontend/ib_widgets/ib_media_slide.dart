@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_media.dart';
-import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 
 class IbMediaSlide extends StatefulWidget {
@@ -46,8 +45,8 @@ class _IbMediaSlideState extends State<IbMediaSlide>
             decoration: const BoxDecoration(
               color: Colors.black,
             ),
-            height: (Get.width - 32) / 1.618,
-            width: Get.width - 32,
+            height: (Get.width * 0.88) / 1.618,
+            width: Get.width * 0.88,
             child: TabBarView(
                 controller: controller,
                 children: widget.medias.map((e) {
@@ -59,7 +58,7 @@ class _IbMediaSlideState extends State<IbMediaSlide>
               bottom: 3,
               child: Container(
                 decoration: BoxDecoration(
-                    color: IbColors.lightGrey.withOpacity(0.88),
+                    color: Theme.of(context).backgroundColor.withOpacity(0.88),
                     borderRadius: const BorderRadius.all(Radius.circular(8))),
                 child: TabPageSelector(
                   indicatorSize: 8,
