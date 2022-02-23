@@ -76,21 +76,15 @@ class _IbMediaSlideState extends State<IbMediaSlide>
     late Widget mediaWidget;
     if (media.type == IbMedia.kPicType) {
       mediaWidget = media.url.contains('http')
-          ? ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
-              child: CachedNetworkImage(
-                imageUrl: media.url,
-                fit: BoxFit.fitHeight,
-              ),
+          ? CachedNetworkImage(
+              imageUrl: media.url,
+              fit: BoxFit.fitHeight,
             )
-          : ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
-              child: Image.file(
-                File(
-                  media.url,
-                ),
-                fit: BoxFit.fitHeight,
+          : Image.file(
+              File(
+                media.url,
               ),
+              fit: BoxFit.fitHeight,
             );
     } else {
       mediaWidget = const FlutterLogo();

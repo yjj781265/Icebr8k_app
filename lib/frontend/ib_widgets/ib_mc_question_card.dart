@@ -92,7 +92,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
               LimitedBox(
                 maxHeight: widget._controller.rxIbQuestion.value.questionType ==
                         IbQuestion.kMultipleChoice
-                    ? 260
+                    ? 300
                     : 400,
                 child: Scrollbar(
                   thickness: 3,
@@ -102,17 +102,12 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                   controller: _scrollController,
                   child: Padding(
                     padding: const EdgeInsets.only(right: 4.0),
-                    child: ListView.builder(
-                      padding: EdgeInsets.zero,
-                      controller: _scrollController,
-                      itemBuilder: (context, index) {
-                        final IbChoice _choice = widget
-                            ._controller.rxIbQuestion.value.choices[index];
-                        return IbQuestionMcItem(_choice, widget._controller);
-                      },
+                    child: ListView(
                       shrinkWrap: true,
-                      itemCount:
-                          widget._controller.rxIbQuestion.value.choices.length,
+                      controller: _scrollController,
+                      children: widget._controller.rxIbQuestion.value.choices
+                          .map((e) => IbQuestionMcItem(e, widget._controller))
+                          .toList(),
                     ),
                   ),
                 ),
@@ -199,41 +194,28 @@ class IbQuestionMcItem extends StatelessWidget {
       if (choice.choiceId == _controller.selectedChoiceId.value) {
         return IbColors.primaryColor;
       } else {
-        return Colors.transparent;
+        return IbColors.lightBlue;
       }
     } else {
-      if (_controller.rxIbQuestion.value.isQuiz) {
-        return _controller.selectedChoiceId.value ==
-                _controller.rxIbQuestion.value.correctChoiceId
-            ? IbColors.accentColor
-            : IbColors.errorRed;
-      }
-
-      if (choice.choiceId == _controller.selectedChoiceId.value) {
+      if (choice.choiceId == _controller.selectedChoiceId.value &&
+          !_controller.rxIbQuestion.value.isQuiz) {
         return IbColors.primaryColor;
       } else if ((_controller.resultMap[choice] ?? 0) == 0) {
         return IbColors.lightBlue;
       } else {
-        return IbColors.lightGrey;
+        return _controller.rxIbQuestion.value.isQuiz
+            ? choice.choiceId == _controller.rxIbQuestion.value.correctChoiceId
+                ? IbColors.accentColor
+                : IbColors.errorRed
+            : IbColors.lightGrey;
       }
     }
   }
 
   double getItemWidth() {
-    if (_controller.showResult.isFalse) {
-      if (choice.choiceId == _controller.selectedChoiceId.value) {
-        return Get.width * 0.95;
-      } else {
-        return Get.width * 0.95;
-      }
-    } else {
-      if (_controller.rxIbQuestion.value.isQuiz) {
-        return Get.width * 0.95 * (_controller.resultMap[choice] ?? 0);
-      }
-      return Get.width * 0.95 * (_controller.resultMap[choice] ?? 0) == 0
-          ? Get.width * 0.95
-          : Get.width * 0.95 * (_controller.resultMap[choice] ?? 0);
-    }
+    return (Get.width * 0.95 * (_controller.resultMap[choice] ?? 0)) == 0
+        ? Get.width * 0.95
+        : Get.width * 0.95 * (_controller.resultMap[choice] ?? 0);
   }
 
   Widget getItemIcon() {
@@ -411,27 +393,23 @@ class IbQuestionMcItem extends StatelessWidget {
                       ),
 
                       /// show percentage animation
-                      if (_controller.showResult.value &&
-                          _controller.totalPolled.value > 0)
+                      if (_controller.showResult.value)
                         TweenAnimationBuilder(
-                          builder: (BuildContext context, Object? value,
-                              Widget? child) {
-                            return Positioned(
-                              right: 8,
-                              child: Text(
-                                '${((_controller.resultMap[choice] ?? 0 / _controller.totalPolled.value.toDouble()) * 100).toStringAsFixed(1)}%',
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                            );
-                          },
-                          duration: const Duration(
-                              milliseconds:
-                                  IbConfig.kEventTriggerDelayInMillis),
-                          tween: Tween<double>(
-                              begin: 0,
-                              end: _controller.resultMap[choice]! /
-                                  _controller.totalPolled.value.toDouble()),
-                        ),
+                            tween: Tween<double>(
+                                begin: 0,
+                                end: _controller.resultMap[choice] ?? 0),
+                            duration: const Duration(
+                                milliseconds:
+                                    IbConfig.kEventTriggerDelayInMillis),
+                            builder: (context, double value, child) {
+                              return Positioned(
+                                right: 8,
+                                child: Text(
+                                  '${(value * 100).toStringAsFixed(1)}%',
+                                  style: const TextStyle(color: Colors.black),
+                                ),
+                              );
+                            })
                     ],
                   ),
                 ),

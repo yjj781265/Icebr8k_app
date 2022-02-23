@@ -110,6 +110,10 @@ class IbQuestionItemController extends GetxController {
     for (final key in countMap!.keys) {
       counter = counter + countMap![key]!;
     }
+    if (counter == 0) {
+      totalPolled.value = counter;
+      return;
+    }
 
     for (final IbChoice ibChoice in rxIbQuestion.value.choices) {
       resultMap[ibChoice] = double.parse(
