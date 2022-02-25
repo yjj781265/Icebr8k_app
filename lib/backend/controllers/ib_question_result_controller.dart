@@ -62,7 +62,7 @@ class IbQuestionResultController extends GetxController {
               answeredTimestampInMs: ibAnswer.answeredTimeInMs));
         }
 
-        final int count = itemController.countMap![ibChoice] ?? 0;
+        final int count = itemController.countMap[ibChoice] ?? 0;
         results.add(ResultItemModel(
             list: resultItem.obs, ibChoice: ibChoice, count: count));
       }

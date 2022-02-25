@@ -12,23 +12,22 @@ IbComment _$IbCommentFromJson(Map<String, dynamic> json) => IbComment(
       questionId: json['questionId'] as String,
       isAnonymous: json['isAnonymous'] as bool? ?? false,
       likes: json['likes'] as int? ?? 0,
+      replies: json['replies'] as int? ?? 0,
+      replyId: json['replyId'] as String?,
       content: json['content'] as String,
       type: json['type'] as String,
       timestampInMs: json['timestampInMs'] as int,
-      replies: (json['replies'] as List<dynamic>?)
-              ?.map((e) => IbComment.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const <IbComment>[],
     );
 
 Map<String, dynamic> _$IbCommentToJson(IbComment instance) => <String, dynamic>{
+      'replyId': instance.replyId,
       'commentId': instance.commentId,
       'questionId': instance.questionId,
       'uid': instance.uid,
       'likes': instance.likes,
+      'replies': instance.replies,
       'isAnonymous': instance.isAnonymous,
       'content': instance.content,
       'type': instance.type,
-      'replies': instance.replies.map((e) => e.toJson()).toList(),
       'timestampInMs': instance.timestampInMs,
     };

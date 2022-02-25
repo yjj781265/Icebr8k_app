@@ -2,32 +2,36 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'ib_comment.g.dart';
 
+/// reply Id is for the reply of a comment
 @JsonSerializable(explicitToJson: true)
 class IbComment {
+  String? replyId;
   String commentId;
   String questionId;
   String uid;
   int likes;
+  int replies;
   bool isAnonymous;
   String content;
   String type;
-  List<IbComment> replies;
   int timestampInMs;
 
   static const String kCommentTypeText = 'text';
   static const String kCommentTypePic = 'pic';
   static const String kCommentTypeAudio = 'audio';
 
-  IbComment(
-      {required this.commentId,
-      required this.uid,
-      required this.questionId,
-      this.isAnonymous = false,
-      this.likes = 0,
-      required this.content,
-      required this.type,
-      required this.timestampInMs,
-      this.replies = const <IbComment>[]});
+  IbComment({
+    required this.commentId,
+    required this.uid,
+    required this.questionId,
+    this.isAnonymous = false,
+    this.likes = 0,
+    this.replies = 0,
+    this.replyId,
+    required this.content,
+    required this.type,
+    required this.timestampInMs,
+  });
 
   factory IbComment.fromJson(Map<String, dynamic> json) =>
       _$IbCommentFromJson(json);

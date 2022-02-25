@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
+import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
@@ -67,7 +68,12 @@ class IbQuestionHeader extends StatelessWidget {
                     onPressed: null,
                   ),
                 IconButton(
-                    onPressed: _itemController.isSample ? null : () {},
+                    onPressed: _itemController.isSample
+                        ? null
+                        : () async {
+                            await IbQuestionDbService().removeQuestion(
+                                _itemController.rxIbQuestion.value);
+                          },
                     icon: const FaIcon(Icons.more_vert_outlined))
               ],
             ),

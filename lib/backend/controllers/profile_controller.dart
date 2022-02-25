@@ -137,7 +137,7 @@ class ProfileController extends GetxController {
     }
 
     final String? photoUrl =
-        await IbStorageService().uploadAndRetrieveImgUrl(_filePath);
+        await IbStorageService().uploadAndRetrieveImgUrl(filePath: _filePath);
 
     if (photoUrl == null) {
       Get.back();

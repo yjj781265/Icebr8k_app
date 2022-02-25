@@ -20,9 +20,12 @@ class IbQuestionButtons extends StatelessWidget {
         height: 56,
         child: Row(
           children: [
-            // don't show answer button once user is answered the quiz
+            // don't show answer button once user is answered the quiz or poll is closed
             if (_controller.rxIbQuestion.value.isQuiz &&
-                _controller.showResult.isTrue)
+                    _controller.voted.isTrue ||
+                (DateTime.now().millisecondsSinceEpoch >
+                        _controller.rxIbQuestion.value.endTimeInMs &&
+                    _controller.rxIbQuestion.value.endTimeInMs > 0))
               const SizedBox()
             else
               Expanded(
@@ -41,7 +44,8 @@ class IbQuestionButtons extends StatelessWidget {
                   disabled: _controller.isSample,
                   onPressed: () {
                     Get.to(() => CommentPage(Get.put(
-                        CommentController(_controller.rxIbQuestion.value))));
+                        CommentController(_controller.rxIbQuestion.value.id),
+                        tag: _controller.rxIbQuestion.value.id)));
                   },
                   textTrKey: 'comment',
                 ),
@@ -58,7 +62,7 @@ class IbQuestionButtons extends StatelessWidget {
     } else {
       return _controller.isAnswering.isTrue
           ? 'voting'
-          : _controller.showResult.isTrue
+          : _controller.voted.isTrue
               ? 'change_vote'
               : 'vote';
     }
@@ -73,6 +77,6 @@ class IbQuestionButtons extends StatelessWidget {
             _controller.rxIbAnswer!.value.choiceId ==
                 _controller.selectedChoiceId.value ||
         _controller.isAnswering.isTrue ||
-        _controller.showResult.isTrue && _controller.rxIbQuestion.value.isQuiz;
+        _controller.voted.isTrue && _controller.rxIbQuestion.value.isQuiz;
   }
 }

@@ -10,12 +10,19 @@ class IbStorageService {
   factory IbStorageService() => _storageService;
   IbStorageService._();
 
-  Future<String?> uploadAndRetrieveImgUrl(String filePath) async {
+  Future<String?> uploadAndRetrieveImgUrl(
+      {required String filePath, String oldUrl = ''}) async {
     final File file = File(filePath);
     final String fileName = IbUtils.getUniqueId();
     final String refString = 'images/$fileName.png';
 
     try {
+      if (oldUrl.isNotEmpty) {
+        await deleteFile(oldUrl);
+      }
+      if (filePath.isEmpty) {
+        return null;
+      }
       await _firebaseStorage.ref(refString).putFile(file);
       final String downloadURL =
           await _firebaseStorage.ref(refString).getDownloadURL();

@@ -203,15 +203,15 @@ class SetupController extends GetxController {
     } else {
       print('Setup Page Three is valid!');
       try {
-        final String? url =
-            await IbStorageService().uploadAndRetrieveImgUrl(avatarUrl.value);
+        final String? url = await IbStorageService()
+            .uploadAndRetrieveImgUrl(filePath: avatarUrl.value);
         if (url == null) {
           throw Exception('failed to upload message');
         }
 
         for (final emoPic in emoPics) {
-          final emoPicUrl =
-              await IbStorageService().uploadAndRetrieveImgUrl(emoPic.url);
+          final emoPicUrl = await IbStorageService()
+              .uploadAndRetrieveImgUrl(filePath: avatarUrl.value);
 
           if (emoPicUrl == null) {
             throw Exception('failed to upload message');

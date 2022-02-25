@@ -47,6 +47,10 @@ class IbAdminService {
         .update({'emoPics': <IbEmoPic>[]});
   }
 
+  Future<void> deleteAvatarUrl(IbUser user) async {
+    await IbStorageService().deleteFile(user.avatarUrl);
+  }
+
   Future<void> sendStatusEmail(
       {required String email,
       required String fName,

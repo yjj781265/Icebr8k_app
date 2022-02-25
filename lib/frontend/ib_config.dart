@@ -35,8 +35,18 @@ class IbConfig {
   static const int kMaxTag = 8;
   static const double kMcPicHeight = 72;
   static const double kPicHeight = 88;
-
   static const double kMcItemCornerRadius = 8;
+  static const int kCommentMaxLen = 2000;
+  static const List<String> kFirst8QuestionIds = [
+    "0bfe7dcd-49f2-419f-a3a1-66f16000cb89",
+    '32351860-a06c-4d11-89e3-b05328c7894c',
+    '3edff96e-81c3-4ee3-a6ad-6090781a99c2',
+    '70f7b948-98af-42c6-b361-a0606a47e304',
+    '7db72ff2-2fc8-455c-b49c-a85e2d0c8f62',
+    'a30b0c6f-b05f-4a7f-8620-bd2274be4891',
+    'b8b0223b-2b7b-460e-9267-4be1395d4092',
+    'c7dc24b9-9f5e-4e9d-8fc6-aab4dd45e072,'
+  ];
   static const String kVersion = '0.1.1${DbConfig.dbSuffix}';
 
   IbConfig._();

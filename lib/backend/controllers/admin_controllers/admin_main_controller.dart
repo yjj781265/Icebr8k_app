@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart';
-import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -202,12 +201,11 @@ class AdminMainController extends GetxController {
                 note: editingController.text.trim(),
                 status: IbUser.kUserStatusRejected);
             await IbAdminService().deleteAllEmoPics(user);
-            await IbStorageService().deleteFile(user.avatarUrl);
+            await IbAdminService().deleteAvatarUrl(user);
             Get.back();
             Get.back();
             IbUtils.showSimpleSnackBar(
                 msg: 'Profile rejected!', backgroundColor: IbColors.errorRed);
-            ;
           },
         ),
       );

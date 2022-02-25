@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
+import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -23,19 +24,39 @@ class CommentController extends GetxController {
   final hintText = 'Add a creative comment here'.obs;
   final replyCommentId = ''.obs;
   final isLoading = true.obs;
-  final IbQuestion ibQuestion;
+  final String questionId;
+  final title = ''.obs;
+  final creatorId = ''.obs;
+  final questionType = ''.obs;
+  final isAnonymous = false.obs;
+  final choices = <IbChoice>[].obs;
   final commentCount = 0.obs;
   final sortByDate = true.obs;
   final isAddingComment = false.obs;
   final TextEditingController editingController = TextEditingController();
   final RefreshController refreshController = RefreshController();
   DocumentSnapshot<Map<String, dynamic>>? lastSnap;
-  CommentController(this.ibQuestion);
+  CommentController(this.questionId);
 
   @override
   Future<void> onInit() async {
     super.onInit();
-    commentCount.value = ibQuestion.comments;
+    await initData();
+  }
+
+  Future<void> initData() async {
+    final IbQuestion? ibQuestion =
+        await IbQuestionDbService().querySingleQuestion(questionId);
+    if (ibQuestion == null) {
+      print('CommentController ibQuestion is null');
+      return;
+    }
+    title.value = ibQuestion.question;
+    creatorId.value = ibQuestion.creatorId;
+    questionType.value = ibQuestion.questionType;
+    choices.value = ibQuestion.choices;
+    isAnonymous.value = ibQuestion.isAnonymous;
+    updateParentQuestionCommentCount(ibQuestion.comments);
     await loadList(dropDownOptions[0]);
   }
 
@@ -47,9 +68,9 @@ class CommentController extends GetxController {
     final List<IbComment> tempList = [];
     late QuerySnapshot<Map<String, dynamic>> snapshot;
     if (dropDownValue == dropDownOptions[0]) {
-      snapshot = await IbQuestionDbService().queryTopComments(ibQuestion.id);
+      snapshot = await IbQuestionDbService().queryTopComments(questionId);
     } else {
-      snapshot = await IbQuestionDbService().queryNewestComments(ibQuestion.id);
+      snapshot = await IbQuestionDbService().queryNewestComments(questionId);
     }
 
     for (final doc in snapshot.docs) {
@@ -59,27 +80,11 @@ class CommentController extends GetxController {
     lastSnap = tempList.isEmpty ? null : snapshot.docs.last;
 
     for (final comment in tempList) {
-      final IbUser? user;
-      final IbAnswer? ibAnswer;
-
-      user = await retrieveUser(comment);
-      ibAnswer = await retrieveIbAnswer(comment);
-      if (user == null) {
+      final item = await _getCommentItem(comment);
+      if (item == null) {
         continue;
       }
-
-      final isLiked = await IbQuestionDbService().isCommentLiked(comment);
-
-      /// retrieve first three replies if available
-      final List<CommentItem> replies =
-          await _retrieveFirstThreeReplies(comment.replies);
-
-      comments.add(CommentItem(
-          ibComment: comment,
-          user: user,
-          firstThreeReplies: replies,
-          ibAnswer: ibAnswer,
-          isLiked: isLiked));
+      comments.add(item);
     }
     comments.refresh();
     isLoading.value = false;
@@ -91,11 +96,11 @@ class CommentController extends GetxController {
       final List<IbComment> tempList = [];
       if (lastSnap != null && currentOption.value == dropDownOptions[0]) {
         snapshot = await IbQuestionDbService()
-            .queryTopComments(ibQuestion.id, lastSnap: lastSnap);
+            .queryTopComments(questionId, lastSnap: lastSnap);
       } else if (lastSnap != null &&
           currentOption.value == dropDownOptions[1]) {
         snapshot = await IbQuestionDbService()
-            .queryNewestComments(ibQuestion.id, lastSnap: lastSnap);
+            .queryNewestComments(questionId, lastSnap: lastSnap);
       }
 
       if (snapshot != null &&
@@ -107,28 +112,11 @@ class CommentController extends GetxController {
         }
 
         for (final comment in tempList) {
-          final IbUser? user;
-          final IbAnswer? ibAnswer;
-
-          user = await retrieveUser(comment);
-          ibAnswer = await retrieveIbAnswer(comment);
-
-          if (user == null) {
+          final item = await _getCommentItem(comment);
+          if (item == null) {
             continue;
           }
-
-          final isLiked = await IbQuestionDbService().isCommentLiked(comment);
-
-          /// retrieve first three replies if available
-          final List<CommentItem> replies =
-              await _retrieveFirstThreeReplies(comment.replies);
-
-          comments.add(CommentItem(
-              ibComment: comment,
-              user: user,
-              firstThreeReplies: replies,
-              ibAnswer: ibAnswer,
-              isLiked: isLiked));
+          comments.add(item);
         }
         refreshController.loadComplete();
       } else {
@@ -165,6 +153,13 @@ class CommentController extends GetxController {
     return user;
   }
 
+  void updateCommentItem(CommentItem commentItem) {
+    if (comments.contains(commentItem)) {
+      comments[comments.indexOf(commentItem)] = commentItem;
+      comments.refresh();
+    }
+  }
+
   Future<void> addComment({required String text, required String type}) async {
     if (text.trim().isEmpty) {
       return;
@@ -173,7 +168,7 @@ class CommentController extends GetxController {
     final IbComment ibComment = IbComment(
         commentId: IbUtils.getUniqueId(),
         uid: IbUtils.getCurrentUid()!,
-        questionId: ibQuestion.id,
+        questionId: questionId,
         content: text.trim(),
         type: type,
         timestampInMs: DateTime.now().millisecondsSinceEpoch);
@@ -190,7 +185,7 @@ class CommentController extends GetxController {
               user: IbUtils.getCurrentIbUser()!,
               ibAnswer: ibAnswer));
 
-      updateCommentCount();
+      updateParentQuestionCommentCount(comments.length);
       IbUtils.showSimpleSnackBar(
           msg: 'Comment added!', backgroundColor: IbColors.accentColor);
     } catch (e) {
@@ -204,16 +199,18 @@ class CommentController extends GetxController {
   }
 
   Future<List<CommentItem>> _retrieveFirstThreeReplies(
-      List<IbComment> replies) async {
-    late List<IbComment> firstThreeList;
+      IbComment ibComment) async {
+    final List<IbComment> firstThreeList = [];
     final List<CommentItem> replyItems = [];
-    replies.sort((a, b) => b.timestampInMs.compareTo(a.timestampInMs));
 
-    if (replies.length >= 3) {
-      firstThreeList = replies.sublist(0, 3);
-    } else {
-      firstThreeList = replies;
+    final snapshot = await IbQuestionDbService().queryReplies(
+        questionId: ibComment.questionId,
+        commentId: ibComment.commentId,
+        limit: 3);
+    for (final doc in snapshot.docs) {
+      firstThreeList.add(IbComment.fromJson(doc.data()));
     }
+    firstThreeList.sort((a, b) => b.timestampInMs.compareTo(a.timestampInMs));
 
     for (final reply in firstThreeList) {
       final IbUser? user;
@@ -247,55 +244,16 @@ class CommentController extends GetxController {
     return replyItems;
   }
 
-  void updateCommentCount() {
-    commentCount.value++;
+  void updateParentQuestionCommentCount(int count) {
+    commentCount.value = count;
+
+    ///update item controller comments if available
     final IbQuestionItemController itemController =
-        Get.find(tag: "${ibQuestion.id}${IbUtils.getCurrentUid()}");
+        Get.find<IbQuestionItemController>(tag: questionId);
     itemController.comments.value = commentCount.value;
     itemController.rxIbQuestion.value.comments = commentCount.value;
     itemController.commented.value = true;
     itemController.rxIbQuestion.refresh();
-  }
-
-  void updateFirstThreeReplies(
-      {required CommentItem reply, required String originCommentId}) {
-    final CommentItem? item = comments.firstWhere((element) {
-      if (element != null) {
-        return element.ibComment.commentId == originCommentId;
-      }
-      return false;
-    });
-
-    if (item != null) {
-      item.firstThreeReplies.add(reply);
-      item.firstThreeReplies.sort((a, b) =>
-          b.ibComment.timestampInMs.compareTo(a.ibComment.timestampInMs));
-      item.firstThreeReplies = item.firstThreeReplies.sublist(
-          0,
-          item.firstThreeReplies.length > 3
-              ? 3
-              : item.firstThreeReplies.length);
-      item.ibComment.replies.add(reply.ibComment);
-      comments.refresh();
-    }
-  }
-
-  void sortList() {
-    if (currentOption.value == dropDownOptions[1]) {
-      comments.sort((a, b) {
-        if (a != null && b != null) {
-          return b.ibComment.timestampInMs.compareTo(a.ibComment.timestampInMs);
-        }
-        return 0;
-      });
-    } else {
-      comments.sort((a, b) {
-        if (a != null && b != null) {
-          return b.ibComment.likes.compareTo(a.ibComment.likes);
-        }
-        return 0;
-      });
-    }
   }
 
   Future<void> likeComment(CommentItem commentItem) async {
@@ -309,7 +267,7 @@ class CommentController extends GetxController {
       await IbQuestionDbService().likeComment(comment);
       comment.likes++;
       commentItem.isLiked = true;
-    } on Exception catch (e) {
+    } catch (e) {
       IbUtils.showSimpleSnackBar(
           msg: 'Failed to like a comment, $e',
           backgroundColor: IbColors.errorRed);
@@ -329,7 +287,7 @@ class CommentController extends GetxController {
       comment.likes--;
       comment.likes = comment.likes <= 0 ? 0 : comment.likes;
       commentItem.isLiked = false;
-    } on Exception catch (e) {
+    } catch (e) {
       IbUtils.showSimpleSnackBar(
           msg: 'Failed to remove like on a comment, $e',
           backgroundColor: IbColors.errorRed);
@@ -338,16 +296,41 @@ class CommentController extends GetxController {
     }
   }
 
+  Future<CommentItem?> _getCommentItem(IbComment comment) async {
+    final IbUser? user;
+    final IbAnswer? ibAnswer;
+
+    user = await retrieveUser(comment);
+    ibAnswer = await retrieveIbAnswer(comment);
+
+    if (user == null) {
+      return null;
+    }
+
+    final isLiked = await IbQuestionDbService().isCommentLiked(comment);
+
+    /// retrieve first three replies if available
+    final List<CommentItem> replies = await _retrieveFirstThreeReplies(comment);
+
+    return CommentItem(
+        ibComment: comment,
+        user: user,
+        isLiked: isLiked,
+        replies: replies,
+        ibAnswer: ibAnswer);
+  }
+
   @override
   void dispose() {
     editingController.dispose();
+    refreshController.dispose();
     super.dispose();
   }
 }
 
 class CommentItem {
   IbComment ibComment;
-  List<CommentItem> firstThreeReplies;
+  List<CommentItem> replies;
   bool isLiked;
   IbUser user;
   IbAnswer? ibAnswer;
@@ -356,7 +339,7 @@ class CommentItem {
       {required this.ibComment,
       required this.user,
       this.isLiked = false,
-      this.firstThreeReplies = const [],
+      this.replies = const [],
       this.ibAnswer});
 
   @override

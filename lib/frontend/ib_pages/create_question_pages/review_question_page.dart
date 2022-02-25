@@ -282,8 +282,8 @@ class ReviewQuestionPage extends StatelessWidget {
         continue;
       }
 
-      final String? url =
-          await IbStorageService().uploadAndRetrieveImgUrl(choice.url!);
+      final String? url = await IbStorageService()
+          .uploadAndRetrieveImgUrl(filePath: choice.url!);
       if (url == null) {
         IbUtils.showSimpleSnackBar(
             msg: 'Failed to upload images...',
@@ -300,8 +300,9 @@ class ReviewQuestionPage extends StatelessWidget {
         continue;
       }
 
-      final String? url =
-          await IbStorageService().uploadAndRetrieveImgUrl(media.url);
+      final String? url = await IbStorageService().uploadAndRetrieveImgUrl(
+        filePath: media.url,
+      );
       if (url == null) {
         IbUtils.showSimpleSnackBar(
             msg: 'Failed to upload images...',

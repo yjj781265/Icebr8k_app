@@ -17,6 +17,8 @@ class IbQuestionDbService {
   static const _kCommentCollectionGroup = 'Comments${DbConfig.dbSuffix}';
   static const _kCommentLikesCollectionGroup =
       'Comments-Likes${DbConfig.dbSuffix}';
+  static const _kCommentRepliesCollectionGroup =
+      'Comments-Replies${DbConfig.dbSuffix}';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
 
   factory IbQuestionDbService() => _ibQuestionDbService;
@@ -31,6 +33,11 @@ class IbQuestionDbService {
     await _collectionRef
         .doc(question.id)
         .set(question.toJson(), SetOptions(merge: true));
+  }
+
+  Future<void> removeQuestion(IbQuestion question) async {
+    print('removeQuestion $question');
+    await _collectionRef.doc(question.id).delete();
   }
 
   Future<IbQuestion?> querySingleQuestion(String questionId) async {
@@ -289,23 +296,6 @@ class IbQuestionDbService {
         .set(ibAnswer.toJson(), SetOptions(merge: true));
   }
 
-  Future<void> increasePollSize(
-      {required String questionId, required String choiceId}) async {
-    await _collectionRef
-        .doc(questionId)
-        .set({choiceId: FieldValue.increment(1)}, SetOptions(merge: true));
-  }
-
-  Future<void> updatePollSize(
-      {required String questionId,
-      required String oldChoiceId,
-      required String newChoiceId}) async {
-    await _collectionRef.doc(questionId).set({
-      newChoiceId: FieldValue.increment(1),
-      oldChoiceId: FieldValue.increment(-1)
-    }, SetOptions(merge: true));
-  }
-
   Future<int> queryPollSize(String questionId) async {
     final _snapshot = await _collectionRef.doc(questionId).get();
 
@@ -381,10 +371,6 @@ class IbQuestionDbService {
       },
       SetOptions(merge: true),
     );
-
-    await _collectionRef
-        .doc(questionId)
-        .set({'likes': FieldValue.increment(1)}, SetOptions(merge: true));
   }
 
   Future<void> removeLikes(String questionId) async {
@@ -396,10 +382,6 @@ class IbQuestionDbService {
         .collection(_kLikesCollectionGroup)
         .doc(IbUtils.getCurrentUid())
         .delete();
-
-    await _collectionRef
-        .doc(questionId)
-        .set({'likes': FieldValue.increment(-1)}, SetOptions(merge: true));
   }
 
   Future<void> eraseAllAnsweredQuestions(String uid) async {
@@ -435,18 +417,9 @@ class IbQuestionDbService {
         .collection(_kCommentCollectionGroup)
         .doc(comment.commentId)
         .set(comment.toJson(), SetOptions(merge: true));
-
-    await _collectionRef
-        .doc(comment.questionId)
-        .set({'comments': FieldValue.increment(1)}, SetOptions(merge: true));
   }
 
   Future<void> likeComment(IbComment comment) async {
-    await _collectionRef
-        .doc(comment.questionId)
-        .collection(_kCommentCollectionGroup)
-        .doc(comment.commentId)
-        .set({'likes': FieldValue.increment(1)}, SetOptions(merge: true));
     await _collectionRef
         .doc(comment.questionId)
         .collection(_kCommentCollectionGroup)
@@ -471,30 +444,10 @@ class IbQuestionDbService {
       return;
     }
 
-    final tempComment = IbComment.fromJson(snapshot.data()!);
-
-    if (tempComment.likes == 0) {
-      return;
-    }
-
-    if (tempComment.likes < 0) {
-      await _collectionRef
-          .doc(tempComment.questionId)
-          .collection(_kCommentCollectionGroup)
-          .doc(tempComment.commentId)
-          .set({'likes': 0}, SetOptions(merge: true));
-      return;
-    }
-
     await _collectionRef
-        .doc(tempComment.questionId)
+        .doc(comment.questionId)
         .collection(_kCommentCollectionGroup)
-        .doc(tempComment.commentId)
-        .set({'likes': FieldValue.increment(-1)}, SetOptions(merge: true));
-    await _collectionRef
-        .doc(tempComment.questionId)
-        .collection(_kCommentCollectionGroup)
-        .doc(tempComment.commentId)
+        .doc(comment.commentId)
         .collection(_kCommentLikesCollectionGroup)
         .doc(IbUtils.getCurrentUid())
         .delete();
@@ -556,6 +509,36 @@ class IbQuestionDbService {
     return snapshot;
   }
 
+  /// return replies of a comment in reversed chronological order
+  Future<QuerySnapshot<Map<String, dynamic>>> queryReplies(
+      {required String questionId,
+      required String commentId,
+      int limit = 8,
+      DocumentSnapshot<Map<String, dynamic>>? lastSnap}) async {
+    QuerySnapshot<Map<String, dynamic>> snapshot = await _collectionRef
+        .doc(questionId)
+        .collection(_kCommentCollectionGroup)
+        .doc(commentId)
+        .collection(_kCommentRepliesCollectionGroup)
+        .orderBy('timestampInMs', descending: true)
+        .limit(limit)
+        .get();
+
+    if (lastSnap != null) {
+      snapshot = await _collectionRef
+          .doc(questionId)
+          .collection(_kCommentCollectionGroup)
+          .doc(commentId)
+          .collection(_kCommentRepliesCollectionGroup)
+          .orderBy('timestampInMs', descending: true)
+          .startAfterDocument(lastSnap)
+          .limit(limit)
+          .get();
+    }
+
+    return snapshot;
+  }
+
   Future<bool> isCommented(String questionId) async {
     final snapshot = await _collectionRef
         .doc(questionId)
@@ -574,9 +557,9 @@ class IbQuestionDbService {
         .doc(questionId)
         .collection(_kCommentCollectionGroup)
         .doc(commentId)
-        .set({
-      'replies': FieldValue.arrayUnion([reply.toJson()])
-    }, SetOptions(merge: true));
+        .collection(_kCommentRepliesCollectionGroup)
+        .doc(reply.replyId)
+        .set(reply.toJson(), SetOptions(merge: true));
   }
 
   Future<void> removeReply(
@@ -587,9 +570,9 @@ class IbQuestionDbService {
         .doc(questionId)
         .collection(_kCommentCollectionGroup)
         .doc(commentId)
-        .set({
-      'replies': FieldValue.arrayRemove([reply.toJson()])
-    }, SetOptions(merge: true));
+        .collection(_kCommentRepliesCollectionGroup)
+        .doc(reply.commentId)
+        .delete();
   }
 
   Future<void> copyCollection(String collection1, String collection2) async {

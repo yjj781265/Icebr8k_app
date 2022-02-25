@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/comment_controller.dart';
@@ -14,6 +15,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CommentPage extends StatelessWidget {
   final CommentController _controller;
@@ -29,7 +31,7 @@ class CommentPage extends StatelessWidget {
           () => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(_controller.ibQuestion.question),
+              Text(_controller.title.value),
               Text(
                 '${IbUtils.statsShortString(_controller.commentCount.value)} '
                 '${_controller.commentCount.value <= 1 ? 'comment' : 'comments'}',
@@ -107,7 +109,10 @@ class CommentPage extends StatelessWidget {
                       index -= 1;
                       return Column(
                         children: [
-                          CommentItemWidget(_controller.comments[index]!),
+                          CommentItemWidget(
+                            item: _controller.comments[index]!,
+                            controller: _controller,
+                          ),
                           const Divider(
                             height: 1,
                             thickness: 1,
@@ -137,12 +142,14 @@ class CommentPage extends StatelessWidget {
                 () => TextField(
                   minLines: 1,
                   maxLines: 5,
+                  maxLength: IbConfig.kCommentMaxLen,
                   focusNode: _controller.focusNode,
                   controller: _controller.editingController,
                   textInputAction: TextInputAction.newline,
                   style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
                   keyboardType: TextInputType.multiline,
                   decoration: InputDecoration(
+                    counterText: '',
                     hintStyle: const TextStyle(
                         color: IbColors.lightGrey,
                         fontSize: IbConfig.kNormalTextSize),
@@ -181,9 +188,9 @@ class CommentPage extends StatelessWidget {
 
 class CommentItemWidget extends StatelessWidget {
   final CommentItem item;
-  final CommentController _controller = Get.find();
+  final CommentController controller;
 
-  CommentItemWidget(this.item);
+  const CommentItemWidget({required this.item, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -192,8 +199,10 @@ class CommentItemWidget extends StatelessWidget {
       child: Material(
         child: InkWell(
           onTap: () {
-            Get.to(() => ReplyPage(Get.put(ReplyController(
-                replyComment: item, commentController: _controller))));
+            Get.to(() => ReplyPage(Get.put(
+                ReplyController(
+                    rxCommentItem: item.obs, commentController: controller),
+                tag: item.ibComment.commentId)));
           },
           child: Ink(
             color: Theme.of(context).primaryColor,
@@ -220,11 +229,14 @@ class CommentItemWidget extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                '${item.user.username} ${item.user.id == _controller.ibQuestion.creatorId ? ' 👑' : ''}',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: IbConfig.kNormalTextSize),
+                              Obx(
+                                () => Text(
+                                  '${item.user.username} ${item.user.id == controller.creatorId.value && controller.isAnonymous.isFalse ? ' 👑' : ''}',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: IbConfig.kNormalTextSize),
+                                ),
                               ),
                               if (item.ibAnswer != null)
                                 Row(
@@ -253,8 +265,14 @@ class CommentItemWidget extends StatelessWidget {
                           const SizedBox(
                             height: 8,
                           ),
-                          Text(
-                            item.ibComment.content,
+                          Linkify(
+                            onOpen: (link) async {
+                              if (await canLaunch(link.url)) {
+                                await launch(link.url);
+                              }
+                            },
+                            options: const LinkifyOptions(looseUrl: true),
+                            text: item.ibComment.content,
                             style: const TextStyle(
                                 fontSize: IbConfig.kNormalTextSize),
                           ),
@@ -264,18 +282,16 @@ class CommentItemWidget extends StatelessWidget {
                                 onPressed: () {
                                   Get.to(() => ReplyPage(Get.put(
                                       ReplyController(
-                                          replyComment: item,
-                                          commentController: _controller))));
+                                          rxCommentItem: item.obs,
+                                          commentController: controller))));
                                 },
                                 icon: const Icon(
                                   FontAwesomeIcons.reply,
                                   size: 16,
                                 ),
                                 label: Text(
-                                  item.ibComment.replies.isEmpty
-                                      ? '0'
-                                      : IbUtils.statsShortString(
-                                          item.ibComment.replies.length),
+                                  IbUtils.statsShortString(
+                                      item.ibComment.replies),
                                   style: const TextStyle(
                                       fontSize: IbConfig.kSecondaryTextSize),
                                 ),
@@ -283,9 +299,9 @@ class CommentItemWidget extends StatelessWidget {
                               TextButton.icon(
                                 onPressed: () async {
                                   if (item.isLiked) {
-                                    await _controller.dislikeComment(item);
+                                    await controller.dislikeComment(item);
                                   } else {
-                                    await _controller.likeComment(item);
+                                    await controller.likeComment(item);
                                   }
                                 },
                                 icon: Icon(
@@ -309,20 +325,20 @@ class CommentItemWidget extends StatelessWidget {
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  _handleReplies(item.firstThreeReplies),
-                                  if (item.ibComment.replies.length > 3)
+                                  _handleReplies(item.replies),
+                                  if (item.replies.length > 3)
                                     SizedBox(
                                         height: 40,
                                         width: double.maxFinite,
                                         child: TextButton(
                                           child: Text(
-                                              'And ${item.ibComment.replies.length - 3} more'),
+                                              'And ${item.replies.length - 3} more'),
                                           onPressed: () {
                                             Get.to(() => ReplyPage(Get.put(
                                                 ReplyController(
-                                                    replyComment: item,
+                                                    rxCommentItem: item.obs,
                                                     commentController:
-                                                        _controller))));
+                                                        controller))));
                                           },
                                         )),
                                 ],
@@ -345,49 +361,55 @@ class CommentItemWidget extends StatelessWidget {
       return const SizedBox();
     }
 
-    if (_controller.ibQuestion.questionType == IbQuestion.kPic) {
-      final String url = _controller.ibQuestion.choices
-          .firstWhere((element) => element.choiceId == item.ibAnswer!.choiceId)
-          .url!;
-      return InkWell(
-        onTap: () {
-          Get.to(() => IbMediaViewer(urls: [url], currentIndex: 0));
-        },
-        child: ClipRRect(
-          borderRadius: const BorderRadius.all(Radius.circular(8)),
-          child: CachedNetworkImage(
-              width: 30, height: 30, fit: BoxFit.fill, imageUrl: url),
-        ),
-      );
-    }
-
-    if (_controller.ibQuestion.questionType == IbQuestion.kMultipleChoice ||
-        _controller.ibQuestion.questionType == IbQuestion.kMultipleChoicePic) {
-      return Text(
-        _controller.ibQuestion.choices
+    return Obx(() {
+      if (controller.questionType.value == IbQuestion.kPic) {
+        final String url = controller.choices
             .firstWhere(
                 (element) => element.choiceId == item.ibAnswer!.choiceId)
-            .content!,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      );
-    }
+            .url!;
+        return InkWell(
+          onTap: () {
+            Get.to(() => IbMediaViewer(urls: [url], currentIndex: 0));
+          },
+          child: ClipRRect(
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            child: CachedNetworkImage(
+                width: 30, height: 30, fit: BoxFit.fill, imageUrl: url),
+          ),
+        );
+      }
 
-    if (_controller.ibQuestion.questionType == IbQuestion.kScale) {
-      return Text(_controller.ibQuestion.choices
-          .firstWhere((element) => element.choiceId == item.ibAnswer!.choiceId)
-          .content!);
-    }
+      if (controller.questionType.value == IbQuestion.kMultipleChoice ||
+          controller.questionType.value == IbQuestion.kMultipleChoicePic) {
+        return Text(
+          controller.choices
+              .firstWhere(
+                  (element) => element.choiceId == item.ibAnswer!.choiceId)
+              .content!,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        );
+      }
 
-    return const SizedBox();
+      if (controller.questionType.value == IbQuestion.kScale) {
+        return Text(controller.choices
+            .firstWhere(
+                (element) => element.choiceId == item.ibAnswer!.choiceId)
+            .content!);
+      }
+
+      return const SizedBox();
+    });
   }
 
   Widget _handleReplies(List<CommentItem> replies) {
     return Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: replies.map((e) {
+        children: replies
+            .getRange(0, replies.length > 3 ? 3 : replies.length)
+            .map((e) {
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -411,7 +433,8 @@ class CommentItemWidget extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            item.user.username,
+                            '${e.user.username} ${e.user.id == controller.creatorId.value && controller.isAnonymous.isFalse ? ' 👑' : ''}',
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: IbConfig.kNormalTextSize),
@@ -439,10 +462,19 @@ class CommentItemWidget extends StatelessWidget {
                             fontSize: IbConfig.kDescriptionTextSize,
                             color: IbColors.lightGrey),
                       ),
-                      Text(
-                        e.ibComment.content,
-                        style:
-                            const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                      Linkify(
+                        options: const LinkifyOptions(looseUrl: true),
+                        onOpen: (link) async {
+                          if (await canLaunch(link.url)) {
+                            await launch(link.url);
+                          }
+                        },
+                        text: e.ibComment.content,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 3,
+                        style: const TextStyle(
+                          fontSize: IbConfig.kNormalTextSize,
+                        ),
                       ),
                     ],
                   ),

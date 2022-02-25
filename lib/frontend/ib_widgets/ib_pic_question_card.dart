@@ -241,7 +241,7 @@ class PicItem extends StatelessWidget {
                           width: IbConfig.kPicHeight,
                         ),
                 ),
-                if (itemController.showResult.isTrue)
+                if (itemController.voted.isTrue)
                   Positioned(
                     bottom: 8,
                     child: Container(
@@ -260,7 +260,7 @@ class PicItem extends StatelessWidget {
                       ),
                     ),
                   ),
-                if (itemController.showResult.isTrue &&
+                if (itemController.voted.isTrue &&
                     itemController.rxIbAnswer!.value.choiceId ==
                         ibChoice.choiceId)
                   const Positioned(

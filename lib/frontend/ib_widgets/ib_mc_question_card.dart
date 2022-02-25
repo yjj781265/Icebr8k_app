@@ -191,7 +191,7 @@ class IbQuestionMcItem extends StatelessWidget {
       : super(key: key);
 
   Color getItemColor() {
-    if (_controller.showResult.isFalse) {
+    if (_controller.voted.isFalse) {
       if (choice.choiceId == _controller.selectedChoiceId.value) {
         return IbColors.primaryColor;
       } else {
@@ -226,7 +226,7 @@ class IbQuestionMcItem extends StatelessWidget {
   }
 
   double getItemWidth() {
-    if (_controller.showResult.isFalse) {
+    if (_controller.voted.isFalse) {
       return Get.width * 0.95;
     }
 
@@ -237,7 +237,7 @@ class IbQuestionMcItem extends StatelessWidget {
 
   Widget getItemIcon() {
     if (!_controller.rxIbQuestion.value.isQuiz &&
-        _controller.showResult.isTrue &&
+        _controller.voted.isTrue &&
         _controller.rxIbAnswer != null &&
         choice.choiceId == _controller.rxIbAnswer!.value.choiceId) {
       return const CircleAvatar(
@@ -252,7 +252,7 @@ class IbQuestionMcItem extends StatelessWidget {
     }
 
     if (_controller.rxIbQuestion.value.isQuiz &&
-        _controller.showResult.isTrue &&
+        _controller.voted.isTrue &&
         choice.choiceId == _controller.rxIbQuestion.value.correctChoiceId) {
       return const CircleAvatar(
         radius: 8,
@@ -265,7 +265,7 @@ class IbQuestionMcItem extends StatelessWidget {
       );
     }
     if (_controller.rxIbQuestion.value.isQuiz &&
-        _controller.showResult.isTrue &&
+        _controller.voted.isTrue &&
         choice.choiceId == _controller.rxIbAnswer!.value.choiceId &&
         choice.choiceId != _controller.rxIbQuestion.value.correctChoiceId) {
       return const CircleAvatar(
@@ -322,7 +322,7 @@ class IbQuestionMcItem extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8)),
                         width: getItemWidth(),
                         duration: Duration(
-                            milliseconds: _controller.showResult.value
+                            milliseconds: _controller.voted.value
                                 ? IbConfig.kEventTriggerDelayInMillis
                                 : 0),
                       ),
@@ -410,7 +410,7 @@ class IbQuestionMcItem extends StatelessWidget {
                       ),
 
                       /// show percentage animation
-                      if (_controller.showResult.value)
+                      if (_controller.voted.value)
                         TweenAnimationBuilder(
                             tween: Tween<double>(
                                 begin: 0,
@@ -469,8 +469,7 @@ class IbQuestionMcItem extends StatelessWidget {
   }
 
   void onItemTap() {
-    if (_controller.rxIbQuestion.value.isQuiz &&
-        _controller.showResult.isTrue) {
+    if (_controller.rxIbQuestion.value.isQuiz && _controller.voted.isTrue) {
       return;
     }
 

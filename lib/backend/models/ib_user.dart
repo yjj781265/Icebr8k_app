@@ -19,8 +19,8 @@ class IbUser {
   /// covert to FireStore Timestamp
   dynamic joinTime;
   int? birthdateInMs;
-  int answeredSize;
-  int askedSize;
+  int answeredCount;
+  int askedCount;
   bool isOnline;
   String coverPhotoUrl;
   String bio;
@@ -53,8 +53,8 @@ class IbUser {
     this.fName = '',
     this.lName = '',
     this.email = '',
-    this.answeredSize = 0,
-    this.askedSize = 0,
+    this.answeredCount = 0,
+    this.askedCount = 0,
     required this.id,
     this.username = '',
   });

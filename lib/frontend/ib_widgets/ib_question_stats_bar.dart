@@ -47,8 +47,10 @@ class IbQuestionStatsBar extends StatelessWidget {
                   onPressed: _itemController.isSample
                       ? null
                       : () {
-                          Get.to(() => CommentPage(Get.put(CommentController(
-                              _itemController.rxIbQuestion.value))));
+                          Get.to(() => CommentPage(Get.put(
+                              CommentController(
+                                  _itemController.rxIbQuestion.value.id),
+                              tag: _itemController.rxIbQuestion.value.id)));
                         },
                   icon: FaIcon(
                     FontAwesomeIcons.comment,
@@ -93,7 +95,7 @@ class IbQuestionStatsBar extends StatelessWidget {
   }
 
   Future<void> _handleOnStatsTap() async {
-    if (_itemController.showResult.isFalse) {
+    if (_itemController.voted.isFalse) {
       IbUtils.showSimpleSnackBar(
           msg: 'You need to answer the poll in order to see the result.',
           backgroundColor: IbColors.primaryColor);
