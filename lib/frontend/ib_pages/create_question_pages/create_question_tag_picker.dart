@@ -30,7 +30,7 @@ class CreateQuestionTagPicker extends StatelessWidget {
                 ),
                 child: TextField(
                   onSubmitted: (value) async {
-                    //TODO
+                    //TODO use typesense for full text search
                   },
                   textInputAction: TextInputAction.search,
                   controller: _controller.textEditingController,

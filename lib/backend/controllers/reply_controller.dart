@@ -85,7 +85,7 @@ class ReplyController extends GetxController {
           }
           final CommentItem item =
               CommentItem(ibComment: ibComment, user: user, ibAnswer: ibAnswer);
-          replies.add(item);
+          replies.addIf(!replies.contains(item), item);
         }
 
         if (snapshot.docs.isNotEmpty) {
@@ -97,6 +97,7 @@ class ReplyController extends GetxController {
           return;
         }
       }
+      refreshController.loadNoData();
     } catch (e) {
       print(e);
       refreshController.loadFailed();
@@ -134,6 +135,8 @@ class ReplyController extends GetxController {
         final item =
             CommentItem(ibComment: reply, user: user, ibAnswer: ibAnswer);
         replies.insert(0, item);
+        rxCommentItem.value.ibComment.replies++;
+        replyCount.value = rxCommentItem.value.ibComment.replies;
         _updateParentComment();
         editingController.clear();
         isAddingReply.value = false;

@@ -369,7 +369,8 @@ class CommentItemWidget extends StatelessWidget {
             .url!;
         return InkWell(
           onTap: () {
-            Get.to(() => IbMediaViewer(urls: [url], currentIndex: 0));
+            Get.to(() => IbMediaViewer(urls: [url], currentIndex: 0),
+                transition: Transition.zoom);
           },
           child: ClipRRect(
             borderRadius: const BorderRadius.all(Radius.circular(8)),

@@ -95,6 +95,9 @@ class IbQuestionStatsBar extends StatelessWidget {
   }
 
   Future<void> _handleOnStatsTap() async {
+    if (_itemController.totalPolled.value == 0) {
+      return;
+    }
     if (_itemController.voted.isFalse) {
       IbUtils.showSimpleSnackBar(
           msg: 'You need to answer the poll in order to see the result.',

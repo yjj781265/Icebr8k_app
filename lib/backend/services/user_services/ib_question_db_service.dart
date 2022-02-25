@@ -467,45 +467,46 @@ class IbQuestionDbService {
   Future<QuerySnapshot<Map<String, dynamic>>> queryNewestComments(
       String questionId,
       {DocumentSnapshot<Map<String, dynamic>>? lastSnap}) async {
-    QuerySnapshot<Map<String, dynamic>> snapshot = await _collectionRef
-        .doc(questionId)
-        .collection(_kCommentCollectionGroup)
-        .orderBy('timestampInMs', descending: true)
-        .limit(8)
-        .get();
-
     if (lastSnap != null) {
-      snapshot = await _collectionRef
+      final snapshot = await _collectionRef
           .doc(questionId)
           .collection(_kCommentCollectionGroup)
           .orderBy('timestampInMs', descending: true)
           .startAfterDocument(lastSnap)
           .limit(8)
           .get();
+      return snapshot;
     }
+
+    final snapshot = await _collectionRef
+        .doc(questionId)
+        .collection(_kCommentCollectionGroup)
+        .orderBy('timestampInMs', descending: true)
+        .limit(8)
+        .get();
     return snapshot;
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> queryTopComments(
       String questionId,
       {DocumentSnapshot<Map<String, dynamic>>? lastSnap}) async {
-    QuerySnapshot<Map<String, dynamic>> snapshot = await _collectionRef
-        .doc(questionId)
-        .collection(_kCommentCollectionGroup)
-        .orderBy('likes', descending: true)
-        .limit(8)
-        .get();
-
     if (lastSnap != null) {
-      snapshot = await _collectionRef
+      final snapshot = await _collectionRef
           .doc(questionId)
           .collection(_kCommentCollectionGroup)
           .orderBy('likes', descending: true)
           .startAfterDocument(lastSnap)
           .limit(8)
           .get();
+      return snapshot;
     }
 
+    final snapshot = await _collectionRef
+        .doc(questionId)
+        .collection(_kCommentCollectionGroup)
+        .orderBy('likes', descending: true)
+        .limit(8)
+        .get();
     return snapshot;
   }
 
@@ -515,17 +516,8 @@ class IbQuestionDbService {
       required String commentId,
       int limit = 8,
       DocumentSnapshot<Map<String, dynamic>>? lastSnap}) async {
-    QuerySnapshot<Map<String, dynamic>> snapshot = await _collectionRef
-        .doc(questionId)
-        .collection(_kCommentCollectionGroup)
-        .doc(commentId)
-        .collection(_kCommentRepliesCollectionGroup)
-        .orderBy('timestampInMs', descending: true)
-        .limit(limit)
-        .get();
-
     if (lastSnap != null) {
-      snapshot = await _collectionRef
+      final snapshot = await _collectionRef
           .doc(questionId)
           .collection(_kCommentCollectionGroup)
           .doc(commentId)
@@ -534,7 +526,17 @@ class IbQuestionDbService {
           .startAfterDocument(lastSnap)
           .limit(limit)
           .get();
+      return snapshot;
     }
+
+    final snapshot = await _collectionRef
+        .doc(questionId)
+        .collection(_kCommentCollectionGroup)
+        .doc(commentId)
+        .collection(_kCommentRepliesCollectionGroup)
+        .orderBy('timestampInMs', descending: true)
+        .limit(limit)
+        .get();
 
     return snapshot;
   }

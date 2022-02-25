@@ -106,17 +106,17 @@ class CommentController extends GetxController {
       if (snapshot != null &&
           snapshot.docs.isNotEmpty &&
           lastSnap != snapshot.docs.last) {
-        lastSnap = snapshot.docs.last;
         for (final doc in snapshot.docs) {
           tempList.add(IbComment.fromJson(doc.data()));
         }
+        lastSnap = snapshot.docs.last;
 
         for (final comment in tempList) {
           final item = await _getCommentItem(comment);
           if (item == null) {
             continue;
           }
-          comments.add(item);
+          comments.addIf(!comments.contains(item), item);
         }
         refreshController.loadComplete();
       } else {
@@ -138,6 +138,7 @@ class CommentController extends GetxController {
       }
     } else {
       ibAnswer = answerMap[comment.uid];
+      print('retrieveIbAnswer from cache map');
     }
     return ibAnswer;
   }
@@ -149,6 +150,7 @@ class CommentController extends GetxController {
       IbCacheManager().cacheIbUser(user);
     } else {
       user = IbCacheManager().getIbUser(comment.uid);
+      print('retrieveUser from cached');
     }
     return user;
   }

@@ -121,7 +121,7 @@ class ReplyPage extends StatelessWidget {
   Widget _handleReplyItemUI(CommentItem item, BuildContext context) {
     return Container(
       color: Theme.of(context).backgroundColor,
-      padding: const EdgeInsets.only(left: 16, right: 8, top: 8, bottom: 10),
+      padding: const EdgeInsets.only(left: 48, right: 8, top: 8, bottom: 10),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,9 +196,11 @@ class ReplyPage extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor,
+          ),
           padding: const EdgeInsets.all(8.0),
           margin: const EdgeInsets.only(bottom: 4),
-          color: Theme.of(context).primaryColor,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,6 +214,7 @@ class ReplyPage extends StatelessWidget {
                 width: 16,
               ),
               Expanded(
+                /// added singChildScrollView to  prevent overflow at hero animation
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -314,6 +317,10 @@ class ReplyPage extends StatelessWidget {
                           ],
                         ),
                       ),
+                      const Divider(
+                        height: 2,
+                        thickness: 2,
+                      ),
                     ],
                   ),
                 ),
@@ -336,7 +343,8 @@ class ReplyPage extends StatelessWidget {
           .url!;
       return InkWell(
         onTap: () {
-          Get.to(() => IbMediaViewer(urls: [url], currentIndex: 0));
+          Get.to(() => IbMediaViewer(urls: [url], currentIndex: 0),
+              transition: Transition.zoom);
         },
         child: ClipRRect(
           borderRadius: const BorderRadius.all(Radius.circular(8)),
