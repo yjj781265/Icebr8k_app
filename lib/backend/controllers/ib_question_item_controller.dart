@@ -1,10 +1,15 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/comment_controller.dart';
+import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
+import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
+import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
@@ -39,6 +44,14 @@ class IbQuestionItemController extends GetxController {
   final avatarUrl = ''.obs;
   final resultMap = <IbChoice, double>{}.obs;
   final RxList<IbTag> ibTags = <IbTag>[].obs;
+  //start
+  // variables for comment page
+  final currentSortOption = 'Top Comments'.obs;
+  final RxList<CommentItem> cachedCommentItems = <CommentItem>[].obs;
+  DocumentSnapshot<Map<String, dynamic>>? lastCommentSnap;
+  final Map<String, IbAnswer> answerMap = {};
+  //end
+
   Map<String, int> countMap = {};
 
   IbQuestionItemController({
@@ -90,9 +103,9 @@ class IbQuestionItemController extends GetxController {
       comments.value = rxIbQuestion.value.comments;
       liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
       likes.value = rxIbQuestion.value.likes;
-
       await _generateIbTags();
       await _generatePollStats();
+      await _generateCachedCommentItems();
       _setUpCountDownTimer();
     }
   }
@@ -163,6 +176,25 @@ class IbQuestionItemController extends GetxController {
     totalPolled.value = counter;
   }
 
+  Future<void> _generateCachedCommentItems() async {
+    final List<IbComment> tempList = [];
+    final snapshot =
+        await IbQuestionDbService().queryTopComments(rxIbQuestion.value.id);
+    for (final doc in snapshot.docs) {
+      tempList.add(IbComment.fromJson(doc.data()));
+    }
+
+    lastCommentSnap = tempList.isEmpty ? null : snapshot.docs.last;
+
+    for (final comment in tempList) {
+      final item = await _getCommentItem(comment);
+      if (item == null) {
+        continue;
+      }
+      cachedCommentItems.add(item);
+    }
+  }
+
   Future<void> onVote() async {
     if (rxIbQuestion.value.endTimeInMs <
             DateTime.now().millisecondsSinceEpoch &&
@@ -227,5 +259,104 @@ class IbQuestionItemController extends GetxController {
       likes.value--;
       await IbQuestionDbService().removeLikes(rxIbQuestion.value.id);
     }
+  }
+
+  Future<IbUser?> retrieveUser(IbComment comment) async {
+    final IbUser? user;
+    if (IbCacheManager().getIbUser(comment.uid) == null) {
+      user = await IbUserDbService().queryIbUser(comment.uid);
+      IbCacheManager().cacheIbUser(user);
+    } else {
+      user = IbCacheManager().getIbUser(comment.uid);
+      print('retrieveUser from cached');
+    }
+    return user;
+  }
+
+  Future<IbAnswer?> retrieveIbAnswer(IbComment comment) async {
+    /// cache ibAnswer
+    final IbAnswer? ibAnswer;
+    if (answerMap[comment.uid] == null ||
+        comment.uid == IbUtils.getCurrentUid()) {
+      ibAnswer = await IbQuestionDbService()
+          .querySingleIbAnswer(comment.uid, comment.questionId);
+      if (ibAnswer != null) {
+        answerMap[comment.uid] = ibAnswer;
+      }
+    } else {
+      ibAnswer = answerMap[comment.uid];
+      print('retrieveIbAnswer from cache map');
+    }
+    return ibAnswer;
+  }
+
+  Future<List<CommentItem>> _retrieveFirstThreeReplies(
+      IbComment ibComment) async {
+    final List<IbComment> firstThreeList = [];
+    final List<CommentItem> replyItems = [];
+
+    final snapshot = await IbQuestionDbService().queryReplies(
+        questionId: ibComment.questionId,
+        commentId: ibComment.commentId,
+        limit: 3);
+    for (final doc in snapshot.docs) {
+      firstThreeList.add(IbComment.fromJson(doc.data()));
+    }
+    firstThreeList.sort((a, b) => b.timestampInMs.compareTo(a.timestampInMs));
+
+    for (final reply in firstThreeList) {
+      final IbUser? user;
+      final IbAnswer? ibAnswer;
+      if (IbCacheManager().getIbUser(reply.uid) == null) {
+        user = await IbUserDbService().queryIbUser(reply.uid);
+        IbCacheManager().cacheIbUser(user);
+      } else {
+        user = IbCacheManager().getIbUser(reply.uid);
+      }
+
+      if (user == null) {
+        continue;
+      }
+
+      /// cache ibAnswer
+      if (answerMap[reply.uid] == null) {
+        ibAnswer = await IbQuestionDbService()
+            .querySingleIbAnswer(reply.uid, reply.questionId);
+        if (ibAnswer != null) {
+          answerMap[reply.uid] = ibAnswer;
+        }
+      } else {
+        ibAnswer = answerMap[reply.uid];
+      }
+
+      replyItems
+          .add(CommentItem(ibComment: reply, user: user, ibAnswer: ibAnswer));
+    }
+
+    return replyItems;
+  }
+
+  Future<CommentItem?> _getCommentItem(IbComment comment) async {
+    final IbUser? user;
+    final IbAnswer? ibAnswer;
+
+    user = await retrieveUser(comment);
+    ibAnswer = await retrieveIbAnswer(comment);
+
+    if (user == null) {
+      return null;
+    }
+
+    final isLiked = await IbQuestionDbService().isCommentLiked(comment);
+
+    /// retrieve first three replies if available
+    final List<CommentItem> replies = await _retrieveFirstThreeReplies(comment);
+
+    return CommentItem(
+        ibComment: comment,
+        user: user,
+        isLiked: isLiked,
+        replies: replies,
+        ibAnswer: ibAnswer);
   }
 }

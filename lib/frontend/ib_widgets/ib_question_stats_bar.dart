@@ -15,7 +15,6 @@ import '../ib_utils.dart';
 /// show action icons with like, poll size, comment
 class IbQuestionStatsBar extends StatelessWidget {
   final IbQuestionItemController _itemController;
-
   const IbQuestionStatsBar(this._itemController);
 
   @override
@@ -49,13 +48,16 @@ class IbQuestionStatsBar extends StatelessWidget {
                       : () {
                           Get.to(() => CommentPage(Get.put(
                               CommentController(
-                                  _itemController.rxIbQuestion.value.id),
+                                  questionId:
+                                      _itemController.rxIbQuestion.value.id,
+                                  lastSnap: _itemController.lastCommentSnap,
+                                  itemController: _itemController),
                               tag: _itemController.rxIbQuestion.value.id)));
                         },
                   icon: FaIcon(
-                    FontAwesomeIcons.comment,
+                    FontAwesomeIcons.comments,
                     color: _itemController.commented.isTrue
-                        ? IbColors.darkPrimaryColor
+                        ? IbColors.accentColor
                         : Colors.grey,
                     size: 16,
                   ),
@@ -77,7 +79,7 @@ class IbQuestionStatsBar extends StatelessWidget {
               icon: FaIcon(
                 FontAwesomeIcons.thumbsUp,
                 color: _itemController.liked.isTrue
-                    ? IbColors.accentColor
+                    ? IbColors.errorRed
                     : IbColors.lightGrey,
                 size: 16,
               ),

@@ -16,11 +16,10 @@ import '../services/user_services/ib_question_db_service.dart';
 import '../services/user_services/ib_user_db_service.dart';
 
 class CommentController extends GetxController {
-  final comments = <CommentItem?>[].obs;
+  final IbQuestionItemController itemController;
+  late IbQuestion? ibQuestion;
   final FocusNode focusNode = FocusNode();
   final List<String> dropDownOptions = ['Top Comments', 'Newest First'];
-  final currentOption = 'Top Comments'.obs;
-  final Map<String, IbAnswer> answerMap = {};
   final hintText = 'Add a creative comment here'.obs;
   final replyCommentId = ''.obs;
   final isLoading = true.obs;
@@ -36,7 +35,11 @@ class CommentController extends GetxController {
   final TextEditingController editingController = TextEditingController();
   final RefreshController refreshController = RefreshController();
   DocumentSnapshot<Map<String, dynamic>>? lastSnap;
-  CommentController(this.questionId);
+  final Map<String, IbAnswer> answerMap = {};
+  CommentController(
+      {required this.questionId,
+      required this.itemController,
+      required this.lastSnap});
 
   @override
   Future<void> onInit() async {
@@ -45,32 +48,34 @@ class CommentController extends GetxController {
   }
 
   Future<void> initData() async {
-    final IbQuestion? ibQuestion =
-        await IbQuestionDbService().querySingleQuestion(questionId);
+    ibQuestion = await IbQuestionDbService().querySingleQuestion(questionId);
     if (ibQuestion == null) {
       print('CommentController ibQuestion is null');
       return;
     }
-    title.value = ibQuestion.question;
-    creatorId.value = ibQuestion.creatorId;
-    questionType.value = ibQuestion.questionType;
-    choices.value = ibQuestion.choices;
-    isAnonymous.value = ibQuestion.isAnonymous;
-    updateParentQuestionCommentCount(ibQuestion.comments);
-    await loadList(dropDownOptions[0]);
+    title.value = ibQuestion!.question;
+    creatorId.value = ibQuestion!.creatorId;
+    questionType.value = ibQuestion!.questionType;
+    choices.value = ibQuestion!.choices;
+    isAnonymous.value = ibQuestion!.isAnonymous;
+    updateParentQuestionCommentCount(ibQuestion!.comments);
+    isLoading.value = false;
   }
 
-  Future<void> loadList(String dropDownValue) async {
-    currentOption.value = dropDownValue;
+  Future<void> loadList(String dropDownValue,
+      {QuerySnapshot<Map<String, dynamic>>? snapshot}) async {
+    itemController.currentSortOption.value = dropDownValue;
     isLoading.value = true;
-    comments.clear();
+    itemController.cachedCommentItems.clear();
     refreshController.resetNoData();
     final List<IbComment> tempList = [];
-    late QuerySnapshot<Map<String, dynamic>> snapshot;
-    if (dropDownValue == dropDownOptions[0]) {
-      snapshot = await IbQuestionDbService().queryTopComments(questionId);
-    } else {
-      snapshot = await IbQuestionDbService().queryNewestComments(questionId);
+    if (snapshot == null) {
+      if (dropDownValue == dropDownOptions[0]) {
+        snapshot = await IbQuestionDbService().queryTopComments(questionId);
+      } else {
+        // ignore: parameter_assignments
+        snapshot = await IbQuestionDbService().queryNewestComments(questionId);
+      }
     }
 
     for (final doc in snapshot.docs) {
@@ -84,9 +89,9 @@ class CommentController extends GetxController {
       if (item == null) {
         continue;
       }
-      comments.add(item);
+      itemController.cachedCommentItems.add(item);
     }
-    comments.refresh();
+    itemController.cachedCommentItems.refresh();
     isLoading.value = false;
   }
 
@@ -94,11 +99,12 @@ class CommentController extends GetxController {
     try {
       QuerySnapshot<Map<String, dynamic>>? snapshot;
       final List<IbComment> tempList = [];
-      if (lastSnap != null && currentOption.value == dropDownOptions[0]) {
+      if (lastSnap != null &&
+          itemController.currentSortOption.value == dropDownOptions[0]) {
         snapshot = await IbQuestionDbService()
             .queryTopComments(questionId, lastSnap: lastSnap);
       } else if (lastSnap != null &&
-          currentOption.value == dropDownOptions[1]) {
+          itemController.currentSortOption.value == dropDownOptions[1]) {
         snapshot = await IbQuestionDbService()
             .queryNewestComments(questionId, lastSnap: lastSnap);
       }
@@ -116,7 +122,8 @@ class CommentController extends GetxController {
           if (item == null) {
             continue;
           }
-          comments.addIf(!comments.contains(item), item);
+          itemController.cachedCommentItems
+              .addIf(!itemController.cachedCommentItems.contains(item), item);
         }
         refreshController.loadComplete();
       } else {
@@ -130,7 +137,8 @@ class CommentController extends GetxController {
   Future<IbAnswer?> retrieveIbAnswer(IbComment comment) async {
     /// cache ibAnswer
     final IbAnswer? ibAnswer;
-    if (answerMap[comment.uid] == null) {
+    if (answerMap[comment.uid] == null ||
+        comment.uid == IbUtils.getCurrentUid()) {
       ibAnswer = await IbQuestionDbService()
           .querySingleIbAnswer(comment.uid, comment.questionId);
       if (ibAnswer != null) {
@@ -156,9 +164,10 @@ class CommentController extends GetxController {
   }
 
   void updateCommentItem(CommentItem commentItem) {
-    if (comments.contains(commentItem)) {
-      comments[comments.indexOf(commentItem)] = commentItem;
-      comments.refresh();
+    if (itemController.cachedCommentItems.contains(commentItem)) {
+      itemController.cachedCommentItems[
+          itemController.cachedCommentItems.indexOf(commentItem)] = commentItem;
+      itemController.cachedCommentItems.refresh();
     }
   }
 
@@ -169,6 +178,7 @@ class CommentController extends GetxController {
 
     final IbComment ibComment = IbComment(
         commentId: IbUtils.getUniqueId(),
+        notifyUid: ibQuestion == null ? '' : ibQuestion!.creatorId,
         uid: IbUtils.getCurrentUid()!,
         questionId: questionId,
         content: text.trim(),
@@ -180,14 +190,15 @@ class CommentController extends GetxController {
       final IbAnswer? ibAnswer = await IbQuestionDbService()
           .querySingleIbAnswer(ibComment.uid, ibComment.questionId);
       editingController.clear();
-      comments.insert(
+      itemController.cachedCommentItems.insert(
           0,
           CommentItem(
               ibComment: ibComment,
               user: IbUtils.getCurrentIbUser()!,
               ibAnswer: ibAnswer));
 
-      updateParentQuestionCommentCount(comments.length);
+      updateParentQuestionCommentCount(
+          itemController.cachedCommentItems.length);
       IbUtils.showSimpleSnackBar(
           msg: 'Comment added!', backgroundColor: IbColors.accentColor);
     } catch (e) {
@@ -259,13 +270,16 @@ class CommentController extends GetxController {
   }
 
   Future<void> likeComment(CommentItem commentItem) async {
-    if (!comments.contains(commentItem) || commentItem.isLiked) {
+    if (!itemController.cachedCommentItems.contains(commentItem) ||
+        commentItem.isLiked) {
       return;
     }
 
     try {
-      final IbComment comment =
-          comments[comments.indexOf(commentItem)]!.ibComment;
+      final IbComment comment = itemController
+          .cachedCommentItems[
+              itemController.cachedCommentItems.indexOf(commentItem)]
+          .ibComment;
       await IbQuestionDbService().likeComment(comment);
       comment.likes++;
       commentItem.isLiked = true;
@@ -274,17 +288,20 @@ class CommentController extends GetxController {
           msg: 'Failed to like a comment, $e',
           backgroundColor: IbColors.errorRed);
     } finally {
-      comments.refresh();
+      itemController.cachedCommentItems.refresh();
     }
   }
 
   Future<void> dislikeComment(CommentItem commentItem) async {
-    if (!comments.contains(commentItem) || !commentItem.isLiked) {
+    if (!itemController.cachedCommentItems.contains(commentItem) ||
+        !commentItem.isLiked) {
       return;
     }
     try {
-      final IbComment comment =
-          comments[comments.indexOf(commentItem)]!.ibComment;
+      final IbComment comment = itemController
+          .cachedCommentItems[
+              itemController.cachedCommentItems.indexOf(commentItem)]
+          .ibComment;
       await IbQuestionDbService().dislikeComment(comment);
       comment.likes--;
       comment.likes = comment.likes <= 0 ? 0 : comment.likes;
@@ -294,7 +311,7 @@ class CommentController extends GetxController {
           msg: 'Failed to remove like on a comment, $e',
           backgroundColor: IbColors.errorRed);
     } finally {
-      comments.refresh();
+      itemController.cachedCommentItems.refresh();
     }
   }
 
@@ -320,6 +337,16 @@ class CommentController extends GetxController {
         isLiked: isLiked,
         replies: replies,
         ibAnswer: ibAnswer);
+  }
+
+  // will update my answer when parent question answer changes
+  void updateMyAnswer(IbAnswer ibAnswer) {
+    for (final CommentItem item in itemController.cachedCommentItems) {
+      if (item.ibComment.uid == ibAnswer.uid) {
+        item.ibAnswer = ibAnswer;
+      }
+    }
+    itemController.cachedCommentItems.refresh();
   }
 
   @override

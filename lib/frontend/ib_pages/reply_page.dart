@@ -9,6 +9,7 @@ import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -60,7 +61,7 @@ class ReplyPage extends StatelessWidget {
                       hintStyle: const TextStyle(
                           color: IbColors.lightGrey,
                           fontSize: IbConfig.kNormalTextSize),
-                      hintText: 'Add a creative reply here',
+                      hintText: _controller.hintText.value,
                       border: InputBorder.none,
                       suffixIcon: _controller.isAddingReply.isTrue
                           ? const Padding(
@@ -71,8 +72,12 @@ class ReplyPage extends StatelessWidget {
                                   child: CircularProgressIndicator()),
                             )
                           : IconButton(
-                              icon: const Icon(
-                                Icons.send_outlined,
+                              icon: Icon(
+                                _controller.replyUid.value !=
+                                        _controller
+                                            .rxCommentItem.value.ibComment.uid
+                                    ? FontAwesomeIcons.reply
+                                    : FontAwesomeIcons.comment,
                                 color: IbColors.primaryColor,
                               ),
                               onPressed: () async {
@@ -94,11 +99,19 @@ class ReplyPage extends StatelessWidget {
   }
 
   Widget _handleReplyCommentUI() {
-    return Obx(
-      () => SmartRefresher(
+    return Obx(() {
+      if (_controller.isLoading.isTrue) {
+        return const Center(
+          child: IbProgressIndicator(),
+        );
+      }
+      return SmartRefresher(
         controller: _controller.refreshController,
         enablePullDown: false,
         enablePullUp: true,
+        footer: ClassicFooter(
+          noDataText: 'no_more_replies'.tr,
+        ),
         onLoading: () async {
           await _controller.loadMore();
         },
@@ -114,78 +127,85 @@ class ReplyPage extends StatelessWidget {
           },
           itemCount: _controller.replies.length + 1,
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _handleReplyItemUI(CommentItem item, BuildContext context) {
-    return Container(
-      color: Theme.of(context).backgroundColor,
-      padding: const EdgeInsets.only(left: 48, right: 8, top: 8, bottom: 10),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          IbUserAvatar(
-            avatarUrl: item.user.avatarUrl,
-            radius: 16,
-            uid: item.user.id,
-          ),
-          const SizedBox(
-            width: 16,
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${item.user.username} '
-                      '${item.user.id == _controller.commentController.creatorId.value ? ' 👑' : ''}',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: IbConfig.kNormalTextSize),
-                    ),
-                    if (item.ibAnswer != null)
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text(
-                            'Vote: ',
-                            style: TextStyle(
-                                color: IbColors.lightGrey,
-                                fontSize: IbConfig.kDescriptionTextSize),
-                          ),
-                          _handleIbAnswerUI(item),
-                        ],
-                      ),
-                  ],
-                ),
-                Text(
-                  IbUtils.getChatTabDateString(
-                      DateTime.fromMillisecondsSinceEpoch(
-                          item.ibComment.timestampInMs)),
-                  style: const TextStyle(
-                      fontSize: IbConfig.kDescriptionTextSize,
-                      color: IbColors.lightGrey),
-                ),
-                Linkify(
-                  options: const LinkifyOptions(looseUrl: true),
-                  onOpen: (link) async {
-                    if (await canLaunch(link.url)) {
-                      await launch(link.url);
-                    }
-                  },
-                  text: item.ibComment.content,
-                  style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
-                ),
-              ],
+    return InkWell(
+      onTap: () {
+        _controller.focusNode.requestFocus();
+        _controller.replyUid.value = item.ibComment.uid;
+        _controller.hintText.value = 'Reply to ${item.user.username}';
+      },
+      child: Ink(
+        color: Theme.of(context).backgroundColor,
+        padding: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            IbUserAvatar(
+              avatarUrl: item.user.avatarUrl,
+              radius: 16,
+              uid: item.user.id,
             ),
-          ),
-        ],
+            const SizedBox(
+              width: 16,
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${item.user.username} '
+                        '${item.user.id == _controller.commentController.creatorId.value ? ' 👑' : ''}',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: IbConfig.kNormalTextSize),
+                      ),
+                      if (item.ibAnswer != null)
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'Vote: ',
+                              style: TextStyle(
+                                  color: IbColors.lightGrey,
+                                  fontSize: IbConfig.kDescriptionTextSize),
+                            ),
+                            _handleIbAnswerUI(item),
+                          ],
+                        ),
+                    ],
+                  ),
+                  Text(
+                    IbUtils.getChatTabDateString(
+                        DateTime.fromMillisecondsSinceEpoch(
+                            item.ibComment.timestampInMs)),
+                    style: const TextStyle(
+                        fontSize: IbConfig.kDescriptionTextSize,
+                        color: IbColors.lightGrey),
+                  ),
+                  Linkify(
+                    options: const LinkifyOptions(looseUrl: true),
+                    onOpen: (link) async {
+                      if (await canLaunch(link.url)) {
+                        await launch(link.url);
+                      }
+                    },
+                    text: item.ibComment.content,
+                    style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -273,6 +293,10 @@ class ReplyPage extends StatelessWidget {
                             TextButton.icon(
                               onPressed: () {
                                 _controller.focusNode.requestFocus();
+                                _controller.replyUid.value = _controller
+                                    .rxCommentItem.value.ibComment.uid;
+                                _controller.hintText.value =
+                                    'Add a creative reply here';
                               },
                               icon: const Icon(
                                 FontAwesomeIcons.reply,
@@ -316,10 +340,6 @@ class ReplyPage extends StatelessWidget {
                             ),
                           ],
                         ),
-                      ),
-                      const Divider(
-                        height: 2,
-                        thickness: 2,
                       ),
                     ],
                   ),

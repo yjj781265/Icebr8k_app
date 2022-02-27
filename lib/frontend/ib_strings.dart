@@ -134,7 +134,9 @@ class IbStrings extends Translations {
           'tag_picker_dialog_hint': 'Enter a tag here',
           'tag_picker_dialog_title': 'Create Your Own Tag',
           'show_case_quiz': 'Pick the correct answer for your quiz!',
-          'show_case_tag': 'Click here to add tags!'
+          'show_case_tag': 'Click here to add tags!',
+          'no_more_comments': 'No more comments',
+          'no_more_replies': 'No more replies'
         }
       };
 }

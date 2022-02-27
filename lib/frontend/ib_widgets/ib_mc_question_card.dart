@@ -157,7 +157,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                 padding: EdgeInsets.zero,
                 onPressed: () {
                   widget._controller.rxIsExpanded.value =
-                      !widget._controller.rxIsExpanded.isTrue;
+                      !widget._controller.rxIsExpanded.value;
                 },
                 icon: Obx(() {
                   _runExpandCheck();

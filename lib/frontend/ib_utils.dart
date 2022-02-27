@@ -227,16 +227,31 @@ class IbUtils {
 
   static void showSimpleSnackBar(
       {required String msg, required Color backgroundColor}) {
+    Widget icon = const SizedBox();
+    if (backgroundColor == IbColors.primaryColor) {
+      icon = Icon(
+        Icons.info_rounded,
+        color: backgroundColor,
+      );
+    } else if (backgroundColor == IbColors.accentColor) {
+      icon = Icon(
+        Icons.check_circle_rounded,
+        color: backgroundColor,
+      );
+    } else if (backgroundColor == IbColors.errorRed) {
+      icon = Icon(Icons.error_rounded, color: backgroundColor);
+    }
+
     Get.showSnackbar(GetSnackBar(
+      icon: icon,
       snackPosition: SnackPosition.TOP,
       borderRadius: IbConfig.kCardCornerRadius,
       margin: const EdgeInsets.only(left: 8, right: 8, top: 32),
       duration: const Duration(seconds: 2),
-      backgroundColor: backgroundColor,
+      backgroundColor: Theme.of(Get.context!).backgroundColor,
       messageText: Text(
         msg,
-        style: const TextStyle(
-            color: Colors.black, fontSize: IbConfig.kNormalTextSize),
+        style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
       ),
     ));
   }

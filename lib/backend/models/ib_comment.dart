@@ -2,10 +2,12 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'ib_comment.g.dart';
 
-/// reply Id is for the reply of a comment
+/// reply Id is the id for the reply of a comment
+/// notifyUid is the Uid of a comment reply to(for push notification)
 @JsonSerializable(explicitToJson: true)
 class IbComment {
   String? replyId;
+  String notifyUid;
   String commentId;
   String questionId;
   String uid;
@@ -25,6 +27,7 @@ class IbComment {
     required this.uid,
     required this.questionId,
     this.isAnonymous = false,
+    required this.notifyUid,
     this.likes = 0,
     this.replies = 0,
     this.replyId,

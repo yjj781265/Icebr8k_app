@@ -15,11 +15,14 @@ class ReplyController extends GetxController {
   final Rx<CommentItem> rxCommentItem;
   final CommentController commentController;
   final replies = <CommentItem>[].obs;
+
+  /// the Uid a reply is replying to
+  final replyUid = ''.obs;
   final likes = 0.obs;
   final isLiked = false.obs;
   final replyCount = 0.obs;
   final isAddingReply = false.obs;
-  final int kMaxPerPage = 8;
+  final hintText = 'Add a creative reply here'.obs;
   DocumentSnapshot<Map<String, dynamic>>? lastSnap;
   final isLoading = true.obs;
   final TextEditingController editingController = TextEditingController();
@@ -35,6 +38,7 @@ class ReplyController extends GetxController {
     likes.value = rxCommentItem.value.ibComment.likes;
     isLiked.value = rxCommentItem.value.isLiked;
     replyCount.value = rxCommentItem.value.ibComment.replies;
+    replyUid.value = rxCommentItem.value.ibComment.uid;
     await _initData();
   }
 
@@ -121,7 +125,8 @@ class ReplyController extends GetxController {
         questionId: rxCommentItem.value.ibComment.questionId,
         content: text.trim(),
         type: type,
-        timestampInMs: DateTime.now().millisecondsSinceEpoch);
+        timestampInMs: DateTime.now().millisecondsSinceEpoch,
+        notifyUid: replyUid.value);
     final user = IbUtils.getCurrentIbUser();
 
     if (user != null) {
@@ -146,6 +151,10 @@ class ReplyController extends GetxController {
       } catch (e) {
         IbUtils.showSimpleSnackBar(
             msg: 'Fail to add a reply $e!', backgroundColor: IbColors.errorRed);
+      } finally {
+        focusNode.requestFocus();
+        replyUid.value = rxCommentItem.value.ibComment.uid;
+        hintText.value = 'Add a creative reply here';
       }
     }
   }
