@@ -32,7 +32,7 @@ class ReplyPage extends StatelessWidget {
       body: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(child: _handleReplyCommentUI()),
+          Expanded(child: _handleReplyCommentUI(context)),
           SafeArea(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 3),
@@ -98,13 +98,8 @@ class ReplyPage extends StatelessWidget {
     );
   }
 
-  Widget _handleReplyCommentUI() {
+  Widget _handleReplyCommentUI(BuildContext context) {
     return Obx(() {
-      if (_controller.isLoading.isTrue) {
-        return const Center(
-          child: IbProgressIndicator(),
-        );
-      }
       return SmartRefresher(
         controller: _controller.refreshController,
         enablePullDown: false,
@@ -115,17 +110,22 @@ class ReplyPage extends StatelessWidget {
         onLoading: () async {
           await _controller.loadMore();
         },
-        child: ListView.builder(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return _handleFirstIndexUI(context);
-            }
-            index -= 1;
-            final CommentItem item = _controller.replies[index];
-            return _handleReplyItemUI(item, context);
-          },
-          itemCount: _controller.replies.length + 1,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              _handleFirstIndexUI(context),
+              if (_controller.isLoading.value)
+                const Center(
+                  child: IbProgressIndicator(),
+                )
+              else
+                Column(
+                  children: _controller.replies
+                      .map((element) => _handleReplyItemUI(element, context))
+                      .toList(),
+                ),
+            ],
+          ),
         ),
       );
     });

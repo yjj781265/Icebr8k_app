@@ -45,9 +45,9 @@ class ReplyController extends GetxController {
   Future<void> _initData() async {
     isLoading.value = true;
     final snapshot = await IbQuestionDbService().queryReplies(
-        questionId: rxCommentItem.value.ibComment.questionId,
-        commentId: rxCommentItem.value.ibComment.commentId,
-        limit: 16);
+      questionId: rxCommentItem.value.ibComment.questionId,
+      commentId: rxCommentItem.value.ibComment.commentId,
+    );
 
     for (final doc in snapshot.docs) {
       final IbComment ibComment = IbComment.fromJson(doc.data());

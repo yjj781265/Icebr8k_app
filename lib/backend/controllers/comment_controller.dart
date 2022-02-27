@@ -199,6 +199,7 @@ class CommentController extends GetxController {
 
       updateParentQuestionCommentCount(
           itemController.cachedCommentItems.length);
+      itemController.commented.value = true;
       IbUtils.showSimpleSnackBar(
           msg: 'Comment added!', backgroundColor: IbColors.accentColor);
     } catch (e) {
@@ -265,7 +266,6 @@ class CommentController extends GetxController {
         Get.find<IbQuestionItemController>(tag: questionId);
     itemController.comments.value = commentCount.value;
     itemController.rxIbQuestion.value.comments = commentCount.value;
-    itemController.commented.value = true;
     itemController.rxIbQuestion.refresh();
   }
 
@@ -376,6 +376,7 @@ class CommentItem {
       identical(this, other) ||
       other is CommentItem &&
           runtimeType == other.runtimeType &&
+          ibComment.replyId == other.ibComment.replyId &&
           ibComment.commentId == other.ibComment.commentId;
 
   @override
