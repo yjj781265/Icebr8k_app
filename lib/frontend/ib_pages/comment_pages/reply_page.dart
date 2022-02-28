@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/comment_controller.dart';
-import 'package:icebr8k/backend/controllers/reply_controller.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -14,8 +12,10 @@ import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../ib_colors.dart';
-import '../ib_config.dart';
+import '../../../backend/controllers/user_controllers/comment_controller.dart';
+import '../../../backend/controllers/user_controllers/reply_controller.dart';
+import '../../ib_colors.dart';
+import '../../ib_config.dart';
 
 class ReplyPage extends StatelessWidget {
   final ReplyController _controller;

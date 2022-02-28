@@ -5,8 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
-import 'package:icebr8k/backend/controllers/ib_question_stats_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/ib_question_stats_controller.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
@@ -19,6 +18,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_question_stats_bar.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_tags.dart';
 import 'package:showcaseview/showcaseview.dart';
 
+import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
 import '../ib_colors.dart';
 import '../ib_config.dart';
 import '../ib_utils.dart';

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/create_question_tag_picker_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:reorderables/reorderables.dart';
+
+import '../../../backend/controllers/user_controllers/create_question_tag_picker_controller.dart';
 
 class CreateQuestionTagPicker extends StatelessWidget {
   final CreateQuestionTagPickerController _controller;

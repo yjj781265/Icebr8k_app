@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
-import 'package:icebr8k/backend/controllers/setup_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/setup_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/admin/admin_main_page.dart';
 import 'package:icebr8k/frontend/admin/role_select_page.dart';
@@ -16,10 +16,10 @@ import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
-import '../services/user_services/ib_auth_service.dart';
-import '../services/user_services/ib_cloud_messaging_service.dart';
-import '../services/user_services/ib_local_data_service.dart';
-import '../services/user_services/ib_user_db_service.dart';
+import '../../services/user_services/ib_auth_service.dart';
+import '../../services/user_services/ib_cloud_messaging_service.dart';
+import '../../services/user_services/ib_local_data_service.dart';
+import '../../services/user_services/ib_user_db_service.dart';
 
 class AuthController extends GetxService {
   final isInitializing = true.obs;
@@ -218,7 +218,8 @@ class AuthController extends GetxService {
 
         switch (status) {
           case IbUser.kUserStatusApproved:
-            Get.offAll(() => MainPage(), binding: HomeBinding());
+            Get.offAll(() => MainPage(),
+                binding: HomeBinding(), transition: Transition.circularReveal);
             break;
 
           case IbUser.kUserStatusBanned:

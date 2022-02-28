@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/auth_controller.dart';
-import 'package:icebr8k/backend/controllers/reset_pwd_controller.dart';
-import 'package:icebr8k/backend/controllers/sign_in_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/reset_pwd_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -13,6 +11,8 @@ import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field_dialog.dart';
 
+import '../../backend/controllers/user_controllers/auth_controller.dart';
+import '../../backend/controllers/user_controllers/sign_in_controller.dart';
 import '../../backend/services/user_services/ib_local_data_service.dart';
 
 class SignInPage extends StatelessWidget {

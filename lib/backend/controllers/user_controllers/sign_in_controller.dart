@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
-import '../services/user_services/ib_local_data_service.dart';
+import '../../services/user_services/ib_local_data_service.dart';
 import 'auth_controller.dart';
 
 class SignInController extends GetxController {

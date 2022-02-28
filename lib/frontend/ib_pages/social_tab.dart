@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/auth_controller.dart';
-import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
-import 'package:icebr8k/backend/controllers/friend_list_controller.dart';
-import 'package:icebr8k/backend/controllers/friend_request_controller.dart';
-import 'package:icebr8k/backend/controllers/people_nearby_controller.dart';
-import 'package:icebr8k/backend/controllers/social_tab_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/friend_list_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
@@ -18,6 +14,10 @@ import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import '../../backend/controllers/user_controllers/auth_controller.dart';
+import '../../backend/controllers/user_controllers/chat_page_controller.dart';
+import '../../backend/controllers/user_controllers/friend_request_controller.dart';
+import '../../backend/controllers/user_controllers/people_nearby_controller.dart';
 import '../../backend/services/user_services/ib_local_data_service.dart';
 
 class SocialTab extends StatefulWidget {

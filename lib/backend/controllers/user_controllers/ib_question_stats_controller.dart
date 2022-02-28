@@ -3,9 +3,8 @@ import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-
-import '../services/user_services/ib_question_db_service.dart';
-import '../services/user_services/ib_user_db_service.dart';
+import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
+import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 
 class IbQuestionStatsController extends GetxController {
   final String questionId;

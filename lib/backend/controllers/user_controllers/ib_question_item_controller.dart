@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/comment_controller.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
@@ -13,9 +12,10 @@ import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
-import '../services/user_services/ib_question_db_service.dart';
-import '../services/user_services/ib_tag_db_service.dart';
-import '../services/user_services/ib_user_db_service.dart';
+import '../../services/user_services/ib_question_db_service.dart';
+import '../../services/user_services/ib_tag_db_service.dart';
+import '../../services/user_services/ib_user_db_service.dart';
+import 'comment_controller.dart';
 
 class IbQuestionItemController extends GetxController {
   final Rx<IbQuestion> rxIbQuestion;
@@ -49,10 +49,17 @@ class IbQuestionItemController extends GetxController {
   final currentSortOption = 'Top Comments'.obs;
   final RxList<CommentItem> cachedCommentItems = <CommentItem>[].obs;
   DocumentSnapshot<Map<String, dynamic>>? lastCommentSnap;
-  final Map<String, IbAnswer> answerMap = {};
+  final RxMap<String, IbAnswer> answerMap = <String, IbAnswer>{}.obs;
   //end
 
-  Map<String, int> countMap = {};
+  //start
+  // variables for poll stat main page
+  final RxMap<IbChoice, List<IbUser>> choiceUserMap =
+      <IbChoice, List<IbUser>>{}.obs;
+  //end
+
+  /// vote count for each choice id
+  RxMap<String, int> countMap = <String, int>{}.obs;
 
   IbQuestionItemController({
     required this.rxIbQuestion,
@@ -70,6 +77,11 @@ class IbQuestionItemController extends GetxController {
 
   Future<void> initData() async {
     countMap.clear();
+    ibTags.clear();
+    resultMap.clear();
+    cachedCommentItems.clear();
+    answerMap.clear();
+    choiceUserMap.clear();
     showComparison.value = ibAnswers != null && ibAnswers!.isNotEmpty;
 
     /// query question author user info
@@ -106,6 +118,7 @@ class IbQuestionItemController extends GetxController {
       await _generateIbTags();
       await _generatePollStats();
       await _generateCachedCommentItems();
+      await _generateChoiceUserMap();
       _setUpCountDownTimer();
     }
   }
@@ -135,6 +148,7 @@ class IbQuestionItemController extends GetxController {
   }
 
   Future<void> _generateIbTags() async {
+    ibTags.clear();
     for (final String id in rxIbQuestion.value.tagIds) {
       final IbTag? tag = await IbTagDbService().retrieveIbTag(id);
       if (tag != null) {
@@ -156,7 +170,7 @@ class IbQuestionItemController extends GetxController {
   Future<void> _generatePollStats() async {
     int counter = 0;
     if (countMap.isEmpty) {
-      countMap = await _getChoiceCountMap();
+      countMap.value = await _getChoiceCountMap();
     }
 
     for (final value in countMap.values) {
@@ -177,6 +191,7 @@ class IbQuestionItemController extends GetxController {
   }
 
   Future<void> _generateCachedCommentItems() async {
+    cachedCommentItems.clear();
     final List<IbComment> tempList = [];
     final snapshot =
         await IbQuestionDbService().queryTopComments(rxIbQuestion.value.id);
@@ -195,7 +210,29 @@ class IbQuestionItemController extends GetxController {
     }
   }
 
+  Future<void> _generateChoiceUserMap() async {
+    for (final IbChoice choice in rxIbQuestion.value.choices) {
+      final snapshot = await IbQuestionDbService().queryIbAnswers(
+          choiceId: choice.choiceId,
+          questionId: rxIbQuestion.value.id,
+          limit: 4);
+      final List<IbAnswer> ibAnswers = [];
+      for (final doc in snapshot.docs) {
+        ibAnswers.add(IbAnswer.fromJson(doc.data()));
+      }
+
+      final List<IbUser> users = [];
+
+      for (final IbAnswer answer in ibAnswers) {
+        final user = await retrieveUser(answer.uid);
+        users.addIf(user != null, user!);
+      }
+      choiceUserMap[choice] = users;
+    }
+  }
+
   Future<void> onVote() async {
+    // don't let user vote if poll is closed
     if (rxIbQuestion.value.endTimeInMs <
             DateTime.now().millisecondsSinceEpoch &&
         rxIbQuestion.value.endTimeInMs > 0) {
@@ -261,13 +298,13 @@ class IbQuestionItemController extends GetxController {
     }
   }
 
-  Future<IbUser?> retrieveUser(IbComment comment) async {
+  Future<IbUser?> retrieveUser(String uid) async {
     final IbUser? user;
-    if (IbCacheManager().getIbUser(comment.uid) == null) {
-      user = await IbUserDbService().queryIbUser(comment.uid);
+    if (IbCacheManager().getIbUser(uid) == null) {
+      user = await IbUserDbService().queryIbUser(uid);
       IbCacheManager().cacheIbUser(user);
     } else {
-      user = IbCacheManager().getIbUser(comment.uid);
+      user = IbCacheManager().getIbUser(uid);
       print('retrieveUser from cached');
     }
     return user;
@@ -340,7 +377,7 @@ class IbQuestionItemController extends GetxController {
     final IbUser? user;
     final IbAnswer? ibAnswer;
 
-    user = await retrieveUser(comment);
+    user = await retrieveUser(comment.uid);
     ibAnswer = await retrieveIbAnswer(comment);
 
     if (user == null) {

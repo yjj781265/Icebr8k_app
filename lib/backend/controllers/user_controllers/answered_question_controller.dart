@@ -6,7 +6,7 @@ import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import '../services/user_services/ib_question_db_service.dart';
+import '../../services/user_services/ib_question_db_service.dart';
 import 'ib_question_item_controller.dart';
 
 class AnsweredQuestionController extends GetxController {

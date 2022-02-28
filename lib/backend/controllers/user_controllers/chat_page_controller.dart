@@ -3,15 +3,15 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/auth_controller.dart';
 import 'package:icebr8k/backend/models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
-import '../services/user_services/ib_chat_db_service.dart';
-import '../services/user_services/ib_cloud_messaging_service.dart';
-import '../services/user_services/ib_user_db_service.dart';
+import '../../services/user_services/ib_chat_db_service.dart';
+import '../../services/user_services/ib_cloud_messaging_service.dart';
+import '../../services/user_services/ib_user_db_service.dart';
+import 'auth_controller.dart';
 
 class ChatPageController extends GetxController {
   final title = ''.obs;

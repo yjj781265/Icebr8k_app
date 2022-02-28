@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/auth_controller.dart';
-import 'package:icebr8k/backend/controllers/ib_user_search_controller.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
@@ -12,6 +10,8 @@ import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
+import '../../backend/controllers/user_controllers/auth_controller.dart';
+import '../../backend/controllers/user_controllers/ib_user_search_controller.dart';
 import '../ib_config.dart';
 
 class IbUserSearchPage extends StatelessWidget {

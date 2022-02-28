@@ -2,13 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/ib_tenor_controller.dart';
 import 'package:icebr8k/backend/models/ib_gif.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+
+import '../../backend/controllers/user_controllers/ib_tenor_controller.dart';
 
 class IbTenorPage extends StatelessWidget {
   final IbTenorController _controller = Get.put(IbTenorController());

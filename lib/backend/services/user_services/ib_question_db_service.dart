@@ -266,10 +266,11 @@ class IbQuestionDbService {
     return IbAnswer.fromJson(_snapshot.data()!);
   }
 
-  /// get list of ibAnswers with the same choice id but different choice id
-  Future<List<IbAnswer>> queryIbAnswers(
+  /// get list of ibAnswers with the same choice id but different user id
+  Future<QuerySnapshot<Map<String, dynamic>>> queryIbAnswers(
       {required String choiceId,
       required String questionId,
+      int limit = 8,
       int? lastTimestampInMs}) async {
     final List<IbAnswer> answers = [];
 
@@ -278,14 +279,10 @@ class IbQuestionDbService {
         .collection(_kAnswerCollectionGroup)
         .where('choiceId', isEqualTo: choiceId)
         .orderBy('answeredTimeInMs', descending: true)
-        .limit(8)
+        .limit(limit)
         .get();
 
-    for (final doc in _snapshot.docs) {
-      answers.add(IbAnswer.fromJson(doc.data()));
-    }
-
-    return answers;
+    return _snapshot;
   }
 
   Future<void> answerQuestion(IbAnswer ibAnswer) async {

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_description_text.dart';
+
+import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
 
 class IbQuestionInfo extends StatelessWidget {
   final IbQuestionItemController _controller;

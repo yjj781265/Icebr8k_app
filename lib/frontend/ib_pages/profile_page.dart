@@ -2,14 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/answered_question_controller.dart';
-import 'package:icebr8k/backend/controllers/asked_questions_controller.dart';
-import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
-import 'package:icebr8k/backend/controllers/common_answers_controller.dart';
-import 'package:icebr8k/backend/controllers/different_answers_controller.dart';
-import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
-import 'package:icebr8k/backend/controllers/main_page_controller.dart';
-import 'package:icebr8k/backend/controllers/profile_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -27,6 +20,13 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import '../../backend/controllers/user_controllers/answered_question_controller.dart';
+import '../../backend/controllers/user_controllers/asked_questions_controller.dart';
+import '../../backend/controllers/user_controllers/chat_page_controller.dart';
+import '../../backend/controllers/user_controllers/common_answers_controller.dart';
+import '../../backend/controllers/user_controllers/different_answers_controller.dart';
+import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
+import '../../backend/controllers/user_controllers/profile_controller.dart';
 import '../ib_widgets/ib_pic_question_card.dart';
 
 class ProfilePage extends StatefulWidget {

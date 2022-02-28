@@ -5,7 +5,7 @@ import '../models/ib_user.dart';
 class IbCacheManager {
   static final IbCacheManager _manager = IbCacheManager._();
   final Map<String, IbUser> ibUsersMap = {};
-  final Map<String, IbAnswer> ibAnswerMap = {};
+  final Map<String, List<IbAnswer>> ibAnswersMap = {};
 
   factory IbCacheManager() => _manager;
 
@@ -22,14 +22,12 @@ class IbCacheManager {
     return ibUsersMap[uid];
   }
 
-  void cacheIbAnswer(IbAnswer? ibAnswer) {
-    if (ibAnswer == null) {
-      return;
-    }
-    ibAnswerMap[ibAnswer.uid] = ibAnswer;
+  void cacheIbAnswers(
+      {required String uid, required List<IbAnswer> ibAnswers}) {
+    ibAnswersMap[uid] = ibAnswers;
   }
 
-  IbAnswer? getIbAnswer(String uid) {
-    return ibAnswerMap[uid];
+  List<IbAnswer> getIbAnswers(String uid) {
+    return ibAnswersMap[uid] ?? [];
   }
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_media.dart';
@@ -12,6 +11,8 @@ import 'package:icebr8k/frontend/ib_pages/create_question_pages/review_question_
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:showcaseview/showcaseview.dart';
+
+import 'ib_question_item_controller.dart';
 
 class CreateQuestionController extends GetxController {
   String questionType = IbQuestion.kMultipleChoice;

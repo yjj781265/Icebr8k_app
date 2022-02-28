@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/setup_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
@@ -18,8 +19,6 @@ import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
-
-import '../setup_controller.dart';
 
 class AdminMainController extends GetxController {
   late StreamSubscription applicationSub;
@@ -73,6 +72,7 @@ class AdminMainController extends GetxController {
 
   Future<void> onUserRoleTap() async {
     Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));
+    await Future.delayed(const Duration(milliseconds: 500));
     try {
       if (IbUtils.getCurrentFbUser() != null &&
           IbUtils.getCurrentFbUser()!.emailVerified) {
@@ -87,7 +87,8 @@ class AdminMainController extends GetxController {
 
         switch (status) {
           case IbUser.kUserStatusApproved:
-            Get.offAll(() => MainPage(), binding: HomeBinding());
+            Get.offAll(() => MainPage(),
+                binding: HomeBinding(), transition: Transition.fadeIn);
             break;
 
           case IbUser.kUserStatusBanned:

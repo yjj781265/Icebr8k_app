@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
@@ -11,9 +10,10 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import '../managers/ib_cache_manager.dart';
-import '../services/user_services/ib_question_db_service.dart';
-import '../services/user_services/ib_user_db_service.dart';
+import '../../managers/ib_cache_manager.dart';
+import '../../services/user_services/ib_question_db_service.dart';
+import '../../services/user_services/ib_user_db_service.dart';
+import 'ib_question_item_controller.dart';
 
 class CommentController extends GetxController {
   final IbQuestionItemController itemController;

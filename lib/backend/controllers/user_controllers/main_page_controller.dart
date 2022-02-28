@@ -2,16 +2,16 @@ import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
-import 'package:icebr8k/backend/controllers/social_tab_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_api_keys_manager.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
+import 'package:icebr8k/backend/services/user_services/ib_cloud_messaging_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
-import '../services/user_services/ib_chat_db_service.dart';
-import '../services/user_services/ib_cloud_messaging_service.dart';
+import 'chat_page_controller.dart';
 
 /// this controller control info of current IbUser, index current home page tab and api keys
 class MainPageController extends GetxController {
@@ -29,8 +29,8 @@ class MainPageController extends GetxController {
       currentIbUser = ibUser;
     });
 
-    // todo add manager to handle this
     await IbApiKeysManager.init();
+    // todo add manager to handle this
     await setupInteractedMessage();
   }
 

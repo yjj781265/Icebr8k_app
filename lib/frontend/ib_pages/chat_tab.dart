@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
-import 'package:icebr8k/backend/controllers/chat_tab_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
@@ -10,6 +8,9 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:lottie/lottie.dart';
+
+import '../../backend/controllers/user_controllers/chat_page_controller.dart';
+import '../../backend/controllers/user_controllers/chat_tab_controller.dart';
 
 class ChatTab extends StatelessWidget {
   ChatTab({Key? key}) : super(key: key);

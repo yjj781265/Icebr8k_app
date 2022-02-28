@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/comment_controller.dart';
-import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
-import 'package:icebr8k/backend/controllers/ib_question_result_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_pages/comment_page.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_question_result.dart';
+import 'package:icebr8k/frontend/ib_pages/question_result_pages/question_result_main_page.dart';
 
+import '../../backend/controllers/user_controllers/comment_controller.dart';
+import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
 import '../ib_config.dart';
+import '../ib_pages/comment_pages/comment_page.dart';
 import '../ib_utils.dart';
 
 /// show action icons with like, poll size, comment
@@ -107,26 +105,6 @@ class IbQuestionStatsBar extends StatelessWidget {
       return;
     }
 
-    final bool isRegistered = Get.isRegistered<IbQuestionResultController>(
-        tag: _itemController.rxIbQuestion.value.id);
-    late IbQuestionResultController _controller;
-
-    if (isRegistered) {
-      _controller = Get.find<IbQuestionResultController>(
-          tag: _itemController.rxIbQuestion.value.id);
-      _controller.initResultMap();
-    } else {
-      _controller = Get.put(IbQuestionResultController(_itemController),
-          tag: _itemController.rxIbQuestion.value.id);
-    }
-
-    Get.bottomSheet(
-        IbCard(
-            child: SizedBox(
-          height: Get.height * 0.6,
-          child: IbQuestionResult(_controller),
-        )),
-        ignoreSafeArea: false,
-        isScrollControlled: false);
+    Get.to(QuestionResultMainPage(_itemController));
   }
 }

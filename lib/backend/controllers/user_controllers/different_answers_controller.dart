@@ -3,31 +3,31 @@ import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
-import '../services/user_services/ib_question_db_service.dart';
+import '../../services/user_services/ib_question_db_service.dart';
 
-/// uid: not current user uid
-class CommonAnswersController extends GetxController {
+class DifferentAnswersController extends GetxController {
   final ibQuestions = <IbQuestion>[].obs;
-  late List<String> _commonQuestionIds;
-  late List<IbAnswer> _commonAnswers;
+  late List<String> _uncommonQuestionIds;
   final String uid;
+  late List<IbAnswer> _uncommonAnswers;
   int lastIndex = 0;
+  DifferentAnswersController(this.uid);
   final int kPaginationMax = 8;
   final isLoading = true.obs;
 
-  CommonAnswersController(this.uid);
   @override
   Future<void> onInit() async {
-    _commonAnswers = await IbUtils.getCommonAnswersQ(uid);
+    _uncommonAnswers = await IbUtils.getUncommonAnswersQ(uid);
     final questionIdMap = <String, IbAnswer>{};
-    for (final IbAnswer answer in _commonAnswers) {
+
+    for (final IbAnswer answer in _uncommonAnswers) {
       questionIdMap[answer.questionId] = answer;
     }
-    _commonQuestionIds = questionIdMap.keys.toList();
+    _uncommonQuestionIds = questionIdMap.keys.toList();
 
-    if (_commonQuestionIds.length <= kPaginationMax) {
-      for (final questionId in questionIdMap.keys) {
-        final q = await IbQuestionDbService().querySingleQuestion(questionId);
+    if (_uncommonQuestionIds.length <= kPaginationMax) {
+      for (final id in _uncommonQuestionIds) {
+        final q = await IbQuestionDbService().querySingleQuestion(id);
         if (q == null || ibQuestions.contains(q)) {
           continue;
         }
@@ -37,7 +37,7 @@ class CommonAnswersController extends GetxController {
     } else {
       for (int i = 0; i < kPaginationMax; i++) {
         final q = await IbQuestionDbService()
-            .querySingleQuestion(_commonQuestionIds[i]);
+            .querySingleQuestion(_uncommonQuestionIds[i]);
         if (q == null || ibQuestions.contains(q)) {
           continue;
         }
@@ -46,32 +46,35 @@ class CommonAnswersController extends GetxController {
       lastIndex = kPaginationMax - 1;
       ibQuestions.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
     }
+
     isLoading.value = false;
     super.onInit();
   }
 
   Future<void> loadMore() async {
-    if (lastIndex == 0 || lastIndex == _commonQuestionIds.length - 1) {
+    if (lastIndex == 0 || lastIndex == _uncommonQuestionIds.length - 1) {
       return;
     }
 
     final int endIndex =
-        (_commonQuestionIds.length - lastIndex) > kPaginationMax
+        (_uncommonQuestionIds.length - lastIndex) > kPaginationMax
             ? (lastIndex + kPaginationMax)
-            : _commonQuestionIds.length;
+            : _uncommonQuestionIds.length;
     for (int i = lastIndex + 1; i < endIndex; i++) {
       final q = await IbQuestionDbService()
-          .querySingleQuestion(_commonQuestionIds[i]);
+          .querySingleQuestion(_uncommonQuestionIds[i]);
+
       if (q == null || ibQuestions.contains(q)) {
         continue;
       }
+
       ibQuestions.add(q);
     }
     lastIndex = endIndex - 1;
   }
 
   List<IbAnswer> retrieveAnswers(String questionId) {
-    return _commonAnswers
+    return _uncommonAnswers
         .where((element) => element.questionId == questionId)
         .toList();
   }

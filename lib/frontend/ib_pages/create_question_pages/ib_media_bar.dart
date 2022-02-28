@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/create_question_controller.dart';
-import 'package:icebr8k/backend/controllers/create_question_tag_picker_controller.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -10,6 +8,8 @@ import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:showcaseview/showcaseview.dart';
 
+import '../../../backend/controllers/user_controllers/create_question_controller.dart';
+import '../../../backend/controllers/user_controllers/create_question_tag_picker_controller.dart';
 import 'create_question_image_picker.dart';
 
 /// for CreateQuestionPage Only
@@ -101,6 +101,7 @@ class IbMediaBar extends StatelessWidget {
             children: [
               Obx(
                 () => IconButton(
+                    padding: EdgeInsets.zero,
                     onPressed: () {
                       IbUtils.hideKeyboard();
                       Get.to(() => CreateQuestionImagePicker(_controller),

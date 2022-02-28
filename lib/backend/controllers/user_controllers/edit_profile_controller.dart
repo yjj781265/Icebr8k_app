@@ -8,8 +8,8 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
-import '../services/user_services/ib_storage_service.dart';
-import '../services/user_services/ib_user_db_service.dart';
+import '../../services/user_services/ib_storage_service.dart';
+import '../../services/user_services/ib_user_db_service.dart';
 
 class EditProfileController extends GetxController {
   final birthdatePickerInstructionKey = ''.obs;

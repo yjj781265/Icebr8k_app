@@ -5,9 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
-import 'package:icebr8k/backend/controllers/chat_tab_controller.dart';
-import 'package:icebr8k/backend/controllers/main_page_controller.dart';
-import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/social_tab.dart';
@@ -15,6 +13,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
 import 'package:move_to_background/move_to_background.dart';
 
+import '../../backend/controllers/user_controllers/chat_tab_controller.dart';
 import '../../backend/services/user_services/ib_local_data_service.dart';
 import '../ib_colors.dart';
 import 'create_question_pages/create_question_page.dart';
@@ -102,8 +101,8 @@ class _MainPageViewState extends State<MainPageView>
         selectedIndex: _mainPageController.currentIndex.value,
         onItemSelected: (index) async {
           if (index == 2) {
-            await IbQuestionDbService()
-                .copyCollection('First8', 'IbQuestions-dev');
+            /*     await IbQuestionDbService()
+                .copyCollection('First8', 'IbQuestions-dev');*/
             Get.to(() => const CreateQuestionPage(),
                 fullscreenDialog: true,
                 popGesture: false,

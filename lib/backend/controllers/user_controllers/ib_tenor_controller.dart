@@ -4,7 +4,7 @@ import 'package:icebr8k/backend/models/ib_gif.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import '../services/user_services/ib_tenor_service.dart';
+import '../../services/user_services/ib_tenor_service.dart';
 
 class IbTenorController extends GetxController {
   final trendingGifs = <IbGif>[].obs;
