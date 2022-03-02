@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
+import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -258,10 +259,25 @@ class IbUtils {
 
   static Future<double> getCompScore(String uid) async {
     final List<IbAnswer> uid1QuestionAnswers = [];
-    uid1QuestionAnswers
-        .addAll(Get.find<MyAnsweredQuestionsController>().ibAnswers);
-    final List<IbAnswer> uid2QuestionAnswers =
-        await IbQuestionDbService().queryUserAnswers(uid);
+    final List<IbAnswer> uid2QuestionAnswers = [];
+    if (IbCacheManager().getIbAnswers(getCurrentUid()!) == null) {
+      final tempList =
+          await IbQuestionDbService().queryUserAnswers(getCurrentUid()!);
+      IbCacheManager()
+          .cacheIbAnswers(uid: getCurrentUid()!, ibAnswers: tempList);
+      uid1QuestionAnswers.addAll(tempList);
+    } else {
+      uid1QuestionAnswers
+          .addAll(IbCacheManager().getIbAnswers(getCurrentUid()!)!);
+    }
+
+    if (IbCacheManager().getIbAnswers(uid) == null) {
+      final tempList = await IbQuestionDbService().queryUserAnswers(uid);
+      IbCacheManager().cacheIbAnswers(uid: uid, ibAnswers: tempList);
+      uid2QuestionAnswers.addAll(tempList);
+    } else {
+      uid2QuestionAnswers.addAll(IbCacheManager().getIbAnswers(uid)!);
+    }
 
     if (uid1QuestionAnswers.isEmpty || uid2QuestionAnswers.isEmpty) {
       return 0;

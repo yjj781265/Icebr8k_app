@@ -241,6 +241,7 @@ class IbQuestionDbService {
     return list;
   }
 
+  /// query all the ibAnswers from a user, this might be time consuming
   Future<List<IbAnswer>> queryUserAnswers(String uid) async {
     final List<IbAnswer> answers = [];
     final _snapshot = await _db
@@ -271,18 +272,25 @@ class IbQuestionDbService {
       {required String choiceId,
       required String questionId,
       int limit = 8,
-      int? lastTimestampInMs}) async {
-    final List<IbAnswer> answers = [];
+      DocumentSnapshot<Map<String, dynamic>>? lastSnap}) async {
+    if (lastSnap != null) {
+      return _collectionRef
+          .doc(questionId)
+          .collection(_kAnswerCollectionGroup)
+          .where('choiceId', isEqualTo: choiceId)
+          .orderBy('answeredTimeInMs', descending: true)
+          .startAfterDocument(lastSnap)
+          .limit(limit)
+          .get();
+    }
 
-    final _snapshot = await _collectionRef
+    return _collectionRef
         .doc(questionId)
         .collection(_kAnswerCollectionGroup)
         .where('choiceId', isEqualTo: choiceId)
         .orderBy('answeredTimeInMs', descending: true)
         .limit(limit)
         .get();
-
-    return _snapshot;
   }
 
   Future<void> answerQuestion(IbAnswer ibAnswer) async {

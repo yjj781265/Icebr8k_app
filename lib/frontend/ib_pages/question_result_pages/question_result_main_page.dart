@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/question_result_detail_controller.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_pages/question_result_pages/question_result_detail_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
@@ -24,15 +26,17 @@ class QuestionResultMainPage extends StatelessWidget {
         ),
       ),
       body: Obx(() {
+        final sortedList = _itemController.choiceUserMap.keys.toList();
+        sortedList.sort((a, b) => _itemController.choiceUserMap[b]!.length
+            .compareTo(_itemController.choiceUserMap[a]!.length));
         return ListView.builder(
           itemBuilder: (context, index) {
-            final IbChoice choice =
-                _itemController.choiceUserMap.keys.toList()[index];
+            final IbChoice choice = sortedList[index];
             return _itemWidget(
                 choice: choice,
                 ibUsers: _itemController.choiceUserMap[choice] ?? []);
           },
-          itemCount: _itemController.choiceUserMap.keys.length,
+          itemCount: sortedList.length,
         );
       }),
     );
@@ -44,45 +48,62 @@ class QuestionResultMainPage extends StatelessWidget {
     if (votes == 0) {
       return const SizedBox();
     }
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Row(children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _handleIbChoiceUI(choice),
-              Text(
-                '${_itemController.countMap[choice.choiceId]} vote(s)',
-                style: const TextStyle(color: IbColors.lightGrey),
+    return InkWell(
+      onTap: () {
+        Get.to(() => QuestionResultDetailPage(Get.put(
+            QuestionResultDetailPageController(
+                itemController: _itemController, ibChoice: choice))));
+      },
+      child: Ink(
+        color: Theme.of(Get.context!).backgroundColor,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+          child: Row(children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _handleIbChoiceUI(choice),
+                  Text(
+                    '${_itemController.countMap[choice.choiceId]} vote(s)',
+                    style: const TextStyle(color: IbColors.lightGrey),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        Row(
-            children: ibUsers.map((e) {
-          if (ibUsers.indexOf(e) == ibUsers.length - 1 &&
-              ibUsers.length - 1 > votes) {
-            return Align(
-              widthFactor: 0.6,
-              child: CircleAvatar(
-                radius: 16,
-                child: Text('+${ibUsers.length - 1 - votes}'),
-              ),
-            );
-          }
-
-          return Align(
-            widthFactor: 0.6,
-            child: IbUserAvatar(
-              disableOnTap: true,
-              radius: 16,
-              avatarUrl: e.avatarUrl,
             ),
-          );
-        }).toList())
-      ]),
+            Row(
+                children: ibUsers.map((e) {
+              if (ibUsers.indexOf(e) == ibUsers.length - 1 &&
+                  ibUsers.length - 1 > votes) {
+                return Align(
+                  widthFactor: 0.6,
+                  child: CircleAvatar(
+                    radius: 16,
+                    child: Text('+${ibUsers.length - 1 - votes}'),
+                  ),
+                );
+              }
+
+              return Align(
+                widthFactor: 0.6,
+                child: IbUserAvatar(
+                  disableOnTap: true,
+                  radius: 16,
+                  avatarUrl: e.avatarUrl,
+                ),
+              );
+            }).toList()),
+            const Padding(
+              padding: EdgeInsets.only(left: 16),
+              child: Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+              ),
+            ),
+          ]),
+        ),
+      ),
     );
   }
 
@@ -92,7 +113,7 @@ class QuestionResultMainPage extends StatelessWidget {
       children: [
         if (choice.url != null && choice.url!.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.only(right: 8.0),
+            padding: const EdgeInsets.only(right: 16.0),
             child: InkWell(
               onTap: () {
                 Get.to(

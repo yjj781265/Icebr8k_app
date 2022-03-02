@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/ib_question_result_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/question_result_detail_controller.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class QuestionResultDetailPage extends StatelessWidget {
-  final QuestionResultDetailPageController _pageController;
+  final QuestionResultDetailPageController _controller;
 
-  QuestionResultDetailPage(this._pageController);
+  const QuestionResultDetailPage(this._controller);
 
   @override
   Widget build(BuildContext context) {
@@ -15,11 +19,47 @@ class QuestionResultDetailPage extends StatelessWidget {
           () => Column(
             children: [
               Text(
-                  '${_pageController.itemController.countMap[_pageController.ibChoice] ?? 0} votes'),
+                  '${_controller.itemController.countMap[_controller.ibChoice.choiceId] ?? 0} vote(s)'),
             ],
           ),
         ),
       ),
+      body: Obx(() {
+        if (_controller.isLoading.isTrue) {
+          return const Center(
+            child: IbProgressIndicator(),
+          );
+        }
+
+        return SmartRefresher(
+          enablePullDown: false,
+          enablePullUp: true,
+          onLoading: () async {
+            await _controller.loadMore();
+          },
+          controller: _controller.refreshController,
+          child: ListView.builder(
+            itemBuilder: (context, index) {
+              final item = _controller.results[index];
+              return ListTile(
+                tileColor: Theme.of(context).backgroundColor,
+                leading: IbUserAvatar(
+                  uid: item.user.id,
+                  avatarUrl: item.user.avatarUrl,
+                ),
+                title: Text(
+                  item.user.username,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: IbLinearIndicator(
+                  endValue: item.compScore,
+                ),
+              );
+            },
+            itemCount: _controller.results.length,
+          ),
+        );
+      }),
     );
   }
 }
