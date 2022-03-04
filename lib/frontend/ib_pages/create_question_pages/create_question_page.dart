@@ -1,24 +1,17 @@
-import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_mc_pic_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_mc_tab.dart';
-import 'package:icebr8k/frontend/ib_pages/ib_tenor_page.dart';
+import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_sc_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
-import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:reorderables/reorderables.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../../backend/controllers/user_controllers/create_question_controller.dart';
@@ -42,19 +35,16 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 2);
+    _tabController = TabController(vsync: this, length: 3);
     _tabController.addListener(() {
       if (_tabController.index == 0) {
-        _controller.questionType = IbQuestion.kMultipleChoice;
+        _controller.questionType.value = IbQuestion.kMultipleChoice;
         _controller.title.value = 'text only';
       } else if (_tabController.index == 1) {
-        _controller.questionType = IbQuestion.kMultipleChoicePic;
+        _controller.questionType.value = IbQuestion.kMultipleChoicePic;
         _controller.title.value = 'text with picture';
-      } else if (_tabController.index == 2) {
-        _controller.questionType = IbQuestion.kPic;
-        _controller.title.value = 'picture only';
       } else {
-        _controller.questionType = IbQuestion.kScale;
+        _controller.questionType.value = IbQuestion.kScaleOne;
         _controller.title.value = 'scale';
       }
     });
@@ -177,14 +167,10 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                                   message: 'mc_p'.tr,
                                   child: const Tab(
                                       icon: Icon(FontAwesomeIcons.listUl))),
-                              /* Tooltip(
-                                  message: 'pic'.tr,
-                                  child: const Tab(
-                                      icon: Icon(FontAwesomeIcons.square))),
                               Tooltip(
                                   message: 'sc'.tr,
                                   child: const Tab(
-                                      icon: Icon(FontAwesomeIcons.slidersH))),*/
+                                      icon: Icon(FontAwesomeIcons.star))),
                             ],
                           ),
                         ),
@@ -200,8 +186,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                   children: [
                     CreateQuestionMcTab(_controller),
                     CreateQuestionMcPicTab(_controller),
-                    /*_picTab(),
-                    _sCTab(),*/
+                    CreateQuestionScTab(_controller),
                   ],
                 ),
               ),
@@ -211,498 +196,4 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
       ),
     );
   }
-
-  Widget _mCWithPicTab() {
-    return SingleChildScrollView(
-      physics: const PageScrollPhysics(),
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      child: Column(
-        children: [
-          const SizedBox(
-            height: 8,
-          ),
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              customBorder: ContinuousRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              onTap: () {
-                IbUtils.hideKeyboard();
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                width: Get.width * 0.95,
-                height: IbConfig.kMcPicItemSize,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Theme.of(context).primaryColor,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        showMediaBottomSheet(
-                            context, null, _controller.picChoiceList);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: IbColors.lightGrey,
-                        ),
-                        width: IbConfig.kMcPicSize,
-                        height: IbConfig.kMcPicSize,
-                        child: const Icon(Icons.add),
-                      ),
-                    ),
-                    Text(
-                      'tap_to_add'.tr,
-                      style: const TextStyle(color: IbColors.lightGrey),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.only(right: 10),
-                      child: Icon(Icons.add_outlined),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          Obx(() => ReorderableColumn(
-                onReorder: (oldIndex, newIndex) {
-                  print('$oldIndex to $newIndex');
-                  _controller.swapIndex(oldIndex, newIndex);
-                },
-                children: _controller.picChoiceList
-                    .map((item) => GestureDetector(
-                          key: UniqueKey(),
-                          onTap: () {
-                            // _showEditTextFiledBtmSheet(item);
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            padding: const EdgeInsets.all(8),
-                            height: IbConfig.kMcPicItemSize,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Theme.of(context).primaryColor),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                if (item.url != null && item.url!.isNotEmpty)
-                                  InkWell(
-                                    onTap: () {
-                                      showMediaBottomSheet(context, item,
-                                          _controller.picChoiceList);
-                                    },
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: SizedBox(
-                                        width: IbConfig.kMcPicSize,
-                                        height: IbConfig.kMcPicSize,
-                                        child: item.url!.contains('http')
-                                            ? CachedNetworkImage(
-                                                fadeInDuration: const Duration(
-                                                    milliseconds: 300),
-                                                fit: BoxFit.fill,
-                                                imageUrl: item.url!,
-                                                height: IbConfig.kPicHeight,
-                                                width: IbConfig.kPicHeight,
-                                              )
-                                            : Image.file(
-                                                File(item.url!),
-                                                fit: BoxFit.fill,
-                                              ),
-                                      ),
-                                    ),
-                                  )
-                                else
-                                  InkWell(
-                                    onTap: () {
-                                      showMediaBottomSheet(context, item,
-                                          _controller.picChoiceList);
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        color: IbColors.lightGrey,
-                                      ),
-                                      width: IbConfig.kMcPicSize,
-                                      height: IbConfig.kMcPicSize,
-                                      child: const Icon(Icons.add),
-                                    ),
-                                  ),
-                                if (item.content != null &&
-                                    item.content!.isNotEmpty)
-                                  Text(item.content!)
-                                else
-                                  const Text(
-                                    'Add text here',
-                                    style: TextStyle(color: IbColors.lightGrey),
-                                  ),
-                                Center(
-                                  child: IconButton(
-                                      padding: EdgeInsets.zero,
-                                      onPressed: () {
-                                        _controller.picChoiceList.remove(item);
-                                      },
-                                      icon: const Icon(
-                                        Icons.remove,
-                                        color: IbColors.errorRed,
-                                      )),
-                                )
-                              ],
-                            ),
-                          ),
-                        ))
-                    .toList(),
-              ))
-        ],
-      ),
-    );
-  }
-
-  Widget _picTab() {
-    return SingleChildScrollView(
-      child: Obx(
-        () => ReorderableWrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
-          runAlignment: WrapAlignment.center,
-          onReorder: (int oldIndex, int newIndex) {
-            final IbChoice ibChoice = _controller.picList.removeAt(oldIndex);
-            _controller.picList.insert(newIndex, ibChoice);
-          },
-          buildDraggableFeedback: (context, axis, item) {
-            return Material(
-              color: Colors.transparent,
-              child: item,
-            );
-          },
-          header: [
-            Obx(() {
-              if (_controller.picList.length < IbConfig.kPicChoiceLimit) {
-                return GestureDetector(
-                  onTap: () {
-                    showMediaBottomSheet(context, null, _controller.picList);
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                        color: IbColors.lightGrey,
-                        borderRadius: BorderRadius.circular(8)),
-                    width: IbConfig.kPicHeight + 8,
-                    height: IbConfig.kPicHeight + 8,
-                    child: const Icon(Icons.add),
-                  ),
-                );
-              }
-              return const SizedBox();
-            }),
-          ],
-          controller: ScrollController(),
-          children: _controller.picList
-              .map(
-                (e) => Stack(
-                  children: [
-                    InkWell(
-                      customBorder: ContinuousRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
-                      onTap: () {
-                        showMediaBottomSheet(context, e, _controller.picList);
-                      },
-                      child: IbCard(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: SizedBox(
-                            width: IbConfig.kPicHeight,
-                            height: IbConfig.kPicHeight,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: e.url!.contains('http')
-                                  ? CachedNetworkImage(
-                                      imageUrl: e.url!, fit: BoxFit.fill)
-                                  : Image.file(
-                                      File(e.url!),
-                                      fit: BoxFit.fill,
-                                    ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      right: -14,
-                      top: -14,
-                      child: IconButton(
-                        color: IbColors.errorRed.withOpacity(1.0),
-                        onPressed: () {
-                          _controller.picList.remove(e);
-                        },
-                        icon: const Icon(Icons.remove_circle),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-              .toList(),
-        ),
-      ),
-    );
-  }
-
-  Widget _sCTab() {
-    return SingleChildScrollView(
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      child: Column(
-        children: [
-          const SizedBox(
-            height: 8,
-          ),
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () {
-                if (_controller.scaleEndPoints.length <
-                    IbConfig.kScChoiceLimit) {
-                  /*_showTextFiledBottomSheet(
-                      'add_endpoint', _controller.scaleEndPoints);*/
-                } else {
-                  IbUtils.showSimpleSnackBar(
-                      msg: 'choice_limit_sc'.tr,
-                      backgroundColor: IbColors.errorRed);
-                }
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                width: Get.width * 0.95,
-                height: 40,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Theme.of(context).primaryColor,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'tap_to_add_sc'.tr,
-                      style: const TextStyle(color: IbColors.lightGrey),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.only(right: 10),
-                      child: Icon(Icons.add_outlined),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          Obx(
-            () => ReorderableListView(
-              onReorder: (oldIndex, newIndex) {
-                print('$oldIndex to $newIndex');
-                _controller.swapIndex(oldIndex, newIndex);
-              },
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              children: [
-                for (final item in _controller.scaleEndPoints)
-                  GestureDetector(
-                    key: UniqueKey(),
-                    onTap: () {
-                      /* _showEditTextFiledBtmSheet(item);*/
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      padding: const EdgeInsets.all(8),
-                      height: 46,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Theme.of(context).primaryColor),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(item.content!),
-                          IconButton(
-                              padding: EdgeInsets.zero,
-                              onPressed: () {
-                                _controller.scaleEndPoints.remove(item);
-                              },
-                              icon: const Icon(
-                                Icons.remove,
-                                color: IbColors.errorRed,
-                              ))
-                        ],
-                      ),
-                    ),
-                  )
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-void showMediaBottomSheet(
-    BuildContext context, IbChoice? ibChoice, RxList<IbChoice> list) {
-  IbUtils.hideKeyboard();
-  final Widget options = ListView(
-    shrinkWrap: true,
-    children: [
-      InkWell(
-        onTap: () async {
-          Get.back();
-          final _picker = ImagePicker();
-          final XFile? pickedFile = await _picker.pickImage(
-            source: ImageSource.camera,
-            imageQuality: IbConfig.kImageQuality,
-          );
-
-          if (pickedFile != null) {
-            if (ibChoice != null) {
-              // ignore: parameter_assignments
-              ibChoice!.url = pickedFile.path;
-            } else {
-              // ignore: parameter_assignments
-              ibChoice = IbChoice(
-                  choiceId: IbUtils.getUniqueId(), url: pickedFile.path);
-              // ignore: parameter_assignments
-              list.add(ibChoice!);
-            }
-
-            list.refresh();
-          }
-        },
-        child: Ink(
-          height: 56,
-          width: double.infinity,
-          color: Theme.of(context).primaryColor,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: const [
-                Icon(
-                  Icons.camera_alt_outlined,
-                  color: IbColors.primaryColor,
-                ),
-                SizedBox(
-                  width: 8,
-                ),
-                Text('Take a photo',
-                    style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
-              ],
-            ),
-          ),
-        ),
-      ),
-      InkWell(
-        onTap: () async {
-          Get.back();
-          final _picker = ImagePicker();
-          final XFile? pickedFile = await _picker.pickImage(
-            source: ImageSource.gallery,
-            imageQuality: IbConfig.kImageQuality,
-          );
-
-          if (pickedFile != null) {
-            if (ibChoice != null) {
-              // ignore: parameter_assignments
-              ibChoice!.url = pickedFile.path;
-            } else {
-              // ignore: parameter_assignments
-              ibChoice = IbChoice(
-                choiceId: IbUtils.getUniqueId(),
-                url: pickedFile.path,
-              );
-              // ignore: parameter_assignments
-              list.add(ibChoice!);
-            }
-            list.refresh();
-          }
-        },
-        child: Ink(
-          height: 56,
-          width: double.infinity,
-          color: Theme.of(context).primaryColor,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: const [
-                Icon(
-                  Icons.photo_album_outlined,
-                  color: IbColors.errorRed,
-                ),
-                SizedBox(
-                  width: 8,
-                ),
-                Text(
-                  'Choose from gallery',
-                  style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      InkWell(
-        onTap: () async {
-          Get.back();
-          final url = await Get.to(
-            () => IbTenorPage(),
-          );
-          if (url != null && url.toString().isNotEmpty) {
-            if (ibChoice != null) {
-              // ignore: parameter_assignments
-              ibChoice!.url = url.toString();
-            } else {
-              // ignore: parameter_assignments
-              ibChoice = IbChoice(
-                choiceId: IbUtils.getUniqueId(),
-                url: url.toString(),
-              );
-              // ignore: parameter_assignments
-              list.add(ibChoice!);
-            }
-
-            list.refresh();
-          }
-        },
-        child: Ink(
-          height: 56,
-          width: double.infinity,
-          color: Theme.of(context).primaryColor,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: const [
-                Icon(
-                  Icons.gif,
-                  color: IbColors.accentColor,
-                  size: 24,
-                ),
-                SizedBox(
-                  width: 8,
-                ),
-                Text(
-                  'Choose GIF from Tenor',
-                  style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    ],
-  );
-
-  Get.bottomSheet(options, ignoreSafeArea: false);
 }

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
-import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
@@ -277,9 +276,7 @@ class CreateQuestionMcPicTab extends StatelessWidget {
       title: strTrKey.tr,
       content: TextField(
         textInputAction: TextInputAction.done,
-        maxLength: _controller.questionType == IbQuestion.kScale
-            ? IbConfig.kScAnswerMaxLength
-            : IbConfig.kAnswerMaxLength,
+        maxLength: IbConfig.kAnswerMaxLength,
         onSubmitted: (value) {
           _handleOnChoiceSubmit(value: value.trim(), index: index);
         },

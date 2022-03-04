@@ -263,9 +263,6 @@ class CommentController extends GetxController {
     commentCount.value = count;
 
     ///update item controller comments if available
-    final IbQuestionItemController itemController =
-        Get.find<IbQuestionItemController>(tag: questionId);
-    itemController.comments.value = commentCount.value;
     itemController.rxIbQuestion.value.comments = commentCount.value;
     itemController.rxIbQuestion.refresh();
   }

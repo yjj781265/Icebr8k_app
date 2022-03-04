@@ -39,6 +39,6 @@ class HomeTabController extends GetxController {
       _lastOffset = scrollController.offset;
     });
 
-    currentList.value = await IbQuestionDbService().queryIbQuestions(8);
+    currentList.value = await IbQuestionDbService().queryIbQuestions(16);
   }
 }

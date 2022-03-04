@@ -389,7 +389,11 @@ class ReplyPage extends StatelessWidget {
       );
     }
 
-    if (_controller.commentController.questionType.value == IbQuestion.kScale) {
+    if (_controller.commentController.choices
+            .firstWhere(
+                (element) => element.choiceId == item.ibAnswer!.choiceId)
+            .content !=
+        null) {
       return Text(_controller.commentController.choices
           .firstWhere((element) => element.choiceId == item.ibAnswer!.choiceId)
           .content!);

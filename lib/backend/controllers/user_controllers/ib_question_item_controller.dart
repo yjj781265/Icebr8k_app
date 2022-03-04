@@ -34,10 +34,7 @@ class IbQuestionItemController extends GetxController {
   /// if user already answered, pass the answer here
   Rx<IbAnswer>? rxIbAnswer;
   final answeredUsername = ''.obs;
-  final totalPolled = 0.obs;
-  final likes = 0.obs;
   final liked = false.obs;
-  final comments = 0.obs;
   final commented = false.obs;
   final selectedChoiceId = ''.obs;
   final title = ''.obs;
@@ -112,11 +109,9 @@ class IbQuestionItemController extends GetxController {
     if (!isSample) {
       commented.value =
           await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
-      comments.value = rxIbQuestion.value.comments;
       liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
-      likes.value = rxIbQuestion.value.likes;
       await _generateIbTags();
-      await _generatePollStats();
+      await generatePollStats();
       await _generateCachedCommentItems();
       await _generateChoiceUserMap();
       _setUpCountDownTimer();
@@ -167,27 +162,21 @@ class IbQuestionItemController extends GetxController {
     return map;
   }
 
-  Future<void> _generatePollStats() async {
-    int counter = 0;
+  Future<void> generatePollStats() async {
+    if (rxIbQuestion.value.pollSize == 0) {
+      return;
+    }
+
     if (countMap.isEmpty) {
       countMap.value = await _getChoiceCountMap();
     }
 
-    for (final value in countMap.values) {
-      counter = counter + value;
-    }
-
-    if (counter == 0) {
-      totalPolled.value = counter;
-      return;
-    }
-
     for (final IbChoice ibChoice in rxIbQuestion.value.choices) {
       resultMap[ibChoice] = double.parse(
-          ((countMap[ibChoice.choiceId] ?? 0).toDouble() / counter.toDouble())
+          ((countMap[ibChoice.choiceId] ?? 0).toDouble() /
+                  rxIbQuestion.value.pollSize)
               .toStringAsFixed(1));
     }
-    totalPolled.value = counter;
   }
 
   Future<void> _generateCachedCommentItems() async {
@@ -279,6 +268,8 @@ class IbQuestionItemController extends GetxController {
         choiceUserMap[rxIbQuestion.value.choices.firstWhere(
                 (element) => element.choiceId == rxIbAnswer!.value.choiceId)] =
             updatedSet;
+      } else {
+        rxIbQuestion.value.pollSize++;
       }
 
       final int incrementedCount = (countMap[ibAnswer.choiceId] ?? 0) + 1;
@@ -293,7 +284,7 @@ class IbQuestionItemController extends GetxController {
       choiceUserMap[rxIbQuestion.value.choices
               .firstWhere((element) => element.choiceId == ibAnswer.choiceId)] =
           updatedSet;
-      await _generatePollStats();
+      await generatePollStats();
       rxIbAnswer = ibAnswer.obs;
       voted.value = true;
     } catch (e) {
@@ -311,10 +302,10 @@ class IbQuestionItemController extends GetxController {
   Future<void> updateLike() async {
     liked.value = !liked.value;
     if (liked.isTrue) {
-      likes.value++;
+      rxIbQuestion.value.likes++;
       await IbQuestionDbService().updateLikes(rxIbQuestion.value.id);
     } else {
-      likes.value--;
+      rxIbQuestion.value.likes--;
       await IbQuestionDbService().removeLikes(rxIbQuestion.value.id);
     }
   }

@@ -7,7 +7,9 @@ part 'ib_question.g.dart';
 @JsonSerializable(explicitToJson: true)
 class IbQuestion {
   static const String kMultipleChoice = "mc";
-  static const String kScale = "sc";
+  static const String kScaleOne = "sc_1";
+  static const String kScaleTwo = "sc_2";
+  static const String kScaleThree = "sc_3";
   static const String kPic = "pic";
   static const String kMultipleChoicePic = "mc_pic";
 
@@ -29,7 +31,6 @@ class IbQuestion {
   int askedTimeInMs;
   int endTimeInMs;
   List<IbChoice> choices;
-  List<IbChoice>? endpoints;
   String questionType;
 
   IbQuestion(
@@ -44,7 +45,6 @@ class IbQuestion {
       this.isCommentEnabled = true,
       this.privacyBounds = const ['public'],
       this.tagIds = const [],
-      this.endpoints,
       this.description = '',
       this.likes = 0,
       this.comments = 0,
@@ -53,9 +53,6 @@ class IbQuestion {
       this.pollSize = 0,
       required this.askedTimeInMs,
       this.endTimeInMs = -1}) {
-    if (kScale == questionType && endpoints == null) {
-      throw Exception('Scale question need end points to be defined');
-    }
     if (isQuiz && correctChoiceId.isEmpty) {
       throw Exception('Quiz needs to have a correct choice id');
     }

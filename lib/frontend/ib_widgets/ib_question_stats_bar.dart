@@ -34,7 +34,7 @@ class IbQuestionStatsBar extends StatelessWidget {
                   size: 16,
                 ),
                 label: Text(
-                  _itemController.totalPolled.value.toString(),
+                  _itemController.rxIbQuestion.value.pollSize.toString(),
                   style: TextStyle(
                       color: Theme.of(context).indicatorColor,
                       fontSize: IbConfig.kDescriptionTextSize),
@@ -60,7 +60,8 @@ class IbQuestionStatsBar extends StatelessWidget {
                     size: 16,
                   ),
                   label: Text(
-                    IbUtils.statsShortString(_itemController.comments.value),
+                    IbUtils.statsShortString(
+                        _itemController.rxIbQuestion.value.comments),
                     style: TextStyle(
                         color: Theme.of(context).indicatorColor,
                         fontSize: IbConfig.kDescriptionTextSize),
@@ -82,7 +83,7 @@ class IbQuestionStatsBar extends StatelessWidget {
                 size: 16,
               ),
               label: Text(
-                _itemController.likes.value.toString(),
+                _itemController.rxIbQuestion.value.likes.toString(),
                 style: TextStyle(
                     color: Theme.of(context).indicatorColor,
                     fontSize: IbConfig.kDescriptionTextSize),
@@ -95,7 +96,7 @@ class IbQuestionStatsBar extends StatelessWidget {
   }
 
   Future<void> _handleOnStatsTap() async {
-    if (_itemController.totalPolled.value == 0) {
+    if (_itemController.rxIbQuestion.value.pollSize == 0) {
       return;
     }
     if (_itemController.voted.isFalse) {

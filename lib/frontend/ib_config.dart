@@ -24,7 +24,7 @@ class IbConfig {
   static const int kQuestionTitleMaxLength = 100; //characters
   static const int kFriendRequestMsgMaxLength = 100; //characters
   static const int kQuestionDescMaxLength = 500; //characters
-  static const int kBioMaxLength = 300; //characters
+  static const int kBioMaxLength = 500; //characters
   static const int kAnswerMaxLength = 30; // characters
   static const int kScAnswerMaxLength = 20; // characters
   static const double kInitChatMessagesLoadSize = 16;
@@ -35,6 +35,7 @@ class IbConfig {
   static const int kMaxTag = 8;
   static const double kMcPicSize = 72;
   static const double kPicHeight = 88;
+  static const double kScItemHeight = 48;
   static const double kMcItemCornerRadius = 8;
   static const int kCommentMaxLen = 2000;
   static const List<String> kFirst8QuestionIds = [

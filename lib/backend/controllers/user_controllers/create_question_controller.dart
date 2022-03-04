@@ -15,7 +15,7 @@ import 'package:showcaseview/showcaseview.dart';
 import 'ib_question_item_controller.dart';
 
 class CreateQuestionController extends GetxController {
-  String questionType = IbQuestion.kMultipleChoice;
+  final questionType = IbQuestion.kMultipleChoice.obs;
   final TextEditingController questionEditController = TextEditingController();
   final TextEditingController descriptionEditController =
       TextEditingController();
@@ -60,14 +60,7 @@ class CreateQuestionController extends GetxController {
   }
 
   bool isChoiceDuplicated(String text) {
-    if (IbQuestion.kScale == questionType) {
-      for (final IbChoice choice in scaleEndPoints) {
-        if (text.trim() == choice.content) {
-          return true;
-        }
-      }
-      return false;
-    } else if (IbQuestion.kMultipleChoice == questionType) {
+    if (IbQuestion.kMultipleChoice == questionType) {
       for (final IbChoice choice in choiceList) {
         if (text.trim() == choice.content) {
           return true;
@@ -81,6 +74,8 @@ class CreateQuestionController extends GetxController {
         }
       }
       return false;
+    } else if (questionType.contains('sc')) {
+      return true;
     }
 
     return false;
@@ -148,38 +143,6 @@ class CreateQuestionController extends GetxController {
       }
     }
 
-    if (questionType == IbQuestion.kPic) {
-      if (picList.length < 2) {
-        Get.dialog(IbDialog(
-            subtitle: 'pic_question_not_valid_min'.tr,
-            title: 'Error',
-            showNegativeBtn: false,
-            positiveTextKey: 'ok'));
-        return;
-      }
-
-      for (final IbChoice ibChoice in picList) {
-        if (ibChoice.url == null || ibChoice.url!.isEmpty) {
-          Get.dialog(IbDialog(
-            subtitle: 'pic_question_not_valid'.tr,
-            positiveTextKey: 'ok',
-            title: 'Error',
-            showNegativeBtn: false,
-          ));
-          return;
-        }
-      }
-    }
-
-    if (questionType == IbQuestion.kScale && scaleEndPoints.length != 2) {
-      Get.dialog(IbDialog(
-          subtitle: 'sc_question_not_valid'.tr,
-          title: 'Error',
-          showNegativeBtn: false,
-          positiveTextKey: 'ok'));
-      return;
-    }
-
     IbUtils.hideKeyboard();
     final String id = IbUtils.getUniqueId();
     final question = IbQuestion(
@@ -190,7 +153,7 @@ class CreateQuestionController extends GetxController {
         creatorId: IbUtils.getCurrentUid()!,
         medias: picMediaList.toSet().union(videoMediaList.toSet()).toList(),
         choices: _getCorrectList(),
-        questionType: questionType,
+        questionType: questionType.value,
         askedTimeInMs: DateTime.now().millisecondsSinceEpoch);
     Get.to(() => ReviewQuestionPage(
         itemController: Get.put(IbQuestionItemController(
@@ -200,11 +163,15 @@ class CreateQuestionController extends GetxController {
   }
 
   List<IbChoice> _getCorrectList() {
-    if (questionType == IbQuestion.kMultipleChoice) {
+    if (questionType.value == IbQuestion.kMultipleChoice) {
       return choiceList;
     }
-    if (questionType == IbQuestion.kMultipleChoicePic) {
+    if (questionType.value == IbQuestion.kMultipleChoicePic) {
       return picChoiceList;
+    }
+
+    if (questionType.value.contains('sc')) {
+      return _generateScaleChoiceList();
     }
     return [];
   }

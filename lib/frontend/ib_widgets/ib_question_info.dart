@@ -32,19 +32,6 @@ class IbQuestionInfo extends StatelessWidget {
                 text: _controller.rxIbQuestion.value.description,
               ),
             ),
-          if (_controller.rxIbQuestion.value.endpoints != null &&
-              _controller.rxIbQuestion.value.endpoints!.length == 2 &&
-              _controller.showComparison.isTrue)
-            Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16),
-              child: Text(
-                '1: ${_controller.rxIbQuestion.value.endpoints?.first.content}  5:${_controller.rxIbQuestion.value.endpoints?.last.content}',
-                overflow: _controller.rxIsExpanded.value
-                    ? null
-                    : TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
-              ),
-            ),
         ],
       ),
     );

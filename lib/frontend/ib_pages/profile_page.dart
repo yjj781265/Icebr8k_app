@@ -14,7 +14,6 @@ import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,7 +26,6 @@ import '../../backend/controllers/user_controllers/common_answers_controller.dar
 import '../../backend/controllers/user_controllers/different_answers_controller.dart';
 import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
 import '../../backend/controllers/user_controllers/profile_controller.dart';
-import '../ib_widgets/ib_pic_question_card.dart';
 
 class ProfilePage extends StatefulWidget {
   final String uid;
@@ -695,13 +693,7 @@ class _CommonAnswersTabState extends State<CommonAnswersTab>
                 _controller.rxIsExpanded.value = index == 0;
               }
 
-              if (item.questionType == IbQuestion.kPic) {
-                return IbPicQuestionCard(_controller);
-              } else if (item.questionType == IbQuestion.kScale) {
-                return IbScQuestionCard(_controller);
-              } else {
-                return IbMcQuestionCard(_controller);
-              }
+              return IbMcQuestionCard(_controller);
             },
             itemCount: widget._commonAnswersController.ibQuestions.length,
           ),
@@ -790,14 +782,7 @@ class _DifferentAnswersTabState extends State<DifferentAnswersTab>
                     tag: tag);
                 _controller.rxIsExpanded.value = index == 0;
               }
-
-              if (item.questionType == IbQuestion.kPic) {
-                return IbPicQuestionCard(_controller);
-              } else if (item.questionType == IbQuestion.kScale) {
-                return IbScQuestionCard(_controller);
-              } else {
-                return IbMcQuestionCard(_controller);
-              }
+              return IbMcQuestionCard(_controller);
             },
             itemCount: widget._uncommonAnswersController.ibQuestions.length,
           ),
@@ -875,13 +860,7 @@ class _AskedQTabState extends State<AskedQTab>
                 _controller.rxIsExpanded.value = index == 0;
               }
 
-              if (item.questionType == IbQuestion.kPic) {
-                return IbPicQuestionCard(_controller);
-              } else if (item.questionType == IbQuestion.kScale) {
-                return IbScQuestionCard(_controller);
-              } else {
-                return IbMcQuestionCard(_controller);
-              }
+              return IbMcQuestionCard(_controller);
             },
             itemCount:
                 widget._createdQuestionController.createdQuestions.length,
@@ -964,13 +943,7 @@ class _AnsweredQTabState extends State<AnsweredQTab>
                 _controller.rxIsExpanded.value = index == 0;
               }
 
-              if (item.ibQuestion.questionType == IbQuestion.kPic) {
-                return IbPicQuestionCard(_controller);
-              } else if (item.ibQuestion.questionType == IbQuestion.kScale) {
-                return IbScQuestionCard(_controller);
-              } else {
-                return IbMcQuestionCard(_controller);
-              }
+              return IbMcQuestionCard(_controller);
             },
             itemCount:
                 widget._answeredQuestionController.myAnsweredQuestions.length,

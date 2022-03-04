@@ -400,7 +400,11 @@ class CommentItemWidget extends StatelessWidget {
         );
       }
 
-      if (controller.questionType.value == IbQuestion.kScale) {
+      if (controller.choices
+              .firstWhere(
+                  (element) => element.choiceId == item.ibAnswer!.choiceId)
+              .content !=
+          null) {
         return Text(controller.choices
             .firstWhere(
                 (element) => element.choiceId == item.ibAnswer!.choiceId)

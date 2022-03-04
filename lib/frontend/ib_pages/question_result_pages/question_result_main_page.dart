@@ -22,7 +22,7 @@ class QuestionResultMainPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Obx(
-          () => Text('${_itemController.totalPolled.value} Polled'),
+          () => Text('${_itemController.rxIbQuestion.value.pollSize} Polled'),
         ),
       ),
       body: Obx(() {
