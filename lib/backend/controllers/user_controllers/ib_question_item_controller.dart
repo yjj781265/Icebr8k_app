@@ -54,8 +54,8 @@ class IbQuestionItemController extends GetxController {
 
   //start
   // variables for poll stat main page
-  final RxMap<IbChoice, List<IbUser>> choiceUserMap =
-      <IbChoice, List<IbUser>>{}.obs;
+  final RxMap<IbChoice, Set<IbUser>> choiceUserMap =
+      <IbChoice, Set<IbUser>>{}.obs;
   //end
 
   /// vote count for each choice id
@@ -221,7 +221,7 @@ class IbQuestionItemController extends GetxController {
         ibAnswers.add(IbAnswer.fromJson(doc.data()));
       }
 
-      final List<IbUser> users = [];
+      final Set<IbUser> users = {};
 
       for (final IbAnswer answer in ibAnswers) {
         final user = await retrieveUser(answer.uid);
@@ -263,16 +263,36 @@ class IbQuestionItemController extends GetxController {
           questionId: rxIbQuestion.value.id,
           questionType: rxIbQuestion.value.questionType);
       await IbQuestionDbService().answerQuestion(ibAnswer);
+      //update choiceUserMap for result main page
 
       if (rxIbAnswer != null) {
         ///decrement old countMap;
         final int decrementedCount =
             (countMap[rxIbAnswer!.value.choiceId] ?? 0) - 1;
-        countMap[rxIbAnswer!.value.choiceId] = decrementedCount;
+        countMap[rxIbAnswer!.value.choiceId] =
+            decrementedCount < 0 ? 0 : decrementedCount;
+        final Set<IbUser> updatedSet = choiceUserMap[rxIbQuestion.value.choices
+                .firstWhere((element) =>
+                    element.choiceId == rxIbAnswer!.value.choiceId)] ??
+            <IbUser>{};
+        updatedSet.remove(IbUtils.getCurrentIbUser());
+        choiceUserMap[rxIbQuestion.value.choices.firstWhere(
+                (element) => element.choiceId == rxIbAnswer!.value.choiceId)] =
+            updatedSet;
       }
 
       final int incrementedCount = (countMap[ibAnswer.choiceId] ?? 0) + 1;
       countMap[ibAnswer.choiceId] = incrementedCount;
+
+      //update choiceUserMap for result main page
+      final Set<IbUser> updatedSet = choiceUserMap[rxIbQuestion.value.choices
+              .firstWhere(
+                  (element) => element.choiceId == ibAnswer.choiceId)] ??
+          <IbUser>{};
+      updatedSet.add(IbUtils.getCurrentIbUser()!);
+      choiceUserMap[rxIbQuestion.value.choices
+              .firstWhere((element) => element.choiceId == ibAnswer.choiceId)] =
+          updatedSet;
       await _generatePollStats();
       rxIbAnswer = ibAnswer.obs;
       voted.value = true;
@@ -284,6 +304,7 @@ class IbQuestionItemController extends GetxController {
       isAnswering.value = false;
       rxIbAnswer!.refresh();
       rxIbQuestion.refresh();
+      choiceUserMap.refresh();
     }
   }
 

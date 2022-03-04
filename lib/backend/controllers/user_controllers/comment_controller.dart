@@ -50,6 +50,7 @@ class CommentController extends GetxController {
   Future<void> initData() async {
     ibQuestion = await IbQuestionDbService().querySingleQuestion(questionId);
     if (ibQuestion == null) {
+      isLoading.value = false;
       print('CommentController ibQuestion is null');
       return;
     }

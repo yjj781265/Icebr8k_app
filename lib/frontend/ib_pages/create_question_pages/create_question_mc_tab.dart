@@ -37,7 +37,7 @@ class CreateQuestionMcTab extends StatelessWidget {
           elevation: 0,
           radius: 8,
           child: SizedBox(
-            height: IbConfig.kMcTxtItemHeight,
+            height: IbConfig.kMcTxtItemSize,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -78,7 +78,7 @@ class CreateQuestionMcTab extends StatelessWidget {
       elevation: 0,
       radius: 8,
       child: SizedBox(
-        height: IbConfig.kMcTxtItemHeight,
+        height: IbConfig.kMcTxtItemSize,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

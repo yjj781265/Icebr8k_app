@@ -34,7 +34,7 @@ class QuestionResultMainPage extends StatelessWidget {
             final IbChoice choice = sortedList[index];
             return _itemWidget(
                 choice: choice,
-                ibUsers: _itemController.choiceUserMap[choice] ?? []);
+                ibUsers: _itemController.choiceUserMap[choice] ?? {});
           },
           itemCount: sortedList.length,
         );
@@ -42,8 +42,7 @@ class QuestionResultMainPage extends StatelessWidget {
     );
   }
 
-  Widget _itemWidget(
-      {required IbChoice choice, required List<IbUser> ibUsers}) {
+  Widget _itemWidget({required IbChoice choice, required Set<IbUser> ibUsers}) {
     final int votes = _itemController.countMap[choice.choiceId] ?? 0;
     if (votes == 0) {
       return const SizedBox();
@@ -74,7 +73,7 @@ class QuestionResultMainPage extends StatelessWidget {
             ),
             Row(
                 children: ibUsers.map((e) {
-              if (ibUsers.indexOf(e) == ibUsers.length - 1 &&
+              if (ibUsers.toList().indexOf(e) == ibUsers.length - 1 &&
                   ibUsers.length - 1 > votes) {
                 return Align(
                   widthFactor: 0.6,

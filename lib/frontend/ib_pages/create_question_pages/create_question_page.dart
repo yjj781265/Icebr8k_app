@@ -11,6 +11,7 @@ import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_mc_pic_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_mc_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/ib_tenor_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
@@ -41,7 +42,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 1);
+    _tabController = TabController(vsync: this, length: 2);
     _tabController.addListener(() {
       if (_tabController.index == 0) {
         _controller.questionType = IbQuestion.kMultipleChoice;
@@ -155,84 +156,6 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                       ),
                     ),
                   ),
-                  /*SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: AnimatedSize(
-                          duration: const Duration(milliseconds: 300),
-                          child: Wrap(
-                            runAlignment: WrapAlignment.end,
-                            crossAxisAlignment: WrapCrossAlignment.end,
-                            children: [
-                              Obx(
-                                () => ReorderableWrap(
-                                  onReorder: (int oldIndex, int newIndex) {
-                                    final String tag =
-                                        _controller.pickedTags.removeAt(oldIndex);
-                                    _controller.pickedTags.insert(newIndex, tag);
-                                  },
-                                  buildDraggableFeedback: (context, axis, item) {
-                                    return Material(
-                                      color: Colors.transparent,
-                                      child: item,
-                                    );
-                                  },
-                                  controller: ScrollController(),
-                                  children: _controller.pickedTags
-                                      .map((e) => Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 4.0),
-                                            child: Chip(
-                                              elevation: 1,
-                                              label: Text(
-                                                e,
-                                              ),
-                                              backgroundColor: Theme.of(context)
-                                                  .backgroundColor,
-                                              onDeleted: () {
-                                                _controller.pickedTags.remove(e);
-                                                final int index = _controller
-                                                    .ibTagModels
-                                                    .indexWhere((element) =>
-                                                        element.tag.text == e);
-                                                if (index != -1) {
-                                                  _controller.ibTagModels[index]
-                                                      .selected = false;
-                                                }
-                                              },
-                                              deleteIcon: const Icon(
-                                                Icons.highlight_remove,
-                                                color: IbColors.lightGrey,
-                                              ),
-                                            ),
-                                          ))
-                                      .toList(),
-                                ),
-                              ),
-                              Obx(() {
-                                if (_controller.pickedTags.length < 8) {
-                                  return TextButton.icon(
-                                      onPressed: () {
-                                        _customTagController.clear();
-                                        _controller.isCustomTagSelected.value =
-                                            false;
-                                        _showTagsDialog();
-                                      },
-                                      icon: const Tooltip(
-                                        message: 'Add Tags',
-                                        child: Icon(Icons.add_circle_outline),
-                                      ),
-                                      label: const Text(
-                                        'Add Tags 🏷️',
-                                      ));
-                                }
-                                return const SizedBox();
-                              }),
-                            ],
-                          )),
-                    ),
-                  ),*/
-
                   SliverOverlapAbsorber(
                     handle:
                         ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
@@ -250,11 +173,11 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                                       icon: Icon(
                                     FontAwesomeIcons.bars,
                                   ))),
-                              /*   Tooltip(
+                              Tooltip(
                                   message: 'mc_p'.tr,
                                   child: const Tab(
                                       icon: Icon(FontAwesomeIcons.listUl))),
-                              Tooltip(
+                              /* Tooltip(
                                   message: 'pic'.tr,
                                   child: const Tab(
                                       icon: Icon(FontAwesomeIcons.square))),
@@ -276,8 +199,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                   controller: _tabController,
                   children: [
                     CreateQuestionMcTab(_controller),
-                    /*  _mCWithPicTab(),
-                    _picTab(),
+                    CreateQuestionMcPicTab(_controller),
+                    /*_picTab(),
                     _sCTab(),*/
                   ],
                 ),
@@ -309,7 +232,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
               child: Container(
                 padding: const EdgeInsets.all(8),
                 width: Get.width * 0.95,
-                height: IbConfig.kMcPicItemHeight,
+                height: IbConfig.kMcPicItemSize,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   color: Theme.of(context).primaryColor,
@@ -327,8 +250,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                           borderRadius: BorderRadius.circular(8),
                           color: IbColors.lightGrey,
                         ),
-                        width: IbConfig.kMcPicHeight,
-                        height: IbConfig.kMcPicHeight,
+                        width: IbConfig.kMcPicSize,
+                        height: IbConfig.kMcPicSize,
                         child: const Icon(Icons.add),
                       ),
                     ),
@@ -363,7 +286,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                             margin: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 4),
                             padding: const EdgeInsets.all(8),
-                            height: IbConfig.kMcPicItemHeight,
+                            height: IbConfig.kMcPicItemSize,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
                                 color: Theme.of(context).primaryColor),
@@ -379,8 +302,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(8),
                                       child: SizedBox(
-                                        width: IbConfig.kMcPicHeight,
-                                        height: IbConfig.kMcPicHeight,
+                                        width: IbConfig.kMcPicSize,
+                                        height: IbConfig.kMcPicSize,
                                         child: item.url!.contains('http')
                                             ? CachedNetworkImage(
                                                 fadeInDuration: const Duration(
@@ -408,8 +331,8 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                                         borderRadius: BorderRadius.circular(8),
                                         color: IbColors.lightGrey,
                                       ),
-                                      width: IbConfig.kMcPicHeight,
-                                      height: IbConfig.kMcPicHeight,
+                                      width: IbConfig.kMcPicSize,
+                                      height: IbConfig.kMcPicSize,
                                       child: const Icon(Icons.add),
                                     ),
                                   ),

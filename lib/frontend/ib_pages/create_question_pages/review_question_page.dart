@@ -274,6 +274,15 @@ class ReviewQuestionPage extends StatelessWidget {
       return;
     }
 
+    if (ibQuestion.isQuiz && ibQuestion.correctChoiceId.isEmpty) {
+      Get.dialog(const IbDialog(
+        title: 'Error',
+        subtitle: 'Quiz question needs to have a correct choice picked',
+        showNegativeBtn: false,
+      ));
+      return;
+    }
+
     Get.dialog(const IbLoadingDialog(messageTrKey: 'Uploading...'),
         barrierDismissible: false);
 

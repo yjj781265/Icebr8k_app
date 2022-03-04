@@ -70,7 +70,7 @@ class IbStrings extends Translations {
           'profile': 'Profile',
           'add_choice': 'Add a choice',
           'add_endpoint': 'Add an endpoint',
-          'tap_to_add': 'Tap to add choices',
+          'tap_to_add': 'Tap to add text',
           'tap_to_add_sc': 'Tap to add 2 end points',
           'edit_choice': 'Edit a choice',
           'match_interests': 'Match Interests',
@@ -82,7 +82,7 @@ class IbStrings extends Translations {
           'mc_question_not_valid':
               'You need at least 2 choices for a multiple choice question',
           'mc_pic_question_not_valid':
-              'All choices need to both have a image and a text',
+              'All choices need to have a image and a text',
           'pic_question_not_valid': 'All choices need to have a image',
           'pic_question_not_valid_min': 'Need at least 2 picture choices',
           'answer': 'Answer',

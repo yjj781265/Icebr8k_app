@@ -20,8 +20,9 @@ class CreateQuestionController extends GetxController {
   final TextEditingController descriptionEditController =
       TextEditingController();
   final title = 'text only'.obs;
-
+  // list for mc tab
   final choiceList = <IbChoice>[].obs;
+  // list for mc pic tab
   final picChoiceList = <IbChoice>[].obs;
   final picList = <IbChoice>[].obs;
   final scaleEndPoints = <IbChoice>[].obs;
@@ -188,7 +189,7 @@ class CreateQuestionController extends GetxController {
         tagIds: pickedTags.map((element) => element.text).toList(),
         creatorId: IbUtils.getCurrentUid()!,
         medias: picMediaList.toSet().union(videoMediaList.toSet()).toList(),
-        choices: choiceList,
+        choices: _getCorrectList(),
         questionType: questionType,
         askedTimeInMs: DateTime.now().millisecondsSinceEpoch);
     Get.to(() => ReviewQuestionPage(
@@ -196,6 +197,16 @@ class CreateQuestionController extends GetxController {
             rxIbQuestion: question.obs,
             rxIsExpanded: false.obs,
             isSample: true))));
+  }
+
+  List<IbChoice> _getCorrectList() {
+    if (questionType == IbQuestion.kMultipleChoice) {
+      return choiceList;
+    }
+    if (questionType == IbQuestion.kMultipleChoicePic) {
+      return picChoiceList;
+    }
+    return [];
   }
 
   List<IbChoice> _generateScaleChoiceList() {

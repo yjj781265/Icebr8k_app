@@ -19,7 +19,7 @@ class QuestionResultDetailPage extends StatelessWidget {
           () => Column(
             children: [
               Text(
-                  '${_controller.itemController.countMap[_controller.ibChoice.choiceId] ?? 0} vote(s)'),
+                  '${_controller.itemController.countMap[_controller.ibChoice.choiceId] ?? 0} Vote(s)'),
             ],
           ),
         ),

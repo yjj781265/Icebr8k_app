@@ -305,8 +305,8 @@ class IbQuestionMcItem extends StatelessWidget {
                         width: Get.width * 0.95,
                         height: _controller.rxIbQuestion.value.questionType ==
                                 IbQuestion.kMultipleChoice
-                            ? IbConfig.kMcTxtItemHeight
-                            : IbConfig.kMcPicItemHeight,
+                            ? IbConfig.kMcTxtItemSize
+                            : IbConfig.kMcPicItemSize,
                         decoration: BoxDecoration(
                             color: IbColors.lightBlue,
                             borderRadius: BorderRadius.circular(
@@ -315,8 +315,8 @@ class IbQuestionMcItem extends StatelessWidget {
                       AnimatedContainer(
                         height: _controller.rxIbQuestion.value.questionType ==
                                 IbQuestion.kMultipleChoice
-                            ? IbConfig.kMcTxtItemHeight
-                            : IbConfig.kMcPicItemHeight,
+                            ? IbConfig.kMcTxtItemSize
+                            : IbConfig.kMcPicItemSize,
                         decoration: BoxDecoration(
                             color: getItemColor(),
                             borderRadius: BorderRadius.circular(8)),
@@ -330,8 +330,8 @@ class IbQuestionMcItem extends StatelessWidget {
                         width: Get.width * 0.95,
                         height: _controller.rxIbQuestion.value.questionType ==
                                 IbQuestion.kMultipleChoice
-                            ? IbConfig.kMcTxtItemHeight
-                            : IbConfig.kMcPicItemHeight,
+                            ? IbConfig.kMcTxtItemSize
+                            : IbConfig.kMcPicItemSize,
                         child: Row(
                           children: [
                             if (choice.url != null && choice.url!.isNotEmpty)
@@ -374,15 +374,15 @@ class IbQuestionMcItem extends StatelessWidget {
                                           ? Image.file(
                                               File(choice.url!),
                                               fit: BoxFit.fill,
-                                              width: IbConfig.kMcPicHeight,
-                                              height: IbConfig.kMcPicHeight,
+                                              width: IbConfig.kMcPicSize,
+                                              height: IbConfig.kMcPicSize,
                                             )
                                           : CachedNetworkImage(
                                               fit: BoxFit.fill,
                                               fadeInDuration: const Duration(
                                                   milliseconds: 300),
-                                              width: IbConfig.kMcPicHeight,
-                                              height: IbConfig.kMcPicHeight,
+                                              width: IbConfig.kMcPicSize,
+                                              height: IbConfig.kMcPicSize,
                                               imageUrl: choice.url!,
                                             ),
                                     ),

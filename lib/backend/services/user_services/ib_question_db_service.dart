@@ -235,7 +235,12 @@ class IbQuestionDbService {
     final list = <IbQuestion>[];
 
     for (final doc in snapshot.docs) {
-      list.add(IbQuestion.fromJson(doc.data()));
+      try {
+        list.add(IbQuestion.fromJson(doc.data()));
+      } catch (e) {
+        print(e);
+        continue;
+      }
     }
 
     return list;
@@ -249,7 +254,12 @@ class IbQuestionDbService {
         .where('uid', isEqualTo: uid)
         .get();
     for (final doc in _snapshot.docs) {
-      answers.add(IbAnswer.fromJson(doc.data()));
+      try {
+        answers.add(IbAnswer.fromJson(doc.data()));
+      } catch (e) {
+        print(e);
+        continue;
+      }
     }
     return answers;
   }
