@@ -138,10 +138,10 @@ class CommentController extends GetxController {
   Future<IbAnswer?> retrieveIbAnswer(IbComment comment) async {
     /// cache ibAnswer
     final IbAnswer? ibAnswer;
-    if (answerMap[comment.uid] == null ||
-        comment.uid == IbUtils.getCurrentUid()) {
+    if (answerMap[comment.uid] == null) {
       ibAnswer = await IbQuestionDbService()
           .querySingleIbAnswer(comment.uid, comment.questionId);
+      print('retrieveIbAnswer from new');
       if (ibAnswer != null) {
         answerMap[comment.uid] = ibAnswer;
       }

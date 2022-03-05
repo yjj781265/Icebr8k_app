@@ -100,29 +100,31 @@ class ReviewQuestionPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Obx(
-                    () => SwitchListTile(
-                      tileColor: Theme.of(context).primaryColor,
-                      value: itemController.rxIbQuestion.value.isQuiz,
-                      onChanged: (value) {
-                        if (value) {
-                          itemController.rxIsExpanded.value = true;
-                          ShowCaseWidget.of(context)!.startShowCase(
-                              [IbShowCaseManager.kPickAnswerForQuizKey]);
-                        } else {
-                          itemController.rxIbQuestion.value.correctChoiceId =
-                              '';
-                        }
-                        itemController.rxIbQuestion.value.isQuiz = value;
-                        itemController.rxIbQuestion.refresh();
-                      },
-                      title: const Text('Quiz'),
-                      secondary: const Icon(
-                        FontAwesomeIcons.question,
-                        color: IbColors.accentColor,
+                  if (!itemController.rxIbQuestion.value.questionType
+                      .contains('sc'))
+                    Obx(
+                      () => SwitchListTile(
+                        tileColor: Theme.of(context).primaryColor,
+                        value: itemController.rxIbQuestion.value.isQuiz,
+                        onChanged: (value) {
+                          if (value) {
+                            itemController.rxIsExpanded.value = true;
+                            ShowCaseWidget.of(context)!.startShowCase(
+                                [IbShowCaseManager.kPickAnswerForQuizKey]);
+                          } else {
+                            itemController.rxIbQuestion.value.correctChoiceId =
+                                '';
+                          }
+                          itemController.rxIbQuestion.value.isQuiz = value;
+                          itemController.rxIbQuestion.refresh();
+                        },
+                        title: const Text('Quiz'),
+                        secondary: const Icon(
+                          FontAwesomeIcons.question,
+                          color: IbColors.accentColor,
+                        ),
                       ),
                     ),
-                  ),
                   ListTile(
                     tileColor: Theme.of(context).primaryColor,
                     trailing: const Text('ALL'),
@@ -171,6 +173,7 @@ class ReviewQuestionPage extends StatelessWidget {
     if (itemController.rxIbQuestion.value.questionType == IbQuestion.kPic) {
       return IbPicQuestionCard(itemController);
     }
+
     return IbScQuestionCard(
       itemController,
     );

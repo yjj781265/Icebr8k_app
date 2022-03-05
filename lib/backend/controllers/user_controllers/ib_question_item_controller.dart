@@ -131,12 +131,16 @@ class IbQuestionItemController extends GetxController {
     if (_timer == null &&
         rxIbQuestion.value.endTimeInMs >=
             DateTime.now().millisecondsSinceEpoch &&
-        DateTime.now()
-                .difference(DateTime.fromMillisecondsSinceEpoch(
-                    rxIbQuestion.value.endTimeInMs))
+        DateTime.fromMillisecondsSinceEpoch(rxIbQuestion.value.endTimeInMs)
+                .difference(DateTime.now())
                 .inMinutes <=
             5) {
       Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (rxIbQuestion.value.endTimeInMs <
+            DateTime.now().millisecondsSinceEpoch) {
+          timer.cancel();
+        }
+        print('${rxIbQuestion.value.question} tick tok');
         rxIbQuestion.refresh();
       });
     }
@@ -284,6 +288,14 @@ class IbQuestionItemController extends GetxController {
       choiceUserMap[rxIbQuestion.value.choices
               .firstWhere((element) => element.choiceId == ibAnswer.choiceId)] =
           updatedSet;
+
+      // update cachedCommentItems
+      for (final item in cachedCommentItems) {
+        if (item.user.id == ibAnswer.uid) {
+          item.ibAnswer = ibAnswer;
+        }
+      }
+
       await generatePollStats();
       rxIbAnswer = ibAnswer.obs;
       voted.value = true;
@@ -296,6 +308,8 @@ class IbQuestionItemController extends GetxController {
       rxIbAnswer!.refresh();
       rxIbQuestion.refresh();
       choiceUserMap.refresh();
+      countMap.refresh();
+      cachedCommentItems.refresh();
     }
   }
 

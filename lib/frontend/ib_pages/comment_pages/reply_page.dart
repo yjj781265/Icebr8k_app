@@ -1,12 +1,12 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -169,8 +169,7 @@ class ReplyPage extends StatelessWidget {
                             fontSize: IbConfig.kNormalTextSize),
                       ),
                       if (item.ibAnswer != null)
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
+                        Wrap(
                           children: [
                             const Text(
                               'Vote: ',
@@ -357,20 +356,75 @@ class ReplyPage extends StatelessWidget {
       return const SizedBox();
     }
 
-    if (_controller.commentController.questionType.value == IbQuestion.kPic) {
-      final String url = _controller.commentController.choices
-          .firstWhere((element) => element.choiceId == item.ibAnswer!.choiceId)
-          .url!;
-      return InkWell(
-        onTap: () {
-          Get.to(() => IbMediaViewer(urls: [url], currentIndex: 0),
-              transition: Transition.zoom);
-        },
-        child: ClipRRect(
-          borderRadius: const BorderRadius.all(Radius.circular(8)),
-          child: CachedNetworkImage(
-              width: 30, height: 30, fit: BoxFit.fill, imageUrl: url),
+    final IbChoice ibChoice = _controller.commentController.choices
+        .firstWhere((element) => element.choiceId == item.ibAnswer!.choiceId);
+
+    if (_controller.commentController.questionType.value ==
+        IbQuestion.kScaleOne) {
+      return RatingBar.builder(
+        initialRating: double.parse(ibChoice.content ?? '0'),
+        ignoreGestures: true,
+        itemSize: 20,
+        itemBuilder: (context, _) => const Icon(
+          Icons.star,
+          color: Colors.amber,
         ),
+        onRatingUpdate: (rating) {},
+      );
+    }
+
+    if (_controller.commentController.questionType.value ==
+        IbQuestion.kScaleTwo) {
+      return RatingBar.builder(
+        initialRating: double.parse(ibChoice.content ?? '0'),
+        ignoreGestures: true,
+        itemSize: 20,
+        itemBuilder: (context, _) => const Icon(
+          Icons.favorite,
+          color: Colors.red,
+        ),
+        onRatingUpdate: (rating) {},
+      );
+    }
+
+    if (_controller.commentController.questionType.value ==
+        IbQuestion.kScaleThree) {
+      return RatingBar.builder(
+        initialRating: double.parse(ibChoice.content ?? '0'),
+        ignoreGestures: true,
+        itemSize: 20,
+        itemBuilder: (context, index) {
+          switch (index) {
+            case 0:
+              return const Icon(
+                Icons.sentiment_very_dissatisfied,
+                color: Colors.red,
+              );
+            case 1:
+              return const Icon(
+                Icons.sentiment_dissatisfied,
+                color: Colors.redAccent,
+              );
+            case 2:
+              return const Icon(
+                Icons.sentiment_neutral,
+                color: Colors.amber,
+              );
+            case 3:
+              return const Icon(
+                Icons.sentiment_satisfied,
+                color: Colors.lightGreen,
+              );
+            case 4:
+              return const Icon(
+                Icons.sentiment_very_satisfied,
+                color: Colors.green,
+              );
+            default:
+              return const SizedBox();
+          }
+        },
+        onRatingUpdate: (rating) {},
       );
     }
 
