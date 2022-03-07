@@ -1,982 +1,187 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
-import 'package:icebr8k/backend/models/ib_friend.dart';
-import 'package:icebr8k/backend/models/ib_question.dart';
-import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_description_text.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_emo_pic_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import '../../backend/controllers/user_controllers/answered_question_controller.dart';
-import '../../backend/controllers/user_controllers/asked_questions_controller.dart';
-import '../../backend/controllers/user_controllers/chat_page_controller.dart';
-import '../../backend/controllers/user_controllers/common_answers_controller.dart';
-import '../../backend/controllers/user_controllers/different_answers_controller.dart';
-import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
-import '../../backend/controllers/user_controllers/profile_controller.dart';
+class ProfilePage extends StatelessWidget {
+  final ProfileController _controller;
 
-class ProfilePage extends StatefulWidget {
-  final String uid;
-  final bool showAppBar;
-  const ProfilePage(this.uid, {Key? key, this.showAppBar = false})
-      : super(key: key);
-
-  @override
-  _ProfilePageState createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends State<ProfilePage>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  late AnsweredQuestionController _answeredQuestionController;
-  late AskedQuestionsController _createdQuestionController;
-  late CommonAnswersController _commonAnswersController;
-  late DifferentAnswersController _uncommonAnswersController;
-  late ProfileController _profileController;
-  late MainPageController _homeController;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _profileController =
-        Get.put(ProfileController(widget.uid), tag: widget.uid);
-    _createdQuestionController =
-        Get.put(AskedQuestionsController(widget.uid), tag: widget.uid);
-
-    if (widget.uid == IbUtils.getCurrentUid()) {
-      _answeredQuestionController =
-          Get.put(AnsweredQuestionController(widget.uid), tag: widget.uid);
-      _homeController = Get.find();
-    } else {
-      _commonAnswersController =
-          Get.put(CommonAnswersController(widget.uid), tag: widget.uid);
-      _uncommonAnswersController =
-          Get.put(DifferentAnswersController(widget.uid), tag: widget.uid);
-    }
-
-    _tabController = TabController(
-        vsync: this, length: _profileController.isMe.isTrue ? 2 : 3);
-    IbUtils.hideKeyboard();
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+  const ProfilePage(this._controller);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: widget.showAppBar
-          ? AppBar(
-              title: Obx(() => Text(
-                    _profileController.username.value,
-                  )),
-            )
-          : null,
-      body: Obx(() {
-        if (_profileController.isLoading.isTrue) {
-          return const Center(child: IbProgressIndicator());
-        }
-        return const SizedBox();
-      }),
-    );
-  }
-
-  /* ExtendedNestedScrollView buildExtendedNestedScrollView() {
-    return ExtendedNestedScrollView(
-      onlyOneScrollInBody: true,
-      dragStartBehavior: DragStartBehavior.down,
-      headerSliverBuilder: (context, value) {
-        return [
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Stack(
-                  clipBehavior: Clip.none,
-                  alignment: Alignment.bottomLeft,
-                  children: [
-                    ///cover photo
-                    Obx(
-                      () => GestureDetector(
-                        onTap: () {
-                          if (_profileController.isMe.isFalse) {
-                            return;
-                          }
-                          showCoverPhotoBottomSheet(context);
-                        },
-                        child: AspectRatio(
-                            aspectRatio: 16 / 9, child: handleCoverPhoto()),
-                      ),
-                    ),
-
-                    /// avatar
-               */ /*     Obx(
-                      () => Positioned(
-                        left: 16,
-                        bottom: -40,
-                        child: IbUserAvatar(
-                            disableOnTap: true,
-                            radius: 40,
-                            uid: widget.uid,
-                            avatarUrl: _profileController.isMe.isTrue
-                                ? _homeController.currentIbAvatarUrl.value
-                                : _profileController.avatarUrl.value),
-                      ),
-                    ),*/ /*
-                  ],
-                ),
-
-                /// name info
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 40, left: 16),
-                        child: Obx(
-                          () => Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  '#${_profileController.isMe.isTrue ? _homeController.currentIbUsername.value : _profileController.username.value}',
-                                  style: const TextStyle(
-                                      fontSize: IbConfig.kPageTitleSize,
-                                      fontWeight: FontWeight.bold)),
-                          */ /*    Text(
-                                _profileController.isMe.isTrue
-                                    ? _homeController.currentIbName.value
-                                    : _profileController.name.value,
-                                style: const TextStyle(
-                                    fontSize: IbConfig.kNormalTextSize),
-                              ),*/ /*
-                              if (_profileController.isMe.isFalse)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'match_interests'.tr,
-                                      style: const TextStyle(
-                                          fontSize: IbConfig.kNormalTextSize,
-                                          fontWeight: FontWeight.w800),
-                                    ),
-                                    IbLinearIndicator(
-                                      endValue:
-                                          _profileController.compScore.value,
-                                    ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    /// questions stats
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: Obx(
-                          () => Wrap(
-                            children: [
-                           */ /*   IbStats(
-                                  title: 'Answered',
-                                  num: _profileController.isMe.isTrue
-                                      ? _homeController.answeredSize.value
-                                      : _profileController.totalAnswered.value),
-                              IbStats(
-                                  title: 'Asked',
-                                  num: _profileController.isMe.isTrue
-                                      ? _homeController.askedSize.value
-                                      : _profileController.totalAsked.value),*/ /*
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-
-                if (_profileController.isMe.isFalse &&
-                    _profileController.description.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      //1
+      body: CustomScrollView(
+        slivers: <Widget>[
+          //2
+          SliverAppBar(
+            expandedHeight: 250.0,
+            collapsedHeight: 100,
+            actions: [
+              IconButton(onPressed: () {}, icon: Icon(Icons.message_rounded)),
+              IconButton(onPressed: () {}, icon: Icon(Icons.person_add)),
+              IconButton(onPressed: () {}, icon: Icon(Icons.cloud)),
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              titlePadding: EdgeInsets.all(8),
+              title: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
                     child: Obx(
-                      () => IbDescriptionText(
-                          text: _profileController.description.value),
-                    ),
-                  ),
-                if (_profileController.isMe.isTrue)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Obx(
-                      () => IbDescriptionText(
-                          text: _homeController.currentBio.value),
-                    ),
-                  ),
-
-                if (_profileController.isMe.isFalse) _buildActionButtons(),
-
-                const SizedBox(
-                  height: 16,
-                ),
-              ],
-            ),
-          ),
-          SliverOverlapAbsorber(
-            handle: ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
-                context),
-            sliver: SliverPersistentHeader(
-                pinned: true,
-                delegate: PersistentHeader(
-                  height: 32,
-                  widget: Obx(
-                    () => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: TabBar(
-                        isScrollable: true,
-                        controller: _tabController,
-                        tabs: [
-                          if (_profileController.isMe.isTrue)
-                            Tab(
-                                text:
-                                    'Answered Questions(${_homeController.answeredSize.value})'),
-                          if (_profileController.isMe.isFalse)
-                            Tab(
-                                text:
-                                    'Common Answers(${_commonAnswersController.ibQuestions.length})'),
-                          if (_profileController.isMe.isFalse)
-                            Tab(
-                                text:
-                                    'Different Answers(${_uncommonAnswersController.ibQuestions.length})'),
-                          Tab(
-                              text:
-                                  'Asked Questions(${_profileController.isMe.isTrue ? _homeController.askedSize.value : _profileController.totalAsked.value})'),
-                        ],
-                        labelStyle:
-                            const TextStyle(fontWeight: FontWeight.bold),
-                        indicatorColor: _tabController.length == 1
-                            ? Colors.transparent
-                            : IbColors.primaryColor,
+                      () => IbUserAvatar(
+                        radius: 40,
+                        avatarUrl: _controller.avatarUrl.value,
+                        compScore: 0.32,
                       ),
                     ),
-                  ),
-                )),
-          ),
-        ];
-      },
-      body: Padding(
-        padding: const EdgeInsets.only(top: 40.0),
-        child: TabBarView(
-          controller: _tabController,
-          children: [
-            if (_profileController.isMe.isTrue) buildAnsweredQTab(),
-            if (_profileController.isMe.isFalse) buildCommonAnswersTab(),
-            if (_profileController.isMe.isFalse) buildUncommonAnswersTab(),
-            buildAskedTab(),
-          ],
-        ),
-      ),
-    );
-  }*/
-
-/*  Widget handleCoverPhoto() {
-    if (_profileController.isMe.isTrue) {
-      final Widget coverPhoto = _homeController.currentIbCoverPhotoUrl.isEmpty
-          ? Image.asset(
-              'assets/images/default_cover_photo.jpeg',
-              fit: BoxFit.cover,
-            )
-          : CachedNetworkImage(
-              progressIndicatorBuilder: (context, value, progress) {
-                if (progress.progress == null) {
-                  return const SizedBox();
-                }
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    IbProgressIndicator(),
-                    Text('rendering cover photo...'),
-                  ],
-                );
-              },
-              fit: BoxFit.fitHeight,
-              imageUrl: _homeController.currentIbCoverPhotoUrl.value,
-            );
-      return Stack(
-        fit: StackFit.expand,
-        children: [
-          coverPhoto,
-          Positioned(
-            right: 8,
-            bottom: 8,
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Theme.of(context).primaryColor,
-              ),
-              child: const Padding(
-                padding: EdgeInsets.all(3.0),
-                child: Icon(
-                  Icons.edit_outlined,
-                  size: 16,
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-
-    return _profileController.coverPhotoUrl.isEmpty
-        ? Image.asset(
-            'assets/images/default_cover_photo.jpeg',
-            fit: BoxFit.cover,
-          )
-        : CachedNetworkImage(
-            fit: BoxFit.fitHeight,
-            imageUrl: _profileController.coverPhotoUrl.value,
-          );
-  }*/
-
-  Widget buildAnsweredQTab() {
-    return AnsweredQTab(
-        answeredQuestionController: _answeredQuestionController,
-        widget: widget);
-  }
-
-  Widget buildAskedTab() {
-    return AskedQTab(
-        createdQuestionController: _createdQuestionController, widget: widget);
-  }
-
-  Widget buildCommonAnswersTab() {
-    final refreshController = RefreshController();
-    return CommonAnswersTab(
-        refreshController: refreshController,
-        commonAnswersController: _commonAnswersController,
-        widget: widget);
-  }
-
-  Widget buildUncommonAnswersTab() {
-    final refreshController = RefreshController();
-    return DifferentAnswersTab(
-        refreshController: refreshController,
-        uncommonAnswersController: _uncommonAnswersController,
-        widget: widget);
-  }
-
-  Widget _buildActionButtons() {
-    return Obx(
-      () => Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              IbActionButton(
-                text: 'Message',
-                iconData: Icons.message_outlined,
-                color: IbColors.primaryColor,
-                onPressed: () {
-                  final List<String> memberUids = [
-                    IbUtils.getCurrentUid()!,
-                    widget.uid
-                  ];
-                  Get.to(() => ChatPage(Get.put(ChatPageController(memberUids),
-                      tag: memberUids.toString())));
-                },
-              ),
-              if (_profileController.friendshipStatus.value.isEmpty)
-                IbActionButton(
-                  text: 'Add Friend',
-                  iconData: Icons.person_add_alt_1_outlined,
-                  color: IbColors.accentColor,
-                  onPressed: () => showFriendRequestDialog(),
-                )
-              else if (_profileController.friendshipStatus.value ==
-                  IbFriend.kFriendshipStatusAccepted)
-                IbActionButton(
-                  text: 'Unfriend',
-                  iconData: Icons.person_remove_alt_1_outlined,
-                  color: IbColors.errorRed,
-                  onPressed: () => _profileController.unfriend(),
-                )
-              else if (_profileController.friendshipStatus.value ==
-                  IbFriend.kFriendshipStatusRequestSent)
-                IbActionButton(
-                  text: 'Cancel Request',
-                  iconData: Icons.cancel_outlined,
-                  color: Colors.orangeAccent,
-                  onPressed: () => _profileController.unfriend(),
-                )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void showFriendRequestDialog() {
-    final Widget dialog = IbCard(
-        child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'friend_request_dialog_title'.trParams(
-              {'username': _profileController.username.value},
-            ),
-            style: const TextStyle(
-                fontSize: IbConfig.kNormalTextSize,
-                fontWeight: FontWeight.bold),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: IbUserAvatar(
-                  avatarUrl: _profileController.avatarUrl.value,
-                  uid: _profileController.uid,
-                  radius: 32,
-                ),
-              ),
-              Expanded(
-                child: TextField(
-                  textInputAction: TextInputAction.done,
-                  maxLines: 3,
-                  onChanged: (requestMsg) {
-                    _profileController.requestMsg = requestMsg;
-                  },
-                  autofocus: true,
-                  style: const TextStyle(
-                    fontSize: IbConfig.kSecondaryTextSize,
-                  ),
-                  maxLength: IbConfig.kFriendRequestMsgMaxLength,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintStyle: const TextStyle(color: IbColors.lightGrey),
-                    hintText: 'friend_request_msg_hint'.tr,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                  child: IbElevatedButton(
-                onPressed: () {
-                  Get.back();
-                },
-                textTrKey: 'cancel',
-                color: IbColors.primaryColor,
-              )),
-              Expanded(
-                flex: 2,
-                child: IbElevatedButton(
-                  onPressed: () {
-                    _profileController.sendFriendRequest();
-                    Get.back();
-                    IbUtils.hideKeyboard();
-                  },
-                  textTrKey: 'send_friend_request',
-                ),
-              ),
-            ],
-          )
-        ],
-      ),
-    ));
-
-    Get.bottomSheet(dialog);
-  }
-
-  void showCoverPhotoBottomSheet(BuildContext context) {
-    final Widget options = ListView(
-      shrinkWrap: true,
-      children: [
-        InkWell(
-          onTap: () async {
-            Get.back();
-            final _picker = ImagePicker();
-            final XFile? pickedFile = await _picker.pickImage(
-              source: ImageSource.camera,
-              imageQuality: IbConfig.kImageQuality,
-            );
-
-            if (pickedFile != null) {
-              final File? file = await IbUtils.showImageCropper(pickedFile.path,
-                  lockAspectRatio: true,
-                  minimumAspectRatio: 16 / 9,
-                  resetAspectRatioEnabled: false,
-                  initAspectRatio: CropAspectRatioPreset.ratio16x9,
-                  ratios: <CropAspectRatioPreset>[
-                    CropAspectRatioPreset.ratio16x9
-                  ],
-                  cropStyle: CropStyle.rectangle);
-
-              if (file != null) {
-                _profileController.updateCoverPhoto(file.path);
-              }
-            }
-          },
-          child: Ink(
-            color: Theme.of(context).primaryColor,
-            height: 56,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.camera_alt_outlined,
-                    color: IbColors.primaryColor,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text('Take a photo',
-                      style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
-                ],
-              ),
-            ),
-          ),
-        ),
-        InkWell(
-          onTap: () async {
-            Get.back();
-            final _picker = ImagePicker();
-            final XFile? pickedFile = await _picker.pickImage(
-              source: ImageSource.gallery,
-              imageQuality: IbConfig.kImageQuality,
-            );
-
-            if (pickedFile != null) {
-              final File? file = await IbUtils.showImageCropper(pickedFile.path,
-                  lockAspectRatio: true,
-                  minimumAspectRatio: 16 / 9,
-                  resetAspectRatioEnabled: false,
-                  initAspectRatio: CropAspectRatioPreset.ratio16x9,
-                  ratios: <CropAspectRatioPreset>[
-                    CropAspectRatioPreset.ratio16x9
-                  ],
-                  cropStyle: CropStyle.rectangle);
-
-              if (file != null) {
-                _profileController.updateCoverPhoto(file.path);
-              }
-            }
-          },
-          child: Ink(
-            color: Theme.of(context).primaryColor,
-            height: 56,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.photo_album_outlined,
-                    color: IbColors.errorRed,
-                  ),
-                  SizedBox(
-                    width: 8,
+                    onTap: () {
+                      Get.to(
+                          () => IbMediaViewer(
+                              urls: [IbUtils.getCurrentIbUser()!.avatarUrl],
+                              currentIndex: 0),
+                          transition: Transition.zoom);
+                    },
                   ),
                   Text(
-                    'Choose from gallery',
-                    style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                    IbUtils.getCurrentIbUser()!.username,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
+                ],
+              ),
+              background: Image.asset(
+                'assets/images/default_cover_photo.jpeg',
+                fit: BoxFit.fill,
+              ),
+            ),
+          ),
+
+          /// poll stats
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+                      color: Theme.of(context).backgroundColor,
+                    ),
+                    width: 120,
+                    height: 120 / 1.618,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Obx(() => Text(
+                              IbUtils.getStatsString(
+                                  _controller.answeredSize.value),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: IbConfig.kPageTitleSize),
+                            )),
+                        const Text('ANSWERED')
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 8,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+                      color: Theme.of(context).backgroundColor,
+                    ),
+                    width: 120,
+                    height: 120 / 1.618,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Obx(() => Text(
+                              IbUtils.getStatsString(
+                                  _controller.askedSize.value),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: IbConfig.kPageTitleSize),
+                            )),
+                        const Text('ASKED')
+                      ],
+                    ),
+                  )
                 ],
               ),
             ),
           ),
-        ),
-      ],
-    );
 
-    Get.bottomSheet(SafeArea(child: options));
-  }
-}
-
-class CommonAnswersTab extends StatefulWidget {
-  const CommonAnswersTab({
-    Key? key,
-    required this.refreshController,
-    required CommonAnswersController commonAnswersController,
-    required this.widget,
-  })  : _commonAnswersController = commonAnswersController,
-        super(key: key);
-
-  final RefreshController refreshController;
-  final CommonAnswersController _commonAnswersController;
-  final ProfilePage widget;
-
-  @override
-  State<CommonAnswersTab> createState() => _CommonAnswersTabState();
-}
-
-class _CommonAnswersTabState extends State<CommonAnswersTab>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-
-    return Obx(
-      () {
-        if (widget._commonAnswersController.isLoading.isTrue) {
-          return const Center(
-            child: IbProgressIndicator(),
-          );
-        }
-        return SmartRefresher(
-          footer: const ClassicFooter(
-            textStyle: TextStyle(color: IbColors.primaryColor),
-            failedIcon: Icon(
-              Icons.error_outline,
-              color: IbColors.errorRed,
-            ),
-            loadStyle: LoadStyle.HideAlways,
-            loadingIcon: IbProgressIndicator(
-              width: 24,
-              height: 24,
-              padding: 0,
-            ),
-          ),
-          controller: widget.refreshController,
-          enablePullDown: false,
-          enablePullUp: true,
-          onLoading: () async {
-            if (widget._commonAnswersController.lastIndex == 0) {
-              widget.refreshController.loadNoData();
-              return;
-            }
-
-            await widget._commonAnswersController.loadMore();
-            widget.refreshController.loadComplete();
-          },
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              final IbQuestion item =
-                  widget._commonAnswersController.ibQuestions[index];
-              final tag = 'common_${item.id}';
-              late IbQuestionItemController _controller;
-              if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
-                _controller = Get.find(tag: tag);
-              } else {
-                _controller = Get.put(
-                    IbQuestionItemController(
-                      ibAnswers: widget._commonAnswersController
-                          .retrieveAnswers(item.id),
-                      rxIsExpanded: false.obs,
-                      rxIbQuestion: item.obs,
+          /// user info
+          SliverToBoxAdapter(
+            child: Obx(
+              () => Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 16,
                     ),
-                    tag: tag);
-                _controller.rxIsExpanded.value = index == 0;
-              }
-
-              return IbMcQuestionCard(_controller);
-            },
-            itemCount: widget._commonAnswersController.ibQuestions.length,
-          ),
-        );
-      },
-    );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-}
-
-class DifferentAnswersTab extends StatefulWidget {
-  const DifferentAnswersTab({
-    Key? key,
-    required this.refreshController,
-    required DifferentAnswersController uncommonAnswersController,
-    required this.widget,
-  })  : _uncommonAnswersController = uncommonAnswersController,
-        super(key: key);
-
-  final RefreshController refreshController;
-  final DifferentAnswersController _uncommonAnswersController;
-  final ProfilePage widget;
-
-  @override
-  State<DifferentAnswersTab> createState() => _DifferentAnswersTabState();
-}
-
-class _DifferentAnswersTabState extends State<DifferentAnswersTab>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return Obx(
-      () {
-        if (widget._uncommonAnswersController.isLoading.isTrue) {
-          return const Center(
-            child: IbProgressIndicator(),
-          );
-        }
-
-        return SmartRefresher(
-          footer: const ClassicFooter(
-            textStyle: TextStyle(color: IbColors.primaryColor),
-            loadStyle: LoadStyle.HideAlways,
-            failedIcon: Icon(
-              Icons.error_outline,
-              color: IbColors.errorRed,
-            ),
-            loadingIcon: IbProgressIndicator(
-              width: 24,
-              height: 24,
-              padding: 0,
-            ),
-          ),
-          controller: widget.refreshController,
-          enablePullDown: false,
-          enablePullUp: true,
-          onLoading: () async {
-            if (widget._uncommonAnswersController.lastIndex == 0) {
-              widget.refreshController.loadNoData();
-              return;
-            }
-
-            await widget._uncommonAnswersController.loadMore();
-            widget.refreshController.loadComplete();
-          },
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              final IbQuestion item =
-                  widget._uncommonAnswersController.ibQuestions[index];
-              final tag = 'uncommon_${item.id}';
-              late IbQuestionItemController _controller;
-
-              if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
-                _controller = Get.find(tag: tag);
-              } else {
-                _controller = Get.put(
-                    IbQuestionItemController(
-                      rxIsExpanded: false.obs,
-                      ibAnswers: widget._uncommonAnswersController
-                          .retrieveAnswers(item.id),
-                      rxIbQuestion: item.obs,
+                    Text(
+                      _controller.name.value,
+                      style:
+                          const TextStyle(fontSize: IbConfig.kNormalTextSize),
                     ),
-                    tag: tag);
-                _controller.rxIsExpanded.value = index == 0;
-              }
-              return IbMcQuestionCard(_controller);
-            },
-            itemCount: widget._uncommonAnswersController.ibQuestions.length,
-          ),
-        );
-      },
-    );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-}
-
-class AskedQTab extends StatefulWidget {
-  const AskedQTab({
-    Key? key,
-    required AskedQuestionsController createdQuestionController,
-    required this.widget,
-  })  : _createdQuestionController = createdQuestionController,
-        super(key: key);
-
-  final AskedQuestionsController _createdQuestionController;
-  final ProfilePage widget;
-
-  @override
-  State<AskedQTab> createState() => _AskedQTabState();
-}
-
-class _AskedQTabState extends State<AskedQTab>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return Obx(
-      () {
-        if (widget._createdQuestionController.isLoading.isTrue) {
-          return const Center(
-            child: IbProgressIndicator(),
-          );
-        }
-        return SmartRefresher(
-          footer: const ClassicFooter(
-            textStyle: TextStyle(color: IbColors.primaryColor),
-            loadStyle: LoadStyle.HideAlways,
-            failedIcon: Icon(
-              Icons.error_outline,
-              color: IbColors.errorRed,
-            ),
-            loadingIcon: IbProgressIndicator(
-              width: 24,
-              height: 24,
-              padding: 0,
+                    IbDescriptionText(text: _controller.bio.value),
+                  ],
+                ),
+              ),
             ),
           ),
-          controller: widget._createdQuestionController.refreshController,
-          enablePullDown: false,
-          enablePullUp: true,
-          onLoading: () async {
-            await widget._createdQuestionController.loadMore();
-          },
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              final IbQuestion item =
-                  widget._createdQuestionController.createdQuestions[index];
-              final tag = "${item.id}${widget.widget.uid}";
-              late IbQuestionItemController _controller;
-              if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
-                _controller = Get.find(tag: tag);
-              } else {
-                _controller = Get.put(
-                    IbQuestionItemController(
-                      rxIbQuestion: item.obs,
-                      rxIsExpanded: false.obs,
+
+          /// emoPics
+          SliverToBoxAdapter(
+            child: Obx(() => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        'My EmoPics',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: IbConfig.kPageTitleSize),
+                      ),
                     ),
-                    tag: tag);
-                _controller.rxIsExpanded.value = index == 0;
-              }
-
-              return IbMcQuestionCard(_controller);
-            },
-            itemCount:
-                widget._createdQuestionController.createdQuestions.length,
-          ),
-        );
-      },
-    );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-}
-
-class AnsweredQTab extends StatefulWidget {
-  const AnsweredQTab({
-    Key? key,
-    required AnsweredQuestionController answeredQuestionController,
-    required this.widget,
-  })  : _answeredQuestionController = answeredQuestionController,
-        super(key: key);
-
-  final AnsweredQuestionController _answeredQuestionController;
-  final ProfilePage widget;
-
-  @override
-  State<AnsweredQTab> createState() => _AnsweredQTabState();
-}
-
-class _AnsweredQTabState extends State<AnsweredQTab>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return Obx(
-      () {
-        if (widget._answeredQuestionController.isLoading.isTrue) {
-          return const Center(
-            child: IbProgressIndicator(),
-          );
-        }
-
-        return SmartRefresher(
-          footer: const ClassicFooter(
-            loadStyle: LoadStyle.HideAlways,
-            textStyle: TextStyle(color: IbColors.primaryColor),
-            failedIcon: Icon(
-              Icons.error_outline,
-              color: IbColors.errorRed,
-            ),
-            loadingIcon: IbProgressIndicator(
-              width: 24,
-              height: 24,
-              padding: 0,
-            ),
-          ),
-          controller: widget._answeredQuestionController.refreshController,
-          enablePullDown: false,
-          enablePullUp: true,
-          onLoading: () async {
-            print('loading...');
-            await widget._answeredQuestionController.loadMore();
-          },
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              final AnsweredQuestionItem item =
-                  widget._answeredQuestionController.myAnsweredQuestions[index];
-
-              final tag = "${item.ibQuestion.id}${IbUtils.getCurrentUid()}";
-              late IbQuestionItemController _controller;
-              if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
-                _controller = Get.find(tag: tag);
-              } else {
-                _controller = Get.put(
-                    IbQuestionItemController(
-                      rxIbAnswer: item.ibAnswer.obs,
-                      rxIbQuestion: item.ibQuestion.obs,
-                      rxIsExpanded: false.obs,
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: _controller.emoPics
+                            .map((element) => IbEmoPicCard(
+                                  emoPic: element,
+                                  ignoreOnDoubleTap: true,
+                                  onTap: () {
+                                    Get.to(
+                                        () => IbMediaViewer(
+                                              urls: [element.url],
+                                              currentIndex: 0,
+                                              heroTag: element.id,
+                                            ),
+                                        transition: Transition.noTransition);
+                                  },
+                                ))
+                            .toList(),
+                      ),
                     ),
-                    tag: tag);
-                _controller.rxIsExpanded.value = index == 0;
-              }
-
-              return IbMcQuestionCard(_controller);
-            },
-            itemCount:
-                widget._answeredQuestionController.myAnsweredQuestions.length,
+                  ],
+                )),
           ),
-        );
-      },
+        ],
+      ),
     );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-}
-
-class PersistentHeader extends SliverPersistentHeaderDelegate {
-  final Widget widget;
-  double height;
-
-  PersistentHeader({required this.widget, this.height = 48});
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return SizedBox(height: height, child: widget);
-  }
-
-  @override
-  double get maxExtent => height;
-
-  @override
-  double get minExtent => height;
-
-  @override
-  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
-    return true;
   }
 }

@@ -31,13 +31,22 @@ class SetupController extends GetxController {
   void onInit() {
     super.onInit();
     emoPics.add(IbEmoPic(
-        url: '', emoji: "😃", id: IbUtils.getUniqueId(), description: "Happy"));
+        url: '',
+        emoji: "😃",
+        id: IbUtils.getUniqueId(),
+        description: "Happy face"));
     emoPics.add(
       IbEmoPic(
-          url: '', emoji: "☹", id: IbUtils.getUniqueId(), description: "Sad"),
+          url: '',
+          emoji: "☹",
+          id: IbUtils.getUniqueId(),
+          description: "Sad face"),
     );
     emoPics.add(IbEmoPic(
-        url: '', emoji: "😱", id: IbUtils.getUniqueId(), description: 'Wow'));
+        url: '',
+        emoji: "😱",
+        id: IbUtils.getUniqueId(),
+        description: 'Wow face'));
   }
 
   @override

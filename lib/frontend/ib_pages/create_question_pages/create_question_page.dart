@@ -10,8 +10,8 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_mc_pic_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_mc_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_sc_tab.dart';
-import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_persistent_header.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../../backend/controllers/user_controllers/create_question_controller.dart';
@@ -152,7 +152,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                             context),
                     sliver: SliverPersistentHeader(
                       pinned: true,
-                      delegate: PersistentHeader(
+                      delegate: IbPersistentHeader(
                         widget: IbCard(
                           child: TabBar(
                             controller: _tabController,

@@ -38,12 +38,11 @@ class _IbMediaSlideState extends State<IbMediaSlide>
       return const SizedBox();
     }
     return Center(
-      child: Stack(
-        alignment: Alignment.center,
+      child: Column(
         children: [
           Container(
-            decoration: const BoxDecoration(
-              color: Colors.black,
+            decoration: BoxDecoration(
+              color: Theme.of(context).backgroundColor,
             ),
             height: (Get.width * 0.88) / 1.618,
             width: Get.width * 0.88,
@@ -54,17 +53,9 @@ class _IbMediaSlideState extends State<IbMediaSlide>
                 }).toList()),
           ),
           if (widget.medias.length > 1)
-            Positioned(
-              bottom: 3,
-              child: Container(
-                decoration: BoxDecoration(
-                    color: Theme.of(context).backgroundColor.withOpacity(0.88),
-                    borderRadius: const BorderRadius.all(Radius.circular(8))),
-                child: TabPageSelector(
-                  indicatorSize: 8,
-                  controller: controller,
-                ),
-              ),
+            TabPageSelector(
+              indicatorSize: 6,
+              controller: controller,
             ),
         ],
       ),

@@ -311,7 +311,7 @@ class CommentItemWidget extends StatelessWidget {
                                           FontAwesomeIcons.thumbsUp,
                                           color: item.isLiked
                                               ? IbColors.errorRed
-                                              : null,
+                                              : IbColors.lightGrey,
                                           size: 16,
                                         ),
                                         label: Text(

@@ -12,22 +12,26 @@ import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 class IbEmoPicCard extends StatelessWidget {
   final IbEmoPic emoPic;
   final Function? onTap;
+  final bool ignoreOnDoubleTap;
 
-  const IbEmoPicCard({required this.emoPic, this.onTap});
+  const IbEmoPicCard(
+      {required this.emoPic, this.onTap, this.ignoreOnDoubleTap = false});
 
   @override
   Widget build(BuildContext context) {
     return IbCard(
         child: SizedBox(
-      height: 290,
+      height: 160 * 1.618,
+      width: 160,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Stack(
             children: [
               if (emoPic.url.isEmpty)
                 Container(
                   width: 160,
-                  height: 260,
+                  height: 160 * 1.618 - 30,
                   decoration: const BoxDecoration(
                       color: IbColors.lightGrey,
                       borderRadius: BorderRadius.only(
@@ -47,7 +51,7 @@ class IbEmoPicCard extends StatelessWidget {
                       File(emoPic.url),
                       fit: BoxFit.cover,
                       width: 160,
-                      height: 260,
+                      height: 160 * 1.618 - 30,
                     ),
                   ),
                 ),
@@ -55,12 +59,14 @@ class IbEmoPicCard extends StatelessWidget {
                 Hero(
                   tag: emoPic.id,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        topRight: Radius.circular(8)),
                     child: CachedNetworkImage(
                       imageUrl: emoPic.url,
                       fit: BoxFit.cover,
                       width: 160,
-                      height: 260,
+                      height: 160 * 1.618 - 30,
                     ),
                   ),
                 ),
@@ -77,6 +83,10 @@ class IbEmoPicCard extends StatelessWidget {
                   color: Colors.transparent,
                   child: InkWell(
                     onDoubleTap: () {
+                      if (ignoreOnDoubleTap) {
+                        return;
+                      }
+
                       if (emoPic.url.isNotEmpty) {
                         Get.to(
                             () => IbMediaViewer(
@@ -100,19 +110,18 @@ class IbEmoPicCard extends StatelessWidget {
           ),
           Expanded(
               child: Center(
-            child: RichText(
-                overflow: TextOverflow.ellipsis,
-                text: TextSpan(
-                    text: emoPic.description,
-                    style: TextStyle(
-                        color: Theme.of(context).indicatorColor,
-                        fontSize: IbConfig.kPageTitleSize,
-                        fontWeight: FontWeight.bold),
-                    children: const [
-                      TextSpan(
-                          text: ' face',
-                          style: TextStyle(color: IbColors.lightGrey))
-                    ])),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: RichText(
+                  overflow: TextOverflow.ellipsis,
+                  text: TextSpan(
+                      text: emoPic.description,
+                      style: TextStyle(
+                          color: Theme.of(context).indicatorColor,
+                          fontSize: IbConfig.kNormalTextSize,
+                          fontWeight: FontWeight.bold),
+                      children: const [])),
+            ),
           )),
         ],
       ),

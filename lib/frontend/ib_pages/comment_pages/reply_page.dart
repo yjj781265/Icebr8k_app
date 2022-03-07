@@ -327,8 +327,8 @@ class ReplyPage extends StatelessWidget {
                               icon: Icon(
                                 FontAwesomeIcons.thumbsUp,
                                 color: _controller.isLiked.isTrue
-                                    ? IbColors.accentColor
-                                    : null,
+                                    ? IbColors.errorRed
+                                    : IbColors.lightGrey,
                                 size: 16,
                               ),
                               label: Text(

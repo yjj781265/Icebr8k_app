@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -23,18 +24,21 @@ class ProfileController extends GetxController {
   final username = ''.obs;
   final birthdateInMs = 0.obs;
   final name = ''.obs;
-  final description = ''.obs;
+  final bio = ''.obs;
   final isMe = false.obs;
   final compScore = 0.0.obs;
   final totalAsked = 0.obs;
   final totalAnswered = 0.obs;
   final friendshipStatus = ''.obs;
+  final emoPics = <IbEmoPic>[].obs;
+  final askedSize = 0.obs;
+  final answeredSize = 0.obs;
   StreamSubscription? friendStatusStream;
   ProfileController(this.uid);
 
   @override
   Future<void> onInit() async {
-    isMe.value = uid == IbUtils.getCurrentUid()!;
+    isMe.value = true;
     if (isMe.isFalse) {
       final String? status = await IbUserDbService()
           .queryFriendshipStatus(IbUtils.getCurrentUid()!, uid);
@@ -69,8 +73,11 @@ class ProfileController extends GetxController {
     coverPhotoUrl.value = user.coverPhotoUrl;
     username.value = user.username;
     name.value = '${user.fName} ${user.lName}';
-    description.value = user.bio;
+    bio.value = user.bio;
     birthdateInMs.value = user.birthdateInMs ?? -1;
+    askedSize.value = user.askedCount;
+    answeredSize.value = user.answeredCount;
+    emoPics.value = user.emoPics;
     isLoading.value = false;
     super.onInit();
   }

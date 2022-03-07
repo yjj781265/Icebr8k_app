@@ -1,15 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
-import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
-import 'package:lottie/lottie.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_persistent_header.dart';
 
-import '../../backend/controllers/user_controllers/chat_page_controller.dart';
 import '../../backend/controllers/user_controllers/chat_tab_controller.dart';
 
 class ChatTab extends StatelessWidget {
@@ -18,118 +13,65 @@ class ChatTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      if (_controller.isLoading.isTrue) {
-        return const Center(
-          child: IbProgressIndicator(),
-        );
-      }
-
-      if (_controller.chatTabItems.isEmpty) {
-        return Center(
-          child: SizedBox(
-              width: 230,
-              height: 230,
-              child: Lottie.asset('assets/images/business_chat.json')),
-        );
-      }
-
-      return ListView.builder(
-        itemBuilder: (context, index) {
-          final ChatTabItem item = _controller.chatTabItems[index];
-          return Material(
-            color: Theme.of(context).primaryColor,
-            child: InkWell(
-              onTap: () {
-                Get.to(() => ChatPage(Get.put(
-                    ChatPageController(item.memberUids,
-                        chatRoomId: item.chatRoomId),
-                    tag: item.chatRoomId)));
-              },
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: IbUserAvatar(
-                      avatarUrl: item.ibUser!.avatarUrl,
-                      uid: item.ibUser!.id,
-                    ),
-                  ),
-                  Expanded(
-                      flex: 8,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              item.title,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: IbConfig.kNormalTextSize),
-                            ),
-                            Text(item.ibMessage.content,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: IbConfig.kSecondaryTextSize)),
-                          ],
-                        ),
-                      )),
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (item.ibMessage.timestamp != null)
-                            Text(
-                              IbUtils.getChatTabDateString(
-                                  (item.ibMessage.timestamp as Timestamp)
-                                      .toDate()),
-                              style: const TextStyle(
-                                  color: IbColors.lightGrey,
-                                  fontSize: IbConfig.kDescriptionTextSize),
-                            ),
-                          if (item.unReadCount == 0)
-                            const SizedBox(
-                              width: 16,
-                            )
-                          else
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: CircleAvatar(
-                                backgroundColor: IbColors.errorRed,
-                                radius: 11,
-                                child: Text(
-                                  item.unReadCount >= 99
-                                      ? '99+'
-                                      : item.unReadCount.toString(),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: IbColors.white,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                              ),
-                            )
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text('Chat'),
+        ),
+      ),
+      body: DefaultTabController(
+        length: 2,
+        child: ExtendedNestedScrollView(
+          onlyOneScrollInBody: true,
+          dragStartBehavior: DragStartBehavior.down,
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return [
+              SliverOverlapAbsorber(
+                handle: ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
+                    context),
+                sliver: SliverPersistentHeader(
+                  pinned: true,
+                  delegate: IbPersistentHeader(
+                    height: 38,
+                    widget: IbCard(
+                      elevation: 0,
+                      child: TabBar(
+                        tabs: [
+                          Tooltip(
+                              message: 'one_to_one_chat'.tr,
+                              child: const Tab(
+                                  height: 30,
+                                  icon: Icon(
+                                    Icons.person,
+                                  ))),
+                          Tooltip(
+                              message: 'group_chat'.tr,
+                              child: const Tab(
+                                  height: 30,
+                                  icon: Icon(
+                                    Icons.group,
+                                  ))),
                         ],
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              )
+            ];
+          },
+          body: const Padding(
+            padding: EdgeInsets.only(top: 38),
+            child: TabBarView(
+              children: [
+                Text('Chat'),
+                Text('Group'),
+              ],
             ),
-          );
-        },
-        itemCount: _controller.chatTabItems.length,
-      );
-    });
+          ),
+        ),
+      ),
+    );
   }
 }

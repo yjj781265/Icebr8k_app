@@ -473,6 +473,12 @@ class IbQuestionMcItem extends StatelessWidget {
       return;
     }
 
+    if (DateTime.now().millisecondsSinceEpoch >
+            _controller.rxIbQuestion.value.endTimeInMs &&
+        _controller.rxIbQuestion.value.endTimeInMs > 0) {
+      return;
+    }
+
     if (_controller.isSample ||
         (_controller.rxIbAnswer != null &&
             _controller.rxIbAnswer!.value.uid != IbUtils.getCurrentUid())) {

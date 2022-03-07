@@ -1,8 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
@@ -47,12 +45,12 @@ class IbUserAvatar extends StatelessWidget {
           onTap: (disableOnTap || uid == null || uid!.isEmpty)
               ? null
               : () {
-                  Get.to(
+                  /*  Get.to(
                       () => ProfilePage(
                             uid!,
                             showAppBar: true,
                           ),
-                      preventDuplicates: false);
+                      preventDuplicates: false);*/
                 },
           child: CachedNetworkImage(
             errorWidget: (context, str, value) => CircleAvatar(

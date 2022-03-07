@@ -7,6 +7,7 @@ class IbChatDbService {
   static final _ibChatDbService = IbChatDbService._();
   static final _db = FirebaseFirestore.instance;
   static const _kChatRoomCollection = 'IbChatRooms${DbConfig.dbSuffix}';
+  static const _kMessageSubCollection = 'IbMessages${DbConfig.dbSuffix}';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
 
   factory IbChatDbService() => _ibChatDbService;
@@ -22,7 +23,7 @@ class IbChatDbService {
       required List<String> uids}) {
     return _collectionRef
         .doc(chatRoomId)
-        .collection('Messages')
+        .collection(_kMessageSubCollection)
         .doc(messageId)
         .set(
             {'readUids': FieldValue.arrayUnion(uids)}, SetOptions(merge: true));
@@ -44,7 +45,7 @@ class IbChatDbService {
       String chatRoomId) {
     return _collectionRef
         .doc(chatRoomId)
-        .collection('Messages')
+        .collection(_kMessageSubCollection)
         .orderBy('timestamp', descending: false)
         .limitToLast(16)
         .snapshots();
@@ -59,7 +60,7 @@ class IbChatDbService {
       {required String chatRoomId, required String uid}) async {
     final _snapshot1 = await _collectionRef
         .doc(chatRoomId)
-        .collection('Messages')
+        .collection(_kMessageSubCollection)
         .orderBy('timestamp')
         .where('readUids', arrayContains: uid)
         .limitToLast(1)
@@ -74,7 +75,7 @@ class IbChatDbService {
 
     final _snapshot2 = await _collectionRef
         .doc(chatRoomId)
-        .collection('Messages')
+        .collection(_kMessageSubCollection)
         .orderBy('timestamp')
         .startAfterDocument(_snapshot1.docs.last)
         .get();
@@ -86,7 +87,7 @@ class IbChatDbService {
       required DocumentSnapshot<Map<String, dynamic>> snapshot}) {
     return _collectionRef
         .doc(chatRoomId)
-        .collection('Messages')
+        .collection(_kMessageSubCollection)
         .orderBy('timestamp', descending: true)
         .startAfterDocument(snapshot)
         .limit(16)
@@ -103,7 +104,7 @@ class IbChatDbService {
     }
     await _collectionRef
         .doc(ibMessage.chatRoomId)
-        .collection('Messages')
+        .collection(_kMessageSubCollection)
         .doc(ibMessage.messageId)
         .set(ibMessage.toJson(), SetOptions(merge: true));
 

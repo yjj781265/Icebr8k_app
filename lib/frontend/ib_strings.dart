@@ -136,7 +136,9 @@ class IbStrings extends Translations {
           'show_case_quiz': 'Pick the correct answer for your quiz!',
           'show_case_tag': 'Click here to add tags!',
           'no_more_comments': 'No more comments',
-          'no_more_replies': 'No more replies'
+          'no_more_replies': 'No more replies',
+          'group_chat': 'Group Chat',
+          'one_to_one_chat': 'One-to-One Chat'
         }
       };
 }

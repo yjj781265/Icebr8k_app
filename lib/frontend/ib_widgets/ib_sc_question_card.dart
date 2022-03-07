@@ -171,6 +171,9 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     if (widget._controller.rxIbQuestion.value.questionType ==
         IbQuestion.kScaleOne) {
       return RatingBar.builder(
+        ignoreGestures: DateTime.now().millisecondsSinceEpoch >
+                widget._controller.rxIbQuestion.value.endTimeInMs &&
+            widget._controller.rxIbQuestion.value.endTimeInMs > 0,
         itemPadding: const EdgeInsets.all(4),
         itemSize: IbConfig.kScItemHeight,
         itemBuilder: (context, _) => const Icon(
@@ -187,6 +190,9 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     if (widget._controller.rxIbQuestion.value.questionType ==
         IbQuestion.kScaleTwo) {
       return RatingBar.builder(
+        ignoreGestures: DateTime.now().millisecondsSinceEpoch >
+                widget._controller.rxIbQuestion.value.endTimeInMs &&
+            widget._controller.rxIbQuestion.value.endTimeInMs > 0,
         itemPadding: const EdgeInsets.all(4),
         itemSize: IbConfig.kScItemHeight,
         initialRating: initRating,
@@ -203,6 +209,9 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     if (widget._controller.rxIbQuestion.value.questionType ==
         IbQuestion.kScaleThree) {
       return RatingBar.builder(
+        ignoreGestures: DateTime.now().millisecondsSinceEpoch >
+                widget._controller.rxIbQuestion.value.endTimeInMs &&
+            widget._controller.rxIbQuestion.value.endTimeInMs > 0,
         itemPadding: const EdgeInsets.all(4),
         itemSize: IbConfig.kScItemHeight,
         initialRating: initRating,

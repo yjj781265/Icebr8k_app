@@ -28,6 +28,9 @@ class _DescriptionTextWidgetState extends State<IbDescriptionText>
 
   @override
   Widget build(BuildContext context) {
+    if (widget.text.isEmpty) {
+      return const SizedBox();
+    }
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         var span = TextSpan(
