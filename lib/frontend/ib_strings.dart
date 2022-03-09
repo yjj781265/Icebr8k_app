@@ -138,7 +138,14 @@ class IbStrings extends Translations {
           'no_more_comments': 'No more comments',
           'no_more_replies': 'No more replies',
           'group_chat': 'Group Chat',
-          'one_to_one_chat': 'One-to-One Chat'
+          'one_to_one_chat': 'One-to-One Chat',
+          'cover_photo': 'Cover Photo',
+          'private': 'Private',
+          'public': 'Public',
+          'friends_only': 'Friends Only',
+          'save': 'Save',
+          'avatar': 'Avatar',
+          'gender': 'Gender',
         }
       };
 }

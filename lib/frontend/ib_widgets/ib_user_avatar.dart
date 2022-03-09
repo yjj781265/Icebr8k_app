@@ -48,16 +48,7 @@ class IbUserAvatar extends StatelessWidget {
             },
           ),
         GestureDetector(
-          onTap: (disableOnTap || uid == null || uid!.isEmpty)
-              ? null
-              : () {
-                  /*  Get.to(
-                      () => ProfilePage(
-                            uid!,
-                            showAppBar: true,
-                          ),
-                      preventDuplicates: false);*/
-                },
+          onTap: (disableOnTap || uid == null || uid!.isEmpty) ? null : () {},
           child: CachedNetworkImage(
             errorWidget: (context, str, value) => CircleAvatar(
                 radius: radius, backgroundColor: IbColors.lightBlue),

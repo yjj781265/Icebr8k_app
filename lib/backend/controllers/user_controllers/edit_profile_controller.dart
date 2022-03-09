@@ -1,33 +1,77 @@
-import 'dart:async';
-
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
-
-import '../../services/user_services/ib_storage_service.dart';
-import '../../services/user_services/ib_user_db_service.dart';
 
 class EditProfileController extends GetxController {
-  final birthdatePickerInstructionKey = ''.obs;
-  final birthdateInMs = 0.obs;
-  final readableBirthdate = ''.obs;
-  final username = ''.obs;
-  final isUsernameValid = false.obs;
-  final isUsernameFirstTime = true.obs;
-  final usernameErrorTrKey = ''.obs;
+  final Rx<IbUser> rxIbUser;
+  final coverPhotoUrl = ''.obs;
   final avatarUrl = ''.obs;
-  final isProfilePicPicked = false.obs;
+  final bio = ''.obs;
+  final username = ''.obs;
+  final fName = ''.obs;
+  final lName = ''.obs;
+  final gender = ''.obs;
+  final genderSelections = [false, false, false].obs;
+  final selectedPrivacy = ''.obs;
+  final List<String> privacyItems = [
+    'public'.tr,
+    'private'.tr,
+    'friends_only'.tr,
+  ];
+  final RxInt birthdateInMs = 0.obs;
+  final TextEditingController birthdateTeController = TextEditingController();
+  final TextEditingController fNameTeController = TextEditingController();
+  final TextEditingController lNameTeController = TextEditingController();
+  final TextEditingController usernameTeController = TextEditingController();
+  final TextEditingController bioTeController = TextEditingController();
 
-  @override
-  void onInit() {
-    super.onInit();
+  EditProfileController(this.rxIbUser) {
+    coverPhotoUrl.value = rxIbUser.value.coverPhotoUrl;
+    avatarUrl.value = rxIbUser.value.avatarUrl;
+    fName.value = rxIbUser.value.fName;
+    lName.value = rxIbUser.value.lName;
+    gender.value = rxIbUser.value.gender;
+    username.value = rxIbUser.value.username;
+    birthdateInMs.value = rxIbUser.value.birthdateInMs ?? -1;
+    bio.value = rxIbUser.value.bio;
+    if (IbUser.kGenders.contains(gender.value)) {
+      genderSelections[IbUser.kGenders.indexOf(gender.value)] = true;
+    }
+    if (rxIbUser.value.isPrivate) {
+      selectedPrivacy.value = privacyItems[1];
+    } else if (!rxIbUser.value.isPrivate && rxIbUser.value.isFriendsOnly) {
+      selectedPrivacy.value = privacyItems[2];
+    } else {
+      selectedPrivacy.value = privacyItems[0];
+    }
   }
 
-  Future<void> validateUsername() async {
+  @override
+  void onClose() {
+    bioTeController.dispose();
+    fNameTeController.dispose();
+    lNameTeController.dispose();
+    usernameTeController.dispose();
+    birthdateTeController.dispose();
+    super.onClose();
+  }
+
+  void onGenderSelect(int index) {
+    for (int i = 0; i < genderSelections.length; i++) {
+      if (i == index) {
+        continue;
+      }
+      genderSelections[i] = false;
+    }
+    genderSelections[index] = !genderSelections[index];
+    if (genderSelections[index]) {
+      gender.value = IbUser.kGenders[index];
+    } else {
+      gender.value = '';
+    }
+  }
+
+  /*Future<void> validateUsername() async {
     final bool isValid =
         GetUtils.isUsername(username.value.trim().toLowerCase());
     isUsernameFirstTime.value = false;
@@ -103,5 +147,5 @@ class EditProfileController extends GetxController {
     IbUtils.showSimpleSnackBar(
         msg: 'Profile updated successfully',
         backgroundColor: IbColors.accentColor);
-  }
+  }*/
 }

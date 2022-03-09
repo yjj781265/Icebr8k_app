@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/my_profile_controller.dart';
+import 'package:icebr8k/frontend/ib_pages/edit_profile_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_description_text.dart';
@@ -31,18 +32,10 @@ class MyProfilePage extends StatelessWidget {
                     backgroundColor:
                         Theme.of(context).backgroundColor.withOpacity(0.8),
                     child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.message_rounded,
-                            color: Theme.of(context).indicatorColor))),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CircleAvatar(
-                    backgroundColor:
-                        Theme.of(context).backgroundColor.withOpacity(0.8),
-                    child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.person_add,
+                        onPressed: () {
+                          Get.to(() => EditProfilePage());
+                        },
+                        icon: Icon(Icons.edit,
                             color: Theme.of(context).indicatorColor))),
               ),
               Padding(
@@ -232,6 +225,20 @@ class MyProfilePage extends StatelessWidget {
                       style:
                           const TextStyle(fontSize: IbConfig.kNormalTextSize),
                     ),
+                    Row(
+                      children: [
+                        Text(_controller.rxIbUser.value.gender),
+                        if (_controller.rxIbUser.value.birthdateInMs != null)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Text(
+                                '🎂 ${IbUtils.readableDateTime(DateTime.fromMillisecondsSinceEpoch(_controller.rxIbUser.value.birthdateInMs ?? 0))}'),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 4,
+                    ),
                     IbDescriptionText(text: _controller.rxIbUser.value.bio),
                   ],
                 ),
@@ -245,77 +252,34 @@ class MyProfilePage extends StatelessWidget {
               child: Obx(() => Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'My EmoPics',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: IbConfig.kPageTitleSize),
-                        ),
-                      ),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(children: _handleEmoPic()),
-                      ),
-                    ],
-                  )),
-            ),
-          if (_controller.rxIbUser.value.emoPics.isNotEmpty)
-            SliverToBoxAdapter(
-              child: Obx(() => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'My EmoPics',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: IbConfig.kPageTitleSize),
-                        ),
-                      ),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(children: _handleEmoPic()),
-                      ),
-                    ],
-                  )),
-            ),
-          if (_controller.rxIbUser.value.emoPics.isNotEmpty)
-            SliverToBoxAdapter(
-              child: Obx(() => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'My EmoPics',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: IbConfig.kPageTitleSize),
-                        ),
-                      ),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(children: _handleEmoPic()),
-                      ),
-                    ],
-                  )),
-            ),
-          if (_controller.rxIbUser.value.emoPics.isNotEmpty)
-            SliverToBoxAdapter(
-              child: Obx(() => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'My EmoPics',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: IbConfig.kPageTitleSize),
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'My EmoPics',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: IbConfig.kPageTitleSize),
+                            ),
+                          ),
+                          Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: TextButton.icon(
+                              onPressed: () {},
+                              label: Text(
+                                'Edit'.tr,
+                                style: const TextStyle(
+                                    color: IbColors.primaryColor),
+                              ),
+                              icon: const Icon(
+                                Icons.edit,
+                                size: 16,
+                              ),
+                            ),
+                          )
+                        ],
                       ),
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,

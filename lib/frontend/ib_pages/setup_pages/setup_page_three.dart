@@ -189,8 +189,8 @@ class SetupPageThree extends StatelessWidget {
                         hintTrKey: 'username_hint',
                         onChanged: (text) {}),
                     IbTextField(
-                        maxLines: 10,
-                        charLimit: 300,
+                        maxLines: IbConfig.kBioMaxLines,
+                        charLimit: IbConfig.kBioMaxLength,
                         controller: _controller.bioTeController,
                         titleIcon: const Icon(
                           Icons.edit,

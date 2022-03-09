@@ -22,6 +22,8 @@ class IbUser {
   int answeredCount;
   int askedCount;
   bool isOnline;
+  bool isPrivate;
+  bool isFriendsOnly;
   String coverPhotoUrl;
   String bio;
   String voiceMemoUrl;
@@ -40,6 +42,8 @@ class IbUser {
     this.avatarUrl = '',
     this.coverPhotoUrl = '',
     this.loginTimeInMs = -1,
+    this.isPrivate = false,
+    this.isFriendsOnly = false,
     this.joinTime,
     this.birthdateInMs = -1,
     this.banedEndTimeInMs = -1,

@@ -61,23 +61,6 @@ class _MenuPageState extends State<MenuPage> {
                           ),
                         ),
                       ),
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: CircleAvatar(
-                          radius: 16,
-                          backgroundColor: Theme.of(context).backgroundColor,
-                          child: IconButton(
-                            splashRadius: 20,
-                            iconSize: 16,
-                            onPressed: () {},
-                            icon: Icon(
-                              Icons.edit,
-                              color: Theme.of(context).indicatorColor,
-                            ),
-                          ),
-                        ),
-                      ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(

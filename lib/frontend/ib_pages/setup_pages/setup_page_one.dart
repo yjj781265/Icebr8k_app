@@ -174,6 +174,7 @@ class SetupPageOne extends StatelessWidget {
                       () => ToggleButtons(
                           borderRadius:
                               const BorderRadius.all(Radius.circular(8)),
+                          borderColor: IbColors.lightGrey,
                           selectedColor: IbColors.primaryColor,
                           selectedBorderColor: IbColors.accentColor,
                           borderWidth: 2,
@@ -228,21 +229,13 @@ class SetupPageOne extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(
-                width: Get.width,
-                child: TextButton(
-                  onPressed: () {
-                    Get.back();
-                  },
-                  child: Text('ok'.tr),
-                ),
-              ),
-              SizedBox(
                 height: 256,
                 width: Get.width,
                 child: CupertinoDatePicker(
                   initialDateTime: DateTime.fromMillisecondsSinceEpoch(
                       _controller.birthdateInMs.value),
                   mode: CupertinoDatePickerMode.date,
+                  maximumDate: DateTime.now(),
                   onDateTimeChanged: (value) async {
                     await HapticFeedback.selectionClick();
                     _controller.birthdateTeController.text =
@@ -252,6 +245,19 @@ class SetupPageOne extends StatelessWidget {
                         value.millisecondsSinceEpoch;
                   },
                   dateOrder: DatePickerDateOrder.mdy,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  width: Get.width,
+                  height: 32,
+                  child: IbElevatedButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    textTrKey: 'ok',
+                  ),
                 ),
               ),
             ],

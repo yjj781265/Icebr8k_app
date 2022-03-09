@@ -75,32 +75,26 @@ class IbTextField extends StatelessWidget {
     }
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(
-            children: [
-              titleIcon,
-              const SizedBox(
-                width: 8,
-              ),
-              Text(titleTrKey.tr),
-            ],
-          ),
+        Row(
+          children: [
+            titleIcon,
+            const SizedBox(
+              width: 8,
+            ),
+            Text(titleTrKey.tr),
+          ],
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(
-                  Radius.circular(IbConfig.kTextBoxCornerRadius)),
-              border: Border.all(
-                color: borderColor,
-              ),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(
+                Radius.circular(IbConfig.kTextBoxCornerRadius)),
+            border: Border.all(
+              color: borderColor,
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(3),
-              child: textField,
-            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(3),
+            child: textField,
           ),
         ),
         /******* error text ****/
