@@ -34,13 +34,19 @@ class IbUserAvatar extends StatelessWidget {
       alignment: Alignment.center,
       children: [
         if (compScore != null && uid != IbUtils.getCurrentUid())
-          SizedBox(
-              height: radius * 2 + 4,
-              width: radius * 2 + 4,
-              child: CircularProgressIndicator(
-                color: IbUtils.handleIndicatorColor(compScore!),
-                value: compScore,
-              )),
+          TweenAnimationBuilder(
+            tween: Tween<double>(begin: 0, end: compScore),
+            duration: const Duration(milliseconds: 888),
+            builder: (BuildContext context, double value, Widget? child) {
+              return SizedBox(
+                  height: radius * 2 + 2,
+                  width: radius * 2 + 2,
+                  child: CircularProgressIndicator(
+                    color: IbUtils.handleIndicatorColor(value),
+                    value: value,
+                  ));
+            },
+          ),
         GestureDetector(
           onTap: (disableOnTap || uid == null || uid!.isEmpty)
               ? null
@@ -85,11 +91,17 @@ class IbUserAvatar extends StatelessWidget {
               ),
               width: 32,
               alignment: Alignment.center,
-              child: Text(
-                '${(compScore! * 100).toInt()}%',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 10),
+              child: TweenAnimationBuilder(
+                duration: const Duration(milliseconds: 888),
+                tween: Tween<double>(begin: 0, end: compScore),
+                builder: (BuildContext context, double value, Widget? child) {
+                  return Text(
+                    '${(value * 100).toInt()}%',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 10),
+                  );
+                },
               ),
             ),
           )

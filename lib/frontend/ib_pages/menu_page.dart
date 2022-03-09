@@ -1,11 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/my_profile_page.dart';
 import 'package:icebr8k/frontend/ib_themes.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../backend/controllers/user_controllers/auth_controller.dart';
@@ -23,6 +27,7 @@ class _MenuPageState extends State<MenuPage> {
 
   bool isDarkMode =
       IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool);
+  final MainPageController _mainPageController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +38,91 @@ class _MenuPageState extends State<MenuPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              Obx(
+                () => DrawerHeader(
+                  padding: EdgeInsets.zero,
+                  child: Stack(
+                    alignment: Alignment.centerLeft,
+                    children: [
+                      SizedBox(
+                        height: 300 / 1.618,
+                        width: double.infinity,
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                              topRight: Radius.circular(16),
+                              topLeft: Radius.circular(16)),
+                          child: CachedNetworkImage(
+                            fit: BoxFit.fill,
+                            imageUrl: _mainPageController
+                                    .rxCurrentIbUser.value.coverPhotoUrl.isEmpty
+                                ? IbConfig.kDefaultCoverPhotoUrl
+                                : _mainPageController
+                                    .rxCurrentIbUser.value.coverPhotoUrl,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: CircleAvatar(
+                          radius: 16,
+                          backgroundColor: Theme.of(context).backgroundColor,
+                          child: IconButton(
+                            splashRadius: 20,
+                            iconSize: 16,
+                            onPressed: () {},
+                            icon: Icon(
+                              Icons.edit,
+                              color: Theme.of(context).indicatorColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IbUserAvatar(
+                                radius: 32,
+                                avatarUrl: _mainPageController
+                                    .rxCurrentIbUser.value.avatarUrl),
+                            IbCard(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Text(
+                                  _mainPageController
+                                      .rxCurrentIbUser.value.username,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                      fontSize: IbConfig.kPageTitleSize,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Positioned.fill(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            customBorder: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(16),
+                                    topRight: Radius.circular(16))),
+                            onTap: () {
+                              Get.back();
+                              Get.to(() => MyProfilePage());
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               SwitchListTile(
                 value: isDarkMode,
                 onChanged: (value) {

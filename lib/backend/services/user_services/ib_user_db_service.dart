@@ -134,13 +134,9 @@ class IbUserDbService {
         .set({'coverPhotoUrl': photoUrl}, SetOptions(merge: true));
   }
 
-  Stream<IbUser?> listenToIbUserChanges(String uid) {
+  Stream<IbUser> listenToIbUserChanges(String uid) {
     return _collectionRef.doc(uid).snapshots().map((event) {
-      if (event.data() == null) {
-        return null;
-      } else {
-        return IbUser.fromJson(event.data()!);
-      }
+      return IbUser.fromJson(event.data() ?? {});
     });
   }
 

@@ -43,31 +43,25 @@ class IbEmoPicCard extends StatelessWidget {
                   ),
                 ),
               if (emoPic.url.isNotEmpty && !emoPic.url.contains('http'))
-                Hero(
-                  tag: emoPic.id,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: Image.file(
-                      File(emoPic.url),
-                      fit: BoxFit.cover,
-                      width: 160,
-                      height: 160 * 1.618 - 30,
-                    ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Image.file(
+                    File(emoPic.url),
+                    fit: BoxFit.cover,
+                    width: 160,
+                    height: 160 * 1.618 - 30,
                   ),
                 ),
               if (emoPic.url.isNotEmpty && emoPic.url.contains('http'))
-                Hero(
-                  tag: emoPic.id,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(8),
-                        topRight: Radius.circular(8)),
-                    child: CachedNetworkImage(
-                      imageUrl: emoPic.url,
-                      fit: BoxFit.cover,
-                      width: 160,
-                      height: 160 * 1.618 - 30,
-                    ),
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      topRight: Radius.circular(8)),
+                  child: CachedNetworkImage(
+                    imageUrl: emoPic.url,
+                    fit: BoxFit.cover,
+                    width: 160,
+                    height: 160 * 1.618 - 30,
                   ),
                 ),
               Positioned(
@@ -92,9 +86,8 @@ class IbEmoPicCard extends StatelessWidget {
                             () => IbMediaViewer(
                                   urls: [emoPic.url],
                                   currentIndex: 0,
-                                  heroTag: emoPic.id,
                                 ),
-                            transition: Transition.noTransition);
+                            transition: Transition.zoom);
                       }
                     },
                     onTap: () {

@@ -65,8 +65,54 @@ class IbUser {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is IbUser && runtimeType == other.runtimeType && id == other.id;
+      other is IbUser &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          fName == other.fName &&
+          lName == other.lName &&
+          email == other.email &&
+          username == other.username &&
+          avatarUrl == other.avatarUrl &&
+          gender == other.gender &&
+          status == other.status &&
+          banedEndTimeInMs == other.banedEndTimeInMs &&
+          loginTimeInMs == other.loginTimeInMs &&
+          joinTime == other.joinTime &&
+          birthdateInMs == other.birthdateInMs &&
+          answeredCount == other.answeredCount &&
+          askedCount == other.askedCount &&
+          isOnline == other.isOnline &&
+          coverPhotoUrl == other.coverPhotoUrl &&
+          bio == other.bio &&
+          voiceMemoUrl == other.voiceMemoUrl &&
+          roles == other.roles &&
+          emoPics == other.emoPics;
 
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode =>
+      id.hashCode ^
+      fName.hashCode ^
+      lName.hashCode ^
+      email.hashCode ^
+      username.hashCode ^
+      avatarUrl.hashCode ^
+      gender.hashCode ^
+      status.hashCode ^
+      banedEndTimeInMs.hashCode ^
+      loginTimeInMs.hashCode ^
+      joinTime.hashCode ^
+      birthdateInMs.hashCode ^
+      answeredCount.hashCode ^
+      askedCount.hashCode ^
+      isOnline.hashCode ^
+      coverPhotoUrl.hashCode ^
+      bio.hashCode ^
+      voiceMemoUrl.hashCode ^
+      roles.hashCode ^
+      emoPics.hashCode;
+
+  @override
+  String toString() {
+    return 'IbUser{id: $id, fName: $fName, lName: $lName, email: $email, username: $username, avatarUrl: $avatarUrl, gender: $gender, status: $status, banedEndTimeInMs: $banedEndTimeInMs, loginTimeInMs: $loginTimeInMs, joinTime: $joinTime, birthdateInMs: $birthdateInMs, answeredCount: $answeredCount, askedCount: $askedCount, isOnline: $isOnline, coverPhotoUrl: $coverPhotoUrl, bio: $bio, voiceMemoUrl: $voiceMemoUrl, roles: $roles, emoPics: $emoPics}';
+  }
 }

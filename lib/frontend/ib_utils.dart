@@ -216,7 +216,7 @@ class IbUtils {
     if (!Get.isRegistered<MainPageController>()) {
       return null;
     }
-    return Get.find<MainPageController>().currentIbUser;
+    return Get.find<MainPageController>().rxCurrentIbUser.value;
   }
 
   static User? getCurrentFbUser() {

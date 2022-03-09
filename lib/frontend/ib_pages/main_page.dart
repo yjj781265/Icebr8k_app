@@ -6,9 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_tab.dart';
-import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/social_tab.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
 import 'package:move_to_background/move_to_background.dart';
@@ -82,7 +80,7 @@ class _MainPageViewState extends State<MainPageView>
       ChatTab(),
       const SizedBox(),
       SocialTab(),
-      ProfilePage(Get.put(ProfileController('AiNSPgsUrnfytsqmPH49rY4F0m52'))),
+      const SizedBox(),
     ];
     return Obx(
       () => IndexedStack(

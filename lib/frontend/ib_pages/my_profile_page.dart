@@ -1,10 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
-import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/my_profile_controller.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_description_text.dart';
@@ -12,21 +9,21 @@ import 'package:icebr8k/frontend/ib_widgets/ib_emo_pic_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
-class ProfilePage extends StatelessWidget {
-  final ProfileController _controller;
+import '../ib_colors.dart';
+import '../ib_config.dart';
+import '../ib_utils.dart';
 
-  const ProfilePage(this._controller);
-
+class MyProfilePage extends StatelessWidget {
+  final MyProfileController _controller = Get.put(MyProfileController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //1
       body: CustomScrollView(
+        controller: _controller.scrollController,
         slivers: <Widget>[
-          //2
           SliverAppBar(
             expandedHeight: 250.0,
-            collapsedHeight: 100,
+            collapsedHeight: 56,
             actions: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -51,52 +48,102 @@ class ProfilePage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: CircleAvatar(
-                    backgroundColor:
-                        Theme.of(context).backgroundColor.withOpacity(0.8),
-                    child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.cloud,
-                            color: Theme.of(context).indicatorColor))),
+                  backgroundColor:
+                      Theme.of(context).backgroundColor.withOpacity(0.8),
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.cloud,
+                        color: Theme.of(context).indicatorColor),
+                  ),
+                ),
               ),
             ],
             flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.all(8),
-              title: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    child: Obx(
-                      () => IbUserAvatar(
-                        radius: 32,
-                        avatarUrl: _controller.avatarUrl.value,
-                        compScore: 0.32,
-                      ),
-                    ),
-                    onTap: () {
-                      Get.to(
-                          () => IbMediaViewer(
-                              urls: [IbUtils.getCurrentIbUser()!.avatarUrl],
-                              currentIndex: 0),
-                          transition: Transition.zoom);
-                    },
-                  ),
-                  IbCard(
-                    radius: 8,
-                    child: Padding(
+              titlePadding: const EdgeInsetsDirectional.only(bottom: 16),
+              title: Obx(() => AnimatedCrossFade(
+                    alignment: Alignment.center,
+                    crossFadeState: _controller.isCollapsing.isTrue
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
+                    firstChild: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text(
-                        IbUtils.getCurrentIbUser()!.username,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            child: Obx(
+                              () => IbUserAvatar(
+                                  radius: 32,
+                                  avatarUrl:
+                                      _controller.rxIbUser.value.avatarUrl),
+                            ),
+                            onTap: () {
+                              Get.to(
+                                  () => IbMediaViewer(urls: [
+                                        _controller.rxIbUser.value.avatarUrl
+                                      ], currentIndex: 0),
+                                  transition: Transition.zoom,
+                                  fullscreenDialog: true);
+                            },
+                          ),
+                          IbCard(
+                            radius: 8,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Obx(
+                                () => Text(
+                                  _controller.rxIbUser.value.username,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+                    duration: const Duration(
+                        milliseconds: IbConfig.kEventTriggerDelayInMillis),
+                    reverseDuration: const Duration(
+                        milliseconds: IbConfig.kEventTriggerDelayInMillis),
+                    secondChild: Obx(() => Padding(
+                          padding: EdgeInsets.only(
+                              left: _controller.titlePadding.value),
+                          child: LimitedBox(
+                            maxWidth: 150,
+                            child: Text(
+                              _controller.rxIbUser.value.username,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  color: Theme.of(context).indicatorColor,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        )),
+                  )),
+              background: Obx(
+                () => GestureDetector(
+                  onTap: () {
+                    Get.to(
+                        () => IbMediaViewer(urls: [
+                              if (_controller
+                                  .rxIbUser.value.coverPhotoUrl.isEmpty)
+                                IbConfig.kDefaultCoverPhotoUrl
+                              else
+                                _controller.rxIbUser.value.coverPhotoUrl
+                            ], currentIndex: 0),
+                        transition: Transition.zoom,
+                        fullscreenDialog: true);
+                  },
+                  child: CachedNetworkImage(
+                    imageUrl: _controller.rxIbUser.value.coverPhotoUrl.isEmpty
+                        ? IbConfig.kDefaultCoverPhotoUrl
+                        : _controller.rxIbUser.value.coverPhotoUrl,
+                    fit: BoxFit.fill,
                   ),
-                ],
-              ),
-              background: CachedNetworkImage(
-                imageUrl: _controller.coverPhotoUrl.value.isEmpty
-                    ? IbConfig.kDefaultCoverPhotoUrl
-                    : _controller.coverPhotoUrl.value,
-                fit: BoxFit.fill,
+                ),
               ),
             ),
           ),
@@ -120,7 +167,7 @@ class ProfilePage extends StatelessWidget {
                       children: [
                         Obx(() => Text(
                               IbUtils.getStatsString(
-                                  _controller.answeredSize.value),
+                                  _controller.rxIbUser.value.answeredCount),
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: IbConfig.kPageTitleSize),
@@ -150,7 +197,7 @@ class ProfilePage extends StatelessWidget {
                       children: [
                         Obx(() => Text(
                               IbUtils.getStatsString(
-                                  _controller.askedSize.value),
+                                  _controller.rxIbUser.value.askedCount),
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: IbConfig.kPageTitleSize),
@@ -181,11 +228,11 @@ class ProfilePage extends StatelessWidget {
                       height: 16,
                     ),
                     Text(
-                      _controller.name.value,
+                      '${_controller.rxIbUser.value.fName} ${_controller.rxIbUser.value.lName} ',
                       style:
                           const TextStyle(fontSize: IbConfig.kNormalTextSize),
                     ),
-                    IbDescriptionText(text: _controller.bio.value),
+                    IbDescriptionText(text: _controller.rxIbUser.value.bio),
                   ],
                 ),
               ),
@@ -193,7 +240,7 @@ class ProfilePage extends StatelessWidget {
           ),
 
           /// emoPics
-          if (_controller.emoPics.isNotEmpty)
+          if (_controller.rxIbUser.value.emoPics.isNotEmpty)
             SliverToBoxAdapter(
               child: Obx(() => Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,7 +261,7 @@ class ProfilePage extends StatelessWidget {
                     ],
                   )),
             ),
-          if (_controller.emoPics.isNotEmpty)
+          if (_controller.rxIbUser.value.emoPics.isNotEmpty)
             SliverToBoxAdapter(
               child: Obx(() => Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -235,7 +282,7 @@ class ProfilePage extends StatelessWidget {
                     ],
                   )),
             ),
-          if (_controller.emoPics.isNotEmpty)
+          if (_controller.rxIbUser.value.emoPics.isNotEmpty)
             SliverToBoxAdapter(
               child: Obx(() => Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,7 +303,7 @@ class ProfilePage extends StatelessWidget {
                     ],
                   )),
             ),
-          if (_controller.emoPics.isNotEmpty)
+          if (_controller.rxIbUser.value.emoPics.isNotEmpty)
             SliverToBoxAdapter(
               child: Obx(() => Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -284,9 +331,12 @@ class ProfilePage extends StatelessWidget {
 
   List<Widget> _handleEmoPic() {
     final List<Widget> list = [];
-    list.addAll(_controller.emoPics
+    list.addAll(_controller.rxIbUser.value.emoPics
         .getRange(
-            0, _controller.emoPics.length > 3 ? 4 : _controller.emoPics.length)
+            0,
+            _controller.rxIbUser.value.emoPics.length > 3
+                ? 4
+                : _controller.rxIbUser.value.emoPics.length)
         .map((element) => IbEmoPicCard(
               emoPic: element,
               ignoreOnDoubleTap: true,
@@ -295,14 +345,14 @@ class ProfilePage extends StatelessWidget {
                     () => IbMediaViewer(
                           urls: [element.url],
                           currentIndex: 0,
-                          heroTag: element.id,
                         ),
-                    transition: Transition.noTransition);
+                    transition: Transition.zoom,
+                    fullscreenDialog: true);
               },
             ))
         .toList());
 
-    if (_controller.emoPics.length > 3) {
+    if (_controller.rxIbUser.value.emoPics.length > 3) {
       list.add(Padding(
         padding: const EdgeInsets.all(16.0),
         child: IbActionButton(

@@ -16,17 +16,19 @@ import 'chat_page_controller.dart';
 /// this controller control info of current IbUser, index current home page tab and api keys
 class MainPageController extends GetxController {
   final currentIndex = 0.obs;
-  final Stream<IbUser?> ibUserBroadcastStream =
-      IbUserDbService().listenToIbUserChanges(IbUtils.getCurrentFbUser()!.uid);
+  final Stream<IbUser> ibUserBroadcastStream = IbUserDbService()
+      .listenToIbUserChanges(IbUtils.getCurrentFbUser()!.uid)
+      .asBroadcastStream();
   final isNavBarVisible = true.obs;
-  late IbUser? currentIbUser;
+  late Rx<IbUser> rxCurrentIbUser;
   late String kGooglePlacesApiKey;
 
   @override
   Future<void> onInit() async {
     super.onInit();
     ibUserBroadcastStream.listen((ibUser) {
-      currentIbUser = ibUser;
+      rxCurrentIbUser = ibUser.obs;
+      rxCurrentIbUser.refresh();
     });
 
     await IbApiKeysManager.init();

@@ -22,10 +22,7 @@ class HomeTabController extends GetxController {
     super.onInit();
     ibUserSub =
         Get.find<MainPageController>().ibUserBroadcastStream.listen((ibUser) {
-      if (ibUser == null) {
-        avatarUrl.value = '';
-      }
-      avatarUrl.value = ibUser!.avatarUrl;
+      avatarUrl.value = ibUser.avatarUrl;
     });
 
     scrollController.addListener(() {
