@@ -27,6 +27,7 @@ dependencies:
   cloud_functions: ^3.2.3
   cupertino_icons: ^1.0.2
   dropdown_button2: ^1.2.0
+  emoji_picker_flutter: ^1.1.2
   extended_nested_scroll_view: ^5.0.0
   firebase_analytics: ^8.3.3
   firebase_auth: ^3.3.3

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/db_config.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
+import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -132,6 +133,13 @@ class IbUserDbService {
     return _collectionRef
         .doc(uid)
         .set({'coverPhotoUrl': photoUrl}, SetOptions(merge: true));
+  }
+
+  Future<void> updateEmoPics(
+      {required List<IbEmoPic> emoPics, required String uid}) {
+    return _collectionRef.doc(uid).set(
+        {'emoPics': emoPics.map((e) => e.toJson()).toList()},
+        SetOptions(merge: true));
   }
 
   Stream<IbUser> listenToIbUserChanges(String uid) {

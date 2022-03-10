@@ -8,7 +8,9 @@ import '../ib_config.dart';
 class IbTextField extends StatelessWidget {
   final Icon titleIcon;
   final TextEditingController? controller;
+  final TextAlign textAlign;
   final Widget? suffixIcon;
+  final TextStyle? textStyle;
   final String titleTrKey;
   final String hintTrKey;
   final String errorTrKey;
@@ -29,9 +31,11 @@ class IbTextField extends StatelessWidget {
     required this.titleIcon,
     required this.titleTrKey,
     required this.hintTrKey,
+    this.textAlign = TextAlign.left,
     this.inputFormatter,
     this.suffixIcon,
     this.errorTrKey = '',
+    this.textStyle,
     this.borderColor = IbColors.lightGrey,
     this.enabled = true,
     this.charLimit,
@@ -51,6 +55,8 @@ class IbTextField extends StatelessWidget {
     final textField = TextField(
       autofillHints: enabled ? autofillHints : null,
       keyboardType: textInputType,
+      textAlign: textAlign,
+      style: textStyle,
       scrollPhysics: const NeverScrollableScrollPhysics(),
       obscureText: obscureText,
       maxLength: charLimit,

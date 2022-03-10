@@ -144,8 +144,17 @@ class IbStrings extends Translations {
           'public': 'Public',
           'friends_only': 'Friends Only',
           'save': 'Save',
+          'my_profile': 'My Profile',
+          'edit_profile': "Edit Profile",
           'avatar': 'Avatar',
           'gender': 'Gender',
+          'emoji': 'Emoji',
+          'emoji_hint': 'Pick an emoji',
+          'description': 'Description',
+          'description_hint': 'Enter a short description',
+          'photo': 'Photo',
+          'edit': 'Edit',
+          'upload': 'Uploading...'
         }
       };
 }

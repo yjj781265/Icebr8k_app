@@ -87,7 +87,8 @@ class IbEmoPicCard extends StatelessWidget {
                                   urls: [emoPic.url],
                                   currentIndex: 0,
                                 ),
-                            transition: Transition.zoom);
+                            transition: Transition.zoom,
+                            fullscreenDialog: true);
                       }
                     },
                     onTap: () {

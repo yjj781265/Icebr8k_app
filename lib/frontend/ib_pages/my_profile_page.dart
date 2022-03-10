@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/edit_emo_pic_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/my_profile_controller.dart';
-import 'package:icebr8k/frontend/ib_pages/edit_profile_page.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
+import 'package:icebr8k/frontend/ib_pages/edit_profile_pages/edit_emo_pics_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_description_text.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_emo_pic_card.dart';
@@ -13,6 +13,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import '../ib_colors.dart';
 import '../ib_config.dart';
 import '../ib_utils.dart';
+import 'edit_profile_pages/edit_profile_page.dart';
 
 class MyProfilePage extends StatelessWidget {
   final MyProfileController _controller = Get.put(MyProfileController());
@@ -247,85 +248,65 @@ class MyProfilePage extends StatelessWidget {
           ),
 
           /// emoPics
-          if (_controller.rxIbUser.value.emoPics.isNotEmpty)
-            SliverToBoxAdapter(
-              child: Obx(() => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text(
-                              'My EmoPics',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: IbConfig.kPageTitleSize),
-                            ),
-                          ),
-                          Directionality(
-                            textDirection: TextDirection.rtl,
-                            child: TextButton.icon(
-                              onPressed: () {},
-                              label: Text(
-                                'Edit'.tr,
-                                style: const TextStyle(
-                                    color: IbColors.primaryColor),
-                              ),
-                              icon: const Icon(
-                                Icons.edit,
-                                size: 16,
-                              ),
-                            ),
-                          )
-                        ],
+          SliverToBoxAdapter(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'My EmoPics',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: IbConfig.kPageTitleSize),
+                    ),
+                  ),
+                  Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        Get.to(() => EditEmoPicsPage(Get.put(
+                            EditEmoPicController(_controller.rxEmoPics))));
+                      },
+                      label: Text(
+                        'edit'.tr,
+                        style: const TextStyle(color: IbColors.primaryColor),
                       ),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(children: _handleEmoPic()),
+                      icon: const Icon(
+                        Icons.edit,
+                        size: 16,
                       ),
-                    ],
-                  )),
-            ),
+                    ),
+                  )
+                ],
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Obx(() => Row(
+                      children: _controller.rxEmoPics
+                          .map((e) => IbEmoPicCard(
+                                emoPic: e,
+                                onTap: () {
+                                  Get.to(
+                                      () => IbMediaViewer(
+                                            urls: [e.url],
+                                            currentIndex: 0,
+                                          ),
+                                      transition: Transition.zoom,
+                                      fullscreenDialog: true);
+                                },
+                                ignoreOnDoubleTap: true,
+                              ))
+                          .toList(),
+                    )),
+              ),
+            ],
+          )),
         ],
       ),
     );
-  }
-
-  List<Widget> _handleEmoPic() {
-    final List<Widget> list = [];
-    list.addAll(_controller.rxIbUser.value.emoPics
-        .getRange(
-            0,
-            _controller.rxIbUser.value.emoPics.length > 3
-                ? 4
-                : _controller.rxIbUser.value.emoPics.length)
-        .map((element) => IbEmoPicCard(
-              emoPic: element,
-              ignoreOnDoubleTap: true,
-              onTap: () {
-                Get.to(
-                    () => IbMediaViewer(
-                          urls: [element.url],
-                          currentIndex: 0,
-                        ),
-                    transition: Transition.zoom,
-                    fullscreenDialog: true);
-              },
-            ))
-        .toList());
-
-    if (_controller.rxIbUser.value.emoPics.length > 3) {
-      list.add(Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: IbActionButton(
-            color: IbColors.primaryColor,
-            iconData: Icons.arrow_forward,
-            onPressed: () {},
-            text: 'See More'),
-      ));
-    }
-    return list;
   }
 }

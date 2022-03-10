@@ -19,8 +19,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditProfilePage extends StatelessWidget {
-  final EditProfileController _controller =
-      Get.put(EditProfileController(IbUtils.getCurrentIbUser()!.obs));
+  final EditProfileController _controller = Get.put(EditProfileController());
   @override
   Widget build(BuildContext context) {
     const TextStyle headerStyle = TextStyle(
@@ -28,6 +27,10 @@ class EditProfilePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 50,
+        title: Text(
+          'edit_profile'.tr,
+          overflow: TextOverflow.ellipsis,
+        ),
         actions: [
           Obx(
             () => Row(
@@ -38,13 +41,6 @@ class EditProfilePage extends StatelessWidget {
                 ),
                 DropdownButtonHideUnderline(
                   child: DropdownButton2(
-                    hint: Text(
-                      'Select Item',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).hintColor,
-                      ),
-                    ),
                     items: _controller.privacyItems
                         .map((item) => DropdownMenuItem<String>(
                               value: item,
@@ -59,6 +55,7 @@ class EditProfilePage extends StatelessWidget {
                     value: _controller.selectedPrivacy.value,
                     onChanged: (value) {
                       _controller.selectedPrivacy.value = value.toString();
+                      _controller.onPrivacySelect(value.toString());
                     },
                   ),
                 ),
@@ -227,7 +224,9 @@ class EditProfilePage extends StatelessWidget {
                 height: 56,
                 child: IbElevatedButton(
                   textTrKey: 'save',
-                  onPressed: () {},
+                  onPressed: () async {
+                    _controller.validate();
+                  },
                   icon: const Icon(Icons.save),
                 ),
               ),
