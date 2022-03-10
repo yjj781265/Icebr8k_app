@@ -50,22 +50,27 @@ class AdminMainController extends GetxController {
       final IbUser ibUser = IbUser.fromJson(docChange.doc.data()!);
       if (docChange.type == DocumentChangeType.added) {
         pendingUsers.addIf(
-            !pendingUsers.contains(ibUser) &&
+            pendingUsers.firstWhereOrNull(
+                        (element) => element.id == ibUser.id) ==
+                    null &&
                 ibUser.status == IbUser.kUserStatusPending,
             ibUser);
+        print('AdminMainController added');
         pendingUsers.refresh();
         totalMessages.value++;
       } else if (docChange.type == DocumentChangeType.modified) {
-        if (pendingUsers.contains(ibUser)) {
-          pendingUsers[pendingUsers.indexOf(ibUser)] = ibUser;
+        if (pendingUsers.indexWhere((element) => ibUser.id == element.id) !=
+            -1) {
+          print('AdminMainController updated');
+          pendingUsers[pendingUsers
+              .indexWhere((element) => ibUser.id == element.id)] = ibUser;
           pendingUsers.refresh();
         }
       } else {
-        if (pendingUsers.contains(ibUser)) {
-          pendingUsers.remove(ibUser);
-          pendingUsers.refresh();
-          totalMessages.value--;
-        }
+        print('AdminMainController removed');
+        pendingUsers.removeWhere((element) => element.id == ibUser.id);
+        pendingUsers.refresh();
+        totalMessages.value--;
       }
     }
   }

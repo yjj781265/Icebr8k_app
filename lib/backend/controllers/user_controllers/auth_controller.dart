@@ -40,7 +40,7 @@ class AuthController extends GetxService {
             transition: Transition.circularReveal,
             duration: const Duration(
                 milliseconds: IbConfig.kEventTriggerDelayInMillis));
-        isInitializing.value = false;
+        isInitializing.value = true;
         return;
       } else {
         firebaseUser = user;

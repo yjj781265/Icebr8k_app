@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/edit_emo_pic_controller.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
-import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_pages/edit_profile_pages/edit_emo_pics_detail_page.dart';
@@ -72,20 +71,7 @@ class EditEmoPicsPage extends StatelessWidget {
                                         color: IbColors.errorRed,
                                       ),
                                       onPressed: () async {
-                                        _controller.rxEmoPics.remove(e);
-                                        try {
-                                          Get.dialog(
-                                              const IbLoadingDialog(
-                                                  messageTrKey: 'update'),
-                                              barrierDismissible: false);
-                                          await IbStorageService()
-                                              .deleteFile(e.url);
-                                          await IbUserDbService().updateEmoPics(
-                                              emoPics: _controller.rxEmoPics,
-                                              uid: IbUtils.getCurrentUid()!);
-                                        } finally {
-                                          Get.back();
-                                        }
+                                        await _controller.onRemoveCard(e);
                                       },
                                     ),
                                   ))

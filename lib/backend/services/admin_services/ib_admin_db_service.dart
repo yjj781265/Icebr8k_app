@@ -62,18 +62,8 @@ class IbAdminService {
       'email': email,
       'note': note,
     };
-    if (DbConfig.dbSuffix == '-dev') {
-      final HttpsCallable callable =
-          FirebaseFunctions.instance.httpsCallable('sendStatusEmailDev');
-      await callable.call(payload);
-    } else if (DbConfig.dbSuffix == '-beta') {
-      final HttpsCallable callable =
-          FirebaseFunctions.instance.httpsCallable('sendStatusEmailBeta');
-      await callable.call(payload);
-    } else {
-      final HttpsCallable callable =
-          FirebaseFunctions.instance.httpsCallable('sendStatusEmailProd');
-      await callable.call(payload);
-    }
+    final HttpsCallable callable =
+        FirebaseFunctions.instance.httpsCallable('sendStatusEmail');
+    await callable.call(payload);
   }
 }

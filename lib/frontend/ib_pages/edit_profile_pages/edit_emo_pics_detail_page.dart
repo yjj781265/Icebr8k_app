@@ -289,7 +289,6 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
         ),
       ],
     );
-
     Get.bottomSheet(options, ignoreSafeArea: false);
   }
 

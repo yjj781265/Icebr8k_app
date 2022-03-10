@@ -5,6 +5,7 @@ import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
+import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_pages/review_page.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_three.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_two.dart';
@@ -214,15 +215,21 @@ class SetupController extends GetxController {
         final String? url = await IbStorageService()
             .uploadAndRetrieveImgUrl(filePath: avatarUrl.value);
         if (url == null) {
-          throw Exception('failed to upload message');
+          IbUtils.showSimpleSnackBar(
+              msg: 'Failed to upload avatar image',
+              backgroundColor: IbColors.errorRed);
+          return;
         }
 
         for (final emoPic in emoPics) {
           final emoPicUrl = await IbStorageService()
-              .uploadAndRetrieveImgUrl(filePath: avatarUrl.value);
+              .uploadAndRetrieveImgUrl(filePath: emoPic.url);
 
           if (emoPicUrl == null) {
-            throw Exception('failed to upload message');
+            IbUtils.showSimpleSnackBar(
+                msg: 'Failed to upload avatar image',
+                backgroundColor: IbColors.errorRed);
+            return;
           }
           emoPic.url = emoPicUrl;
         }
@@ -247,9 +254,9 @@ class SetupController extends GetxController {
         Get.offAll(() => ReviewPage());
       } catch (e) {
         Get.back();
-        Get.dialog(const IbDialog(
+        Get.dialog(IbDialog(
           title: 'Error',
-          subtitle: "Failed to upload images..",
+          subtitle: "Failed to upload images..${e.toString()}",
           showNegativeBtn: false,
         ));
       }

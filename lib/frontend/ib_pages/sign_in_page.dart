@@ -210,10 +210,6 @@ class SignInPage extends StatelessWidget {
                               transitionOnUserGestures: true,
                               tag: 'login',
                               child: GestureDetector(
-                                onLongPress: () async {
-                                  IbUtils.hideKeyboard();
-                                  await _authController.signOut();
-                                },
                                 child: Container(
                                   height: 80,
                                   width: Get.width,

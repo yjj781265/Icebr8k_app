@@ -12,7 +12,24 @@ class EditEmoPicController extends GetxController {
 
   EditEmoPicController(this.rxEmoPics);
 
+  Future<void> onRemoveCard(IbEmoPic e) async {
+    rxEmoPics.remove(e);
+    try {
+      Get.dialog(const IbLoadingDialog(messageTrKey: 'update'),
+          barrierDismissible: false);
+      await IbStorageService().deleteFile(e.url);
+      await IbUserDbService()
+          .updateEmoPics(emoPics: rxEmoPics, uid: IbUtils.getCurrentUid()!);
+    } finally {
+      Get.back();
+    }
+  }
+
   Future<void> uploadEmoPic(IbEmoPic emoPic) async {
+    if (emoPic.id.isEmpty) {
+      return;
+    }
+
     if (emoPic.url.isEmpty) {
       Get.dialog(const IbDialog(
         title: 'Missing Info',
@@ -46,12 +63,11 @@ class EditEmoPicController extends GetxController {
     try {
       Get.dialog(const IbLoadingDialog(messageTrKey: 'upload'),
           barrierDismissible: false);
-      if (rxEmoPics.contains(emoPic)) {
-        final String oldUrl = rxEmoPics[rxEmoPics.indexOf(emoPic)].url;
-        if (oldUrl == emoPic.url && emoPic.url.contains('http')) {
-          rxEmoPics[rxEmoPics.indexOf(emoPic)] = emoPic;
-          print('1');
-        } else if (!emoPic.url.contains('http')) {
+
+      /// check the old and new url are not the same
+      if (rxEmoPics.contains(emoPic) &&
+          rxEmoPics[rxEmoPics.indexOf(emoPic)].url != emoPic.url) {
+        if (!emoPic.url.contains('http')) {
           final String? newUrl = await IbStorageService()
               .uploadAndRetrieveImgUrl(filePath: emoPic.url);
           if (newUrl == null) {
@@ -61,13 +77,13 @@ class EditEmoPicController extends GetxController {
                 backgroundColor: IbColors.errorRed);
             return;
           }
+          if (rxEmoPics[rxEmoPics.indexOf(emoPic)].url.contains('http')) {
+            await IbStorageService()
+                .deleteFile(rxEmoPics[rxEmoPics.indexOf(emoPic)].url);
+          }
           emoPic.url = newUrl;
         }
 
-        if (oldUrl.contains('http')) {
-          await IbStorageService().deleteFile(oldUrl);
-        }
-        print('2');
         rxEmoPics[rxEmoPics.indexOf(emoPic)] = emoPic;
         rxEmoPics.refresh();
       } else {
@@ -83,13 +99,9 @@ class EditEmoPicController extends GetxController {
           }
           emoPic.url = newUrl;
           emoPic.id = IbUtils.getUniqueId();
-          rxEmoPics.add(emoPic);
-          rxEmoPics.refresh();
-          print('3');
-        } else {
-          rxEmoPics.add(emoPic);
-          rxEmoPics.refresh();
         }
+        rxEmoPics.add(emoPic);
+        rxEmoPics.refresh();
       }
 
       await IbUserDbService()

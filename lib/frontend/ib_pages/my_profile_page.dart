@@ -136,6 +136,8 @@ class MyProfilePage extends StatelessWidget {
                         ? IbConfig.kDefaultCoverPhotoUrl
                         : _controller.rxIbUser.value.coverPhotoUrl,
                     fit: BoxFit.fill,
+                    width: Get.width,
+                    height: Get.width / 1.78,
                   ),
                 ),
               ),
@@ -249,62 +251,67 @@ class MyProfilePage extends StatelessWidget {
 
           /// emoPics
           SliverToBoxAdapter(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'My EmoPics',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: IbConfig.kPageTitleSize),
+            child: Obx(() => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'My EmoPics',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: IbConfig.kPageTitleSize),
+                          ),
+                        ),
+                        Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: TextButton.icon(
+                            onPressed: () {
+                              Get.to(() => EditEmoPicsPage(Get.put(
+                                  EditEmoPicController(
+                                      _controller.rxEmoPics))));
+                            },
+                            label: Text(
+                              _controller.rxEmoPics.isEmpty
+                                  ? 'add'.tr
+                                  : 'edit'.tr,
+                              style:
+                                  const TextStyle(color: IbColors.primaryColor),
+                            ),
+                            icon: const Icon(
+                              Icons.edit,
+                              size: 16,
+                            ),
+                          ),
+                        )
+                      ],
                     ),
-                  ),
-                  Directionality(
-                    textDirection: TextDirection.rtl,
-                    child: TextButton.icon(
-                      onPressed: () {
-                        Get.to(() => EditEmoPicsPage(Get.put(
-                            EditEmoPicController(_controller.rxEmoPics))));
-                      },
-                      label: Text(
-                        'edit'.tr,
-                        style: const TextStyle(color: IbColors.primaryColor),
-                      ),
-                      icon: const Icon(
-                        Icons.edit,
-                        size: 16,
-                      ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Obx(() => Row(
+                            children: _controller.rxEmoPics
+                                .map((e) => IbEmoPicCard(
+                                      emoPic: e,
+                                      onTap: () {
+                                        Get.to(
+                                            () => IbMediaViewer(
+                                                  urls: [e.url],
+                                                  currentIndex: 0,
+                                                ),
+                                            transition: Transition.zoom,
+                                            fullscreenDialog: true);
+                                      },
+                                      ignoreOnDoubleTap: true,
+                                    ))
+                                .toList(),
+                          )),
                     ),
-                  )
-                ],
-              ),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Obx(() => Row(
-                      children: _controller.rxEmoPics
-                          .map((e) => IbEmoPicCard(
-                                emoPic: e,
-                                onTap: () {
-                                  Get.to(
-                                      () => IbMediaViewer(
-                                            urls: [e.url],
-                                            currentIndex: 0,
-                                          ),
-                                      transition: Transition.zoom,
-                                      fullscreenDialog: true);
-                                },
-                                ignoreOnDoubleTap: true,
-                              ))
-                          .toList(),
-                    )),
-              ),
-            ],
-          )),
+                  ],
+                )),
+          ),
         ],
       ),
     );

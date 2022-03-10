@@ -154,7 +154,8 @@ class IbStrings extends Translations {
           'description_hint': 'Enter a short description',
           'photo': 'Photo',
           'edit': 'Edit',
-          'upload': 'Uploading...'
+          'upload': 'Uploading...',
+          'update': 'Updating...'
         }
       };
 }
