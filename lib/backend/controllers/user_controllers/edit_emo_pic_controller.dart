@@ -25,7 +25,8 @@ class EditEmoPicController extends GetxController {
     }
   }
 
-  Future<void> uploadEmoPic(IbEmoPic emoPic) async {
+  Future<void> uploadEmoPic(
+      {required IbEmoPic emoPic, required String oldUrl}) async {
     if (emoPic.id.isEmpty) {
       return;
     }
@@ -63,47 +64,30 @@ class EditEmoPicController extends GetxController {
     try {
       Get.dialog(const IbLoadingDialog(messageTrKey: 'upload'),
           barrierDismissible: false);
-
-      /// check the old and new url are not the same
-      if (rxEmoPics.contains(emoPic) &&
-          rxEmoPics[rxEmoPics.indexOf(emoPic)].url != emoPic.url) {
-        if (!emoPic.url.contains('http')) {
-          final String? newUrl = await IbStorageService()
-              .uploadAndRetrieveImgUrl(filePath: emoPic.url);
-          if (newUrl == null) {
-            Get.back();
-            IbUtils.showSimpleSnackBar(
-                msg: 'Failed to upload image',
-                backgroundColor: IbColors.errorRed);
-            return;
-          }
-          if (rxEmoPics[rxEmoPics.indexOf(emoPic)].url.contains('http')) {
-            await IbStorageService()
-                .deleteFile(rxEmoPics[rxEmoPics.indexOf(emoPic)].url);
-          }
-          emoPic.url = newUrl;
-        }
-
-        rxEmoPics[rxEmoPics.indexOf(emoPic)] = emoPic;
-        rxEmoPics.refresh();
+      if (emoPic.url.contains('http')) {
+        await IbStorageService()
+            .deleteFile(oldUrl.contains('http') ? oldUrl : '');
       } else {
-        if (!emoPic.url.contains('http')) {
-          final String? newUrl = await IbStorageService()
-              .uploadAndRetrieveImgUrl(filePath: emoPic.url);
-          if (newUrl == null) {
-            Get.back();
-            IbUtils.showSimpleSnackBar(
-                msg: 'Failed to upload image',
-                backgroundColor: IbColors.errorRed);
-            return;
-          }
-          emoPic.url = newUrl;
-          emoPic.id = IbUtils.getUniqueId();
+        final String? newUrl = await IbStorageService().uploadAndRetrieveImgUrl(
+            filePath: emoPic.url,
+            oldUrl: oldUrl.contains('http') ? oldUrl : '');
+        if (newUrl == null) {
+          Get.back();
+          IbUtils.showSimpleSnackBar(
+              msg: 'Failed to upload image',
+              backgroundColor: IbColors.errorRed);
+          return;
         }
-        rxEmoPics.add(emoPic);
-        rxEmoPics.refresh();
+        emoPic.url = newUrl;
       }
 
+      if (rxEmoPics.contains(emoPic)) {
+        rxEmoPics[rxEmoPics.indexOf(emoPic)] = emoPic;
+      } else {
+        rxEmoPics.add(emoPic);
+      }
+
+      rxEmoPics.refresh();
       await IbUserDbService()
           .updateEmoPics(emoPics: rxEmoPics, uid: IbUtils.getCurrentUid()!);
 

@@ -155,7 +155,8 @@ class IbStrings extends Translations {
           'photo': 'Photo',
           'edit': 'Edit',
           'upload': 'Uploading...',
-          'update': 'Updating...'
+          'update': 'Updating...',
+          'nothing': 'Nothing to see here 😐',
         }
       };
 }

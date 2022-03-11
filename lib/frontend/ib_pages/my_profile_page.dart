@@ -165,12 +165,14 @@ class MyProfilePage extends StatelessWidget {
                               IbUtils.getStatsString(
                                   _controller.rxIbUser.value.answeredCount),
                               style: const TextStyle(
+                                  overflow: TextOverflow.ellipsis,
                                   fontWeight: FontWeight.bold,
                                   fontSize: IbConfig.kPageTitleSize),
                             )),
                         const Text(
-                          'ANSWERED',
+                          '✅ ANSWERED',
                           style: TextStyle(
+                              overflow: TextOverflow.ellipsis,
                               fontSize: IbConfig.kDescriptionTextSize,
                               color: IbColors.lightGrey),
                         )
@@ -195,12 +197,14 @@ class MyProfilePage extends StatelessWidget {
                               IbUtils.getStatsString(
                                   _controller.rxIbUser.value.askedCount),
                               style: const TextStyle(
+                                  overflow: TextOverflow.ellipsis,
                                   fontWeight: FontWeight.bold,
                                   fontSize: IbConfig.kPageTitleSize),
                             )),
                         const Text(
-                          'ASKED',
+                          '✋ ASKED',
                           style: TextStyle(
+                              overflow: TextOverflow.ellipsis,
                               fontSize: IbConfig.kDescriptionTextSize,
                               color: IbColors.lightGrey),
                         )
@@ -286,7 +290,7 @@ class MyProfilePage extends StatelessWidget {
                               size: 16,
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                     SingleChildScrollView(
@@ -309,6 +313,12 @@ class MyProfilePage extends StatelessWidget {
                                 .toList(),
                           )),
                     ),
+                    if (_controller.rxEmoPics.isEmpty)
+                      Center(
+                          child: Text(
+                        'nothing'.tr,
+                        style: const TextStyle(color: IbColors.lightGrey),
+                      )),
                   ],
                 )),
           ),

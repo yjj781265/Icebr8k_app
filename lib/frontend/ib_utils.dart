@@ -14,7 +14,6 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../backend/controllers/user_controllers/auth_controller.dart';
-import '../backend/controllers/user_controllers/my_answered_questions_controller.dart';
 import '../backend/services/user_services/ib_question_db_service.dart';
 import 'ib_config.dart';
 
@@ -314,11 +313,25 @@ class IbUtils {
   static Future<List<IbAnswer>> getCommonAnswersQ(String uid) async {
     /// query each user answered questions then intersect
     final List<IbAnswer> uid1QuestionAnswers = [];
-    uid1QuestionAnswers
-        .addAll(Get.find<MyAnsweredQuestionsController>().ibAnswers);
-    print(uid1QuestionAnswers);
-    final List<IbAnswer> uid2QuestionAnswers =
-        await IbQuestionDbService().queryUserAnswers(uid);
+    final List<IbAnswer> uid2QuestionAnswers = [];
+    if (IbCacheManager().getIbAnswers(getCurrentUid()!) == null) {
+      final tempList =
+          await IbQuestionDbService().queryUserAnswers(getCurrentUid()!);
+      IbCacheManager()
+          .cacheIbAnswers(uid: getCurrentUid()!, ibAnswers: tempList);
+      uid1QuestionAnswers.addAll(tempList);
+    } else {
+      uid1QuestionAnswers
+          .addAll(IbCacheManager().getIbAnswers(getCurrentUid()!)!);
+    }
+
+    if (IbCacheManager().getIbAnswers(uid) == null) {
+      final tempList = await IbQuestionDbService().queryUserAnswers(uid);
+      IbCacheManager().cacheIbAnswers(uid: uid, ibAnswers: tempList);
+      uid2QuestionAnswers.addAll(tempList);
+    } else {
+      uid2QuestionAnswers.addAll(IbCacheManager().getIbAnswers(uid)!);
+    }
 
     final List<IbAnswer> common1 = uid2QuestionAnswers
         .toSet()
@@ -335,10 +348,25 @@ class IbUtils {
   static Future<List<IbAnswer>> getUncommonAnswersQ(String uid) async {
     /// query each user answered questions then find the difference
     final List<IbAnswer> uid1QuestionAnswers = [];
-    uid1QuestionAnswers
-        .addAll(Get.find<MyAnsweredQuestionsController>().ibAnswers);
-    final List<IbAnswer> uid2QuestionAnswers =
-        await IbQuestionDbService().queryUserAnswers(uid);
+    final List<IbAnswer> uid2QuestionAnswers = [];
+    if (IbCacheManager().getIbAnswers(getCurrentUid()!) == null) {
+      final tempList =
+          await IbQuestionDbService().queryUserAnswers(getCurrentUid()!);
+      IbCacheManager()
+          .cacheIbAnswers(uid: getCurrentUid()!, ibAnswers: tempList);
+      uid1QuestionAnswers.addAll(tempList);
+    } else {
+      uid1QuestionAnswers
+          .addAll(IbCacheManager().getIbAnswers(getCurrentUid()!)!);
+    }
+
+    if (IbCacheManager().getIbAnswers(uid) == null) {
+      final tempList = await IbQuestionDbService().queryUserAnswers(uid);
+      IbCacheManager().cacheIbAnswers(uid: uid, ibAnswers: tempList);
+      uid2QuestionAnswers.addAll(tempList);
+    } else {
+      uid2QuestionAnswers.addAll(IbCacheManager().getIbAnswers(uid)!);
+    }
 
     final List<String> uid1QuestionIds = [];
     final List<String> uid2QuestionIds = [];
@@ -368,7 +396,7 @@ class IbUtils {
             .firstWhere((element) => element.questionId == id));
       }
     }
-
+    print('getUncommonAnswersQ ${uncommonAnswers.length}');
     return uncommonAnswers;
   }
 

@@ -34,6 +34,9 @@ class IbStorageService {
   }
 
   Future<void> deleteFile(String url) async {
+    if (url.isEmpty) {
+      return;
+    }
     try {
       await _firebaseStorage.refFromURL(url).delete();
     } catch (e) {

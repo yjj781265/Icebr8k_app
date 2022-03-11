@@ -1,84 +1,52 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/models/ib_emo_pic.dart';
-import 'package:icebr8k/backend/models/ib_friend.dart';
+import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
-
-import '../../services/user_services/ib_cloud_messaging_service.dart';
-import '../../services/user_services/ib_storage_service.dart';
-import '../../services/user_services/ib_user_db_service.dart';
 
 class ProfileController extends GetxController {
   final isLoading = true.obs;
-  final currentIndex = 0.obs;
   final String uid;
-  final refreshController = RefreshController();
-  String requestMsg = '';
-  final avatarUrl = ''.obs;
-  final coverPhotoUrl = ''.obs;
-  final username = ''.obs;
-  final birthdateInMs = 0.obs;
-  final name = ''.obs;
-  final bio = ''.obs;
-  final isMe = false.obs;
   final compScore = 0.0.obs;
-  final totalAsked = 0.obs;
-  final totalAnswered = 0.obs;
-  final friendshipStatus = ''.obs;
-  final emoPics = <IbEmoPic>[].obs;
-  final askedSize = 0.obs;
-  final answeredSize = 0.obs;
+  final titlePadding = 8.0.obs;
+  late Rx<IbUser> rxIbUser;
   StreamSubscription? friendStatusStream;
+  final double kAppBarCollapseHeight = 56;
+  final isCollapsing = false.obs;
+  final ScrollController scrollController = ScrollController();
+  final commonAnswers = <IbAnswer>[].obs;
+  final uncommonAnswers = <IbAnswer>[].obs;
   ProfileController(this.uid);
 
   @override
   Future<void> onInit() async {
-    isMe.value = true;
-    if (isMe.isFalse) {
-      final String? status = await IbUserDbService()
-          .queryFriendshipStatus(IbUtils.getCurrentUid()!, uid);
-      friendshipStatus.value = status ?? '';
-      compScore.value = await IbUtils.getCompScore(uid);
-
-      totalAnswered.value =
-          await IbUserDbService().queryIbUserAnsweredSize(uid);
-
-      totalAsked.value = await IbUserDbService().queryIbUserAskedSize(uid);
-
-      friendStatusStream =
-          IbUserDbService().listenToSingleFriend(uid).listen((event) {
-        if (!event.exists) {
-          friendshipStatus.value = '';
-          return;
-        }
-        friendshipStatus.value = event['status'].toString();
-      }, onError: (error) {
-        friendshipStatus.value = '';
-      });
-    }
-
+    isLoading.value = true;
     final IbUser? user = await IbUserDbService().queryIbUser(uid);
-
-    if (user == null) {
-      isLoading.value = false;
-      return;
+    if (user != null) {
+      rxIbUser = user.obs;
+      commonAnswers.value = await IbUtils.getCommonAnswersQ(uid);
+      uncommonAnswers.value = await IbUtils.getUncommonAnswersQ(uid);
+      compScore.value = await IbUtils.getCompScore(uid);
     }
 
-    avatarUrl.value = user.avatarUrl;
-    coverPhotoUrl.value = user.coverPhotoUrl;
-    username.value = user.username;
-    name.value = '${user.fName} ${user.lName}';
-    bio.value = user.bio;
-    birthdateInMs.value = user.birthdateInMs ?? -1;
-    askedSize.value = user.askedCount;
-    answeredSize.value = user.answeredCount;
-    emoPics.value = user.emoPics;
+    scrollController.addListener(() {
+      titlePadding.value =
+          ((scrollController.offset / 206) * kAppBarCollapseHeight) >
+                  kAppBarCollapseHeight
+              ? kAppBarCollapseHeight
+              : (scrollController.offset / 206) * kAppBarCollapseHeight;
+      if (scrollController.offset > kAppBarCollapseHeight) {
+        isCollapsing.value = true;
+      } else {
+        isCollapsing.value = false;
+      }
+    });
+
     isLoading.value = false;
+
     super.onInit();
   }
 
@@ -89,70 +57,5 @@ class ProfileController extends GetxController {
     }
 
     super.onClose();
-  }
-
-  Future<void> sendFriendRequest() async {
-    try {
-      await IbUserDbService().sendFriendRequest(
-          myUid: IbUtils.getCurrentUid()!,
-          friendUid: uid,
-          requestMsg: requestMsg);
-      final _token = await IbCloudMessagingService().retrieveToken(uid);
-
-      if (_token != null) {
-        await IbCloudMessagingService().sendNotification(
-            tokens: [_token],
-            title: IbUtils.getCurrentIbUser()!.username,
-            body: '${'send_you_a_friend_request'.tr}\n $requestMsg',
-            type: IbCloudMessagingService.kNotificationTypeRequest);
-      }
-
-      friendshipStatus.value = IbFriend.kFriendshipStatusRequestSent;
-      IbUtils.showSimpleSnackBar(
-          msg: 'send_friend_request_success'.tr,
-          backgroundColor: IbColors.accentColor);
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  void unfriend() {
-    print('ProfileController unfriend');
-    IbUserDbService()
-        .rejectFriendRequest(myUid: IbUtils.getCurrentUid()!, friendUid: uid)
-        .then((value) {
-      friendshipStatus.value = '';
-    }).onError((error, stackTrace) {
-      IbUtils.showSimpleSnackBar(
-          msg: error.toString(), backgroundColor: IbColors.errorRed);
-    });
-  }
-
-  Future<void> updateCoverPhoto(String _filePath) async {
-    if (isMe.isFalse) {
-      return;
-    }
-
-    Get.dialog(const IbLoadingDialog(messageTrKey: 'Uploading...'),
-        barrierDismissible: true);
-
-    //delete the old one first
-    if (IbUtils.getCurrentIbUser() != null &&
-        IbUtils.getCurrentIbUser()!.coverPhotoUrl.isNotEmpty) {
-      await IbStorageService()
-          .deleteFile(IbUtils.getCurrentIbUser()!.coverPhotoUrl);
-    }
-
-    final String? photoUrl =
-        await IbStorageService().uploadAndRetrieveImgUrl(filePath: _filePath);
-
-    if (photoUrl == null) {
-      Get.back();
-      return;
-    }
-
-    await IbUserDbService()
-        .updateCoverPhotoUrl(photoUrl: photoUrl, uid: IbUtils.getCurrentUid()!);
-    Get.back();
   }
 }

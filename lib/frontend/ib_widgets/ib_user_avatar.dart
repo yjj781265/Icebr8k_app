@@ -1,6 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_pages/my_profile_page.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
@@ -48,7 +52,15 @@ class IbUserAvatar extends StatelessWidget {
             },
           ),
         GestureDetector(
-          onTap: (disableOnTap || uid == null || uid!.isEmpty) ? null : () {},
+          onTap: (disableOnTap || uid == null || uid!.isEmpty)
+              ? null
+              : () {
+                  if (uid == IbUtils.getCurrentUid()!) {
+                    Get.to(MyProfilePage());
+                  } else {
+                    Get.to(ProfilePage(Get.put(ProfileController(uid!))));
+                  }
+                },
           child: CachedNetworkImage(
             errorWidget: (context, str, value) => CircleAvatar(
                 radius: radius, backgroundColor: IbColors.lightBlue),

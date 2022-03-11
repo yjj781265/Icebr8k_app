@@ -29,10 +29,12 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
   final TextEditingController emojiTeController = TextEditingController();
   final TextEditingController descTeController = TextEditingController();
   String emojiStr = '';
+  String oldUrl = '';
 
   @override
   void initState() {
     emojiStr = widget.ibEmoPic.emoji;
+    oldUrl = widget.ibEmoPic.url;
     super.initState();
   }
 
@@ -90,7 +92,7 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
                     ),
                     IbTextField(
                         controller: descTeController,
-                        charLimit: 15,
+                        charLimit: 20,
                         text: widget.ibEmoPic.description,
                         textStyle: TextStyle(
                             color: Theme.of(context).indicatorColor,
@@ -119,7 +121,8 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
                   onPressed: () async {
                     widget.ibEmoPic.emoji = emojiTeController.text;
                     widget.ibEmoPic.description = descTeController.text.trim();
-                    await _controller.uploadEmoPic(widget.ibEmoPic);
+                    await _controller.uploadEmoPic(
+                        emoPic: widget.ibEmoPic, oldUrl: oldUrl);
                   },
                   icon: const Icon(Icons.check_circle_rounded),
                 ),
