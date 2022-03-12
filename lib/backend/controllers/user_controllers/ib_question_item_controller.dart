@@ -204,6 +204,7 @@ class IbQuestionItemController extends GetxController {
   }
 
   Future<void> _generateChoiceUserMap() async {
+    choiceUserMap.clear();
     for (final IbChoice choice in rxIbQuestion.value.choices) {
       final snapshot = await IbQuestionDbService().queryIbAnswers(
           choiceId: choice.choiceId,
@@ -250,6 +251,7 @@ class IbQuestionItemController extends GetxController {
     try {
       final IbAnswer ibAnswer = IbAnswer(
           choiceId: selectedChoiceId.value,
+          edited: rxIbAnswer != null,
           answeredTimeInMs: DateTime.now().millisecondsSinceEpoch,
           askedTimeInMs: rxIbQuestion.value.askedTimeInMs,
           uid: IbUtils.getCurrentUid()!,
@@ -264,14 +266,6 @@ class IbQuestionItemController extends GetxController {
             (countMap[rxIbAnswer!.value.choiceId] ?? 0) - 1;
         countMap[rxIbAnswer!.value.choiceId] =
             decrementedCount < 0 ? 0 : decrementedCount;
-        final Set<IbUser> updatedSet = choiceUserMap[rxIbQuestion.value.choices
-                .firstWhere((element) =>
-                    element.choiceId == rxIbAnswer!.value.choiceId)] ??
-            <IbUser>{};
-        updatedSet.remove(IbUtils.getCurrentIbUser());
-        choiceUserMap[rxIbQuestion.value.choices.firstWhere(
-                (element) => element.choiceId == rxIbAnswer!.value.choiceId)] =
-            updatedSet;
       } else {
         rxIbQuestion.value.pollSize++;
       }
@@ -279,24 +273,14 @@ class IbQuestionItemController extends GetxController {
       final int incrementedCount = (countMap[ibAnswer.choiceId] ?? 0) + 1;
       countMap[ibAnswer.choiceId] = incrementedCount;
 
-      //update choiceUserMap for result main page
-      final Set<IbUser> updatedSet = choiceUserMap[rxIbQuestion.value.choices
-              .firstWhere(
-                  (element) => element.choiceId == ibAnswer.choiceId)] ??
-          <IbUser>{};
-      updatedSet.add(IbUtils.getCurrentIbUser()!);
-      choiceUserMap[rxIbQuestion.value.choices
-              .firstWhere((element) => element.choiceId == ibAnswer.choiceId)] =
-          updatedSet;
-
       // update cachedCommentItems
       for (final item in cachedCommentItems) {
         if (item.user.id == ibAnswer.uid) {
           item.ibAnswer = ibAnswer;
         }
       }
-
       await generatePollStats();
+      await _generateChoiceUserMap();
       rxIbAnswer = ibAnswer.obs;
       voted.value = true;
     } catch (e) {

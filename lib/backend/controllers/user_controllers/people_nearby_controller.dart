@@ -108,7 +108,7 @@ class PeopleNearbyController extends GetxController {
       }
 
       final user = await IbUserDbService().queryIbUser(uid);
-      final compScore = await IbUtils.getCompScore(uid);
+      final compScore = await IbUtils.getCompScore(uid: uid);
       if (user != null) {
         final item = PeopleNearbyItem(ibUser: user, compScore: compScore);
         tempList.add(item);

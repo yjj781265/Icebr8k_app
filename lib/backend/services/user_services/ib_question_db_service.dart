@@ -60,49 +60,51 @@ class IbQuestionDbService {
     return list;
   }
 
-  /// query all question this uid asked
+  /// query all question this uid asked, public question (no Anonymous question) by default
   Future<QuerySnapshot<Map<String, dynamic>>> queryAskedQuestions({
-    int limit = -1,
+    int limit = 8,
+    bool publicOnly = true,
     required String uid,
     DocumentSnapshot? lastDoc,
   }) {
-    if (limit == -1) {
+    if (lastDoc == null && publicOnly) {
       return _collectionRef
           .orderBy('askedTimeInMs', descending: true)
+          .where('isAnonymous', isEqualTo: false)
           .where('creatorId', isEqualTo: uid)
-          .get();
-    }
-
-    if (lastDoc == null) {
-      return _collectionRef
-          .orderBy('askedTimeInMs', descending: true)
-          .where('creatorId', isEqualTo: uid)
+          .where('privacyBounds', arrayContains: 'public')
           .limit(limit)
           .get();
     }
+    if (lastDoc != null && publicOnly) {
+      return _collectionRef
+          .orderBy('askedTimeInMs', descending: true)
+          .where('creatorId', isEqualTo: uid)
+          .where('isAnonymous', isEqualTo: false)
+          .where('privacyBounds', arrayContains: 'public')
+          .startAfterDocument(lastDoc)
+          .limit(limit)
+          .get();
+    }
+
+    if (lastDoc != null && !publicOnly) {
+      return _collectionRef
+          .orderBy('askedTimeInMs', descending: true)
+          .where('creatorId', isEqualTo: uid)
+          .startAfterDocument(lastDoc)
+          .limit(limit)
+          .get();
+    }
+
     return _collectionRef
         .orderBy('askedTimeInMs', descending: true)
-        .startAfterDocument(lastDoc)
         .where('creatorId', isEqualTo: uid)
         .limit(limit)
         .get();
   }
 
-  Future<List<String>> queryAnsweredQuestionIds(String uid) async {
-    final List<String> _list = [];
-    final _snapshot = await _db
-        .collectionGroup(_kAnswerCollectionGroup)
-        .where('uid', isEqualTo: uid)
-        .get();
-
-    for (final element in _snapshot.docs) {
-      _list.add(element['questionId'].toString());
-    }
-    return _list;
-  }
-
   Future<QuerySnapshot<Map<String, dynamic>>> queryAnsweredQuestions(String uid,
-      {DocumentSnapshot? lastDoc, int limit = 8}) {
+      {DocumentSnapshot? lastDoc, int limit = 8}) async {
     late Query<Map<String, dynamic>> query;
     if (lastDoc != null) {
       query = _db
@@ -119,45 +121,6 @@ class IbQuestionDbService {
           .limit(limit);
     }
     return query.get();
-  }
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> listenToAnsweredQuestionsChange(
-      String uid,
-      {DocumentSnapshot? lastDoc,
-      int? limit}) {
-    late Query<Map<String, dynamic>> query;
-    if (limit == null && lastDoc == null) {
-      query = _db
-          .collectionGroup(_kAnswerCollectionGroup)
-          .where('uid', isEqualTo: uid)
-          .orderBy('answeredTimeInMs', descending: true);
-    } else if (limit != null && lastDoc == null) {
-      query = _db
-          .collectionGroup(_kAnswerCollectionGroup)
-          .where('uid', isEqualTo: uid)
-          .limit(limit)
-          .orderBy('answeredTimeInMs', descending: true);
-    } else if (limit == null && lastDoc != null) {
-      query = _db
-          .collectionGroup(_kAnswerCollectionGroup)
-          .where('uid', isEqualTo: uid)
-          .orderBy('answeredTimeInMs', descending: true)
-          .startAfterDocument(lastDoc);
-    } else if (limit != null && lastDoc != null) {
-      query = _db
-          .collectionGroup(_kAnswerCollectionGroup)
-          .where('uid', isEqualTo: uid)
-          .orderBy('answeredTimeInMs', descending: true)
-          .limit(limit)
-          .startAfterDocument(lastDoc);
-    } else {
-      query = _db
-          .collectionGroup(_kAnswerCollectionGroup)
-          .where('uid', isEqualTo: uid)
-          .orderBy('answeredTimeInMs', descending: true);
-    }
-
-    return query.snapshots();
   }
 
   Future<IbAnswer?> queryLatestAnsweredQ(String uid) async {
@@ -309,25 +272,6 @@ class IbQuestionDbService {
         .collection(_kAnswerCollectionGroup)
         .doc(ibAnswer.uid)
         .set(ibAnswer.toJson(), SetOptions(merge: true));
-  }
-
-  Future<int> queryPollSize(String questionId) async {
-    final _snapshot = await _collectionRef.doc(questionId).get();
-
-    if (!_snapshot.exists ||
-        _snapshot.data() == null ||
-        _snapshot.data()!['pollSize'] == 0) {
-      print('queryPollSize legacy method');
-      final _snapshot = await _collectionRef
-          .doc(questionId)
-          .collection(_kAnswerCollectionGroup)
-          .get();
-      return _snapshot.size;
-    }
-
-    print('queryPollSize new method');
-
-    return _snapshot.data()!['pollSize'] as int;
   }
 
   Future<int> querySpecificAnswerPollSize(

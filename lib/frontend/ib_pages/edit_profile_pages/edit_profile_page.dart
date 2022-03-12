@@ -253,6 +253,8 @@ class EditProfilePage extends StatelessWidget {
             else
               Image.file(
                 File(_controller.coverPhotoUrl.value),
+                width: Get.width,
+                height: Get.width / 1.78,
                 fit: BoxFit.fill,
               ),
             Positioned(

@@ -256,10 +256,11 @@ class IbUtils {
     ));
   }
 
-  static Future<double> getCompScore(String uid) async {
+  static Future<double> getCompScore(
+      {required String uid, bool isRefresh = false}) async {
     final List<IbAnswer> uid1QuestionAnswers = [];
     final List<IbAnswer> uid2QuestionAnswers = [];
-    if (IbCacheManager().getIbAnswers(getCurrentUid()!) == null) {
+    if (IbCacheManager().getIbAnswers(getCurrentUid()!) == null || isRefresh) {
       final tempList =
           await IbQuestionDbService().queryUserAnswers(getCurrentUid()!);
       IbCacheManager()
@@ -270,7 +271,7 @@ class IbUtils {
           .addAll(IbCacheManager().getIbAnswers(getCurrentUid()!)!);
     }
 
-    if (IbCacheManager().getIbAnswers(uid) == null) {
+    if (IbCacheManager().getIbAnswers(uid) == null || isRefresh) {
       final tempList = await IbQuestionDbService().queryUserAnswers(uid);
       IbCacheManager().cacheIbAnswers(uid: uid, ibAnswers: tempList);
       uid2QuestionAnswers.addAll(tempList);
@@ -310,11 +311,12 @@ class IbUtils {
     return _score;
   }
 
-  static Future<List<IbAnswer>> getCommonAnswersQ(String uid) async {
+  static Future<List<IbAnswer>> getCommonAnswersQ(
+      {required String uid, bool isRefresh = false}) async {
     /// query each user answered questions then intersect
     final List<IbAnswer> uid1QuestionAnswers = [];
     final List<IbAnswer> uid2QuestionAnswers = [];
-    if (IbCacheManager().getIbAnswers(getCurrentUid()!) == null) {
+    if (IbCacheManager().getIbAnswers(getCurrentUid()!) == null || isRefresh) {
       final tempList =
           await IbQuestionDbService().queryUserAnswers(getCurrentUid()!);
       IbCacheManager()
@@ -325,7 +327,7 @@ class IbUtils {
           .addAll(IbCacheManager().getIbAnswers(getCurrentUid()!)!);
     }
 
-    if (IbCacheManager().getIbAnswers(uid) == null) {
+    if (IbCacheManager().getIbAnswers(uid) == null || isRefresh) {
       final tempList = await IbQuestionDbService().queryUserAnswers(uid);
       IbCacheManager().cacheIbAnswers(uid: uid, ibAnswers: tempList);
       uid2QuestionAnswers.addAll(tempList);
@@ -345,11 +347,12 @@ class IbUtils {
     return common1;
   }
 
-  static Future<List<IbAnswer>> getUncommonAnswersQ(String uid) async {
+  static Future<List<IbAnswer>> getUncommonAnswersQ(
+      {required String uid, bool isRefresh = false}) async {
     /// query each user answered questions then find the difference
     final List<IbAnswer> uid1QuestionAnswers = [];
     final List<IbAnswer> uid2QuestionAnswers = [];
-    if (IbCacheManager().getIbAnswers(getCurrentUid()!) == null) {
+    if (IbCacheManager().getIbAnswers(getCurrentUid()!) == null || isRefresh) {
       final tempList =
           await IbQuestionDbService().queryUserAnswers(getCurrentUid()!);
       IbCacheManager()
@@ -360,7 +363,7 @@ class IbUtils {
           .addAll(IbCacheManager().getIbAnswers(getCurrentUid()!)!);
     }
 
-    if (IbCacheManager().getIbAnswers(uid) == null) {
+    if (IbCacheManager().getIbAnswers(uid) == null || isRefresh) {
       final tempList = await IbQuestionDbService().queryUserAnswers(uid);
       IbCacheManager().cacheIbAnswers(uid: uid, ibAnswers: tempList);
       uid2QuestionAnswers.addAll(tempList);

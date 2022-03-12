@@ -7,12 +7,10 @@ import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../services/user_services/ib_question_db_service.dart';
-import 'ib_question_item_controller.dart';
 
 class AnsweredQuestionController extends GetxController {
-  late StreamSubscription myAnsweredQuestionsSub;
   final refreshController = RefreshController();
-  final myAnsweredQuestions = <AnsweredQuestionItem>[].obs;
+  final answeredQs = <AnsweredQuestionItem>[].obs;
   final isLoading = true.obs;
   DocumentSnapshot? lastDoc;
   final String uid;
@@ -21,95 +19,46 @@ class AnsweredQuestionController extends GetxController {
 
   @override
   Future<void> onInit() async {
-    myAnsweredQuestionsSub = IbQuestionDbService()
-        .listenToAnsweredQuestionsChange(uid, limit: 8)
-        .listen((event) async {
-      for (final docChange in event.docChanges) {
-        final IbAnswer ibAnswer = IbAnswer.fromJson(docChange.doc.data()!);
-        final IbQuestion? ibQuestion = await IbQuestionDbService()
-            .querySingleQuestion(ibAnswer.questionId);
-        if (ibQuestion == null) {
-          continue;
-        }
-
-        final AnsweredQuestionItem item =
-            AnsweredQuestionItem(ibQuestion: ibQuestion, ibAnswer: ibAnswer);
-
-        if (docChange.type == DocumentChangeType.added) {
-          myAnsweredQuestions.addIf(!myAnsweredQuestions.contains(item), item);
-          print('added new answered question');
-          myAnsweredQuestions.sort(
-            (a, b) => b.ibAnswer.answeredTimeInMs
-                .compareTo(a.ibAnswer.answeredTimeInMs),
-          );
-        }
-
-        if (docChange.type == DocumentChangeType.removed) {
-          myAnsweredQuestions.remove(item);
-          print('remove new answered question');
-        }
+    final snapshot = await IbQuestionDbService().queryAnsweredQuestions(uid);
+    lastDoc = snapshot.size == 0 ? null : snapshot.docs.last;
+    for (final doc in snapshot.docs) {
+      final IbAnswer ibAnswer = IbAnswer.fromJson(doc.data());
+      final IbQuestion? question =
+          await IbQuestionDbService().querySingleQuestion(ibAnswer.questionId);
+      if (question != null) {
+        answeredQs.add(
+            AnsweredQuestionItem(ibQuestion: question, ibAnswer: ibAnswer));
       }
-
-      /// prevent loadMore function to load from the start
-      if (isLoading.isTrue && event.docs.isNotEmpty) {
-        lastDoc = event.docs.last;
-      }
-
-      isLoading.value = false;
-    });
+    }
+    isLoading.value = false;
     super.onInit();
   }
 
   Future<void> loadMore() async {
     if (lastDoc == null) {
       refreshController.loadNoData();
-      print('AnsweredQuestionController no more');
       return;
     }
-    print('AnsweredQuestionController loadMore');
-    final _snapshot = await IbQuestionDbService()
+
+    final snapshot = await IbQuestionDbService()
         .queryAnsweredQuestions(uid, lastDoc: lastDoc);
-
-    if (_snapshot.docs.isNotEmpty) {
-      lastDoc = _snapshot.docs.last;
-      print('AnsweredQuestionController last doc is ${lastDoc!.data()}');
-      for (final doc in _snapshot.docs) {
-        final IbAnswer ibAnswer = IbAnswer.fromJson(doc.data());
-        final IbQuestion? ibQuestion = await IbQuestionDbService()
-            .querySingleQuestion(ibAnswer.questionId);
-        if (ibQuestion == null) {
-          continue;
-        }
-        final AnsweredQuestionItem item =
-            AnsweredQuestionItem(ibQuestion: ibQuestion, ibAnswer: ibAnswer);
-        myAnsweredQuestions.addIf(!myAnsweredQuestions.contains(item), item);
+    lastDoc = snapshot.size == 0 ? null : snapshot.docs.last;
+    for (final doc in snapshot.docs) {
+      final IbAnswer ibAnswer = IbAnswer.fromJson(doc.data());
+      final IbQuestion? question =
+          await IbQuestionDbService().querySingleQuestion(ibAnswer.questionId);
+      if (question != null) {
+        answeredQs.add(
+            AnsweredQuestionItem(ibQuestion: question, ibAnswer: ibAnswer));
       }
-      myAnsweredQuestions.sort(
-        (a, b) =>
-            b.ibAnswer.answeredTimeInMs.compareTo(a.ibAnswer.answeredTimeInMs),
-      );
-    } else {
-      lastDoc = null;
     }
+
+    if (lastDoc == null) {
+      refreshController.loadNoData();
+      return;
+    }
+
     refreshController.loadComplete();
-  }
-
-  Future<void> updateItems() async {
-    print('AnsweredQuestionController updateItems');
-    for (final item in myAnsweredQuestions) {
-      final tag = 'answered_${item.ibQuestion.id}';
-      if (Get.isRegistered<IbQuestionItemController>(tag: tag)) {
-        final ibQuestion =
-            await IbQuestionDbService().querySingleQuestion(item.ibQuestion.id);
-        if (ibQuestion != null) {}
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    myAnsweredQuestionsSub.cancel();
-    super.dispose();
   }
 }
 

@@ -86,7 +86,8 @@ class _IbMediaSlideState extends State<IbMediaSlide>
             () => IbMediaViewer(
                 urls: widget.medias.map((e) => e.url).toList(),
                 currentIndex: widget.medias.indexOf(media)),
-            transition: Transition.zoom);
+            transition: Transition.zoom,
+            fullscreenDialog: true);
       },
       child: mediaWidget,
     );

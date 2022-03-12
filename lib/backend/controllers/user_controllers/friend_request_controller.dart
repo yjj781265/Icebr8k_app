@@ -34,7 +34,7 @@ class FriendRequestController extends GetxController {
         final IbFriend friend = IbFriend.fromJson(change.doc.data()!);
         final IbUser? user =
             await IbUserDbService().queryIbUser(friend.friendUid);
-        final double score = await IbUtils.getCompScore(friend.friendUid);
+        final double score = await IbUtils.getCompScore(uid: friend.friendUid);
 
         if (change.type == DocumentChangeType.added) {
           if (user != null) {

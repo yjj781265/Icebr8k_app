@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_pages/my_profile_page.dart';
-import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
+
+import '../ib_pages/profile_pages/my_profile_page.dart';
+import '../ib_pages/profile_pages/profile_page.dart';
 
 class IbUserAvatar extends StatelessWidget {
   final String avatarUrl;
@@ -56,9 +57,10 @@ class IbUserAvatar extends StatelessWidget {
               ? null
               : () {
                   if (uid == IbUtils.getCurrentUid()!) {
-                    Get.to(MyProfilePage());
+                    Get.to(() => MyProfilePage());
                   } else {
-                    Get.to(ProfilePage(Get.put(ProfileController(uid!))));
+                    Get.to(() => ProfilePage(Get.put(ProfileController(uid!),
+                        tag: IbUtils.getUniqueId())));
                   }
                 },
           child: CachedNetworkImage(

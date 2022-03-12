@@ -6,7 +6,6 @@ import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controll
 import '../controllers/user_controllers/chat_tab_controller.dart';
 import '../controllers/user_controllers/friend_request_controller.dart';
 import '../controllers/user_controllers/home_tab_controller.dart';
-import '../controllers/user_controllers/my_answered_questions_controller.dart';
 import '../controllers/user_controllers/people_nearby_controller.dart';
 
 class HomeBinding implements Bindings {
@@ -14,7 +13,6 @@ class HomeBinding implements Bindings {
   void dependencies() {
     Get.lazyPut(() => SocialTabController(), fenix: true);
     Get.lazyPut(() => MainPageController(), fenix: true);
-    Get.lazyPut(() => MyAnsweredQuestionsController(), fenix: true);
     Get.lazyPut(() => HomeTabController(), fenix: true);
     Get.lazyPut(() => ChatTabController(), fenix: true);
     Get.lazyPut(() => FriendListController(), fenix: true);

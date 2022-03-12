@@ -39,7 +39,7 @@ class QuestionResultDetailPageController extends GetxController {
 
       for (final doc in snapshot.docs) {
         final IbAnswer ibAnswer = IbAnswer.fromJson(doc.data());
-        final double compScore = await IbUtils.getCompScore(ibAnswer.uid);
+        final double compScore = await IbUtils.getCompScore(uid: ibAnswer.uid);
         late IbUser? ibUser;
         if (IbCacheManager().getIbUser(ibAnswer.uid) == null) {
           ibUser = await IbUserDbService().queryIbUser(ibAnswer.uid);
@@ -80,7 +80,8 @@ class QuestionResultDetailPageController extends GetxController {
 
         for (final doc in snapshot.docs) {
           final IbAnswer ibAnswer = IbAnswer.fromJson(doc.data());
-          final double compScore = await IbUtils.getCompScore(ibAnswer.uid);
+          final double compScore =
+              await IbUtils.getCompScore(uid: ibAnswer.uid);
           late IbUser? ibUser;
           if (IbCacheManager().getIbUser(ibAnswer.uid) == null) {
             ibUser = await IbUserDbService().queryIbUser(ibAnswer.uid);

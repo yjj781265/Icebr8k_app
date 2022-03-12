@@ -6,6 +6,7 @@ import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class ProfileController extends GetxController {
   final isLoading = true.obs;
@@ -16,6 +17,7 @@ class ProfileController extends GetxController {
   StreamSubscription? friendStatusStream;
   final double kAppBarCollapseHeight = 56;
   final isCollapsing = false.obs;
+  final RefreshController refreshController = RefreshController();
   final ScrollController scrollController = ScrollController();
   final commonAnswers = <IbAnswer>[].obs;
   final uncommonAnswers = <IbAnswer>[].obs;
@@ -27,9 +29,9 @@ class ProfileController extends GetxController {
     final IbUser? user = await IbUserDbService().queryIbUser(uid);
     if (user != null) {
       rxIbUser = user.obs;
-      commonAnswers.value = await IbUtils.getCommonAnswersQ(uid);
-      uncommonAnswers.value = await IbUtils.getUncommonAnswersQ(uid);
-      compScore.value = await IbUtils.getCompScore(uid);
+      commonAnswers.value = await IbUtils.getCommonAnswersQ(uid: uid);
+      uncommonAnswers.value = await IbUtils.getUncommonAnswersQ(uid: uid);
+      compScore.value = await IbUtils.getCompScore(uid: uid);
     }
 
     scrollController.addListener(() {
@@ -48,6 +50,20 @@ class ProfileController extends GetxController {
     isLoading.value = false;
 
     super.onInit();
+  }
+
+  Future<void> onRefresh() async {
+    final IbUser? user = await IbUserDbService().queryIbUser(uid);
+    if (user != null) {
+      rxIbUser = user.obs;
+      rxIbUser = user.obs;
+      commonAnswers.value =
+          await IbUtils.getCommonAnswersQ(uid: uid, isRefresh: true);
+      uncommonAnswers.value =
+          await IbUtils.getUncommonAnswersQ(uid: uid, isRefresh: true);
+      compScore.value = await IbUtils.getCompScore(uid: uid, isRefresh: true);
+    }
+    refreshController.refreshCompleted();
   }
 
   @override

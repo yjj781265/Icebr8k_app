@@ -1,16 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:get/get.dart';
 import 'package:icebr8k/backend/db_config.dart';
-import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
-import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
-import '../../controllers/user_controllers/my_answered_questions_controller.dart';
 import '../../managers/ib_cache_manager.dart';
-import 'ib_question_db_service.dart';
 
 class IbUserDbService {
   static final _ibUserService = IbUserDbService._();
@@ -93,23 +88,6 @@ class IbUserDbService {
     return !snapshot.exists ||
         snapshot.data()!['avatarUrl'] == null ||
         snapshot['avatarUrl'] == '';
-  }
-
-  Future<List<IbQuestion>> queryUnAnsweredFirst8Q(String uid) async {
-    List<String> questionIds = [];
-    final _controller = Get.find<MyAnsweredQuestionsController>();
-    final List<IbQuestion> questions =
-        await IbQuestionDbService().queryFirst8();
-    if (_controller.isLoaded.isTrue && _controller.ibAnswers.isNotEmpty) {
-      for (final IbAnswer ibAnswer in _controller.ibAnswers) {
-        questionIds.add(ibAnswer.questionId);
-      }
-    } else {
-      questionIds = await IbQuestionDbService().queryAnsweredQuestionIds(uid);
-    }
-
-    questions.removeWhere((element) => questionIds.contains(element.id));
-    return questions;
   }
 
   Future<void> updateAvatarUrl({required String url, required String uid}) {
@@ -204,31 +182,6 @@ class IbUserDbService {
     }
 
     return IbUser.fromJson(snapshot.docs.first.data());
-  }
-
-  Future<int> queryIbUserAnsweredSize(String uid) async {
-    final snapshot = await _collectionRef.doc(uid).get();
-
-    if (!snapshot.exists || snapshot.data()!['answeredSize'] == null) {
-      print('queryIbUserAnsweredSize legacy method');
-      final list = await IbQuestionDbService().queryAnsweredQuestionIds(uid);
-      return list.length;
-    }
-    print('queryIbUserAnsweredSize new method');
-    return snapshot.data()!['answeredSize'] as int;
-  }
-
-  Future<int> queryIbUserAskedSize(String uid) async {
-    final snapshot = await _collectionRef.doc(uid).get();
-
-    if (!snapshot.exists || snapshot.data()!['askedSize'] == null) {
-      print('queryIbUserAskedSize legacy method');
-      final snapshot =
-          await IbQuestionDbService().queryAskedQuestions(uid: uid);
-      return snapshot.size;
-    }
-    print('queryIbUserAskedSize new method');
-    return snapshot.data()!['askedSize'] as int;
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> listenToFriendRequest(

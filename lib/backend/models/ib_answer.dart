@@ -10,6 +10,7 @@ class IbAnswer {
   final int askedTimeInMs;
   final String questionId;
   final String questionType;
+  final bool edited;
 
   IbAnswer(
       {required this.choiceId,
@@ -17,6 +18,7 @@ class IbAnswer {
       required this.askedTimeInMs,
       required this.questionId,
       required this.questionType,
+      this.edited = false,
       required this.uid});
 
   factory IbAnswer.fromJson(Map<String, dynamic> json) =>

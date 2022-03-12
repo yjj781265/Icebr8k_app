@@ -157,6 +157,8 @@ class IbStrings extends Translations {
           'upload': 'Uploading...',
           'update': 'Updating...',
           'nothing': 'Nothing to see here 😐',
+          'private_profile': 'The Profile is Private 🔐',
+          'asked_question_ps': 'Anonymous and non-public questions are hidden'
         }
       };
 }

@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
@@ -29,7 +28,7 @@ class FriendListController extends GetxController {
         if (ibUser == null) {
           continue;
         }
-        final double score = await IbUtils.getCompScore(friend.friendUid);
+        final double score = await IbUtils.getCompScore(uid: friend.friendUid);
         final FriendListItem item = FriendListItem(
             username: ibUser.username,
             avatarUrl: ibUser.avatarUrl,
@@ -56,12 +55,6 @@ class FriendListController extends GetxController {
       friendItems.sort((a, b) => b.score.compareTo(a.score));
     });
 
-    _myAnsweredQuestionsSub = IbQuestionDbService()
-        .listenToAnsweredQuestionsChange(myUid)
-        .listen((event) {
-      _refreshScore();
-    });
-
     super.onInit();
   }
 
@@ -83,7 +76,7 @@ class FriendListController extends GetxController {
       if (ibUser == null) {
         continue;
       }
-      final double score = await IbUtils.getCompScore(friend.friendUid);
+      final double score = await IbUtils.getCompScore(uid: friend.friendUid);
       final FriendListItem item = FriendListItem(
           username: ibUser.username,
           avatarUrl: ibUser.avatarUrl,
@@ -110,7 +103,7 @@ class FriendListController extends GetxController {
 
   Future<void> _refreshScore() async {
     for (final FriendListItem item in friendItems) {
-      final double score = await IbUtils.getCompScore(item.uid);
+      final double score = await IbUtils.getCompScore(uid: item.uid);
       item.score = score;
     }
     friendItems.sort((a, b) => b.score.compareTo(a.score));
