@@ -45,10 +45,11 @@ class IbUserAvatar extends StatelessWidget {
             duration: const Duration(milliseconds: 888),
             builder: (BuildContext context, double value, Widget? child) {
               return SizedBox(
-                  height: radius * 2 + 2,
-                  width: radius * 2 + 2,
+                  height: radius * 2 + 4,
+                  width: radius * 2 + 4,
                   child: CircularProgressIndicator(
                     color: IbUtils.handleIndicatorColor(value),
+                    strokeWidth: 6,
                     value: value,
                   ));
             },
@@ -92,7 +93,7 @@ class IbUserAvatar extends StatelessWidget {
                     IbUtils.handleIndicatorColor(compScore!).withOpacity(0.8),
                 borderRadius: BorderRadius.circular(8),
               ),
-              width: 32,
+              width: 40,
               alignment: Alignment.center,
               child: TweenAnimationBuilder(
                 duration: const Duration(milliseconds: 888),

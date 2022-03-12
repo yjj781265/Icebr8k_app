@@ -347,26 +347,23 @@ class MyProfilePage extends StatelessWidget {
                             ),
                           ],
                         ),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Obx(() => Row(
-                                children: _controller.rxEmoPics
-                                    .map((e) => IbEmoPicCard(
-                                          emoPic: e,
-                                          onTap: () {
-                                            Get.to(
-                                                () => IbMediaViewer(
-                                                      urls: [e.url],
-                                                      currentIndex: 0,
-                                                    ),
-                                                transition: Transition.zoom,
-                                                fullscreenDialog: true);
-                                          },
-                                          ignoreOnDoubleTap: true,
-                                        ))
-                                    .toList(),
-                              )),
-                        ),
+                        Obx(() => Wrap(
+                              children: _controller.rxEmoPics
+                                  .map((e) => IbEmoPicCard(
+                                        emoPic: e,
+                                        onTap: () {
+                                          Get.to(
+                                              () => IbMediaViewer(
+                                                    urls: [e.url],
+                                                    currentIndex: 0,
+                                                  ),
+                                              transition: Transition.zoom,
+                                              fullscreenDialog: true);
+                                        },
+                                        ignoreOnDoubleTap: true,
+                                      ))
+                                  .toList(),
+                            )),
                         const SizedBox(
                           height: 16,
                         ),

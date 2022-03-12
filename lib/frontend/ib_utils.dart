@@ -311,7 +311,7 @@ class IbUtils {
     return _score;
   }
 
-  static Future<List<IbAnswer>> getCommonAnswersQ(
+  static Future<List<String>> getCommonAnswerQuestionIds(
       {required String uid, bool isRefresh = false}) async {
     /// query each user answered questions then intersect
     final List<IbAnswer> uid1QuestionAnswers = [];
@@ -334,20 +334,16 @@ class IbUtils {
     } else {
       uid2QuestionAnswers.addAll(IbCacheManager().getIbAnswers(uid)!);
     }
-
-    final List<IbAnswer> common1 = uid2QuestionAnswers
+    final List<IbAnswer> commonAnswers = uid2QuestionAnswers
         .toSet()
         .intersection(uid1QuestionAnswers.toSet())
         .toList();
-    final List<IbAnswer> common2 = uid1QuestionAnswers
-        .toSet()
-        .intersection(uid2QuestionAnswers.toSet())
-        .toList();
-    common1.addAll(common2);
-    return common1;
+    commonAnswers
+        .sort((a, b) => b.answeredTimeInMs.compareTo(a.answeredTimeInMs));
+    return commonAnswers.map((e) => e.questionId).toList();
   }
 
-  static Future<List<IbAnswer>> getUncommonAnswersQ(
+  static Future<List<String>> getUncommonAnswerQuestionIds(
       {required String uid, bool isRefresh = false}) async {
     /// query each user answered questions then find the difference
     final List<IbAnswer> uid1QuestionAnswers = [];
@@ -371,36 +367,63 @@ class IbUtils {
       uid2QuestionAnswers.addAll(IbCacheManager().getIbAnswers(uid)!);
     }
 
-    final List<String> uid1QuestionIds = [];
-    final List<String> uid2QuestionIds = [];
+    final List<String> commonQuestionIds = uid1QuestionAnswers
+        .map((e) => e.questionId)
+        .toSet()
+        .intersection(uid2QuestionAnswers.map((e) => e.questionId).toSet())
+        .toList();
 
-    for (final IbAnswer answer in uid1QuestionAnswers) {
-      uid1QuestionIds.add(answer.questionId);
-    }
-
-    for (final IbAnswer answer in uid2QuestionAnswers) {
-      uid2QuestionIds.add(answer.questionId);
-    }
-
-    final List<String> commonQuestionId =
-        uid1QuestionIds.toSet().intersection(uid2QuestionIds.toSet()).toList();
     final List<IbAnswer> uncommonAnswers = [];
 
-    for (final id in commonQuestionId) {
-      if (uid1QuestionAnswers
-              .firstWhere((element) => element.questionId == id)
-              .choiceId !=
-          uid2QuestionAnswers
-              .firstWhere((element) => element.questionId == id)
-              .choiceId) {
-        uncommonAnswers.add(uid2QuestionAnswers
-            .firstWhere((element) => element.questionId == id));
-        uncommonAnswers.add(uid1QuestionAnswers
-            .firstWhere((element) => element.questionId == id));
+    for (final String id in commonQuestionIds) {
+      final IbAnswer? uid1Answer = uid1QuestionAnswers
+          .firstWhereOrNull((element) => element.questionId == id);
+      final IbAnswer? uid2Answer = uid2QuestionAnswers
+          .firstWhereOrNull((element) => element.questionId == id);
+      if (uid1Answer == null || uid2Answer == null) {
+        continue;
+      } else if (uid1Answer.choiceId != uid2Answer.choiceId) {
+        uncommonAnswers.add(uid1Answer);
       }
     }
-    print('getUncommonAnswersQ ${uncommonAnswers.length}');
-    return uncommonAnswers;
+    uncommonAnswers
+        .sort((a, b) => b.answeredTimeInMs.compareTo(a.answeredTimeInMs));
+    return uncommonAnswers.map((e) => e.questionId).toList();
+  }
+
+  static Future<List<IbAnswer>> getIbAnswers(
+      {required List<String> uids,
+      required String questionId,
+      bool isRefresh = false}) async {
+    final List<IbAnswer> theAnswers = [];
+
+    /// look for ibAnswer in cache first
+
+    for (final String uid in uids.toSet()) {
+      if (IbCacheManager().getIbAnswers(uid) == null || isRefresh) {
+        final answer =
+            await IbQuestionDbService().querySingleIbAnswer(uid, questionId);
+        if (answer == null) {
+          continue;
+        }
+        theAnswers.add(answer);
+      } else {
+        final List<IbAnswer> answers = IbCacheManager().getIbAnswers(uid)!;
+        final IbAnswer? ibAnswer = answers
+            .firstWhereOrNull((element) => element.questionId == questionId);
+        if (ibAnswer != null) {
+          theAnswers.add(ibAnswer);
+        } else {
+          final answer =
+              await IbQuestionDbService().querySingleIbAnswer(uid, questionId);
+          if (answer == null) {
+            continue;
+          }
+          theAnswers.add(answer);
+        }
+      }
+    }
+    return theAnswers;
   }
 
   static Color getRandomColor() {

@@ -86,7 +86,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
               IbQuestionStats(Get.put(
                   IbQuestionStatsController(
                       ibAnswers: widget._controller.ibAnswers!,
-                      questionId: widget._controller.rxIbQuestion.value.id),
+                      ibQuestion: widget._controller.rxIbQuestion.value),
                   tag: widget._controller.rxIbQuestion.value.id))
             else
               Align(
@@ -104,6 +104,9 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                   ],
                 ),
               )),
+            const SizedBox(
+              height: 16,
+            ),
             IbQuestionTags(widget._controller),
             const SizedBox(
               height: 8,

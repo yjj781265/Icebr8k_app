@@ -13,7 +13,7 @@ class IbQuestionTags extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: tagList(context),
+      child: SizedBox(height: 30, child: tagList(context)),
     );
   }
 

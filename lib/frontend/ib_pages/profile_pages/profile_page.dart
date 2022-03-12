@@ -4,10 +4,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/asked_questions_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/compare_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/asked_page.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_pages/compare_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_description_text.dart';
@@ -205,7 +207,28 @@ class ProfilePage extends StatelessWidget {
                             Radius.circular(8),
                           ),
                         ),
-                        onTap: () {},
+                        onTap: () {
+                          if (_controller.rxIbUser.value.isPrivate) {
+                            IbUtils.showSimpleSnackBar(
+                                msg: 'private_profile'.tr,
+                                backgroundColor: IbColors.errorRed);
+                            return;
+                          }
+                          Get.to(
+                            () => ComparePage(
+                              Get.put(
+                                CompareController(
+                                  title: '👍 AGREE',
+                                  questionIds: _controller.commonAnswers,
+                                  uids: [
+                                    _controller.uid,
+                                    IbUtils.getCurrentUid() ?? ''
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
@@ -246,7 +269,28 @@ class ProfilePage extends StatelessWidget {
                             Radius.circular(8),
                           ),
                         ),
-                        onTap: () {},
+                        onTap: () {
+                          if (_controller.rxIbUser.value.isPrivate) {
+                            IbUtils.showSimpleSnackBar(
+                                msg: 'private_profile'.tr,
+                                backgroundColor: IbColors.errorRed);
+                            return;
+                          }
+                          Get.to(
+                            () => ComparePage(
+                              Get.put(
+                                CompareController(
+                                  title: '👎 DISAGREE',
+                                  questionIds: _controller.uncommonAnswers,
+                                  uids: [
+                                    _controller.uid,
+                                    IbUtils.getCurrentUid() ?? ''
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
@@ -288,6 +332,12 @@ class ProfilePage extends StatelessWidget {
                           ),
                         ),
                         onTap: () {
+                          if (_controller.rxIbUser.value.isPrivate) {
+                            IbUtils.showSimpleSnackBar(
+                                msg: 'private_profile'.tr,
+                                backgroundColor: IbColors.errorRed);
+                            return;
+                          }
                           Get.to(
                             () => AskedPage(
                               Get.put(AskedQuestionsController(_controller.uid),
@@ -386,56 +436,32 @@ class ProfilePage extends StatelessWidget {
                   Obx(() => Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  'My EmoPics',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: IbConfig.kPageTitleSize),
-                                ),
-                              ),
-                              if (_controller.rxIbUser.value.emoPics.isNotEmpty)
-                                Directionality(
-                                  textDirection: TextDirection.rtl,
-                                  child: TextButton.icon(
-                                    onPressed: () {},
-                                    label: Text(
-                                      'more'.tr,
-                                      style: const TextStyle(
-                                          color: IbColors.primaryColor),
-                                    ),
-                                    icon: const Icon(
-                                      Icons.more_horiz,
-                                      size: 16,
-                                    ),
-                                  ),
-                                ),
-                            ],
+                          const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'My EmoPics',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: IbConfig.kPageTitleSize),
+                            ),
                           ),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Obx(() => Row(
-                                  children: _controller.rxIbUser.value.emoPics
-                                      .map((e) => IbEmoPicCard(
-                                            emoPic: e,
-                                            onTap: () {
-                                              Get.to(
-                                                  () => IbMediaViewer(
-                                                        urls: [e.url],
-                                                        currentIndex: 0,
-                                                      ),
-                                                  transition: Transition.zoom,
-                                                  fullscreenDialog: true);
-                                            },
-                                            ignoreOnDoubleTap: true,
-                                          ))
-                                      .toList(),
-                                )),
-                          ),
+                          Obx(() => Wrap(
+                                children: _controller.rxIbUser.value.emoPics
+                                    .map((e) => IbEmoPicCard(
+                                          emoPic: e,
+                                          onTap: () {
+                                            Get.to(
+                                                () => IbMediaViewer(
+                                                      urls: [e.url],
+                                                      currentIndex: 0,
+                                                    ),
+                                                transition: Transition.zoom,
+                                                fullscreenDialog: true);
+                                          },
+                                          ignoreOnDoubleTap: true,
+                                        ))
+                                    .toList(),
+                              )),
                           const SizedBox(
                             height: 16,
                           ),

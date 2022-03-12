@@ -19,10 +19,11 @@ class IbEmoPicCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = Get.width / 2.12;
     return IbCard(
         child: SizedBox(
-      height: 160 * 1.618,
-      width: 160,
+      height: width * 1.618,
+      width: width,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -30,8 +31,8 @@ class IbEmoPicCard extends StatelessWidget {
             children: [
               if (emoPic.url.isEmpty)
                 Container(
-                  width: 160,
-                  height: 160 * 1.618 - 30,
+                  height: width * 1.618 - 30,
+                  width: width,
                   decoration: const BoxDecoration(
                       color: IbColors.lightGrey,
                       borderRadius: BorderRadius.only(
@@ -48,8 +49,8 @@ class IbEmoPicCard extends StatelessWidget {
                   child: Image.file(
                     File(emoPic.url),
                     fit: BoxFit.cover,
-                    width: 160,
-                    height: 160 * 1.618 - 30,
+                    height: width * 1.618 - 30,
+                    width: width,
                   ),
                 ),
               if (emoPic.url.isNotEmpty && emoPic.url.contains('http'))
@@ -60,8 +61,8 @@ class IbEmoPicCard extends StatelessWidget {
                   child: CachedNetworkImage(
                     imageUrl: emoPic.url,
                     fit: BoxFit.cover,
-                    width: 160,
-                    height: 160 * 1.618 - 30,
+                    height: width * 1.618 - 30,
+                    width: width,
                   ),
                 ),
               Positioned(

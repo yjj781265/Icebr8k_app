@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
@@ -38,6 +39,7 @@ class IbTagDbService {
     final snapshot = await _db.collection(_kTagCollection).doc(tagId).get();
 
     if (snapshot.exists) {
+      IbCacheManager().cacheIbTag(IbTag.fromJson(snapshot.data()!));
       return IbTag.fromJson(snapshot.data()!);
     }
     return null;

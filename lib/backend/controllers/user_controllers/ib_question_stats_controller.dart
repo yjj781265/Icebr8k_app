@@ -1,32 +1,26 @@
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 
 class IbQuestionStatsController extends GetxController {
-  final String questionId;
   final List<IbAnswer> ibAnswers;
   final stats = <IbQuestionStatsItem>[].obs;
-  IbQuestion? ibQuestion;
+  final IbQuestion ibQuestion;
   IbQuestionStatsController(
-      {required this.questionId, required this.ibAnswers});
+      {required this.ibQuestion, required this.ibAnswers});
   @override
   Future<void> onInit() async {
-    ibQuestion = await IbQuestionDbService().querySingleQuestion(questionId);
-    ibAnswers.removeWhere((element) => element.questionId != questionId);
+    ibAnswers.removeWhere((element) => element.questionId != ibQuestion.id);
     await initStatsMap();
     super.onInit();
   }
 
   Future<void> initStatsMap() async {
-    if (ibQuestion == null) {
-      return;
-    }
-
-    for (final ibChoice in ibQuestion!.choices) {
+    for (final ibChoice in ibQuestion.choices) {
       final List<IbAnswer> tempList = ibAnswers
           .where((element) => element.choiceId == ibChoice.choiceId)
           .toList();
@@ -34,8 +28,12 @@ class IbQuestionStatsController extends GetxController {
       if (tempList.isNotEmpty) {
         final List<IbUser> userList = [];
         for (final IbAnswer ibAnswer in tempList) {
-          final IbUser? user =
-              await IbUserDbService().queryIbUser(ibAnswer.uid);
+          final IbUser? user;
+          if (IbCacheManager().getIbUser(ibAnswer.uid) == null) {
+            user = await IbUserDbService().queryIbUser(ibAnswer.uid);
+          } else {
+            user = IbCacheManager().getIbUser(ibAnswer.uid);
+          }
 
           if (user == null) {
             continue;

@@ -37,6 +37,6 @@ class IbAnswer {
 
   @override
   String toString() {
-    return 'IbAnswer{choiceId: $choiceId, uid: $uid, questionId: $questionId, questionType: $questionType}';
+    return 'IbAnswer{ questionId: $questionId,choiceId: $choiceId, uid: $uid,}';
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/question_result_detail_controller.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
@@ -42,6 +44,10 @@ class QuestionResultDetailPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final item = _controller.results[index];
               return ListTile(
+                onTap: () {
+                  Get.to(() =>
+                      ProfilePage(Get.put(ProfileController(item.user.id))));
+                },
                 tileColor: Theme.of(context).backgroundColor,
                 leading: IbUserAvatar(
                   uid: item.user.id,
@@ -54,6 +60,7 @@ class QuestionResultDetailPage extends StatelessWidget {
                 subtitle: IbLinearIndicator(
                   endValue: item.compScore,
                 ),
+                trailing: const Icon(Icons.arrow_forward_ios_rounded),
               );
             },
             itemCount: _controller.results.length,

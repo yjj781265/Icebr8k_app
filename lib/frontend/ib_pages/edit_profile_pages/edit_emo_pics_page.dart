@@ -29,7 +29,6 @@ class EditEmoPicsPage extends StatelessWidget {
                 ),
               Expanded(
                 child: ReorderableWrap(
-                  padding: const EdgeInsets.all(8.0),
                   footer: IbEmoPicCard(
                     emoPic: IbEmoPic(
                       url: '',
@@ -45,7 +44,6 @@ class EditEmoPicsPage extends StatelessWidget {
                           )));
                     },
                   ),
-                  spacing: 8,
                   runAlignment: WrapAlignment.center,
                   children: _controller.rxEmoPics
                       .map((e) => Stack(
@@ -59,7 +57,7 @@ class EditEmoPicsPage extends StatelessWidget {
                               ),
                               Positioned(
                                   top: 0,
-                                  right: -8,
+                                  right: 0,
                                   child: CircleAvatar(
                                     radius: 16,
                                     backgroundColor:

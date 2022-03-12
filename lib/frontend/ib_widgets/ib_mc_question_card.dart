@@ -87,7 +87,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
               IbQuestionStats(Get.put(
                   IbQuestionStatsController(
                       ibAnswers: widget._controller.ibAnswers!,
-                      questionId: widget._controller.rxIbQuestion.value.id),
+                      ibQuestion: widget._controller.rxIbQuestion.value),
                   tag: widget._controller.rxIbQuestion.value.id))
             else
               LimitedBox(
@@ -95,17 +95,17 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                         IbQuestion.kMultipleChoice
                     ? 300
                     : 400,
-                child: Scrollbar(
-                  thickness: 3,
-                  radius: const Radius.circular(8),
-                  showTrackOnHover: true,
-                  isAlwaysShown: true,
-                  controller: _scrollController,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 4.0),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 4.0),
+                  child: Scrollbar(
+                    thickness: 3,
+                    isAlwaysShown: true,
+                    radius: const Radius.circular(8),
+                    showTrackOnHover: true,
+                    controller: _scrollController,
                     child: ListView(
-                      shrinkWrap: true,
                       controller: _scrollController,
+                      shrinkWrap: true,
                       children: widget._controller.rxIbQuestion.value.choices
                           .map((e) => IbQuestionMcItem(e, widget._controller))
                           .toList(),
@@ -114,13 +114,17 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                 ),
               ),
             if (IbQuestion.kMultipleChoicePic ==
-                widget._controller.rxIbQuestion.value.questionType)
-              const Text(
-                'Double tap on the picture to enlarge',
-                style: TextStyle(
+                    widget._controller.rxIbQuestion.value.questionType &&
+                widget._controller.showComparison.isFalse)
+              Text(
+                'double_tap_pic'.tr,
+                style: const TextStyle(
                     color: IbColors.lightGrey,
                     fontSize: IbConfig.kDescriptionTextSize),
               ),
+            const SizedBox(
+              height: 16,
+            ),
             IbQuestionTags(widget._controller),
             const SizedBox(
               height: 8,

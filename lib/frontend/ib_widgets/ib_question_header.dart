@@ -89,13 +89,13 @@ class IbQuestionHeader extends StatelessWidget {
           disableOnTap: _itemController.isSample,
           avatarUrl: _itemController.avatarUrl.value,
           uid: _itemController.rxIbQuestion.value.creatorId,
-          radius: 16,
+          radius: 20,
         );
       }
 
       return const CircleAvatar(
         backgroundColor: IbColors.creamYellow,
-        radius: 16,
+        radius: 20,
         child: Icon(
           Icons.person_rounded,
           color: IbColors.lightGrey,

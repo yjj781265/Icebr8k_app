@@ -93,7 +93,18 @@ class IbQuestionItemController extends GetxController {
       avatarUrl.value = ibUser.avatarUrl;
     }
 
-    if (rxIbAnswer == null && !isSample) {
+    if (!isSample) {
+      commented.value =
+          await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
+      liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
+      await _generateIbTags();
+      await generatePollStats();
+      await _generateCachedCommentItems();
+      await _generateChoiceUserMap();
+      _setUpCountDownTimer();
+    }
+
+    if (rxIbAnswer == null && !isSample && showComparison.isFalse) {
       /// query my answer to this question
       final myAnswer = await IbQuestionDbService()
           .querySingleIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id);
@@ -111,17 +122,6 @@ class IbQuestionItemController extends GetxController {
             rxIbQuestion.value.endTimeInMs &&
         rxIbQuestion.value.endTimeInMs > 0;
     voted.value = rxIbAnswer != null || isPollClosed.value;
-
-    if (!isSample) {
-      commented.value =
-          await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
-      liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
-      await _generateIbTags();
-      await generatePollStats();
-      await _generateCachedCommentItems();
-      await _generateChoiceUserMap();
-      _setUpCountDownTimer();
-    }
   }
 
   @override
@@ -158,9 +158,13 @@ class IbQuestionItemController extends GetxController {
   Future<void> _generateIbTags() async {
     ibTags.clear();
     for (final String id in rxIbQuestion.value.tagIds) {
-      final IbTag? tag = await IbTagDbService().retrieveIbTag(id);
-      if (tag != null) {
-        ibTags.add(tag);
+      if (IbCacheManager().getIbTag(id) != null) {
+        ibTags.add(IbCacheManager().getIbTag(id)!);
+      } else {
+        final IbTag? tag = await IbTagDbService().retrieveIbTag(id);
+        if (tag != null) {
+          ibTags.add(tag);
+        }
       }
     }
   }

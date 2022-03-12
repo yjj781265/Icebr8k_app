@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -19,8 +18,8 @@ class ProfileController extends GetxController {
   final isCollapsing = false.obs;
   final RefreshController refreshController = RefreshController();
   final ScrollController scrollController = ScrollController();
-  final commonAnswers = <IbAnswer>[].obs;
-  final uncommonAnswers = <IbAnswer>[].obs;
+  final commonAnswers = <String>[].obs;
+  final uncommonAnswers = <String>[].obs;
   ProfileController(this.uid);
 
   @override
@@ -29,8 +28,9 @@ class ProfileController extends GetxController {
     final IbUser? user = await IbUserDbService().queryIbUser(uid);
     if (user != null) {
       rxIbUser = user.obs;
-      commonAnswers.value = await IbUtils.getCommonAnswersQ(uid: uid);
-      uncommonAnswers.value = await IbUtils.getUncommonAnswersQ(uid: uid);
+      commonAnswers.value = await IbUtils.getCommonAnswerQuestionIds(uid: uid);
+      uncommonAnswers.value =
+          await IbUtils.getUncommonAnswerQuestionIds(uid: uid);
       compScore.value = await IbUtils.getCompScore(uid: uid);
     }
 
@@ -58,9 +58,9 @@ class ProfileController extends GetxController {
       rxIbUser = user.obs;
       rxIbUser = user.obs;
       commonAnswers.value =
-          await IbUtils.getCommonAnswersQ(uid: uid, isRefresh: true);
+          await IbUtils.getCommonAnswerQuestionIds(uid: uid, isRefresh: true);
       uncommonAnswers.value =
-          await IbUtils.getUncommonAnswersQ(uid: uid, isRefresh: true);
+          await IbUtils.getUncommonAnswerQuestionIds(uid: uid, isRefresh: true);
       compScore.value = await IbUtils.getCompScore(uid: uid, isRefresh: true);
     }
     refreshController.refreshCompleted();
