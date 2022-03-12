@@ -4,7 +4,6 @@ import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
 import '../../backend/controllers/user_controllers/home_tab_controller.dart';
 import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
@@ -29,19 +28,11 @@ class HomeTab extends StatelessWidget {
           ),
         ],
         leading: Builder(
-          builder: (context) => InkWell(
-            customBorder: const CircleBorder(),
-            onTap: () {
-              Scaffold.of(context).openDrawer();
-            },
-            child: Obx(
-              () => IbUserAvatar(
-                avatarUrl: _controller.avatarUrl.value,
-                radius: 16,
-              ),
-            ),
-          ),
-        ),
+            builder: (context) => IconButton(
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                icon: const Icon(Icons.menu))),
       ),
       drawer: const MenuPage(),
       body: Obx(

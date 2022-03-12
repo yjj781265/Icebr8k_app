@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/setup_controller.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_emo_pic_card.dart';
 import 'package:image_picker/image_picker.dart';
@@ -192,8 +193,8 @@ class SetupPageTwo extends StatelessWidget {
 
   void showEditAvatarBottomSheet(
       {required BuildContext context, required IbEmoPic emoPic}) {
-    final Widget options = ListView(
-      shrinkWrap: true,
+    final Widget options = Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         InkWell(
           onTap: () async {
@@ -214,7 +215,6 @@ class SetupPageTwo extends StatelessWidget {
           child: Ink(
             height: 56,
             width: double.infinity,
-            color: Theme.of(context).primaryColor,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -250,7 +250,6 @@ class SetupPageTwo extends StatelessWidget {
           child: Ink(
             height: 56,
             width: double.infinity,
-            color: Theme.of(context).primaryColor,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -274,6 +273,6 @@ class SetupPageTwo extends StatelessWidget {
       ],
     );
 
-    Get.bottomSheet(SafeArea(child: options));
+    Get.bottomSheet(SafeArea(child: IbCard(child: options)));
   }
 }

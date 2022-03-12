@@ -8,6 +8,7 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/ib_tenor_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:reorderables/reorderables.dart';
@@ -170,173 +171,172 @@ class CreateQuestionImagePicker extends StatelessWidget {
 
   void showMediaBottomSheet(
       BuildContext context, int? index, RxList<IbMedia> list) {
-    final Widget options = ListView(
-      shrinkWrap: true,
-      children: [
-        InkWell(
-          onTap: () async {
-            Get.back();
-            final _picker = ImagePicker();
-            final XFile? pickedFile = await _picker.pickImage(
-              source: ImageSource.camera,
-              imageQuality: IbConfig.kImageQuality,
-            );
-
-            if (pickedFile != null) {
-              if (index != null) {
-                // ignore: parameter_assignments
-                list[index] = IbMedia(
-                    url: pickedFile.path,
-                    id: IbUtils.getUniqueId(),
-                    type: IbMedia.kPicType);
-              } else {
-                // ignore: parameter_assignments
-                list.add(IbMedia(
-                    url: pickedFile.path,
-                    id: IbUtils.getUniqueId(),
-                    type: IbMedia.kPicType));
-              }
-
-              list.refresh();
-            }
-          },
-          child: Ink(
-            height: 56,
-            width: double.infinity,
-            color: Theme.of(context).primaryColor,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.camera_alt_outlined,
-                    color: IbColors.primaryColor,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text('Take a photo',
-                      style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
-                ],
-              ),
-            ),
-          ),
-        ),
-        InkWell(
-          onTap: () async {
-            Get.back();
-            final _picker = ImagePicker();
-            if (index == null) {
-              final List<XFile>? pickedFiles = await _picker.pickMultiImage(
+    final Widget options = IbCard(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: () async {
+              Get.back();
+              final _picker = ImagePicker();
+              final XFile? pickedFile = await _picker.pickImage(
+                source: ImageSource.camera,
                 imageQuality: IbConfig.kImageQuality,
               );
 
-              if (pickedFiles != null) {
-                if (pickedFiles.length + _controller.picMediaList.length >
-                    IbConfig.kMaxImagesCount) {
-                  IbUtils.showSimpleSnackBar(
-                      msg: '4 Pictures Max',
-                      backgroundColor: IbColors.errorRed);
-                  return;
-                }
-
-                for (final xFile in pickedFiles) {
+              if (pickedFile != null) {
+                if (index != null) {
+                  // ignore: parameter_assignments
+                  list[index] = IbMedia(
+                      url: pickedFile.path,
+                      id: IbUtils.getUniqueId(),
+                      type: IbMedia.kPicType);
+                } else {
+                  // ignore: parameter_assignments
                   list.add(IbMedia(
-                      url: xFile.path,
+                      url: pickedFile.path,
                       id: IbUtils.getUniqueId(),
                       type: IbMedia.kPicType));
                 }
+
+                list.refresh();
               }
-              return;
-            }
-
-            final XFile? pickedFile = await _picker.pickImage(
-              source: ImageSource.gallery,
-              imageQuality: IbConfig.kImageQuality,
-            );
-
-            if (pickedFile != null) {
-              list[index] = IbMedia(
-                  url: pickedFile.path,
-                  id: IbUtils.getUniqueId(),
-                  type: IbMedia.kPicType);
-
-              list.refresh();
-            }
-          },
-          child: Ink(
-            height: 56,
-            width: double.infinity,
-            color: Theme.of(context).primaryColor,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.photo_album_outlined,
-                    color: IbColors.errorRed,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    'Choose from gallery',
-                    style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                  ),
-                ],
+            },
+            child: Ink(
+              height: 56,
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: const [
+                    Icon(
+                      Icons.camera_alt_outlined,
+                      color: IbColors.primaryColor,
+                    ),
+                    SizedBox(
+                      width: 8,
+                    ),
+                    Text('Take a photo',
+                        style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        InkWell(
-          onTap: () async {
-            Get.back();
-            final gifUrl = await Get.to(
-              () => IbTenorPage(),
-            );
-            if (gifUrl != null && gifUrl.toString().isNotEmpty) {
-              if (index != null) {
-                // ignore: parameter_assignments
+          InkWell(
+            onTap: () async {
+              Get.back();
+              final _picker = ImagePicker();
+              if (index == null) {
+                final List<XFile>? pickedFiles = await _picker.pickMultiImage(
+                  imageQuality: IbConfig.kImageQuality,
+                );
+
+                if (pickedFiles != null) {
+                  if (pickedFiles.length + _controller.picMediaList.length >
+                      IbConfig.kMaxImagesCount) {
+                    IbUtils.showSimpleSnackBar(
+                        msg: '4 Pictures Max',
+                        backgroundColor: IbColors.errorRed);
+                    return;
+                  }
+
+                  for (final xFile in pickedFiles) {
+                    list.add(IbMedia(
+                        url: xFile.path,
+                        id: IbUtils.getUniqueId(),
+                        type: IbMedia.kPicType));
+                  }
+                }
+                return;
+              }
+
+              final XFile? pickedFile = await _picker.pickImage(
+                source: ImageSource.gallery,
+                imageQuality: IbConfig.kImageQuality,
+              );
+
+              if (pickedFile != null) {
                 list[index] = IbMedia(
-                    url: gifUrl.toString(),
+                    url: pickedFile.path,
                     id: IbUtils.getUniqueId(),
                     type: IbMedia.kPicType);
-              } else {
-                list.add(IbMedia(
-                    url: gifUrl.toString(),
-                    id: IbUtils.getUniqueId(),
-                    type: IbMedia.kPicType));
-              }
 
-              list.refresh();
-            }
-          },
-          child: Ink(
-            height: 56,
-            width: double.infinity,
-            color: Theme.of(context).primaryColor,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.gif,
-                    color: IbColors.accentColor,
-                    size: 24,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    'Choose GIF from Tenor',
-                    style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                  ),
-                ],
+                list.refresh();
+              }
+            },
+            child: Ink(
+              height: 56,
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: const [
+                    Icon(
+                      Icons.photo_album_outlined,
+                      color: IbColors.errorRed,
+                    ),
+                    SizedBox(
+                      width: 8,
+                    ),
+                    Text(
+                      'Choose from gallery',
+                      style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ],
+          InkWell(
+            onTap: () async {
+              Get.back();
+              final gifUrl = await Get.to(
+                () => IbTenorPage(),
+              );
+              if (gifUrl != null && gifUrl.toString().isNotEmpty) {
+                if (index != null) {
+                  // ignore: parameter_assignments
+                  list[index] = IbMedia(
+                      url: gifUrl.toString(),
+                      id: IbUtils.getUniqueId(),
+                      type: IbMedia.kPicType);
+                } else {
+                  list.add(IbMedia(
+                      url: gifUrl.toString(),
+                      id: IbUtils.getUniqueId(),
+                      type: IbMedia.kPicType));
+                }
+
+                list.refresh();
+              }
+            },
+            child: Ink(
+              height: 56,
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: const [
+                    Icon(
+                      Icons.gif,
+                      color: IbColors.accentColor,
+                      size: 24,
+                    ),
+                    SizedBox(
+                      width: 8,
+                    ),
+                    Text(
+                      'Choose GIF from Tenor',
+                      style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
 
     Get.bottomSheet(options, ignoreSafeArea: false);

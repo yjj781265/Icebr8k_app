@@ -6,6 +6,7 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
+import '../ib_config.dart';
 import '../ib_pages/profile_pages/my_profile_page.dart';
 import '../ib_pages/profile_pages/profile_page.dart';
 
@@ -101,7 +102,8 @@ class IbUserAvatar extends StatelessWidget {
                     '${(value * 100).toInt()}%',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 10),
+                    style:
+                        const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
                   );
                 },
               ),

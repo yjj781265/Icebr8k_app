@@ -175,36 +175,38 @@ class ReviewQuestionPage extends StatelessWidget {
   }
 
   void _timeLimitBtmSheet() {
-    Get.bottomSheet(IbCard(
-      child: ListView(
-        shrinkWrap: true,
-        children: [
-          ListTile(
-            leading: const Icon(
-              Icons.calendar_today,
-              color: IbColors.primaryColor,
-            ),
-            title: const Text('Pick a date and time'),
-            onTap: () {
-              Get.back();
-              _showDateTimePicker();
-            },
+    Get.bottomSheet(
+        IbCard(
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              ListTile(
+                leading: const Icon(
+                  Icons.calendar_today,
+                  color: IbColors.primaryColor,
+                ),
+                title: const Text('Pick a date and time'),
+                onTap: () {
+                  Get.back();
+                  _showDateTimePicker();
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.loop_outlined,
+                  color: IbColors.accentColor,
+                ),
+                title: const Text('No Time Limit'),
+                onTap: () {
+                  itemController.rxIbQuestion.value.endTimeInMs = -1;
+                  itemController.rxIbQuestion.refresh();
+                  Get.back();
+                },
+              ),
+            ],
           ),
-          ListTile(
-            leading: const Icon(
-              Icons.loop_outlined,
-              color: IbColors.accentColor,
-            ),
-            title: const Text('No Time Limit'),
-            onTap: () {
-              itemController.rxIbQuestion.value.endTimeInMs = -1;
-              itemController.rxIbQuestion.refresh();
-              Get.back();
-            },
-          ),
-        ],
-      ),
-    ));
+        ),
+        ignoreSafeArea: false);
   }
 
   void _showDateTimePicker() {

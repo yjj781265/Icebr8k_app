@@ -210,8 +210,8 @@ class SetupPageThree extends StatelessWidget {
   }
 
   void showEditAvatarBottomSheet(BuildContext context) {
-    final Widget options = ListView(
-      shrinkWrap: true,
+    final Widget options = Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         InkWell(
           onTap: () async {
@@ -235,7 +235,6 @@ class SetupPageThree extends StatelessWidget {
           child: Ink(
             height: 56,
             width: double.infinity,
-            color: Theme.of(context).primaryColor,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -276,7 +275,6 @@ class SetupPageThree extends StatelessWidget {
           child: Ink(
             height: 56,
             width: double.infinity,
-            color: Theme.of(context).primaryColor,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -300,6 +298,6 @@ class SetupPageThree extends StatelessWidget {
       ],
     );
 
-    Get.bottomSheet(SafeArea(child: options));
+    Get.bottomSheet(SafeArea(child: IbCard(child: options)));
   }
 }

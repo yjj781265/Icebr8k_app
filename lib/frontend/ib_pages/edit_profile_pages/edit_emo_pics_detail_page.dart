@@ -8,6 +8,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/edit_emo_pic_contro
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:icebr8k/frontend/ib_pages/ib_tenor_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
 import 'package:image_picker/image_picker.dart';
@@ -173,8 +174,8 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
   }
 
   void showMediaBottomSheet(BuildContext context) {
-    final Widget options = ListView(
-      shrinkWrap: true,
+    final Widget options = Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         InkWell(
           onTap: () async {
@@ -194,7 +195,6 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
           child: Ink(
             height: 56,
             width: double.infinity,
-            color: Theme.of(context).primaryColor,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -232,7 +232,6 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
           child: Ink(
             height: 56,
             width: double.infinity,
-            color: Theme.of(context).primaryColor,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -268,7 +267,6 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
           child: Ink(
             height: 56,
             width: double.infinity,
-            color: Theme.of(context).primaryColor,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -292,24 +290,28 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
         ),
       ],
     );
-    Get.bottomSheet(options, ignoreSafeArea: false);
+    Get.bottomSheet(IbCard(child: options), ignoreSafeArea: false);
   }
 
   void _showEmojiKeyBoard() {
     IbUtils.hideKeyboard();
-    Get.bottomSheet(SizedBox(
-        height: Get.height / 2,
-        child: EmojiPicker(
-          onEmojiSelected: (category, emoji) {
-            setState(() {
-              emojiStr = emoji.emoji;
-              widget.ibEmoPic.emoji = emojiStr;
-            });
-            Get.back();
-          },
-          config: Config(
-            emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
-          ),
-        )));
+    Get.bottomSheet(
+        IbCard(
+          child: SizedBox(
+              height: Get.height / 2,
+              child: EmojiPicker(
+                onEmojiSelected: (category, emoji) {
+                  setState(() {
+                    emojiStr = emoji.emoji;
+                    widget.ibEmoPic.emoji = emojiStr;
+                  });
+                  Get.back();
+                },
+                config: Config(
+                  emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
+                ),
+              )),
+        ),
+        ignoreSafeArea: false);
   }
 }

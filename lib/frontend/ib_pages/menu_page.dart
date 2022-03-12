@@ -42,7 +42,7 @@ class _MenuPageState extends State<MenuPage> {
                 () => DrawerHeader(
                   padding: EdgeInsets.zero,
                   child: Stack(
-                    alignment: Alignment.centerLeft,
+                    alignment: Alignment.bottomLeft,
                     children: [
                       SizedBox(
                         height: 300 / 1.618,
@@ -61,9 +61,25 @@ class _MenuPageState extends State<MenuPage> {
                           ),
                         ),
                       ),
+                      Positioned.fill(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            customBorder: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(16),
+                                    topRight: Radius.circular(16))),
+                            onTap: () {
+                              Get.back();
+                              Get.to(() => MyProfilePage());
+                            },
+                          ),
+                        ),
+                      ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IbUserAvatar(
@@ -85,21 +101,6 @@ class _MenuPageState extends State<MenuPage> {
                               ),
                             ),
                           ],
-                        ),
-                      ),
-                      Positioned.fill(
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            customBorder: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(16),
-                                    topRight: Radius.circular(16))),
-                            onTap: () {
-                              Get.back();
-                              Get.to(() => MyProfilePage());
-                            },
-                          ),
                         ),
                       ),
                     ],

@@ -168,7 +168,6 @@ class EditProfileController extends GetxController {
     if (await IbUserDbService()
             .isUsernameTaken(usernameTeController.text.trim()) &&
         rxIbUser.value.username != usernameTeController.text.trim()) {
-      Get.back();
       Get.dialog(const IbDialog(
         title: 'Error',
         subtitle: "Username is taken, try a different username",
@@ -222,6 +221,7 @@ class EditProfileController extends GetxController {
       rxIbUser.value.lName = lNameTeController.text.trim();
       rxIbUser.value.bio = bioTeController.text.trim();
       rxIbUser.value.gender = gender.value;
+      rxIbUser.value.birthdateInMs = birthdateInMs.value;
       await IbUserDbService().updateIbUser(rxIbUser.value);
       Get.back(closeOverlays: true);
       IbUtils.showSimpleSnackBar(
@@ -236,82 +236,4 @@ class EditProfileController extends GetxController {
       ));
     }
   }
-
-  /*Future<void> validateUsername() async {
-    final bool isValid =
-        GetUtils.isUsername(username.value.trim().toLowerCase());
-    isUsernameFirstTime.value = false;
-
-    if (username.value.isEmpty) {
-      usernameErrorTrKey.value = 'username is empty';
-      isUsernameValid.value = false;
-      return;
-    }
-
-    if (username.value.length < IbConfig.kUsernameMinLength) {
-      usernameErrorTrKey.value = '3_characters_error';
-      isUsernameValid.value = false;
-      return;
-    }
-
-    if (!isValid) {
-      usernameErrorTrKey.value = "username_not_valid";
-      isUsernameValid.value = false;
-      return;
-    }
-
-    if (await IbUserDbService().isUsernameTaken(username.value)) {
-      usernameErrorTrKey.value = 'username_exist_error';
-      isUsernameValid.value = false;
-      return;
-    }
-
-    usernameErrorTrKey.value = '';
-    isUsernameValid.value = true;
-    return;
-  }
-
-  Future<void> updateAvatarUrl(String _filePath) async {
-    //delete the old one first
-    if (IbUtils.getCurrentIbUser() != null &&
-        IbUtils.getCurrentIbUser()!.avatarUrl.isNotEmpty) {
-      await IbStorageService()
-          .deleteFile(IbUtils.getCurrentIbUser()!.avatarUrl);
-    }
-
-    final String? photoUrl =
-        await IbStorageService().uploadAndRetrieveImgUrl(filePath: _filePath);
-
-    if (photoUrl == null) {
-      return;
-    }
-
-    await IbUserDbService()
-        .updateAvatarUrl(url: photoUrl, uid: IbUtils.getCurrentUid()!);
-  }
-
-  Future<void> updateUserInfo(IbUser ibUser) async {
-    await validateUsername();
-    if (isUsernameValid.isFalse) {
-      Get.dialog(IbDialog(
-        title: 'Error',
-        subtitle: '$usernameErrorTrKey'.tr,
-        positiveTextKey: 'ok',
-      ));
-      return;
-    }
-
-    Get.dialog(const IbLoadingDialog(
-      messageTrKey: 'updating',
-    ));
-    await IbUserDbService().updateIbUser(ibUser);
-    if (isProfilePicPicked.isTrue) {
-      await updateAvatarUrl(avatarUrl.value);
-    }
-
-    Get.back(closeOverlays: true);
-    IbUtils.showSimpleSnackBar(
-        msg: 'Profile updated successfully',
-        backgroundColor: IbColors.accentColor);
-  }*/
 }

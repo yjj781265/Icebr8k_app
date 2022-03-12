@@ -58,6 +58,9 @@ class IbQuestionItemController extends GetxController {
   /// vote count for each choice id
   RxMap<String, int> countMap = <String, int>{}.obs;
 
+  /// flag for closed poll
+  final isPollClosed = false.obs;
+
   IbQuestionItemController({
     required this.rxIbQuestion,
     required this.rxIsExpanded,
@@ -104,7 +107,10 @@ class IbQuestionItemController extends GetxController {
       selectedChoiceId.value = rxIbAnswer!.value.choiceId;
     }
 
-    voted.value = rxIbAnswer != null;
+    isPollClosed.value = DateTime.now().millisecondsSinceEpoch >
+            rxIbQuestion.value.endTimeInMs &&
+        rxIbQuestion.value.endTimeInMs > 0;
+    voted.value = rxIbAnswer != null || isPollClosed.value;
 
     if (!isSample) {
       commented.value =
@@ -138,6 +144,9 @@ class IbQuestionItemController extends GetxController {
       Timer.periodic(const Duration(seconds: 1), (timer) {
         if (rxIbQuestion.value.endTimeInMs <
             DateTime.now().millisecondsSinceEpoch) {
+          isPollClosed.value = DateTime.now().millisecondsSinceEpoch >
+                  rxIbQuestion.value.endTimeInMs &&
+              rxIbQuestion.value.endTimeInMs > 0;
           timer.cancel();
         }
         print('${rxIbQuestion.value.question} tick tok');

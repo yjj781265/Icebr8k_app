@@ -297,8 +297,8 @@ class CreateQuestionMcPicTab extends StatelessWidget {
       IbChoice? ibChoice,
       required RxList<IbChoice> list}) {
     IbUtils.hideKeyboard();
-    final Widget options = ListView(
-      shrinkWrap: true,
+    final Widget options = Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         InkWell(
           onTap: () async {
@@ -327,7 +327,6 @@ class CreateQuestionMcPicTab extends StatelessWidget {
           child: Ink(
             height: 56,
             width: double.infinity,
-            color: Theme.of(context).primaryColor,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -374,7 +373,6 @@ class CreateQuestionMcPicTab extends StatelessWidget {
           child: Ink(
             height: 56,
             width: double.infinity,
-            color: Theme.of(context).primaryColor,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -421,7 +419,6 @@ class CreateQuestionMcPicTab extends StatelessWidget {
           child: Ink(
             height: 56,
             width: double.infinity,
-            color: Theme.of(context).primaryColor,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -446,6 +443,6 @@ class CreateQuestionMcPicTab extends StatelessWidget {
       ],
     );
 
-    Get.bottomSheet(options, ignoreSafeArea: false);
+    Get.bottomSheet(IbCard(child: options), ignoreSafeArea: false);
   }
 }

@@ -166,14 +166,16 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     final IbChoice? choice = widget._controller.rxIbQuestion.value.choices
         .firstWhereOrNull((element) =>
             element.choiceId == widget._controller.selectedChoiceId.value);
-    final double initRating =
-        choice == null ? 0 : double.parse(choice.content ?? '0');
+    final double initRating = widget._controller.isPollClosed.isTrue
+        ? _getAverage()
+        : choice == null
+            ? 0
+            : double.parse(choice.content ?? '0');
     if (widget._controller.rxIbQuestion.value.questionType ==
         IbQuestion.kScaleOne) {
       return RatingBar.builder(
-        ignoreGestures: DateTime.now().millisecondsSinceEpoch >
-                widget._controller.rxIbQuestion.value.endTimeInMs &&
-            widget._controller.rxIbQuestion.value.endTimeInMs > 0,
+        ignoreGestures: widget._controller.isPollClosed.isTrue,
+        allowHalfRating: widget._controller.isPollClosed.isTrue,
         itemPadding: const EdgeInsets.all(4),
         itemSize: IbConfig.kScItemHeight,
         itemBuilder: (context, _) => const Icon(
@@ -190,9 +192,8 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     if (widget._controller.rxIbQuestion.value.questionType ==
         IbQuestion.kScaleTwo) {
       return RatingBar.builder(
-        ignoreGestures: DateTime.now().millisecondsSinceEpoch >
-                widget._controller.rxIbQuestion.value.endTimeInMs &&
-            widget._controller.rxIbQuestion.value.endTimeInMs > 0,
+        ignoreGestures: widget._controller.isPollClosed.isTrue,
+        allowHalfRating: widget._controller.isPollClosed.isTrue,
         itemPadding: const EdgeInsets.all(4),
         itemSize: IbConfig.kScItemHeight,
         initialRating: initRating,
@@ -209,10 +210,9 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     if (widget._controller.rxIbQuestion.value.questionType ==
         IbQuestion.kScaleThree) {
       return RatingBar.builder(
-        ignoreGestures: DateTime.now().millisecondsSinceEpoch >
-                widget._controller.rxIbQuestion.value.endTimeInMs &&
-            widget._controller.rxIbQuestion.value.endTimeInMs > 0,
+        ignoreGestures: widget._controller.isPollClosed.isTrue,
         itemPadding: const EdgeInsets.all(4),
+        allowHalfRating: widget._controller.isPollClosed.isTrue,
         itemSize: IbConfig.kScItemHeight,
         initialRating: initRating,
         itemBuilder: (context, index) {
@@ -264,6 +264,9 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
   }
 
   double _getAverage() {
+    if (widget._controller.rxIbQuestion.value.pollSize == 0) {
+      return 0.0;
+    }
     double totalPoints = 0;
     for (final choice in widget._controller.rxIbQuestion.value.choices) {
       totalPoints = totalPoints +

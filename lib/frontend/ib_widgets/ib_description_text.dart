@@ -75,9 +75,12 @@ class _DescriptionTextWidgetState extends State<IbDescriptionText>
               Align(
                 alignment: Alignment.centerRight,
                 child: InkWell(
-                  child: Text(
-                    isExpanded ? "show less" : "show more",
-                    style: const TextStyle(color: IbColors.primaryColor),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      isExpanded ? "show less" : "show more",
+                      style: const TextStyle(color: IbColors.primaryColor),
+                    ),
                   ),
                   onTap: () {
                     setState(() {
