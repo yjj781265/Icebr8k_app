@@ -126,6 +126,9 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           IbQuestionHeader(widget._controller),
+          const SizedBox(
+            height: 8,
+          ),
           IbMediaSlide(widget._controller.rxIbQuestion.value.medias),
           IbQuestionInfo(widget._controller),
           const SizedBox(

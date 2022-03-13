@@ -44,8 +44,9 @@ class _IbMediaSlideState extends State<IbMediaSlide>
             decoration: BoxDecoration(
               color: Theme.of(context).backgroundColor,
             ),
-            height: (Get.width * 0.88) / 1.618,
-            width: Get.width * 0.88,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            height: (Get.width) / 1.618,
+            width: Get.width,
             child: TabBarView(
                 controller: controller,
                 children: widget.medias.map((e) {

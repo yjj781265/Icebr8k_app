@@ -78,7 +78,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
     super.build(context);
     _runExpandCheck();
     final Widget expandableInfo = Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
+      padding: const EdgeInsets.only(left: 14, right: 14, top: 16),
       child: Obx(
         () => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,11 +116,14 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
             if (IbQuestion.kMultipleChoicePic ==
                     widget._controller.rxIbQuestion.value.questionType &&
                 widget._controller.showComparison.isFalse)
-              Text(
-                'double_tap_pic'.tr,
-                style: const TextStyle(
-                    color: IbColors.lightGrey,
-                    fontSize: IbConfig.kDescriptionTextSize),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(
+                  'double_tap_pic'.tr,
+                  style: const TextStyle(
+                      color: IbColors.lightGrey,
+                      fontSize: IbConfig.kDescriptionTextSize),
+                ),
               ),
             const SizedBox(
               height: 16,
@@ -144,6 +147,9 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           IbQuestionHeader(widget._controller),
+          const SizedBox(
+            height: 8,
+          ),
           IbMediaSlide(widget._controller.rxIbQuestion.value.medias),
           IbQuestionInfo(widget._controller),
           const SizedBox(
@@ -231,12 +237,12 @@ class IbQuestionMcItem extends StatelessWidget {
 
   double getItemWidth() {
     if (_controller.voted.isFalse) {
-      return Get.width * 0.95;
+      return Get.width;
     }
 
-    return (Get.width * 0.95 * (_controller.resultMap[choice] ?? 0)) == 0
-        ? Get.width * 0.95
-        : Get.width * 0.95 * (_controller.resultMap[choice] ?? 0);
+    return (Get.width * (_controller.resultMap[choice] ?? 0)) == 0
+        ? Get.width
+        : Get.width * (_controller.resultMap[choice] ?? 0);
   }
 
   Widget getItemIcon() {
@@ -306,7 +312,7 @@ class IbQuestionMcItem extends StatelessWidget {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
-                        width: Get.width * 0.95,
+                        width: Get.width,
                         height: _controller.rxIbQuestion.value.questionType ==
                                 IbQuestion.kMultipleChoice
                             ? IbConfig.kMcTxtItemSize
@@ -331,7 +337,7 @@ class IbQuestionMcItem extends StatelessWidget {
                                 : 0),
                       ),
                       SizedBox(
-                        width: Get.width * 0.95,
+                        width: Get.width,
                         height: _controller.rxIbQuestion.value.questionType ==
                                 IbQuestion.kMultipleChoice
                             ? IbConfig.kMcTxtItemSize
