@@ -24,12 +24,14 @@ class IbQuestionStats extends StatelessWidget {
       child: SingleChildScrollView(
         child: Obx(
           () => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: _controller.stats.map((element) {
               return Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       _handleAvatars(element.users),
                       const SizedBox(
@@ -140,7 +142,6 @@ class IbQuestionStats extends StatelessWidget {
       {required IbChoice choice,
       required BuildContext context,
       required bool isMe}) {
-    final String heroTag = IbUtils.getUniqueId();
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

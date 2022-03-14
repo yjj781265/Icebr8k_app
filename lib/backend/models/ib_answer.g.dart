@@ -13,12 +13,14 @@ IbAnswer _$IbAnswerFromJson(Map<String, dynamic> json) => IbAnswer(
       questionId: json['questionId'] as String,
       questionType: json['questionType'] as String,
       edited: json['edited'] as bool? ?? false,
+      isPublic: json['isPublic'] as bool? ?? true,
       uid: json['uid'] as String,
     );
 
 Map<String, dynamic> _$IbAnswerToJson(IbAnswer instance) => <String, dynamic>{
       'choiceId': instance.choiceId,
       'answeredTimeInMs': instance.answeredTimeInMs,
+      'isPublic': instance.isPublic,
       'uid': instance.uid,
       'askedTimeInMs': instance.askedTimeInMs,
       'questionId': instance.questionId,

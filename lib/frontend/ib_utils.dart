@@ -240,6 +240,11 @@ class IbUtils {
       );
     } else if (backgroundColor == IbColors.errorRed) {
       icon = Icon(Icons.error_rounded, color: backgroundColor);
+    } else {
+      icon = Icon(
+        Icons.info_rounded,
+        color: backgroundColor,
+      );
     }
 
     Get.showSnackbar(GetSnackBar(
@@ -283,29 +288,39 @@ class IbUtils {
       return 0;
     }
 
-    final List<String> uid1QuestionIds = [];
-    final List<String> uid2QuestionIds = [];
-
-    for (final IbAnswer answer in uid1QuestionAnswers) {
-      uid1QuestionIds.add(answer.questionId);
-    }
-
-    for (final IbAnswer answer in uid2QuestionAnswers) {
-      uid2QuestionIds.add(answer.questionId);
-    }
-
-    final int commonQuestionSize =
-        uid1QuestionIds.toSet().intersection(uid2QuestionIds.toSet()).length;
-    final int commonAnswerSize = uid1QuestionAnswers
+    final int commonQuestionSize = uid1QuestionAnswers
+        .map((e) => e.questionId)
         .toSet()
-        .intersection(uid2QuestionAnswers.toSet())
+        .intersection(uid2QuestionAnswers.map((e) => e.questionId).toSet())
         .length;
 
     if (commonQuestionSize == 0) {
       return 0;
     }
 
-    final _score = commonAnswerSize / commonQuestionSize.toDouble();
+    final List<IbAnswer> commonAnswers = [];
+    final List<String> questionIds = uid1QuestionAnswers
+        .map((e) => e.questionId)
+        .toSet()
+        .intersection(uid2QuestionAnswers.map((e) => e.questionId).toSet())
+        .toList();
+
+    for (final String id in questionIds) {
+      final IbAnswer? uid1Answer = uid1QuestionAnswers
+          .firstWhereOrNull((element) => element.questionId == id);
+      final IbAnswer? uid2Answer = uid2QuestionAnswers
+          .firstWhereOrNull((element) => element.questionId == id);
+      if (uid1Answer == null || uid2Answer == null) {
+        continue;
+      } else if (uid1Answer.choiceId == uid2Answer.choiceId) {
+        commonAnswers.add(uid1Answer);
+      }
+    }
+    commonAnswers
+        .sort((a, b) => b.answeredTimeInMs.compareTo(a.answeredTimeInMs));
+
+    final _score =
+        commonAnswers.length.toDouble() / commonQuestionSize.toDouble();
     print('score is $_score');
 
     return _score;
@@ -334,10 +349,25 @@ class IbUtils {
     } else {
       uid2QuestionAnswers.addAll(IbCacheManager().getIbAnswers(uid)!);
     }
-    final List<IbAnswer> commonAnswers = uid2QuestionAnswers
+
+    final List<IbAnswer> commonAnswers = [];
+    final List<String> questionIds = uid1QuestionAnswers
+        .map((e) => e.questionId)
         .toSet()
-        .intersection(uid1QuestionAnswers.toSet())
+        .intersection(uid2QuestionAnswers.map((e) => e.questionId).toSet())
         .toList();
+
+    for (final String id in questionIds) {
+      final IbAnswer? uid1Answer = uid1QuestionAnswers
+          .firstWhereOrNull((element) => element.questionId == id);
+      final IbAnswer? uid2Answer = uid2QuestionAnswers
+          .firstWhereOrNull((element) => element.questionId == id);
+      if (uid1Answer == null || uid2Answer == null) {
+        continue;
+      } else if (uid1Answer.choiceId == uid2Answer.choiceId) {
+        commonAnswers.add(uid1Answer);
+      }
+    }
     commonAnswers
         .sort((a, b) => b.answeredTimeInMs.compareTo(a.answeredTimeInMs));
     return commonAnswers.map((e) => e.questionId).toList();

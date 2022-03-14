@@ -34,6 +34,9 @@ class IbQuestionButtons extends StatelessWidget {
                   onPressed: () async {
                     await _controller.onVote();
                   },
+                  onLongPressed: () async {
+                    await _controller.onVote(isPublic: false);
+                  },
                   textTrKey: _handleVoteButtonText(),
                   color: IbColors.primaryColor,
                 ),
@@ -76,9 +79,6 @@ class IbQuestionButtons extends StatelessWidget {
         _controller.selectedChoiceId.isEmpty ||
         (_controller.rxIbAnswer != null &&
             _controller.rxIbAnswer!.value.uid != IbUtils.getCurrentUid()) ||
-        _controller.rxIbAnswer != null &&
-            _controller.rxIbAnswer!.value.choiceId ==
-                _controller.selectedChoiceId.value ||
         _controller.isAnswering.isTrue ||
         _controller.voted.isTrue && _controller.rxIbQuestion.value.isQuiz;
   }

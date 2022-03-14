@@ -196,7 +196,8 @@ class QuestionResultMainPage extends StatelessWidget {
               onTap: () {
                 Get.to(
                     () => IbMediaViewer(urls: [choice.url!], currentIndex: 0),
-                    transition: Transition.zoom);
+                    transition: Transition.zoom,
+                    fullscreenDialog: true);
               },
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(8)),

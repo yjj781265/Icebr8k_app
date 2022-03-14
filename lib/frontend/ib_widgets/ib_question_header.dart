@@ -117,7 +117,10 @@ class IbQuestionHeader extends StatelessWidget {
               color: IbColors.lightGrey),
         ),
         if (_itemController.rxIbQuestion.value.endTimeInMs != -1)
-          const Text(' • '),
+          const Text(
+            ' • ',
+            style: TextStyle(color: IbColors.lightGrey),
+          ),
         if (_itemController.rxIbQuestion.value.endTimeInMs != -1)
           IbUtils.leftTimeText(_itemController.rxIbQuestion.value.endTimeInMs)
       ]);

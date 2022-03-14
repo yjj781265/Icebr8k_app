@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
@@ -65,7 +66,6 @@ class IbQuestionItemController extends GetxController {
     required this.rxIbQuestion,
     required this.rxIsExpanded,
     this.isSample = false,
-    this.rxIbAnswer,
     this.ibAnswers,
   });
 
@@ -92,8 +92,22 @@ class IbQuestionItemController extends GetxController {
       title.value = ibUser.username;
       avatarUrl.value = ibUser.avatarUrl;
     }
-
     if (!isSample) {
+      if (rxIbAnswer == null) {
+        /// query my answer to this question
+        final myAnswer = await IbQuestionDbService().querySingleIbAnswer(
+            IbUtils.getCurrentUid()!, rxIbQuestion.value.id);
+        if (myAnswer != null) {
+          rxIbAnswer = myAnswer.obs;
+          selectedChoiceId.value = rxIbAnswer!.value.choiceId;
+          rxIbAnswer!.refresh();
+        }
+      } else {
+        selectedChoiceId.value = rxIbAnswer!.value.choiceId;
+      }
+
+      voted.value = rxIbAnswer != null;
+
       commented.value =
           await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
       liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
@@ -102,26 +116,13 @@ class IbQuestionItemController extends GetxController {
       await _generateCachedCommentItems();
       await _generateChoiceUserMap();
       _setUpCountDownTimer();
+      isPollClosed.value = DateTime.now().millisecondsSinceEpoch >
+              rxIbQuestion.value.endTimeInMs &&
+          rxIbQuestion.value.endTimeInMs > 0;
+
+      /// flag for enabling user to open result page
+      voted.value = rxIbAnswer != null || isPollClosed.value;
     }
-
-    if (rxIbAnswer == null && !isSample && showComparison.isFalse) {
-      /// query my answer to this question
-      final myAnswer = await IbQuestionDbService()
-          .querySingleIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id);
-
-      if (myAnswer != null) {
-        rxIbAnswer = myAnswer.obs;
-        selectedChoiceId.value = rxIbAnswer!.value.choiceId;
-        rxIbAnswer!.refresh();
-      }
-    } else if (rxIbAnswer != null) {
-      selectedChoiceId.value = rxIbAnswer!.value.choiceId;
-    }
-
-    isPollClosed.value = DateTime.now().millisecondsSinceEpoch >
-            rxIbQuestion.value.endTimeInMs &&
-        rxIbQuestion.value.endTimeInMs > 0;
-    voted.value = rxIbAnswer != null || isPollClosed.value;
   }
 
   @override
@@ -238,7 +239,7 @@ class IbQuestionItemController extends GetxController {
     }
   }
 
-  Future<void> onVote() async {
+  Future<void> onVote({bool isPublic = true}) async {
     // don't let user vote if poll is closed
     if (rxIbQuestion.value.endTimeInMs <
             DateTime.now().millisecondsSinceEpoch &&
@@ -251,6 +252,7 @@ class IbQuestionItemController extends GetxController {
     }
 
     if (rxIbAnswer != null &&
+        rxIbAnswer!.value.isPublic == isPublic &&
         selectedChoiceId.value == rxIbAnswer!.value.choiceId) {
       return;
     }
@@ -264,6 +266,7 @@ class IbQuestionItemController extends GetxController {
     try {
       final IbAnswer ibAnswer = IbAnswer(
           choiceId: selectedChoiceId.value,
+          isPublic: isPublic,
           edited: rxIbAnswer != null,
           answeredTimeInMs: DateTime.now().millisecondsSinceEpoch,
           askedTimeInMs: rxIbQuestion.value.askedTimeInMs,
@@ -271,7 +274,15 @@ class IbQuestionItemController extends GetxController {
           questionId: rxIbQuestion.value.id,
           questionType: rxIbQuestion.value.questionType);
       await IbQuestionDbService().answerQuestion(ibAnswer);
-      //update choiceUserMap for result main page
+
+      if (isPublic) {
+        IbUtils.showSimpleSnackBar(
+            msg: 'Answered publicly 📢',
+            backgroundColor: IbColors.primaryColor);
+      } else {
+        IbUtils.showSimpleSnackBar(
+            msg: 'Answered anonymously 🕵️', backgroundColor: Colors.black);
+      }
 
       if (rxIbAnswer != null) {
         ///decrement old countMap;
@@ -279,7 +290,9 @@ class IbQuestionItemController extends GetxController {
             (countMap[rxIbAnswer!.value.choiceId] ?? 0) - 1;
         countMap[rxIbAnswer!.value.choiceId] =
             decrementedCount < 0 ? 0 : decrementedCount;
+        rxIbAnswer!.value = ibAnswer;
       } else {
+        rxIbAnswer = ibAnswer.obs;
         rxIbQuestion.value.pollSize++;
       }
 
@@ -294,7 +307,6 @@ class IbQuestionItemController extends GetxController {
       }
       await generatePollStats();
       await _generateChoiceUserMap();
-      rxIbAnswer = ibAnswer.obs;
       voted.value = true;
     } catch (e) {
       voted.value = false;

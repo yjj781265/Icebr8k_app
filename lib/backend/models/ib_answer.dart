@@ -6,6 +6,7 @@ part 'ib_answer.g.dart';
 class IbAnswer {
   final String choiceId;
   final int answeredTimeInMs;
+  final bool isPublic;
   final String uid;
   final int askedTimeInMs;
   final String questionId;
@@ -19,6 +20,7 @@ class IbAnswer {
       required this.questionId,
       required this.questionType,
       this.edited = false,
+      this.isPublic = true,
       required this.uid});
 
   factory IbAnswer.fromJson(Map<String, dynamic> json) =>
@@ -28,12 +30,28 @@ class IbAnswer {
 
   @override
   bool operator ==(Object other) =>
+      identical(this, other) ||
       other is IbAnswer &&
-      choiceId == other.choiceId &&
-      questionId == other.questionId;
+          runtimeType == other.runtimeType &&
+          choiceId == other.choiceId &&
+          answeredTimeInMs == other.answeredTimeInMs &&
+          isPublic == other.isPublic &&
+          uid == other.uid &&
+          askedTimeInMs == other.askedTimeInMs &&
+          questionId == other.questionId &&
+          questionType == other.questionType &&
+          edited == other.edited;
 
   @override
-  int get hashCode => choiceId.hashCode ^ questionId.hashCode;
+  int get hashCode =>
+      choiceId.hashCode ^
+      answeredTimeInMs.hashCode ^
+      isPublic.hashCode ^
+      uid.hashCode ^
+      askedTimeInMs.hashCode ^
+      questionId.hashCode ^
+      questionType.hashCode ^
+      edited.hashCode;
 
   @override
   String toString() {

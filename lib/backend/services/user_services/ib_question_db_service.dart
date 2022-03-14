@@ -240,7 +240,7 @@ class IbQuestionDbService {
     return IbAnswer.fromJson(_snapshot.data()!);
   }
 
-  /// get list of ibAnswers with the same choice id but different user id
+  /// get list of PUBLIC ibAnswers with the same choice id but different user id
   Future<QuerySnapshot<Map<String, dynamic>>> queryIbAnswers(
       {required String choiceId,
       required String questionId,
@@ -251,6 +251,7 @@ class IbQuestionDbService {
           .doc(questionId)
           .collection(_kAnswerCollectionGroup)
           .where('choiceId', isEqualTo: choiceId)
+          .where('isPublic', isEqualTo: true)
           .orderBy('answeredTimeInMs', descending: true)
           .startAfterDocument(lastSnap)
           .limit(limit)
@@ -260,6 +261,7 @@ class IbQuestionDbService {
     return _collectionRef
         .doc(questionId)
         .collection(_kAnswerCollectionGroup)
+        .where('isPublic', isEqualTo: true)
         .where('choiceId', isEqualTo: choiceId)
         .orderBy('answeredTimeInMs', descending: true)
         .limit(limit)

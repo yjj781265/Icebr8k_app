@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/question_result_detail_controller.dart';
+import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
@@ -42,6 +44,20 @@ class QuestionResultDetailPage extends StatelessWidget {
           controller: _controller.refreshController,
           child: ListView.builder(
             itemBuilder: (context, index) {
+              if (index == 0) {
+                return const Align(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 4),
+                    child: Text(
+                      'Users who voted anonymously are hidden',
+                      style: TextStyle(
+                          fontSize: IbConfig.kSecondaryTextSize,
+                          color: IbColors.lightGrey),
+                    ),
+                  ),
+                );
+              }
+              index -= 1;
               final item = _controller.results[index];
               return ListTile(
                 onTap: () {
@@ -63,7 +79,7 @@ class QuestionResultDetailPage extends StatelessWidget {
                 trailing: const Icon(Icons.arrow_forward_ios_rounded),
               );
             },
-            itemCount: _controller.results.length,
+            itemCount: _controller.results.length + 1,
           ),
         );
       }),

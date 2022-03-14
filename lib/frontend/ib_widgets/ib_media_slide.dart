@@ -40,18 +40,20 @@ class _IbMediaSlideState extends State<IbMediaSlide>
     return Center(
       child: Column(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).backgroundColor,
-            ),
+          Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            height: (Get.width) / 1.618,
-            width: Get.width,
-            child: TabBarView(
-                controller: controller,
-                children: widget.medias.map((e) {
-                  return _itemWidget(e);
-                }).toList()),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).backgroundColor,
+              ),
+              height: (Get.width) / 1.618,
+              width: Get.width,
+              child: TabBarView(
+                  controller: controller,
+                  children: widget.medias.map((e) {
+                    return _itemWidget(e);
+                  }).toList()),
+            ),
           ),
           if (widget.medias.length > 1)
             TabPageSelector(

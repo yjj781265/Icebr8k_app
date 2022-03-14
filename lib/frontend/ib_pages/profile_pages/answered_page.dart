@@ -50,9 +50,9 @@ class AnsweredPage extends StatelessWidget {
   Widget _handleQuestionType(AnsweredQuestionItem item) {
     final IbQuestionItemController itemController = Get.put(
         IbQuestionItemController(
-            rxIbQuestion: (item.ibQuestion).obs,
-            rxIsExpanded: false.obs,
-            rxIbAnswer: item.ibAnswer.obs),
+          rxIbQuestion: (item.ibQuestion).obs,
+          rxIsExpanded: false.obs,
+        )..rxIbAnswer = item.ibAnswer.obs,
         tag: item.ibQuestion.id);
 
     if (item.ibQuestion.questionType == IbQuestion.kMultipleChoice ||

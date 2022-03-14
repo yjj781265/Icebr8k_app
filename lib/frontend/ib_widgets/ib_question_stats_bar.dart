@@ -17,10 +17,10 @@ class IbQuestionStatsBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => AnimatedSize(
-        duration: const Duration(milliseconds: 300),
-        child: Row(
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 300),
+      child: Obx(
+        () => Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -29,7 +29,10 @@ class IbQuestionStatsBar extends StatelessWidget {
                 icon: FaIcon(
                   FontAwesomeIcons.voteYea,
                   color: _itemController.rxIbAnswer != null
-                      ? IbColors.primaryColor
+                      ? (_itemController.rxIbAnswer != null &&
+                              _itemController.rxIbAnswer!.value.isPublic
+                          ? IbColors.primaryColor
+                          : Colors.black)
                       : IbColors.lightGrey,
                   size: 16,
                 ),
@@ -106,6 +109,6 @@ class IbQuestionStatsBar extends StatelessWidget {
       return;
     }
 
-    Get.to(QuestionResultMainPage(_itemController));
+    Get.to(() => QuestionResultMainPage(_itemController));
   }
 }

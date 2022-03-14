@@ -7,6 +7,7 @@ import '../ib_config.dart';
 class IbElevatedButton extends StatelessWidget {
   final String textTrKey;
   final Function onPressed;
+  final Function? onLongPressed;
   final Color color;
   final Widget? icon;
   final bool disabled;
@@ -14,6 +15,7 @@ class IbElevatedButton extends StatelessWidget {
       {Key? key,
       required this.textTrKey,
       required this.onPressed,
+      this.onLongPressed,
       this.icon,
       this.disabled = false,
       this.color = IbColors.accentColor})
@@ -37,6 +39,12 @@ class IbElevatedButton extends StatelessWidget {
           ),
           primary: color),
       onPressed: disabled ? null : () => onPressed(),
+      onHover: (flag) {
+        print(flag);
+      },
+      onLongPress: disabled
+          ? null
+          : () => onLongPressed == null ? null : onLongPressed!(),
       child: Text(
         textTrKey.tr,
         maxLines: 1,
@@ -59,6 +67,9 @@ class IbElevatedButton extends StatelessWidget {
           ),
           primary: color),
       onPressed: disabled ? null : () => onPressed(),
+      onLongPress: disabled
+          ? null
+          : () => onLongPressed == null ? null : onLongPressed!(),
       icon: icon!,
       label: Text(
         textTrKey.tr,

@@ -177,7 +177,7 @@ class EditProfileController extends GetxController {
       return;
     }
     try {
-      Get.dialog(const IbLoadingDialog(messageTrKey: 'updating...'),
+      Get.dialog(const IbLoadingDialog(messageTrKey: 'update'),
           barrierDismissible: false);
 
       /// upload to cloud
