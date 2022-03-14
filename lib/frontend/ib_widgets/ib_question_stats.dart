@@ -31,7 +31,6 @@ class IbQuestionStats extends StatelessWidget {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       _handleAvatars(element.users),
                       const SizedBox(
