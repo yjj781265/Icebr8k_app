@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
@@ -107,83 +105,6 @@ class IbUserSearchPage extends StatelessWidget {
 
       return const SizedBox();
     });
-  }
-
-  void showFriendRequestDialog() {
-    final Widget dialog = IbCard(
-        child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'friend_request_dialog_title'
-                .trParams({'username': _controller.username.value}),
-            style: const TextStyle(
-                fontSize: IbConfig.kNormalTextSize,
-                fontWeight: FontWeight.bold),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: IbUserAvatar(
-                  avatarUrl: _controller.ibUser!.avatarUrl,
-                  uid: _controller.ibUser!.id,
-                  radius: 32,
-                ),
-              ),
-              Expanded(
-                child: TextField(
-                  textInputAction: TextInputAction.done,
-                  maxLines: 3,
-                  onChanged: (requestMsg) {
-                    _controller.requestMsg = requestMsg;
-                  },
-                  autofocus: true,
-                  style: const TextStyle(
-                    fontSize: IbConfig.kSecondaryTextSize,
-                  ),
-                  maxLength: IbConfig.kFriendRequestMsgMaxLength,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintStyle: const TextStyle(color: IbColors.lightGrey),
-                    hintText: 'friend_request_msg_hint'.tr,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                  child: IbElevatedButton(
-                onPressed: () {
-                  Get.back();
-                },
-                textTrKey: 'cancel',
-                color: IbColors.primaryColor,
-              )),
-              Expanded(
-                flex: 2,
-                child: IbElevatedButton(
-                  onPressed: () {
-                    _controller.sendFriendRequest();
-                    Get.back();
-                    IbUtils.hideKeyboard();
-                  },
-                  textTrKey: 'send_friend_request',
-                ),
-              ),
-            ],
-          )
-        ],
-      ),
-    ));
-
-    Get.bottomSheet(dialog);
   }
 
   Widget handleFriendshipStatus() {

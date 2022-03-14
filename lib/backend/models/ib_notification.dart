@@ -11,6 +11,7 @@ class IbNotification {
   String? attachmentUrl;
   String type;
   int timestampInMs;
+  bool isRead;
   String senderId;
   String recipientId;
 
@@ -23,6 +24,7 @@ class IbNotification {
       required this.subtitle,
       this.avatarUrl,
       this.attachmentUrl,
+      this.isRead = false,
       required this.type,
       required this.timestampInMs,
       required this.senderId,

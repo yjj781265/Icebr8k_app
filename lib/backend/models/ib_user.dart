@@ -86,6 +86,8 @@ class IbUser {
           answeredCount == other.answeredCount &&
           askedCount == other.askedCount &&
           isOnline == other.isOnline &&
+          isPrivate == other.isPrivate &&
+          isFriendsOnly == other.isFriendsOnly &&
           coverPhotoUrl == other.coverPhotoUrl &&
           bio == other.bio &&
           voiceMemoUrl == other.voiceMemoUrl &&
@@ -109,6 +111,8 @@ class IbUser {
       answeredCount.hashCode ^
       askedCount.hashCode ^
       isOnline.hashCode ^
+      isPrivate.hashCode ^
+      isFriendsOnly.hashCode ^
       coverPhotoUrl.hashCode ^
       bio.hashCode ^
       voiceMemoUrl.hashCode ^

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/db_config.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:icebr8k/backend/models/ib_friend.dart';
+import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
@@ -11,6 +12,9 @@ class IbUserDbService {
   static final _ibUserService = IbUserDbService._();
   static final _db = FirebaseFirestore.instance;
   static const _kUserCollection = 'IbUsers${DbConfig.dbSuffix}';
+  static const _kNotificationSubCollection =
+      'IbNotification${DbConfig.dbSuffix}';
+  static const _kFriendSubCollection = 'IbFriends${DbConfig.dbSuffix}';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
 
   factory IbUserDbService() => _ibUserService;
@@ -137,40 +141,36 @@ class IbUserDbService {
     return user;
   }
 
-  Future<String?> queryFriendshipStatus(String myUid, String friendUid) async {
+  Future<String> queryFriendshipStatus(String myUid, String friendUid) async {
     final _snapshot = await _collectionRef
         .doc(myUid)
-        .collection('Friends')
+        .collection(_kFriendSubCollection)
         .doc(friendUid)
         .get();
     if (!_snapshot.exists) {
-      return null;
+      return '';
     }
-
     return _snapshot['status'].toString();
   }
 
-  Future<void> sendFriendRequest(
-      {required String myUid,
-      required String friendUid,
-      required String requestMsg}) async {
-    final int timestamp = DateTime.now().millisecondsSinceEpoch;
-
+  Future<void> sendFriendRequest(IbNotification n) async {
     //my sub collection
-    await _collectionRef.doc(myUid).collection('Friends').doc(friendUid).set({
-      'friendUid': friendUid,
-      'status': IbFriend.kFriendshipStatusRequestSent,
-      'requestMsg': requestMsg.trim(),
-      'timestampInMs': timestamp
-    }, SetOptions(merge: true));
+    await _collectionRef
+        .doc(n.recipientId)
+        .collection(_kNotificationSubCollection)
+        .doc(n.id)
+        .set(n.toJson(), SetOptions(merge: true));
+  }
 
-    //my friends sub collection
-    await _collectionRef.doc(friendUid).collection('Friends').doc(myUid).set({
-      'friendUid': myUid,
-      'status': IbFriend.kFriendshipStatusPending,
-      'requestMsg': requestMsg.trim(),
-      'timestampInMs': timestamp
-    }, SetOptions(merge: true));
+  Future<bool> isFriendRequestPending(String friendId) async {
+    final snapshot = await _collectionRef
+        .doc(friendId)
+        .collection(_kNotificationSubCollection)
+        .where('type', isEqualTo: "friend_request")
+        .where('senderId', isEqualTo: IbUtils.getCurrentUid())
+        .where('recipientId', isEqualTo: friendId)
+        .get();
+    return snapshot.size > 0;
   }
 
   Future<IbUser?> queryIbUserFromUsername(String username) async {

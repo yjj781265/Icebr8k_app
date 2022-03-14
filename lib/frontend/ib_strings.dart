@@ -158,6 +158,7 @@ class IbStrings extends Translations {
           'update': 'Updating...',
           'nothing': 'Nothing to see here 😐',
           'private_profile': 'The Profile is Private 🔐',
+          'friends_only_profile': 'The Profile is Friends Only',
           'asked_question_ps': 'Anonymous and non-public questions are hidden'
         }
       };

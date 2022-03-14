@@ -2,20 +2,26 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/models/ib_friend.dart';
+import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
+import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class ProfileController extends GetxController {
   final isLoading = true.obs;
+  final isFriend = false.obs;
+  final isProfileVisible = false.obs;
+
+  /// is friend request pending
+  final isPending = false.obs;
   final String uid;
   final compScore = 0.0.obs;
-  final titlePadding = 8.0.obs;
   late Rx<IbUser> rxIbUser;
   StreamSubscription? friendStatusStream;
   final double kAppBarCollapseHeight = 56;
-  final isCollapsing = false.obs;
   final RefreshController refreshController = RefreshController();
   final ScrollController scrollController = ScrollController();
   final commonAnswers = <String>[].obs;
@@ -32,22 +38,15 @@ class ProfileController extends GetxController {
       uncommonAnswers.value =
           await IbUtils.getUncommonAnswerQuestionIds(uid: uid);
       compScore.value = await IbUtils.getCompScore(uid: uid);
+      isFriend.value = await IbUserDbService()
+              .queryFriendshipStatus(IbUtils.getCurrentUid()!, user.id) ==
+          IbFriend.kFriendshipStatusAccepted;
+      isPending.value = await IbUserDbService().isFriendRequestPending(user.id);
+      isProfileVisible.value =
+          isFriend.isTrue && rxIbUser.value.isFriendsOnly ||
+              !rxIbUser.value.isPrivate && !rxIbUser.value.isFriendsOnly;
+      isLoading.value = false;
     }
-
-    scrollController.addListener(() {
-      titlePadding.value =
-          ((scrollController.offset / 206) * kAppBarCollapseHeight) >
-                  kAppBarCollapseHeight
-              ? kAppBarCollapseHeight
-              : (scrollController.offset / 206) * kAppBarCollapseHeight;
-      if (scrollController.offset > kAppBarCollapseHeight) {
-        isCollapsing.value = true;
-      } else {
-        isCollapsing.value = false;
-      }
-    });
-
-    isLoading.value = false;
 
     super.onInit();
   }
@@ -55,15 +54,48 @@ class ProfileController extends GetxController {
   Future<void> onRefresh() async {
     final IbUser? user = await IbUserDbService().queryIbUser(uid);
     if (user != null) {
-      rxIbUser = user.obs;
-      rxIbUser = user.obs;
+      rxIbUser.value = user;
       commonAnswers.value =
           await IbUtils.getCommonAnswerQuestionIds(uid: uid, isRefresh: true);
       uncommonAnswers.value =
           await IbUtils.getUncommonAnswerQuestionIds(uid: uid, isRefresh: true);
       compScore.value = await IbUtils.getCompScore(uid: uid, isRefresh: true);
+      isFriend.value = await IbUserDbService()
+              .queryFriendshipStatus(IbUtils.getCurrentUid()!, user.id) ==
+          IbFriend.kFriendshipStatusAccepted;
+      isPending.value = await IbUserDbService().isFriendRequestPending(user.id);
+      isProfileVisible.value =
+          isFriend.isTrue && rxIbUser.value.isFriendsOnly ||
+              !rxIbUser.value.isPrivate && !rxIbUser.value.isFriendsOnly;
+      rxIbUser.refresh();
+      refreshController.refreshCompleted();
+    } else {
+      refreshController.refreshFailed();
     }
-    refreshController.refreshCompleted();
+  }
+
+  Future<void> addFriend(String message) async {
+    final IbUser? currentUser = IbUtils.getCurrentIbUser();
+    if (currentUser == null || isPending.isTrue) {
+      return;
+    }
+
+    final IbNotification n = IbNotification(
+        id: IbUtils.getUniqueId(),
+        title: currentUser.username,
+        subtitle: message,
+        type: IbNotification.kFriendRequest,
+        timestampInMs: DateTime.now().millisecondsSinceEpoch,
+        senderId: currentUser.id,
+        recipientId: rxIbUser.value.id);
+    try {
+      await IbUserDbService().sendFriendRequest(n);
+      IbUtils.showSimpleSnackBar(
+          msg: 'Friend request sent!', backgroundColor: IbColors.accentColor);
+    } catch (e) {
+      IbUtils.showSimpleSnackBar(
+          msg: 'Friend request failed $e', backgroundColor: IbColors.errorRed);
+    }
   }
 
   @override

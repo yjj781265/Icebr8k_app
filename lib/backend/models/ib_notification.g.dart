@@ -13,6 +13,7 @@ IbNotification _$IbNotificationFromJson(Map<String, dynamic> json) =>
       subtitle: json['subtitle'] as String,
       avatarUrl: json['avatarUrl'] as String?,
       attachmentUrl: json['attachmentUrl'] as String?,
+      isRead: json['isRead'] as bool? ?? false,
       type: json['type'] as String,
       timestampInMs: json['timestampInMs'] as int,
       senderId: json['senderId'] as String,
@@ -28,6 +29,7 @@ Map<String, dynamic> _$IbNotificationToJson(IbNotification instance) =>
       'attachmentUrl': instance.attachmentUrl,
       'type': instance.type,
       'timestampInMs': instance.timestampInMs,
+      'isRead': instance.isRead,
       'senderId': instance.senderId,
       'recipientId': instance.recipientId,
     };

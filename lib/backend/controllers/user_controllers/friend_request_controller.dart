@@ -1,10 +1,7 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/models/ib_friend.dart';
-import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
@@ -20,71 +17,7 @@ class FriendRequestController extends GetxController {
 
   @override
   void onInit() {
-    initFriendRequestStream();
     super.onInit();
-  }
-
-  void initFriendRequestStream() {
-    friendRequestStream = IbUserDbService()
-        .listenToFriendRequest(Get.find<AuthController>().firebaseUser!.uid)
-        .listen((event) async {
-      print('find ${event.docChanges.length} requests');
-
-      for (final change in event.docChanges) {
-        final IbFriend friend = IbFriend.fromJson(change.doc.data()!);
-        final IbUser? user =
-            await IbUserDbService().queryIbUser(friend.friendUid);
-        final double score = await IbUtils.getCompScore(uid: friend.friendUid);
-
-        if (change.type == DocumentChangeType.added) {
-          if (user != null) {
-            final FriendRequestItem item = FriendRequestItem(
-                avatarUrl: user.avatarUrl,
-                username: user.username,
-                timeStampInMs: friend.timestampInMs,
-                friendUid: friend.friendUid,
-                score: score,
-                requestMsg: friend.requestMsg);
-            requests.addIf(!requests.contains(item), item);
-            if (animatedListKey.currentState == null) {
-              continue;
-            }
-            animatedListKey.currentState!.insertItem(0);
-          }
-        }
-
-        if (change.type == DocumentChangeType.modified) {
-          if (user != null) {
-            final FriendRequestItem item = FriendRequestItem(
-                avatarUrl: user.avatarUrl,
-                username: user.username,
-                timeStampInMs: friend.timestampInMs,
-                friendUid: friend.friendUid,
-                score: score,
-                requestMsg: friend.requestMsg);
-
-            if (requests.contains(item)) {
-              requests[requests.indexOf(item)] = item;
-            }
-          }
-        }
-
-        if (change.type == DocumentChangeType.removed) {
-          if (user != null) {
-            final FriendRequestItem item = FriendRequestItem(
-                avatarUrl: user.avatarUrl,
-                username: user.username,
-                timeStampInMs: friend.timestampInMs,
-                friendUid: friend.friendUid,
-                score: score,
-                requestMsg: friend.requestMsg);
-
-            requests.remove(item);
-          }
-        }
-      }
-      requests.sort((a, b) => b.timeStampInMs.compareTo(a.timeStampInMs));
-    });
   }
 
   void acceptFriendRequest(String friendUid) {

@@ -1,11 +1,8 @@
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
-import '../../services/user_services/ib_cloud_messaging_service.dart';
 import '../../services/user_services/ib_user_db_service.dart';
 import 'auth_controller.dart';
 
@@ -62,31 +59,5 @@ class IbUserSearchController extends GetxController {
     noResultTrKey.value = '';
     friendshipStatus.value = '';
     requestMsg = '';
-  }
-
-  Future<void> sendFriendRequest() async {
-    try {
-      await IbUserDbService().sendFriendRequest(
-          myUid: Get.find<AuthController>().firebaseUser!.uid,
-          friendUid: friendUid.value,
-          requestMsg: requestMsg);
-      final _token =
-          await IbCloudMessagingService().retrieveToken(friendUid.value);
-
-      if (_token != null) {
-        await IbCloudMessagingService().sendNotification(
-            tokens: [_token],
-            title: IbUtils.getCurrentIbUser()!.username,
-            body: '${'send_you_a_friend_request'.tr}\n $requestMsg',
-            type: IbCloudMessagingService.kNotificationTypeRequest);
-      }
-      friendshipStatus.value = IbFriend.kFriendshipStatusRequestSent;
-
-      IbUtils.showSimpleSnackBar(
-          msg: 'send_friend_request_success'.tr,
-          backgroundColor: IbColors.accentColor);
-    } on Exception catch (e) {
-      print(e.toString());
-    }
   }
 }

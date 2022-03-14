@@ -13,6 +13,7 @@ import 'package:icebr8k/frontend/ib_pages/profile_pages/compare_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_description_text.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_emo_pic_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
@@ -104,18 +105,20 @@ class ProfilePage extends StatelessWidget {
                               Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  CircleAvatar(
-                                    backgroundColor: Theme.of(context)
-                                        .backgroundColor
-                                        .withOpacity(0.8),
-                                    child: IconButton(
-                                      padding: EdgeInsets.zero,
-                                      onPressed: () {},
-                                      icon: Icon(Icons.message,
-                                          color:
-                                              Theme.of(context).indicatorColor),
+                                  if (!_controller.rxIbUser.value.isPrivate ||
+                                      _controller.isFriend.isTrue)
+                                    CircleAvatar(
+                                      backgroundColor: Theme.of(context)
+                                          .backgroundColor
+                                          .withOpacity(0.8),
+                                      child: IconButton(
+                                        padding: EdgeInsets.zero,
+                                        onPressed: () {},
+                                        icon: Icon(Icons.message,
+                                            color: Theme.of(context)
+                                                .indicatorColor),
+                                      ),
                                     ),
-                                  ),
                                   const SizedBox(
                                     width: 8,
                                   ),
@@ -125,8 +128,22 @@ class ProfilePage extends StatelessWidget {
                                         .withOpacity(0.8),
                                     child: IconButton(
                                       padding: EdgeInsets.zero,
-                                      onPressed: () {},
-                                      icon: Icon(Icons.person_add,
+                                      onPressed: () {
+                                        if (IbUtils.getCurrentIbUser() ==
+                                                null ||
+                                            _controller.isPending.isTrue) {
+                                          IbUtils.showSimpleSnackBar(
+                                              msg: 'Friend request is pending',
+                                              backgroundColor:
+                                                  Colors.orangeAccent);
+                                          return;
+                                        }
+                                        showFriendRequestDialog();
+                                      },
+                                      icon: Icon(
+                                          _controller.isPending.isTrue
+                                              ? Icons.pending_rounded
+                                              : Icons.person_add,
                                           color:
                                               Theme.of(context).indicatorColor),
                                     ),
@@ -208,10 +225,7 @@ class ProfilePage extends StatelessWidget {
                           ),
                         ),
                         onTap: () {
-                          if (_controller.rxIbUser.value.isPrivate) {
-                            IbUtils.showSimpleSnackBar(
-                                msg: 'private_profile'.tr,
-                                backgroundColor: IbColors.errorRed);
+                          if (_controller.isProfileVisible.isFalse) {
                             return;
                           }
                           Get.to(
@@ -270,10 +284,7 @@ class ProfilePage extends StatelessWidget {
                           ),
                         ),
                         onTap: () {
-                          if (_controller.rxIbUser.value.isPrivate) {
-                            IbUtils.showSimpleSnackBar(
-                                msg: 'private_profile'.tr,
-                                backgroundColor: IbColors.errorRed);
+                          if (_controller.isProfileVisible.isFalse) {
                             return;
                           }
                           Get.to(
@@ -332,10 +343,7 @@ class ProfilePage extends StatelessWidget {
                           ),
                         ),
                         onTap: () {
-                          if (_controller.rxIbUser.value.isPrivate) {
-                            IbUtils.showSimpleSnackBar(
-                                msg: 'private_profile'.tr,
-                                backgroundColor: IbColors.errorRed);
+                          if (_controller.isProfileVisible.isFalse) {
                             return;
                           }
                           Get.to(
@@ -390,8 +398,17 @@ class ProfilePage extends StatelessWidget {
                     child: Text('private_profile'.tr),
                   )),
 
+                if (_controller.rxIbUser.value.isFriendsOnly &&
+                    _controller.isFriend.isFalse &&
+                    !_controller.rxIbUser.value.isPrivate)
+                  Center(
+                      child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('friends_only_profile'.tr),
+                  )),
+
                 /// user info
-                if (!_controller.rxIbUser.value.isPrivate)
+                if (_controller.isProfileVisible.isTrue)
                   Obx(
                     () => Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -432,7 +449,7 @@ class ProfilePage extends StatelessWidget {
                   ),
 
                 /// emoPics
-                if (!_controller.rxIbUser.value.isPrivate)
+                if (_controller.isProfileVisible.isTrue)
                   Obx(() => Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -467,10 +484,12 @@ class ProfilePage extends StatelessWidget {
                           ),
                           if (_controller.rxIbUser.value.emoPics.isEmpty)
                             Center(
-                                child: Text(
-                              'nothing'.tr,
-                              style: const TextStyle(color: IbColors.lightGrey),
-                            ))
+                              child: Text(
+                                'nothing'.tr,
+                                style:
+                                    const TextStyle(color: IbColors.lightGrey),
+                              ),
+                            )
                         ],
                       )),
               ],
@@ -479,5 +498,83 @@ class ProfilePage extends StatelessWidget {
         }),
       ),
     );
+  }
+
+  void showFriendRequestDialog() {
+    final TextEditingController editingController = TextEditingController();
+    final Widget dialog = IbCard(
+        child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'friend_request_dialog_title'
+                .trParams({'username': _controller.rxIbUser.value.username}),
+            style: const TextStyle(
+                fontSize: IbConfig.kNormalTextSize,
+                fontWeight: FontWeight.bold),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: IbUserAvatar(
+                  avatarUrl: _controller.rxIbUser.value.avatarUrl,
+                  uid: _controller.rxIbUser.value.id,
+                  radius: 32,
+                ),
+              ),
+              Expanded(
+                child: TextField(
+                  controller: editingController,
+                  textInputAction: TextInputAction.done,
+                  maxLines: 3,
+                  onChanged: (requestMsg) {},
+                  autofocus: true,
+                  style: const TextStyle(
+                    fontSize: IbConfig.kSecondaryTextSize,
+                  ),
+                  maxLength: IbConfig.kFriendRequestMsgMaxLength,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintStyle: const TextStyle(color: IbColors.lightGrey),
+                    hintText: 'friend_request_msg_hint'.tr,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                  child: IbElevatedButton(
+                onPressed: () {
+                  Get.back();
+                },
+                textTrKey: 'cancel',
+                color: IbColors.lightGrey,
+              )),
+              Expanded(
+                flex: 2,
+                child: IbElevatedButton(
+                  onPressed: () {
+                    _controller.addFriend(editingController.text.trim());
+                    Get.back();
+                    IbUtils.hideKeyboard();
+                  },
+                  textTrKey: 'send_friend_request',
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    ));
+
+    Get.bottomSheet(dialog);
   }
 }

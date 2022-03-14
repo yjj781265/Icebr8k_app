@@ -24,7 +24,6 @@ class IbQuestionHeader extends StatelessWidget {
         children: [
           Obx(
             () => Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _handleAvatarImage(),
                 const SizedBox(
