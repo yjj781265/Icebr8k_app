@@ -20,7 +20,6 @@ class ProfileController extends GetxController {
   final String uid;
   final compScore = 0.0.obs;
   late Rx<IbUser> rxIbUser;
-  StreamSubscription? friendStatusStream;
   final double kAppBarCollapseHeight = 56;
   final RefreshController refreshController = RefreshController();
   final ScrollController scrollController = ScrollController();
@@ -83,6 +82,7 @@ class ProfileController extends GetxController {
     final IbNotification n = IbNotification(
         id: IbUtils.getUniqueId(),
         title: currentUser.username,
+        avatarUrl: currentUser.avatarUrl,
         subtitle: message,
         type: IbNotification.kFriendRequest,
         timestampInMs: DateTime.now().millisecondsSinceEpoch,
@@ -90,20 +90,12 @@ class ProfileController extends GetxController {
         recipientId: rxIbUser.value.id);
     try {
       await IbUserDbService().sendFriendRequest(n);
+      isPending.value = true;
       IbUtils.showSimpleSnackBar(
           msg: 'Friend request sent!', backgroundColor: IbColors.accentColor);
     } catch (e) {
       IbUtils.showSimpleSnackBar(
           msg: 'Friend request failed $e', backgroundColor: IbColors.errorRed);
     }
-  }
-
-  @override
-  void onClose() {
-    if (friendStatusStream != null) {
-      friendStatusStream!.cancel();
-    }
-
-    super.onClose();
   }
 }

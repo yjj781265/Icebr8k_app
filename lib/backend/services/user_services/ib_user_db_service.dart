@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/db_config.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
-import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -13,7 +12,7 @@ class IbUserDbService {
   static final _db = FirebaseFirestore.instance;
   static const _kUserCollection = 'IbUsers${DbConfig.dbSuffix}';
   static const _kNotificationSubCollection =
-      'IbNotification${DbConfig.dbSuffix}';
+      'IbNotifications${DbConfig.dbSuffix}';
   static const _kFriendSubCollection = 'IbFriends${DbConfig.dbSuffix}';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
 
@@ -43,33 +42,6 @@ class IbUserDbService {
         .set(_ibUser.toJson(), SetOptions(merge: true));
   }
 
-  Future<void> loginIbUser({required String uid, required int loginTimeInMs}) {
-    print('loginIbUser');
-    return _collectionRef
-        .doc(uid)
-        .update({'loginTimeInMs': loginTimeInMs, 'id': uid});
-  }
-
-  Future<String?> queryIbUserStatus(String uid) async {
-    final snapshot = await _collectionRef.doc(uid).get();
-
-    if (!snapshot.exists) {
-      return null;
-    }
-    try {
-      return snapshot['status'].toString();
-    } on Exception catch (e) {
-      return null;
-    }
-  }
-
-  Future<bool> isIbUserExist(String _uid) async {
-    final snapshot = await _collectionRef.doc(_uid).get();
-    final bool isExist = snapshot.exists;
-    print('isIbUserExist $isExist');
-    return isExist;
-  }
-
   Future<bool> isUsernameTaken(String username) async {
     final snapshot = await _collectionRef
         .where('username', isEqualTo: username.toLowerCase())
@@ -77,44 +49,6 @@ class IbUserDbService {
     print(
         'isUsernameTaken , found  ${snapshot.size} user with username ${username.toLowerCase()}');
     return snapshot.size >= 1;
-  }
-
-  Future<bool> isUsernameMissing(String uid) async {
-    print(uid);
-    final snapshot = await _collectionRef.doc(uid).get();
-    return !snapshot.exists ||
-        snapshot.data()!['username'] == null ||
-        snapshot['username'] == '';
-  }
-
-  Future<bool> isAvatarUrlMissing(String uid) async {
-    final snapshot = await _collectionRef.doc(uid).get();
-    return !snapshot.exists ||
-        snapshot.data()!['avatarUrl'] == null ||
-        snapshot['avatarUrl'] == '';
-  }
-
-  Future<void> updateAvatarUrl({required String url, required String uid}) {
-    return _collectionRef.doc(uid).update({'avatarUrl': url});
-  }
-
-  /// update username of current IbUser, it will convert to all lower case
-  Future<void> updateUsername({required String username, required String uid}) {
-    return _collectionRef.doc(uid).set(
-        {'username': username.trim().toLowerCase()}, SetOptions(merge: true));
-  }
-
-  Future<void> updateName({required String name, required String uid}) {
-    return _collectionRef
-        .doc(uid)
-        .set({'name': name.trim()}, SetOptions(merge: true));
-  }
-
-  Future<void> updateCoverPhotoUrl(
-      {required String photoUrl, required String uid}) {
-    return _collectionRef
-        .doc(uid)
-        .set({'coverPhotoUrl': photoUrl}, SetOptions(merge: true));
   }
 
   Future<void> updateEmoPics(
@@ -166,86 +100,19 @@ class IbUserDbService {
     final snapshot = await _collectionRef
         .doc(friendId)
         .collection(_kNotificationSubCollection)
-        .where('type', isEqualTo: "friend_request")
+        .where('type', isEqualTo: IbNotification.kFriendRequest)
         .where('senderId', isEqualTo: IbUtils.getCurrentUid())
         .where('recipientId', isEqualTo: friendId)
         .get();
     return snapshot.size > 0;
   }
 
-  Future<IbUser?> queryIbUserFromUsername(String username) async {
-    final snapshot = await _collectionRef
-        .where('username', isEqualTo: username.trim().toLowerCase())
-        .get();
-    if (snapshot.docs.isEmpty || snapshot.docs.length != 1) {
-      return null;
-    }
-
-    return IbUser.fromJson(snapshot.docs.first.data());
-  }
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> listenToFriendRequest(
-      String uid) {
-    return _collectionRef
-        .doc(uid)
-        .collection('Friends')
-        .where('status', isEqualTo: IbFriend.kFriendshipStatusPending)
-        .orderBy('timestampInMs', descending: true)
-        .snapshots(includeMetadataChanges: true);
-  }
-
-  Future<void> acceptFriendRequest(
-      {required String friendUid, required String myUid}) async {
-    await _collectionRef.doc(myUid).collection('Friends').doc(friendUid).set({
-      'status': IbFriend.kFriendshipStatusAccepted,
-      'timestampInMs': DateTime.now().millisecondsSinceEpoch
-    }, SetOptions(merge: true));
-    await _collectionRef.doc(friendUid).collection('Friends').doc(myUid).set({
-      'status': IbFriend.kFriendshipStatusAccepted,
-      'timestampInMs': DateTime.now().millisecondsSinceEpoch
-    }, SetOptions(merge: true));
-  }
-
-  Future<void> rejectFriendRequest(
-      {required String friendUid, required String myUid}) async {
-    await _collectionRef
-        .doc(myUid)
-        .collection('Friends')
-        .doc(friendUid)
-        .delete();
-
-    await _collectionRef
-        .doc(friendUid)
-        .collection('Friends')
-        .doc(myUid)
-        .delete();
-  }
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> listenToFriendList(String uid) {
-    return _collectionRef
-        .doc(uid)
-        .collection('Friends')
-        .where('status', isEqualTo: IbFriend.kFriendshipStatusAccepted)
-        .orderBy('timestampInMs', descending: true)
-        .snapshots(includeMetadataChanges: true);
-  }
-
-  Stream<DocumentSnapshot<Map<String, dynamic>>> listenToSingleFriend(
-      String friendUid) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> listenToIbNotifications() {
     return _collectionRef
         .doc(IbUtils.getCurrentUid())
-        .collection('Friends')
-        .doc(friendUid)
-        .snapshots(includeMetadataChanges: true);
-  }
-
-  Future<QuerySnapshot<Map<String, dynamic>>> queryFriendList(String uid) {
-    return _collectionRef
-        .doc(uid)
-        .collection('Friends')
-        .where('status', isEqualTo: IbFriend.kFriendshipStatusAccepted)
+        .collection(_kNotificationSubCollection)
         .orderBy('timestampInMs', descending: true)
-        .get();
+        .snapshots();
   }
 
   Future<void> saveTokenToDatabase(String token) async {

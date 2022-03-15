@@ -6,6 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
+import 'package:icebr8k/frontend/ib_pages/alert_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/social_tab.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
@@ -80,7 +81,7 @@ class _MainPageViewState extends State<MainPageView>
       ChatTab(),
       const SizedBox(),
       SocialTab(),
-      const SizedBox(),
+      AlertTab(),
     ];
     return Obx(
       () => IndexedStack(

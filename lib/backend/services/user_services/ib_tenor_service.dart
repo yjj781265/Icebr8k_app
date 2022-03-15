@@ -27,9 +27,9 @@ class IbTenorService extends GetConnect {
       for (final item in tempList) {
         final String id = item['id'].toString();
         final String description = item['content_description'].toString();
-        final url = item['media'][0]['tinygif']['url'].toString();
-        final int width = item['media'][0]['tinygif']['dims'][0] as int;
-        final int height = item['media'][0]['tinygif']['dims'][1] as int;
+        final url = item['media'][0]['gif']['url'].toString();
+        final int width = item['media'][0]['gif']['dims'][0] as int;
+        final int height = item['media'][0]['gif']['dims'][1] as int;
         final double timeStampInSec = item['created'] as double;
         final IbGif ibGif = IbGif(
             url: url,
