@@ -72,6 +72,10 @@ class IbUtils {
 
   static String getAgoDateTimeString(DateTime _dateTime) {
     final Duration diffDt = DateTime.now().difference(_dateTime);
+    if (diffDt.inSeconds < 0) {
+      return '';
+    }
+
     if (diffDt.inSeconds == 0) {
       return 'now';
     }

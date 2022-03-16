@@ -171,9 +171,9 @@ class MyProfilePage extends StatelessWidget {
                 ),
 
                 /// poll stats
-                Material(
-                  color: Colors.transparent,
-                  child: Row(
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Wrap(
                     children: [
                       InkWell(
                         customBorder: const RoundedRectangleBorder(
@@ -188,7 +188,7 @@ class MyProfilePage extends StatelessWidget {
                               tag: IbUtils.getUniqueId())));
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius:
@@ -235,7 +235,7 @@ class MyProfilePage extends StatelessWidget {
                               tag: IbUtils.getUniqueId())));
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius:
@@ -267,6 +267,47 @@ class MyProfilePage extends StatelessWidget {
                             ),
                           ),
                         ),
+                      ),
+                      InkWell(
+                        customBorder: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(8),
+                          ),
+                        ),
+                        onTap: () {},
+                        child: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(8)),
+                              color: Theme.of(context).backgroundColor,
+                            ),
+                            width: 88,
+                            height: 88 / 1.618,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Obx(() => Text(
+                                      IbUtils.getStatsString(_controller
+                                          .rxIbUser.value.friendCount),
+                                      style: const TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: IbConfig.kPageTitleSize),
+                                    )),
+                                const Text(
+                                  '👥 FRIEND(S)',
+                                  style: TextStyle(
+                                      overflow: TextOverflow.ellipsis,
+                                      fontSize: IbConfig.kDescriptionTextSize,
+                                      color: IbColors.lightGrey),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
                       )
                     ],
                   ),
@@ -274,7 +315,7 @@ class MyProfilePage extends StatelessWidget {
 
                 /// user info
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

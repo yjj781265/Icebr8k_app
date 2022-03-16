@@ -78,19 +78,17 @@ class PendingAppDetailPage extends StatelessWidget {
               child: SizedBox(
                 height: 48,
                 width: double.infinity,
-                child: InkWell(
-                  onLongPress: () async {
+                child: IbElevatedButton(
+                  textTrKey: 'Approve',
+                  onLongPressed: () async {
                     await _controller.approveApplication(user);
                   },
-                  child: IbElevatedButton(
-                    textTrKey: 'Approve',
-                    onPressed: () {
-                      IbUtils.showSimpleSnackBar(
-                          msg: 'Long press to approve',
-                          backgroundColor: IbColors.accentColor);
-                    },
-                    icon: const Icon(Icons.check_circle),
-                  ),
+                  onPressed: () {
+                    IbUtils.showSimpleSnackBar(
+                        msg: 'Long press to approve',
+                        backgroundColor: IbColors.accentColor);
+                  },
+                  icon: const Icon(Icons.check_circle),
                 ),
               ),
             ),
@@ -99,20 +97,18 @@ class PendingAppDetailPage extends StatelessWidget {
               child: SizedBox(
                 height: 48,
                 width: double.infinity,
-                child: InkWell(
-                  onLongPress: () async {
+                child: IbElevatedButton(
+                  textTrKey: 'Reject',
+                  color: IbColors.errorRed,
+                  onLongPressed: () async {
                     await _controller.rejectApplication(user);
                   },
-                  child: IbElevatedButton(
-                    textTrKey: 'Reject',
-                    color: IbColors.errorRed,
-                    onPressed: () {
-                      IbUtils.showSimpleSnackBar(
-                          msg: 'Long press to reject',
-                          backgroundColor: IbColors.errorRed);
-                    },
-                    icon: const Icon(Icons.cancel),
-                  ),
+                  onPressed: () {
+                    IbUtils.showSimpleSnackBar(
+                        msg: 'Long press to reject',
+                        backgroundColor: IbColors.errorRed);
+                  },
+                  icon: const Icon(Icons.cancel),
                 ),
               ),
             ),

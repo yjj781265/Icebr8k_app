@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/asked_questions_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/compare_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -190,9 +191,9 @@ class ProfilePage extends StatelessWidget {
                 ),
 
                 /// poll stats
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Wrap(
                     children: [
                       InkWell(
                         customBorder: const RoundedRectangleBorder(
@@ -220,7 +221,7 @@ class ProfilePage extends StatelessWidget {
                           );
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius:
@@ -279,7 +280,7 @@ class ProfilePage extends StatelessWidget {
                           );
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius:
@@ -330,7 +331,7 @@ class ProfilePage extends StatelessWidget {
                           );
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius:
@@ -353,6 +354,47 @@ class ProfilePage extends StatelessWidget {
                                     )),
                                 const Text(
                                   '✋ ASKED',
+                                  style: TextStyle(
+                                      overflow: TextOverflow.ellipsis,
+                                      fontSize: IbConfig.kDescriptionTextSize,
+                                      color: IbColors.lightGrey),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        customBorder: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(8),
+                          ),
+                        ),
+                        onTap: () {},
+                        child: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(8)),
+                              color: Theme.of(context).backgroundColor,
+                            ),
+                            width: 88,
+                            height: 88 / 1.618,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Obx(() => Text(
+                                      IbUtils.getStatsString(_controller
+                                          .rxIbUser.value.friendCount),
+                                      style: const TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: IbConfig.kPageTitleSize),
+                                    )),
+                                const Text(
+                                  '👥 FRIEND(S)',
                                   style: TextStyle(
                                       overflow: TextOverflow.ellipsis,
                                       fontSize: IbConfig.kDescriptionTextSize,
@@ -387,7 +429,7 @@ class ProfilePage extends StatelessWidget {
                 if (_controller.isProfileVisible.isTrue)
                   Obx(
                     () => Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -559,12 +601,28 @@ class ProfilePage extends StatelessWidget {
                           Expanded(
                               child: IbElevatedButton(
                             textTrKey: 'decline',
-                            onPressed: () {},
+                            onPressed: () async {
+                              final NotificationController nController =
+                                  Get.find();
+                              Get.back();
+                              await nController
+                                  .declineFr(_controller.frNotification!);
+                              await _controller.onRefresh();
+                            },
                             color: IbColors.errorRed,
                           )),
                           Expanded(
-                              child: IbElevatedButton(
-                                  textTrKey: 'accept', onPressed: () {})),
+                            child: IbElevatedButton(
+                                textTrKey: 'accept',
+                                onPressed: () async {
+                                  Get.back();
+                                  final NotificationController nController =
+                                      Get.find();
+                                  await nController
+                                      .acceptFr(_controller.frNotification!);
+                                  await _controller.onRefresh();
+                                }),
+                          ),
                         ],
                       )
                     ],

@@ -21,6 +21,8 @@ class IbUser {
   int? birthdateInMs;
   int answeredCount;
   int askedCount;
+  int friendCount;
+  int notificationCount;
   bool isOnline;
   bool isPrivate;
   bool isFriendsOnly;
@@ -47,6 +49,8 @@ class IbUser {
     this.joinTime,
     this.birthdateInMs = -1,
     this.banedEndTimeInMs = -1,
+    this.friendCount = 0,
+    this.notificationCount = 0,
     this.isOnline = false,
     this.gender = '',
     this.status = '',

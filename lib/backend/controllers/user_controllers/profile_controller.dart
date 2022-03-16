@@ -68,6 +68,8 @@ class ProfileController extends GetxController {
               .queryFriendshipStatus(IbUtils.getCurrentUid()!, user.id) ==
           IbFriend.kFriendshipStatusAccepted;
       isFrSent.value = await IbUserDbService().isFriendRequestSent(user.id);
+      frNotification = await IbUserDbService()
+          .isFriendRequestWaitingForMeForApproval(user.id);
       isProfileVisible.value =
           isFriend.isTrue && rxIbUser.value.isFriendsOnly ||
               !rxIbUser.value.isPrivate && !rxIbUser.value.isFriendsOnly;
