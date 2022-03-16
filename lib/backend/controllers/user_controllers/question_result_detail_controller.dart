@@ -71,7 +71,6 @@ class QuestionResultDetailPageController extends GetxController {
 
   Future<void> loadMore() async {
     if (lastSnap != null) {
-      isLoading.value = true;
       try {
         final snapshot = await IbQuestionDbService().queryIbAnswers(
             lastSnap: lastSnap,
@@ -110,7 +109,6 @@ class QuestionResultDetailPageController extends GetxController {
         refreshController.loadFailed();
       } finally {
         results.sort((a, b) => b.compScore.compareTo(a.compScore));
-        isLoading.value = false;
       }
     }
   }

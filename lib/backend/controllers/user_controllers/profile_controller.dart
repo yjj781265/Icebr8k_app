@@ -15,8 +15,11 @@ class ProfileController extends GetxController {
   final isFriend = false.obs;
   final isProfileVisible = false.obs;
 
-  /// is friend request pending
-  final isPending = false.obs;
+  /// is friend request sent
+  final isFrSent = false.obs;
+
+  /// is friend request waiting for me for approval
+  IbNotification? frNotification;
   final String uid;
   final compScore = 0.0.obs;
   late Rx<IbUser> rxIbUser;
@@ -40,7 +43,9 @@ class ProfileController extends GetxController {
       isFriend.value = await IbUserDbService()
               .queryFriendshipStatus(IbUtils.getCurrentUid()!, user.id) ==
           IbFriend.kFriendshipStatusAccepted;
-      isPending.value = await IbUserDbService().isFriendRequestPending(user.id);
+      isFrSent.value = await IbUserDbService().isFriendRequestSent(user.id);
+      frNotification = await IbUserDbService()
+          .isFriendRequestWaitingForMeForApproval(user.id);
       isProfileVisible.value =
           isFriend.isTrue && rxIbUser.value.isFriendsOnly ||
               !rxIbUser.value.isPrivate && !rxIbUser.value.isFriendsOnly;
@@ -62,7 +67,7 @@ class ProfileController extends GetxController {
       isFriend.value = await IbUserDbService()
               .queryFriendshipStatus(IbUtils.getCurrentUid()!, user.id) ==
           IbFriend.kFriendshipStatusAccepted;
-      isPending.value = await IbUserDbService().isFriendRequestPending(user.id);
+      isFrSent.value = await IbUserDbService().isFriendRequestSent(user.id);
       isProfileVisible.value =
           isFriend.isTrue && rxIbUser.value.isFriendsOnly ||
               !rxIbUser.value.isPrivate && !rxIbUser.value.isFriendsOnly;
@@ -75,7 +80,7 @@ class ProfileController extends GetxController {
 
   Future<void> addFriend(String message) async {
     final IbUser? currentUser = IbUtils.getCurrentIbUser();
-    if (currentUser == null || isPending.isTrue) {
+    if (currentUser == null || isFrSent.isTrue) {
       return;
     }
 
@@ -90,12 +95,29 @@ class ProfileController extends GetxController {
         recipientId: rxIbUser.value.id);
     try {
       await IbUserDbService().sendFriendRequest(n);
-      isPending.value = true;
+      isFrSent.value = true;
       IbUtils.showSimpleSnackBar(
           msg: 'Friend request sent!', backgroundColor: IbColors.accentColor);
     } catch (e) {
       IbUtils.showSimpleSnackBar(
           msg: 'Friend request failed $e', backgroundColor: IbColors.errorRed);
+    }
+  }
+
+  Future<void> removeFriend() async {
+    final IbUser? currentUser = IbUtils.getCurrentIbUser();
+    if (currentUser == null) {
+      return;
+    }
+    try {
+      await IbUserDbService().removeFriend(uid);
+      isFriend.value = false;
+      isProfileVisible.value =
+          isFriend.isTrue && rxIbUser.value.isFriendsOnly ||
+              !rxIbUser.value.isPrivate && !rxIbUser.value.isFriendsOnly;
+    } catch (e) {
+      IbUtils.showSimpleSnackBar(
+          msg: 'Delete friend failed $e', backgroundColor: IbColors.errorRed);
     }
   }
 }

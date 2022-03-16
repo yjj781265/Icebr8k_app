@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_themes.dart';
 import 'package:lottie/lottie.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'backend/controllers/user_controllers/init_controller.dart';
 import 'backend/services/user_services/ib_local_data_service.dart';
@@ -60,20 +61,24 @@ class MainApp extends StatelessWidget {
         return _loading();
       }
 
-      return GetMaterialApp(
-        navigatorObservers: [
-          FirebaseAnalyticsObserver(analytics: analytics),
-        ],
-        defaultTransition: Transition.cupertino,
-        debugShowCheckedModeBanner: false,
-        home: SplashPage(),
-        enableLog: true,
-        translations: IbStrings(),
-        locale: const Locale('en', 'US'),
-        themeMode: ThemeMode.light,
-        theme: IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
-            ? IbThemes(context).buildDarkTheme()
-            : IbThemes(context).buildLightTheme(),
+      return RefreshConfiguration(
+        headerBuilder: () => const ClassicHeader(),
+        child: GetMaterialApp(
+          navigatorObservers: [
+            FirebaseAnalyticsObserver(analytics: analytics),
+          ],
+          defaultTransition: Transition.cupertino,
+          debugShowCheckedModeBanner: false,
+          home: SplashPage(),
+          enableLog: true,
+          translations: IbStrings(),
+          locale: const Locale('en', 'US'),
+          themeMode: ThemeMode.light,
+          theme:
+              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
+                  ? IbThemes(context).buildDarkTheme()
+                  : IbThemes(context).buildLightTheme(),
+        ),
       );
     });
   }

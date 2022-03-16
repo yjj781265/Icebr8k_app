@@ -78,8 +78,9 @@ class QuestionResultMainPage extends StatelessWidget {
               if (ibUsers.toList().indexOf(e) == ibUsers.length - 1 &&
                   ibUsers.length - 1 > votes) {
                 return Align(
-                  widthFactor: 0.6,
+                  widthFactor: 0.8,
                   child: CircleAvatar(
+                    backgroundColor: IbColors.lightGrey,
                     radius: 16,
                     child: Text('+${ibUsers.length - 1 - votes}'),
                   ),
@@ -87,7 +88,7 @@ class QuestionResultMainPage extends StatelessWidget {
               }
 
               return Align(
-                widthFactor: 0.6,
+                widthFactor: 0.8,
                 child: IbUserAvatar(
                   disableOnTap: true,
                   radius: 16,

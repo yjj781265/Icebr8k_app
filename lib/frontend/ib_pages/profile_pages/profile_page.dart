@@ -13,6 +13,7 @@ import 'package:icebr8k/frontend/ib_pages/profile_pages/compare_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_description_text.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_emo_pic_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
@@ -122,32 +123,7 @@ class ProfilePage extends StatelessWidget {
                                   const SizedBox(
                                     width: 8,
                                   ),
-                                  CircleAvatar(
-                                    backgroundColor: Theme.of(context)
-                                        .backgroundColor
-                                        .withOpacity(0.8),
-                                    child: IconButton(
-                                      padding: EdgeInsets.zero,
-                                      onPressed: () {
-                                        if (IbUtils.getCurrentIbUser() ==
-                                                null ||
-                                            _controller.isPending.isTrue) {
-                                          IbUtils.showSimpleSnackBar(
-                                              msg: 'Friend request is pending',
-                                              backgroundColor:
-                                                  Colors.orangeAccent);
-                                          return;
-                                        }
-                                        showFriendRequestDialog();
-                                      },
-                                      icon: Icon(
-                                          _controller.isPending.isTrue
-                                              ? Icons.pending_rounded
-                                              : Icons.person_add,
-                                          color:
-                                              Theme.of(context).indicatorColor),
-                                    ),
-                                  ),
+                                  _handleFrIcon(context),
                                   const SizedBox(
                                     width: 8,
                                   ),
@@ -500,6 +476,154 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  Widget _handleFrIcon(BuildContext context) {
+    if (_controller.frNotification != null) {
+      return CircleAvatar(
+        backgroundColor: Theme.of(context).backgroundColor.withOpacity(0.8),
+        child: IconButton(
+          padding: EdgeInsets.zero,
+          onPressed: () {
+            final Widget dialog = IbCard(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          IbUserAvatar(
+                            avatarUrl:
+                                _controller.frNotification!.avatarUrl ?? '',
+                            uid: _controller.frNotification!.senderId,
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      _controller.frNotification!.title,
+                                      style: const TextStyle(
+                                          fontSize: IbConfig.kNormalTextSize,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(
+                                      width: 8,
+                                    ),
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text(
+                                          IbUtils.getAgoDateTimeString(
+                                            DateTime.fromMillisecondsSinceEpoch(
+                                                _controller.frNotification!
+                                                    .timestampInMs),
+                                          ),
+                                          style: const TextStyle(
+                                              fontSize:
+                                                  IbConfig.kDescriptionTextSize,
+                                              color: IbColors.lightGrey)),
+                                    )
+                                  ],
+                                ),
+                                Text(
+                                  'sent_you_a_friend_request'.tr,
+                                  style: const TextStyle(
+                                      color: IbColors.lightGrey),
+                                ),
+                                if (_controller
+                                    .frNotification!.subtitle.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: Text(
+                                        _controller.frNotification!.subtitle),
+                                  ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                              child: IbElevatedButton(
+                            textTrKey: 'decline',
+                            onPressed: () {},
+                            color: IbColors.errorRed,
+                          )),
+                          Expanded(
+                              child: IbElevatedButton(
+                                  textTrKey: 'accept', onPressed: () {})),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            );
+            Get.bottomSheet(dialog, ignoreSafeArea: false);
+          },
+          icon: const Icon(Icons.notification_important,
+              color: IbColors.accentColor),
+        ),
+      );
+    }
+    if (_controller.isFriend.isTrue) {
+      return CircleAvatar(
+        backgroundColor: Theme.of(context).backgroundColor.withOpacity(0.8),
+        child: IconButton(
+          padding: EdgeInsets.zero,
+          onPressed: () async {
+            Get.dialog(IbDialog(
+              title:
+                  'Are you sure to unfriend ${_controller.rxIbUser.value.username}?',
+              subtitle: '',
+              onPositiveTap: () async {
+                await _controller.removeFriend();
+                Get.back();
+              },
+            ));
+          },
+          icon: Icon(Icons.person_remove,
+              color: Theme.of(context).indicatorColor),
+        ),
+      );
+    }
+
+    return CircleAvatar(
+      backgroundColor: Theme.of(context).backgroundColor.withOpacity(0.8),
+      child: IconButton(
+        padding: EdgeInsets.zero,
+        onPressed: () {
+          if (IbUtils.getCurrentIbUser() == null ||
+              _controller.isFrSent.isTrue) {
+            IbUtils.showSimpleSnackBar(
+                msg: 'Friend request already sent',
+                backgroundColor: Colors.orangeAccent);
+            return;
+          }
+          showFriendRequestDialog();
+        },
+        icon: Icon(
+            _controller.isFrSent.isTrue
+                ? Icons.pending_rounded
+                : Icons.person_add,
+            color: Theme.of(context).indicatorColor),
+      ),
+    );
+  }
+
   void showFriendRequestDialog() {
     final TextEditingController editingController = TextEditingController();
     final Widget dialog = IbCard(
@@ -512,6 +636,7 @@ class ProfilePage extends StatelessWidget {
           Text(
             'friend_request_dialog_title'
                 .trParams({'username': _controller.rxIbUser.value.username}),
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
                 fontSize: IbConfig.kNormalTextSize,
                 fontWeight: FontWeight.bold),
@@ -575,6 +700,6 @@ class ProfilePage extends StatelessWidget {
       ),
     ));
 
-    Get.bottomSheet(dialog);
+    Get.bottomSheet(dialog, ignoreSafeArea: false);
   }
 }

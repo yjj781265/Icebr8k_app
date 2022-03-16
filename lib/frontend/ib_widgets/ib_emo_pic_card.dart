@@ -31,7 +31,7 @@ class IbEmoPicCard extends StatelessWidget {
             children: [
               if (emoPic.url.isEmpty)
                 Container(
-                  height: width * 1.618 - 30,
+                  height: width * 1.618 - 40,
                   width: width,
                   decoration: const BoxDecoration(
                       color: IbColors.lightGrey,
@@ -49,7 +49,7 @@ class IbEmoPicCard extends StatelessWidget {
                   child: Image.file(
                     File(emoPic.url),
                     fit: BoxFit.cover,
-                    height: width * 1.618 - 30,
+                    height: width * 1.618 - 40,
                     width: width,
                   ),
                 ),
@@ -61,7 +61,7 @@ class IbEmoPicCard extends StatelessWidget {
                   child: CachedNetworkImage(
                     imageUrl: emoPic.url,
                     fit: BoxFit.cover,
-                    height: width * 1.618 - 30,
+                    height: width * 1.618 - 40,
                     width: width,
                   ),
                 ),
@@ -106,7 +106,7 @@ class IbEmoPicCard extends StatelessWidget {
           Expanded(
               child: Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
               child: RichText(
                   overflow: TextOverflow.ellipsis,
                   text: TextSpan(

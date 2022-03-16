@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/db_config.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
+import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -96,7 +97,7 @@ class IbUserDbService {
         .set(n.toJson(), SetOptions(merge: true));
   }
 
-  Future<bool> isFriendRequestPending(String friendId) async {
+  Future<bool> isFriendRequestSent(String friendId) async {
     final snapshot = await _collectionRef
         .doc(friendId)
         .collection(_kNotificationSubCollection)
@@ -105,6 +106,61 @@ class IbUserDbService {
         .where('recipientId', isEqualTo: friendId)
         .get();
     return snapshot.size > 0;
+  }
+
+  Future<IbNotification?> isFriendRequestWaitingForMeForApproval(
+      String friendId) async {
+    final snapshot = await _collectionRef
+        .doc(IbUtils.getCurrentUid())
+        .collection(_kNotificationSubCollection)
+        .where('type', isEqualTo: IbNotification.kFriendRequest)
+        .where('senderId', isEqualTo: friendId)
+        .where('recipientId', isEqualTo: IbUtils.getCurrentUid())
+        .get();
+    if (snapshot.size == 0) {
+      return null;
+    }
+    return IbNotification.fromJson(snapshot.docs.first.data());
+  }
+
+  Future<void> addFriend(IbFriend ibFriend) async {
+    final IbFriend self = IbFriend(
+        friendUid: IbUtils.getCurrentUid()!,
+        status: IbFriend.kFriendshipStatusAccepted,
+        timestampInMs: DateTime.now().millisecondsSinceEpoch);
+    await _collectionRef
+        .doc(IbUtils.getCurrentUid())
+        .collection(_kFriendSubCollection)
+        .doc(ibFriend.friendUid)
+        .set(ibFriend.toJson(), SetOptions(merge: true));
+
+    await _collectionRef
+        .doc(ibFriend.friendUid)
+        .collection(_kFriendSubCollection)
+        .doc(IbUtils.getCurrentUid())
+        .set(self.toJson(), SetOptions(merge: true));
+  }
+
+  Future<void> removeFriend(String friendUid) async {
+    await _collectionRef
+        .doc(IbUtils.getCurrentUid())
+        .collection(_kFriendSubCollection)
+        .doc(friendUid)
+        .delete();
+
+    await _collectionRef
+        .doc(friendUid)
+        .collection(_kFriendSubCollection)
+        .doc(IbUtils.getCurrentUid())
+        .delete();
+  }
+
+  Future<void> removeNotification(IbNotification n) async {
+    return _collectionRef
+        .doc(IbUtils.getCurrentUid())
+        .collection(_kNotificationSubCollection)
+        .doc(n.id)
+        .delete();
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> listenToIbNotifications() {
