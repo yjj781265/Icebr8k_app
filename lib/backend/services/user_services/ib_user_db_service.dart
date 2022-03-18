@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/db_config.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
-import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -76,18 +75,6 @@ class IbUserDbService {
     return user;
   }
 
-  Future<String> queryFriendshipStatus(String myUid, String friendUid) async {
-    final _snapshot = await _collectionRef
-        .doc(myUid)
-        .collection(_kFriendSubCollection)
-        .doc(friendUid)
-        .get();
-    if (!_snapshot.exists) {
-      return '';
-    }
-    return _snapshot['status'].toString();
-  }
-
   Future<void> sendFriendRequest(IbNotification n) async {
     //my sub collection
     await _collectionRef
@@ -123,36 +110,42 @@ class IbUserDbService {
     return IbNotification.fromJson(snapshot.docs.first.data());
   }
 
-  Future<void> addFriend(IbFriend ibFriend) async {
-    final IbFriend self = IbFriend(
-        friendUid: IbUtils.getCurrentUid()!,
-        status: IbFriend.kFriendshipStatusAccepted,
-        timestampInMs: DateTime.now().millisecondsSinceEpoch);
-    await _collectionRef
-        .doc(IbUtils.getCurrentUid())
-        .collection(_kFriendSubCollection)
-        .doc(ibFriend.friendUid)
-        .set(ibFriend.toJson(), SetOptions(merge: true));
+  Future<void> addFriend(String friendUid) async {
+    await _collectionRef.doc(IbUtils.getCurrentUid()).update({
+      'friendUids': FieldValue.arrayUnion([friendUid])
+    });
 
-    await _collectionRef
-        .doc(ibFriend.friendUid)
-        .collection(_kFriendSubCollection)
-        .doc(IbUtils.getCurrentUid())
-        .set(self.toJson(), SetOptions(merge: true));
+    await _collectionRef.doc(friendUid).update({
+      'friendUids': FieldValue.arrayUnion([IbUtils.getCurrentUid()])
+    });
   }
 
   Future<void> removeFriend(String friendUid) async {
-    await _collectionRef
-        .doc(IbUtils.getCurrentUid())
-        .collection(_kFriendSubCollection)
-        .doc(friendUid)
-        .delete();
+    await _collectionRef.doc(IbUtils.getCurrentUid()).update({
+      'friendUids': FieldValue.arrayRemove([friendUid])
+    });
+    await _collectionRef.doc(IbUtils.getCurrentUid()).update({
+      'blockedFriendUids': FieldValue.arrayRemove([friendUid])
+    });
 
-    await _collectionRef
-        .doc(friendUid)
-        .collection(_kFriendSubCollection)
-        .doc(IbUtils.getCurrentUid())
-        .delete();
+    await _collectionRef.doc(friendUid).update({
+      'friendUids': FieldValue.arrayRemove([IbUtils.getCurrentUid()])
+    });
+    await _collectionRef.doc(friendUid).update({
+      'blockedFriendUids': FieldValue.arrayRemove([IbUtils.getCurrentUid()])
+    });
+  }
+
+  Future<void> blockFriend(String friendUid) async {
+    await _collectionRef.doc(IbUtils.getCurrentUid()).update({
+      'blockedFriendUids': FieldValue.arrayUnion([friendUid])
+    });
+  }
+
+  Future<void> unblockFriend(String friendUid) async {
+    await _collectionRef.doc(IbUtils.getCurrentUid()).update({
+      'blockedFriendUids': FieldValue.arrayRemove([friendUid])
+    });
   }
 
   Future<void> removeNotification(IbNotification n) async {

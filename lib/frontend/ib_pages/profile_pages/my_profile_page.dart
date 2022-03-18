@@ -291,7 +291,7 @@ class MyProfilePage extends StatelessWidget {
                               children: [
                                 Obx(() => Text(
                                       IbUtils.getStatsString(_controller
-                                          .rxIbUser.value.friendCount),
+                                          .rxIbUser.value.friendUids.length),
                                       style: const TextStyle(
                                           overflow: TextOverflow.ellipsis,
                                           fontWeight: FontWeight.bold,

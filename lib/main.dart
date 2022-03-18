@@ -63,6 +63,7 @@ class MainApp extends StatelessWidget {
 
       return RefreshConfiguration(
         headerBuilder: () => const ClassicHeader(),
+        enableScrollWhenRefreshCompleted: true,
         child: GetMaterialApp(
           navigatorObservers: [
             FirebaseAnalyticsObserver(analytics: analytics),

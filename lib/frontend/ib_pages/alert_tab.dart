@@ -9,9 +9,15 @@ import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
-class AlertTab extends StatelessWidget {
-  final NotificationController _controller = Get.put(NotificationController());
+class AlertTab extends StatefulWidget {
+  @override
+  State<AlertTab> createState() => _AlertTabState();
+}
 
+class _AlertTabState extends State<AlertTab> {
+  final NotificationController _controller = Get.put(NotificationController());
+  String title = 'one_to_one_chat'.tr;
+  late TabController _tabController;
   @override
   Widget build(BuildContext context) {
     return SafeArea(

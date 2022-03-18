@@ -93,7 +93,7 @@ class AdminMainController extends GetxController {
         switch (status) {
           case IbUser.kUserStatusApproved:
             Get.offAll(() => MainPage(),
-                binding: HomeBinding(), transition: Transition.fadeIn);
+                binding: HomeBinding(ibUser!), transition: Transition.fadeIn);
             break;
 
           case IbUser.kUserStatusBanned:

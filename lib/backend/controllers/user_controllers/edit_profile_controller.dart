@@ -44,12 +44,12 @@ class EditProfileController extends GetxController {
     if (IbUser.kGenders.contains(gender.value)) {
       genderSelections[IbUser.kGenders.indexOf(gender.value)] = true;
     }
-    if (rxIbUser.value.isPrivate) {
-      selectedPrivacy.value = privacyItems[1];
-    } else if (!rxIbUser.value.isPrivate && rxIbUser.value.isFriendsOnly) {
-      selectedPrivacy.value = privacyItems[2];
-    } else {
+    if (rxIbUser.value.profilePrivacy == IbUser.kUserPrivacyPublic) {
       selectedPrivacy.value = privacyItems[0];
+    } else if (rxIbUser.value.profilePrivacy == IbUser.kUserPrivacyPrivate) {
+      selectedPrivacy.value = privacyItems[1];
+    } else {
+      selectedPrivacy.value = privacyItems[2];
     }
   }
 
@@ -80,17 +80,13 @@ class EditProfileController extends GetxController {
 
   void onPrivacySelect(String text) {
     if (text == privacyItems[0]) {
-      rxIbUser.value.isPrivate = false;
-      rxIbUser.value.isFriendsOnly = false;
+      rxIbUser.value.profilePrivacy = IbUser.kUserPrivacyPublic;
     } else if (text == privacyItems[1]) {
-      rxIbUser.value.isPrivate = true;
-      rxIbUser.value.isFriendsOnly = false;
+      rxIbUser.value.profilePrivacy = IbUser.kUserPrivacyPrivate;
     } else if (text == privacyItems[2]) {
-      rxIbUser.value.isPrivate = false;
-      rxIbUser.value.isFriendsOnly = true;
+      rxIbUser.value.profilePrivacy = IbUser.kUserPrivacyFrOnly;
     } else {
-      rxIbUser.value.isPrivate = false;
-      rxIbUser.value.isFriendsOnly = false;
+      rxIbUser.value.profilePrivacy = IbUser.kUserPrivacyFrOnly;
     }
   }
 

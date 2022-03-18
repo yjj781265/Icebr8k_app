@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -51,6 +52,7 @@ class _DescriptionTextWidgetState extends State<IbDescriptionText>
         // whether the text overflowed or not
         final bool isOverflow = tp.didExceedMaxLines;
         return Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             AnimatedSize(
@@ -74,19 +76,18 @@ class _DescriptionTextWidgetState extends State<IbDescriptionText>
             if (isOverflow)
               Align(
                 alignment: Alignment.centerRight,
-                child: InkWell(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      isExpanded ? "show less" : "show more",
-                      style: const TextStyle(color: IbColors.primaryColor),
-                    ),
-                  ),
-                  onTap: () {
-                    setState(() {
-                      isExpanded = !isExpanded;
-                    });
-                  },
+                child: SizedBox(
+                  height: 30,
+                  child: TextButton(
+                      onPressed: () {
+                        setState(() {
+                          isExpanded = !isExpanded;
+                        });
+                      },
+                      child: Text(
+                        isExpanded ? "show less" : "show more",
+                        style: const TextStyle(color: IbColors.primaryColor),
+                      )),
                 ),
               ),
           ],

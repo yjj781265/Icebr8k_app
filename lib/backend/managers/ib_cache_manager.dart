@@ -40,6 +40,30 @@ class IbCacheManager {
     _ibAnswersMap[uid] = ibAnswers;
   }
 
+  void cacheSingleIbAnswer({required String uid, required IbAnswer ibAnswer}) {
+    final List<IbAnswer> list = _ibAnswersMap[uid] ?? [];
+    final int index = list.indexWhere((element) =>
+        element.uid == ibAnswer.uid &&
+        element.questionId == ibAnswer.questionId);
+    if (index != -1) {
+      list[index] = ibAnswer;
+    } else {
+      list.add(ibAnswer);
+    }
+    _ibAnswersMap[uid] = list;
+  }
+
+  void removeSingleIbAnswer({required String uid, required IbAnswer ibAnswer}) {
+    final List<IbAnswer> list = _ibAnswersMap[uid] ?? [];
+    final int index = list.indexWhere((element) =>
+        element.uid == ibAnswer.uid &&
+        element.questionId == ibAnswer.questionId);
+    if (index != -1) {
+      list.removeAt(index);
+    }
+    _ibAnswersMap[uid] = list;
+  }
+
   List<IbAnswer>? getIbAnswers(String uid) {
     return _ibAnswersMap[uid];
   }

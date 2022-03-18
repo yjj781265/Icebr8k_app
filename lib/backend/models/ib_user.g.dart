@@ -10,12 +10,17 @@ IbUser _$IbUserFromJson(Map<String, dynamic> json) => IbUser(
       avatarUrl: json['avatarUrl'] as String? ?? '',
       coverPhotoUrl: json['coverPhotoUrl'] as String? ?? '',
       loginTimeInMs: json['loginTimeInMs'] as int? ?? -1,
-      isPrivate: json['isPrivate'] as bool? ?? false,
-      isFriendsOnly: json['isFriendsOnly'] as bool? ?? false,
-      joinTime: json['joinTime'],
+      profilePrivacy: json['profilePrivacy'] as String? ?? 'public',
       birthdateInMs: json['birthdateInMs'] as int? ?? -1,
       banedEndTimeInMs: json['banedEndTimeInMs'] as int? ?? -1,
-      friendCount: json['friendCount'] as int? ?? 0,
+      friendUids: (json['friendUids'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      blockedFriendUids: (json['blockedFriendUids'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       notificationCount: json['notificationCount'] as int? ?? 0,
       isOnline: json['isOnline'] as bool? ?? false,
       gender: json['gender'] as String? ?? '',
@@ -36,7 +41,7 @@ IbUser _$IbUserFromJson(Map<String, dynamic> json) => IbUser(
       askedCount: json['askedCount'] as int? ?? 0,
       id: json['id'] as String,
       username: json['username'] as String? ?? '',
-    );
+    )..joinTime = json['joinTime'];
 
 Map<String, dynamic> _$IbUserToJson(IbUser instance) => <String, dynamic>{
       'id': instance.id,
@@ -53,11 +58,11 @@ Map<String, dynamic> _$IbUserToJson(IbUser instance) => <String, dynamic>{
       'birthdateInMs': instance.birthdateInMs,
       'answeredCount': instance.answeredCount,
       'askedCount': instance.askedCount,
-      'friendCount': instance.friendCount,
+      'friendUids': instance.friendUids,
+      'blockedFriendUids': instance.blockedFriendUids,
       'notificationCount': instance.notificationCount,
+      'profilePrivacy': instance.profilePrivacy,
       'isOnline': instance.isOnline,
-      'isPrivate': instance.isPrivate,
-      'isFriendsOnly': instance.isFriendsOnly,
       'coverPhotoUrl': instance.coverPhotoUrl,
       'bio': instance.bio,
       'voiceMemoUrl': instance.voiceMemoUrl,

@@ -219,7 +219,8 @@ class AuthController extends GetxService {
         switch (status) {
           case IbUser.kUserStatusApproved:
             Get.offAll(() => MainPage(),
-                binding: HomeBinding(), transition: Transition.circularReveal);
+                binding: HomeBinding(ibUser!),
+                transition: Transition.circularReveal);
             break;
 
           case IbUser.kUserStatusBanned:

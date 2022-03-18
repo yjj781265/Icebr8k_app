@@ -16,48 +16,45 @@ class IbQuestionButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      return SizedBox(
-        height: 56,
-        child: Row(
-          children: [
-            // don't show answer button once user is answered the quiz or poll is closed
-            if (_controller.rxIbQuestion.value.isQuiz &&
-                    _controller.voted.isTrue ||
-                (DateTime.now().millisecondsSinceEpoch >
-                        _controller.rxIbQuestion.value.endTimeInMs &&
-                    _controller.rxIbQuestion.value.endTimeInMs > 0))
-              const SizedBox()
-            else
-              Expanded(
-                child: IbElevatedButton(
-                  disabled: _handleVoteButtonDisableState(),
-                  onPressed: () async {
-                    await _controller.onVote();
-                  },
-                  onLongPressed: () async {
-                    await _controller.onVote(isPublic: false);
-                  },
-                  textTrKey: _handleVoteButtonText(),
-                  color: IbColors.primaryColor,
-                ),
+      return Row(
+        children: [
+          // don't show answer button once user is answered the quiz or poll is closed
+          if (_controller.rxIbQuestion.value.isQuiz &&
+                  _controller.voted.isTrue ||
+              (DateTime.now().millisecondsSinceEpoch >
+                      _controller.rxIbQuestion.value.endTimeInMs &&
+                  _controller.rxIbQuestion.value.endTimeInMs > 0))
+            const SizedBox()
+          else
+            Expanded(
+              child: IbElevatedButton(
+                disabled: _handleVoteButtonDisableState(),
+                onPressed: () async {
+                  await _controller.onVote();
+                },
+                onLongPressed: () async {
+                  await _controller.onVote(isPublic: false);
+                },
+                textTrKey: _handleVoteButtonText(),
+                color: IbColors.primaryColor,
               ),
-            if (_controller.rxIbQuestion.value.isCommentEnabled)
-              Expanded(
-                child: IbElevatedButton(
-                  disabled: _controller.isSample,
-                  onPressed: () {
-                    Get.to(() => CommentPage(Get.put(
-                        CommentController(
-                            questionId: _controller.rxIbQuestion.value.id,
-                            itemController: _controller,
-                            lastSnap: _controller.lastCommentSnap),
-                        tag: _controller.rxIbQuestion.value.id)));
-                  },
-                  textTrKey: 'comment',
-                ),
-              )
-          ],
-        ),
+            ),
+          if (_controller.rxIbQuestion.value.isCommentEnabled)
+            Expanded(
+              child: IbElevatedButton(
+                disabled: _controller.isSample,
+                onPressed: () {
+                  Get.to(() => CommentPage(Get.put(
+                      CommentController(
+                          questionId: _controller.rxIbQuestion.value.id,
+                          itemController: _controller,
+                          lastSnap: _controller.lastCommentSnap),
+                      tag: _controller.rxIbQuestion.value.id)));
+                },
+                textTrKey: 'comment',
+              ),
+            )
+        ],
       );
     });
   }

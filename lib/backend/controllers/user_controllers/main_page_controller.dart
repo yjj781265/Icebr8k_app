@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_api_keys_manager.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
@@ -20,8 +19,10 @@ class MainPageController extends GetxController {
       .listenToIbUserChanges(IbUtils.getCurrentFbUser()!.uid)
       .asBroadcastStream();
   final isNavBarVisible = true.obs;
-  late Rx<IbUser> rxCurrentIbUser;
+  Rx<IbUser> rxCurrentIbUser;
   late String kGooglePlacesApiKey;
+
+  MainPageController(this.rxCurrentIbUser);
 
   @override
   Future<void> onInit() async {
@@ -80,12 +81,6 @@ class MainPageController extends GetxController {
       IbChatDbService().queryMemberUids(chatRoomId).then((value) {
         Get.to(() => ChatPage(Get.put(ChatPageController(value))));
       });
-    }
-
-    if (IbCloudMessagingService.kNotificationTypeRequest == type) {
-      currentIndex.value = 2;
-      Get.find<SocialTabController>().tabController!.animateTo(2);
-      return;
     }
   }
 }

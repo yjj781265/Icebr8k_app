@@ -7,6 +7,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/asked_questions_con
 import 'package:icebr8k/backend/controllers/user_controllers/compare_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
+import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/asked_page.dart';
@@ -104,40 +105,41 @@ class ProfilePage extends StatelessWidget {
                               ),
 
                               ///actions
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (!_controller.rxIbUser.value.isPrivate ||
-                                      _controller.isFriend.isTrue)
-                                    CircleAvatar(
-                                      backgroundColor: Theme.of(context)
-                                          .backgroundColor
-                                          .withOpacity(0.8),
-                                      child: IconButton(
-                                        padding: EdgeInsets.zero,
-                                        onPressed: () {},
-                                        icon: Icon(Icons.message,
-                                            color: Theme.of(context)
-                                                .indicatorColor),
-                                      ),
-                                    ),
-                                  const SizedBox(
-                                    width: 8,
-                                  ),
-                                  _handleFrIcon(context),
-                                  const SizedBox(
-                                    width: 8,
-                                  ),
-                                  CircleAvatar(
-                                      backgroundColor: Theme.of(context)
-                                          .backgroundColor
-                                          .withOpacity(0.8),
-                                      child: IconButton(
+                              Obx(
+                                () => Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (_controller.isProfileVisible.isTrue)
+                                      CircleAvatar(
+                                        backgroundColor: Theme.of(context)
+                                            .backgroundColor
+                                            .withOpacity(0.8),
+                                        child: IconButton(
+                                          padding: EdgeInsets.zero,
                                           onPressed: () {},
-                                          icon: Icon(Icons.cloud,
+                                          icon: Icon(Icons.message,
                                               color: Theme.of(context)
-                                                  .indicatorColor))),
-                                ],
+                                                  .indicatorColor),
+                                        ),
+                                      ),
+                                    const SizedBox(
+                                      width: 8,
+                                    ),
+                                    _handleFrIcon(context),
+                                    const SizedBox(
+                                      width: 8,
+                                    ),
+                                    CircleAvatar(
+                                        backgroundColor: Theme.of(context)
+                                            .backgroundColor
+                                            .withOpacity(0.8),
+                                        child: IconButton(
+                                            onPressed: () {},
+                                            icon: Icon(Icons.cloud,
+                                                color: Theme.of(context)
+                                                    .indicatorColor))),
+                                  ],
+                                ),
                               )
                             ],
                           ),
@@ -387,7 +389,7 @@ class ProfilePage extends StatelessWidget {
                               children: [
                                 Obx(() => Text(
                                       IbUtils.getStatsString(_controller
-                                          .rxIbUser.value.friendCount),
+                                          .rxIbUser.value.friendUids.length),
                                       style: const TextStyle(
                                           overflow: TextOverflow.ellipsis,
                                           fontWeight: FontWeight.bold,
@@ -409,16 +411,19 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
 
-                if (_controller.rxIbUser.value.isPrivate)
+                if (_controller.rxIbUser.value.profilePrivacy ==
+                        IbUser.kUserPrivacyPrivate ||
+                    _controller.isBlocked.isTrue)
                   Center(
                       child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text('private_profile'.tr),
                   )),
 
-                if (_controller.rxIbUser.value.isFriendsOnly &&
+                if (_controller.rxIbUser.value.profilePrivacy ==
+                        IbUser.kUserPrivacyFrOnly &&
                     _controller.isFriend.isFalse &&
-                    !_controller.rxIbUser.value.isPrivate)
+                    _controller.isBlocked.isFalse)
                   Center(
                       child: Padding(
                     padding: const EdgeInsets.all(8.0),

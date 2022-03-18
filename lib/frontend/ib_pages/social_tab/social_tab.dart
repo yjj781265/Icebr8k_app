@@ -1,23 +1,21 @@
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
+import 'package:icebr8k/frontend/ib_pages/social_tab/my_friends_list.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_persistent_header.dart';
 
-import '../../backend/controllers/user_controllers/chat_tab_controller.dart';
-
-class ChatTab extends StatefulWidget {
-  const ChatTab({Key? key}) : super(key: key);
-
+class SocialTab extends StatefulWidget {
   @override
-  State<ChatTab> createState() => _ChatTabState();
+  State<SocialTab> createState() => _SocialTabState();
 }
 
-class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
-  final ChatTabController _controller = Get.find();
-  String title = 'one_to_one_chat'.tr;
+class _SocialTabState extends State<SocialTab>
+    with SingleTickerProviderStateMixin {
+  String title = 'friends_tab'.tr;
   late TabController _tabController;
+  final SocialTabController _controller = Get.put(SocialTabController());
 
   @override
   void initState() {
@@ -25,9 +23,9 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
     _tabController.addListener(() {
       setState(() {
         if (_tabController.index == 0) {
-          title = 'one_to_one_chat'.tr;
+          title = 'friends_tab'.tr;
         } else {
-          title = 'group_chat'.tr;
+          title = 'ppl_nearby_tab'.tr;
         }
       });
     });
@@ -43,10 +41,10 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(title),
         ),
+        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.sort))],
       ),
       body: ExtendedNestedScrollView(
         onlyOneScrollInBody: true,
-        dragStartBehavior: DragStartBehavior.down,
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return [
             SliverOverlapAbsorber(
@@ -57,24 +55,24 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
                 delegate: IbPersistentHeader(
                   height: 32,
                   widget: IbCard(
-                    elevation: 0,
                     margin: EdgeInsets.zero,
+                    elevation: 0,
                     child: TabBar(
                       controller: _tabController,
                       tabs: [
                         Tooltip(
-                            message: 'one_to_one_chat'.tr,
-                            child: const Tab(
-                                height: 32,
-                                icon: Icon(
-                                  Icons.person,
-                                ))),
-                        Tooltip(
-                            message: 'group_chat'.tr,
+                            message: 'friends'.tr,
                             child: const Tab(
                                 height: 32,
                                 icon: Icon(
                                   Icons.group,
+                                ))),
+                        Tooltip(
+                            message: 'people_nearby'.tr,
+                            child: const Tab(
+                                height: 32,
+                                icon: Icon(
+                                  Icons.person_pin_circle_rounded,
                                 ))),
                       ],
                     ),
@@ -88,9 +86,9 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
           padding: const EdgeInsets.only(top: 38),
           child: TabBarView(
             controller: _tabController,
-            children: const [
-              Text('Chat'),
-              Text('Group'),
+            children: [
+              MyFriendsList(_controller),
+              Text('People Nearby'),
             ],
           ),
         ),

@@ -78,7 +78,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
     super.build(context);
     _runExpandCheck();
     final Widget expandableInfo = Padding(
-      padding: const EdgeInsets.only(left: 14, right: 14, top: 16),
+      padding: const EdgeInsets.only(left: 14, right: 14, top: 8),
       child: Obx(
         () => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,9 +152,6 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
           ),
           IbMediaSlide(widget._controller.rxIbQuestion.value.medias),
           IbQuestionInfo(widget._controller),
-          const SizedBox(
-            height: 8,
-          ),
           SizeTransition(
             sizeFactor: animation,
             child: expandableInfo,

@@ -123,47 +123,20 @@ class IbQuestionDbService {
     return query.get();
   }
 
-  Future<IbAnswer?> queryLatestAnsweredQ(String uid) async {
-    final _snapshot = await _db
-        .collectionGroup(_kAnswerCollectionGroup)
-        .limit(1)
-        .where('uid', isEqualTo: uid)
-        .orderBy('askedTimeInMs', descending: true)
-        .get();
-    if (_snapshot.docs.isEmpty) {
-      return null;
-    }
-
-    return IbAnswer.fromJson(_snapshot.docs.first.data());
-  }
-
-  Future<IbAnswer?> queryFirstAnsweredQ(String uid) async {
-    final _snapshot = await _db
-        .collectionGroup(_kAnswerCollectionGroup)
-        .limit(1)
-        .where('uid', isEqualTo: uid)
-        .orderBy('askedTimeInMs', descending: false)
-        .get();
-    if (_snapshot.docs.isEmpty) {
-      return null;
-    }
-
-    return IbAnswer.fromJson(_snapshot.docs.first.data());
-  }
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> listenToUserAskedQuestionsChange(
-      String uid,
-      {DocumentSnapshot? lastDoc}) {
+  Stream<QuerySnapshot<Map<String, dynamic>>>
+      listenToUserPublicAnsweredQuestionsChange(String uid,
+          {DocumentSnapshot? lastDoc}) {
     late Query<Map<String, dynamic>> query;
     if (lastDoc == null) {
-      query = _collectionRef
-          .where('creatorId', isEqualTo: uid)
-          .orderBy('askedTimeInMs', descending: true)
-          .limit(8);
+      query = _db
+          .collectionGroup(_kAnswerCollectionGroup)
+          .where('uid', isEqualTo: uid)
+          .where('isPublic', isEqualTo: true);
     } else {
-      query = _collectionRef
-          .where('creatorId', isEqualTo: uid)
-          .orderBy('askedTimeInMs', descending: true)
+      query = _db
+          .collectionGroup(_kAnswerCollectionGroup)
+          .where('uid', isEqualTo: uid)
+          .where('isPublic', isEqualTo: true)
           .startAfterDocument(lastDoc)
           .limit(8);
     }
@@ -215,6 +188,7 @@ class IbQuestionDbService {
     final _snapshot = await _db
         .collectionGroup(_kAnswerCollectionGroup)
         .where('uid', isEqualTo: uid)
+        .where('isPublic', isEqualTo: true)
         .get();
     for (final doc in _snapshot.docs) {
       try {

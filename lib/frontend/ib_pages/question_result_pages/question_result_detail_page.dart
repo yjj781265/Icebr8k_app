@@ -4,7 +4,9 @@ import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.
 import 'package:icebr8k/backend/controllers/user_controllers/question_result_detail_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_pages/my_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
@@ -61,6 +63,10 @@ class QuestionResultDetailPage extends StatelessWidget {
               final item = _controller.results[index];
               return ListTile(
                 onTap: () {
+                  if (item.user.id == IbUtils.getCurrentUid()) {
+                    Get.to(() => MyProfilePage());
+                    return;
+                  }
                   Get.to(() =>
                       ProfilePage(Get.put(ProfileController(item.user.id))));
                 },

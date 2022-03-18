@@ -21,11 +21,11 @@ class IbUser {
   int? birthdateInMs;
   int answeredCount;
   int askedCount;
-  int friendCount;
+  List<String> friendUids;
+  List<String> blockedFriendUids;
   int notificationCount;
+  String profilePrivacy;
   bool isOnline;
-  bool isPrivate;
-  bool isFriendsOnly;
   String coverPhotoUrl;
   String bio;
   String voiceMemoUrl;
@@ -37,6 +37,9 @@ class IbUser {
   static const String kUserStatusRejected = 'rejected';
   static const String kUserStatusBanned = 'banned';
   static const String kUserStatusApproved = 'approved';
+  static const String kUserPrivacyPublic = 'public';
+  static const String kUserPrivacyPrivate = 'private';
+  static const String kUserPrivacyFrOnly = 'friends_only';
   static const String kUserStatusPending = 'pending';
   static List<String> kGenders = ['🧑 Male', '👩 Female', '🌈 Other'];
 
@@ -44,12 +47,11 @@ class IbUser {
     this.avatarUrl = '',
     this.coverPhotoUrl = '',
     this.loginTimeInMs = -1,
-    this.isPrivate = false,
-    this.isFriendsOnly = false,
-    this.joinTime,
+    this.profilePrivacy = 'public',
     this.birthdateInMs = -1,
     this.banedEndTimeInMs = -1,
-    this.friendCount = 0,
+    this.friendUids = const [],
+    this.blockedFriendUids = const [],
     this.notificationCount = 0,
     this.isOnline = false,
     this.gender = '',
@@ -71,6 +73,11 @@ class IbUser {
   Map<String, dynamic> toJson() => _$IbUserToJson(this);
 
   @override
+  String toString() {
+    return 'IbUser{id: $id, fName: $fName, lName: $lName, email: $email, username: $username, avatarUrl: $avatarUrl, gender: $gender, status: $status, banedEndTimeInMs: $banedEndTimeInMs, loginTimeInMs: $loginTimeInMs, joinTime: $joinTime, birthdateInMs: $birthdateInMs, answeredCount: $answeredCount, askedCount: $askedCount, friendUids: $friendUids, blockedFriendUids: $blockedFriendUids, notificationCount: $notificationCount, profilePrivacy: $profilePrivacy, isOnline: $isOnline, coverPhotoUrl: $coverPhotoUrl, bio: $bio, voiceMemoUrl: $voiceMemoUrl, roles: $roles, emoPics: $emoPics}';
+  }
+
+  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is IbUser &&
@@ -89,9 +96,11 @@ class IbUser {
           birthdateInMs == other.birthdateInMs &&
           answeredCount == other.answeredCount &&
           askedCount == other.askedCount &&
+          friendUids == other.friendUids &&
+          blockedFriendUids == other.blockedFriendUids &&
+          notificationCount == other.notificationCount &&
+          profilePrivacy == other.profilePrivacy &&
           isOnline == other.isOnline &&
-          isPrivate == other.isPrivate &&
-          isFriendsOnly == other.isFriendsOnly &&
           coverPhotoUrl == other.coverPhotoUrl &&
           bio == other.bio &&
           voiceMemoUrl == other.voiceMemoUrl &&
@@ -114,17 +123,14 @@ class IbUser {
       birthdateInMs.hashCode ^
       answeredCount.hashCode ^
       askedCount.hashCode ^
+      friendUids.hashCode ^
+      blockedFriendUids.hashCode ^
+      notificationCount.hashCode ^
+      profilePrivacy.hashCode ^
       isOnline.hashCode ^
-      isPrivate.hashCode ^
-      isFriendsOnly.hashCode ^
       coverPhotoUrl.hashCode ^
       bio.hashCode ^
       voiceMemoUrl.hashCode ^
       roles.hashCode ^
       emoPics.hashCode;
-
-  @override
-  String toString() {
-    return 'IbUser{id: $id, fName: $fName, lName: $lName, email: $email, username: $username, avatarUrl: $avatarUrl, gender: $gender, status: $status, banedEndTimeInMs: $banedEndTimeInMs, loginTimeInMs: $loginTimeInMs, joinTime: $joinTime, birthdateInMs: $birthdateInMs, answeredCount: $answeredCount, askedCount: $askedCount, isOnline: $isOnline, coverPhotoUrl: $coverPhotoUrl, bio: $bio, voiceMemoUrl: $voiceMemoUrl, roles: $roles, emoPics: $emoPics}';
-  }
 }

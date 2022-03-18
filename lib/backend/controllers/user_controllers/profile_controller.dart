@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -14,6 +14,7 @@ class ProfileController extends GetxController {
   final isLoading = true.obs;
   final isFriend = false.obs;
   final isProfileVisible = false.obs;
+  final isBlocked = false.obs;
 
   /// is friend request sent
   final isFrSent = false.obs;
@@ -40,15 +41,13 @@ class ProfileController extends GetxController {
       uncommonAnswers.value =
           await IbUtils.getUncommonAnswerQuestionIds(uid: uid);
       compScore.value = await IbUtils.getCompScore(uid: uid);
-      isFriend.value = await IbUserDbService()
-              .queryFriendshipStatus(IbUtils.getCurrentUid()!, user.id) ==
-          IbFriend.kFriendshipStatusAccepted;
+      isFriend.value = user.friendUids.contains(IbUtils.getCurrentUid());
       isFrSent.value = await IbUserDbService().isFriendRequestSent(user.id);
       frNotification = await IbUserDbService()
           .isFriendRequestWaitingForMeForApproval(user.id);
-      isProfileVisible.value =
-          isFriend.isTrue && rxIbUser.value.isFriendsOnly ||
-              !rxIbUser.value.isPrivate && !rxIbUser.value.isFriendsOnly;
+      isBlocked.value =
+          user.blockedFriendUids.contains(IbUtils.getCurrentUid());
+      isProfileVisible.value = _handleProfileVisibility();
       isLoading.value = false;
     }
 
@@ -64,20 +63,32 @@ class ProfileController extends GetxController {
       uncommonAnswers.value =
           await IbUtils.getUncommonAnswerQuestionIds(uid: uid, isRefresh: true);
       compScore.value = await IbUtils.getCompScore(uid: uid, isRefresh: true);
-      isFriend.value = await IbUserDbService()
-              .queryFriendshipStatus(IbUtils.getCurrentUid()!, user.id) ==
-          IbFriend.kFriendshipStatusAccepted;
+      isFriend.value = user.friendUids.contains(IbUtils.getCurrentUid());
       isFrSent.value = await IbUserDbService().isFriendRequestSent(user.id);
       frNotification = await IbUserDbService()
           .isFriendRequestWaitingForMeForApproval(user.id);
-      isProfileVisible.value =
-          isFriend.isTrue && rxIbUser.value.isFriendsOnly ||
-              !rxIbUser.value.isPrivate && !rxIbUser.value.isFriendsOnly;
+      isBlocked.value =
+          user.blockedFriendUids.contains(IbUtils.getCurrentUid());
+      isProfileVisible.value = _handleProfileVisibility();
       rxIbUser.refresh();
       refreshController.refreshCompleted();
     } else {
       refreshController.refreshFailed();
     }
+  }
+
+  bool _handleProfileVisibility() {
+    if (isBlocked.isTrue ||
+        rxIbUser.value.profilePrivacy == IbUser.kUserPrivacyPrivate) {
+      return false;
+    }
+
+    if (isFriend.isTrue &&
+        rxIbUser.value.profilePrivacy == IbUser.kUserPrivacyFrOnly) {
+      return true;
+    }
+
+    return true;
   }
 
   Future<void> addFriend(String message) async {
@@ -86,6 +97,13 @@ class ProfileController extends GetxController {
       return;
     }
 
+    if (currentUser.friendUids.length >= IbConfig.kFriendsLimit) {
+      IbUtils.showSimpleSnackBar(
+          msg:
+              'Failed to add friend, you have reach your ${IbConfig.kFriendsLimit} friends limit',
+          backgroundColor: IbColors.errorRed);
+      return;
+    }
     final IbNotification n = IbNotification(
         id: IbUtils.getUniqueId(),
         title: currentUser.username,
@@ -114,9 +132,11 @@ class ProfileController extends GetxController {
     try {
       await IbUserDbService().removeFriend(uid);
       isFriend.value = false;
-      isProfileVisible.value =
-          isFriend.isTrue && rxIbUser.value.isFriendsOnly ||
-              !rxIbUser.value.isPrivate && !rxIbUser.value.isFriendsOnly;
+      isProfileVisible.value = isFriend.isTrue &&
+              rxIbUser.value.profilePrivacy == IbUser.kUserPrivacyFrOnly ||
+          rxIbUser.value.profilePrivacy == IbUser.kUserPrivacyPublic;
+      IbUtils.showSimpleSnackBar(
+          msg: 'Friend deleted!', backgroundColor: IbColors.errorRed);
     } catch (e) {
       IbUtils.showSimpleSnackBar(
           msg: 'Delete friend failed $e', backgroundColor: IbColors.errorRed);

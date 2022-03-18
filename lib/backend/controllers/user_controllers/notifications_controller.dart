@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/models/ib_friend.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
+import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 
 class NotificationController extends GetxController {
   late StreamSubscription ibNotificationsStream;
@@ -47,14 +48,29 @@ class NotificationController extends GetxController {
   }
 
   Future<void> acceptFr(IbNotification ibNotification) async {
-    await IbUserDbService().removeNotification(ibNotification);
-    await IbUserDbService().addFriend(IbFriend(
-        status: IbFriend.kFriendshipStatusAccepted,
-        friendUid: ibNotification.senderId,
-        timestampInMs: DateTime.now().millisecondsSinceEpoch));
+    try {
+      await IbUserDbService().addFriend(ibNotification.senderId);
+      await IbUserDbService().removeNotification(ibNotification);
+      IbUtils.showSimpleSnackBar(
+          msg: 'Friend request accepted',
+          backgroundColor: IbColors.accentColor);
+    } catch (e) {
+      IbUtils.showSimpleSnackBar(
+          msg: 'Failed to accept friend request $e',
+          backgroundColor: IbColors.errorRed);
+    }
   }
 
   Future<void> declineFr(IbNotification ibNotification) async {
-    await IbUserDbService().removeNotification(ibNotification);
+    try {
+      await IbUserDbService().removeNotification(ibNotification);
+      IbUtils.showSimpleSnackBar(
+          msg: 'Friend request declined',
+          backgroundColor: IbColors.accentColor);
+    } catch (e) {
+      IbUtils.showSimpleSnackBar(
+          msg: 'Failed to decline request $e',
+          backgroundColor: IbColors.accentColor);
+    }
   }
 }
