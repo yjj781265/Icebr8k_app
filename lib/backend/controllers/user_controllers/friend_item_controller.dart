@@ -5,7 +5,7 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 class FriendItemController extends GetxController {
-  final IbUser user;
+  IbUser user;
   final isLoading = true.obs;
   final compScore = 0.0.obs;
   final username = ''.obs;
@@ -74,7 +74,13 @@ class FriendItemController extends GetxController {
 
   /// update user2 's answer list if isRefresh is true
   Future<void> refreshItem(bool isRefresh) async {
+    print('refreshItem ${user.username}');
+    user = (await IbUserDbService().queryIbUser(user.id))!;
+    username.value = user.username;
+    avatarUrl.value = user.avatarUrl;
     compScore.value =
         await IbUtils.getCompScore(uid: user.id, isRefresh: isRefresh);
+    isBlocked.value =
+        IbUtils.getCurrentIbUser()!.blockedFriendUids.contains(user.id);
   }
 }

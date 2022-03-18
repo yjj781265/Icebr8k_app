@@ -88,7 +88,11 @@ class ProfileController extends GetxController {
       return true;
     }
 
-    return true;
+    if (rxIbUser.value.profilePrivacy == IbUser.kUserPrivacyPublic) {
+      return true;
+    }
+
+    return false;
   }
 
   Future<void> addFriend(String message) async {
