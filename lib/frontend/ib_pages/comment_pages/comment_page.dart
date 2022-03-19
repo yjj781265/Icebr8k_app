@@ -213,7 +213,7 @@ class CommentItemWidget extends StatelessWidget {
                 tag: item.ibComment.commentId)));
           },
           child: Ink(
-            color: Theme.of(context).primaryColor,
+            color: Theme.of(context).backgroundColor,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: SingleChildScrollView(

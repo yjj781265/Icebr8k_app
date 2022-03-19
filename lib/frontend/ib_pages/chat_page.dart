@@ -1,203 +1,214 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/models/ib_message.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../backend/controllers/user_controllers/chat_page_controller.dart';
-import '../ib_config.dart';
 
-class ChatPage extends StatefulWidget {
+class ChatPage extends StatelessWidget {
   const ChatPage(this._controller, {Key? key}) : super(key: key);
   final ChatPageController _controller;
-
-  @override
-  State<ChatPage> createState() => _ChatPageState();
-}
-
-class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
-  final _txtController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance!.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed) {
-      await widget._controller.setInChat();
-    }
-
-    if (state == AppLifecycleState.inactive) {
-      await widget._controller.setOffChat();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Obx(
-            () => Text(
-              widget._controller.title.value,
-              style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
+            () => SizedBox(
+              width: Get.width * 0.6,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IbUserAvatar(
+                    avatarUrl: _controller.avatarUrl.value,
+                    radius: 16,
+                  ),
+                  const SizedBox(
+                    width: 8,
+                  ),
+                  Text(
+                    _controller.title.value,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
         body: Obx(() {
-          return Column(
-            children: [
-              Expanded(
-                child: NotificationListener(
-                  onNotification: (t) {
-                    if (t is UserScrollNotification) {
-                      FocusScope.of(context).requestFocus(FocusNode());
+          if (_controller.isLoading.isTrue) {
+            return const Center(child: IbProgressIndicator());
+          }
+          return GestureDetector(
+            onTap: () {
+              IbUtils.hideKeyboard();
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Expanded(
+                    child: ScrollablePositionedList.builder(
+                  itemScrollController: _controller.itemScrollController,
+                  itemPositionsListener: _controller.itemPositionsListener,
+                  itemBuilder: (context, index) {
+                    if (index % 2 == 0) {
+                      return _meItem(_controller.messages[index]);
                     }
-                    return true;
+                    return _item(_controller.messages[index]);
                   },
-                  child: AnimatedList(
-                    reverse: true,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    controller: widget._controller.scrollController,
-                    key: widget._controller.listKey,
-                    itemBuilder: (BuildContext context, int index,
-                        Animation<double> animation) {
-                      if (index == widget._controller.messages.length - 2) {
-                        widget._controller.loadMoreMessages();
-                      }
-
-                      return buildItem(
-                          widget._controller.messages[index], animation);
-                    },
-                    initialItemCount: widget._controller.messages.length,
-                  ),
+                  itemCount: _controller.messages.length,
+                )),
+                _inputWidget(context),
+                const SizedBox(
+                  height: 8,
                 ),
-              ),
-              SafeArea(
-                child: Container(
-                  margin: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: const BorderRadius.all(
-                        Radius.circular(IbConfig.kTextBoxCornerRadius)),
-                    border: Border.all(
-                      color: IbColors.primaryColor,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 3),
-                    child: TextField(
-                      controller: _txtController,
-                      minLines: 1,
-                      maxLines: 5,
-                      textInputAction: TextInputAction.newline,
-                      style:
-                          const TextStyle(fontSize: IbConfig.kNormalTextSize),
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                          hintStyle: const TextStyle(
-                              color: IbColors.lightGrey,
-                              fontSize: IbConfig.kNormalTextSize),
-                          hintText: 'Type something creative',
-                          border: InputBorder.none,
-                          suffixIcon: widget._controller.isSending.isTrue
-                              ? const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: SizedBox(
-                                      height: 16,
-                                      width: 16,
-                                      child: CircularProgressIndicator()),
-                                )
-                              : IconButton(
-                                  icon: const Icon(
-                                    Icons.send_outlined,
-                                    color: IbColors.primaryColor,
-                                  ),
-                                  onPressed: () async {
-                                    if (_txtController.text.trim().isEmpty) {
-                                      return;
-                                    }
-                                    final text = _txtController.text.trim();
-                                    _txtController.clear();
-                                    await widget._controller
-                                        .uploadMessage(text);
-                                  },
-                                )),
-                    ),
-                  ),
-                ),
-              )
-            ],
+              ],
+            ),
           );
         }));
   }
 
-  Widget buildItem(ChatMessageItem item, Animation<double> animation) {
-    return SlideTransition(
-      position: Tween<Offset>(
-        end: Offset.zero,
-        begin: item.isMe ? const Offset(1.5, 0) : const Offset(-1.5, 0),
-      ).animate(
-          CurvedAnimation(parent: animation, curve: Curves.linearToEaseOut)),
-      child: item.isMe ? MyMessageItemView(item) : MessageItemView(item),
-    );
-  }
-}
-
-class MyMessageItemView extends StatelessWidget {
-  const MyMessageItemView(
-    this.item, {
-    Key? key,
-  }) : super(key: key);
-  final ChatMessageItem item;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          LimitedBox(
-            maxWidth: Get.width * 0.8,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Container(
-                  decoration: const BoxDecoration(
-                    color: IbColors.primaryColor,
-                    borderRadius: BorderRadius.all(
-                        Radius.circular(IbConfig.kTextBoxCornerRadius)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SelectableLinkify(
-                      onOpen: (link) async {
-                        if (await canLaunch(link.url)) {
-                          launch(link.url);
-                        }
-                      },
-                      text: item.message.content,
-                      linkStyle: const TextStyle(color: Colors.white),
-                      style: const TextStyle(
-                          fontSize: IbConfig.kNormalTextSize,
-                          color: Colors.black),
+  Widget _inputWidget(BuildContext context) {
+    return SafeArea(
+      child: IbCard(
+        radius: 24,
+        margin: EdgeInsets.zero,
+        color: Theme.of(context).backgroundColor,
+        child: AnimatedSize(
+          alignment: Alignment.topCenter,
+          duration:
+              const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: CircleAvatar(
+                          backgroundColor: IbColors.accentColor,
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              _controller.showOptions.value =
+                                  !_controller.showOptions.value;
+                            },
+                            icon: Icon(
+                                _controller.showOptions.isTrue
+                                    ? Icons.remove
+                                    : Icons.add,
+                                color: Theme.of(context).indicatorColor),
+                          ),
+                        ),
+                      ),
                     ),
+                    Flexible(
+                      flex: 8,
+                      child: Container(
+                        margin: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: IbColors.lightGrey.withOpacity(0.3),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(8),
+                          ),
+                        ),
+                        child: TextField(
+                          scrollPadding: EdgeInsets.zero,
+                          minLines: 1,
+                          maxLines: 8,
+                          maxLength: 2000,
+                          onSubmitted: (value) async {
+                            if (value.isNotEmpty) {}
+                          },
+                          textInputAction: TextInputAction.send,
+                          controller: _controller.txtController,
+                          decoration: const InputDecoration(
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 4.0),
+                            counterText: '',
+                            fillColor: IbColors.lightGrey,
+                            border: InputBorder.none,
+                            hintText: 'Write a message',
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: CircleAvatar(
+                          backgroundColor: IbColors.primaryColor,
+                          child: IconButton(
+                            onPressed: () {},
+                            icon: Icon(Icons.send,
+                                color: Theme.of(context).indicatorColor),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (_controller.showOptions.isTrue)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      IbActionButton(
+                          color: IbColors.errorRed,
+                          iconData: Icons.mic,
+                          onPressed: () {},
+                          text: 'Voice'),
+                      IbActionButton(
+                          color: IbColors.primaryColor,
+                          iconData: Icons.image,
+                          onPressed: () {},
+                          text: 'Images'),
+                    ],
                   ),
                 ),
-                handleSeenIndicator()
-              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _meItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 8, left: 40, right: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Container(
+              decoration: const BoxDecoration(
+                  color: IbColors.primaryColor,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                      bottomLeft: Radius.circular(16))),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  text,
+                  style: const TextStyle(
+                      color: Colors.black, fontSize: IbConfig.kNormalTextSize),
+                ),
+              ),
             ),
           )
         ],
@@ -205,77 +216,44 @@ class MyMessageItemView extends StatelessWidget {
     );
   }
 
-  Widget handleSeenIndicator() {
-    if (!item.showReadIndicator) {
-      return const SizedBox();
-    }
-
-    final List<Widget> widgets = [];
-    for (final String uid in item.message.readUids) {
-      if (uid != IbUtils.getCurrentUid()) {
-        widgets.add(Padding(
-          padding: const EdgeInsets.all(2.0),
-          child: IbUserAvatar(
-            disableOnTap: true,
-            avatarUrl: item.controller.ibUserMap[uid]!.avatarUrl,
-            uid: uid,
-            radius: 6,
-          ),
-        ));
-      }
-    }
-    return Wrap(
-      children: widgets,
-    );
-  }
-}
-
-class MessageItemView extends StatelessWidget {
-  final ChatMessageItem item;
-  const MessageItemView(this.item, {Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final IbUser? user = item.controller.ibUserMap[item.message.senderUid];
+  Widget _item(String text) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.only(top: 8, bottom: 8, right: 40, left: 8),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           IbUserAvatar(
-            disableOnTap: true,
+            avatarUrl: _controller.avatarUrl.value,
             radius: 16,
-            avatarUrl: user!.avatarUrl,
-            uid: user.id,
           ),
           const SizedBox(
             width: 8,
           ),
-          LimitedBox(
-            maxWidth: Get.width * 0.8,
+          Flexible(
             child: Container(
               decoration: const BoxDecoration(
-                color: IbColors.accentColor,
-                borderRadius: BorderRadius.all(
-                    Radius.circular(IbConfig.kTextBoxCornerRadius)),
-              ),
+                  color: IbColors.accentColor,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                      bottomRight: Radius.circular(16))),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: SelectableLinkify(
-                  text: item.message.content,
-                  onOpen: (link) async {
-                    if (await canLaunch(link.url)) {
-                      launch(link.url);
-                    }
-                  },
-                  linkStyle: const TextStyle(color: Colors.white),
+                child: Text(
+                  text,
                   style: const TextStyle(
-                      fontSize: IbConfig.kNormalTextSize, color: Colors.black),
+                      color: Colors.black, fontSize: IbConfig.kNormalTextSize),
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
+  }
+
+  Widget _handleMessageType(IbMessage message) {
+    //TODO
+    return const SizedBox();
   }
 }

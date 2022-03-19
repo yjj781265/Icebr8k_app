@@ -77,6 +77,9 @@ class IbEmoPicCard extends StatelessWidget {
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
+                    borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        topRight: Radius.circular(8)),
                     onDoubleTap: () {
                       if (ignoreOnDoubleTap) {
                         return;

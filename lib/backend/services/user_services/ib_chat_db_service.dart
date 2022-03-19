@@ -1,13 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:icebr8k/backend/models/ib_chat.dart';
+import 'package:icebr8k/backend/models/ib_chat_member.dart';
 import 'package:icebr8k/backend/models/ib_message.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 
 import '../../db_config.dart';
 
 class IbChatDbService {
   static final _ibChatDbService = IbChatDbService._();
   static final _db = FirebaseFirestore.instance;
-  static const _kChatRoomCollection = 'IbChatRooms${DbConfig.dbSuffix}';
+  static const _kChatRoomCollection = 'IbChats${DbConfig.dbSuffix}';
   static const _kMessageSubCollection = 'IbMessages${DbConfig.dbSuffix}';
+  static const _kMemberSubCollection = 'IbMembers${DbConfig.dbSuffix}';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
 
   factory IbChatDbService() => _ibChatDbService;
@@ -96,12 +100,6 @@ class IbChatDbService {
 
   Future<void> uploadMessage(IbMessage ibMessage,
       {List<String>? memberUids}) async {
-    if (memberUids != null) {
-      await createChatRoom(
-          chatRoomId: ibMessage.chatRoomId,
-          memberUids: memberUids,
-          lastMessage: ibMessage);
-    }
     await _collectionRef
         .doc(ibMessage.chatRoomId)
         .collection(_kMessageSubCollection)
@@ -113,25 +111,20 @@ class IbChatDbService {
     }, SetOptions(merge: true));
   }
 
-  Future<void> createChatRoom(
-      {required String chatRoomId,
-      required List<String> memberUids,
-      required IbMessage lastMessage}) async {
-    final _snapshot = await _collectionRef.doc(chatRoomId).get();
+  Future<void> addMember(
+      {required String chatId, required IbChatMember member}) async {
+    return _collectionRef
+        .doc(chatId)
+        .collection(_kMemberSubCollection)
+        .doc(member.uid)
+        .set(member.toJson(), SetOptions(merge: true));
+  }
 
-    if (_snapshot.exists) {
-      print('createChatRoom $chatRoomId existed');
-      return;
-    }
-
-    memberUids.sort();
-    await _collectionRef.doc(chatRoomId).set({
-      'memberUids': memberUids,
-      'chatRoomId': chatRoomId,
-      'createdTimestampInMs': DateTime.now().millisecondsSinceEpoch,
-      'lastMessage': lastMessage.toJson(),
-    }, SetOptions(merge: true));
-    print('createChatRoom new room $chatRoomId');
+  Future<void> addIbChat(IbChat ibChat) async {
+    ibChat.createdAtTimestamp = FieldValue.serverTimestamp();
+    await _collectionRef
+        .doc(ibChat.chatId)
+        .set(ibChat.toJson(), SetOptions(merge: true));
   }
 
   // todo call cloud function for this
@@ -139,30 +132,18 @@ class IbChatDbService {
     await _collectionRef.doc(chatRoomId).delete();
   }
 
-  Future<String?> getChatRoomId(List<String> uids) async {
+  Future<IbChat?> queryOneToOneIbChat(String uid) async {
+    final List<String> uids = [IbUtils.getCurrentUid()!, uid];
     uids.sort();
-    print('getChatRoomId $uids');
-    final _snapshot =
-        await _collectionRef.where('memberUids', isEqualTo: uids).get();
-
-    if (_snapshot.docs.isEmpty) {
-      print('getChatRoomId could not find existed chat room');
+    print(uids);
+    final snapshot = await _collectionRef
+        .where('memberUids', isEqualTo: uids)
+        .where('memberCount', isEqualTo: 2)
+        .get();
+    if (snapshot.size == 0) {
       return null;
     }
 
-    if (_snapshot.size > 1) {
-      throw UnimplementedError('found more than 1 chat room');
-    }
-    return _snapshot.docs.first.data()['chatRoomId'].toString();
-  }
-
-  Future<List<String>> queryMemberUids(String chatRoomId) async {
-    final _snapshot = await _collectionRef.doc(chatRoomId).get();
-    if (!_snapshot.exists) {
-      return <String>[];
-    }
-    return (_snapshot['memberUids'] as List<dynamic>)
-        .map((e) => e as String)
-        .toList();
+    return IbChat.fromJson(snapshot.docs.first.data());
   }
 }

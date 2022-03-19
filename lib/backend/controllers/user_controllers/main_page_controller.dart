@@ -4,13 +4,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/managers/ib_api_keys_manager.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
-import 'package:icebr8k/backend/services/user_services/ib_cloud_messaging_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
-import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
-
-import 'chat_page_controller.dart';
 
 /// this controller control info of current IbUser, index current home page tab and api keys
 class MainPageController extends GetxController {
@@ -70,7 +65,7 @@ class MainPageController extends GetxController {
   }
 
   void _handleMessage(RemoteMessage message) {
-    final data = message.data;
+    /*final data = message.data;
     final type = data['type'];
     if (IbCloudMessagingService.kNotificationTypeChat == type) {
       final String? chatRoomId = data['chatRoomId'] as String?;
@@ -81,6 +76,6 @@ class MainPageController extends GetxController {
       IbChatDbService().queryMemberUids(chatRoomId).then((value) {
         Get.to(() => ChatPage(Get.put(ChatPageController(value))));
       });
-    }
+    }*/
   }
 }

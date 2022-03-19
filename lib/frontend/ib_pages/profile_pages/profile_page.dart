@@ -4,12 +4,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/asked_questions_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/compare_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/asked_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/compare_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -116,7 +118,16 @@ class ProfilePage extends StatelessWidget {
                                             .withOpacity(0.8),
                                         child: IconButton(
                                           padding: EdgeInsets.zero,
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            Get.to(() => ChatPage(Get.put(
+                                                ChatPageController(
+                                                    recipientId: _controller
+                                                        .rxIbUser.value.id))
+                                              ..title.value = _controller
+                                                  .rxIbUser.value.username
+                                              ..avatarUrl.value = _controller
+                                                  .rxIbUser.value.avatarUrl));
+                                          },
                                           icon: Icon(Icons.message,
                                               color: Theme.of(context)
                                                   .indicatorColor),

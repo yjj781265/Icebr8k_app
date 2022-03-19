@@ -5,8 +5,6 @@ import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_persistent_header.dart';
 
-import '../../backend/controllers/user_controllers/chat_tab_controller.dart';
-
 class ChatTab extends StatefulWidget {
   const ChatTab({Key? key}) : super(key: key);
 
@@ -15,7 +13,7 @@ class ChatTab extends StatefulWidget {
 }
 
 class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
-  final ChatTabController _controller = Get.find();
+  /* final ChatTabController _controller = Get.find();*/
   String title = 'one_to_one_chat'.tr;
   late TabController _tabController;
 

@@ -60,7 +60,7 @@ dependencies:
   move_to_background: ^1.0.2
   pull_to_refresh: ^2.0.0
   reorderables: ^0.4.2
-  scroll_to_index: ^2.1.1
+  scrollable_positioned_list: ^0.2.3
   showcaseview: ^1.1.1
   url_launcher: ^6.0.12
   uuid: ^3.0.4
