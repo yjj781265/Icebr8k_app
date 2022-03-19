@@ -220,6 +220,7 @@ class ChatPage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 8, right: 40, left: 8),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
           IbUserAvatar(
