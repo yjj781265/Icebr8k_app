@@ -37,12 +37,17 @@ class HomeTab extends StatelessWidget {
       drawer: const MenuPage(),
       body: Obx(
         () => ListView.builder(
+          padding: const EdgeInsets.only(bottom: 16),
           controller: _controller.scrollController,
           itemBuilder: (context, index) {
             return _handleQuestionType(_controller.currentList[index]);
           },
           itemCount: _controller.currentList.length,
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {},
       ),
     );
   }

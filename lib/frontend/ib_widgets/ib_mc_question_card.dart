@@ -81,6 +81,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
       padding: const EdgeInsets.only(left: 14, right: 14, top: 8),
       child: Obx(
         () => Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (widget._controller.showComparison.isTrue)
@@ -93,7 +94,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
               LimitedBox(
                 maxHeight: widget._controller.rxIbQuestion.value.questionType ==
                         IbQuestion.kMultipleChoice
-                    ? 300
+                    ? 200
                     : 400,
                 child: Padding(
                   padding: const EdgeInsets.only(left: 4.0),
@@ -103,12 +104,13 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                     radius: const Radius.circular(8),
                     showTrackOnHover: true,
                     controller: _scrollController,
-                    child: ListView(
+                    child: SingleChildScrollView(
                       controller: _scrollController,
-                      shrinkWrap: true,
-                      children: widget._controller.rxIbQuestion.value.choices
-                          .map((e) => IbQuestionMcItem(e, widget._controller))
-                          .toList(),
+                      child: Column(
+                        children: widget._controller.rxIbQuestion.value.choices
+                            .map((e) => IbQuestionMcItem(e, widget._controller))
+                            .toList(),
+                      ),
                     ),
                   ),
                 ),
@@ -126,7 +128,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                 ),
               ),
             const SizedBox(
-              height: 16,
+              height: 8,
             ),
             IbQuestionTags(widget._controller),
             const SizedBox(
@@ -144,6 +146,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
     );
     return IbCard(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           IbQuestionHeader(widget._controller),

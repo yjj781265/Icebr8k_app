@@ -7,6 +7,7 @@ class IbMessage {
   String messageId;
   String content;
   String senderUid;
+  List<String> mentionUids;
   String messageType;
   String chatRoomId;
   dynamic timestamp;
@@ -17,6 +18,7 @@ class IbMessage {
   static const String kMessageTypePic = 'pic';
   static const String kMessageTypeAudio = 'audio';
   static const String kMessageTypePoll = 'poll';
+  static const String kMessageTypeLoadMore = 'loadMore';
 
   IbMessage(
       {required this.messageId,
@@ -24,6 +26,7 @@ class IbMessage {
       required this.senderUid,
       required this.messageType,
       required this.chatRoomId,
+      this.mentionUids = const <String>[],
       this.extra = const <String>[],
       this.timestamp,
       this.readUids = const <String>[]});

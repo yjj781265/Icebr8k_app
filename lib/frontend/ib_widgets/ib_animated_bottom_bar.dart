@@ -50,27 +50,30 @@ class IbAnimatedBottomBar extends StatelessWidget {
         runAlignment: WrapAlignment.center,
         alignment: WrapAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: mainAxisAlignment,
-            children: items.map((item) {
-              final index = items.indexOf(item);
-              return Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  customBorder: const CircleBorder(),
-                  onTap: () => onItemSelected(index),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: _ItemWidget(
-                      item: item,
-                      iconSize: iconSize,
-                      isSelected: index == selectedIndex,
-                      backgroundColor: bgColor,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Row(
+              mainAxisAlignment: mainAxisAlignment,
+              children: items.map((item) {
+                final index = items.indexOf(item);
+                return Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: () => onItemSelected(index),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: _ItemWidget(
+                        item: item,
+                        iconSize: iconSize,
+                        isSelected: index == selectedIndex,
+                        backgroundColor: bgColor,
+                      ),
                     ),
                   ),
-                ),
-              );
-            }).toList(),
+                );
+              }).toList(),
+            ),
           ),
         ],
       ),

@@ -32,15 +32,15 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Obx(() {
-          if (_controller.isLoading.isTrue) {
-            return const Center(
-              child: IbProgressIndicator(),
-            );
-          }
-          return SmartRefresher(
+    return Scaffold(
+      body: Obx(() {
+        if (_controller.isLoading.isTrue) {
+          return const Center(
+            child: IbProgressIndicator(),
+          );
+        }
+        return SafeArea(
+          child: SmartRefresher(
             scrollController: _controller.scrollController,
             controller: _controller.refreshController,
             onRefresh: () async {
@@ -204,9 +204,10 @@ class ProfilePage extends StatelessWidget {
                 ),
 
                 /// poll stats
-                Padding(
+                SingleChildScrollView(
                   padding: const EdgeInsets.all(4.0),
-                  child: Wrap(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
                     children: [
                       InkWell(
                         customBorder: const RoundedRectangleBorder(
@@ -528,9 +529,9 @@ class ProfilePage extends StatelessWidget {
                       )),
               ],
             ),
-          );
-        }),
-      ),
+          ),
+        );
+      }),
     );
   }
 

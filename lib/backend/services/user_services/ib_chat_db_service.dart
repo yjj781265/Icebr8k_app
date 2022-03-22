@@ -45,6 +45,7 @@ class IbChatDbService {
         {'inChatUids': FieldValue.arrayRemove(uids)}, SetOptions(merge: true));
   }
 
+  /// stream of ibMessage in ascending order
   Stream<QuerySnapshot<Map<String, dynamic>>> listenToMessageChanges(
       String chatRoomId) {
     return _collectionRef
@@ -86,29 +87,27 @@ class IbChatDbService {
     return _snapshot2.size;
   }
 
+  ///query message in descending order
   Future<QuerySnapshot<Map<String, dynamic>>> queryMessages(
       {required String chatRoomId,
-      required DocumentSnapshot<Map<String, dynamic>> snapshot}) {
+      required DocumentSnapshot<Map<String, dynamic>> snapshot,
+      int limit = 16}) {
     return _collectionRef
         .doc(chatRoomId)
         .collection(_kMessageSubCollection)
         .orderBy('timestamp', descending: true)
         .startAfterDocument(snapshot)
-        .limit(16)
+        .limit(limit)
         .get();
   }
 
-  Future<void> uploadMessage(IbMessage ibMessage,
-      {List<String>? memberUids}) async {
+  Future<void> uploadMessage(IbMessage ibMessage) async {
+    ibMessage.timestamp = FieldValue.serverTimestamp();
     await _collectionRef
         .doc(ibMessage.chatRoomId)
         .collection(_kMessageSubCollection)
         .doc(ibMessage.messageId)
         .set(ibMessage.toJson(), SetOptions(merge: true));
-
-    await _collectionRef.doc(ibMessage.chatRoomId).set({
-      'lastMessage': ibMessage.toJson(),
-    }, SetOptions(merge: true));
   }
 
   Future<void> addMember(

@@ -89,7 +89,9 @@ class SocialTabController extends GetxController {
 
       /// refresh friend list
       for (final user in friends) {
-        Get.find<FriendItemController>(tag: user.username).refreshItem(false);
+        if (Get.isRegistered<FriendItemController>(tag: user.username)) {
+          Get.find<FriendItemController>(tag: user.username).refreshItem(false);
+        }
       }
     });
   }

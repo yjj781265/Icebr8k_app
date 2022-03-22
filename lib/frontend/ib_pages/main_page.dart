@@ -71,7 +71,9 @@ class _MainPageViewState extends State<MainPageView>
         }
         return false;
       },
-      child: Scaffold(body: getBody(), bottomNavigationBar: _buildBottomBar()),
+      child: Scaffold(
+          body: SafeArea(child: getBody()),
+          bottomNavigationBar: _buildBottomBar()),
     );
   }
 
@@ -96,12 +98,10 @@ class _MainPageViewState extends State<MainPageView>
     const _inactiveColor = IbColors.lightGrey;
     return Obx(
       () => IbAnimatedBottomBar(
-        containerHeight: _mainPageController.isNavBarVisible.isTrue ? 64 : 0,
+        containerHeight: _mainPageController.isNavBarVisible.isTrue ? 80 : 0,
         selectedIndex: _mainPageController.currentIndex.value,
         onItemSelected: (index) async {
           if (index == 2) {
-            /*     await IbQuestionDbService()
-                .copyCollection('First8', 'IbQuestions-dev');*/
             Get.to(() => const CreateQuestionPage(),
                 fullscreenDialog: true,
                 popGesture: false,

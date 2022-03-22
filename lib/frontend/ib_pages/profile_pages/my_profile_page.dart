@@ -173,143 +173,145 @@ class MyProfilePage extends StatelessWidget {
                 /// poll stats
                 Padding(
                   padding: const EdgeInsets.all(4.0),
-                  child: Wrap(
-                    children: [
-                      InkWell(
-                        customBorder: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(8),
-                          ),
-                        ),
-                        onTap: () {
-                          Get.to(() => AnsweredPage(Get.put(
-                              AnsweredQuestionController(
-                                  _controller.rxIbUser.value.id),
-                              tag: IbUtils.getUniqueId())));
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(8)),
-                              color: Theme.of(context).backgroundColor,
-                            ),
-                            width: 88,
-                            height: 88 / 1.618,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Obx(() => Text(
-                                      IbUtils.getStatsString(_controller
-                                          .rxIbUser.value.answeredCount),
-                                      style: const TextStyle(
-                                          overflow: TextOverflow.ellipsis,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: IbConfig.kPageTitleSize),
-                                    )),
-                                const Text(
-                                  '✅ ANSWERED',
-                                  style: TextStyle(
-                                      overflow: TextOverflow.ellipsis,
-                                      fontSize: IbConfig.kDescriptionTextSize,
-                                      color: IbColors.lightGrey),
-                                )
-                              ],
+                  child: SingleChildScrollView(
+                    child: Row(
+                      children: [
+                        InkWell(
+                          customBorder: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(8),
                             ),
                           ),
-                        ),
-                      ),
-                      InkWell(
-                        customBorder: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(8),
-                          ),
-                        ),
-                        onTap: () {
-                          Get.to(() => AskedPage(Get.put(
-                              AskedQuestionsController(
-                                  _controller.rxIbUser.value.id,
-                                  showPublicOnly: false),
-                              tag: IbUtils.getUniqueId())));
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(8)),
-                              color: Theme.of(context).backgroundColor,
-                            ),
-                            width: 88,
-                            height: 88 / 1.618,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Obx(() => Text(
-                                      IbUtils.getStatsString(_controller
-                                          .rxIbUser.value.askedCount),
-                                      style: const TextStyle(
-                                          overflow: TextOverflow.ellipsis,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: IbConfig.kPageTitleSize),
-                                    )),
-                                const Text(
-                                  '✋ ASKED',
-                                  style: TextStyle(
-                                      overflow: TextOverflow.ellipsis,
-                                      fontSize: IbConfig.kDescriptionTextSize,
-                                      color: IbColors.lightGrey),
-                                )
-                              ],
+                          onTap: () {
+                            Get.to(() => AnsweredPage(Get.put(
+                                AnsweredQuestionController(
+                                    _controller.rxIbUser.value.id),
+                                tag: IbUtils.getUniqueId())));
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(8)),
+                                color: Theme.of(context).backgroundColor,
+                              ),
+                              width: 88,
+                              height: 88 / 1.618,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Obx(() => Text(
+                                        IbUtils.getStatsString(_controller
+                                            .rxIbUser.value.answeredCount),
+                                        style: const TextStyle(
+                                            overflow: TextOverflow.ellipsis,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: IbConfig.kPageTitleSize),
+                                      )),
+                                  const Text(
+                                    '✅ ANSWERED',
+                                    style: TextStyle(
+                                        overflow: TextOverflow.ellipsis,
+                                        fontSize: IbConfig.kDescriptionTextSize,
+                                        color: IbColors.lightGrey),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      InkWell(
-                        customBorder: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(8),
-                          ),
-                        ),
-                        onTap: () {},
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(8)),
-                              color: Theme.of(context).backgroundColor,
-                            ),
-                            width: 88,
-                            height: 88 / 1.618,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Obx(() => Text(
-                                      IbUtils.getStatsString(_controller
-                                          .rxIbUser.value.friendUids.length),
-                                      style: const TextStyle(
-                                          overflow: TextOverflow.ellipsis,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: IbConfig.kPageTitleSize),
-                                    )),
-                                const Text(
-                                  '👥 FRIEND(S)',
-                                  style: TextStyle(
-                                      overflow: TextOverflow.ellipsis,
-                                      fontSize: IbConfig.kDescriptionTextSize,
-                                      color: IbColors.lightGrey),
-                                )
-                              ],
+                        InkWell(
+                          customBorder: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(8),
                             ),
                           ),
+                          onTap: () {
+                            Get.to(() => AskedPage(Get.put(
+                                AskedQuestionsController(
+                                    _controller.rxIbUser.value.id,
+                                    showPublicOnly: false),
+                                tag: IbUtils.getUniqueId())));
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(8)),
+                                color: Theme.of(context).backgroundColor,
+                              ),
+                              width: 88,
+                              height: 88 / 1.618,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Obx(() => Text(
+                                        IbUtils.getStatsString(_controller
+                                            .rxIbUser.value.askedCount),
+                                        style: const TextStyle(
+                                            overflow: TextOverflow.ellipsis,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: IbConfig.kPageTitleSize),
+                                      )),
+                                  const Text(
+                                    '✋ ASKED',
+                                    style: TextStyle(
+                                        overflow: TextOverflow.ellipsis,
+                                        fontSize: IbConfig.kDescriptionTextSize,
+                                        color: IbColors.lightGrey),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                      )
-                    ],
+                        InkWell(
+                          customBorder: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(8),
+                            ),
+                          ),
+                          onTap: () {},
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(8)),
+                                color: Theme.of(context).backgroundColor,
+                              ),
+                              width: 88,
+                              height: 88 / 1.618,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Obx(() => Text(
+                                        IbUtils.getStatsString(_controller
+                                            .rxIbUser.value.friendUids.length),
+                                        style: const TextStyle(
+                                            overflow: TextOverflow.ellipsis,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: IbConfig.kPageTitleSize),
+                                      )),
+                                  const Text(
+                                    '👥 FRIEND(S)',
+                                    style: TextStyle(
+                                        overflow: TextOverflow.ellipsis,
+                                        fontSize: IbConfig.kDescriptionTextSize,
+                                        color: IbColors.lightGrey),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
 

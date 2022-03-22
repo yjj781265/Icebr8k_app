@@ -29,9 +29,9 @@ class SignInPage extends StatelessWidget {
                   ? Colors.black
                   : IbColors.lightBlue),
     );
-    return SafeArea(
-      child: Scaffold(
-        body: GestureDetector(
+    return Scaffold(
+      body: SafeArea(
+        child: GestureDetector(
           onTap: () => IbUtils.hideKeyboard(),
           child: Center(
             child: Scrollbar(

@@ -12,6 +12,10 @@ IbMessage _$IbMessageFromJson(Map<String, dynamic> json) => IbMessage(
       senderUid: json['senderUid'] as String,
       messageType: json['messageType'] as String,
       chatRoomId: json['chatRoomId'] as String,
+      mentionUids: (json['mentionUids'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const <String>[],
       extra:
           (json['extra'] as List<dynamic>?)?.map((e) => e as String).toList() ??
               const <String>[],
@@ -26,6 +30,7 @@ Map<String, dynamic> _$IbMessageToJson(IbMessage instance) => <String, dynamic>{
       'messageId': instance.messageId,
       'content': instance.content,
       'senderUid': instance.senderUid,
+      'mentionUids': instance.mentionUids,
       'messageType': instance.messageType,
       'chatRoomId': instance.chatRoomId,
       'timestamp': instance.timestamp,

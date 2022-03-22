@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_message.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -9,6 +11,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../backend/controllers/user_controllers/chat_page_controller.dart';
 
@@ -19,30 +22,32 @@ class ChatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Obx(
-            () => SizedBox(
-              width: Get.width * 0.6,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IbUserAvatar(
-                    avatarUrl: _controller.avatarUrl.value,
-                    radius: 16,
-                  ),
-                  const SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    _controller.title.value,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
+      appBar: AppBar(
+        centerTitle: false,
+        title: Obx(
+          () => SizedBox(
+            width: Get.width * 0.6,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IbUserAvatar(
+                  avatarUrl: _controller.avatarUrl.value,
+                  radius: 16,
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                Text(
+                  _controller.title.value,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
         ),
-        body: Obx(() {
+      ),
+      body: Obx(
+        () {
           if (_controller.isLoading.isTrue) {
             return const Center(child: IbProgressIndicator());
           }
@@ -54,16 +59,23 @@ class ChatPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Expanded(
-                    child: ScrollablePositionedList.builder(
-                  itemScrollController: _controller.itemScrollController,
-                  itemPositionsListener: _controller.itemPositionsListener,
-                  itemBuilder: (context, index) {
-                    if (index % 2 == 0) {
-                      return _meItem(_controller.messages[index]);
+                    child: NotificationListener<ScrollNotification>(
+                  child: ScrollablePositionedList.builder(
+                    reverse: true,
+                    itemScrollController: _controller.itemScrollController,
+                    itemPositionsListener: _controller.itemPositionsListener,
+                    itemBuilder: (context, index) {
+                      return _handleMessageType(_controller.messages[index]);
+                    },
+                    itemCount: _controller.messages.length,
+                  ),
+                  onNotification: (info) {
+                    if (info.metrics.pixels - info.metrics.maxScrollExtent >
+                        32) {
+                      _controller.loadMore();
                     }
-                    return _item(_controller.messages[index]);
+                    return true;
                   },
-                  itemCount: _controller.messages.length,
                 )),
                 _inputWidget(context),
                 const SizedBox(
@@ -72,19 +84,22 @@ class ChatPage extends StatelessWidget {
               ],
             ),
           );
-        }));
+        },
+      ),
+    );
   }
 
   Widget _inputWidget(BuildContext context) {
-    return SafeArea(
-      child: IbCard(
-        radius: 24,
-        margin: EdgeInsets.zero,
-        color: Theme.of(context).backgroundColor,
-        child: AnimatedSize(
-          alignment: Alignment.topCenter,
-          duration:
-              const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
+    return IbCard(
+      radius: 24,
+      margin: EdgeInsets.zero,
+      color: Theme.of(context).backgroundColor,
+      child: AnimatedSize(
+        alignment: Alignment.topCenter,
+        duration:
+            const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -147,14 +162,20 @@ class ChatPage extends StatelessWidget {
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 10.0),
-                        child: CircleAvatar(
-                          backgroundColor: IbColors.primaryColor,
-                          child: IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.send,
-                                color: Theme.of(context).indicatorColor),
-                          ),
-                        ),
+                        child: _controller.isSending.isTrue
+                            ? const CircularProgressIndicator(
+                                color: IbColors.primaryColor,
+                              )
+                            : CircleAvatar(
+                                backgroundColor: IbColors.primaryColor,
+                                child: IconButton(
+                                  onPressed: () async {
+                                    await _controller.sendMessage();
+                                  },
+                                  icon: Icon(Icons.send,
+                                      color: Theme.of(context).indicatorColor),
+                                ),
+                              ),
                       ),
                     ),
                   ],
@@ -186,7 +207,7 @@ class ChatPage extends StatelessWidget {
     );
   }
 
-  Widget _meItem(String text) {
+  Widget _meTextMsgItem(IbMessage message) {
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 8, left: 40, right: 8),
       child: Row(
@@ -194,19 +215,36 @@ class ChatPage extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Flexible(
-            child: Container(
-              decoration: const BoxDecoration(
-                  color: IbColors.primaryColor,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
-                      bottomLeft: Radius.circular(16))),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  text,
-                  style: const TextStyle(
-                      color: Colors.black, fontSize: IbConfig.kNormalTextSize),
+            child: InkWell(
+              onLongPress: () {
+                HapticFeedback.heavyImpact();
+                Clipboard.setData(ClipboardData(text: message.content));
+                IbUtils.showSimpleSnackBar(
+                    msg: "Text copied to clipboard",
+                    backgroundColor: IbColors.primaryColor);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                    color: IbColors.primaryColor.withOpacity(0.8),
+                    borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(16),
+                        bottomLeft: Radius.circular(16))),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Linkify(
+                    linkStyle: const TextStyle(color: IbColors.creamYellow),
+                    options: const LinkifyOptions(looseUrl: true),
+                    onOpen: (link) async {
+                      if (await canLaunch(link.url)) {
+                        launch(link.url);
+                      }
+                    },
+                    text: message.content,
+                    style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: IbConfig.kNormalTextSize),
+                  ),
                 ),
               ),
             ),
@@ -216,7 +254,7 @@ class ChatPage extends StatelessWidget {
     );
   }
 
-  Widget _item(String text) {
+  Widget _textMsgItem(IbMessage message) {
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 8, right: 40, left: 8),
       child: Row(
@@ -231,19 +269,35 @@ class ChatPage extends StatelessWidget {
             width: 8,
           ),
           Flexible(
-            child: Container(
-              decoration: const BoxDecoration(
-                  color: IbColors.accentColor,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
-                      bottomRight: Radius.circular(16))),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  text,
-                  style: const TextStyle(
-                      color: Colors.black, fontSize: IbConfig.kNormalTextSize),
+            child: InkWell(
+              onLongPress: () {
+                HapticFeedback.heavyImpact();
+                Clipboard.setData(ClipboardData(text: message.content));
+                IbUtils.showSimpleSnackBar(
+                    msg: "Text copied to clipboard",
+                    backgroundColor: IbColors.primaryColor);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                    color: IbColors.accentColor.withOpacity(0.8),
+                    borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(16),
+                        bottomRight: Radius.circular(16))),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Linkify(
+                    options: const LinkifyOptions(looseUrl: true),
+                    text: message.content,
+                    onOpen: (link) async {
+                      if (await canLaunch(link.url)) {
+                        launch(link.url);
+                      }
+                    },
+                    style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: IbConfig.kNormalTextSize),
+                  ),
                 ),
               ),
             ),
@@ -254,7 +308,18 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget _handleMessageType(IbMessage message) {
-    //TODO
+    final bool isMe = message.senderUid == IbUtils.getCurrentUid();
+    if (message.messageType == IbMessage.kMessageTypeText) {
+      return isMe ? _meTextMsgItem(message) : _textMsgItem(message);
+    }
+    if (message.messageType == IbMessage.kMessageTypeLoadMore) {
+      return const Center(
+        child: IbProgressIndicator(
+          height: 30,
+          width: 30,
+        ),
+      );
+    }
     return const SizedBox();
   }
 }
