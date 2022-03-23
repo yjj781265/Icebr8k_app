@@ -84,7 +84,7 @@ class ReviewQuestionPage extends StatelessWidget {
                     }),
                   ),
                   Obx(
-                    () => SwitchListTile(
+                    () => SwitchListTile.adaptive(
                       tileColor: Theme.of(context).primaryColor,
                       value: itemController.rxIbQuestion.value.isCommentEnabled,
                       onChanged: (value) {
@@ -102,7 +102,7 @@ class ReviewQuestionPage extends StatelessWidget {
                   if (!itemController.rxIbQuestion.value.questionType
                       .contains('sc'))
                     Obx(
-                      () => SwitchListTile(
+                      () => SwitchListTile.adaptive(
                         tileColor: Theme.of(context).primaryColor,
                         value: itemController.rxIbQuestion.value.isQuiz,
                         onChanged: (value) {
@@ -136,7 +136,7 @@ class ReviewQuestionPage extends StatelessWidget {
                     ),
                   ),
                   Obx(
-                    () => SwitchListTile(
+                    () => SwitchListTile.adaptive(
                       tileColor: Theme.of(context).primaryColor,
                       value: itemController.rxIbQuestion.value.isAnonymous,
                       onChanged: (value) {

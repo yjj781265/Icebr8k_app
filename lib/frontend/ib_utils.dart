@@ -141,7 +141,7 @@ class IbUtils {
 
   static String getSuffixDateTimeString(DateTime _dateTime) {
     if (_calculateDifference(_dateTime) == 0) {
-      return 'today';
+      return '';
     }
 
     if (_calculateDifference(_dateTime) == 1) {

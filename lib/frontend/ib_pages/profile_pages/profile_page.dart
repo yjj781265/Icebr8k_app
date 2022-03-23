@@ -11,7 +11,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/asked_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/compare_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -458,7 +458,7 @@ class ProfilePage extends StatelessWidget {
                             style: const TextStyle(
                                 fontSize: IbConfig.kNormalTextSize),
                           ),
-                          Row(
+                          /* Row(
                             children: [
                               Text(_controller.rxIbUser.value.gender),
                               if (_controller.rxIbUser.value.birthdateInMs !=
@@ -472,7 +472,7 @@ class ProfilePage extends StatelessWidget {
                           ),
                           const SizedBox(
                             height: 4,
-                          ),
+                          ),*/
                           IbDescriptionText(
                               text: _controller.rxIbUser.value.bio),
                           const Divider(

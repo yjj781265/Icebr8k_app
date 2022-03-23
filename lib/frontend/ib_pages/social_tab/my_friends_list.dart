@@ -65,6 +65,9 @@ class FriendListItem extends StatelessWidget {
       }
 
       return ListTile(
+        onLongPress: () {
+          _showBtmSheet(context);
+        },
         onTap: () {
           Get.to(
             () => ProfilePage(
@@ -113,89 +116,31 @@ class FriendListItem extends StatelessWidget {
 
   void _showBtmSheet(BuildContext context) {
     final Widget menu = IbCard(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(
-              Icons.person_remove,
-              color: IbColors.errorRed,
-            ),
-            onTap: () async {
-              Get.back();
-              Get.dialog(IbDialog(
-                title:
-                    'Are you sure to unfriend ${_controller.username.value}?',
-                subtitle: '',
-                onPositiveTap: () async {
-                  Get.back();
-                  await _controller.removeFriend();
-                },
-              ));
-            },
-            title: Text.rich(
-              TextSpan(
-                  text: 'Unfriend ',
-                  style: const TextStyle(color: IbColors.errorRed),
-                  children: [
-                    TextSpan(
-                        text: _controller.username.value,
-                        style:
-                            TextStyle(color: Theme.of(context).indicatorColor))
-                  ]),
-            ),
-          ),
-          if (_controller.isBlocked.isTrue)
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
             ListTile(
-              onTap: () {
+              leading: const Icon(
+                Icons.person_remove,
+                color: IbColors.errorRed,
+              ),
+              onTap: () async {
                 Get.back();
                 Get.dialog(IbDialog(
                   title:
-                      'Are you sure to unblock ${_controller.username.value}?',
+                      'Are you sure to unfriend ${_controller.username.value}?',
                   subtitle: '',
                   onPositiveTap: () async {
                     Get.back();
-                    await _controller.unblockFriend();
+                    await _controller.removeFriend();
                   },
                 ));
               },
-              leading: const Icon(
-                Icons.check_circle_rounded,
-                color: IbColors.accentColor,
-              ),
               title: Text.rich(
                 TextSpan(
-                    text: 'Unblock ',
-                    style: const TextStyle(color: IbColors.accentColor),
-                    children: [
-                      TextSpan(
-                          text: _controller.username.value,
-                          style: TextStyle(
-                              color: Theme.of(context).indicatorColor))
-                    ]),
-              ),
-            ),
-          if (_controller.isBlocked.isFalse)
-            ListTile(
-              onTap: () {
-                Get.back();
-                Get.dialog(IbDialog(
-                  title: 'Are you sure to block ${_controller.username.value}?',
-                  subtitle:
-                      'You will not able to receive messages from this user',
-                  onPositiveTap: () async {
-                    Get.back();
-                    await _controller.blockFriend();
-                  },
-                ));
-              },
-              leading: const Icon(
-                Icons.block_flipped,
-                color: IbColors.errorRed,
-              ),
-              title: Text.rich(
-                TextSpan(
-                    text: 'Block ',
+                    text: 'Unfriend ',
                     style: const TextStyle(color: IbColors.errorRed),
                     children: [
                       TextSpan(
@@ -205,7 +150,69 @@ class FriendListItem extends StatelessWidget {
                     ]),
               ),
             ),
-        ],
+            if (_controller.isBlocked.isTrue)
+              ListTile(
+                onTap: () {
+                  Get.back();
+                  Get.dialog(IbDialog(
+                    title:
+                        'Are you sure to unblock ${_controller.username.value}?',
+                    subtitle: '',
+                    onPositiveTap: () async {
+                      Get.back();
+                      await _controller.unblockFriend();
+                    },
+                  ));
+                },
+                leading: const Icon(
+                  Icons.check_circle_rounded,
+                  color: IbColors.accentColor,
+                ),
+                title: Text.rich(
+                  TextSpan(
+                      text: 'Unblock ',
+                      style: const TextStyle(color: IbColors.accentColor),
+                      children: [
+                        TextSpan(
+                            text: _controller.username.value,
+                            style: TextStyle(
+                                color: Theme.of(context).indicatorColor))
+                      ]),
+                ),
+              ),
+            if (_controller.isBlocked.isFalse)
+              ListTile(
+                onTap: () {
+                  Get.back();
+                  Get.dialog(IbDialog(
+                    title:
+                        'Are you sure to block ${_controller.username.value}?',
+                    subtitle:
+                        'You will not able to receive messages from this user',
+                    onPositiveTap: () async {
+                      Get.back();
+                      await _controller.blockFriend();
+                    },
+                  ));
+                },
+                leading: const Icon(
+                  Icons.block_flipped,
+                  color: IbColors.errorRed,
+                ),
+                title: Text.rich(
+                  TextSpan(
+                      text: 'Block ',
+                      style: const TextStyle(color: IbColors.errorRed),
+                      children: [
+                        TextSpan(
+                            text: _controller.username.value,
+                            style: TextStyle(
+                                color: Theme.of(context).indicatorColor))
+                      ]),
+                ),
+              ),
+          ],
+        ),
       ),
     );
 

@@ -107,7 +107,7 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                 ),
               ),
-              SwitchListTile(
+              SwitchListTile.adaptive(
                 value: isDarkMode,
                 onChanged: (value) {
                   print('dark mode to $value');

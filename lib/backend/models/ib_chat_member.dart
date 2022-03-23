@@ -15,4 +15,14 @@ class IbChatMember {
       _$IbChatMemberFromJson(json);
 
   Map<String, dynamic> toJson() => _$IbChatMemberToJson(this);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is IbChatMember &&
+          runtimeType == other.runtimeType &&
+          uid == other.uid;
+
+  @override
+  int get hashCode => uid.hashCode;
 }

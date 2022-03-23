@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -5,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_message.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/chat_page_settings.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
@@ -13,7 +15,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../backend/controllers/user_controllers/chat_page_controller.dart';
+import '../../../backend/controllers/user_controllers/chat_page_controller.dart';
 
 class ChatPage extends StatelessWidget {
   const ChatPage(this._controller, {Key? key}) : super(key: key);
@@ -23,6 +25,7 @@ class ChatPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leadingWidth: 40,
         centerTitle: false,
         title: Obx(
           () => SizedBox(
@@ -45,6 +48,26 @@ class ChatPage extends StatelessWidget {
             ),
           ),
         ),
+        actions: [
+          Obx(
+            () => IconButton(
+                onPressed: () async {
+                  if (_controller.isMuted.isTrue) {
+                    await _controller.unMuteNotification();
+                  } else {
+                    await _controller.muteNotification();
+                  }
+                },
+                icon: Icon(_controller.isMuted.isTrue
+                    ? Icons.notifications_off
+                    : Icons.notifications_on)),
+          ),
+          IconButton(
+              onPressed: () {
+                Get.to(() => ChatPageSettings(_controller));
+              },
+              icon: const Icon(Icons.settings))
+        ],
       ),
       body: Obx(
         () {
@@ -210,44 +233,63 @@ class ChatPage extends StatelessWidget {
   Widget _meTextMsgItem(IbMessage message) {
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 8, left: 40, right: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Flexible(
-            child: InkWell(
-              onLongPress: () {
-                HapticFeedback.heavyImpact();
-                Clipboard.setData(ClipboardData(text: message.content));
-                IbUtils.showSimpleSnackBar(
-                    msg: "Text copied to clipboard",
-                    backgroundColor: IbColors.primaryColor);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                    color: IbColors.primaryColor.withOpacity(0.8),
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(16),
-                        topRight: Radius.circular(16),
-                        bottomLeft: Radius.circular(16))),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Linkify(
-                    linkStyle: const TextStyle(color: IbColors.creamYellow),
-                    options: const LinkifyOptions(looseUrl: true),
-                    onOpen: (link) async {
-                      if (await canLaunch(link.url)) {
-                        launch(link.url);
-                      }
-                    },
-                    text: message.content,
-                    style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: IbConfig.kNormalTextSize),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: InkWell(
+                  customBorder: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8))),
+                  onLongPress: () {
+                    HapticFeedback.heavyImpact();
+                    Clipboard.setData(ClipboardData(text: message.content));
+                    IbUtils.showSimpleSnackBar(
+                        msg: "Text copied to clipboard",
+                        backgroundColor: IbColors.primaryColor);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: IbColors.primaryColor.withOpacity(0.8),
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(16),
+                            topRight: Radius.circular(16),
+                            bottomLeft: Radius.circular(16))),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Linkify(
+                        linkStyle: const TextStyle(color: IbColors.creamYellow),
+                        options: const LinkifyOptions(looseUrl: true),
+                        onOpen: (link) async {
+                          if (await canLaunch(link.url)) {
+                            launch(link.url);
+                          }
+                        },
+                        text: message.content,
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: IbConfig.kNormalTextSize),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
+              )
+            ],
+          ),
+          Text(
+            message.timestamp == null
+                ? 'Sending...'
+                : IbUtils.readableDateTime(
+                    DateTime.fromMillisecondsSinceEpoch(
+                        (message.timestamp as Timestamp)
+                            .millisecondsSinceEpoch),
+                    showTime: true),
+            style: const TextStyle(
+                color: IbColors.lightGrey,
+                fontSize: IbConfig.kDescriptionTextSize),
           )
         ],
       ),
@@ -257,51 +299,72 @@ class ChatPage extends StatelessWidget {
   Widget _textMsgItem(IbMessage message) {
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 8, right: 40, left: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IbUserAvatar(
-            avatarUrl: _controller.avatarUrl.value,
-            radius: 16,
-          ),
-          const SizedBox(
-            width: 8,
-          ),
-          Flexible(
-            child: InkWell(
-              onLongPress: () {
-                HapticFeedback.heavyImpact();
-                Clipboard.setData(ClipboardData(text: message.content));
-                IbUtils.showSimpleSnackBar(
-                    msg: "Text copied to clipboard",
-                    backgroundColor: IbColors.primaryColor);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                    color: IbColors.accentColor.withOpacity(0.8),
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(16),
-                        topRight: Radius.circular(16),
-                        bottomRight: Radius.circular(16))),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Linkify(
-                    options: const LinkifyOptions(looseUrl: true),
-                    text: message.content,
-                    onOpen: (link) async {
-                      if (await canLaunch(link.url)) {
-                        launch(link.url);
-                      }
-                    },
-                    style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: IbConfig.kNormalTextSize),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_controller.isGroupChat.isTrue)
+                IbUserAvatar(
+                  avatarUrl: _controller.avatarUrl.value,
+                  radius: 16,
+                ),
+              if (_controller.isGroupChat.isTrue)
+                const SizedBox(
+                  width: 8,
+                ),
+              Flexible(
+                child: InkWell(
+                  customBorder: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8))),
+                  onLongPress: () {
+                    HapticFeedback.heavyImpact();
+                    Clipboard.setData(ClipboardData(text: message.content));
+                    IbUtils.showSimpleSnackBar(
+                        msg: "Text copied to clipboard",
+                        backgroundColor: IbColors.primaryColor);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: IbColors.accentColor.withOpacity(0.8),
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(16),
+                            topRight: Radius.circular(16),
+                            bottomRight: Radius.circular(16))),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Linkify(
+                        options: const LinkifyOptions(looseUrl: true),
+                        text: message.content,
+                        onOpen: (link) async {
+                          if (await canLaunch(link.url)) {
+                            launch(link.url);
+                          }
+                        },
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: IbConfig.kNormalTextSize),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
+          Text(
+            message.timestamp == null
+                ? 'Sending...'
+                : IbUtils.readableDateTime(
+                    DateTime.fromMillisecondsSinceEpoch(
+                        (message.timestamp as Timestamp)
+                            .millisecondsSinceEpoch),
+                    showTime: true),
+            style: const TextStyle(
+                color: IbColors.lightGrey,
+                fontSize: IbConfig.kDescriptionTextSize),
+          )
         ],
       ),
     );

@@ -80,7 +80,7 @@ class _MainPageViewState extends State<MainPageView>
   Widget getBody() {
     final List<Widget> pages = [
       HomeTab(),
-      ChatTab(),
+      const ChatTab(),
       const SizedBox(),
       SocialTab(),
       AlertTab(),

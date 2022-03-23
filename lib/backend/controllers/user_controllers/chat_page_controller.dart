@@ -3,10 +3,13 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_chat_member.dart';
 import 'package:icebr8k/backend/models/ib_message.dart';
+import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
+import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -23,9 +26,12 @@ class ChatPageController extends GetxController {
   final title = ''.obs;
   final subtitle = ''.obs;
   late StreamSubscription _messageSub;
+  late StreamSubscription _memberSub;
+  late StreamSubscription _chatSub;
   final isSending = false.obs;
   final isInChat = true.obs;
   final isGroupChat = false.obs;
+  final isMuted = false.obs;
   final int kQueryLimit = 16;
   DocumentSnapshot<Map<String, dynamic>>? lastSnap;
   final txtController = TextEditingController();
@@ -33,6 +39,7 @@ class ChatPageController extends GetxController {
   final RefreshController refreshController = RefreshController();
   final ItemPositionsListener itemPositionsListener =
       ItemPositionsListener.create();
+  final ibChatMembers = <IbChatMemberModel>[].obs;
 
   ChatPageController({this.ibChat, this.recipientId = ''});
   final IbMessage loadMessage = IbMessage(
@@ -54,13 +61,17 @@ class ChatPageController extends GetxController {
   @override
   void onClose() {
     _messageSub.cancel();
+    _memberSub.cancel();
+    _chatSub.cancel();
   }
 
   Future<void> initData() async {
     if (ibChat == null && recipientId.isEmpty) {
       return;
     }
-    ibChat = await IbChatDbService().queryOneToOneIbChat(recipientId);
+    if (recipientId.isNotEmpty) {
+      ibChat = await IbChatDbService().queryOneToOneIbChat(recipientId);
+    }
     print('ChatPageController looking for IbChat');
     if (ibChat == null) {
       try {
@@ -85,22 +96,89 @@ class ChatPageController extends GetxController {
     }
 
     isGroupChat.value = ibChat!.memberCount > 2;
+    isMuted.value = ibChat!.mutedUids.contains(IbUtils.getCurrentUid());
+    title.value = ibChat!.name;
+    avatarUrl.value = ibChat!.photoUrl;
 
     ///loading messages from stream
     _messageSub = IbChatDbService()
         .listenToMessageChanges(ibChat!.chatId)
-        .listen((event) {
+        .listen((event) async {
       for (final docChange in event.docChanges) {
         final IbMessage ibMessage = IbMessage.fromJson(docChange.doc.data()!);
-        print('chat page controller ${docChange.type}');
+        print('ChatPageController ${docChange.type}');
         if (docChange.type == DocumentChangeType.added) {
           messages.insert(0, ibMessage);
         } else if (docChange.type == DocumentChangeType.modified) {
+          final int index = messages.indexOf(ibMessage);
+          if (index != -1) {
+            messages[index] = ibMessage;
+          }
         } else {}
       }
 
       if (event.docs.isNotEmpty) {
         lastSnap = event.docs.first;
+      }
+
+      /// update readUids
+      if (messages.isNotEmpty &&
+          messages.first.senderUid != IbUtils.getCurrentUid() &&
+          !messages.first.readUids.contains(IbUtils.getCurrentUid())) {
+        final IbMessage lastMessage = messages.first;
+        await IbChatDbService().updateReadUidArray(
+            chatRoomId: ibChat!.chatId, messageId: lastMessage.messageId);
+      }
+    });
+
+    _memberSub = IbChatDbService()
+        .listenToIbMemberChanges(ibChat!.chatId)
+        .listen((event) async {
+      for (final docChange in event.docChanges) {
+        final IbChatMember ibChatMember =
+            IbChatMember.fromJson(docChange.doc.data()!);
+        print('chat page controller member ${docChange.type}');
+        if (docChange.type == DocumentChangeType.added) {
+          IbUser? ibUser;
+          if (IbCacheManager().getIbUser(ibChatMember.uid) == null) {
+            ibUser = await IbUserDbService().queryIbUser(ibChatMember.uid);
+          } else {
+            ibUser = IbCacheManager().getIbUser(ibChatMember.uid);
+          }
+
+          if (ibUser != null) {
+            ibChatMembers
+                .add(IbChatMemberModel(member: ibChatMember, user: ibUser));
+          }
+        } else if (docChange.type == DocumentChangeType.modified) {
+          final index = ibChatMembers
+              .indexWhere((element) => element.member.uid == ibChatMember.uid);
+          if (index != -1) {
+            ibChatMembers[index].member = ibChatMember;
+            ibChatMembers.refresh();
+          }
+        } else {
+          final index = ibChatMembers
+              .indexWhere((element) => element.member.uid == ibChatMember.uid);
+          if (index != -1) {
+            ibChatMembers.removeAt(index);
+            ibChatMembers.refresh();
+          }
+        }
+      }
+      ibChatMembers.sort((a, b) {
+        return a.member.role.compareTo(b.member.role);
+      });
+    });
+
+    _chatSub =
+        IbChatDbService().listenToIbChatChanges(ibChat!.chatId).listen((event) {
+      ibChat = IbChat.fromJson(event.data()!);
+
+      /// only update if is group chat
+      if (ibChat!.memberCount > 2) {
+        title.value = ibChat!.name;
+        avatarUrl.value = ibChat!.photoUrl;
       }
     });
 
@@ -122,11 +200,26 @@ class ChatPageController extends GetxController {
     }
   }
 
+  Future<void> muteNotification() async {
+    isMuted.value = true;
+    await IbChatDbService().muteNotification(ibChat!);
+    IbUtils.showSimpleSnackBar(
+        msg: "Notification OFF", backgroundColor: IbColors.primaryColor);
+  }
+
+  Future<void> unMuteNotification() async {
+    isMuted.value = false;
+    await IbChatDbService().unMuteNotification(ibChat!);
+    IbUtils.showSimpleSnackBar(
+        msg: "Notification ON", backgroundColor: IbColors.primaryColor);
+  }
+
   IbMessage buildMessage() {
     return IbMessage(
         messageId: IbUtils.getUniqueId(),
         content: txtController.text.trim(),
         senderUid: IbUtils.getCurrentUid()!,
+        readUids: [IbUtils.getCurrentUid()!],
         messageType: IbMessage.kMessageTypeText,
         chatRoomId: ibChat!.chatId);
   }
@@ -157,4 +250,21 @@ class ChatPageController extends GetxController {
     }
     isLoadingMore.value = false;
   }
+}
+
+class IbChatMemberModel {
+  IbChatMember member;
+  IbUser user;
+
+  IbChatMemberModel({required this.member, required this.user});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is IbChatMemberModel &&
+          runtimeType == other.runtimeType &&
+          member == other.member;
+
+  @override
+  int get hashCode => member.hashCode;
 }

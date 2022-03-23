@@ -22,27 +22,14 @@ class IbChatDbService {
   }
 
   Future<void> updateReadUidArray(
-      {required String chatRoomId,
-      required String messageId,
-      required List<String> uids}) {
+      {required String chatRoomId, required String messageId}) {
     return _collectionRef
         .doc(chatRoomId)
         .collection(_kMessageSubCollection)
         .doc(messageId)
-        .set(
-            {'readUids': FieldValue.arrayUnion(uids)}, SetOptions(merge: true));
-  }
-
-  Future<void> updateInChatUidArray(
-      {required String chatRoomId, required List<String> uids}) {
-    return _collectionRef.doc(chatRoomId).set(
-        {'inChatUids': FieldValue.arrayUnion(uids)}, SetOptions(merge: true));
-  }
-
-  Future<void> removeInChatUidArray(
-      {required String chatRoomId, required List<String> uids}) {
-    return _collectionRef.doc(chatRoomId).set(
-        {'inChatUids': FieldValue.arrayRemove(uids)}, SetOptions(merge: true));
+        .set({
+      'readUids': FieldValue.arrayUnion([IbUtils.getCurrentUid()])
+    }, SetOptions(merge: true));
   }
 
   /// stream of ibMessage in ascending order
@@ -56,9 +43,31 @@ class IbChatDbService {
         .snapshots();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> listenToChatRoomChanges(
-      String uid) {
-    return _collectionRef.where('memberUids', arrayContains: uid).snapshots();
+  Stream<QuerySnapshot<Map<String, dynamic>>> listenToIbMemberChanges(
+      String chatId) {
+    return _collectionRef
+        .doc(chatId)
+        .collection(_kMemberSubCollection)
+        .snapshots();
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> listenToIbChatChanges(
+      String chatId) {
+    return _collectionRef.doc(chatId).snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> listenToOneToOneChat() {
+    return _collectionRef
+        .where('memberCount', isEqualTo: 2)
+        .where('memberUids', arrayContains: IbUtils.getCurrentUid())
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> listenToGroupChat() {
+    return _collectionRef
+        .where('memberCount', isGreaterThan: 2)
+        .where('memberUids', arrayContains: IbUtils.getCurrentUid())
+        .snapshots();
   }
 
   Future<int> queryUnreadCount(
@@ -126,6 +135,20 @@ class IbChatDbService {
         .set(ibChat.toJson(), SetOptions(merge: true));
   }
 
+  Future<void> muteNotification(IbChat ibChat) async {
+    ibChat.createdAtTimestamp = FieldValue.serverTimestamp();
+    await _collectionRef.doc(ibChat.chatId).update({
+      'mutedUids': FieldValue.arrayUnion([IbUtils.getCurrentUid()])
+    });
+  }
+
+  Future<void> unMuteNotification(IbChat ibChat) async {
+    ibChat.createdAtTimestamp = FieldValue.serverTimestamp();
+    await _collectionRef.doc(ibChat.chatId).update({
+      'mutedUids': FieldValue.arrayRemove([IbUtils.getCurrentUid()])
+    });
+  }
+
   // todo call cloud function for this
   Future<void> removeChatRoom(String chatRoomId) async {
     await _collectionRef.doc(chatRoomId).delete();
@@ -134,7 +157,6 @@ class IbChatDbService {
   Future<IbChat?> queryOneToOneIbChat(String uid) async {
     final List<String> uids = [IbUtils.getCurrentUid()!, uid];
     uids.sort();
-    print(uids);
     final snapshot = await _collectionRef
         .where('memberUids', isEqualTo: uids)
         .where('memberCount', isEqualTo: 2)
