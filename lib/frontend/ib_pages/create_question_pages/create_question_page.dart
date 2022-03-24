@@ -78,117 +78,114 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                   )),
             ],
           ),
-          body: Scrollbar(
-            radius: const Radius.circular(8),
-            child: ExtendedNestedScrollView(
-              onlyOneScrollInBody: true,
-              dragStartBehavior: DragStartBehavior.down,
-              headerSliverBuilder:
-                  (BuildContext context, bool innerBoxIsScrolled) {
-                return [
-                  SliverToBoxAdapter(
-                    child: IbCard(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Column(
-                          children: [
-                            TextField(
-                              keyboardType: TextInputType.text,
-                              controller: _controller.questionEditController,
-                              minLines: 3,
-                              maxLines: 8,
-                              maxLength: IbConfig.kQuestionTitleMaxLength,
-                              style: const TextStyle(
-                                  fontSize: IbConfig.kPageTitleSize,
-                                  fontWeight: FontWeight.bold),
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: 'question'.tr,
-                                  hintStyle: const TextStyle(
-                                    color: IbColors.lightGrey,
-                                  )),
-                            ),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                            const Divider(
-                              height: 0,
-                              thickness: 1,
-                            ),
-                            IbMediaBar(_controller),
+          body: ExtendedNestedScrollView(
+            onlyOneScrollInBody: true,
+            dragStartBehavior: DragStartBehavior.down,
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return [
+                SliverToBoxAdapter(
+                  child: IbCard(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Column(
+                        children: [
+                          TextField(
+                            keyboardType: TextInputType.text,
+                            controller: _controller.questionEditController,
+                            minLines: 3,
+                            maxLines: 8,
+                            maxLength: IbConfig.kQuestionTitleMaxLength,
+                            style: const TextStyle(
+                                fontSize: IbConfig.kPageTitleSize,
+                                fontWeight: FontWeight.bold),
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: 'question'.tr,
+                                hintStyle: const TextStyle(
+                                  color: IbColors.lightGrey,
+                                )),
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          const Divider(
+                            height: 0,
+                            thickness: 1,
+                          ),
+                          IbMediaBar(_controller),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: IbCard(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: TextField(
+                        keyboardType: TextInputType.multiline,
+                        textInputAction: TextInputAction.newline,
+                        controller: _controller.descriptionEditController,
+                        maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                        minLines: 3,
+                        maxLines: 8,
+                        maxLength: IbConfig.kQuestionDescMaxLength,
+                        style: const TextStyle(
+                            fontSize: IbConfig.kNormalTextSize,
+                            fontWeight: FontWeight.normal),
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'description_option'.tr,
+                            hintStyle: const TextStyle(
+                              color: IbColors.lightGrey,
+                            )),
+                      ),
+                    ),
+                  ),
+                ),
+                SliverOverlapAbsorber(
+                  handle:
+                      ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
+                          context),
+                  sliver: SliverPersistentHeader(
+                    pinned: true,
+                    delegate: IbPersistentHeader(
+                      widget: IbCard(
+                        child: TabBar(
+                          controller: _tabController,
+                          tabs: [
+                            Tooltip(
+                                message: 'mc'.tr,
+                                child: const Tab(
+                                    icon: Icon(
+                                  FontAwesomeIcons.bars,
+                                ))),
+                            Tooltip(
+                                message: 'mc_p'.tr,
+                                child: const Tab(
+                                    icon: Icon(FontAwesomeIcons.listUl))),
+                            Tooltip(
+                                message: 'sc'.tr,
+                                child: const Tab(
+                                    icon: Icon(FontAwesomeIcons.star))),
                           ],
                         ),
                       ),
                     ),
                   ),
-                  SliverToBoxAdapter(
-                    child: IbCard(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: TextField(
-                          keyboardType: TextInputType.multiline,
-                          textInputAction: TextInputAction.newline,
-                          controller: _controller.descriptionEditController,
-                          maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                          minLines: 3,
-                          maxLines: 8,
-                          maxLength: IbConfig.kQuestionDescMaxLength,
-                          style: const TextStyle(
-                              fontSize: IbConfig.kNormalTextSize,
-                              fontWeight: FontWeight.normal),
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'description_option'.tr,
-                              hintStyle: const TextStyle(
-                                color: IbColors.lightGrey,
-                              )),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SliverOverlapAbsorber(
-                    handle:
-                        ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
-                            context),
-                    sliver: SliverPersistentHeader(
-                      pinned: true,
-                      delegate: IbPersistentHeader(
-                        widget: IbCard(
-                          child: TabBar(
-                            controller: _tabController,
-                            tabs: [
-                              Tooltip(
-                                  message: 'mc'.tr,
-                                  child: const Tab(
-                                      icon: Icon(
-                                    FontAwesomeIcons.bars,
-                                  ))),
-                              Tooltip(
-                                  message: 'mc_p'.tr,
-                                  child: const Tab(
-                                      icon: Icon(FontAwesomeIcons.listUl))),
-                              Tooltip(
-                                  message: 'sc'.tr,
-                                  child: const Tab(
-                                      icon: Icon(FontAwesomeIcons.star))),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                ];
-              },
-              body: Padding(
-                padding: const EdgeInsets.only(top: 56),
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    CreateQuestionMcTab(_controller),
-                    CreateQuestionMcPicTab(_controller),
-                    CreateQuestionScTab(_controller),
-                  ],
-                ),
+                )
+              ];
+            },
+            body: Padding(
+              padding: const EdgeInsets.only(top: 56),
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  CreateQuestionMcTab(_controller),
+                  CreateQuestionMcPicTab(_controller),
+                  CreateQuestionScTab(_controller),
+                ],
               ),
             ),
           ),

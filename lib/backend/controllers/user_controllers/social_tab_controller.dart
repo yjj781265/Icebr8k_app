@@ -77,11 +77,9 @@ class SocialTabController extends GetxController {
       for (final docChange in event.docChanges) {
         final IbAnswer ibAnswer = IbAnswer.fromJson(docChange.doc.data()!);
         if (docChange.type == DocumentChangeType.removed) {
-          print('ibAnswer removed');
           IbCacheManager().removeSingleIbAnswer(
               uid: IbUtils.getCurrentUid()!, ibAnswer: ibAnswer);
         } else {
-          print('ibAnswer updated');
           IbCacheManager().cacheSingleIbAnswer(
               uid: IbUtils.getCurrentUid()!, ibAnswer: ibAnswer);
         }

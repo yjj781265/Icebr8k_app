@@ -9,34 +9,25 @@ import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
-class AlertTab extends StatefulWidget {
-  @override
-  State<AlertTab> createState() => _AlertTabState();
-}
-
-class _AlertTabState extends State<AlertTab> {
-  final NotificationController _controller = Get.put(NotificationController());
-  String title = 'one_to_one_chat'.tr;
-  late TabController _tabController;
+class AlertTab extends StatelessWidget {
+  final NotificationController _controller = Get.find();
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Obx(
-          () => ListView.builder(
-            itemBuilder: (context, index) {
-              final IbNotification n = _controller.ibNotifications[index];
-              return _handleNotificationType(n);
-            },
-            itemCount: _controller.ibNotifications.length,
-          ),
+    return Scaffold(
+      body: Obx(
+        () => ListView.builder(
+          itemBuilder: (context, index) {
+            final NotificationItem item = _controller.items[index];
+            return _handleNotificationType(item);
+          },
+          itemCount: _controller.items.length,
         ),
       ),
     );
   }
 
-  Widget _handleNotificationType(IbNotification notification) {
-    if (notification.type == IbNotification.kFriendRequest) {
+  Widget _handleNotificationType(NotificationItem item) {
+    if (item.notification.type == IbNotification.kFriendRequest) {
       return IbCard(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -47,8 +38,8 @@ class _AlertTabState extends State<AlertTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   IbUserAvatar(
-                    avatarUrl: notification.avatarUrl ?? '',
-                    uid: notification.senderId,
+                    avatarUrl: item.notification.avatarUrl ?? '',
+                    uid: item.notification.senderId,
                   ),
                   const SizedBox(
                     width: 8,
@@ -61,7 +52,7 @@ class _AlertTabState extends State<AlertTab> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              notification.title,
+                              item.notification.title,
                               style: const TextStyle(
                                   fontSize: IbConfig.kNormalTextSize,
                                   fontWeight: FontWeight.bold),
@@ -74,7 +65,7 @@ class _AlertTabState extends State<AlertTab> {
                               child: Text(
                                   IbUtils.getAgoDateTimeString(
                                     DateTime.fromMillisecondsSinceEpoch(
-                                        notification.timestampInMs),
+                                        item.notification.timestampInMs),
                                   ),
                                   style: const TextStyle(
                                       fontSize: IbConfig.kDescriptionTextSize,
@@ -86,10 +77,10 @@ class _AlertTabState extends State<AlertTab> {
                           'sent_you_a_friend_request'.tr,
                           style: const TextStyle(color: IbColors.lightGrey),
                         ),
-                        if (notification.subtitle.isNotEmpty)
+                        if (item.notification.subtitle.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(top: 8),
-                            child: Text(notification.subtitle),
+                            child: Text(item.notification.subtitle),
                           ),
                       ],
                     ),
@@ -105,7 +96,7 @@ class _AlertTabState extends State<AlertTab> {
                       child: IbElevatedButton(
                     textTrKey: 'decline',
                     onPressed: () async {
-                      await _controller.declineFr(notification);
+                      await _controller.declineFr(item.notification);
                     },
                     color: IbColors.errorRed,
                   )),
@@ -113,7 +104,7 @@ class _AlertTabState extends State<AlertTab> {
                     child: IbElevatedButton(
                         textTrKey: 'accept',
                         onPressed: () async {
-                          await _controller.acceptFr(notification);
+                          await _controller.acceptFr(item.notification);
                         }),
                   ),
                 ],
@@ -123,7 +114,15 @@ class _AlertTabState extends State<AlertTab> {
         ),
       );
     }
-
+    if (item.notification.type == IbNotification.kGroupInvite &&
+        item.ibChat != null) {
+      return IbCard(
+          child: ListTile(
+        leading: IbUserAvatar(
+          avatarUrl: item.ibChat!.photoUrl,
+        ),
+      ));
+    }
     return SizedBox();
   }
 }

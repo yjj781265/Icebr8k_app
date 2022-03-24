@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 
@@ -17,6 +18,7 @@ class HomeBinding implements Bindings {
     Get.lazyPut(() => MainPageController(currentIbUser.obs), fenix: true);
     Get.lazyPut(() => HomeTabController(), fenix: true);
     Get.lazyPut(() => ChatTabController(), fenix: true);
+    Get.lazyPut(() => NotificationController(), fenix: true);
     Get.lazyPut(() => SocialTabController(), fenix: true);
     Get.lazyPut(() => PeopleNearbyController(), fenix: true);
   }

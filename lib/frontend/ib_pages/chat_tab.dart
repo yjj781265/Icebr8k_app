@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_tab_controller.dart';
-import 'package:icebr8k/backend/models/ib_chat.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_persistent_header.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
+import '../ib_colors.dart';
 import 'chat_pages/chat_page.dart';
 
 class ChatTab extends StatefulWidget {
@@ -77,12 +77,14 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
                                   Icons.person,
                                 ))),
                         Tooltip(
-                            message: 'group_chat'.tr,
-                            child: const Tab(
-                                height: 32,
-                                icon: Icon(
-                                  Icons.group,
-                                ))),
+                          message: 'group_chat'.tr,
+                          child: const Tab(
+                            height: 32,
+                            icon: Icon(
+                              Icons.group,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -97,7 +99,7 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
             controller: _tabController,
             children: [
               buildOneToOneList(),
-              Text('Group'),
+              const SizedBox(),
             ],
           ),
         ),
@@ -108,17 +110,34 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
   Widget buildOneToOneList() {
     return Obx(() => ListView.separated(
           itemBuilder: (context, index) {
-            final IbChat chat = _controller.oneToOneChats[index];
+            final ChatTabItem item = _controller.oneToOneChats[index];
             return ListTile(
               tileColor: Theme.of(context).backgroundColor,
-              leading: IbUserAvatar(
-                avatarUrl: chat.photoUrl,
+              leading: Stack(
+                children: [
+                  IbUserAvatar(
+                    avatarUrl: item.ibChat.photoUrl,
+                  ),
+                  if (item.isMuted)
+                    Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).backgroundColor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.notifications_off,
+                              size: 16,
+                            )))
+                ],
               ),
               onTap: () {
                 Get.to(
                   () => ChatPage(
                     Get.put(
-                      ChatPageController(ibChat: chat),
+                      ChatPageController(ibChat: item.ibChat),
                     ),
                   ),
                 );
@@ -127,31 +146,56 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    chat.name,
+                    item.ibChat.name,
                     style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: IbConfig.kNormalTextSize),
                   ),
-                  if (chat.lastMessage != null)
+                  if (item.ibChat.lastMessage != null)
                     Text(
                       IbUtils.readableDateTime(
                           DateTime.fromMillisecondsSinceEpoch(
-                              (chat.lastMessage!.timestamp as Timestamp)
+                              (item.ibChat.lastMessage!.timestamp as Timestamp)
                                   .millisecondsSinceEpoch),
                           showTime: true),
                       style: const TextStyle(
+                          color: IbColors.lightGrey,
                           fontWeight: FontWeight.normal,
                           fontSize: IbConfig.kDescriptionTextSize),
                     ),
                 ],
               ),
-              subtitle: Text(
-                chat.lastMessage == null ? '' : chat.lastMessage!.content,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: IbConfig.kSecondaryTextSize,
-                ),
+              subtitle: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    item.ibChat.lastMessage == null
+                        ? ''
+                        : item.ibChat.lastMessage!.content,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: IbConfig.kSecondaryTextSize,
+                    ),
+                  ),
+                  if (item.unReadCount != 0)
+                    Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: const BoxDecoration(
+                          color: IbColors.errorRed, shape: BoxShape.circle),
+                      child: Text(
+                        item.unReadCount > 99
+                            ? '99+'
+                            : item.unReadCount.toString(),
+                        maxLines: 1,
+                        overflow: TextOverflow.fade,
+                        style: const TextStyle(
+                          color: IbColors.white,
+                          fontSize: IbConfig.kDescriptionTextSize,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             );
           },

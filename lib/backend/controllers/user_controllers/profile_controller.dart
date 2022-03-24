@@ -118,7 +118,7 @@ class ProfileController extends GetxController {
         senderId: currentUser.id,
         recipientId: rxIbUser.value.id);
     try {
-      await IbUserDbService().sendFriendRequest(n);
+      await IbUserDbService().sendAlertNotification(n);
       isFrSent.value = true;
       IbUtils.showSimpleSnackBar(
           msg: 'Friend request sent!', backgroundColor: IbColors.accentColor);

@@ -2,14 +2,16 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
+import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 class NotificationController extends GetxController {
   late StreamSubscription ibNotificationsStream;
-  final ibNotifications = <IbNotification>[].obs;
+  final items = <NotificationItem>[].obs;
 
   @override
   Future<void> onInit() async {
@@ -29,22 +31,45 @@ class NotificationController extends GetxController {
 
         final IbNotification n = IbNotification.fromJson(docChange.doc.data()!);
         if (docChange.type == DocumentChangeType.added) {
-          ibNotifications.add(n);
+          _onNotificationAdded(n);
         }
 
         if (docChange.type == DocumentChangeType.modified) {
-          final int index =
-              ibNotifications.indexWhere((element) => element.id == n.id);
-          if (index != 1) {
-            ibNotifications[index] = n;
-          }
+          _onNotificationModified(n);
         }
 
         if (docChange.type == DocumentChangeType.removed) {
-          ibNotifications.removeWhere((element) => element.id == n.id);
+          _onNotificationRemoved(n);
         }
       }
     });
+  }
+
+  Future<void> _onNotificationAdded(IbNotification notification) async {
+    if (notification.type == IbNotification.kGroupInvite) {
+      final IbChat? chat = await IbChatDbService().queryChat(notification.id);
+      if (chat != null) {
+        items.add(NotificationItem(notification: notification, ibChat: chat));
+      }
+    } else if (notification.type == IbNotification.kFriendRequest) {
+      items.add(NotificationItem(notification: notification));
+    }
+  }
+
+  Future<void> _onNotificationModified(IbNotification notification) async {
+    final int index = items
+        .indexWhere((element) => element.notification.id == notification.id);
+    if (index != -1) {
+      items[index].notification = notification;
+    }
+  }
+
+  Future<void> _onNotificationRemoved(IbNotification notification) async {
+    final int index = items
+        .indexWhere((element) => element.notification.id == notification.id);
+    if (index != -1) {
+      items.removeAt(index);
+    }
   }
 
   Future<void> acceptFr(IbNotification ibNotification) async {
@@ -73,4 +98,11 @@ class NotificationController extends GetxController {
           backgroundColor: IbColors.accentColor);
     }
   }
+}
+
+class NotificationItem {
+  IbNotification notification;
+  IbChat? ibChat;
+
+  NotificationItem({required this.notification, this.ibChat});
 }

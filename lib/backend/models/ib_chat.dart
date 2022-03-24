@@ -20,8 +20,8 @@ class IbChat {
 
   IbChat(
       {required this.chatId,
-      required this.name,
-      required this.photoUrl,
+      this.name = '',
+      this.photoUrl = '',
       this.createdAtTimestamp,
       this.description = '',
       this.memberUids = const [],

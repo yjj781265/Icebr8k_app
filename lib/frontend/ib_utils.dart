@@ -255,8 +255,8 @@ class IbUtils {
       icon: icon,
       snackPosition: SnackPosition.TOP,
       borderRadius: IbConfig.kCardCornerRadius,
-      margin: const EdgeInsets.only(left: 8, right: 8, top: 32),
-      duration: const Duration(seconds: 2),
+      margin: const EdgeInsets.only(left: 8, right: 8, top: 16),
+      duration: const Duration(seconds: 1),
       backgroundColor: Theme.of(Get.context!).backgroundColor,
       messageText: Text(
         msg,

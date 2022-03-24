@@ -59,6 +59,7 @@ class IbChatDbService {
   Stream<QuerySnapshot<Map<String, dynamic>>> listenToOneToOneChat() {
     return _collectionRef
         .where('memberCount', isEqualTo: 2)
+        .where('messageCount', isGreaterThan: 0)
         .where('memberUids', arrayContains: IbUtils.getCurrentUid())
         .snapshots();
   }
@@ -70,25 +71,21 @@ class IbChatDbService {
         .snapshots();
   }
 
-  Future<int> queryUnreadCount(
-      {required String chatRoomId, required String uid}) async {
+  Future<int> queryUnreadCount({required IbChat ibChat}) async {
     final _snapshot1 = await _collectionRef
-        .doc(chatRoomId)
+        .doc(ibChat.chatId)
         .collection(_kMessageSubCollection)
         .orderBy('timestamp')
-        .where('readUids', arrayContains: uid)
+        .where('readUids', arrayContains: IbUtils.getCurrentUid())
         .limitToLast(1)
         .get();
 
-    // todo add cloud function
     if (_snapshot1.size == 0) {
-      final snapshot =
-          await _collectionRef.doc(chatRoomId).collection('Messages').get();
-      return snapshot.size;
+      return ibChat.messageCount;
     }
 
     final _snapshot2 = await _collectionRef
-        .doc(chatRoomId)
+        .doc(ibChat.chatId)
         .collection(_kMessageSubCollection)
         .orderBy('timestamp')
         .startAfterDocument(_snapshot1.docs.last)
@@ -166,5 +163,14 @@ class IbChatDbService {
     }
 
     return IbChat.fromJson(snapshot.docs.first.data());
+  }
+
+  Future<IbChat?> queryChat(String chatId) async {
+    final snapshot = await _collectionRef.doc(chatId).get();
+    if (snapshot.exists) {
+      return null;
+    }
+
+    return IbChat.fromJson(snapshot.data()!);
   }
 }

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
 import 'package:icebr8k/backend/models/ib_chat_member.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/ib_friends_picker.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:reorderables/reorderables.dart';
 
@@ -56,13 +59,28 @@ class ChatPageSettings extends StatelessWidget {
                   radius: 24,
                   backgroundColor: IbColors.lightGrey,
                   child: IconButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      final items = await Get.to(
+                        () => IbFriendsPicker(
+                          Get.put(
+                            IbFriendsPickerController(
+                              IbUtils.getCurrentUid()!,
+                              ibChat: _controller.ibChat!,
+                              pickedUids: _controller.ibChatMembers
+                                  .map((element) => element.user.id)
+                                  .toList(),
+                            ),
+                          ),
+                        ),
+                      );
+                      print(items);
+                    },
                     icon: const Icon(Icons.add),
                   ),
                 ),
                 children: _controller.ibChatMembers.map((element) {
                   return SizedBox(
-                    width: 56,
+                    width: 72,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [

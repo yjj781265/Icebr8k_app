@@ -75,7 +75,8 @@ class IbUserDbService {
     return user;
   }
 
-  Future<void> sendFriendRequest(IbNotification n) async {
+  /// send an alert message in the app, will appear under Alert tab
+  Future<void> sendAlertNotification(IbNotification n) async {
     //my sub collection
     await _collectionRef
         .doc(n.recipientId)

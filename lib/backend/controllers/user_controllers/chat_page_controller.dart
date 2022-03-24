@@ -69,17 +69,20 @@ class ChatPageController extends GetxController {
     if (ibChat == null && recipientId.isEmpty) {
       return;
     }
-    if (recipientId.isNotEmpty) {
+    if (ibChat != null && isGroupChat.isFalse) {
+      title.value = ibChat!.name;
+      avatarUrl.value = ibChat!.photoUrl;
+    }
+
+    if (recipientId.isNotEmpty && ibChat == null) {
       ibChat = await IbChatDbService().queryOneToOneIbChat(recipientId);
     }
+
     print('ChatPageController looking for IbChat');
     if (ibChat == null) {
       try {
         print('ChatPageController creating new IbChat');
-        ibChat = IbChat(
-            chatId: IbUtils.getUniqueId(),
-            name: title.value,
-            photoUrl: avatarUrl.value);
+        ibChat = IbChat(chatId: IbUtils.getUniqueId());
         await IbChatDbService().addIbChat(ibChat!);
         await IbChatDbService().addMember(
             chatId: ibChat!.chatId,
@@ -97,8 +100,6 @@ class ChatPageController extends GetxController {
 
     isGroupChat.value = ibChat!.memberCount > 2;
     isMuted.value = ibChat!.mutedUids.contains(IbUtils.getCurrentUid());
-    title.value = ibChat!.name;
-    avatarUrl.value = ibChat!.photoUrl;
 
     ///loading messages from stream
     _messageSub = IbChatDbService()

@@ -221,6 +221,7 @@ class CommentItemWidget extends StatelessWidget {
                   children: [
                     Row(
                         mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           IbUserAvatar(
@@ -328,20 +329,16 @@ class CommentItemWidget extends StatelessWidget {
                             ),
                           ),
                           if (item.ibAnswer != null)
-                            SizedBox(
-                              width: 100,
-                              child: Wrap(
-                                children: [
-                                  const Text(
-                                    'Vote: ',
-                                    style: TextStyle(
-                                        color: IbColors.lightGrey,
-                                        fontSize:
-                                            IbConfig.kDescriptionTextSize),
-                                  ),
-                                  _handleIbAnswerUI(item),
-                                ],
-                              ),
+                            Wrap(
+                              children: [
+                                const Text(
+                                  'Vote: ',
+                                  style: TextStyle(
+                                      color: IbColors.lightGrey,
+                                      fontSize: IbConfig.kDescriptionTextSize),
+                                ),
+                                _handleIbAnswerUI(item),
+                              ],
                             ),
                         ]),
                     Container(
@@ -400,7 +397,7 @@ class CommentItemWidget extends StatelessWidget {
         return RatingBar.builder(
           initialRating: double.parse(ibChoice.content ?? '0'),
           ignoreGestures: true,
-          itemSize: 20,
+          itemSize: 16,
           itemBuilder: (context, _) => const Icon(
             Icons.star,
             color: Colors.amber,
@@ -413,7 +410,7 @@ class CommentItemWidget extends StatelessWidget {
         return RatingBar.builder(
           initialRating: double.parse(ibChoice.content ?? '0'),
           ignoreGestures: true,
-          itemSize: 20,
+          itemSize: 16,
           itemBuilder: (context, _) => const Icon(
             Icons.favorite,
             color: Colors.red,
@@ -426,7 +423,7 @@ class CommentItemWidget extends StatelessWidget {
         return RatingBar.builder(
           initialRating: double.parse(ibChoice.content ?? '0'),
           ignoreGestures: true,
-          itemSize: 20,
+          itemSize: 16,
           itemBuilder: (context, index) {
             switch (index) {
               case 0:

@@ -30,10 +30,11 @@ class IbUserAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (avatarUrl.isEmpty) {
-      return SizedBox(
+      return Container(
+        decoration: const BoxDecoration(
+            shape: BoxShape.circle, color: IbColors.lightGrey),
         height: radius * 2,
         width: radius * 2,
-        child: const IbProgressIndicator(),
       );
     }
     return Stack(
