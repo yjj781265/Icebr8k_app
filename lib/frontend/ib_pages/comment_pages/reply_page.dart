@@ -29,71 +29,74 @@ class ReplyPage extends StatelessWidget {
         centerTitle: false,
         title: const Text('Replies'),
       ),
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Expanded(child: _handleReplyCommentUI(context)),
-          SafeArea(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 3),
-              margin: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: const BorderRadius.all(
-                    Radius.circular(IbConfig.kTextBoxCornerRadius)),
-                border: Border.all(
-                  color: IbColors.primaryColor,
+      body: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(child: _handleReplyCommentUI(context)),
+            SafeArea(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                margin: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: const BorderRadius.all(
+                      Radius.circular(IbConfig.kTextBoxCornerRadius)),
+                  border: Border.all(
+                    color: IbColors.primaryColor,
+                  ),
                 ),
-              ),
-              child: Obx(
-                () => SafeArea(
-                  child: TextField(
-                    minLines: 1,
-                    maxLines: 5,
-                    maxLength: IbConfig.kCommentMaxLen,
-                    focusNode: _controller.focusNode,
-                    controller: _controller.editingController,
-                    textInputAction: TextInputAction.newline,
-                    style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
-                    keyboardType: TextInputType.multiline,
-                    decoration: InputDecoration(
-                      counterText: '',
-                      hintStyle: const TextStyle(
-                          color: IbColors.lightGrey,
-                          fontSize: IbConfig.kNormalTextSize),
-                      hintText: _controller.hintText.value,
-                      border: InputBorder.none,
-                      suffixIcon: _controller.isAddingReply.isTrue
-                          ? const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: SizedBox(
-                                  height: 16,
-                                  width: 16,
-                                  child: CircularProgressIndicator()),
-                            )
-                          : IconButton(
-                              icon: Icon(
-                                _controller.replyUid.value !=
-                                        _controller
-                                            .rxCommentItem.value.ibComment.uid
-                                    ? FontAwesomeIcons.reply
-                                    : FontAwesomeIcons.comment,
-                                color: IbColors.primaryColor,
+                child: Obx(
+                  () => SafeArea(
+                    child: TextField(
+                      minLines: 1,
+                      maxLines: 5,
+                      maxLength: IbConfig.kCommentMaxLen,
+                      focusNode: _controller.focusNode,
+                      controller: _controller.editingController,
+                      textInputAction: TextInputAction.newline,
+                      style:
+                          const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                      keyboardType: TextInputType.multiline,
+                      decoration: InputDecoration(
+                        counterText: '',
+                        hintStyle: const TextStyle(
+                            color: IbColors.lightGrey,
+                            fontSize: IbConfig.kNormalTextSize),
+                        hintText: _controller.hintText.value,
+                        border: InputBorder.none,
+                        suffixIcon: _controller.isAddingReply.isTrue
+                            ? const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: SizedBox(
+                                    height: 16,
+                                    width: 16,
+                                    child: CircularProgressIndicator()),
+                              )
+                            : IconButton(
+                                icon: Icon(
+                                  _controller.replyUid.value !=
+                                          _controller
+                                              .rxCommentItem.value.ibComment.uid
+                                      ? FontAwesomeIcons.reply
+                                      : FontAwesomeIcons.comment,
+                                  color: IbColors.primaryColor,
+                                ),
+                                onPressed: () async {
+                                  _controller.addReply(
+                                      text: _controller.editingController.text
+                                          .trim(),
+                                      type: IbComment.kCommentTypeText);
+                                },
                               ),
-                              onPressed: () async {
-                                _controller.addReply(
-                                    text: _controller.editingController.text
-                                        .trim(),
-                                    type: IbComment.kCommentTypeText);
-                              },
-                            ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

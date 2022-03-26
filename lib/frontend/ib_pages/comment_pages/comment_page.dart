@@ -43,152 +43,155 @@ class CommentPage extends StatelessWidget {
           ),
         ),
       ),
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Expanded(
-            child: Obx(() {
-              if (_controller.isLoading.isTrue) {
-                return const Center(
-                  child: IbProgressIndicator(),
-                );
-              }
+      body: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(
+              child: Obx(() {
+                if (_controller.isLoading.isTrue) {
+                  return const Center(
+                    child: IbProgressIndicator(),
+                  );
+                }
 
-              if (_controller.isLoading.isFalse &&
-                  _controller.itemController.cachedCommentItems.isEmpty) {
-                return const Center(
-                  child: Text(
-                    '😞 No comments to see here',
-                    style: TextStyle(
-                      color: IbColors.lightGrey,
-                      fontSize: IbConfig.kPageTitleSize,
+                if (_controller.isLoading.isFalse &&
+                    _controller.itemController.cachedCommentItems.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      '😞 No comments to see here',
+                      style: TextStyle(
+                        color: IbColors.lightGrey,
+                        fontSize: IbConfig.kPageTitleSize,
+                      ),
                     ),
-                  ),
-                );
-              }
+                  );
+                }
 
-              return SmartRefresher(
-                controller: _controller.refreshController,
-                footer: ClassicFooter(
-                  noDataText: 'no_more_comments'.tr,
-                ),
-                enablePullUp: true,
-                enablePullDown: false,
-                onLoading: () async {
-                  await _controller.loadMore();
-                },
-                child: ListView.builder(
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  itemBuilder: (context, index) {
-                    return Builder(builder: (context) {
-                      if (index == 0) {
-                        return SizedBox(
-                          height: 56,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Obx(
-                                  () => DropdownButton2<String>(
-                                    value: _controller
-                                        .itemController.currentSortOption.value,
-                                    items: _controller.dropDownOptions
-                                        .map((String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Text(value),
-                                      );
-                                    }).toList(),
-                                    onChanged: (value) async {
-                                      await _controller.loadList(value!);
-                                    },
+                return SmartRefresher(
+                  controller: _controller.refreshController,
+                  footer: ClassicFooter(
+                    noDataText: 'no_more_comments'.tr,
+                  ),
+                  enablePullUp: true,
+                  enablePullDown: false,
+                  onLoading: () async {
+                    await _controller.loadMore();
+                  },
+                  child: ListView.builder(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    itemBuilder: (context, index) {
+                      return Builder(builder: (context) {
+                        if (index == 0) {
+                          return SizedBox(
+                            height: 56,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Obx(
+                                    () => DropdownButton2<String>(
+                                      value: _controller.itemController
+                                          .currentSortOption.value,
+                                      items: _controller.dropDownOptions
+                                          .map((String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      }).toList(),
+                                      onChanged: (value) async {
+                                        await _controller.loadList(value!);
+                                      },
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                      index -= 1;
-                      return Column(
-                        children: [
-                          CommentItemWidget(
-                            item: _controller
-                                .itemController.cachedCommentItems[index],
-                            controller: _controller,
-                          ),
-                          const Divider(
-                            height: 1,
-                            thickness: 1,
-                          ),
-                        ],
-                      );
-                    });
-                  },
-                  itemCount:
-                      _controller.itemController.cachedCommentItems.length + 1,
-                ),
-              );
-            }),
-          ),
-          SafeArea(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 3),
-              margin: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: const BorderRadius.all(
-                    Radius.circular(IbConfig.kTextBoxCornerRadius)),
-                border: Border.all(
-                  color: IbColors.primaryColor,
-                ),
-              ),
-              child: Obx(
-                () => TextField(
-                  minLines: 1,
-                  maxLines: 5,
-                  maxLength: IbConfig.kCommentMaxLen,
-                  focusNode: _controller.focusNode,
-                  controller: _controller.editingController,
-                  textInputAction: TextInputAction.newline,
-                  style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
-                  keyboardType: TextInputType.multiline,
-                  decoration: InputDecoration(
-                    counterText: '',
-                    hintStyle: const TextStyle(
-                        color: IbColors.lightGrey,
-                        fontSize: IbConfig.kNormalTextSize),
-                    hintText: _controller.hintText.value,
-                    border: InputBorder.none,
-                    suffixIcon: _controller.isAddingComment.isTrue
-                        ? const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: SizedBox(
-                                height: 16,
-                                width: 16,
-                                child: CircularProgressIndicator()),
-                          )
-                        : IconButton(
-                            icon: const Icon(
-                              FontAwesomeIcons.comment,
-                              color: IbColors.primaryColor,
+                              ],
                             ),
-                            onPressed: () async {
-                              await _controller.addComment(
-                                  text:
-                                      _controller.editingController.text.trim(),
-                                  type: IbComment.kCommentTypeText);
-                            },
-                          ),
+                          );
+                        }
+                        index -= 1;
+                        return Column(
+                          children: [
+                            CommentItemWidget(
+                              item: _controller
+                                  .itemController.cachedCommentItems[index],
+                              controller: _controller,
+                            ),
+                            const Divider(
+                              height: 1,
+                              thickness: 1,
+                            ),
+                          ],
+                        );
+                      });
+                    },
+                    itemCount:
+                        _controller.itemController.cachedCommentItems.length +
+                            1,
+                  ),
+                );
+              }),
+            ),
+            SafeArea(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                margin: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: const BorderRadius.all(
+                      Radius.circular(IbConfig.kTextBoxCornerRadius)),
+                  border: Border.all(
+                    color: IbColors.primaryColor,
+                  ),
+                ),
+                child: Obx(
+                  () => TextField(
+                    minLines: 1,
+                    maxLines: 5,
+                    maxLength: IbConfig.kCommentMaxLen,
+                    focusNode: _controller.focusNode,
+                    controller: _controller.editingController,
+                    textInputAction: TextInputAction.newline,
+                    style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      counterText: '',
+                      hintStyle: const TextStyle(
+                          color: IbColors.lightGrey,
+                          fontSize: IbConfig.kNormalTextSize),
+                      hintText: _controller.hintText.value,
+                      border: InputBorder.none,
+                      suffixIcon: _controller.isAddingComment.isTrue
+                          ? const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: SizedBox(
+                                  height: 16,
+                                  width: 16,
+                                  child: CircularProgressIndicator()),
+                            )
+                          : IconButton(
+                              icon: const Icon(
+                                FontAwesomeIcons.comment,
+                                color: IbColors.primaryColor,
+                              ),
+                              onPressed: () async {
+                                await _controller.addComment(
+                                    text: _controller.editingController.text
+                                        .trim(),
+                                    type: IbComment.kCommentTypeText);
+                              },
+                            ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

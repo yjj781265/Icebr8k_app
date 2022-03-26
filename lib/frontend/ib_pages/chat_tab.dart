@@ -165,6 +165,8 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
                 ],
               ),
               onTap: () {
+                item.unReadCount = 0;
+                _controller.oneToOneChats.refresh();
                 Get.to(
                   () => ChatPage(
                     Get.put(
@@ -199,33 +201,42 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
               subtitle: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    item.ibChat.lastMessage == null
-                        ? ''
-                        : item.ibChat.lastMessage!.content,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: IbConfig.kSecondaryTextSize,
-                    ),
-                  ),
-                  if (item.unReadCount != 0)
-                    Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: const BoxDecoration(
-                          color: IbColors.errorRed, shape: BoxShape.circle),
-                      child: Text(
-                        item.unReadCount > 99
-                            ? '99+'
-                            : item.unReadCount.toString(),
-                        maxLines: 1,
-                        overflow: TextOverflow.fade,
-                        style: const TextStyle(
-                          color: IbColors.white,
-                          fontSize: IbConfig.kDescriptionTextSize,
-                        ),
+                  Expanded(
+                    flex: 9,
+                    child: Text(
+                      item.ibChat.lastMessage == null
+                          ? ''
+                          : item.ibChat.lastMessage!.content,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: IbConfig.kSecondaryTextSize,
                       ),
                     ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(
+                          color: IbColors.errorRed, shape: BoxShape.circle),
+                      child: item.unReadCount != 0
+                          ? Padding(
+                              padding: const EdgeInsets.all(3.0),
+                              child: Text(
+                                item.unReadCount > 99
+                                    ? '99+'
+                                    : item.unReadCount.toString(),
+                                maxLines: 1,
+                                overflow: TextOverflow.fade,
+                                style: const TextStyle(
+                                  color: IbColors.white,
+                                  fontSize: IbConfig.kDescriptionTextSize,
+                                ),
+                              ),
+                            )
+                          : const SizedBox(),
+                    ),
+                  ),
                 ],
               ),
             );
@@ -234,7 +245,7 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
           separatorBuilder: (BuildContext context, int index) {
             return const Divider(
               color: IbColors.lightGrey,
-              thickness: 1,
+              thickness: 0.5,
               height: 1,
             );
           },

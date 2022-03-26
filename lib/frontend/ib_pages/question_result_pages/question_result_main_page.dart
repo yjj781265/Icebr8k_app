@@ -27,20 +27,22 @@ class QuestionResultMainPage extends StatelessWidget {
           () => Text('${_itemController.rxIbQuestion.value.pollSize} Polled'),
         ),
       ),
-      body: Obx(() {
-        final sortedList = _itemController.choiceUserMap.keys.toList();
-        sortedList.sort((a, b) => _itemController.choiceUserMap[b]!.length
-            .compareTo(_itemController.choiceUserMap[a]!.length));
-        return ListView.builder(
-          itemBuilder: (context, index) {
-            final IbChoice choice = sortedList[index];
-            return _itemWidget(
-                choice: choice,
-                ibUsers: _itemController.choiceUserMap[choice] ?? {});
-          },
-          itemCount: sortedList.length,
-        );
-      }),
+      body: SafeArea(
+        child: Obx(() {
+          final sortedList = _itemController.choiceUserMap.keys.toList();
+          sortedList.sort((a, b) => _itemController.choiceUserMap[b]!.length
+              .compareTo(_itemController.choiceUserMap[a]!.length));
+          return ListView.builder(
+            itemBuilder: (context, index) {
+              final IbChoice choice = sortedList[index];
+              return _itemWidget(
+                  choice: choice,
+                  ibUsers: _itemController.choiceUserMap[choice] ?? {});
+            },
+            itemCount: sortedList.length,
+          );
+        }),
+      ),
     );
   }
 

@@ -45,92 +45,95 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
         fontWeight: FontWeight.bold, fontSize: IbConfig.kNormalTextSize);
     return Scaffold(
       appBar: AppBar(),
-      body: Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SingleChildScrollView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: Text(
-                        'photo'.tr,
-                        style: headerStyle,
-                      ),
-                    ),
-                    GestureDetector(
-                        onTap: () {
-                          showMediaBottomSheet(context);
-                        },
-                        child: _handleEmoPic()),
-                    const Divider(
-                      thickness: 2,
-                    ),
-                    InkWell(
-                      onTap: _showEmojiKeyBoard,
-                      child: SizedBox(
-                        width: 100,
-                        child: IbTextField(
-                            enabled: false,
-                            textAlign: TextAlign.center,
-                            textStyle:
-                                const TextStyle(fontSize: IbConfig.kSloganSize),
-                            controller: emojiTeController,
-                            text: emojiStr,
-                            titleIcon: const Icon(
-                              Icons.emoji_emotions,
-                              color: Colors.orangeAccent,
-                            ),
-                            titleTrKey: 'emoji',
-                            hintTrKey: '',
-                            onChanged: (text) {}),
-                      ),
-                    ),
-                    IbTextField(
-                        controller: descTeController,
-                        charLimit: 20,
-                        text: widget.ibEmoPic.description,
-                        textStyle: TextStyle(
-                            color: Theme.of(context).indicatorColor,
-                            fontSize: IbConfig.kNormalTextSize,
-                            fontWeight: FontWeight.bold),
-                        titleIcon: const Icon(
-                          Icons.description,
-                          color: IbColors.primaryColor,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SingleChildScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: Text(
+                          'photo'.tr,
+                          style: headerStyle,
                         ),
-                        titleTrKey: 'description',
-                        hintTrKey: 'description_hint',
-                        onChanged: (text) {}),
-                  ],
+                      ),
+                      GestureDetector(
+                          onTap: () {
+                            showMediaBottomSheet(context);
+                          },
+                          child: _handleEmoPic()),
+                      const Divider(
+                        thickness: 2,
+                      ),
+                      InkWell(
+                        onTap: _showEmojiKeyBoard,
+                        child: SizedBox(
+                          width: 100,
+                          child: IbTextField(
+                              enabled: false,
+                              textAlign: TextAlign.center,
+                              textStyle: const TextStyle(
+                                  fontSize: IbConfig.kSloganSize),
+                              controller: emojiTeController,
+                              text: emojiStr,
+                              titleIcon: const Icon(
+                                Icons.emoji_emotions,
+                                color: Colors.orangeAccent,
+                              ),
+                              titleTrKey: 'emoji',
+                              hintTrKey: '',
+                              onChanged: (text) {}),
+                        ),
+                      ),
+                      IbTextField(
+                          controller: descTeController,
+                          charLimit: 20,
+                          text: widget.ibEmoPic.description,
+                          textStyle: TextStyle(
+                              color: Theme.of(context).indicatorColor,
+                              fontSize: IbConfig.kNormalTextSize,
+                              fontWeight: FontWeight.bold),
+                          titleIcon: const Icon(
+                            Icons.description,
+                            color: IbColors.primaryColor,
+                          ),
+                          titleTrKey: 'description',
+                          hintTrKey: 'description_hint',
+                          onChanged: (text) {}),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: IbElevatedButton(
-                  textTrKey: 'confirm',
-                  onPressed: () async {
-                    widget.ibEmoPic.emoji = emojiTeController.text;
-                    widget.ibEmoPic.description = descTeController.text.trim();
-                    await _controller.uploadEmoPic(
-                        emoPic: widget.ibEmoPic, oldUrl: oldUrl);
-                  },
-                  icon: const Icon(Icons.check_circle_rounded),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: IbElevatedButton(
+                    textTrKey: 'confirm',
+                    onPressed: () async {
+                      widget.ibEmoPic.emoji = emojiTeController.text;
+                      widget.ibEmoPic.description =
+                          descTeController.text.trim();
+                      await _controller.uploadEmoPic(
+                          emoPic: widget.ibEmoPic, oldUrl: oldUrl);
+                    },
+                    icon: const Icon(Icons.check_circle_rounded),
+                  ),
                 ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

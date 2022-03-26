@@ -28,12 +28,14 @@ class ChatPageSettings extends StatelessWidget {
   }
 
   Widget getBody(BuildContext context) {
-    return Obx(
-      () => Column(
-        children: [
-          if (_controller.isCircle.isTrue) membersList(context),
-          settings(context),
-        ],
+    return SafeArea(
+      child: Obx(
+        () => Column(
+          children: [
+            if (_controller.isCircle.isTrue) membersList(context),
+            settings(context),
+          ],
+        ),
       ),
     );
   }

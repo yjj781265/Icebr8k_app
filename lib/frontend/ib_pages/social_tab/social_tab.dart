@@ -43,53 +43,55 @@ class _SocialTabState extends State<SocialTab>
         ),
         actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.sort))],
       ),
-      body: ExtendedNestedScrollView(
-        onlyOneScrollInBody: true,
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return [
-            SliverOverlapAbsorber(
-              handle: ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
-                  context),
-              sliver: SliverPersistentHeader(
-                pinned: true,
-                delegate: IbPersistentHeader(
-                  height: 32,
-                  widget: IbCard(
-                    margin: EdgeInsets.zero,
-                    elevation: 0,
-                    child: TabBar(
-                      controller: _tabController,
-                      tabs: [
-                        Tooltip(
-                            message: 'friends'.tr,
-                            child: const Tab(
-                                height: 32,
-                                icon: Icon(
-                                  Icons.group,
-                                ))),
-                        Tooltip(
-                            message: 'people_nearby'.tr,
-                            child: const Tab(
-                                height: 32,
-                                icon: Icon(
-                                  Icons.person_pin_circle_rounded,
-                                ))),
-                      ],
+      body: SafeArea(
+        child: ExtendedNestedScrollView(
+          onlyOneScrollInBody: true,
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return [
+              SliverOverlapAbsorber(
+                handle: ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
+                    context),
+                sliver: SliverPersistentHeader(
+                  pinned: true,
+                  delegate: IbPersistentHeader(
+                    height: 32,
+                    widget: IbCard(
+                      margin: EdgeInsets.zero,
+                      elevation: 0,
+                      child: TabBar(
+                        controller: _tabController,
+                        tabs: [
+                          Tooltip(
+                              message: 'friends'.tr,
+                              child: const Tab(
+                                  height: 32,
+                                  icon: Icon(
+                                    Icons.group,
+                                  ))),
+                          Tooltip(
+                              message: 'people_nearby'.tr,
+                              child: const Tab(
+                                  height: 32,
+                                  icon: Icon(
+                                    Icons.person_pin_circle_rounded,
+                                  ))),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            )
-          ];
-        },
-        body: Padding(
-          padding: const EdgeInsets.only(top: 38),
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              MyFriendsList(_controller),
-              Text('People Nearby'),
-            ],
+              )
+            ];
+          },
+          body: Padding(
+            padding: const EdgeInsets.only(top: 38),
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                MyFriendsList(_controller),
+                Text('People Nearby'),
+              ],
+            ),
           ),
         ),
       ),

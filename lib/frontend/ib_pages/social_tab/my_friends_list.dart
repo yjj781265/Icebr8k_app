@@ -23,31 +23,33 @@ class MyFriendsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Obx(() {
-        if (_controller.isFriendListLoading.isTrue) {
-          return const Center(
-            child: IbProgressIndicator(),
-          );
-        }
-        return SmartRefresher(
-          scrollDirection: Axis.vertical,
-          controller: _controller.friendListRefreshController,
-          physics: const AlwaysScrollableScrollPhysics(),
-          onRefresh: () async {
-            await _controller.onFriendListRefresh();
-          },
-          child: ListView.builder(
-            controller: scrollController,
-            itemBuilder: (context, index) {
-              final item = _controller.friends[index];
-              return FriendListItem(
-                Get.put(FriendItemController(item), tag: item.username),
-              );
+      body: SafeArea(
+        child: Obx(() {
+          if (_controller.isFriendListLoading.isTrue) {
+            return const Center(
+              child: IbProgressIndicator(),
+            );
+          }
+          return SmartRefresher(
+            scrollDirection: Axis.vertical,
+            controller: _controller.friendListRefreshController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            onRefresh: () async {
+              await _controller.onFriendListRefresh();
             },
-            itemCount: _controller.friends.length,
-          ),
-        );
-      }),
+            child: ListView.builder(
+              controller: scrollController,
+              itemBuilder: (context, index) {
+                final item = _controller.friends[index];
+                return FriendListItem(
+                  Get.put(FriendItemController(item), tag: item.username),
+                );
+              },
+              itemCount: _controller.friends.length,
+            ),
+          );
+        }),
+      ),
     );
   }
 }

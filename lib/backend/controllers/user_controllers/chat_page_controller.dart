@@ -247,7 +247,10 @@ class ChatPageController extends GetxController {
       final List<IbMessage> tempList = [];
 
       for (final doc in snapshot.docs) {
-        tempList.add(IbMessage.fromJson(doc.data()));
+        final IbMessage message = IbMessage.fromJson(doc.data());
+        if (!messages.contains(message)) {
+          tempList.add(IbMessage.fromJson(doc.data()));
+        }
       }
       messages.remove(loadMessage);
       messages.addAll(tempList);

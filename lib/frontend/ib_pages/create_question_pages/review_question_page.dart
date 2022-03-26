@@ -42,118 +42,122 @@ class ReviewQuestionPage extends StatelessWidget {
           ),
         ],
       ),
-      body: ShowCaseWidget(
-        onFinish: () {
-          IbLocalDataService().updateBoolValue(
-              key: StorageKey.pickAnswerForQuizBool, value: true);
-        },
-        builder: Builder(
-          builder: (context) => Scrollbar(
-            isAlwaysShown: true,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _handleQuestionType(),
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Options',
-                      style: TextStyle(
-                          fontSize: IbConfig.kNormalTextSize,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  ListTile(
-                    tileColor: Theme.of(context).primaryColor,
-                    leading: const Icon(
-                      Icons.hourglass_top_outlined,
-                      color: Colors.redAccent,
-                    ),
-                    onTap: () {
-                      _timeLimitBtmSheet();
-                    },
-                    title: const Text('Time Limit'),
-                    trailing: Obx(() {
-                      if (itemController.rxIbQuestion.value.endTimeInMs == -1) {
-                        return const Text('No Time Limit');
-                      }
-                      return IbUtils.leftTimeText(
-                          itemController.rxIbQuestion.value.endTimeInMs);
-                    }),
-                  ),
-                  Obx(
-                    () => SwitchListTile.adaptive(
-                      tileColor: Theme.of(context).primaryColor,
-                      value: itemController.rxIbQuestion.value.isCommentEnabled,
-                      onChanged: (value) {
-                        itemController.rxIbQuestion.value.isCommentEnabled =
-                            value;
-                        itemController.rxIbQuestion.refresh();
-                      },
-                      title: const Text('Comment'),
-                      secondary: const Icon(
-                        FontAwesomeIcons.comment,
-                        color: IbColors.primaryColor,
+      body: SafeArea(
+        child: ShowCaseWidget(
+          onFinish: () {
+            IbLocalDataService().updateBoolValue(
+                key: StorageKey.pickAnswerForQuizBool, value: true);
+          },
+          builder: Builder(
+            builder: (context) => Scrollbar(
+              isAlwaysShown: true,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _handleQuestionType(),
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        'Options',
+                        style: TextStyle(
+                            fontSize: IbConfig.kNormalTextSize,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
-                  ),
-                  if (!itemController.rxIbQuestion.value.questionType
-                      .contains('sc'))
+                    ListTile(
+                      tileColor: Theme.of(context).primaryColor,
+                      leading: const Icon(
+                        Icons.hourglass_top_outlined,
+                        color: Colors.redAccent,
+                      ),
+                      onTap: () {
+                        _timeLimitBtmSheet();
+                      },
+                      title: const Text('Time Limit'),
+                      trailing: Obx(() {
+                        if (itemController.rxIbQuestion.value.endTimeInMs ==
+                            -1) {
+                          return const Text('No Time Limit');
+                        }
+                        return IbUtils.leftTimeText(
+                            itemController.rxIbQuestion.value.endTimeInMs);
+                      }),
+                    ),
                     Obx(
                       () => SwitchListTile.adaptive(
                         tileColor: Theme.of(context).primaryColor,
-                        value: itemController.rxIbQuestion.value.isQuiz,
+                        value:
+                            itemController.rxIbQuestion.value.isCommentEnabled,
                         onChanged: (value) {
-                          if (value) {
-                            itemController.rxIsExpanded.value = true;
-                            ShowCaseWidget.of(context)!.startShowCase(
-                                [IbShowCaseManager.kPickAnswerForQuizKey]);
-                          } else {
-                            itemController.rxIbQuestion.value.correctChoiceId =
-                                '';
-                          }
-                          itemController.rxIbQuestion.value.isQuiz = value;
+                          itemController.rxIbQuestion.value.isCommentEnabled =
+                              value;
                           itemController.rxIbQuestion.refresh();
                         },
-                        title: const Text('Quiz'),
+                        title: const Text('Comment'),
                         secondary: const Icon(
-                          FontAwesomeIcons.question,
-                          color: IbColors.accentColor,
+                          FontAwesomeIcons.comment,
+                          color: IbColors.primaryColor,
                         ),
                       ),
                     ),
-                  ListTile(
-                    tileColor: Theme.of(context).primaryColor,
-                    trailing: const Text('ALL'),
-                    title: const Text(
-                      'Privacy Bonds',
-                    ),
-                    leading: const Icon(
-                      Icons.remove_red_eye,
-                      color: IbColors.primaryColor,
-                    ),
-                  ),
-                  Obx(
-                    () => SwitchListTile.adaptive(
+                    if (!itemController.rxIbQuestion.value.questionType
+                        .contains('sc'))
+                      Obx(
+                        () => SwitchListTile.adaptive(
+                          tileColor: Theme.of(context).primaryColor,
+                          value: itemController.rxIbQuestion.value.isQuiz,
+                          onChanged: (value) {
+                            if (value) {
+                              itemController.rxIsExpanded.value = true;
+                              ShowCaseWidget.of(context)!.startShowCase(
+                                  [IbShowCaseManager.kPickAnswerForQuizKey]);
+                            } else {
+                              itemController
+                                  .rxIbQuestion.value.correctChoiceId = '';
+                            }
+                            itemController.rxIbQuestion.value.isQuiz = value;
+                            itemController.rxIbQuestion.refresh();
+                          },
+                          title: const Text('Quiz'),
+                          secondary: const Icon(
+                            FontAwesomeIcons.question,
+                            color: IbColors.accentColor,
+                          ),
+                        ),
+                      ),
+                    ListTile(
                       tileColor: Theme.of(context).primaryColor,
-                      value: itemController.rxIbQuestion.value.isAnonymous,
-                      onChanged: (value) {
-                        itemController.rxIbQuestion.value.isAnonymous = value;
-                        itemController.rxIbQuestion.refresh();
-                      },
-                      title: const Text('Anonymous'),
-                      secondary: const Icon(
-                        Icons.person,
-                        color: IbColors.lightGrey,
+                      trailing: const Text('ALL'),
+                      title: const Text(
+                        'Privacy Bonds',
+                      ),
+                      leading: const Icon(
+                        Icons.remove_red_eye,
+                        color: IbColors.primaryColor,
                       ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 16,
-                  ),
-                ],
+                    Obx(
+                      () => SwitchListTile.adaptive(
+                        tileColor: Theme.of(context).primaryColor,
+                        value: itemController.rxIbQuestion.value.isAnonymous,
+                        onChanged: (value) {
+                          itemController.rxIbQuestion.value.isAnonymous = value;
+                          itemController.rxIbQuestion.refresh();
+                        },
+                        title: const Text('Anonymous'),
+                        secondary: const Icon(
+                          Icons.person,
+                          color: IbColors.lightGrey,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

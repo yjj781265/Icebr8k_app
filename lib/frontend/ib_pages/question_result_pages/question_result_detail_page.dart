@@ -30,65 +30,67 @@ class QuestionResultDetailPage extends StatelessWidget {
           ),
         ),
       ),
-      body: Obx(() {
-        if (_controller.isLoading.isTrue) {
-          return const Center(
-            child: IbProgressIndicator(),
-          );
-        }
+      body: SafeArea(
+        child: Obx(() {
+          if (_controller.isLoading.isTrue) {
+            return const Center(
+              child: IbProgressIndicator(),
+            );
+          }
 
-        return SmartRefresher(
-          enablePullDown: false,
-          enablePullUp: true,
-          onLoading: () async {
-            await _controller.loadMore();
-          },
-          controller: _controller.refreshController,
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return const Align(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 4),
-                    child: Text(
-                      'Users who voted anonymously are hidden',
-                      style: TextStyle(
-                          fontSize: IbConfig.kSecondaryTextSize,
-                          color: IbColors.lightGrey),
-                    ),
-                  ),
-                );
-              }
-              index -= 1;
-              final item = _controller.results[index];
-              return ListTile(
-                onTap: () {
-                  if (item.user.id == IbUtils.getCurrentUid()) {
-                    Get.to(() => MyProfilePage());
-                    return;
-                  }
-                  Get.to(() =>
-                      ProfilePage(Get.put(ProfileController(item.user.id))));
-                },
-                tileColor: Theme.of(context).backgroundColor,
-                leading: IbUserAvatar(
-                  uid: item.user.id,
-                  avatarUrl: item.user.avatarUrl,
-                ),
-                title: Text(
-                  item.user.username,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: IbLinearIndicator(
-                  endValue: item.compScore,
-                ),
-                trailing: const Icon(Icons.arrow_forward_ios_rounded),
-              );
+          return SmartRefresher(
+            enablePullDown: false,
+            enablePullUp: true,
+            onLoading: () async {
+              await _controller.loadMore();
             },
-            itemCount: _controller.results.length + 1,
-          ),
-        );
-      }),
+            controller: _controller.refreshController,
+            child: ListView.builder(
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return const Align(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                      child: Text(
+                        'Users who voted anonymously are hidden',
+                        style: TextStyle(
+                            fontSize: IbConfig.kSecondaryTextSize,
+                            color: IbColors.lightGrey),
+                      ),
+                    ),
+                  );
+                }
+                index -= 1;
+                final item = _controller.results[index];
+                return ListTile(
+                  onTap: () {
+                    if (item.user.id == IbUtils.getCurrentUid()) {
+                      Get.to(() => MyProfilePage());
+                      return;
+                    }
+                    Get.to(() =>
+                        ProfilePage(Get.put(ProfileController(item.user.id))));
+                  },
+                  tileColor: Theme.of(context).backgroundColor,
+                  leading: IbUserAvatar(
+                    uid: item.user.id,
+                    avatarUrl: item.user.avatarUrl,
+                  ),
+                  title: Text(
+                    item.user.username,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: IbLinearIndicator(
+                    endValue: item.compScore,
+                  ),
+                  trailing: const Icon(Icons.arrow_forward_ios_rounded),
+                );
+              },
+              itemCount: _controller.results.length + 1,
+            ),
+          );
+        }),
+      ),
     );
   }
 }

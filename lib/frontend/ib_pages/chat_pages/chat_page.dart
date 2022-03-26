@@ -74,45 +74,47 @@ class ChatPage extends StatelessWidget {
               icon: const Icon(Icons.settings))
         ],
       ),
-      body: Obx(
-        () {
-          if (_controller.isLoading.isTrue) {
-            return const Center(child: IbProgressIndicator());
-          }
-          return GestureDetector(
-            onTap: () {
-              IbUtils.hideKeyboard();
-            },
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Expanded(
-                    child: NotificationListener<ScrollNotification>(
-                  child: ScrollablePositionedList.builder(
-                    reverse: true,
-                    itemScrollController: _controller.itemScrollController,
-                    itemPositionsListener: _controller.itemPositionsListener,
-                    itemBuilder: (context, index) {
-                      return _handleMessageType(_controller.messages[index]);
+      body: SafeArea(
+        child: Obx(
+          () {
+            if (_controller.isLoading.isTrue) {
+              return const Center(child: IbProgressIndicator());
+            }
+            return GestureDetector(
+              onTap: () {
+                IbUtils.hideKeyboard();
+              },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Expanded(
+                      child: NotificationListener<ScrollNotification>(
+                    child: ScrollablePositionedList.builder(
+                      reverse: true,
+                      itemScrollController: _controller.itemScrollController,
+                      itemPositionsListener: _controller.itemPositionsListener,
+                      itemBuilder: (context, index) {
+                        return _handleMessageType(_controller.messages[index]);
+                      },
+                      itemCount: _controller.messages.length,
+                    ),
+                    onNotification: (info) {
+                      if (info.metrics.pixels - info.metrics.maxScrollExtent >
+                          32) {
+                        _controller.loadMore();
+                      }
+                      return true;
                     },
-                    itemCount: _controller.messages.length,
+                  )),
+                  _inputWidget(context),
+                  const SizedBox(
+                    height: 8,
                   ),
-                  onNotification: (info) {
-                    if (info.metrics.pixels - info.metrics.maxScrollExtent >
-                        32) {
-                      _controller.loadMore();
-                    }
-                    return true;
-                  },
-                )),
-                _inputWidget(context),
-                const SizedBox(
-                  height: 8,
-                ),
-              ],
-            ),
-          );
-        },
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

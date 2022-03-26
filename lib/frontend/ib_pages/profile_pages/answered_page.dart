@@ -20,30 +20,32 @@ class AnsweredPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Questions Answered'),
       ),
-      body: Obx(() {
-        if (_controller.isLoading.value) {
-          return const Center(
-            child: IbProgressIndicator(),
-          );
-        }
+      body: SafeArea(
+        child: Obx(() {
+          if (_controller.isLoading.value) {
+            return const Center(
+              child: IbProgressIndicator(),
+            );
+          }
 
-        return SmartRefresher(
-          controller: _controller.refreshController,
-          scrollController: _scrollController,
-          enablePullDown: false,
-          enablePullUp: true,
-          onLoading: () async {
-            await _controller.loadMore();
-          },
-          child: ListView.builder(
-            controller: _scrollController,
-            itemBuilder: (context, index) {
-              return _handleQuestionType(_controller.answeredQs[index]);
+          return SmartRefresher(
+            controller: _controller.refreshController,
+            scrollController: _scrollController,
+            enablePullDown: false,
+            enablePullUp: true,
+            onLoading: () async {
+              await _controller.loadMore();
             },
-            itemCount: _controller.answeredQs.length,
-          ),
-        );
-      }),
+            child: ListView.builder(
+              controller: _scrollController,
+              itemBuilder: (context, index) {
+                return _handleQuestionType(_controller.answeredQs[index]);
+              },
+              itemCount: _controller.answeredQs.length,
+            ),
+          );
+        }),
+      ),
     );
   }
 

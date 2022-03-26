@@ -64,175 +64,181 @@ class EditProfilePage extends StatelessWidget {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Scrollbar(
-              isAlwaysShown: true,
-              radius: const Radius.circular(8),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SingleChildScrollView(
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('cover_photo'.tr, style: headerStyle),
-                      _editCoverPhotoWidget(context),
-                      const Divider(
-                        thickness: 2,
-                      ),
-                      Text(
-                        'avatar'.tr,
-                        style: headerStyle,
-                      ),
-                      _editAvatarWidget(context),
-                      const Divider(
-                        thickness: 2,
-                      ),
-                      Text('gender'.tr, style: headerStyle),
-                      Obx(
-                        () => ToggleButtons(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
-                            borderColor: IbColors.lightGrey,
-                            selectedColor: IbColors.primaryColor,
-                            selectedBorderColor: IbColors.accentColor,
-                            borderWidth: 2,
-                            onPressed: (index) {
-                              _controller.onGenderSelect(index);
-                            },
-                            isSelected: _controller.genderSelections,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  IbUser.kGenders[0],
-                                  style: TextStyle(
-                                      color: Theme.of(context).indicatorColor),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  IbUser.kGenders[1],
-                                  style: TextStyle(
-                                      color: Theme.of(context).indicatorColor),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  IbUser.kGenders[2],
-                                  style: TextStyle(
-                                      color: Theme.of(context).indicatorColor),
-                                ),
-                              )
-                            ]),
-                      ),
-                      const Divider(
-                        thickness: 2,
-                      ),
-                      Obx(
-                        () => IbTextField(
-                            text: _controller.fName.value,
-                            controller: _controller.fNameTeController,
-                            titleIcon: const Icon(
-                              Icons.person_rounded,
-                              color: IbColors.primaryColor,
-                            ),
-                            textInputType: TextInputType.name,
-                            titleTrKey: 'fName',
-                            hintTrKey: 'fNameHint',
-                            onChanged: (text) {}),
-                      ),
-                      Obx(
-                        () => IbTextField(
-                            text: _controller.lName.value,
-                            controller: _controller.lNameTeController,
-                            titleIcon: const Icon(
-                              Icons.person_rounded,
-                              color: IbColors.primaryColor,
-                            ),
-                            textInputType: TextInputType.name,
-                            titleTrKey: 'lName',
-                            hintTrKey: 'lNameHint',
-                            onChanged: (text) {}),
-                      ),
-                      Obx(
-                        () => IbTextField(
-                            inputFormatter: <TextInputFormatter>[
-                              FilteringTextInputFormatter.allow(
-                                  RegExp('[a-z0-9_.]')),
-                              LengthLimitingTextInputFormatter(
-                                  IbConfig.kUsernameMaxLength)
-                            ],
-                            text: _controller.username.value,
-                            controller: _controller.usernameTeController,
-                            titleIcon: const Icon(
-                              Icons.person_rounded,
-                              color: IbColors.primaryColor,
-                            ),
-                            titleTrKey: 'username',
-                            hintTrKey: 'username_hint',
-                            onChanged: (text) {}),
-                      ),
-                      InkWell(
-                        onTap: _showDateTimePicker,
-                        child: IbTextField(
-                          titleIcon: const Icon(
-                            Icons.cake_outlined,
-                            color: IbColors.primaryColor,
-                          ),
-                          controller: _controller.birthdateTeController,
-                          text: IbUtils.readableDateTime(
-                              DateTime.fromMillisecondsSinceEpoch(
-                                  _controller.birthdateInMs.value)),
-                          suffixIcon: const Icon(Icons.calendar_today_outlined),
-                          titleTrKey: 'birthdate',
-                          hintTrKey: 'birthdate_hint',
-                          enabled: false,
-                          onChanged: (birthdate) {},
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Scrollbar(
+                isAlwaysShown: true,
+                radius: const Radius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SingleChildScrollView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('cover_photo'.tr, style: headerStyle),
+                        _editCoverPhotoWidget(context),
+                        const Divider(
+                          thickness: 2,
                         ),
-                      ),
-                      Obx(
-                        () => IbTextField(
-                            text: _controller.bio.value,
-                            maxLines: IbConfig.kBioMaxLines,
-                            charLimit: IbConfig.kBioMaxLength,
-                            controller: _controller.bioTeController,
+                        Text(
+                          'avatar'.tr,
+                          style: headerStyle,
+                        ),
+                        _editAvatarWidget(context),
+                        const Divider(
+                          thickness: 2,
+                        ),
+                        Text('gender'.tr, style: headerStyle),
+                        Obx(
+                          () => ToggleButtons(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(8)),
+                              borderColor: IbColors.lightGrey,
+                              selectedColor: IbColors.primaryColor,
+                              selectedBorderColor: IbColors.accentColor,
+                              borderWidth: 2,
+                              onPressed: (index) {
+                                _controller.onGenderSelect(index);
+                              },
+                              isSelected: _controller.genderSelections,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    IbUser.kGenders[0],
+                                    style: TextStyle(
+                                        color:
+                                            Theme.of(context).indicatorColor),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    IbUser.kGenders[1],
+                                    style: TextStyle(
+                                        color:
+                                            Theme.of(context).indicatorColor),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    IbUser.kGenders[2],
+                                    style: TextStyle(
+                                        color:
+                                            Theme.of(context).indicatorColor),
+                                  ),
+                                )
+                              ]),
+                        ),
+                        const Divider(
+                          thickness: 2,
+                        ),
+                        Obx(
+                          () => IbTextField(
+                              text: _controller.fName.value,
+                              controller: _controller.fNameTeController,
+                              titleIcon: const Icon(
+                                Icons.person_rounded,
+                                color: IbColors.primaryColor,
+                              ),
+                              textInputType: TextInputType.name,
+                              titleTrKey: 'fName',
+                              hintTrKey: 'fNameHint',
+                              onChanged: (text) {}),
+                        ),
+                        Obx(
+                          () => IbTextField(
+                              text: _controller.lName.value,
+                              controller: _controller.lNameTeController,
+                              titleIcon: const Icon(
+                                Icons.person_rounded,
+                                color: IbColors.primaryColor,
+                              ),
+                              textInputType: TextInputType.name,
+                              titleTrKey: 'lName',
+                              hintTrKey: 'lNameHint',
+                              onChanged: (text) {}),
+                        ),
+                        Obx(
+                          () => IbTextField(
+                              inputFormatter: <TextInputFormatter>[
+                                FilteringTextInputFormatter.allow(
+                                    RegExp('[a-z0-9_.]')),
+                                LengthLimitingTextInputFormatter(
+                                    IbConfig.kUsernameMaxLength)
+                              ],
+                              text: _controller.username.value,
+                              controller: _controller.usernameTeController,
+                              titleIcon: const Icon(
+                                Icons.person_rounded,
+                                color: IbColors.primaryColor,
+                              ),
+                              titleTrKey: 'username',
+                              hintTrKey: 'username_hint',
+                              onChanged: (text) {}),
+                        ),
+                        InkWell(
+                          onTap: _showDateTimePicker,
+                          child: IbTextField(
                             titleIcon: const Icon(
-                              Icons.edit,
+                              Icons.cake_outlined,
                               color: IbColors.primaryColor,
                             ),
-                            titleTrKey: 'bio',
-                            hintTrKey: 'bio_hint',
-                            onChanged: (text) {}),
-                      ),
-                    ],
+                            controller: _controller.birthdateTeController,
+                            text: IbUtils.readableDateTime(
+                                DateTime.fromMillisecondsSinceEpoch(
+                                    _controller.birthdateInMs.value)),
+                            suffixIcon:
+                                const Icon(Icons.calendar_today_outlined),
+                            titleTrKey: 'birthdate',
+                            hintTrKey: 'birthdate_hint',
+                            enabled: false,
+                            onChanged: (birthdate) {},
+                          ),
+                        ),
+                        Obx(
+                          () => IbTextField(
+                              text: _controller.bio.value,
+                              maxLines: IbConfig.kBioMaxLines,
+                              charLimit: IbConfig.kBioMaxLength,
+                              controller: _controller.bioTeController,
+                              titleIcon: const Icon(
+                                Icons.edit,
+                                color: IbColors.primaryColor,
+                              ),
+                              titleTrKey: 'bio',
+                              hintTrKey: 'bio_hint',
+                              onChanged: (text) {}),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: IbElevatedButton(
-                  textTrKey: 'save',
-                  onPressed: () async {
-                    _controller.validate();
-                  },
-                  icon: const Icon(Icons.save),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: IbElevatedButton(
+                    textTrKey: 'save',
+                    onPressed: () async {
+                      _controller.validate();
+                    },
+                    icon: const Icon(Icons.save),
+                  ),
                 ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

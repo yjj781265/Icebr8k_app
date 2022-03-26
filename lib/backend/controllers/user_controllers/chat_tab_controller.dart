@@ -115,7 +115,7 @@ class ChatTabController extends GetxController {
     if (ibChat.name.isNotEmpty) {
       title = ibChat.name;
     }
-    print('title $title');
+
     final int unReadCount =
         await IbChatDbService().queryUnreadCount(ibChat: ibChat);
 

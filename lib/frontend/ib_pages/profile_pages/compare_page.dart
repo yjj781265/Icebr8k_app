@@ -19,29 +19,31 @@ class ComparePage extends StatelessWidget {
       appBar: AppBar(
         title: Text(_controller.title),
       ),
-      body: Obx(() {
-        if (_controller.isLoading.isTrue) {
-          return const Center(
-            child: IbProgressIndicator(),
-          );
-        }
+      body: SafeArea(
+        child: Obx(() {
+          if (_controller.isLoading.isTrue) {
+            return const Center(
+              child: IbProgressIndicator(),
+            );
+          }
 
-        return SmartRefresher(
-          enablePullUp: true,
-          enablePullDown: false,
-          onLoading: () async {
-            await _controller.loadMore();
-          },
-          controller: _controller.refreshController,
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              return _handleQuestionType(
-                  _controller.items.keys.toList()[index]);
+          return SmartRefresher(
+            enablePullUp: true,
+            enablePullDown: false,
+            onLoading: () async {
+              await _controller.loadMore();
             },
-            itemCount: _controller.items.keys.toList().length,
-          ),
-        );
-      }),
+            controller: _controller.refreshController,
+            child: ListView.builder(
+              itemBuilder: (context, index) {
+                return _handleQuestionType(
+                    _controller.items.keys.toList()[index]);
+              },
+              itemCount: _controller.items.keys.toList().length,
+            ),
+          );
+        }),
+      ),
     );
   }
 

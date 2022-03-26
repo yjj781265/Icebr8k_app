@@ -22,45 +22,47 @@ class AskedPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Questions Asked'),
       ),
-      body: Obx(() {
-        if (_controller.isLoading.value) {
-          return const Center(
-            child: IbProgressIndicator(),
-          );
-        }
+      body: SafeArea(
+        child: Obx(() {
+          if (_controller.isLoading.value) {
+            return const Center(
+              child: IbProgressIndicator(),
+            );
+          }
 
-        return SmartRefresher(
-          controller: _controller.refreshController,
-          scrollController: _scrollController,
-          enablePullDown: false,
-          enablePullUp: true,
-          onLoading: () async {
-            await _controller.loadMore();
-          },
-          child: ListView.builder(
-            controller: _scrollController,
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                // return the header
-                if (_controller.showPublicOnly) {
-                  return Align(
-                    child: Text(
-                      'asked_question_ps'.tr,
-                      style: const TextStyle(
-                          fontSize: IbConfig.kDescriptionTextSize,
-                          color: IbColors.lightGrey),
-                    ),
-                  );
-                }
-                return const SizedBox();
-              }
-              index -= 1;
-              return _handleQuestionType(_controller.createdQuestions[index]);
+          return SmartRefresher(
+            controller: _controller.refreshController,
+            scrollController: _scrollController,
+            enablePullDown: false,
+            enablePullUp: true,
+            onLoading: () async {
+              await _controller.loadMore();
             },
-            itemCount: _controller.createdQuestions.length + 1,
-          ),
-        );
-      }),
+            child: ListView.builder(
+              controller: _scrollController,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  // return the header
+                  if (_controller.showPublicOnly) {
+                    return Align(
+                      child: Text(
+                        'asked_question_ps'.tr,
+                        style: const TextStyle(
+                            fontSize: IbConfig.kDescriptionTextSize,
+                            color: IbColors.lightGrey),
+                      ),
+                    );
+                  }
+                  return const SizedBox();
+                }
+                index -= 1;
+                return _handleQuestionType(_controller.createdQuestions[index]);
+              },
+              itemCount: _controller.createdQuestions.length + 1,
+            ),
+          );
+        }),
+      ),
     );
   }
 

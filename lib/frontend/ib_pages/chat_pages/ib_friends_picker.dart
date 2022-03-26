@@ -64,82 +64,86 @@ class IbFriendsPicker extends StatelessWidget {
           }),
         ],
       ),
-      body: Obx(() {
-        return Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                  color: Theme.of(context).backgroundColor,
-                  borderRadius: const BorderRadius.all(Radius.circular(8))),
-              child: TextField(
-                decoration: const InputDecoration(
-                    hintText: 'Search username',
-                    prefixIcon: Icon(Icons.search),
-                    border: InputBorder.none),
-                controller: _controller.txtEditController,
+      body: SafeArea(
+        child: Obx(() {
+          return Column(
+            children: [
+              Container(
+                margin: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                    color: Theme.of(context).backgroundColor,
+                    borderRadius: const BorderRadius.all(Radius.circular(8))),
+                child: TextField(
+                  decoration: const InputDecoration(
+                      hintText: 'Search username',
+                      prefixIcon: Icon(Icons.search),
+                      border: InputBorder.none),
+                  controller: _controller.txtEditController,
+                ),
               ),
-            ),
-            Expanded(
-              child: ListView.separated(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                itemBuilder: (context, index) {
-                  final ibUser = _controller.isSearching.isTrue
-                      ? _controller.searchItems.keys.toList()[index]
-                      : _controller.items.keys.toList()[index];
-                  final isPicked = _controller.isSearching.isTrue
-                      ? _controller.searchItems[ibUser]
-                      : _controller.items[ibUser];
-                  final int pickedCount = _controller.items.keys
-                      .where((element) =>
-                          !_controller.pickedUids.contains(element.id) &&
-                          _controller.items[element] == true)
-                      .length;
-                  final bool meetMax = pickedCount == limit;
-                  return Opacity(
-                    opacity: (meetMax && _controller.items[ibUser] == false) ||
-                            _controller.pickedUids.contains(ibUser.id)
-                        ? 0.5
-                        : 1,
-                    child: CheckboxListTile(
-                        controlAffinity: ListTileControlAffinity.trailing,
-                        title: Text(ibUser.username),
-                        secondary: IbUserAvatar(
-                          avatarUrl: ibUser.avatarUrl,
-                        ),
-                        value: isPicked,
-                        onChanged: (value) {
-                          if (_controller.pickedUids.contains(ibUser.id)) {
-                            return;
-                          }
+              Expanded(
+                child: ListView.separated(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  itemBuilder: (context, index) {
+                    final ibUser = _controller.isSearching.isTrue
+                        ? _controller.searchItems.keys.toList()[index]
+                        : _controller.items.keys.toList()[index];
+                    final isPicked = _controller.isSearching.isTrue
+                        ? _controller.searchItems[ibUser]
+                        : _controller.items[ibUser];
+                    final int pickedCount = _controller.items.keys
+                        .where((element) =>
+                            !_controller.pickedUids.contains(element.id) &&
+                            _controller.items[element] == true)
+                        .length;
+                    final bool meetMax = pickedCount == limit;
+                    return Opacity(
+                      opacity:
+                          (meetMax && _controller.items[ibUser] == false) ||
+                                  _controller.pickedUids.contains(ibUser.id)
+                              ? 0.5
+                              : 1,
+                      child: CheckboxListTile(
+                          controlAffinity: ListTileControlAffinity.trailing,
+                          title: Text(ibUser.username),
+                          secondary: IbUserAvatar(
+                            avatarUrl: ibUser.avatarUrl,
+                          ),
+                          value: isPicked,
+                          onChanged: (value) {
+                            if (_controller.pickedUids.contains(ibUser.id)) {
+                              return;
+                            }
 
-                          if (pickedCount >= limit &&
-                              limit != -1 &&
-                              value == true) {
-                            IbUtils.showSimpleSnackBar(
-                                msg: 'You can only pick up to $limit friend(s)',
-                                backgroundColor: IbColors.primaryColor);
-                            return;
-                          }
-                          _controller.items[ibUser] = value ?? false;
-                          _controller.searchItems[ibUser] = value ?? false;
-                        }),
-                  );
-                },
-                itemCount: _controller.isSearching.isTrue
-                    ? _controller.searchItems.length
-                    : _controller.items.length,
-                separatorBuilder: (BuildContext context, int index) {
-                  return const Divider(
-                    height: 1,
-                  );
-                },
+                            if (pickedCount >= limit &&
+                                limit != -1 &&
+                                value == true) {
+                              IbUtils.showSimpleSnackBar(
+                                  msg:
+                                      'You can only pick up to $limit friend(s)',
+                                  backgroundColor: IbColors.primaryColor);
+                              return;
+                            }
+                            _controller.items[ibUser] = value ?? false;
+                            _controller.searchItems[ibUser] = value ?? false;
+                          }),
+                    );
+                  },
+                  itemCount: _controller.isSearching.isTrue
+                      ? _controller.searchItems.length
+                      : _controller.items.length,
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const Divider(
+                      height: 1,
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
-        );
-      }),
+            ],
+          );
+        }),
+      ),
     );
   }
 }

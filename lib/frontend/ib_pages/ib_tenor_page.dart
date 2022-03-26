@@ -68,139 +68,141 @@ class IbTenorPage extends StatelessWidget {
           ],
         ),
       ),
-      body: GestureDetector(
-        onTap: () {
-          IbUtils.hideKeyboard();
-        },
-        child: Obx(
-          () => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              /// show trending keywords when search box is empty
-              if (_controller.isSearchBoxEmpty.isTrue)
-                Obx(
-                  () => SingleChildScrollView(
-                    keyboardDismissBehavior:
-                        ScrollViewKeyboardDismissBehavior.onDrag,
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: _controller.trendingTerms
-                          .map((element) => Container(
-                                margin: const EdgeInsets.all(4),
-                                child: InkWell(
-                                  customBorder: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  onTap: () async {
-                                    _controller.editingController.text =
-                                        element;
-                                    await _controller.search();
-                                  },
-                                  child: Ink(
-                                    decoration: BoxDecoration(
-                                        color: IbUtils.getRandomColor(),
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(6))),
-                                    padding: const EdgeInsets.all(8),
-                                    child: Text(
-                                      element,
-                                      style:
-                                          const TextStyle(color: Colors.black),
-                                    ),
-                                  ),
-                                ),
-                              ))
-                          .toList(),
-                    ),
-                  ),
-                ),
-
-              /// show auto complete keywords when search box is not empty
-              if (_controller.isSearchBoxEmpty.isFalse)
-                Obx(
-                  () => SingleChildScrollView(
-                    keyboardDismissBehavior:
-                        ScrollViewKeyboardDismissBehavior.onDrag,
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: _controller.autocompleteTerms
-                          .map((element) => Container(
-                                margin: const EdgeInsets.all(4),
-                                child: InkWell(
-                                  customBorder: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  onTap: () async {
-                                    _controller.editingController.text =
-                                        element;
-                                    await _controller.search();
-                                  },
-                                  child: Ink(
-                                    decoration: const BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(6)),
-                                        color: IbColors.primaryColor),
-                                    padding: const EdgeInsets.all(8),
-                                    child: Text(
-                                      element,
-                                      style:
-                                          const TextStyle(color: Colors.black),
-                                    ),
-                                  ),
-                                ),
-                              ))
-                          .toList(),
-                    ),
-                  ),
-                ),
-              const SizedBox(
-                height: 4,
-              ),
-
-              /// show trending gif when search box is empty
-              /// show search result gif when search is done
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SmartRefresher(
-                    scrollController: _controller.scrollController,
-                    controller: _controller.refreshController,
-                    enablePullUp: true,
-                    enablePullDown: false,
-                    onLoading: () async {
-                      await _controller.loadMore();
-                    },
-                    child: SingleChildScrollView(
+      body: SafeArea(
+        child: GestureDetector(
+          onTap: () {
+            IbUtils.hideKeyboard();
+          },
+          child: Obx(
+            () => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                /// show trending keywords when search box is empty
+                if (_controller.isSearchBoxEmpty.isTrue)
+                  Obx(
+                    () => SingleChildScrollView(
                       keyboardDismissBehavior:
                           ScrollViewKeyboardDismissBehavior.onDrag,
-                      child: StaggeredGrid.count(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
-                        children: _controller.showSearchResult.isFalse
-                            ? _controller.trendingGifs
-                                .map(
-                                  (e) => iBGifItem(e),
-                                )
-                                .toList()
-                            : _controller.resultGifs
-                                .map(
-                                  (e) => iBGifItem(e),
-                                )
-                                .toList(),
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: _controller.trendingTerms
+                            .map((element) => Container(
+                                  margin: const EdgeInsets.all(4),
+                                  child: InkWell(
+                                    customBorder: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    onTap: () async {
+                                      _controller.editingController.text =
+                                          element;
+                                      await _controller.search();
+                                    },
+                                    child: Ink(
+                                      decoration: BoxDecoration(
+                                          color: IbUtils.getRandomColor(),
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(6))),
+                                      padding: const EdgeInsets.all(8),
+                                      child: Text(
+                                        element,
+                                        style: const TextStyle(
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                    ),
+                  ),
+
+                /// show auto complete keywords when search box is not empty
+                if (_controller.isSearchBoxEmpty.isFalse)
+                  Obx(
+                    () => SingleChildScrollView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: _controller.autocompleteTerms
+                            .map((element) => Container(
+                                  margin: const EdgeInsets.all(4),
+                                  child: InkWell(
+                                    customBorder: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    onTap: () async {
+                                      _controller.editingController.text =
+                                          element;
+                                      await _controller.search();
+                                    },
+                                    child: Ink(
+                                      decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(6)),
+                                          color: IbColors.primaryColor),
+                                      padding: const EdgeInsets.all(8),
+                                      child: Text(
+                                        element,
+                                        style: const TextStyle(
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                    ),
+                  ),
+                const SizedBox(
+                  height: 4,
+                ),
+
+                /// show trending gif when search box is empty
+                /// show search result gif when search is done
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SmartRefresher(
+                      scrollController: _controller.scrollController,
+                      controller: _controller.refreshController,
+                      enablePullUp: true,
+                      enablePullDown: false,
+                      onLoading: () async {
+                        await _controller.loadMore();
+                      },
+                      child: SingleChildScrollView(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        child: StaggeredGrid.count(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                          children: _controller.showSearchResult.isFalse
+                              ? _controller.trendingGifs
+                                  .map(
+                                    (e) => iBGifItem(e),
+                                  )
+                                  .toList()
+                              : _controller.resultGifs
+                                  .map(
+                                    (e) => iBGifItem(e),
+                                  )
+                                  .toList(),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              if (_controller.showSearchResult.isTrue &&
-                  _controller.isSearching.isTrue)
-                const Expanded(
-                    child: Center(
-                  child: IbProgressIndicator(),
-                )),
-            ],
+                if (_controller.showSearchResult.isTrue &&
+                    _controller.isSearching.isTrue)
+                  const Expanded(
+                      child: Center(
+                    child: IbProgressIndicator(),
+                  )),
+              ],
+            ),
           ),
         ),
       ),
