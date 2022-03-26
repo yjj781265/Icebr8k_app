@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/models/ib_message.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
+import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/chat_page_settings.dart';
@@ -33,17 +34,21 @@ class ChatPage extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                IbUserAvatar(
-                  avatarUrl: _controller.avatarUrl.value,
-                  radius: 16,
-                ),
+                if (_controller.avatarUrl.isEmpty)
+                  _buildAvatar(
+                      context: context,
+                      avatarUsers: _controller.ibChatMembers
+                          .map((element) => element.user)
+                          .toList())
+                else
+                  IbUserAvatar(
+                    avatarUrl: _controller.avatarUrl.value,
+                    radius: 16,
+                  ),
                 const SizedBox(
                   width: 8,
                 ),
-                Text(
-                  _controller.title.value,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                _buildTitle(),
               ],
             ),
           ),
@@ -306,12 +311,12 @@ class ChatPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (_controller.isGroupChat.isTrue)
+              if (_controller.isCircle.isTrue)
                 IbUserAvatar(
                   avatarUrl: _controller.avatarUrl.value,
                   radius: 16,
                 ),
-              if (_controller.isGroupChat.isTrue)
+              if (_controller.isCircle.isTrue)
                 const SizedBox(
                   width: 8,
                 ),
@@ -367,6 +372,54 @@ class ChatPage extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+
+  Widget _buildAvatar(
+      {required BuildContext context, required List<IbUser> avatarUsers}) {
+    avatarUsers.removeWhere((element) => element.id == IbUtils.getCurrentUid());
+    final list = avatarUsers.take(4).toList();
+    final double radius = avatarUsers.length > 1 ? 8 : 16;
+    return CircleAvatar(
+      backgroundColor: Theme.of(context).primaryColor,
+      minRadius: 16,
+      maxRadius: 22,
+      child: Wrap(
+        spacing: 1,
+        runSpacing: 1,
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        runAlignment: WrapAlignment.center,
+        children: list
+            .map((e) => IbUserAvatar(
+                  avatarUrl: e.avatarUrl,
+                  radius: radius,
+                ))
+            .toList(),
+      ),
+    );
+  }
+
+  Widget _buildTitle() {
+    if (_controller.ibChat != null && _controller.ibChat!.name.isNotEmpty) {
+      return Text(
+        _controller.title.value,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+
+    if (_controller.title.isEmpty) {
+      final avatarUsers =
+          _controller.ibChatMembers.map((element) => element.user).toList();
+      avatarUsers
+          .removeWhere((element) => element.id == IbUtils.getCurrentUid());
+      for (final user in avatarUsers) {
+        _controller.title.value = '${_controller.title.value}${user.username} ';
+      }
+    }
+    return Text(
+      _controller.title.value,
+      overflow: TextOverflow.ellipsis,
     );
   }
 

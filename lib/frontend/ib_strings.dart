@@ -139,7 +139,7 @@ class IbStrings extends Translations {
           'show_case_tag': 'Click here to add tags!',
           'no_more_comments': 'No more comments',
           'no_more_replies': 'No more replies',
-          'group_chat': 'Group Chat',
+          'circles': 'Circles',
           'one_to_one_chat': 'One-to-One Chat',
           'cover_photo': 'Cover Photo',
           'private': 'Private',

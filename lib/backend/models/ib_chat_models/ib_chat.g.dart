@@ -8,9 +8,10 @@ part of 'ib_chat.dart';
 
 IbChat _$IbChatFromJson(Map<String, dynamic> json) => IbChat(
       chatId: json['chatId'] as String,
-      name: json['name'] as String,
-      photoUrl: json['photoUrl'] as String,
+      name: json['name'] as String? ?? '',
+      photoUrl: json['photoUrl'] as String? ?? '',
       createdAtTimestamp: json['createdAtTimestamp'],
+      isCircle: json['isCircle'] as bool? ?? false,
       description: json['description'] as String? ?? '',
       memberUids: (json['memberUids'] as List<dynamic>?)
               ?.map((e) => e as String)
@@ -39,6 +40,7 @@ Map<String, dynamic> _$IbChatToJson(IbChat instance) => <String, dynamic>{
       'createdAtTimestamp': instance.createdAtTimestamp,
       'memberUids': instance.memberUids,
       'mutedUids': instance.mutedUids,
+      'isCircle': instance.isCircle,
       'memberCount': instance.memberCount,
       'lastMessage': instance.lastMessage?.toJson(),
       'isTypingUids': instance.isTypingUids,

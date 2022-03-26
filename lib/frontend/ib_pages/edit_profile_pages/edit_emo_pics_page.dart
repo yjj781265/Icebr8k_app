@@ -18,80 +18,84 @@ class EditEmoPicsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: Obx(() => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (_controller.rxEmoPics.length > 1)
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text('Hold and drag to reorder'),
-                ),
-              Expanded(
-                child: ReorderableWrap(
-                  footer: IbEmoPicCard(
-                    emoPic: IbEmoPic(
-                      url: '',
-                      id: '',
-                      emoji: '',
+      appBar: AppBar(
+        title: const Text('Edit My EmoPics'),
+      ),
+      body: Obx(() => SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (_controller.rxEmoPics.length > 1)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text('Hold and drag to reorder'),
+                  ),
+                Expanded(
+                  child: ReorderableWrap(
+                    footer: IbEmoPicCard(
+                      emoPic: IbEmoPic(
+                        url: '',
+                        id: '',
+                        emoji: '',
+                      ),
+                      ignoreOnDoubleTap: true,
+                      onTap: () {
+                        Get.to(() => EditEmoPicDetailPage(IbEmoPic(
+                              url: '',
+                              id: IbUtils.getUniqueId(),
+                              emoji: '',
+                            )));
+                      },
                     ),
-                    ignoreOnDoubleTap: true,
-                    onTap: () {
-                      Get.to(() => EditEmoPicDetailPage(IbEmoPic(
-                            url: '',
-                            id: IbUtils.getUniqueId(),
-                            emoji: '',
-                          )));
+                    runAlignment: WrapAlignment.center,
+                    children: _controller.rxEmoPics
+                        .map((e) => Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                IbEmoPicCard(
+                                  emoPic: e,
+                                  onTap: () {
+                                    Get.to(() => EditEmoPicDetailPage(e));
+                                  },
+                                ),
+                                Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: CircleAvatar(
+                                      radius: 16,
+                                      backgroundColor:
+                                          Theme.of(context).backgroundColor,
+                                      child: IconButton(
+                                        padding: EdgeInsets.zero,
+                                        icon: const Icon(
+                                          Icons.remove_circle_outlined,
+                                          color: IbColors.errorRed,
+                                        ),
+                                        onPressed: () async {
+                                          await _controller.onRemoveCard(e);
+                                        },
+                                      ),
+                                    ))
+                              ],
+                            ))
+                        .toList(),
+                    buildDraggableFeedback: (context, axis, item) {
+                      return Material(color: Colors.transparent, child: item);
+                    },
+                    onReorder: (oldIndex, newIndex) async {
+                      final item = _controller.rxEmoPics.removeAt(oldIndex);
+                      _controller.rxEmoPics.insert(newIndex, item);
+                      Get.dialog(const IbLoadingDialog(messageTrKey: 'update'),
+                          barrierDismissible: false);
+                      await IbUserDbService().updateEmoPics(
+                          emoPics: _controller.rxEmoPics,
+                          uid: IbUtils.getCurrentUid()!);
+                      Get.back();
                     },
                   ),
-                  runAlignment: WrapAlignment.center,
-                  children: _controller.rxEmoPics
-                      .map((e) => Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              IbEmoPicCard(
-                                emoPic: e,
-                                onTap: () {
-                                  Get.to(() => EditEmoPicDetailPage(e));
-                                },
-                              ),
-                              Positioned(
-                                  top: 0,
-                                  right: 0,
-                                  child: CircleAvatar(
-                                    radius: 16,
-                                    backgroundColor:
-                                        Theme.of(context).backgroundColor,
-                                    child: IconButton(
-                                      padding: EdgeInsets.zero,
-                                      icon: const Icon(
-                                        Icons.remove_circle_outlined,
-                                        color: IbColors.errorRed,
-                                      ),
-                                      onPressed: () async {
-                                        await _controller.onRemoveCard(e);
-                                      },
-                                    ),
-                                  ))
-                            ],
-                          ))
-                      .toList(),
-                  buildDraggableFeedback: (context, axis, item) {
-                    return Material(color: Colors.transparent, child: item);
-                  },
-                  onReorder: (oldIndex, newIndex) async {
-                    final item = _controller.rxEmoPics.removeAt(oldIndex);
-                    _controller.rxEmoPics.insert(newIndex, item);
-                    Get.dialog(const IbLoadingDialog(messageTrKey: 'update'),
-                        barrierDismissible: false);
-                    await IbUserDbService().updateEmoPics(
-                        emoPics: _controller.rxEmoPics,
-                        uid: IbUtils.getCurrentUid()!);
-                    Get.back();
-                  },
                 ),
-              ),
-            ],
+              ],
+            ),
           )),
     );
   }

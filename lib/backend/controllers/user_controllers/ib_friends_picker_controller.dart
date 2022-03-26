@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
-import 'package:icebr8k/backend/models/ib_chat.dart';
-import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 
@@ -13,10 +11,8 @@ class IbFriendsPickerController extends GetxController {
   final String uid;
   final searchItems = <IbUser, bool>{}.obs;
   final List<String> pickedUids;
-  final IbChat ibChat;
 
-  IbFriendsPickerController(this.uid,
-      {required this.ibChat, this.pickedUids = const []});
+  IbFriendsPickerController(this.uid, {this.pickedUids = const []});
 
   @override
   Future<void> onInit() async {
@@ -52,7 +48,7 @@ class IbFriendsPickerController extends GetxController {
     super.onInit();
   }
 
-  Future<void> sendInvites() async {
+  /*Future<void> sendInvites() async {
     final List<IbUser> users = items.keys
         .where((element) =>
             !pickedUids.contains(element.id) && items[element] == true)
@@ -69,5 +65,5 @@ class IbFriendsPickerController extends GetxController {
           recipientId: user.id);
       await IbUserDbService().sendAlertNotification(notification);
     }
-  }
+  }*/
 }

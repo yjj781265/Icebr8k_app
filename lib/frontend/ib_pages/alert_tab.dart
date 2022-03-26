@@ -14,13 +14,15 @@ class AlertTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Obx(
-        () => ListView.builder(
-          itemBuilder: (context, index) {
-            final NotificationItem item = _controller.items[index];
-            return _handleNotificationType(item);
-          },
-          itemCount: _controller.items.length,
+      body: SafeArea(
+        child: Obx(
+          () => ListView.builder(
+            itemBuilder: (context, index) {
+              final NotificationItem item = _controller.items[index];
+              return _handleNotificationType(item);
+            },
+            itemCount: _controller.items.length,
+          ),
         ),
       ),
     );
@@ -123,6 +125,6 @@ class AlertTab extends StatelessWidget {
         ),
       ));
     }
-    return SizedBox();
+    return const SizedBox();
   }
 }

@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
-import 'package:icebr8k/backend/models/ib_chat_member.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/ib_friends_picker.dart';
@@ -28,11 +28,13 @@ class ChatPageSettings extends StatelessWidget {
   }
 
   Widget getBody(BuildContext context) {
-    return Column(
-      children: [
-        membersList(context),
-        settings(context),
-      ],
+    return Obx(
+      () => Column(
+        children: [
+          if (_controller.isCircle.isTrue) membersList(context),
+          settings(context),
+        ],
+      ),
     );
   }
 
@@ -65,7 +67,6 @@ class ChatPageSettings extends StatelessWidget {
                           Get.put(
                             IbFriendsPickerController(
                               IbUtils.getCurrentUid()!,
-                              ibChat: _controller.ibChat!,
                               pickedUids: _controller.ibChatMembers
                                   .map((element) => element.user.id)
                                   .toList(),
@@ -73,7 +74,6 @@ class ChatPageSettings extends StatelessWidget {
                           ),
                         ),
                       );
-                      print(items);
                     },
                     icon: const Icon(Icons.add),
                   ),

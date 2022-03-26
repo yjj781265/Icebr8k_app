@@ -4,12 +4,19 @@ part 'ib_chat_member.g.dart';
 
 @JsonSerializable()
 class IbChatMember {
+  String chatId;
   String uid;
   String role;
+  dynamic joinTimestamp;
   static const String kRoleLeader = 'leader';
   static const String kRoleMember = 'member';
+  static const String kRoleAssistant = 'assistant';
 
-  IbChatMember(this.uid, this.role);
+  IbChatMember(
+      {required this.chatId,
+      required this.uid,
+      required this.role,
+      this.joinTimestamp});
 
   factory IbChatMember.fromJson(Map<String, dynamic> json) =>
       _$IbChatMemberFromJson(json);

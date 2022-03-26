@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_tab_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
+import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/ib_friends_picker.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_persistent_header.dart';
@@ -23,7 +26,7 @@ class ChatTab extends StatefulWidget {
 
 class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
   final ChatTabController _controller = Get.find();
-  String title = 'one_to_one_chat'.tr;
+  String title = 'circles'.tr;
   late TabController _tabController;
 
   @override
@@ -31,10 +34,10 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       setState(() {
-        if (_tabController.index == 0) {
+        if (_tabController.index == 1) {
           title = 'one_to_one_chat'.tr;
         } else {
-          title = 'group_chat'.tr;
+          title = 'circles'.tr;
         }
       });
     });
@@ -51,58 +54,83 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
           child: Text(title),
         ),
       ),
-      body: ExtendedNestedScrollView(
-        onlyOneScrollInBody: true,
-        dragStartBehavior: DragStartBehavior.down,
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return [
-            SliverOverlapAbsorber(
-              handle: ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
-                  context),
-              sliver: SliverPersistentHeader(
-                pinned: true,
-                delegate: IbPersistentHeader(
-                  height: 32,
-                  widget: IbCard(
-                    elevation: 0,
-                    margin: EdgeInsets.zero,
-                    child: TabBar(
-                      controller: _tabController,
-                      tabs: [
-                        Tooltip(
-                            message: 'one_to_one_chat'.tr,
+      body: SafeArea(
+        child: ExtendedNestedScrollView(
+          onlyOneScrollInBody: true,
+          dragStartBehavior: DragStartBehavior.down,
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return [
+              SliverOverlapAbsorber(
+                handle: ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
+                    context),
+                sliver: SliverPersistentHeader(
+                  pinned: true,
+                  delegate: IbPersistentHeader(
+                    height: 32,
+                    widget: IbCard(
+                      elevation: 0,
+                      margin: EdgeInsets.zero,
+                      child: TabBar(
+                        controller: _tabController,
+                        tabs: [
+                          Tooltip(
+                            message: 'circles'.tr,
                             child: const Tab(
-                                height: 32,
-                                icon: Icon(
-                                  Icons.person,
-                                ))),
-                        Tooltip(
-                          message: 'group_chat'.tr,
-                          child: const Tab(
-                            height: 32,
-                            icon: Icon(
-                              Icons.group,
+                              height: 32,
+                              icon: Icon(
+                                Icons.circle_outlined,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                          Tooltip(
+                              message: 'one_to_one_chat'.tr,
+                              child: const Tab(
+                                  height: 32,
+                                  icon: Icon(
+                                    Icons.message,
+                                  ))),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            )
-          ];
-        },
-        body: Padding(
-          padding: const EdgeInsets.only(top: 38),
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              buildOneToOneList(),
-              const SizedBox(),
-            ],
+              )
+            ];
+          },
+          body: Padding(
+            padding: const EdgeInsets.only(top: 38),
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                const SizedBox(),
+                buildOneToOneList(),
+              ],
+            ),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: title != ('one_to_one_chat'.tr)
+            ? const Icon(Icons.group_add_outlined)
+            : const Icon(Icons.message),
+        onPressed: () async {
+          if (title != ('one_to_one_chat'.tr)) {
+          } else {
+            final users = await Get.to(
+              () => IbFriendsPicker(
+                Get.put(
+                  IbFriendsPickerController(IbUtils.getCurrentUid()!),
+                ),
+                limit: 1,
+                buttonTxt: 'Add',
+              ),
+            );
+            if (users != null) {
+              Get.to(() => ChatPage(Get.put(ChatPageController(
+                  recipientId: (users as List<IbUser>).first.id))));
+            }
+          }
+        },
       ),
     );
   }
@@ -115,22 +143,25 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
               tileColor: Theme.of(context).backgroundColor,
               leading: Stack(
                 children: [
-                  IbUserAvatar(
-                    avatarUrl: item.ibChat.photoUrl,
-                  ),
+                  if (item.ibChat.photoUrl.isEmpty)
+                    _buildAvatar(item.avatarUsers)
+                  else
+                    IbUserAvatar(avatarUrl: item.ibChat.photoUrl),
                   if (item.isMuted)
                     Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).backgroundColor,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.notifications_off,
-                              size: 16,
-                            )))
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).backgroundColor,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.notifications_off,
+                          size: 16,
+                        ),
+                      ),
+                    )
                 ],
               ),
               onTap: () {
@@ -146,7 +177,7 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    item.ibChat.name,
+                    item.title,
                     style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: IbConfig.kNormalTextSize),
@@ -202,10 +233,32 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
           itemCount: _controller.oneToOneChats.length,
           separatorBuilder: (BuildContext context, int index) {
             return const Divider(
+              color: IbColors.lightGrey,
               thickness: 1,
               height: 1,
             );
           },
         ));
+  }
+
+  Widget _buildAvatar(List<IbUser> avatarUsers) {
+    final double radius = avatarUsers.length > 1 ? 10 : 24;
+    return CircleAvatar(
+      backgroundColor: Theme.of(context).backgroundColor,
+      radius: 26,
+      child: Wrap(
+        spacing: 1,
+        runSpacing: 1,
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        runAlignment: WrapAlignment.center,
+        children: avatarUsers
+            .map((e) => IbUserAvatar(
+                  avatarUrl: e.avatarUrl,
+                  radius: radius,
+                ))
+            .toList(),
+      ),
+    );
   }
 }

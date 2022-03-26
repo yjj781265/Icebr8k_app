@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
+import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
 class IbFriendsPicker extends StatelessWidget {
   final IbFriendsPickerController _controller;
-  const IbFriendsPicker(this._controller, {Key? key}) : super(key: key);
+  final int limit;
+  final String buttonTxt;
+  const IbFriendsPicker(this._controller,
+      {this.limit = -1, this.buttonTxt = 'Invite', Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +25,8 @@ class IbFriendsPicker extends StatelessWidget {
                   !_controller.pickedUids.contains(element.id) &&
                   _controller.items[element] == true)
               .length;
-          return Text('Add ${pickedCount == 0 ? '' : pickedCount} member(s)');
+          return Text(
+              'Add${pickedCount == 0 ? '' : ' $pickedCount'} Member(s)');
         }),
         actions: [
           Obx(() {
@@ -29,14 +36,30 @@ class IbFriendsPicker extends StatelessWidget {
                     _controller.items[element] == true)
                 .length;
             return TextButton(
-                onPressed: pickedCount == 0
-                    ? null
-                    : () {
-                        Get.back(result: _controller.items.keys);
-                      },
-                child: const Text(
-                  'Invite',
-                  style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                onPressed: () {
+                  if (pickedCount == 0) {
+                    return;
+                  }
+                  if (pickedCount > limit && limit != -1) {
+                    IbUtils.showSimpleSnackBar(
+                        msg: 'You can only pick up to $limit friend(s)',
+                        backgroundColor: IbColors.primaryColor);
+                    return;
+                  }
+                  Get.back(
+                      result: _controller.items.keys
+                          .where((element) =>
+                              !_controller.pickedUids.contains(element.id) &&
+                              _controller.items[element] == true)
+                          .toList());
+                },
+                child: Text(
+                  buttonTxt,
+                  style: TextStyle(
+                      fontSize: IbConfig.kNormalTextSize,
+                      color: pickedCount == 0
+                          ? IbColors.lightGrey
+                          : IbColors.primaryColor),
                 ));
           }),
         ],
@@ -68,9 +91,17 @@ class IbFriendsPicker extends StatelessWidget {
                   final isPicked = _controller.isSearching.isTrue
                       ? _controller.searchItems[ibUser]
                       : _controller.items[ibUser];
+                  final int pickedCount = _controller.items.keys
+                      .where((element) =>
+                          !_controller.pickedUids.contains(element.id) &&
+                          _controller.items[element] == true)
+                      .length;
+                  final bool meetMax = pickedCount == limit;
                   return Opacity(
-                    opacity:
-                        _controller.pickedUids.contains(ibUser.id) ? 0.5 : 1,
+                    opacity: (meetMax && _controller.items[ibUser] == false) ||
+                            _controller.pickedUids.contains(ibUser.id)
+                        ? 0.5
+                        : 1,
                     child: CheckboxListTile(
                         controlAffinity: ListTileControlAffinity.trailing,
                         title: Text(ibUser.username),
@@ -80,6 +111,15 @@ class IbFriendsPicker extends StatelessWidget {
                         value: isPicked,
                         onChanged: (value) {
                           if (_controller.pickedUids.contains(ibUser.id)) {
+                            return;
+                          }
+
+                          if (pickedCount >= limit &&
+                              limit != -1 &&
+                              value == true) {
+                            IbUtils.showSimpleSnackBar(
+                                msg: 'You can only pick up to $limit friend(s)',
+                                backgroundColor: IbColors.primaryColor);
                             return;
                           }
                           _controller.items[ibUser] = value ?? false;

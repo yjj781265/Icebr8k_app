@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:icebr8k/backend/models/ib_chat.dart';
-import 'package:icebr8k/backend/models/ib_chat_member.dart';
-import 'package:icebr8k/backend/models/ib_message.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 import '../../db_config.dart';
@@ -59,14 +59,15 @@ class IbChatDbService {
   Stream<QuerySnapshot<Map<String, dynamic>>> listenToOneToOneChat() {
     return _collectionRef
         .where('memberCount', isEqualTo: 2)
+        .where('isCircle', isEqualTo: false)
         .where('messageCount', isGreaterThan: 0)
         .where('memberUids', arrayContains: IbUtils.getCurrentUid())
         .snapshots();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> listenToGroupChat() {
+  Stream<QuerySnapshot<Map<String, dynamic>>> listenToCircles() {
     return _collectionRef
-        .where('memberCount', isGreaterThan: 2)
+        .where('isCircle', isEqualTo: true)
         .where('memberUids', arrayContains: IbUtils.getCurrentUid())
         .snapshots();
   }
@@ -116,10 +117,10 @@ class IbChatDbService {
         .set(ibMessage.toJson(), SetOptions(merge: true));
   }
 
-  Future<void> addMember(
-      {required String chatId, required IbChatMember member}) async {
+  Future<void> addChatMember({required IbChatMember member}) async {
+    member.joinTimestamp = FieldValue.serverTimestamp();
     return _collectionRef
-        .doc(chatId)
+        .doc(member.chatId)
         .collection(_kMemberSubCollection)
         .doc(member.uid)
         .set(member.toJson(), SetOptions(merge: true));

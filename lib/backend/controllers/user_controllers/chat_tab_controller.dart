@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
-import 'package:icebr8k/backend/models/ib_chat.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
@@ -14,9 +14,9 @@ import '../../services/user_services/ib_user_db_service.dart';
 class ChatTabController extends GetxController {
   Map<String, IbUser> ibUserMap = {};
   final oneToOneChats = <ChatTabItem>[].obs;
-  final groupChats = <IbChat>[].obs;
+  final circles = <ChatTabItem>[].obs;
   late StreamSubscription _oneToOneSub;
-  late StreamSubscription _groupSub;
+  late StreamSubscription _circleSub;
   final isLoading = true.obs;
   final totalUnread = 0.obs;
 
@@ -28,21 +28,13 @@ class ChatTabController extends GetxController {
         print('ChatTabController 1-1 ${docChange.type}');
         final IbChat ibChat = IbChat.fromJson(docChange.doc.data()!);
         if (docChange.type == DocumentChangeType.added) {
-          _handleIbChatNameAndPhotoUrl(ibChat);
-          final int unReadCount =
-              await IbChatDbService().queryUnreadCount(ibChat: ibChat);
-          oneToOneChats
-              .add(ChatTabItem(ibChat: ibChat, unReadCount: unReadCount));
+          final item = await _buildItem(ibChat);
+          oneToOneChats.add(item);
         } else if (docChange.type == DocumentChangeType.modified) {
-          _handleIbChatNameAndPhotoUrl(ibChat);
-          final int unReadCount =
-              await IbChatDbService().queryUnreadCount(ibChat: ibChat);
           final index = oneToOneChats
               .indexWhere((element) => element.ibChat.chatId == ibChat.chatId);
-          if (index != -1) {
-            oneToOneChats[index] =
-                ChatTabItem(ibChat: ibChat, unReadCount: unReadCount);
-          }
+          final item = await _buildItem(ibChat);
+          oneToOneChats[index] = item;
         } else {
           final index = oneToOneChats
               .indexWhere((element) => element.ibChat.chatId == ibChat.chatId);
@@ -62,75 +54,101 @@ class ChatTabController extends GetxController {
       }
     });
 
-    _groupSub = IbChatDbService().listenToGroupChat().listen((event) {
+    _circleSub = IbChatDbService().listenToCircles().listen((event) async {
       for (final docChange in event.docChanges) {
         final IbChat ibChat = IbChat.fromJson(docChange.doc.data()!);
-        print('ChatTabController group ${docChange.type}');
+        print('ChatTabController circle ${docChange.type}');
         if (docChange.type == DocumentChangeType.added) {
-          groupChats.add(ibChat);
+          final item = await _buildItem(ibChat);
+          circles.add(item);
         } else if (docChange.type == DocumentChangeType.modified) {
-          final index = groupChats
-              .indexWhere((element) => element.chatId == ibChat.chatId);
+          final index = circles
+              .indexWhere((element) => element.ibChat.chatId == ibChat.chatId);
           if (index != -1) {
-            groupChats[index] = ibChat;
+            final item = await _buildItem(ibChat);
+            circles[index] = item;
           }
         } else {
-          final index = groupChats
-              .indexWhere((element) => element.chatId == ibChat.chatId);
+          final index = circles
+              .indexWhere((element) => element.ibChat.chatId == ibChat.chatId);
           if (index != -1) {
-            groupChats.removeAt(index);
+            circles.removeAt(index);
           }
         }
 
-        groupChats.sort((a, b) {
-          if (a.lastMessage == null || b.lastMessage == null) {
-            return a.name.compareTo(b.name);
+        circles.sort((a, b) {
+          if (a.ibChat.lastMessage == null || b.ibChat.lastMessage == null) {
+            return a.ibChat.name.compareTo(b.ibChat.name);
           }
-          return (b.lastMessage!.timestamp as Timestamp)
-              .compareTo(a.lastMessage!.timestamp as Timestamp);
+          return (b.ibChat.lastMessage!.timestamp as Timestamp)
+              .compareTo(a.ibChat.lastMessage!.timestamp as Timestamp);
         });
-        groupChats.refresh();
+        circles.refresh();
       }
     });
     super.onInit();
   }
 
-  Future<void> _handleIbChatNameAndPhotoUrl(IbChat ibChat) async {
-    if (ibChat.memberUids.length == 2) {
-      final IbUser? user;
-      final uid = ibChat.memberUids
-          .firstWhere((element) => element != IbUtils.getCurrentUid());
+  Future<ChatTabItem> _buildItem(IbChat ibChat) async {
+    final List<String> uids = ibChat.memberUids
+        .where((element) => element != IbUtils.getCurrentUid())
+        .toList();
+    final List<IbUser> avatarUsers = [];
+    String title = '';
+    final int max = uids.length > 4 ? 4 : uids.length;
 
+    for (int i = 0; i < max; i++) {
+      final String uid = uids[i];
+      final IbUser? user;
       if (IbCacheManager().getIbUser(uid) == null) {
         user = await IbUserDbService().queryIbUser(uid);
       } else {
         user = IbCacheManager().getIbUser(uid);
       }
 
-      if (user != null && ibChat.name.isEmpty) {
-        ibChat.name = user.username;
-      }
-
-      if (user != null && ibChat.photoUrl.isEmpty) {
-        ibChat.photoUrl = user.avatarUrl;
+      if (user != null) {
+        title = '$title${user.username} ';
+        avatarUsers.add(user);
       }
     }
+
+    if (ibChat.name.isNotEmpty) {
+      title = ibChat.name;
+    }
+    print('title $title');
+    final int unReadCount =
+        await IbChatDbService().queryUnreadCount(ibChat: ibChat);
+
+    final ChatTabItem item = ChatTabItem(
+        ibChat: ibChat,
+        unReadCount: unReadCount,
+        title: title,
+        avatarUsers: avatarUsers);
+
+    return item;
   }
 
   @override
   void onClose() {
     _oneToOneSub.cancel();
-    _groupSub.cancel();
+    _circleSub.cancel();
     super.onClose();
   }
 }
 
 class ChatTabItem {
   IbChat ibChat;
+  String title;
+  List<IbUser> avatarUsers;
   bool isMuted = false;
   int unReadCount;
 
-  ChatTabItem({required this.ibChat, required this.unReadCount}) {
+  ChatTabItem({
+    required this.ibChat,
+    required this.unReadCount,
+    required this.title,
+    required this.avatarUsers,
+  }) {
     isMuted = ibChat.mutedUids.contains(IbUtils.getCurrentUid());
   }
 }

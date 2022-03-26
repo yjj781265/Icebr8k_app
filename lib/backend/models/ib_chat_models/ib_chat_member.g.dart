@@ -7,12 +7,16 @@ part of 'ib_chat_member.dart';
 // **************************************************************************
 
 IbChatMember _$IbChatMemberFromJson(Map<String, dynamic> json) => IbChatMember(
-      json['uid'] as String,
-      json['role'] as String,
+      chatId: json['chatId'] as String,
+      uid: json['uid'] as String,
+      role: json['role'] as String,
+      joinTimestamp: json['joinTimestamp'],
     );
 
 Map<String, dynamic> _$IbChatMemberToJson(IbChatMember instance) =>
     <String, dynamic>{
+      'chatId': instance.chatId,
       'uid': instance.uid,
       'role': instance.role,
+      'joinTimestamp': instance.joinTimestamp,
     };

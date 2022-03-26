@@ -13,6 +13,7 @@ class IbChat {
   dynamic createdAtTimestamp;
   List<String> memberUids;
   List<String> mutedUids;
+  bool isCircle;
   int memberCount;
   IbMessage? lastMessage;
   List<String> isTypingUids;
@@ -23,6 +24,7 @@ class IbChat {
       this.name = '',
       this.photoUrl = '',
       this.createdAtTimestamp,
+      this.isCircle = false,
       this.description = '',
       this.memberUids = const [],
       this.mutedUids = const [],

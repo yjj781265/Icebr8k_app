@@ -4,9 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
-import 'package:icebr8k/backend/models/ib_chat.dart';
-import 'package:icebr8k/backend/models/ib_chat_member.dart';
-import 'package:icebr8k/backend/models/ib_message.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
@@ -20,6 +20,7 @@ class ChatPageController extends GetxController {
   final String recipientId;
   final isLoading = true.obs;
   final isLoadingMore = false.obs;
+  final isCircle = false.obs;
   final showOptions = false.obs;
   final messages = <IbMessage>[].obs;
   final avatarUrl = ''.obs;
@@ -29,8 +30,6 @@ class ChatPageController extends GetxController {
   late StreamSubscription _memberSub;
   late StreamSubscription _chatSub;
   final isSending = false.obs;
-  final isInChat = true.obs;
-  final isGroupChat = false.obs;
   final isMuted = false.obs;
   final int kQueryLimit = 16;
   DocumentSnapshot<Map<String, dynamic>>? lastSnap;
@@ -69,10 +68,6 @@ class ChatPageController extends GetxController {
     if (ibChat == null && recipientId.isEmpty) {
       return;
     }
-    if (ibChat != null && isGroupChat.isFalse) {
-      title.value = ibChat!.name;
-      avatarUrl.value = ibChat!.photoUrl;
-    }
 
     if (recipientId.isNotEmpty && ibChat == null) {
       ibChat = await IbChatDbService().queryOneToOneIbChat(recipientId);
@@ -82,15 +77,20 @@ class ChatPageController extends GetxController {
     if (ibChat == null) {
       try {
         print('ChatPageController creating new IbChat');
-        ibChat = IbChat(chatId: IbUtils.getUniqueId());
+        final List<String> sortedArr = [IbUtils.getCurrentUid()!, recipientId];
+        sortedArr.sort();
+        ibChat = IbChat(chatId: IbUtils.getUniqueId(), memberUids: sortedArr);
         await IbChatDbService().addIbChat(ibChat!);
-        await IbChatDbService().addMember(
-            chatId: ibChat!.chatId,
+        await IbChatDbService().addChatMember(
             member: IbChatMember(
-                IbUtils.getCurrentUid()!, IbChatMember.kRoleLeader));
-        await IbChatDbService().addMember(
-            chatId: ibChat!.chatId,
-            member: IbChatMember(recipientId, IbChatMember.kRoleMember));
+                chatId: ibChat!.chatId,
+                uid: IbUtils.getCurrentUid()!,
+                role: IbChatMember.kRoleLeader));
+        await IbChatDbService().addChatMember(
+            member: IbChatMember(
+                chatId: ibChat!.chatId,
+                uid: recipientId,
+                role: IbChatMember.kRoleMember));
       } catch (e) {
         IbUtils.showSimpleSnackBar(
             msg: 'Failed to create chat room $e',
@@ -98,8 +98,13 @@ class ChatPageController extends GetxController {
       }
     }
 
-    isGroupChat.value = ibChat!.memberCount > 2;
     isMuted.value = ibChat!.mutedUids.contains(IbUtils.getCurrentUid());
+    isCircle.value = ibChat!.isCircle;
+
+    if (ibChat != null) {
+      title.value = ibChat!.name;
+      avatarUrl.value = ibChat!.photoUrl;
+    }
 
     ///loading messages from stream
     _messageSub = IbChatDbService()
@@ -174,7 +179,7 @@ class ChatPageController extends GetxController {
 
     _chatSub =
         IbChatDbService().listenToIbChatChanges(ibChat!.chatId).listen((event) {
-      ibChat = IbChat.fromJson(event.data()!);
+      if (event.data() != null) ibChat = IbChat.fromJson(event.data()!);
 
       /// only update if is group chat
       if (ibChat!.memberCount > 2) {
