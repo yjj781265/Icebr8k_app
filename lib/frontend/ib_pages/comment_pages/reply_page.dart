@@ -252,19 +252,23 @@ class ReplyPage extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                                 fontSize: IbConfig.kNormalTextSize),
                           ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text(
-                                'Vote: ',
-                                style: TextStyle(
-                                    color: IbColors.lightGrey,
-                                    fontSize: IbConfig.kDescriptionTextSize),
-                              ),
-                              _handleIbAnswerUI(
-                                  _controller.rxCommentItem.value),
-                            ],
-                          ),
+                          if (_controller.rxCommentItem.value.ibAnswer !=
+                                  null &&
+                              _controller
+                                  .rxCommentItem.value.ibAnswer!.isPublic)
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text(
+                                  'Vote: ',
+                                  style: TextStyle(
+                                      color: IbColors.lightGrey,
+                                      fontSize: IbConfig.kDescriptionTextSize),
+                                ),
+                                _handleIbAnswerUI(
+                                    _controller.rxCommentItem.value),
+                              ],
+                            ),
                         ],
                       ),
                       Text(

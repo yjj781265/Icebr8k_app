@@ -41,13 +41,15 @@ class IbActionButton extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(
-          height: 2,
-        ),
-        Text(
-          text,
-          style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
-        )
+        if (text.isNotEmpty)
+          const SizedBox(
+            height: 2,
+          ),
+        if (text.isNotEmpty)
+          Text(
+            text,
+            style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
+          )
       ],
     );
   }

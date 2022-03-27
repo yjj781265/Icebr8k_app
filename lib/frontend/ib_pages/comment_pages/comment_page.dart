@@ -331,7 +331,7 @@ class CommentItemWidget extends StatelessWidget {
                               ),
                             ),
                           ),
-                          if (item.ibAnswer != null)
+                          if (item.ibAnswer != null && item.ibAnswer!.isPublic)
                             Wrap(
                               children: [
                                 const Text(

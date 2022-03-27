@@ -8,6 +8,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/chat_tab_controller
 import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_settings.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/ib_friends_picker.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
@@ -115,6 +116,7 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
             : const Icon(Icons.message),
         onPressed: () async {
           if (title != ('one_to_one_chat'.tr)) {
+            Get.to(() => CircleSettings(), fullscreenDialog: true);
           } else {
             final users = await Get.to(
               () => IbFriendsPicker(
