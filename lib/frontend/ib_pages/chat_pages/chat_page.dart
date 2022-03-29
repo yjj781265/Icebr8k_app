@@ -107,9 +107,6 @@ class ChatPage extends StatelessWidget {
                     },
                   )),
                   _inputWidget(context),
-                  const SizedBox(
-                    height: 8,
-                  ),
                 ],
               ),
             );
@@ -128,110 +125,106 @@ class ChatPage extends StatelessWidget {
         alignment: Alignment.topCenter,
         duration:
             const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 10.0),
-                        child: CircleAvatar(
-                          backgroundColor: IbColors.accentColor,
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              _controller.showOptions.value =
-                                  !_controller.showOptions.value;
-                            },
-                            icon: Icon(
-                                _controller.showOptions.isTrue
-                                    ? Icons.remove
-                                    : Icons.add,
-                                color: Theme.of(context).indicatorColor),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 8,
-                      child: Container(
-                        margin: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: IbColors.lightGrey.withOpacity(0.3),
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(8),
-                          ),
-                        ),
-                        child: TextField(
-                          scrollPadding: EdgeInsets.zero,
-                          minLines: 1,
-                          maxLines: 8,
-                          maxLength: 2000,
-                          onSubmitted: (value) async {
-                            if (value.isNotEmpty) {}
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: CircleAvatar(
+                        backgroundColor: IbColors.accentColor,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            _controller.showOptions.value =
+                                !_controller.showOptions.value;
                           },
-                          textInputAction: TextInputAction.send,
-                          controller: _controller.txtController,
-                          decoration: const InputDecoration(
-                            contentPadding:
-                                EdgeInsets.symmetric(horizontal: 4.0),
-                            counterText: '',
-                            fillColor: IbColors.lightGrey,
-                            border: InputBorder.none,
-                            hintText: 'Write a message',
-                          ),
+                          icon: Icon(
+                              _controller.showOptions.isTrue
+                                  ? Icons.remove
+                                  : Icons.add,
+                              color: Theme.of(context).indicatorColor),
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 10.0),
-                        child: _controller.isSending.isTrue
-                            ? const CircularProgressIndicator(
-                                color: IbColors.primaryColor,
-                              )
-                            : CircleAvatar(
-                                backgroundColor: IbColors.primaryColor,
-                                child: IconButton(
-                                  onPressed: () async {
-                                    await _controller.sendMessage();
-                                  },
-                                  icon: Icon(Icons.send,
-                                      color: Theme.of(context).indicatorColor),
-                                ),
-                              ),
+                  ),
+                  Flexible(
+                    flex: 8,
+                    child: Container(
+                      margin: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: IbColors.lightGrey.withOpacity(0.3),
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(8),
+                        ),
+                      ),
+                      child: TextField(
+                        scrollPadding: EdgeInsets.zero,
+                        minLines: 1,
+                        maxLines: 8,
+                        maxLength: 2000,
+                        onSubmitted: (value) async {
+                          if (value.isNotEmpty) {}
+                        },
+                        textInputAction: TextInputAction.send,
+                        controller: _controller.txtController,
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                          counterText: '',
+                          fillColor: IbColors.lightGrey,
+                          border: InputBorder.none,
+                          hintText: 'Write a message',
+                        ),
                       ),
                     ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: _controller.isSending.isTrue
+                          ? const CircularProgressIndicator(
+                              color: IbColors.primaryColor,
+                            )
+                          : CircleAvatar(
+                              backgroundColor: IbColors.primaryColor,
+                              child: IconButton(
+                                onPressed: () async {
+                                  await _controller.sendMessage();
+                                },
+                                icon: Icon(Icons.send,
+                                    color: Theme.of(context).indicatorColor),
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (_controller.showOptions.isTrue)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IbActionButton(
+                        color: IbColors.errorRed,
+                        iconData: Icons.mic,
+                        onPressed: () {},
+                        text: 'Voice'),
+                    IbActionButton(
+                        color: IbColors.primaryColor,
+                        iconData: Icons.image,
+                        onPressed: () {},
+                        text: 'Images'),
                   ],
                 ),
               ),
-              if (_controller.showOptions.isTrue)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      IbActionButton(
-                          color: IbColors.errorRed,
-                          iconData: Icons.mic,
-                          onPressed: () {},
-                          text: 'Voice'),
-                      IbActionButton(
-                          color: IbColors.primaryColor,
-                          iconData: Icons.image,
-                          onPressed: () {},
-                          text: 'Images'),
-                    ],
-                  ),
-                ),
-            ],
-          ),
+          ],
         ),
       ),
     );

@@ -12,7 +12,9 @@ IbChat _$IbChatFromJson(Map<String, dynamic> json) => IbChat(
       photoUrl: json['photoUrl'] as String? ?? '',
       createdAtTimestamp: json['createdAtTimestamp'],
       isCircle: json['isCircle'] as bool? ?? false,
+      isPublicCircle: json['isPublicCircle'] as bool? ?? false,
       description: json['description'] as String? ?? '',
+      welcomeMsg: json['welcomeMsg'] as String? ?? '',
       memberUids: (json['memberUids'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -37,10 +39,12 @@ Map<String, dynamic> _$IbChatToJson(IbChat instance) => <String, dynamic>{
       'name': instance.name,
       'photoUrl': instance.photoUrl,
       'description': instance.description,
+      'welcomeMsg': instance.welcomeMsg,
       'createdAtTimestamp': instance.createdAtTimestamp,
       'memberUids': instance.memberUids,
       'mutedUids': instance.mutedUids,
       'isCircle': instance.isCircle,
+      'isPublicCircle': instance.isPublicCircle,
       'memberCount': instance.memberCount,
       'lastMessage': instance.lastMessage?.toJson(),
       'isTypingUids': instance.isTypingUids,

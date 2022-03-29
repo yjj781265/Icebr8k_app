@@ -161,7 +161,12 @@ class IbStrings extends Translations {
           'nothing': 'Nothing to see here 😐',
           'private_profile': 'The Profile is Private 🔐',
           'friends_only_profile': 'The Profile is Friends Only',
-          'asked_question_ps': 'Anonymous and non-public questions are hidden'
+          'asked_question_ps': 'Anonymous and non-public questions are hidden',
+          'circle_title_hint': 'The name of circle(required)',
+          'circle_description_hint': 'Description(optional)',
+          'circle_welcome_message_hint':
+              'A welcome message(optional), a popup will show when member'
+                  ' join the circle for the first time',
         }
       };
 }

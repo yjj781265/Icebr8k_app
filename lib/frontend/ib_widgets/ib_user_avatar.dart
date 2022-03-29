@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -55,35 +57,40 @@ class IbUserAvatar extends StatelessWidget {
             },
           ),
         GestureDetector(
-          onTap: (disableOnTap || uid == null || uid!.isEmpty)
-              ? null
-              : () {
-                  if (uid == IbUtils.getCurrentUid()!) {
-                    Get.to(() => MyProfilePage());
-                  } else {
-                    Get.to(() => ProfilePage(Get.put(ProfileController(uid!),
-                        tag: IbUtils.getUniqueId())));
-                  }
-                },
-          child: CachedNetworkImage(
-            errorWidget: (context, str, value) => CircleAvatar(
-                radius: radius, backgroundColor: IbColors.lightBlue),
-            imageUrl: avatarUrl,
-            imageBuilder: (context, imageProvider) => Container(
-              height: radius * 2,
-              width: radius * 2,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
-              ),
-            ),
-            placeholder: (context, url) => CircleAvatar(
-              radius: radius,
-              backgroundColor: IbColors.lightBlue,
-              child: const IbProgressIndicator(),
-            ),
-          ),
-        ),
+            onTap: (disableOnTap || uid == null || uid!.isEmpty)
+                ? null
+                : () {
+                    if (uid == IbUtils.getCurrentUid()!) {
+                      Get.to(() => MyProfilePage());
+                    } else {
+                      Get.to(() => ProfilePage(Get.put(ProfileController(uid!),
+                          tag: IbUtils.getUniqueId())));
+                    }
+                  },
+            child: avatarUrl.contains('http')
+                ? CachedNetworkImage(
+                    errorWidget: (context, str, value) => CircleAvatar(
+                        radius: radius, backgroundColor: IbColors.lightBlue),
+                    imageUrl: avatarUrl,
+                    imageBuilder: (context, imageProvider) => Container(
+                      height: radius * 2,
+                      width: radius * 2,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            image: imageProvider, fit: BoxFit.cover),
+                      ),
+                    ),
+                    placeholder: (context, url) => CircleAvatar(
+                      radius: radius,
+                      backgroundColor: IbColors.lightBlue,
+                      child: const IbProgressIndicator(),
+                    ),
+                  )
+                : CircleAvatar(
+                    radius: radius,
+                    backgroundImage: FileImage(File(avatarUrl)),
+                  )),
         if (compScore != null && uid != IbUtils.getCurrentUid())
           Positioned(
             bottom: 2,
