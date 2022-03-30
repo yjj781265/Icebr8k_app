@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -34,12 +35,17 @@ class ChatPage extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (_controller.avatarUrl.isEmpty)
+                if (_controller.avatarUrl.isEmpty &&
+                    _controller.isCircle.isFalse)
                   _buildAvatar(
                       context: context,
                       avatarUsers: _controller.ibChatMembers
                           .map((element) => element.user)
                           .toList())
+                else if (_controller.ibChat != null &&
+                    _controller.isCircle.isTrue)
+                  _buildCircleAvatar(
+                      context: context, ibChat: _controller.ibChat!)
                 else
                   IbUserAvatar(
                     avatarUrl: _controller.avatarUrl.value,
@@ -48,7 +54,7 @@ class ChatPage extends StatelessWidget {
                 const SizedBox(
                   width: 8,
                 ),
-                _buildTitle(),
+                Expanded(child: _buildTitle()),
               ],
             ),
           ),
@@ -114,6 +120,29 @@ class ChatPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildCircleAvatar(
+      {required BuildContext context, required IbChat ibChat}) {
+    if (ibChat.photoUrl.isEmpty) {
+      return CircleAvatar(
+        backgroundColor: IbColors.lightGrey,
+        radius: 16,
+        child: Text(
+          ibChat.name[0],
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              color: Theme.of(context).indicatorColor,
+              fontSize: 16,
+              fontWeight: FontWeight.bold),
+        ),
+      );
+    } else {
+      return IbUserAvatar(
+        radius: 16,
+        avatarUrl: ibChat.photoUrl,
+      );
+    }
   }
 
   Widget _inputWidget(BuildContext context) {

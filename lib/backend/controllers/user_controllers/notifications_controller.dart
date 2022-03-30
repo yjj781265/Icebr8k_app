@@ -19,6 +19,12 @@ class NotificationController extends GetxController {
     super.onInit();
   }
 
+  @override
+  void onClose() {
+    ibNotificationsStream.cancel();
+    super.onClose();
+  }
+
   void _initIbNotificationStream() {
     ibNotificationsStream =
         IbUserDbService().listenToIbNotifications().listen((event) {
@@ -42,14 +48,17 @@ class NotificationController extends GetxController {
           _onNotificationRemoved(n);
         }
       }
+      items.refresh();
     });
   }
 
   Future<void> _onNotificationAdded(IbNotification notification) async {
     if (notification.type == IbNotification.kGroupInvite) {
       final IbChat? chat = await IbChatDbService().queryChat(notification.id);
+      print('add');
       if (chat != null) {
         items.add(NotificationItem(notification: notification, ibChat: chat));
+        print('add2');
       }
     } else if (notification.type == IbNotification.kFriendRequest) {
       items.add(NotificationItem(notification: notification));

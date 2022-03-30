@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_tab_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/circle_settings_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -103,7 +104,7 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
             child: TabBarView(
               controller: _tabController,
               children: [
-                const SizedBox(),
+                buildCircle(),
                 buildOneToOneList(),
               ],
             ),
@@ -116,7 +117,8 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
             : const Icon(Icons.message),
         onPressed: () async {
           if (title != ('one_to_one_chat'.tr)) {
-            Get.to(() => CircleSettings(), fullscreenDialog: true);
+            Get.to(() => CircleSettings(Get.put(CircleSettingsController())),
+                fullscreenDialog: true);
           } else {
             final users = await Get.to(
               () => IbFriendsPicker(
@@ -252,6 +254,141 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
             );
           },
         ));
+  }
+
+  Widget buildCircle() {
+    return Obx(() => ListView.separated(
+          itemBuilder: (context, index) {
+            final ChatTabItem item = _controller.circles[index];
+            return ListTile(
+              tileColor: Theme.of(context).backgroundColor,
+              leading: Stack(
+                children: [
+                  _buildCircleAvatar(item),
+                  if (item.isMuted)
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).backgroundColor,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.notifications_off,
+                          size: 16,
+                        ),
+                      ),
+                    )
+                ],
+              ),
+              onTap: () {
+                item.unReadCount = 0;
+                _controller.circles.refresh();
+                Get.to(
+                  () => ChatPage(
+                    Get.put(
+                      ChatPageController(ibChat: item.ibChat),
+                    ),
+                  ),
+                );
+              },
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    item.title,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: IbConfig.kNormalTextSize),
+                  ),
+                  if (item.ibChat.lastMessage != null)
+                    Text(
+                      IbUtils.readableDateTime(
+                          DateTime.fromMillisecondsSinceEpoch(
+                              (item.ibChat.lastMessage!.timestamp as Timestamp)
+                                  .millisecondsSinceEpoch),
+                          showTime: true),
+                      style: const TextStyle(
+                          color: IbColors.lightGrey,
+                          fontWeight: FontWeight.normal,
+                          fontSize: IbConfig.kDescriptionTextSize),
+                    ),
+                ],
+              ),
+              subtitle: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    flex: 9,
+                    child: Text(
+                      item.ibChat.lastMessage == null
+                          ? ''
+                          : item.ibChat.lastMessage!.content,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: IbConfig.kSecondaryTextSize,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(
+                          color: IbColors.errorRed, shape: BoxShape.circle),
+                      child: item.unReadCount != 0
+                          ? Padding(
+                              padding: const EdgeInsets.all(3.0),
+                              child: Text(
+                                item.unReadCount > 99
+                                    ? '99+'
+                                    : item.unReadCount.toString(),
+                                maxLines: 1,
+                                overflow: TextOverflow.fade,
+                                style: const TextStyle(
+                                  color: IbColors.white,
+                                  fontSize: IbConfig.kDescriptionTextSize,
+                                ),
+                              ),
+                            )
+                          : const SizedBox(),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+          itemCount: _controller.circles.length,
+          separatorBuilder: (BuildContext context, int index) {
+            return const Divider(
+              color: IbColors.lightGrey,
+              thickness: 0.5,
+              height: 1,
+            );
+          },
+        ));
+  }
+
+  Widget _buildCircleAvatar(ChatTabItem item) {
+    if (item.ibChat.photoUrl.isEmpty) {
+      return CircleAvatar(
+        backgroundColor: IbColors.lightGrey,
+        radius: 24,
+        child: Text(
+          item.ibChat.name[0],
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              color: Theme.of(context).indicatorColor,
+              fontSize: 24,
+              fontWeight: FontWeight.bold),
+        ),
+      );
+    } else {
+      return IbUserAvatar(
+        avatarUrl: item.ibChat.photoUrl,
+      );
+    }
   }
 
   Widget _buildAvatar(List<IbUser> avatarUsers) {

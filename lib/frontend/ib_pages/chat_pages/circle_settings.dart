@@ -18,12 +18,20 @@ import 'package:image_picker/image_picker.dart';
 import 'package:reorderables/reorderables.dart';
 
 class CircleSettings extends StatelessWidget {
-  final CircleSettingsController _controller =
-      Get.put(CircleSettingsController());
+  final CircleSettingsController _controller;
+
+  const CircleSettings(this._controller);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: _controller.ibChat == null
+            ? const Text('Create A Circle')
+            : _controller.isAbleToEdit
+                ? const Text('Edit A Circle')
+                : const Text('Circle Info'),
+      ),
       body: SafeArea(
         child: GestureDetector(
           onTap: () {
@@ -39,7 +47,9 @@ class CircleSettings extends StatelessWidget {
                     () => Column(
                       children: [
                         InkWell(
-                          onTap: showEditAvatarBottomSheet,
+                          onTap: _controller.isAbleToEdit
+                              ? showEditAvatarBottomSheet
+                              : null,
                           child: Stack(
                             children: [
                               if (_controller.photoUrl.isEmpty)
@@ -60,20 +70,21 @@ class CircleSettings extends StatelessWidget {
                                   avatarUrl: _controller.photoUrl.value,
                                   radius: 56,
                                 ),
-                              Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: CircleAvatar(
-                                    backgroundColor: Theme.of(context)
-                                        .backgroundColor
-                                        .withOpacity(0.8),
-                                    radius: 16,
-                                    child: Icon(
-                                      Icons.edit,
-                                      color: Theme.of(context).indicatorColor,
-                                      size: 16,
-                                    ),
-                                  ))
+                              if (_controller.isAbleToEdit)
+                                Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: CircleAvatar(
+                                      backgroundColor: Theme.of(context)
+                                          .backgroundColor
+                                          .withOpacity(0.8),
+                                      radius: 16,
+                                      child: Icon(
+                                        Icons.edit,
+                                        color: Theme.of(context).indicatorColor,
+                                        size: 16,
+                                      ),
+                                    ))
                             ],
                           ),
                         ),
@@ -89,6 +100,7 @@ class CircleSettings extends StatelessWidget {
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8))),
                             child: TextField(
+                              enabled: _controller.isAbleToEdit,
                               maxLength: 100,
                               controller: _controller.titleTxtController,
                               style: const TextStyle(
@@ -112,6 +124,7 @@ class CircleSettings extends StatelessWidget {
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8))),
                             child: TextField(
+                              enabled: _controller.isAbleToEdit,
                               controller: _controller.welcomeMsgController,
                               minLines: 1,
                               maxLines: 5,
@@ -133,6 +146,7 @@ class CircleSettings extends StatelessWidget {
                               borderRadius:
                                   const BorderRadius.all(Radius.circular(8))),
                           child: TextField(
+                            enabled: _controller.isAbleToEdit,
                             minLines: 1,
                             maxLines: 5,
                             maxLength: 500,
@@ -150,7 +164,9 @@ class CircleSettings extends StatelessWidget {
                           value: _controller.isPublicCircle.value,
                           dense: true,
                           onChanged: (value) {
-                            _controller.isPublicCircle.value = value ?? false;
+                            if (_controller.isAbleToEdit) {
+                              _controller.isPublicCircle.value = value ?? false;
+                            }
                           },
                           controlAffinity: ListTileControlAffinity.trailing,
                           title: const Text(
@@ -170,8 +186,10 @@ class CircleSettings extends StatelessWidget {
                           value: !_controller.isPublicCircle.value,
                           dense: true,
                           onChanged: (value) {
-                            _controller.isPublicCircle.value =
-                                !(value ?? false);
+                            if (_controller.isAbleToEdit) {
+                              _controller.isPublicCircle.value =
+                                  !(value ?? false);
+                            }
                           },
                           controlAffinity: ListTileControlAffinity.trailing,
                           title: const Text(
@@ -191,63 +209,66 @@ class CircleSettings extends StatelessWidget {
                           height: 16,
                           thickness: 1,
                         ),
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text(
-                              'Invites',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: IbConfig.kNormalTextSize),
+                        if (_controller.ibChat == null)
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                'Invites',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: IbConfig.kNormalTextSize),
+                              ),
                             ),
                           ),
-                        ),
+                        if (_controller.ibChat == null)
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: ReorderableWrap(
+                              spacing: 8,
+                              header: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 8),
+                                  child: IbActionButton(
+                                      color: IbColors.primaryColor,
+                                      iconData: Icons.add,
+                                      onPressed: () async {
+                                        IbUtils.hideKeyboard();
+                                        final list = await Get.to(
+                                            () => IbFriendsPicker(
+                                                  Get.put(
+                                                      IbFriendsPickerController(
+                                                          IbUtils
+                                                              .getCurrentUid()!,
+                                                          pickedUids:
+                                                              _controller
+                                                                  .invitees
+                                                                  .map((p0) =>
+                                                                      p0.id)
+                                                                  .toList())),
+                                                ),
+                                            fullscreenDialog: true,
+                                            transition: Transition.zoom);
 
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: ReorderableWrap(
-                            spacing: 8,
-                            header: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: IbActionButton(
-                                    color: IbColors.primaryColor,
-                                    iconData: Icons.add,
-                                    onPressed: () async {
-                                      IbUtils.hideKeyboard();
-                                      final list = await Get.to(
-                                          () => IbFriendsPicker(
-                                                Get.put(
-                                                    IbFriendsPickerController(
-                                                        IbUtils
-                                                            .getCurrentUid()!,
-                                                        pickedUids: _controller
-                                                            .invitees
-                                                            .map((p0) => p0.id)
-                                                            .toList())),
-                                              ),
-                                          fullscreenDialog: true,
-                                          transition: Transition.zoom);
-
-                                      for (final dynamic item in list) {
-                                        _controller.invitees
-                                            .add(item as IbUser);
-                                      }
-                                    },
-                                    text: ''),
-                              ),
-                            ],
-                            onReorder: (int oldIndex, int newIndex) {},
-                            children: _controller.invitees
-                                .map((element) => Opacity(
-                                    opacity: 0.5,
-                                    child: IbUserAvatar(
-                                        avatarUrl: element.avatarUrl)))
-                                .toList(),
+                                        for (final dynamic item in list) {
+                                          _controller.invitees
+                                              .add(item as IbUser);
+                                        }
+                                      },
+                                      text: ''),
+                                ),
+                              ],
+                              onReorder: (int oldIndex, int newIndex) {},
+                              children: _controller.invitees
+                                  .map((element) => Opacity(
+                                      opacity: 0.8,
+                                      child: IbUserAvatar(
+                                          avatarUrl: element.avatarUrl)))
+                                  .toList(),
+                            ),
                           ),
-                        ),
                         const SizedBox(
                           height: 16,
                         ),
@@ -256,17 +277,19 @@ class CircleSettings extends StatelessWidget {
                   ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.all(8),
-                height: 64,
-                width: double.infinity,
-                child: IbElevatedButton(
-                  onPressed: () async {
-                    await _controller.onCreateCircle();
-                  },
-                  textTrKey: 'Create Circle',
-                ),
-              )
+              if (_controller.isAbleToEdit)
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  height: 64,
+                  width: double.infinity,
+                  child: IbElevatedButton(
+                    onPressed: () async {
+                      await _controller.onCreateCircle();
+                    },
+                    textTrKey:
+                        _controller.ibChat == null ? 'Create a circle' : 'Save',
+                  ),
+                )
             ],
           ),
         ),
@@ -278,6 +301,24 @@ class CircleSettings extends StatelessWidget {
     final Widget options = ListView(
       shrinkWrap: true,
       children: [
+        InkWell(
+          borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+          onTap: () {
+            _controller.photoUrl.value = '';
+            Get.back();
+          },
+          child: Ink(
+            height: 56,
+            width: double.infinity,
+            child: const Center(
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text('Default Photo'),
+              ),
+            ),
+          ),
+        ),
         InkWell(
           onTap: () async {
             Get.back();

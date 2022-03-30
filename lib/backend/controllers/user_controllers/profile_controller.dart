@@ -16,11 +16,12 @@ class ProfileController extends GetxController {
   final isProfileVisible = false.obs;
   final isBlocked = false.obs;
 
-  /// is friend request sent
-  final isFrSent = false.obs;
-
   /// is friend request waiting for me for approval
   IbNotification? frNotification;
+
+  /// is friend request sent
+  IbNotification? frSentNotification;
+  final isFrSent = false.obs;
   final String uid;
   final compScore = 0.0.obs;
   late Rx<IbUser> rxIbUser;
@@ -42,7 +43,9 @@ class ProfileController extends GetxController {
           await IbUtils.getUncommonAnswerQuestionIds(uid: uid);
       compScore.value = await IbUtils.getCompScore(uid: uid);
       isFriend.value = user.friendUids.contains(IbUtils.getCurrentUid());
-      isFrSent.value = await IbUserDbService().isFriendRequestSent(user.id);
+      frSentNotification =
+          await IbUserDbService().querySentFriendRequest(user.id);
+      isFrSent.value = frSentNotification != null;
       frNotification = await IbUserDbService()
           .isFriendRequestWaitingForMeForApproval(user.id);
       isBlocked.value =
@@ -64,7 +67,9 @@ class ProfileController extends GetxController {
           await IbUtils.getUncommonAnswerQuestionIds(uid: uid, isRefresh: true);
       compScore.value = await IbUtils.getCompScore(uid: uid, isRefresh: true);
       isFriend.value = user.friendUids.contains(IbUtils.getCurrentUid());
-      isFrSent.value = await IbUserDbService().isFriendRequestSent(user.id);
+      frSentNotification =
+          await IbUserDbService().querySentFriendRequest(user.id);
+      isFrSent.value = frSentNotification != null;
       frNotification = await IbUserDbService()
           .isFriendRequestWaitingForMeForApproval(user.id);
       isBlocked.value =
@@ -119,7 +124,8 @@ class ProfileController extends GetxController {
         recipientId: rxIbUser.value.id);
     try {
       await IbUserDbService().sendAlertNotification(n);
-      isFrSent.value = true;
+      frSentNotification = n;
+      isFrSent.value = frSentNotification != null;
       IbUtils.showSimpleSnackBar(
           msg: 'Friend request sent!', backgroundColor: IbColors.accentColor);
     } catch (e) {

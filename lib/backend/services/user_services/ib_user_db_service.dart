@@ -85,13 +85,28 @@ class IbUserDbService {
         .set(n.toJson(), SetOptions(merge: true));
   }
 
-  Future<bool> isFriendRequestSent(String friendId) async {
+  Future<IbNotification?> querySentFriendRequest(String friendId) async {
     final snapshot = await _collectionRef
         .doc(friendId)
         .collection(_kNotificationSubCollection)
         .where('type', isEqualTo: IbNotification.kFriendRequest)
         .where('senderId', isEqualTo: IbUtils.getCurrentUid())
         .where('recipientId', isEqualTo: friendId)
+        .get();
+    if (snapshot.size == 0) {
+      return null;
+    }
+    return IbNotification.fromJson(snapshot.docs.first.data());
+  }
+
+  Future<bool> isCircleRequestSent(
+      {required String chatId, required String recipientId}) async {
+    final snapshot = await _collectionRef
+        .doc(chatId)
+        .collection(_kNotificationSubCollection)
+        .where('type', isEqualTo: IbNotification.kGroupRequest)
+        .where('senderId', isEqualTo: IbUtils.getCurrentUid())
+        .where('recipientId', isEqualTo: recipientId)
         .get();
     return snapshot.size > 0;
   }
@@ -151,7 +166,7 @@ class IbUserDbService {
 
   Future<void> removeNotification(IbNotification n) async {
     return _collectionRef
-        .doc(IbUtils.getCurrentUid())
+        .doc(n.recipientId)
         .collection(_kNotificationSubCollection)
         .doc(n.id)
         .delete();

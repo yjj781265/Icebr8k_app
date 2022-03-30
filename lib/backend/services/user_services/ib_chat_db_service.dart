@@ -126,8 +126,11 @@ class IbChatDbService {
         .set(member.toJson(), SetOptions(merge: true));
   }
 
-  Future<void> addIbChat(IbChat ibChat) async {
-    ibChat.createdAtTimestamp = FieldValue.serverTimestamp();
+  Future<void> addIbChat(IbChat ibChat, {bool isEdit = false}) async {
+    if (!isEdit) {
+      ibChat.createdAtTimestamp = FieldValue.serverTimestamp();
+    }
+
     await _collectionRef
         .doc(ibChat.chatId)
         .set(ibChat.toJson(), SetOptions(merge: true));
@@ -168,7 +171,7 @@ class IbChatDbService {
 
   Future<IbChat?> queryChat(String chatId) async {
     final snapshot = await _collectionRef.doc(chatId).get();
-    if (snapshot.exists) {
+    if (!snapshot.exists) {
       return null;
     }
 

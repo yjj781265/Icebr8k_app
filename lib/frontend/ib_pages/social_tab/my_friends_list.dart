@@ -79,7 +79,6 @@ class FriendListItem extends StatelessWidget {
             ),
           );
         },
-        tileColor: Theme.of(context).backgroundColor,
         leading: Stack(
           children: [
             IbUserAvatar(

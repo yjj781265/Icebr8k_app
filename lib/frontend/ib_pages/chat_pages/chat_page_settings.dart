@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/circle_settings_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
+import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_settings.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/ib_friends_picker.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
@@ -30,11 +33,14 @@ class ChatPageSettings extends StatelessWidget {
   Widget getBody(BuildContext context) {
     return SafeArea(
       child: Obx(
-        () => Column(
-          children: [
-            if (_controller.isCircle.isTrue) membersList(context),
-            settings(context),
-          ],
+        () => SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (_controller.isCircle.isTrue) membersList(context),
+              settings(context),
+            ],
+          ),
         ),
       ),
     );
@@ -76,6 +82,11 @@ class ChatPageSettings extends StatelessWidget {
                           ),
                         ),
                       );
+                      final List<IbUser> invitees = [];
+                      for (final dynamic item in items) {
+                        invitees.add(item as IbUser);
+                      }
+                      await _controller.sendCircleInvites(invitees);
                     },
                     icon: const Icon(Icons.add),
                   ),
@@ -141,13 +152,43 @@ class ChatPageSettings extends StatelessWidget {
             title: const Text('Mute Notifications'),
           ),
         ),
-        ListTile(
-          onTap: () {},
-          leading: const Icon(
-            FontAwesomeIcons.signOutAlt,
+        Obx(() {
+          final chatMember = _controller.ibChatMembers.firstWhereOrNull(
+              (element) => element.member.uid == IbUtils.getCurrentUid()!);
+          if (chatMember != null &&
+              (chatMember.member.role == IbChatMember.kRoleLeader ||
+                  chatMember.member.role == IbChatMember.kRoleAssistant)) {
+            return ListTile(
+              onTap: () {
+                Get.to(
+                  () => CircleSettings(
+                    Get.put(
+                      CircleSettingsController(
+                        ibChat: _controller.ibChat,
+                      ),
+                    ),
+                  ),
+                );
+              },
+              title: const Text('Edit Circle Info'),
+              trailing: const Icon(Icons.edit),
+            );
+          }
+          return ListTile(
+            onTap: () {
+              Get.to(() => CircleSettings(Get.put(CircleSettingsController(
+                  ibChat: _controller.ibChat, isAbleToEdit: false))));
+            },
+            title: const Text('Circle Info'),
+            trailing: const Icon(Icons.info),
+          );
+        }),
+        const ListTile(
+          leading: Icon(
+            FontAwesomeIcons.rightFromBracket,
             color: IbColors.errorRed,
           ),
-          title: const Text(
+          title: Text(
             'Leave Chat',
             style: TextStyle(color: IbColors.errorRed),
           ),

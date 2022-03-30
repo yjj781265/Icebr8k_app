@@ -89,7 +89,7 @@ class _SocialTabState extends State<SocialTab>
               controller: _tabController,
               children: [
                 MyFriendsList(_controller),
-                Text('People Nearby'),
+                const Text('People Nearby'),
               ],
             ),
           ),

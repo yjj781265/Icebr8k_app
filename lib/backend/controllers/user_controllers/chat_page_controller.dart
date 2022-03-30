@@ -7,11 +7,14 @@ import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
+import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -21,6 +24,7 @@ class ChatPageController extends GetxController {
   final isLoading = true.obs;
   final isLoadingMore = false.obs;
   final isCircle = false.obs;
+  final isPublicCircle = false.obs;
   final showOptions = false.obs;
   final messages = <IbMessage>[].obs;
   final avatarUrl = ''.obs;
@@ -34,6 +38,9 @@ class ChatPageController extends GetxController {
   final int kQueryLimit = 16;
   DocumentSnapshot<Map<String, dynamic>>? lastSnap;
   final txtController = TextEditingController();
+  final TextEditingController titleTxtController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController welcomeMsgController = TextEditingController();
   final ItemScrollController itemScrollController = ItemScrollController();
   final RefreshController refreshController = RefreshController();
   final ItemPositionsListener itemPositionsListener =
@@ -98,12 +105,12 @@ class ChatPageController extends GetxController {
       }
     }
 
-    isMuted.value = ibChat!.mutedUids.contains(IbUtils.getCurrentUid());
-    isCircle.value = ibChat!.isCircle;
-
     if (ibChat != null) {
       title.value = ibChat!.name;
       avatarUrl.value = ibChat!.photoUrl;
+      isMuted.value = ibChat!.mutedUids.contains(IbUtils.getCurrentUid());
+      isCircle.value = ibChat!.isCircle;
+      isPublicCircle.value = ibChat!.isPublicCircle;
     }
 
     ///loading messages from stream
@@ -182,7 +189,7 @@ class ChatPageController extends GetxController {
       if (event.data() != null) ibChat = IbChat.fromJson(event.data()!);
 
       /// only update if is group chat
-      if (ibChat!.memberCount > 2) {
+      if (ibChat!.isCircle) {
         title.value = ibChat!.name;
         avatarUrl.value = ibChat!.photoUrl;
       }
@@ -228,6 +235,36 @@ class ChatPageController extends GetxController {
         readUids: [IbUtils.getCurrentUid()!],
         messageType: IbMessage.kMessageTypeText,
         chatRoomId: ibChat!.chatId);
+  }
+
+  Future<void> sendCircleInvites(List<IbUser> users) async {
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'Sending invites....'));
+    try {
+      for (final IbUser user in users) {
+        final n = IbNotification(
+            id: ibChat!.chatId,
+            title: 'Group invite from ${IbUtils.getCurrentIbUser()!.username}',
+            subtitle: '',
+            type: IbNotification.kGroupInvite,
+            timestampInMs: DateTime.now().millisecondsSinceEpoch,
+            senderId: IbUtils.getCurrentUid()!,
+            recipientId: user.id,
+            avatarUrl: IbUtils.getCurrentIbUser()!.avatarUrl);
+        await IbUserDbService().sendAlertNotification(n);
+      }
+      Get.back();
+      IbUtils.showSimpleSnackBar(
+          msg: 'Invite(s) sent', backgroundColor: IbColors.accentColor);
+    } catch (e) {
+      Get.back();
+      Get.dialog(
+        IbDialog(
+          title: 'Error',
+          subtitle: e.toString(),
+          showNegativeBtn: false,
+        ),
+      );
+    }
   }
 
   Future<void> loadMore() async {

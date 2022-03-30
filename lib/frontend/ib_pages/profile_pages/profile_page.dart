@@ -9,6 +9,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/compare_controller.
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/chat_page.dart';
@@ -661,8 +662,8 @@ class ProfilePage extends StatelessWidget {
                   'Are you sure to unfriend ${_controller.rxIbUser.value.username}?',
               subtitle: '',
               onPositiveTap: () async {
-                await _controller.removeFriend();
                 Get.back();
+                await _controller.removeFriend();
               },
             ));
           },
@@ -676,20 +677,22 @@ class ProfilePage extends StatelessWidget {
       backgroundColor: Theme.of(context).backgroundColor.withOpacity(0.8),
       child: IconButton(
         padding: EdgeInsets.zero,
-        onPressed: () {
+        onPressed: () async {
           if (IbUtils.getCurrentIbUser() == null ||
-              _controller.isFrSent.isTrue) {
+              (_controller.isFrSent.isTrue &&
+                  _controller.frSentNotification != null)) {
+            await IbUserDbService()
+                .removeNotification(_controller.frSentNotification!);
+            _controller.isFrSent.value = false;
             IbUtils.showSimpleSnackBar(
-                msg: 'Friend request already sent',
+                msg: 'Friend request canceled',
                 backgroundColor: Colors.orangeAccent);
             return;
           }
           showFriendRequestDialog();
         },
         icon: Icon(
-            _controller.isFrSent.isTrue
-                ? Icons.pending_rounded
-                : Icons.person_add,
+            _controller.isFrSent.isTrue ? Icons.cancel : Icons.person_add,
             color: Theme.of(context).indicatorColor),
       ),
     );
