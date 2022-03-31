@@ -30,9 +30,9 @@ class ChatPageController extends GetxController {
   final avatarUrl = ''.obs;
   final title = ''.obs;
   final subtitle = ''.obs;
-  late StreamSubscription _messageSub;
-  late StreamSubscription _memberSub;
-  late StreamSubscription _chatSub;
+  StreamSubscription? _messageSub;
+  StreamSubscription? _memberSub;
+  StreamSubscription? _chatSub;
   final isSending = false.obs;
   final isMuted = false.obs;
   final int kQueryLimit = 16;
@@ -66,9 +66,17 @@ class ChatPageController extends GetxController {
 
   @override
   void onClose() {
-    _messageSub.cancel();
-    _memberSub.cancel();
-    _chatSub.cancel();
+    if (_messageSub != null) {
+      _messageSub!.cancel();
+    }
+
+    if (_memberSub != null) {
+      _memberSub!.cancel();
+    }
+
+    if (_chatSub != null) {
+      _chatSub!.cancel();
+    }
   }
 
   Future<void> initData() async {
@@ -77,40 +85,17 @@ class ChatPageController extends GetxController {
     }
 
     if (recipientId.isNotEmpty && ibChat == null) {
+      print('ChatPageController looking for IbChat');
       ibChat = await IbChatDbService().queryOneToOneIbChat(recipientId);
     }
+    setUpStreams();
+    setUpInfo();
+    isLoading.value = false;
+  }
 
-    print('ChatPageController looking for IbChat');
+  void setUpStreams() {
     if (ibChat == null) {
-      try {
-        print('ChatPageController creating new IbChat');
-        final List<String> sortedArr = [IbUtils.getCurrentUid()!, recipientId];
-        sortedArr.sort();
-        ibChat = IbChat(chatId: IbUtils.getUniqueId(), memberUids: sortedArr);
-        await IbChatDbService().addIbChat(ibChat!);
-        await IbChatDbService().addChatMember(
-            member: IbChatMember(
-                chatId: ibChat!.chatId,
-                uid: IbUtils.getCurrentUid()!,
-                role: IbChatMember.kRoleLeader));
-        await IbChatDbService().addChatMember(
-            member: IbChatMember(
-                chatId: ibChat!.chatId,
-                uid: recipientId,
-                role: IbChatMember.kRoleMember));
-      } catch (e) {
-        IbUtils.showSimpleSnackBar(
-            msg: 'Failed to create chat room $e',
-            backgroundColor: IbColors.errorRed);
-      }
-    }
-
-    if (ibChat != null) {
-      title.value = ibChat!.name;
-      avatarUrl.value = ibChat!.photoUrl;
-      isMuted.value = ibChat!.mutedUids.contains(IbUtils.getCurrentUid());
-      isCircle.value = ibChat!.isCircle;
-      isPublicCircle.value = ibChat!.isPublicCircle;
+      return;
     }
 
     ///loading messages from stream
@@ -194,12 +179,84 @@ class ChatPageController extends GetxController {
         avatarUrl.value = ibChat!.photoUrl;
       }
     });
+  }
 
-    isLoading.value = false;
+  void setUpInfo() {
+    if (ibChat != null) {
+      if (title.value.isEmpty) {
+        title.value = ibChat!.name;
+      }
+
+      if (avatarUrl.value.isEmpty) {
+        avatarUrl.value = ibChat!.photoUrl;
+      }
+
+      isMuted.value = ibChat!.mutedUids.contains(IbUtils.getCurrentUid());
+      isCircle.value = ibChat!.isCircle;
+      isPublicCircle.value = ibChat!.isPublicCircle;
+    }
   }
 
   Future<void> sendMessage() async {
     isSending.value = true;
+    if (ibChat == null) {
+      if (recipientId.isNotEmpty) {
+        print('ChatPageController looking for IbChat');
+        ibChat = await IbChatDbService().queryOneToOneIbChat(recipientId);
+      }
+
+      if (ibChat != null) {
+        setUpStreams();
+        setUpInfo();
+      } else {
+        try {
+          print('ChatPageController creating new IbChat');
+          final List<String> sortedArr = [
+            IbUtils.getCurrentUid()!,
+            recipientId
+          ];
+          sortedArr.sort();
+          ibChat = IbChat(chatId: IbUtils.getUniqueId(), memberUids: sortedArr);
+          await IbChatDbService().addIbChat(ibChat!);
+          await IbChatDbService().addChatMember(
+              member: IbChatMember(
+                  chatId: ibChat!.chatId,
+                  uid: IbUtils.getCurrentUid()!,
+                  role: IbChatMember.kRoleLeader));
+          await IbChatDbService().addChatMember(
+              member: IbChatMember(
+                  chatId: ibChat!.chatId,
+                  uid: recipientId,
+                  role: IbChatMember.kRoleMember));
+          setUpStreams();
+          setUpInfo();
+        } catch (e) {
+          IbUtils.showSimpleSnackBar(
+              msg: 'Failed to create chat room $e',
+              backgroundColor: IbColors.errorRed);
+        }
+      }
+    }
+    if (ibChatMembers.length == 2 && isCircle.isFalse) {
+      final item = ibChatMembers.firstWhereOrNull(
+          (element) => element.user.id != IbUtils.getCurrentUid());
+      if (item != null) {
+        final IbUser? user = await IbUserDbService().queryIbUser(item.user.id);
+        if (user != null) {
+          item.user = user;
+          ibChatMembers.refresh();
+
+          if (user.blockedFriendUids.contains(IbUtils.getCurrentUid())) {
+            IbUtils.showSimpleSnackBar(
+                msg: 'Sending message failed, message is blocked',
+                backgroundColor: IbColors.errorRed);
+            isSending.value = false;
+            return;
+          }
+        }
+      }
+    }
+
     try {
       if (txtController.text.trim().isNotEmpty) {
         await IbChatDbService().uploadMessage(buildMessage());

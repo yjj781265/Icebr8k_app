@@ -94,6 +94,7 @@ class FriendListItem extends StatelessWidget {
                         color: Theme.of(context).backgroundColor),
                     child: const Icon(
                       Icons.block_flipped,
+                      size: 16,
                       color: IbColors.errorRed,
                     ),
                   ))

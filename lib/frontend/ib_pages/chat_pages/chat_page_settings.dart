@@ -156,6 +156,7 @@ class ChatPageSettings extends StatelessWidget {
           final chatMember = _controller.ibChatMembers.firstWhereOrNull(
               (element) => element.member.uid == IbUtils.getCurrentUid()!);
           if (chatMember != null &&
+              _controller.isCircle.isTrue &&
               (chatMember.member.role == IbChatMember.kRoleLeader ||
                   chatMember.member.role == IbChatMember.kRoleAssistant)) {
             return ListTile(
@@ -174,14 +175,20 @@ class ChatPageSettings extends StatelessWidget {
               trailing: const Icon(Icons.edit),
             );
           }
-          return ListTile(
-            onTap: () {
-              Get.to(() => CircleSettings(Get.put(CircleSettingsController(
-                  ibChat: _controller.ibChat, isAbleToEdit: false))));
-            },
-            title: const Text('Circle Info'),
-            trailing: const Icon(Icons.info),
-          );
+          if (chatMember != null &&
+              _controller.isCircle.isTrue &&
+              (chatMember.member.role == IbChatMember.kRoleLeader ||
+                  chatMember.member.role == IbChatMember.kRoleAssistant)) {
+            return ListTile(
+              onTap: () {
+                Get.to(() => CircleSettings(Get.put(CircleSettingsController(
+                    ibChat: _controller.ibChat, isAbleToEdit: false))));
+              },
+              title: const Text('Circle Info'),
+              trailing: const Icon(Icons.info),
+            );
+          }
+          return const SizedBox();
         }),
         const ListTile(
           leading: Icon(

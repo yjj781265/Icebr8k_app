@@ -115,6 +115,7 @@ class SocialTabController extends GetxController {
         Get.find<FriendItemController>(tag: user.username).refreshItem(true);
       }
     }
+    friends.sort((a, b) => a.username.compareTo(b.username));
     friendListRefreshController.refreshCompleted();
     isFriendListLoading.value = false;
   }
