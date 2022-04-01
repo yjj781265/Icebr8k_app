@@ -101,7 +101,7 @@ class CircleSettings extends StatelessWidget {
                                     const BorderRadius.all(Radius.circular(8))),
                             child: TextField(
                               enabled: _controller.isAbleToEdit,
-                              maxLength: 100,
+                              maxLength: 50,
                               controller: _controller.titleTxtController,
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -311,10 +311,22 @@ class CircleSettings extends StatelessWidget {
           child: Ink(
             height: 56,
             width: double.infinity,
-            child: const Center(
-              child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text('Default Photo'),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: const [
+                  Icon(
+                    Icons.person,
+                    color: IbColors.lightGrey,
+                  ),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Text(
+                    'Circle name initial',
+                    style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                  ),
+                ],
               ),
             ),
           ),

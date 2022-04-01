@@ -128,7 +128,9 @@ class ProfilePage extends StatelessWidget {
                                                       .rxIbUser.value.username
                                                   ..avatarUrl.value =
                                                       _controller.rxIbUser.value
-                                                          .avatarUrl)));
+                                                          .avatarUrl,
+                                                tag: _controller
+                                                    .rxIbUser.value.id)));
                                           },
                                           icon: Icon(Icons.message,
                                               color: Theme.of(context)

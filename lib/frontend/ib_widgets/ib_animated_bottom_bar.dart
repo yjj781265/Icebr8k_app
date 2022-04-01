@@ -99,49 +99,54 @@ class _ItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(alignment: AlignmentDirectional.center, children: [
-      Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          IconTheme(
-            data: IconThemeData(
-              size: iconSize,
-              color: isSelected
-                  ? item.activeColor.withOpacity(1)
-                  : item.inactiveColor ?? item.activeColor,
-            ),
-            child: item.icon,
+    return Stack(
+        alignment: AlignmentDirectional.center,
+        clipBehavior: Clip.none,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              IconTheme(
+                data: IconThemeData(
+                  size: iconSize,
+                  color: isSelected
+                      ? item.activeColor.withOpacity(1)
+                      : item.inactiveColor ?? item.activeColor,
+                ),
+                child: item.icon,
+              ),
+              if (item.title.isNotEmpty)
+                Text(
+                  item.title,
+                  style: TextStyle(
+                      color: isSelected ? item.activeColor : item.inactiveColor,
+                      fontSize: IbConfig.kDescriptionTextSize,
+                      fontWeight: FontWeight.bold,
+                      overflow: TextOverflow.ellipsis),
+                ),
+            ],
           ),
-          if (item.title.isNotEmpty)
-            Text(
-              item.title,
-              style: TextStyle(
-                  color: isSelected ? item.activeColor : item.inactiveColor,
-                  fontSize: IbConfig.kDescriptionTextSize,
-                  fontWeight: FontWeight.bold,
-                  overflow: TextOverflow.ellipsis),
-            ),
-        ],
-      ),
-      if (item.notification > 0)
-        Positioned(
-          top: 2,
-          right: 0,
-          child: CircleAvatar(
-            backgroundColor: IbColors.errorRed,
-            radius: 11,
-            child: Text(
-              item.notification >= 99 ? '99+' : item.notification.toString(),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: IbColors.white,
-                fontSize: 11,
+          if (item.notification > 0)
+            Positioned(
+              top: -3,
+              right: -12,
+              child: CircleAvatar(
+                backgroundColor: IbColors.errorRed,
+                radius: 10,
+                child: Text(
+                  item.notification >= 99
+                      ? '99+'
+                      : item.notification.toString(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: IbColors.white,
+                    fontSize: 10,
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-    ]);
+        ]);
   }
 }
 

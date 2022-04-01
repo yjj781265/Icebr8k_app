@@ -10,6 +10,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 /// this controller control info of current IbUser, index current home page tab and api keys
 class MainPageController extends GetxController {
   final currentIndex = 0.obs;
+
   final Stream<IbUser> ibUserBroadcastStream = IbUserDbService()
       .listenToIbUserChanges(IbUtils.getCurrentFbUser()!.uid)
       .asBroadcastStream();
@@ -23,6 +24,7 @@ class MainPageController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
     ibUserBroadcastStream.listen((ibUser) {
+      print('MainPageController user update');
       rxCurrentIbUser = ibUser.obs;
       rxCurrentIbUser.refresh();
     });

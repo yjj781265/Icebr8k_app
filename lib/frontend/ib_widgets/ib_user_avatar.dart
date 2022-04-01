@@ -41,6 +41,7 @@ class IbUserAvatar extends StatelessWidget {
     }
     return Stack(
       alignment: Alignment.center,
+      clipBehavior: Clip.none,
       children: [
         if (compScore != null && uid != IbUtils.getCurrentUid())
           TweenAnimationBuilder(
@@ -91,14 +92,14 @@ class IbUserAvatar extends StatelessWidget {
                     radius: radius,
                     backgroundImage: FileImage(File(avatarUrl)),
                   )),
-        if (compScore != null && uid != IbUtils.getCurrentUid())
+        if (compScore != null && uid != IbUtils.getCurrentUid() && radius >= 16)
           Positioned(
-            bottom: 2,
+            bottom: 0,
             child: Container(
               decoration: BoxDecoration(
                 color:
-                    IbUtils.handleIndicatorColor(compScore!).withOpacity(0.88),
-                borderRadius: BorderRadius.circular(8),
+                    IbUtils.handleIndicatorColor(compScore!).withOpacity(0.8),
+                borderRadius: BorderRadius.circular(16),
               ),
               width: 40,
               alignment: Alignment.center,

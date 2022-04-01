@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/circle_info_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_info.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
@@ -16,14 +18,25 @@ class AlertTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text('Alert'),
+        ),
+      ),
       body: SafeArea(
         child: Obx(
-          () => ListView.builder(
+          () => ListView.separated(
             itemBuilder: (context, index) {
               final NotificationItem item = _controller.items[index];
               return _handleNotificationType(item, context);
             },
             itemCount: _controller.items.length,
+            separatorBuilder: (BuildContext context, int index) {
+              return const SizedBox(
+                height: 1,
+              );
+            },
           ),
         ),
       ),
@@ -33,6 +46,7 @@ class AlertTab extends StatelessWidget {
   Widget _handleNotificationType(NotificationItem item, BuildContext context) {
     if (item.notification.type == IbNotification.kFriendRequest) {
       return IbCard(
+        radius: 0,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -146,10 +160,18 @@ class AlertTab extends StatelessWidget {
           ),
         ),
         child: IbCard(
+          radius: 0,
           margin: EdgeInsets.zero,
           child: InkWell(
-            borderRadius: const BorderRadius.all(Radius.circular(16)),
-            onTap: () {},
+            onTap: () async {
+              item.notification.isRead = true;
+              await IbUserDbService().sendAlertNotification(item.notification);
+              _controller.items.refresh();
+              Get.to(
+                  () => CircleInfo(Get.put(CircleInfoController(item.ibChat!))),
+                  transition: Transition.downToUp,
+                  fullscreenDialog: true);
+            },
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Opacity(
@@ -180,13 +202,17 @@ class AlertTab extends StatelessWidget {
                           ),
                         ),
                         Expanded(
-                          child: Text(
-                            IbUtils.getAgoDateTimeString(
-                                DateTime.fromMillisecondsSinceEpoch(
-                                    item.notification.timestampInMs)),
-                            style: const TextStyle(
-                                fontSize: IbConfig.kDescriptionTextSize,
-                                color: IbColors.lightGrey),
+                          flex: 2,
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              IbUtils.getAgoDateTimeString(
+                                  DateTime.fromMillisecondsSinceEpoch(
+                                      item.notification.timestampInMs)),
+                              style: const TextStyle(
+                                  fontSize: IbConfig.kDescriptionTextSize,
+                                  color: IbColors.lightGrey),
+                            ),
                           ),
                         ),
                       ],
@@ -220,30 +246,47 @@ class AlertTab extends StatelessWidget {
                               const SizedBox(
                                 width: 8,
                               ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(item.ibChat!.name,
-                                      style: TextStyle(
-                                          color:
-                                              Theme.of(context).indicatorColor,
-                                          fontSize: IbConfig.kSecondaryTextSize,
-                                          fontWeight: FontWeight.bold)),
-                                  Text('${item.ibChat!.memberCount} member(s)',
-                                      style: const TextStyle(
-                                          color: IbColors.lightGrey,
-                                          fontSize:
-                                              IbConfig.kDescriptionTextSize,
-                                          fontWeight: FontWeight.normal))
-                                ],
+                              Expanded(
+                                flex: 8,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(item.ibChat!.name,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .indicatorColor,
+                                            fontSize:
+                                                IbConfig.kSecondaryTextSize,
+                                            fontWeight: FontWeight.bold)),
+                                    Text(
+                                        '${item.ibChat!.memberCount} member(s)',
+                                        style: const TextStyle(
+                                            color: IbColors.lightGrey,
+                                            fontSize:
+                                                IbConfig.kDescriptionTextSize,
+                                            fontWeight: FontWeight.normal))
+                                  ],
+                                ),
                               ),
+                              const Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Icon(Icons.arrow_forward_ios_rounded),
+                                ),
+                              )
                             ],
                           ),
-                          Text(
-                            item.ibChat!.description,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 3,
-                          ),
+                          if (item.ibChat!.description.isNotEmpty)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text(
+                                item.ibChat!.description,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 3,
+                              ),
+                            ),
                         ],
                       ),
                     )

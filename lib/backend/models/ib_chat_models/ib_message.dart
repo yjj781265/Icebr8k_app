@@ -19,6 +19,7 @@ class IbMessage {
   static const String kMessageTypeAudio = 'audio';
   static const String kMessageTypePoll = 'poll';
   static const String kMessageTypeLoadMore = 'loadMore';
+  static const String kMessageTypeAnnouncement = 'announcement';
 
   IbMessage(
       {required this.messageId,

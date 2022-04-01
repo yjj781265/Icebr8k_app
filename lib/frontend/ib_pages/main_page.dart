@@ -6,6 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/alert_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_tab.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
@@ -131,7 +132,6 @@ class _MainPageViewState extends State<MainPageView>
             ),
             title: '',
             inactiveColor: IbColors.accentColor,
-            notification: Get.find<ChatTabController>().totalUnread.value,
             textAlign: TextAlign.center,
           ),
           BottomNavyBarItem(
@@ -141,6 +141,10 @@ class _MainPageViewState extends State<MainPageView>
               textAlign: TextAlign.center),
           BottomNavyBarItem(
             icon: const Icon(Icons.notifications),
+            notification: Get.find<NotificationController>()
+                .items
+                .where((p0) => p0.notification.isRead == false)
+                .length,
             title: 'alert'.tr,
             inactiveColor: _inactiveColor,
             textAlign: TextAlign.center,

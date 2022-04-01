@@ -177,8 +177,7 @@ class ChatPageSettings extends StatelessWidget {
           }
           if (chatMember != null &&
               _controller.isCircle.isTrue &&
-              (chatMember.member.role == IbChatMember.kRoleLeader ||
-                  chatMember.member.role == IbChatMember.kRoleAssistant)) {
+              (chatMember.member.role == IbChatMember.kRoleMember)) {
             return ListTile(
               onTap: () {
                 Get.to(() => CircleSettings(Get.put(CircleSettingsController(

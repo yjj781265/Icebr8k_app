@@ -50,6 +50,7 @@ class ChatTabController extends GetxController {
           return (b.ibChat.lastMessage!.timestamp as Timestamp)
               .compareTo(a.ibChat.lastMessage!.timestamp as Timestamp);
         });
+        calculateTotalUnread();
         oneToOneChats.refresh();
       }
     });
@@ -83,6 +84,7 @@ class ChatTabController extends GetxController {
           return (b.ibChat.lastMessage!.timestamp as Timestamp)
               .compareTo(a.ibChat.lastMessage!.timestamp as Timestamp);
         });
+        calculateTotalUnread();
         circles.refresh();
       }
     });
@@ -126,6 +128,17 @@ class ChatTabController extends GetxController {
         avatarUsers: avatarUsers);
 
     return item;
+  }
+
+  void calculateTotalUnread() {
+    totalUnread.value = 0;
+    for (final item in oneToOneChats) {
+      totalUnread.value += item.unReadCount;
+    }
+
+    for (final item in circles) {
+      totalUnread.value += item.unReadCount;
+    }
   }
 
   @override

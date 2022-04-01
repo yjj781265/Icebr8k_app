@@ -100,7 +100,9 @@ class ChatPage extends StatelessWidget {
                       itemScrollController: _controller.itemScrollController,
                       itemPositionsListener: _controller.itemPositionsListener,
                       itemBuilder: (context, index) {
-                        return _handleMessageType(_controller.messages[index]);
+                        return _handleMessageType(
+                            message: _controller.messages[index],
+                            context: context);
                       },
                       itemCount: _controller.messages.length,
                     ),
@@ -337,7 +339,16 @@ class ChatPage extends StatelessWidget {
             children: [
               if (_controller.isCircle.isTrue)
                 IbUserAvatar(
-                  avatarUrl: _controller.avatarUrl.value,
+                  avatarUrl: _controller.ibChatMembers
+                      .firstWhere(
+                          (element) => element.user.id == message.senderUid)
+                      .user
+                      .avatarUrl,
+                  uid: _controller.ibChatMembers
+                      .firstWhere(
+                          (element) => element.user.id == message.senderUid)
+                      .user
+                      .id,
                   radius: 16,
                 ),
               if (_controller.isCircle.isTrue)
@@ -345,54 +356,61 @@ class ChatPage extends StatelessWidget {
                   width: 8,
                 ),
               Flexible(
-                child: InkWell(
-                  customBorder: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8))),
-                  onLongPress: () {
-                    HapticFeedback.heavyImpact();
-                    Clipboard.setData(ClipboardData(text: message.content));
-                    IbUtils.showSimpleSnackBar(
-                        msg: "Text copied to clipboard",
-                        backgroundColor: IbColors.primaryColor);
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: IbColors.accentColor.withOpacity(0.8),
-                        borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(16),
-                            topRight: Radius.circular(16),
-                            bottomRight: Radius.circular(16))),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Linkify(
-                        options: const LinkifyOptions(looseUrl: true),
-                        text: message.content,
-                        onOpen: (link) async {
-                          if (await canLaunch(link.url)) {
-                            launch(link.url);
-                          }
-                        },
-                        style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: IbConfig.kNormalTextSize),
+                child: Column(
+                  children: [
+                    InkWell(
+                      customBorder: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8))),
+                      onLongPress: () {
+                        HapticFeedback.heavyImpact();
+                        Clipboard.setData(ClipboardData(text: message.content));
+                        IbUtils.showSimpleSnackBar(
+                            msg: "Text copied to clipboard",
+                            backgroundColor: IbColors.primaryColor);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: IbColors.accentColor.withOpacity(0.8),
+                            borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(16),
+                                topRight: Radius.circular(16),
+                                bottomRight: Radius.circular(16))),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Linkify(
+                            options: const LinkifyOptions(looseUrl: true),
+                            text: message.content,
+                            onOpen: (link) async {
+                              if (await canLaunch(link.url)) {
+                                launch(link.url);
+                              }
+                            },
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: IbConfig.kNormalTextSize),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ],
           ),
-          Text(
-            message.timestamp == null
-                ? 'Sending...'
-                : IbUtils.readableDateTime(
-                    DateTime.fromMillisecondsSinceEpoch(
-                        (message.timestamp as Timestamp)
-                            .millisecondsSinceEpoch),
-                    showTime: true),
-            style: const TextStyle(
-                color: IbColors.lightGrey,
-                fontSize: IbConfig.kDescriptionTextSize),
+          Padding(
+            padding: const EdgeInsets.only(left: 40.0),
+            child: Text(
+              message.timestamp == null
+                  ? 'Sending...'
+                  : IbUtils.readableDateTime(
+                      DateTime.fromMillisecondsSinceEpoch(
+                          (message.timestamp as Timestamp)
+                              .millisecondsSinceEpoch),
+                      showTime: true),
+              style: const TextStyle(
+                  color: IbColors.lightGrey,
+                  fontSize: IbConfig.kDescriptionTextSize),
+            ),
           )
         ],
       ),
@@ -447,10 +465,30 @@ class ChatPage extends StatelessWidget {
     );
   }
 
-  Widget _handleMessageType(IbMessage message) {
+  Widget _handleMessageType(
+      {required IbMessage message, required BuildContext context}) {
     final bool isMe = message.senderUid == IbUtils.getCurrentUid();
     if (message.messageType == IbMessage.kMessageTypeText) {
       return isMe ? _meTextMsgItem(message) : _textMsgItem(message);
+    }
+
+    if (message.messageType == IbMessage.kMessageTypeAnnouncement) {
+      return Align(
+        child: Container(
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+                color: Theme.of(context).backgroundColor,
+                borderRadius: const BorderRadius.all(Radius.circular(8))),
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Text(
+                message.content,
+                style: const TextStyle(
+                    color: IbColors.lightGrey,
+                    fontSize: IbConfig.kSecondaryTextSize),
+              ),
+            )),
+      );
     }
     if (message.messageType == IbMessage.kMessageTypeLoadMore) {
       return const Center(

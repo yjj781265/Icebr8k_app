@@ -68,29 +68,85 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
                 sliver: SliverPersistentHeader(
                   pinned: true,
                   delegate: IbPersistentHeader(
-                    height: 32,
+                    height: 40,
                     widget: IbCard(
                       elevation: 0,
                       margin: EdgeInsets.zero,
                       child: TabBar(
                         controller: _tabController,
                         tabs: [
-                          Tooltip(
-                            message: 'circles'.tr,
-                            child: const Tab(
-                              height: 32,
-                              icon: Icon(
-                                Icons.circle_outlined,
-                              ),
-                            ),
-                          ),
-                          Tooltip(
-                              message: 'one_to_one_chat'.tr,
-                              child: const Tab(
+                          Obx(() {
+                            int total = 0;
+                            for (final item in _controller.circles) {
+                              total += item.unReadCount;
+                            }
+
+                            return Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                const Tab(
+                                  height: 32,
+                                  icon: Icon(
+                                    Icons.circle_outlined,
+                                  ),
+                                ),
+                                if (total > 0)
+                                  Positioned(
+                                    right: -10,
+                                    top: 0,
+                                    child: CircleAvatar(
+                                      backgroundColor: IbColors.errorRed,
+                                      radius: 10,
+                                      child: Text(
+                                        total >= 99 ? '99+' : total.toString(),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: IbColors.white,
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            );
+                          }),
+                          Obx(() {
+                            int total = 0;
+                            for (final item in _controller.oneToOneChats) {
+                              total += item.unReadCount;
+                            }
+
+                            return Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                const Tab(
                                   height: 32,
                                   icon: Icon(
                                     Icons.message,
-                                  ))),
+                                  ),
+                                ),
+                                if (total > 0)
+                                  Positioned(
+                                    right: -10,
+                                    top: 0,
+                                    child: CircleAvatar(
+                                      backgroundColor: IbColors.errorRed,
+                                      radius: 10,
+                                      child: Text(
+                                        total >= 99 ? '99+' : total.toString(),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: IbColors.white,
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            );
+                          }),
                         ],
                       ),
                     ),
@@ -100,7 +156,7 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
             ];
           },
           body: Padding(
-            padding: const EdgeInsets.only(top: 38),
+            padding: const EdgeInsets.only(top: 42),
             child: TabBarView(
               controller: _tabController,
               children: [
@@ -171,6 +227,7 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
               onTap: () {
                 item.unReadCount = 0;
                 _controller.oneToOneChats.refresh();
+                _controller.calculateTotalUnread();
                 Get.to(
                   () => ChatPage(
                     Get.put(
@@ -285,6 +342,7 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
               onTap: () {
                 item.unReadCount = 0;
                 _controller.circles.refresh();
+                _controller.calculateTotalUnread();
                 Get.to(
                   () => ChatPage(
                     Get.put(
