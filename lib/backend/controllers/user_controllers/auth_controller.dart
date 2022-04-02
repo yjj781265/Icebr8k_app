@@ -13,12 +13,13 @@ import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/admin/admin_main_page.dart';
 import 'package:icebr8k/frontend/admin/role_select_page.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/main_page.dart';
 import 'package:icebr8k/frontend/ib_pages/review_page.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_one.dart';
 import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
+
+import '../../../frontend/ib_pages/main_page.dart';
 
 class AuthController extends GetxService {
   final isInitializing = true.obs;
@@ -35,11 +36,11 @@ class AuthController extends GetxService {
       if (user == null) {
         firebaseUser = null;
         print('User is signed out!');
+        isInitializing.value = true;
         Get.offAll(() => WelcomePage(),
             transition: Transition.circularReveal,
             duration: const Duration(
                 milliseconds: IbConfig.kEventTriggerDelayInMillis));
-        isInitializing.value = true;
         return;
       } else {
         firebaseUser = user;
@@ -78,9 +79,9 @@ class AuthController extends GetxService {
 
       final UserCredential userCredential =
           await _ibAuthService.signInViaEmail(email, password);
-      final user = userCredential.user;
+      firebaseUser = userCredential.user;
 
-      if (user != null && !user.emailVerified) {
+      if (firebaseUser != null && !firebaseUser!.emailVerified) {
         Get.back();
         Get.dialog(
           IbDialog(
@@ -91,7 +92,7 @@ class AuthController extends GetxService {
             actionButtons: TextButton(
               onPressed: () async {
                 try {
-                  await user.sendEmailVerification();
+                  await firebaseUser!.sendEmailVerification();
                   Get.back();
                   Get.dialog(
                     IbDialog(
@@ -121,6 +122,7 @@ class AuthController extends GetxService {
           barrierDismissible: false,
         );
       } else if (firebaseUser != null && firebaseUser!.emailVerified) {
+        print('here');
         _navigateToCorrectPage();
       }
     } on FirebaseAuthException catch (e) {
@@ -188,6 +190,7 @@ class AuthController extends GetxService {
         positiveTextKey: 'ok',
       ));
     } finally {
+      await _ibAuthService.signOut();
       isSigningUp.value = false;
     }
   }
@@ -255,10 +258,6 @@ class AuthController extends GetxService {
         }
       } else {
         print('AuthController firebase user email is not verified ');
-        Get.offAll(() => WelcomePage(),
-            transition: Transition.circularReveal,
-            duration: const Duration(
-                milliseconds: IbConfig.kEventTriggerDelayInMillis));
       }
     } on FirebaseAuthException catch (e) {
       Get.dialog(IbDialog(

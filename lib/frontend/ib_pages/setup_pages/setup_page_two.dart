@@ -138,17 +138,14 @@ class SetupPageTwo extends StatelessWidget {
             const SizedBox(
               height: 8,
             ),
-            Obx(() => SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: _controller.emoPics
-                        .map((element) => IbEmoPicCard(
-                              emoPic: element,
-                              onTap: () => showEditAvatarBottomSheet(
-                                  context: context, emoPic: element),
-                            ))
-                        .toList(),
-                  ),
+            Obx(() => Wrap(
+                  children: _controller.emoPics
+                      .map((element) => IbEmoPicCard(
+                            emoPic: element,
+                            onTap: () => showEditAvatarBottomSheet(
+                                context: context, emoPic: element),
+                          ))
+                      .toList(),
                 )),
             const Padding(
               padding: EdgeInsets.all(8.0),
