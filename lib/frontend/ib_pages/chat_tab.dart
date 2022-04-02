@@ -240,11 +240,16 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    item.title,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: IbConfig.kNormalTextSize),
+                  Expanded(
+                    flex: 6,
+                    child: Text(
+                      item.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: IbConfig.kNormalTextSize),
+                    ),
                   ),
                   if (item.ibChat.lastMessage != null)
                     Text(

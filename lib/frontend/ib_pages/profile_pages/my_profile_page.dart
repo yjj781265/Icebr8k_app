@@ -329,7 +329,7 @@ class MyProfilePage extends StatelessWidget {
                         style:
                             const TextStyle(fontSize: IbConfig.kNormalTextSize),
                       ),
-                      Row(
+                      /*      Row(
                         children: [
                           Text(_controller.rxIbUser.value.gender),
                           if (_controller.rxIbUser.value.birthdateInMs != null)
@@ -342,7 +342,7 @@ class MyProfilePage extends StatelessWidget {
                       ),
                       const SizedBox(
                         height: 4,
-                      ),
+                      ),*/
                       IbDescriptionText(text: _controller.rxIbUser.value.bio),
                       const Divider(
                         thickness: 2,
