@@ -30,7 +30,6 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   late AnimationController expandController;
   late Animation<double> animation;
-  final _scrollController = ScrollController();
   List<Color> colors = [
     Colors.redAccent,
     Colors.orangeAccent,

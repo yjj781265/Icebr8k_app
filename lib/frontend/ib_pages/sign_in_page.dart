@@ -216,8 +216,8 @@ class SignInPage extends StatelessWidget {
                                   padding: const EdgeInsets.only(
                                       left: 8, right: 8, bottom: 16, top: 8),
                                   child: IbElevatedButton(
-                                    icon:
-                                        const Icon(FontAwesomeIcons.signInAlt),
+                                    icon: const Icon(
+                                        FontAwesomeIcons.rightToBracket),
                                     color: IbColors.primaryColor,
                                     textTrKey:
                                         _authController.isSigningIn.isTrue

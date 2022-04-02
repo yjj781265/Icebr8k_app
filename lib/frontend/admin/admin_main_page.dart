@@ -71,7 +71,7 @@ class AdminMainPage extends StatelessWidget {
                   padding: const EdgeInsets.all(16.0),
                   child: IbActionButton(
                     color: IbColors.errorRed,
-                    iconData: FontAwesomeIcons.signOutAlt,
+                    iconData: FontAwesomeIcons.rightFromBracket,
                     onPressed: () {
                       IbUtils.showSimpleSnackBar(
                           msg: 'Long press to sign out',

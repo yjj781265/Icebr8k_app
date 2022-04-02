@@ -60,7 +60,7 @@ class WelcomePage extends StatelessWidget {
                       height: 80,
                       padding: const EdgeInsets.all(8),
                       child: IbElevatedButton(
-                        icon: const Icon(FontAwesomeIcons.signInAlt),
+                        icon: const Icon(FontAwesomeIcons.rightToBracket),
                         textTrKey: 'login',
                         onPressed: () {
                           Get.to(() => SignInPage());

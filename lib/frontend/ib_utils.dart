@@ -28,14 +28,16 @@ class IbUtils {
 
   static Future<File?> showImageCropper(String filePath,
       {CropStyle cropStyle = CropStyle.circle,
-      List<CropAspectRatioPreset> ratios = const [],
+      List<CropAspectRatioPreset> ratios = const [
+        CropAspectRatioPreset.original,
+      ],
       bool resetAspectRatioEnabled = true,
       double? width,
       double? height,
       CropAspectRatioPreset initAspectRatio = CropAspectRatioPreset.original,
       bool lockAspectRatio = false,
       double? minimumAspectRatio}) async {
-    return ImageCropper.cropImage(
+    return ImageCropper().cropImage(
         sourcePath: filePath,
         cropStyle: cropStyle,
         aspectRatioPresets: ratios,

@@ -175,6 +175,7 @@ class IbChatDbService {
     final List<String> uids = [IbUtils.getCurrentUid()!, uid];
     uids.sort();
     final snapshot = await _collectionRef
+        .where('isCircle', isEqualTo: false)
         .where('memberUids', isEqualTo: uids)
         .where('memberCount', isEqualTo: 2)
         .get();

@@ -187,8 +187,11 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
               ),
             );
             if (users != null) {
-              Get.to(() => ChatPage(Get.put(ChatPageController(
-                  recipientId: (users as List<IbUser>).first.id))));
+              final IbUser user = (users as List<IbUser>).first;
+              Get.to(() =>
+                  ChatPage(Get.put(ChatPageController(recipientId: (user.id))
+                    ..title.value = user.username
+                    ..avatarUrl.value = user.avatarUrl)));
             }
           }
         },

@@ -347,7 +347,6 @@ class IbQuestionItemController extends GetxController {
       IbCacheManager().cacheIbUser(user);
     } else {
       user = IbCacheManager().getIbUser(uid);
-      print('retrieveUser from cached');
     }
     return user;
   }
@@ -364,7 +363,6 @@ class IbQuestionItemController extends GetxController {
       }
     } else {
       ibAnswer = answerMap[comment.uid];
-      print('retrieveIbAnswer from cache map');
     }
     return ibAnswer;
   }

@@ -61,7 +61,7 @@ class _IbMediaViewerState extends State<IbMediaViewer>
                       Get.back(canPop: false);
                     },
                     child: InteractiveViewer(
-                      minScale: 1.0,
+                      minScale: 1.5,
                       boundaryMargin: const EdgeInsets.all(8),
                       child: img,
                     ),

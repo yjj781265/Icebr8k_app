@@ -7,3 +7,6 @@ linter:
     require_trailing_commas: false
     cancel_subscriptions: false
     avoid_positional_boolean_parameters: false
+    avoid_relative_lib_imports: false
+    always_use_package_imports: false
+    avoid_dynamic_calls: false

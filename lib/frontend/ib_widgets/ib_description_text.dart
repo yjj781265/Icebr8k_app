@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -34,12 +32,12 @@ class _DescriptionTextWidgetState extends State<IbDescriptionText>
     }
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        var span = TextSpan(
+        final span = TextSpan(
           text: widget.text,
         );
 
         // Use a textpainter to determine if it will exceed max lines
-        var tp = TextPainter(
+        final tp = TextPainter(
           maxLines: maxLines,
           textAlign: TextAlign.left,
           textDirection: TextDirection.ltr,

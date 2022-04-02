@@ -77,7 +77,7 @@ class RoleSelectPage extends StatelessWidget {
               },
               child: IbActionButton(
                 color: IbColors.errorRed,
-                iconData: FontAwesomeIcons.signOutAlt,
+                iconData: FontAwesomeIcons.rightFromBracket,
                 onPressed: () {
                   IbUtils.showSimpleSnackBar(
                       msg: 'Long press to sign out',

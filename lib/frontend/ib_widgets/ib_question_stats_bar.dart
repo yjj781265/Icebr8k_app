@@ -27,7 +27,7 @@ class IbQuestionStatsBar extends StatelessWidget {
             TextButton.icon(
                 onPressed: _itemController.isSample ? null : _handleOnStatsTap,
                 icon: FaIcon(
-                  FontAwesomeIcons.voteYea,
+                  FontAwesomeIcons.checkToSlot,
                   color: _itemController.rxIbAnswer != null
                       ? (_itemController.rxIbAnswer != null &&
                               _itemController.rxIbAnswer!.value.isPublic

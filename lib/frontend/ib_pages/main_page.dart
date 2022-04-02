@@ -2,9 +2,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
-import 'package:get/route_manager.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/alert_tab.dart';
@@ -50,11 +48,7 @@ class _MainPageViewState extends State<MainPageView>
   }
 
   @override
-  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed) {
-      await FlutterLocalNotificationsPlugin().cancelAll();
-    }
-  }
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {}
 
   @override
   Widget build(BuildContext context) {

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/circle_info_controller.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
@@ -40,9 +41,19 @@ class CircleInfo extends StatelessWidget {
                           ),
                         )
                       else
-                        IbUserAvatar(
-                          avatarUrl: _controller.ibChat.photoUrl,
-                          radius: 56,
+                        GestureDetector(
+                          child: IbUserAvatar(
+                            avatarUrl: _controller.ibChat.photoUrl,
+                            radius: 56,
+                          ),
+                          onTap: () {
+                            Get.to(
+                                () => IbMediaViewer(
+                                    urls: [_controller.ibChat.photoUrl],
+                                    currentIndex: 0),
+                                fullscreenDialog: true,
+                                transition: Transition.zoom);
+                          },
                         ),
                       Text(
                         '${_controller.ibChat.memberCount} Member(s)',

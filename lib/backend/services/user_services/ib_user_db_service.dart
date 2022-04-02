@@ -13,7 +13,6 @@ class IbUserDbService {
   static const _kUserCollection = 'IbUsers${DbConfig.dbSuffix}';
   static const _kNotificationSubCollection =
       'IbNotifications${DbConfig.dbSuffix}';
-  static const _kFriendSubCollection = 'IbFriends${DbConfig.dbSuffix}';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
 
   factory IbUserDbService() => _ibUserService;

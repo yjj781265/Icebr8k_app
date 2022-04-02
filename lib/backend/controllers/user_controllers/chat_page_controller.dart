@@ -91,6 +91,7 @@ class ChatPageController extends GetxController {
 
   void setUpStreams() {
     if (ibChat == null) {
+      isLoading.value = false;
       return;
     }
 
@@ -108,7 +109,12 @@ class ChatPageController extends GetxController {
           if (index != -1) {
             messages[index] = ibMessage;
           }
-        } else {}
+        } else {
+          final int index = messages.indexOf(ibMessage);
+          if (index != -1) {
+            messages.removeAt(index);
+          }
+        }
       }
 
       if (event.docs.isNotEmpty) {
@@ -123,6 +129,7 @@ class ChatPageController extends GetxController {
         await IbChatDbService().updateReadUidArray(
             chatRoomId: ibChat!.chatId, messageId: lastMessage.messageId);
       }
+      messages.refresh();
       isLoading.value = false;
     });
 

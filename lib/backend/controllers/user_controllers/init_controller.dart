@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -17,6 +16,7 @@ class InitController extends GetxController {
       await Firebase.initializeApp();
       await GetStorage.init();
 
+      //Todo replace with a manager
       //SetUp Crashlytics
       if (kDebugMode) {
         await FirebaseCrashlytics.instance
@@ -37,9 +37,6 @@ class InitController extends GetxController {
           originalOnError(errorDetails);
         }
       };
-
-      // remove all notifications while opening the app
-      await FlutterLocalNotificationsPlugin().cancelAll();
     } catch (e) {
       print('MainController $e');
       hasError.value = true;

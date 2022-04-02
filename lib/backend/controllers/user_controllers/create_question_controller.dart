@@ -43,13 +43,13 @@ class CreateQuestionController extends GetxController {
   }
 
   void swapIndex(int oldIndex, int newIndex) {
-    if (questionType == IbQuestion.kMultipleChoice) {
+    if (questionType.value == IbQuestion.kMultipleChoice) {
       final IbChoice item = choiceList.removeAt(oldIndex);
       choiceList.insert(oldIndex < newIndex ? newIndex - 1 : newIndex, item);
       return;
     }
 
-    if (questionType == IbQuestion.kMultipleChoicePic) {
+    if (questionType.value == IbQuestion.kMultipleChoicePic) {
       final IbChoice item = picChoiceList.removeAt(oldIndex);
       picChoiceList.insert(oldIndex < newIndex ? newIndex - 1 : newIndex, item);
       return;
@@ -60,14 +60,14 @@ class CreateQuestionController extends GetxController {
   }
 
   bool isChoiceDuplicated(String text) {
-    if (IbQuestion.kMultipleChoice == questionType) {
+    if (IbQuestion.kMultipleChoice == questionType.value) {
       for (final IbChoice choice in choiceList) {
         if (text.trim() == choice.content) {
           return true;
         }
       }
       return false;
-    } else if (IbQuestion.kMultipleChoicePic == questionType) {
+    } else if (IbQuestion.kMultipleChoicePic == questionType.value) {
       for (final IbChoice choice in picChoiceList) {
         if (text.trim() == choice.content) {
           return true;
@@ -108,7 +108,8 @@ class CreateQuestionController extends GetxController {
       ));
       return;
     }
-    if (questionType == IbQuestion.kMultipleChoice && choiceList.length < 2) {
+    if (questionType.value == IbQuestion.kMultipleChoice &&
+        choiceList.length < 2) {
       Get.dialog(IbDialog(
           subtitle: 'mc_question_not_valid'.tr,
           title: 'Error',
@@ -117,7 +118,7 @@ class CreateQuestionController extends GetxController {
       return;
     }
 
-    if (questionType == IbQuestion.kMultipleChoicePic &&
+    if (questionType.value == IbQuestion.kMultipleChoicePic &&
         picChoiceList.length < 2) {
       Get.dialog(IbDialog(
           showNegativeBtn: false,
@@ -127,7 +128,7 @@ class CreateQuestionController extends GetxController {
       return;
     }
 
-    if (questionType == IbQuestion.kMultipleChoicePic) {
+    if (questionType.value == IbQuestion.kMultipleChoicePic) {
       for (final IbChoice ibChoice in picChoiceList) {
         if (ibChoice.url == null ||
             ibChoice.url!.isEmpty ||
