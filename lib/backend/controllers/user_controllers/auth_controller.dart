@@ -122,7 +122,6 @@ class AuthController extends GetxService {
           barrierDismissible: false,
         );
       } else if (firebaseUser != null && firebaseUser!.emailVerified) {
-        print('here');
         _navigateToCorrectPage();
       }
     } on FirebaseAuthException catch (e) {
