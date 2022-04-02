@@ -62,9 +62,6 @@ class ChatPageController extends GetxController {
   }
 
   @override
-  void onReady() {}
-
-  @override
   void onClose() {
     if (_messageSub != null) {
       _messageSub!.cancel();
@@ -90,7 +87,6 @@ class ChatPageController extends GetxController {
     }
     setUpStreams();
     setUpInfo();
-    isLoading.value = false;
   }
 
   void setUpStreams() {
@@ -127,6 +123,7 @@ class ChatPageController extends GetxController {
         await IbChatDbService().updateReadUidArray(
             chatRoomId: ibChat!.chatId, messageId: lastMessage.messageId);
       }
+      isLoading.value = false;
     });
 
     _memberSub = IbChatDbService()
@@ -145,28 +142,55 @@ class ChatPageController extends GetxController {
           }
 
           if (ibUser != null) {
-            ibChatMembers
-                .add(IbChatMemberModel(member: ibChatMember, user: ibUser));
+            final double compScore = await IbUtils.getCompScore(uid: ibUser.id);
+            ibChatMembers.add(IbChatMemberModel(
+                member: ibChatMember, user: ibUser, compScore: compScore));
           }
         } else if (docChange.type == DocumentChangeType.modified) {
           final index = ibChatMembers
               .indexWhere((element) => element.member.uid == ibChatMember.uid);
           if (index != -1) {
+            final double compScore =
+                await IbUtils.getCompScore(uid: ibChatMembers[index].user.id);
             ibChatMembers[index].member = ibChatMember;
-            ibChatMembers.refresh();
+            ibChatMembers[index].compScore = compScore;
           }
         } else {
           final index = ibChatMembers
               .indexWhere((element) => element.member.uid == ibChatMember.uid);
           if (index != -1) {
             ibChatMembers.removeAt(index);
-            ibChatMembers.refresh();
           }
         }
       }
+
       ibChatMembers.sort((a, b) {
-        return a.member.role.compareTo(b.member.role);
+        if (a.member.role == IbChatMember.kRoleLeader &&
+            (b.member.role == IbChatMember.kRoleAssistant ||
+                b.member.role == IbChatMember.kRoleMember)) {
+          return -1;
+        }
+
+        if ((a.member.role == IbChatMember.kRoleAssistant ||
+                a.member.role == IbChatMember.kRoleMember) &&
+            b.member.role == IbChatMember.kRoleLeader) {
+          return 1;
+        }
+
+        if (a.member.role == IbChatMember.kRoleAssistant &&
+            b.member.role == IbChatMember.kRoleMember) {
+          print(3);
+          return -1;
+        }
+
+        if (b.member.role == IbChatMember.kRoleAssistant &&
+            a.member.role == IbChatMember.kRoleMember) {
+          return 1;
+        }
+
+        return a.user.username.compareTo(b.user.username);
       });
+      ibChatMembers.refresh();
     });
 
     _chatSub =
@@ -270,6 +294,117 @@ class ChatPageController extends GetxController {
     }
   }
 
+  Future<void> removeFromCircle(IbChatMemberModel model) async {
+    Get.dialog(
+      IbDialog(
+        title: 'Are you sure to remove ${model.user.username} from the circle?',
+        subtitle: '',
+        onPositiveTap: () async {
+          Get.back();
+          try {
+            await IbChatDbService().removeChatMember(member: model.member);
+            await IbChatDbService().uploadMessage(IbMessage(
+                messageId: IbUtils.getUniqueId(),
+                content:
+                    '${IbUtils.getCurrentIbUser()!.username} removed ${model.user.username} from the circle',
+                messageType: IbMessage.kMessageTypeAnnouncement,
+                senderUid: IbUtils.getCurrentUid()!,
+                chatRoomId: ibChat!.chatId));
+          } catch (e) {
+            Get.dialog(IbDialog(
+              title: 'Error',
+              subtitle: e.toString(),
+              showNegativeBtn: false,
+            ));
+          }
+          ibChatMembers.refresh();
+          IbUtils.showSimpleSnackBar(
+              msg: 'Member Removed', backgroundColor: IbColors.primaryColor);
+        },
+      ),
+    );
+  }
+
+  Future<void> transferLeadership(IbChatMemberModel model) async {
+    final mChatModel = ibChatMembers.firstWhereOrNull(
+        (element) => element.user.id == IbUtils.getCurrentUid()!);
+    Get.dialog(
+      IbDialog(
+        title:
+            'Are you sure to transfer your leadership to ${model.user.username}?',
+        subtitle: '',
+        onPositiveTap: () async {
+          Get.back();
+          try {
+            if (mChatModel != null) {
+              mChatModel.member.role = IbChatMember.kRoleAssistant;
+              await IbChatDbService()
+                  .updateChatMember(member: mChatModel.member);
+            }
+
+            model.member.role = IbChatMember.kRoleLeader;
+            await IbChatDbService().updateChatMember(member: model.member);
+            await IbChatDbService().uploadMessage(IbMessage(
+                messageId: IbUtils.getUniqueId(),
+                content: '${model.user.username} is now the new circle leader',
+                messageType: IbMessage.kMessageTypeAnnouncement,
+                senderUid: IbUtils.getCurrentUid()!,
+                chatRoomId: ibChat!.chatId));
+          } catch (e) {
+            Get.dialog(IbDialog(
+              title: 'Error',
+              subtitle: e.toString(),
+              showNegativeBtn: false,
+            ));
+          }
+          ibChatMembers.refresh();
+          IbUtils.showSimpleSnackBar(
+              msg: 'Leadership Transferred',
+              backgroundColor: IbColors.accentColor);
+        },
+      ),
+    );
+  }
+
+  Future<void> promoteToAssistant(IbChatMemberModel model) async {
+    try {
+      model.member.role = IbChatMember.kRoleAssistant;
+      await IbChatDbService().updateChatMember(member: model.member);
+      await IbChatDbService().uploadMessage(IbMessage(
+          messageId: IbUtils.getUniqueId(),
+          content:
+              '${model.user.username} is promoted to be a circle assistant',
+          messageType: IbMessage.kMessageTypeAnnouncement,
+          senderUid: IbUtils.getCurrentUid()!,
+          chatRoomId: ibChat!.chatId));
+    } catch (e) {
+      Get.dialog(IbDialog(
+        title: 'Error',
+        subtitle: e.toString(),
+        showNegativeBtn: false,
+      ));
+    }
+    ibChatMembers.refresh();
+    IbUtils.showSimpleSnackBar(
+        msg: 'Member Promoted', backgroundColor: IbColors.accentColor);
+  }
+
+  Future<void> demoteToMember(IbChatMemberModel model) async {
+    try {
+      model.member.role = IbChatMember.kRoleMember;
+      await IbChatDbService().updateChatMember(member: model.member);
+    } catch (e) {
+      Get.dialog(IbDialog(
+        title: 'Error',
+        subtitle: e.toString(),
+        showNegativeBtn: false,
+      ));
+    }
+    ibChatMembers.refresh();
+    IbUtils.showSimpleSnackBar(
+        msg: 'Member Demoted', backgroundColor: IbColors.primaryColor);
+  }
+
   Future<void> muteNotification() async {
     isMuted.value = true;
     await IbChatDbService().muteNotification(ibChat!);
@@ -358,8 +493,10 @@ class ChatPageController extends GetxController {
 class IbChatMemberModel {
   IbChatMember member;
   IbUser user;
+  double compScore;
 
-  IbChatMemberModel({required this.member, required this.user});
+  IbChatMemberModel(
+      {required this.member, required this.user, required this.compScore});
 
   @override
   bool operator ==(Object other) =>

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
@@ -117,6 +118,13 @@ class CircleSettingsController extends GetxController {
 
       Get.back(closeOverlays: true);
       if (ibChat != null) {
+        await IbChatDbService().uploadMessage(IbMessage(
+            messageId: IbUtils.getUniqueId(),
+            content:
+                '${IbUtils.getCurrentIbUser()!.username} updated circle info',
+            messageType: IbMessage.kMessageTypeAnnouncement,
+            senderUid: IbUtils.getCurrentUid()!,
+            chatRoomId: ibChat!.chatId));
         IbUtils.showSimpleSnackBar(
             msg: 'Circle info updated', backgroundColor: IbColors.accentColor);
       } else {

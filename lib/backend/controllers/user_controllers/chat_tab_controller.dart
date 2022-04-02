@@ -96,6 +96,7 @@ class ChatTabController extends GetxController {
         .where((element) => element != IbUtils.getCurrentUid())
         .toList();
     final List<IbUser> avatarUsers = [];
+    IbUser? lastMsgUser;
     String title = '';
     final int max = uids.length > 4 ? 4 : uids.length;
 
@@ -114,6 +115,11 @@ class ChatTabController extends GetxController {
       }
     }
 
+    if (ibChat.lastMessage != null) {
+      lastMsgUser =
+          await IbUserDbService().queryIbUser(ibChat.lastMessage!.senderUid);
+    }
+
     if (ibChat.name.isNotEmpty) {
       title = ibChat.name;
     }
@@ -122,10 +128,12 @@ class ChatTabController extends GetxController {
         await IbChatDbService().queryUnreadCount(ibChat: ibChat);
 
     final ChatTabItem item = ChatTabItem(
-        ibChat: ibChat,
-        unReadCount: unReadCount,
-        title: title,
-        avatarUsers: avatarUsers);
+      avatars: avatarUsers,
+      lastMessageUser: lastMsgUser,
+      ibChat: ibChat,
+      unReadCount: unReadCount,
+      title: title,
+    );
 
     return item;
   }
@@ -152,15 +160,17 @@ class ChatTabController extends GetxController {
 class ChatTabItem {
   IbChat ibChat;
   String title;
-  List<IbUser> avatarUsers;
+  List<IbUser> avatars;
+  IbUser? lastMessageUser;
   bool isMuted = false;
   int unReadCount;
 
   ChatTabItem({
+    required this.avatars,
     required this.ibChat,
     required this.unReadCount,
     required this.title,
-    required this.avatarUsers,
+    required this.lastMessageUser,
   }) {
     isMuted = ibChat.mutedUids.contains(IbUtils.getCurrentUid());
   }

@@ -37,6 +37,7 @@ class IbUserAvatar extends StatelessWidget {
             shape: BoxShape.circle, color: IbColors.lightGrey),
         height: radius * 2,
         width: radius * 2,
+        child: const Icon(Icons.person_off_rounded),
       );
     }
     return Stack(
@@ -92,7 +93,7 @@ class IbUserAvatar extends StatelessWidget {
                     radius: radius,
                     backgroundImage: FileImage(File(avatarUrl)),
                   )),
-        if (compScore != null && uid != IbUtils.getCurrentUid() && radius >= 16)
+        if (compScore != null && uid != IbUtils.getCurrentUid() && radius > 32)
           Positioned(
             bottom: 0,
             child: Container(

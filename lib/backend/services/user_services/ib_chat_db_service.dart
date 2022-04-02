@@ -126,6 +126,22 @@ class IbChatDbService {
         .set(member.toJson(), SetOptions(merge: true));
   }
 
+  Future<void> updateChatMember({required IbChatMember member}) async {
+    return _collectionRef
+        .doc(member.chatId)
+        .collection(_kMemberSubCollection)
+        .doc(member.uid)
+        .set(member.toJson(), SetOptions(merge: true));
+  }
+
+  Future<void> removeChatMember({required IbChatMember member}) async {
+    return _collectionRef
+        .doc(member.chatId)
+        .collection(_kMemberSubCollection)
+        .doc(member.uid)
+        .delete();
+  }
+
   Future<void> addIbChat(IbChat ibChat, {bool isEdit = false}) async {
     if (!isEdit) {
       ibChat.createdAtTimestamp = FieldValue.serverTimestamp();

@@ -43,12 +43,13 @@ class IbDialog extends StatelessWidget {
                 const SizedBox(
                   height: 16,
                 ),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    fontSize: IbConfig.kNormalTextSize,
+                if (subtitle.trim().isNotEmpty)
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: IbConfig.kNormalTextSize,
+                    ),
                   ),
-                ),
                 content ?? const SizedBox(),
                 const SizedBox(
                   height: 24,

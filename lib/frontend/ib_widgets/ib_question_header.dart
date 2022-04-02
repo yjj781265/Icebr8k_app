@@ -85,6 +85,7 @@ class IbQuestionHeader extends StatelessWidget {
     return Obx(() {
       if (!_itemController.rxIbQuestion.value.isAnonymous) {
         return IbUserAvatar(
+          compScore: _itemController.compScore.value,
           disableOnTap: _itemController.isSample,
           avatarUrl: _itemController.avatarUrl.value,
           uid: _itemController.rxIbQuestion.value.creatorId,

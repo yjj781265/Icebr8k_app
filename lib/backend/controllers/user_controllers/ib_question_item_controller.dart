@@ -40,6 +40,7 @@ class IbQuestionItemController extends GetxController {
   final selectedChoiceId = ''.obs;
   final title = ''.obs;
   final avatarUrl = ''.obs;
+  final compScore = 0.0.obs;
   final resultMap = <IbChoice, double>{}.obs;
   final RxList<IbTag> ibTags = <IbTag>[].obs;
   //start
@@ -61,6 +62,8 @@ class IbQuestionItemController extends GetxController {
 
   /// flag for closed poll
   final isPollClosed = false.obs;
+
+  IbUser? creatorUser;
 
   IbQuestionItemController({
     required this.rxIbQuestion,
@@ -84,13 +87,14 @@ class IbQuestionItemController extends GetxController {
     choiceUserMap.clear();
     showComparison.value = ibAnswers != null && ibAnswers!.isNotEmpty;
 
-    /// query question author user info
-    final ibUser =
+    /// query question poll creator user info
+    creatorUser =
         await IbUserDbService().queryIbUser(rxIbQuestion.value.creatorId);
 
-    if (ibUser != null) {
-      title.value = ibUser.username;
-      avatarUrl.value = ibUser.avatarUrl;
+    if (creatorUser != null) {
+      title.value = creatorUser!.username;
+      avatarUrl.value = creatorUser!.avatarUrl;
+      compScore.value = await IbUtils.getCompScore(uid: creatorUser!.id);
     }
     if (!isSample) {
       if (rxIbAnswer == null) {
@@ -313,6 +317,9 @@ class IbQuestionItemController extends GetxController {
       IbUtils.showSimpleSnackBar(
           msg: "Failed to vote $e", backgroundColor: IbColors.errorRed);
     } finally {
+      if (creatorUser != null) {
+        compScore.value = await IbUtils.getCompScore(uid: creatorUser!.id);
+      }
       isAnswering.value = false;
       rxIbAnswer!.refresh();
       rxIbQuestion.refresh();

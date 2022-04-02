@@ -7,6 +7,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controlle
 import 'package:icebr8k/backend/controllers/user_controllers/chat_tab_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/circle_settings_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_settings.dart';
@@ -204,7 +205,7 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
               leading: Stack(
                 children: [
                   if (item.ibChat.photoUrl.isEmpty)
-                    _buildAvatar(item.avatarUsers)
+                    _buildAvatar(item.avatars)
                   else
                     IbUserAvatar(avatarUrl: item.ibChat.photoUrl),
                   if (item.isMuted)
@@ -264,16 +265,7 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
                 children: [
                   Expanded(
                     flex: 9,
-                    child: Text(
-                      item.ibChat.lastMessage == null
-                          ? ''
-                          : item.ibChat.lastMessage!.content,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: IbConfig.kSecondaryTextSize,
-                      ),
-                    ),
+                    child: _buildSubtitle(item),
                   ),
                   Expanded(
                     child: Container(
@@ -379,16 +371,7 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
                 children: [
                   Expanded(
                     flex: 9,
-                    child: Text(
-                      item.ibChat.lastMessage == null
-                          ? ''
-                          : item.ibChat.lastMessage!.content,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: IbConfig.kSecondaryTextSize,
-                      ),
-                    ),
+                    child: _buildSubtitle(item),
                   ),
                   Expanded(
                     child: Container(
@@ -468,5 +451,43 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
             .toList(),
       ),
     );
+  }
+
+  Widget _buildSubtitle(ChatTabItem item) {
+    if (item.ibChat.lastMessage == null) {
+      return const SizedBox();
+    }
+
+    final String messageType = item.ibChat.lastMessage!.messageType;
+
+    if (item.ibChat.isCircle) {
+      switch (messageType) {
+        case IbMessage.kMessageTypeAnnouncement:
+          return Text(
+            item.ibChat.lastMessage!.content,
+            style: const TextStyle(
+                fontSize: IbConfig.kSecondaryTextSize,
+                color: IbColors.accentColor),
+          );
+        case IbMessage.kMessageTypeText:
+          return Text(
+            '${item.lastMessageUser == null ? '' : '${item.lastMessageUser!.username}:'} ${item.ibChat.lastMessage!.content}',
+            style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          );
+        default:
+          return const SizedBox();
+      }
+    } else {
+      return Text(
+        item.ibChat.lastMessage!.content,
+        maxLines: 3,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(
+          fontSize: IbConfig.kSecondaryTextSize,
+        ),
+      );
+    }
   }
 }

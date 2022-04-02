@@ -12,6 +12,7 @@ import 'package:icebr8k/frontend/ib_pages/chat_pages/chat_page_settings.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -27,8 +28,8 @@ class ChatPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leadingWidth: 40,
         centerTitle: false,
+        leadingWidth: 40,
         title: Obx(
           () => SizedBox(
             width: Get.width * 0.6,
@@ -83,9 +84,6 @@ class ChatPage extends StatelessWidget {
       body: SafeArea(
         child: Obx(
           () {
-            if (_controller.isLoading.isTrue) {
-              return const Center(child: IbProgressIndicator());
-            }
             return GestureDetector(
               onTap: () {
                 IbUtils.hideKeyboard();
@@ -93,27 +91,36 @@ class ChatPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Expanded(
-                      child: NotificationListener<ScrollNotification>(
-                    child: ScrollablePositionedList.builder(
-                      reverse: true,
-                      itemScrollController: _controller.itemScrollController,
-                      itemPositionsListener: _controller.itemPositionsListener,
-                      itemBuilder: (context, index) {
-                        return _handleMessageType(
-                            message: _controller.messages[index],
-                            context: context);
+                  if (_controller.isLoading.isTrue)
+                    const Expanded(
+                      child: Center(
+                        child: IbProgressIndicator(),
+                      ),
+                    )
+                  else
+                    Expanded(
+                        child: NotificationListener<ScrollNotification>(
+                      child: ScrollablePositionedList.builder(
+                        physics: const BouncingScrollPhysics(),
+                        reverse: true,
+                        itemScrollController: _controller.itemScrollController,
+                        itemPositionsListener:
+                            _controller.itemPositionsListener,
+                        itemBuilder: (context, index) {
+                          return _handleMessageType(
+                              message: _controller.messages[index],
+                              context: context);
+                        },
+                        itemCount: _controller.messages.length,
+                      ),
+                      onNotification: (info) {
+                        if (info.metrics.pixels - info.metrics.maxScrollExtent >
+                            32) {
+                          _controller.loadMore();
+                        }
+                        return true;
                       },
-                      itemCount: _controller.messages.length,
-                    ),
-                    onNotification: (info) {
-                      if (info.metrics.pixels - info.metrics.maxScrollExtent >
-                          32) {
-                        _controller.loadMore();
-                      }
-                      return true;
-                    },
-                  )),
+                    )),
                   _inputWidget(context),
                 ],
               ),
@@ -140,9 +147,15 @@ class ChatPage extends StatelessWidget {
         ),
       );
     } else {
-      return IbUserAvatar(
-        radius: 16,
-        avatarUrl: ibChat.photoUrl,
+      return GestureDetector(
+        onTap: () {
+          Get.to(() => IbMediaViewer(urls: [ibChat.photoUrl], currentIndex: 0),
+              transition: Transition.zoom, fullscreenDialog: true);
+        },
+        child: IbUserAvatar(
+          radius: 16,
+          avatarUrl: ibChat.photoUrl,
+        ),
       );
     }
   }
@@ -200,7 +213,9 @@ class ChatPage extends StatelessWidget {
                         maxLines: 8,
                         maxLength: 2000,
                         onSubmitted: (value) async {
-                          if (value.isNotEmpty) {}
+                          if (value.isNotEmpty) {
+                            _controller.sendMessage();
+                          }
                         },
                         textInputAction: TextInputAction.send,
                         controller: _controller.txtController,
@@ -286,9 +301,9 @@ class ChatPage extends StatelessWidget {
                     decoration: BoxDecoration(
                         color: IbColors.primaryColor.withOpacity(0.8),
                         borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(16),
                             topLeft: Radius.circular(16),
-                            topRight: Radius.circular(16),
-                            bottomLeft: Radius.circular(16))),
+                            bottomRight: Radius.circular(16))),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Linkify(
@@ -328,27 +343,22 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget _textMsgItem(IbMessage message) {
+    final IbUser? senderUser = _controller.ibChatMembers
+        .firstWhereOrNull((element) => element.user.id == message.senderUid)
+        ?.user;
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 8, right: 40, left: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               if (_controller.isCircle.isTrue)
                 IbUserAvatar(
-                  avatarUrl: _controller.ibChatMembers
-                      .firstWhere(
-                          (element) => element.user.id == message.senderUid)
-                      .user
-                      .avatarUrl,
-                  uid: _controller.ibChatMembers
-                      .firstWhere(
-                          (element) => element.user.id == message.senderUid)
-                      .user
-                      .id,
+                  avatarUrl: senderUser == null ? '' : senderUser.avatarUrl,
+                  uid: senderUser == null ? '' : senderUser.id,
                   radius: 16,
                 ),
               if (_controller.isCircle.isTrue)
@@ -357,7 +367,10 @@ class ChatPage extends StatelessWidget {
                 ),
               Flexible(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (senderUser != null && _controller.isCircle.isTrue)
+                      Text(senderUser.username),
                     InkWell(
                       customBorder: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(8))),
@@ -372,7 +385,7 @@ class ChatPage extends StatelessWidget {
                         decoration: BoxDecoration(
                             color: IbColors.accentColor.withOpacity(0.8),
                             borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(16),
+                                bottomLeft: Radius.circular(16),
                                 topRight: Radius.circular(16),
                                 bottomRight: Radius.circular(16))),
                         child: Padding(
@@ -398,7 +411,9 @@ class ChatPage extends StatelessWidget {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 40.0),
+            padding: _controller.isCircle.isTrue
+                ? const EdgeInsets.only(left: 40.0)
+                : const EdgeInsets.only(left: 2.0),
             child: Text(
               message.timestamp == null
                   ? 'Sending...'
@@ -481,11 +496,27 @@ class ChatPage extends StatelessWidget {
                 borderRadius: const BorderRadius.all(Radius.circular(8))),
             child: Padding(
               padding: const EdgeInsets.all(4.0),
-              child: Text(
-                message.content,
-                style: const TextStyle(
-                    color: IbColors.lightGrey,
-                    fontSize: IbConfig.kSecondaryTextSize),
+              child: Column(
+                children: [
+                  Text(
+                    message.timestamp == null
+                        ? 'Sending...'
+                        : IbUtils.readableDateTime(
+                            DateTime.fromMillisecondsSinceEpoch(
+                                (message.timestamp as Timestamp)
+                                    .millisecondsSinceEpoch),
+                            showTime: true),
+                    style: const TextStyle(
+                        color: IbColors.lightGrey,
+                        fontSize: IbConfig.kDescriptionTextSize),
+                  ),
+                  Text(
+                    message.content,
+                    style: const TextStyle(
+                        color: IbColors.lightGrey,
+                        fontSize: IbConfig.kSecondaryTextSize),
+                  ),
+                ],
               ),
             )),
       );
