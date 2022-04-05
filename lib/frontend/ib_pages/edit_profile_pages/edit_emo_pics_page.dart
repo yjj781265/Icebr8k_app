@@ -40,11 +40,15 @@ class EditEmoPicsPage extends StatelessWidget {
                       ),
                       ignoreOnDoubleTap: true,
                       onTap: () {
-                        Get.to(() => EditEmoPicDetailPage(IbEmoPic(
+                        Get.to(
+                          () => EditEmoPicDetailPage(
+                            IbEmoPic(
                               url: '',
                               id: IbUtils.getUniqueId(),
                               emoji: '',
-                            )));
+                            ),
+                          ),
+                        );
                       },
                     ),
                     runAlignment: WrapAlignment.center,

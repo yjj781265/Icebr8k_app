@@ -59,6 +59,15 @@ class IbEmoPicCard extends StatelessWidget {
                       topLeft: Radius.circular(8),
                       topRight: Radius.circular(8)),
                   child: CachedNetworkImage(
+                    errorWidget: (
+                      context,
+                      string,
+                      d,
+                    ) =>
+                        Container(
+                      color: IbColors.lightGrey,
+                      child: const Center(child: Text('Failed to load image')),
+                    ),
                     imageUrl: emoPic.url,
                     fit: BoxFit.cover,
                     height: width * 1.618 - 40,

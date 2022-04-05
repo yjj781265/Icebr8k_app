@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/edit_emo_pic_controller.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
-import 'package:icebr8k/frontend/ib_pages/ib_tenor_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_emoji_keyboard.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -73,7 +73,7 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
                         thickness: 2,
                       ),
                       InkWell(
-                        onTap: _showEmojiKeyBoard,
+                        onTap: () => _showEmojiKeyBoard(context),
                         child: SizedBox(
                           width: 100,
                           child: IbTextField(
@@ -158,6 +158,15 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
               borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(8), topRight: Radius.circular(8)),
               child: CachedNetworkImage(
+                errorWidget: (
+                  context,
+                  string,
+                  d,
+                ) =>
+                    Container(
+                  color: IbColors.lightGrey,
+                  child: const Center(child: Text('Failed to load image')),
+                ),
                 imageUrl: widget.ibEmoPic.url,
                 fit: BoxFit.cover,
                 width: 160,
@@ -255,66 +264,36 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
             ),
           ),
         ),
-        InkWell(
-          onTap: () async {
-            Get.back();
-            final gifUrl = await Get.to(
-              () => IbTenorPage(),
-            );
-            if (gifUrl != null && gifUrl.toString().isNotEmpty) {
-              setState(() {
-                widget.ibEmoPic.url = gifUrl.toString();
-              });
-            }
-          },
-          child: Ink(
-            height: 56,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.gif,
-                    color: IbColors.accentColor,
-                    size: 24,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    'Choose GIF from Tenor',
-                    style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
       ],
     );
     Get.bottomSheet(IbCard(child: options), ignoreSafeArea: false);
   }
 
-  void _showEmojiKeyBoard() {
+  void _showEmojiKeyBoard(BuildContext context) {
     IbUtils.hideKeyboard();
     Get.bottomSheet(
-        IbCard(
-          child: SizedBox(
-              height: Get.height / 2,
-              child: EmojiPicker(
-                onEmojiSelected: (category, emoji) {
-                  setState(() {
-                    emojiStr = emoji.emoji;
-                    widget.ibEmoPic.emoji = emojiStr;
-                  });
-                  Get.back();
-                },
-                config: Config(
-                  emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
-                ),
-              )),
-        ),
+        EmojiPicker(
+            onEmojiSelected: (Category category, Emoji emoji) {
+              Get.back();
+              emojiTeController.text = emoji.emoji;
+            },
+            customWidget: (config, state) => IbEmojiKeyboard(config, state),
+            config: Config(
+                columns: 8,
+                // Issue: https://github.com/flutter/flutter/issues/28894
+                emojiSizeMax: 24 * (Platform.isIOS ? 1.30 : 1.0),
+                bgColor: Theme.of(context).backgroundColor,
+                indicatorColor: IbColors.primaryColor,
+                iconColor: IbColors.lightGrey,
+                skinToneIndicatorColor: Theme.of(context).indicatorColor,
+                iconColorSelected: Theme.of(context).indicatorColor,
+                progressIndicatorColor: IbColors.primaryColor,
+                recentsLimit: 32,
+                tabIndicatorAnimDuration: const Duration(milliseconds: 100),
+                noRecentsStyle: TextStyle(
+                    fontSize: IbConfig.kNormalTextSize,
+                    color: Theme.of(context).indicatorColor),
+                buttonMode: ButtonMode.CUPERTINO)),
         ignoreSafeArea: false);
   }
 }

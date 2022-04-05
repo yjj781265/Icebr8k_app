@@ -41,6 +41,7 @@ class EditProfilePage extends StatelessWidget {
                 ),
                 DropdownButtonHideUnderline(
                   child: DropdownButton2(
+                    offset: const Offset(-8, 0),
                     items: _controller.privacyItems
                         .map((item) => DropdownMenuItem<String>(
                               value: item,

@@ -195,7 +195,7 @@ class ChatPageSettings extends StatelessWidget {
               },
               title: const Text('Demote to Member'),
             ),
-          if (isLeader)
+          if (isLeader && model.user.id != IbUtils.getCurrentUid())
             ListTile(
               onTap: () async {
                 Get.back();
