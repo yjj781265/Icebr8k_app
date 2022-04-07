@@ -37,7 +37,6 @@ class IbUserAvatar extends StatelessWidget {
             shape: BoxShape.circle, color: IbColors.lightGrey),
         height: radius * 2,
         width: radius * 2,
-        child: const Icon(Icons.person_off_rounded),
       );
     }
     return Stack(

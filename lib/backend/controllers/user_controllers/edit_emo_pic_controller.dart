@@ -64,18 +64,20 @@ class EditEmoPicController extends GetxController {
     try {
       Get.dialog(const IbLoadingDialog(messageTrKey: 'upload'),
           barrierDismissible: false);
-      if (emoPic.url.contains('http')) {
-        await IbStorageService()
-            .deleteFile(oldUrl.contains('http') ? oldUrl : '');
-      } else {
+      final bool shouldUpdateUrl =
+          emoPic.url != oldUrl && !emoPic.url.contains('http');
+
+      if (shouldUpdateUrl) {
         final String? newUrl = await IbStorageService().uploadAndRetrieveImgUrl(
             filePath: emoPic.url,
             oldUrl: oldUrl.contains('http') ? oldUrl : '');
         if (newUrl == null) {
           Get.back();
-          IbUtils.showSimpleSnackBar(
-              msg: 'Failed to upload image',
-              backgroundColor: IbColors.errorRed);
+          Get.dialog(const IbDialog(
+            title: 'Error',
+            subtitle: 'Failed to upload image',
+            showNegativeBtn: false,
+          ));
           return;
         }
         emoPic.url = newUrl;
@@ -96,8 +98,12 @@ class EditEmoPicController extends GetxController {
       IbUtils.showSimpleSnackBar(
           msg: 'EmoPic uploaded', backgroundColor: IbColors.accentColor);
     } catch (e) {
-      IbUtils.showSimpleSnackBar(
-          msg: 'Failed to upload image $e', backgroundColor: IbColors.errorRed);
+      Get.back();
+      Get.dialog(IbDialog(
+        title: 'Error',
+        subtitle: 'Failed to upload image ${e.toString()}',
+        showNegativeBtn: false,
+      ));
     }
   }
 }

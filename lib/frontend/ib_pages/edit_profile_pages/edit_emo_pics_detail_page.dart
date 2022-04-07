@@ -18,24 +18,27 @@ import '../../ib_config.dart';
 
 class EditEmoPicDetailPage extends StatefulWidget {
   final IbEmoPic ibEmoPic;
+  final EditEmoPicController _controller;
 
-  const EditEmoPicDetailPage(this.ibEmoPic);
+  const EditEmoPicDetailPage(this.ibEmoPic, this._controller);
 
   @override
   State<EditEmoPicDetailPage> createState() => _EditEmoPicDetailPageState();
 }
 
 class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
-  final EditEmoPicController _controller = Get.find();
+  late EditEmoPicController _controller;
   final TextEditingController emojiTeController = TextEditingController();
   final TextEditingController descTeController = TextEditingController();
-  String emojiStr = '';
   String oldUrl = '';
+  String newUrl = '';
 
   @override
   void initState() {
-    emojiStr = widget.ibEmoPic.emoji;
+    _controller = widget._controller;
     oldUrl = widget.ibEmoPic.url;
+    descTeController.text = widget.ibEmoPic.description;
+    emojiTeController.text = widget.ibEmoPic.emoji;
     super.initState();
   }
 
@@ -44,7 +47,17 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
     const TextStyle headerStyle = TextStyle(
         fontWeight: FontWeight.bold, fontSize: IbConfig.kNormalTextSize);
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            widget.ibEmoPic.url = oldUrl;
+            Get.back();
+          },
+          icon: Platform.isAndroid
+              ? const Icon(Icons.arrow_back)
+              : const Icon(Icons.arrow_back_ios),
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -82,7 +95,6 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
                               textStyle: const TextStyle(
                                   fontSize: IbConfig.kSloganSize),
                               controller: emojiTeController,
-                              text: emojiStr,
                               titleIcon: const Icon(
                                 Icons.emoji_emotions,
                                 color: Colors.orangeAccent,
@@ -95,7 +107,6 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
                       IbTextField(
                           controller: descTeController,
                           charLimit: 20,
-                          text: widget.ibEmoPic.description,
                           textStyle: TextStyle(
                               color: Theme.of(context).indicatorColor,
                               fontSize: IbConfig.kNormalTextSize,
@@ -177,6 +188,14 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
               borderRadius: BorderRadius.circular(8.0),
               child: Image.file(
                 File(widget.ibEmoPic.url),
+                errorBuilder: (context, obj, stackTrace) {
+                  return Container(
+                    height: 160 * 1.618 - 30,
+                    width: 160,
+                    color: IbColors.lightGrey,
+                    child: const Center(child: Text('Failed to load image')),
+                  );
+                },
                 fit: BoxFit.cover,
                 width: 160,
                 height: 160 * 1.618 - 30,
@@ -276,6 +295,7 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
             onEmojiSelected: (Category category, Emoji emoji) {
               Get.back();
               emojiTeController.text = emoji.emoji;
+              widget.ibEmoPic.emoji = emojiTeController.text;
             },
             customWidget: (config, state) => IbEmojiKeyboard(config, state),
             config: Config(

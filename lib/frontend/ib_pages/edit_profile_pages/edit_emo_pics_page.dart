@@ -42,12 +42,12 @@ class EditEmoPicsPage extends StatelessWidget {
                       onTap: () {
                         Get.to(
                           () => EditEmoPicDetailPage(
-                            IbEmoPic(
-                              url: '',
-                              id: IbUtils.getUniqueId(),
-                              emoji: '',
-                            ),
-                          ),
+                              IbEmoPic(
+                                url: '',
+                                id: IbUtils.getUniqueId(),
+                                emoji: '',
+                              ),
+                              _controller),
                         );
                       },
                     ),
@@ -59,7 +59,8 @@ class EditEmoPicsPage extends StatelessWidget {
                                 IbEmoPicCard(
                                   emoPic: e,
                                   onTap: () {
-                                    Get.to(() => EditEmoPicDetailPage(e));
+                                    Get.to(() =>
+                                        EditEmoPicDetailPage(e, _controller));
                                   },
                                 ),
                                 Positioned(

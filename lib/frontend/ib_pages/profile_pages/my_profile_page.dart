@@ -373,7 +373,8 @@ class MyProfilePage extends StatelessWidget {
                                 onPressed: () {
                                   Get.to(() => EditEmoPicsPage(Get.put(
                                       EditEmoPicController(
-                                          _controller.rxEmoPics))));
+                                          _controller.rxEmoPics),
+                                      tag: IbUtils.getUniqueId())));
                                 },
                                 label: Text(
                                   _controller.rxEmoPics.isEmpty

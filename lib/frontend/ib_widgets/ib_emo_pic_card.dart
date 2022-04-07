@@ -48,6 +48,15 @@ class IbEmoPicCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8.0),
                   child: Image.file(
                     File(emoPic.url),
+                    errorBuilder: (context, obj, stackTrace) {
+                      return Container(
+                        height: width * 1.618 - 40,
+                        width: width,
+                        color: IbColors.lightGrey,
+                        child:
+                            const Center(child: Text('Failed to load image')),
+                      );
+                    },
                     fit: BoxFit.cover,
                     height: width * 1.618 - 40,
                     width: width,
