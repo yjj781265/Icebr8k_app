@@ -15,6 +15,7 @@ import 'package:icebr8k/frontend/ib_pages/chat_pages/ib_friends_picker.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_persistent_header.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
 import '../ib_colors.dart';
@@ -200,228 +201,242 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
   }
 
   Widget buildOneToOneList() {
-    return Obx(() => ListView.separated(
-          itemBuilder: (context, index) {
-            final ChatTabItem item = _controller.oneToOneChats[index];
-            return ListTile(
-              tileColor: Theme.of(context).backgroundColor,
-              leading: Stack(
-                children: [
-                  if (item.ibChat.photoUrl.isEmpty)
-                    _buildAvatar(item.avatars)
-                  else
-                    IbUserAvatar(avatarUrl: item.ibChat.photoUrl),
-                  if (item.isMuted)
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).backgroundColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.notifications_off,
-                          size: 16,
-                        ),
-                      ),
-                    )
-                ],
-              ),
-              onTap: () {
-                item.unReadCount = 0;
-                _controller.oneToOneChats.refresh();
-                _controller.calculateTotalUnread();
-                Get.to(
-                  () => ChatPage(
-                    Get.put(
-                      ChatPageController(ibChat: item.ibChat),
-                    ),
-                  ),
-                );
-              },
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    flex: 6,
-                    child: Text(
-                      item.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: IbConfig.kNormalTextSize),
-                    ),
-                  ),
-                  if (item.ibChat.lastMessage != null)
-                    Text(
-                      IbUtils.readableDateTime(
-                          DateTime.fromMillisecondsSinceEpoch(
-                              (item.ibChat.lastMessage!.timestamp as Timestamp)
-                                  .millisecondsSinceEpoch),
-                          showTime: true),
-                      style: const TextStyle(
-                          color: IbColors.lightGrey,
-                          fontWeight: FontWeight.normal,
-                          fontSize: IbConfig.kDescriptionTextSize),
-                    ),
-                ],
-              ),
-              subtitle: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    flex: 9,
-                    child: _buildSubtitle(item),
-                  ),
-                  Expanded(
+    return Obx(() {
+      if (_controller.isLoadingChat.value) {
+        return const Center(
+          child: IbProgressIndicator(),
+        );
+      }
+      return ListView.separated(
+        itemBuilder: (context, index) {
+          final ChatTabItem item = _controller.oneToOneChats[index];
+          return ListTile(
+            tileColor: Theme.of(context).backgroundColor,
+            leading: Stack(
+              children: [
+                if (item.ibChat.photoUrl.isEmpty)
+                  _buildAvatar(item.avatars)
+                else
+                  IbUserAvatar(avatarUrl: item.ibChat.photoUrl),
+                if (item.isMuted)
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
                     child: Container(
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(
-                          color: IbColors.errorRed, shape: BoxShape.circle),
-                      child: item.unReadCount != 0
-                          ? Padding(
-                              padding: const EdgeInsets.all(3.0),
-                              child: Text(
-                                item.unReadCount > 99
-                                    ? '99+'
-                                    : item.unReadCount.toString(),
-                                maxLines: 1,
-                                overflow: TextOverflow.fade,
-                                style: const TextStyle(
-                                  color: IbColors.white,
-                                  fontSize: IbConfig.kDescriptionTextSize,
-                                ),
-                              ),
-                            )
-                          : const SizedBox(),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).backgroundColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.notifications_off,
+                        size: 16,
+                      ),
                     ),
+                  )
+              ],
+            ),
+            onTap: () {
+              item.unReadCount = 0;
+              _controller.oneToOneChats.refresh();
+              _controller.calculateTotalUnread();
+              Get.to(
+                () => ChatPage(
+                  Get.put(
+                    ChatPageController(ibChat: item.ibChat),
                   ),
-                ],
-              ),
-            );
-          },
-          itemCount: _controller.oneToOneChats.length,
-          separatorBuilder: (BuildContext context, int index) {
-            return const Divider(
-              color: IbColors.lightGrey,
-              thickness: 0.5,
-              height: 1,
-            );
-          },
-        ));
+                ),
+              );
+            },
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 6,
+                  child: Text(
+                    item.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: IbConfig.kNormalTextSize),
+                  ),
+                ),
+                if (item.ibChat.lastMessage != null)
+                  Text(
+                    IbUtils.readableDateTime(
+                        DateTime.fromMillisecondsSinceEpoch(
+                            (item.ibChat.lastMessage!.timestamp as Timestamp)
+                                .millisecondsSinceEpoch),
+                        showTime: true),
+                    style: const TextStyle(
+                        color: IbColors.lightGrey,
+                        fontWeight: FontWeight.normal,
+                        fontSize: IbConfig.kDescriptionTextSize),
+                  ),
+              ],
+            ),
+            subtitle: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 9,
+                  child: _buildSubtitle(item),
+                ),
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                        color: IbColors.errorRed, shape: BoxShape.circle),
+                    child: item.unReadCount != 0
+                        ? Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Text(
+                              item.unReadCount > 99
+                                  ? '99+'
+                                  : item.unReadCount.toString(),
+                              maxLines: 1,
+                              overflow: TextOverflow.fade,
+                              style: const TextStyle(
+                                color: IbColors.white,
+                                fontSize: IbConfig.kDescriptionTextSize,
+                              ),
+                            ),
+                          )
+                        : const SizedBox(),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+        itemCount: _controller.oneToOneChats.length,
+        separatorBuilder: (BuildContext context, int index) {
+          return const Divider(
+            color: IbColors.lightGrey,
+            thickness: 0.5,
+            height: 1,
+          );
+        },
+      );
+    });
   }
 
   Widget buildCircle() {
-    return Obx(() => ListView.separated(
-          itemBuilder: (context, index) {
-            final ChatTabItem item = _controller.circles[index];
-            return ListTile(
-              tileColor: Theme.of(context).backgroundColor,
-              leading: Stack(
-                children: [
-                  _buildCircleAvatar(item),
-                  if (item.isMuted)
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).backgroundColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.notifications_off,
-                          size: 16,
-                        ),
-                      ),
-                    )
-                ],
-              ),
-              onTap: () {
-                item.unReadCount = 0;
-                _controller.circles.refresh();
-                _controller.calculateTotalUnread();
-                Get.to(
-                  () => ChatPage(
-                    Get.put(
-                      ChatPageController(ibChat: item.ibChat),
-                    ),
-                  ),
-                );
-              },
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    flex: 6,
-                    child: Text(
-                      item.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: IbConfig.kNormalTextSize),
-                    ),
-                  ),
-                  if (item.ibChat.lastMessage != null)
-                    Text(
-                      IbUtils.readableDateTime(
-                          DateTime.fromMillisecondsSinceEpoch(
-                              (item.ibChat.lastMessage!.timestamp as Timestamp)
-                                  .millisecondsSinceEpoch),
-                          showTime: true),
-                      style: const TextStyle(
-                          color: IbColors.lightGrey,
-                          fontWeight: FontWeight.normal,
-                          fontSize: IbConfig.kDescriptionTextSize),
-                    ),
-                ],
-              ),
-              subtitle: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    flex: 9,
-                    child: _buildSubtitle(item),
-                  ),
-                  Expanded(
+    return Obx(() {
+      if (_controller.isLoadingCircles.value) {
+        return const Center(
+          child: IbProgressIndicator(),
+        );
+      }
+      return ListView.separated(
+        itemBuilder: (context, index) {
+          final ChatTabItem item = _controller.circles[index];
+          return ListTile(
+            tileColor: Theme.of(context).backgroundColor,
+            leading: Stack(
+              children: [
+                _buildCircleAvatar(item),
+                if (item.isMuted)
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
                     child: Container(
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(
-                          color: IbColors.errorRed, shape: BoxShape.circle),
-                      child: item.unReadCount != 0
-                          ? Padding(
-                              padding: const EdgeInsets.all(3.0),
-                              child: Text(
-                                item.unReadCount > 99
-                                    ? '99+'
-                                    : item.unReadCount.toString(),
-                                maxLines: 1,
-                                overflow: TextOverflow.fade,
-                                style: const TextStyle(
-                                  color: IbColors.white,
-                                  fontSize: IbConfig.kDescriptionTextSize,
-                                ),
-                              ),
-                            )
-                          : const SizedBox(),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).backgroundColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.notifications_off,
+                        size: 16,
+                      ),
                     ),
+                  )
+              ],
+            ),
+            onTap: () {
+              item.unReadCount = 0;
+              _controller.circles.refresh();
+              _controller.calculateTotalUnread();
+              Get.to(
+                () => ChatPage(
+                  Get.put(
+                    ChatPageController(ibChat: item.ibChat),
                   ),
-                ],
-              ),
-            );
-          },
-          itemCount: _controller.circles.length,
-          separatorBuilder: (BuildContext context, int index) {
-            return const Divider(
-              color: IbColors.lightGrey,
-              thickness: 0.5,
-              height: 1,
-            );
-          },
-        ));
+                ),
+              );
+            },
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 6,
+                  child: Text(
+                    item.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: IbConfig.kNormalTextSize),
+                  ),
+                ),
+                if (item.ibChat.lastMessage != null)
+                  Text(
+                    IbUtils.readableDateTime(
+                        DateTime.fromMillisecondsSinceEpoch(
+                            (item.ibChat.lastMessage!.timestamp as Timestamp)
+                                .millisecondsSinceEpoch),
+                        showTime: true),
+                    style: const TextStyle(
+                        color: IbColors.lightGrey,
+                        fontWeight: FontWeight.normal,
+                        fontSize: IbConfig.kDescriptionTextSize),
+                  ),
+              ],
+            ),
+            subtitle: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 9,
+                  child: _buildSubtitle(item),
+                ),
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                        color: IbColors.errorRed, shape: BoxShape.circle),
+                    child: item.unReadCount != 0
+                        ? Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Text(
+                              item.unReadCount > 99
+                                  ? '99+'
+                                  : item.unReadCount.toString(),
+                              maxLines: 1,
+                              overflow: TextOverflow.fade,
+                              style: const TextStyle(
+                                color: IbColors.white,
+                                fontSize: IbConfig.kDescriptionTextSize,
+                              ),
+                            ),
+                          )
+                        : const SizedBox(),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+        itemCount: _controller.circles.length,
+        separatorBuilder: (BuildContext context, int index) {
+          return const Divider(
+            color: IbColors.lightGrey,
+            thickness: 0.5,
+            height: 1,
+          );
+        },
+      );
+    });
   }
 
   Widget _buildCircleAvatar(ChatTabItem item) {

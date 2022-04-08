@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_media.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 
+import '../ib_colors.dart';
+
 class IbMediaSlide extends StatefulWidget {
   final List<IbMedia> medias;
 
@@ -40,20 +42,17 @@ class _IbMediaSlideState extends State<IbMediaSlide>
     return Center(
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).backgroundColor,
-              ),
-              height: (Get.width) / 1.78,
-              width: Get.width,
-              child: TabBarView(
-                  controller: controller,
-                  children: widget.medias.map((e) {
-                    return _itemWidget(e);
-                  }).toList()),
-            ),
+          SizedBox(
+            height: Get.width / 1.78,
+            width: Get.width,
+            child: TabBarView(
+                controller: controller,
+                children: widget.medias.map((e) {
+                  return Container(
+                      margin: const EdgeInsets.all(8),
+                      color: Theme.of(context).backgroundColor,
+                      child: _itemWidget(e));
+                }).toList()),
           ),
           if (widget.medias.length > 1)
             TabPageSelector(
@@ -70,7 +69,25 @@ class _IbMediaSlideState extends State<IbMediaSlide>
     if (media.type == IbMedia.kPicType) {
       mediaWidget = media.url.contains('http')
           ? CachedNetworkImage(
+              progressIndicatorBuilder: (context, string, progress) {
+                return Center(
+                  child: CircularProgressIndicator.adaptive(
+                    value: progress.progress,
+                  ),
+                );
+              },
+              errorWidget: (
+                context,
+                string,
+                d,
+              ) =>
+                  Container(
+                color: IbColors.lightGrey,
+                child: const Center(child: Text('Failed to load image')),
+              ),
               imageUrl: media.url,
+              height: Get.width * 1.78,
+              width: Get.width,
               fit: BoxFit.fitHeight,
             )
           : Image.file(
@@ -78,9 +95,15 @@ class _IbMediaSlideState extends State<IbMediaSlide>
                 media.url,
               ),
               fit: BoxFit.fitHeight,
+              errorBuilder: (context, obj, stackTrace) {
+                return Container(
+                  color: IbColors.lightGrey,
+                  child: const Center(child: Text('Failed to load image')),
+                );
+              },
             );
     } else {
-      mediaWidget = const FlutterLogo();
+      mediaWidget = const SizedBox();
     }
 
     return InkWell(

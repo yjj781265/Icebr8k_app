@@ -63,7 +63,8 @@ class CircleInfoController extends GetxController {
                 role: IbChatMember.kRoleMember));
         await IbChatDbService().uploadMessage(IbMessage(
             messageId: IbUtils.getUniqueId(),
-            content: '${IbUtils.getCurrentIbUser()!.username} joined the chat',
+            content:
+                '${IbUtils.getCurrentIbUser()!.username} joined the circle',
             senderUid: IbUtils.getCurrentUid()!,
             messageType: IbMessage.kMessageTypeAnnouncement,
             chatRoomId: chat!.chatId));

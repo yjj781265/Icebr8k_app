@@ -112,7 +112,8 @@ class ProfilePage extends StatelessWidget {
                                 () => Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    if (_controller.isProfileVisible.isTrue)
+                                    if (_controller.isProfileVisible.isTrue ||
+                                        _controller.isFriend.value)
                                       CircleAvatar(
                                         backgroundColor: Theme.of(context)
                                             .backgroundColor

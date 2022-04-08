@@ -90,18 +90,18 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
                         child: SizedBox(
                           width: 100,
                           child: IbTextField(
-                              enabled: false,
-                              textAlign: TextAlign.center,
-                              textStyle: const TextStyle(
-                                  fontSize: IbConfig.kSloganSize),
-                              controller: emojiTeController,
-                              titleIcon: const Icon(
-                                Icons.emoji_emotions,
-                                color: Colors.orangeAccent,
-                              ),
-                              titleTrKey: 'emoji',
-                              hintTrKey: '',
-                              onChanged: (text) {}),
+                            enabled: false,
+                            textAlign: TextAlign.center,
+                            textStyle:
+                                const TextStyle(fontSize: IbConfig.kSloganSize),
+                            controller: emojiTeController,
+                            titleIcon: const Icon(
+                              Icons.emoji_emotions,
+                              color: Colors.orangeAccent,
+                            ),
+                            titleTrKey: 'emoji',
+                            hintTrKey: '',
+                          ),
                         ),
                       ),
                       IbTextField(

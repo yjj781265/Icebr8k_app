@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -53,7 +52,7 @@ class _IbMediaViewerState extends State<IbMediaViewer>
                       File(e),
                     );
                   } else {
-                    img = CachedNetworkImage(imageUrl: e);
+                    img = Image.network(e);
                   }
 
                   return GestureDetector(

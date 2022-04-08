@@ -46,6 +46,7 @@ class AlertTab extends StatelessWidget {
     if (item.notification.type == IbNotification.kFriendRequest) {
       return IbCard(
         radius: 0,
+        margin: EdgeInsets.zero,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -167,7 +168,8 @@ class AlertTab extends StatelessWidget {
               await IbUserDbService().sendAlertNotification(item.notification);
               _controller.items.refresh();
               Get.to(
-                  () => CircleInfo(Get.put(CircleInfoController(item.ibChat!))),
+                  () => CircleInfo(Get.put(CircleInfoController(item.ibChat!),
+                      tag: IbUtils.getUniqueId())),
                   transition: Transition.downToUp,
                   fullscreenDialog: true);
             },

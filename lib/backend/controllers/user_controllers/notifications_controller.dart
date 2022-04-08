@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
@@ -11,6 +12,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 
 class NotificationController extends GetxController {
   late StreamSubscription ibNotificationsStream;
+  final MainPageController _mainPageController = Get.find();
   final items = <NotificationItem>[].obs;
 
   @override
@@ -48,28 +50,45 @@ class NotificationController extends GetxController {
           _onNotificationRemoved(n);
         }
       }
+      items.sort((a, b) =>
+          b.notification.timestampInMs.compareTo(a.notification.timestampInMs));
       items.refresh();
     });
   }
 
   Future<void> _onNotificationAdded(IbNotification notification) async {
+    final item = NotificationItem(notification: notification);
     if (notification.type == IbNotification.kGroupInvite) {
       final IbChat? chat = await IbChatDbService().queryChat(notification.id);
-      print('add');
+      item.ibChat = chat;
       if (chat != null) {
-        items.add(NotificationItem(notification: notification, ibChat: chat));
-        print('add2');
+        items.add(item);
+      }
+      if (_mainPageController.currentIndex.value != 4 && !notification.isRead) {
+        IbUtils.showSimpleSnackBar(
+            msg: item.notification.title,
+            backgroundColor: IbColors.primaryColor);
       }
     } else if (notification.type == IbNotification.kFriendRequest) {
-      items.add(NotificationItem(notification: notification));
+      items.add(item);
+      if (_mainPageController.currentIndex.value != 4 && !notification.isRead) {
+        IbUtils.showSimpleSnackBar(
+            msg: '${item.notification.title} ${'sent_you_a_friend_request'.tr}',
+            backgroundColor: IbColors.primaryColor);
+      }
     }
   }
 
   Future<void> _onNotificationModified(IbNotification notification) async {
     final int index = items
         .indexWhere((element) => element.notification.id == notification.id);
+
     if (index != -1) {
       items[index].notification = notification;
+      if (notification.type == IbNotification.kGroupInvite) {
+        final IbChat? chat = await IbChatDbService().queryChat(notification.id);
+        items[index].ibChat = chat;
+      }
     }
   }
 

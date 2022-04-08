@@ -24,7 +24,7 @@ class IbTextField extends StatelessWidget {
   final bool hideCounterText;
   final Iterable<String> autofillHints;
   final TextInputType textInputType;
-  final Function(String) onChanged;
+  final Function(String value)? onChanged;
   final bool enabled;
   const IbTextField({
     Key? key,
@@ -42,7 +42,7 @@ class IbTextField extends StatelessWidget {
     this.maxLines = 1,
     this.hideCounterText = false,
     this.text,
-    required this.onChanged,
+    this.onChanged,
     this.textInputType = TextInputType.text,
     this.obscureText = false,
     this.autofillHints = const [],
@@ -64,7 +64,7 @@ class IbTextField extends StatelessWidget {
       minLines: 1,
       inputFormatters: inputFormatter,
       onChanged: (text) {
-        onChanged(text);
+        onChanged?.call(text);
       },
       controller: controller,
       decoration: InputDecoration(

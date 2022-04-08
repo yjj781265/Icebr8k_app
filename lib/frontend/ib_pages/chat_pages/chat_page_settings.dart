@@ -276,13 +276,16 @@ class ChatPageSettings extends StatelessWidget {
           }
           return const SizedBox();
         }),
-        const ListTile(
-          leading: Icon(
+        ListTile(
+          onTap: () async {
+            await _controller.leaveChat();
+          },
+          leading: const Icon(
             FontAwesomeIcons.rightFromBracket,
             color: IbColors.errorRed,
           ),
-          title: Text(
-            'Leave Chat',
+          title: const Text(
+            'Leave',
             style: TextStyle(color: IbColors.errorRed),
           ),
         ),

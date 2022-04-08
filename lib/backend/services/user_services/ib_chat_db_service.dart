@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
+import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 import '../../db_config.dart';
@@ -166,9 +167,46 @@ class IbChatDbService {
     });
   }
 
-  // todo call cloud function for this
-  Future<void> removeChatRoom(String chatRoomId) async {
+  Future<void> leaveChatRoom(String chatRoomId) async {
     await _collectionRef.doc(chatRoomId).delete();
+    final messageSnapShot = await _collectionRef
+        .doc(chatRoomId)
+        .collection(_kMessageSubCollection)
+        .get();
+    for (final doc in messageSnapShot.docs) {
+      final message = IbMessage.fromJson(doc.data());
+      try {
+        if (message.messageType == IbMessage.kMessageTypePic &&
+            message.content.contains('http')) {
+          IbStorageService().deleteFile(message.content);
+        }
+      } catch (e) {
+        print(e);
+        continue;
+      }
+      _collectionRef
+          .doc(chatRoomId)
+          .collection(_kMessageSubCollection)
+          .doc(doc.id)
+          .delete();
+    }
+
+    final memberSnapShot = await _collectionRef
+        .doc(chatRoomId)
+        .collection(_kMemberSubCollection)
+        .get();
+    for (final doc in memberSnapShot.docs) {
+      try {
+        _collectionRef
+            .doc(chatRoomId)
+            .collection(_kMemberSubCollection)
+            .doc(doc.id)
+            .delete();
+      } catch (e) {
+        print(e);
+        continue;
+      }
+    }
   }
 
   Future<IbChat?> queryOneToOneIbChat(String uid) async {

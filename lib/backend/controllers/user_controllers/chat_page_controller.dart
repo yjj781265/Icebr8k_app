@@ -27,6 +27,7 @@ class ChatPageController extends GetxController {
   final isPublicCircle = false.obs;
   final showOptions = false.obs;
   final messages = <IbMessage>[].obs;
+  final urls = <String>[].obs;
   final avatarUrl = ''.obs;
   final title = ''.obs;
   final subtitle = ''.obs;
@@ -129,7 +130,6 @@ class ChatPageController extends GetxController {
         await IbChatDbService().updateReadUidArray(
             chatRoomId: ibChat!.chatId, messageId: lastMessage.messageId);
       }
-      messages.refresh();
       isLoading.value = false;
     });
 
@@ -202,7 +202,10 @@ class ChatPageController extends GetxController {
 
     _chatSub =
         IbChatDbService().listenToIbChatChanges(ibChat!.chatId).listen((event) {
-      if (event.data() != null) ibChat = IbChat.fromJson(event.data()!);
+      if (event.data() != null) {
+        ibChat = IbChat.fromJson(event.data()!);
+        print('update IbChat');
+      }
 
       /// only update if is group chat
       if (ibChat!.isCircle) {
@@ -229,6 +232,9 @@ class ChatPageController extends GetxController {
   }
 
   Future<void> sendMessage() async {
+    if (txtController.text.trim().isEmpty && urls.isEmpty) {
+      return;
+    }
     isSending.value = true;
     if (ibChat == null) {
       if (recipientId.isNotEmpty) {
@@ -289,8 +295,15 @@ class ChatPageController extends GetxController {
     }
 
     try {
+      if (urls.isNotEmpty) {
+        for (final String url in urls) {
+          await IbChatDbService().uploadMessage(buildImgMessage(url));
+        }
+        urls.clear();
+      }
+
       if (txtController.text.trim().isNotEmpty) {
-        await IbChatDbService().uploadMessage(buildMessage());
+        await IbChatDbService().uploadMessage(buildTxtMessage());
         txtController.clear();
       }
     } catch (e) {
@@ -412,6 +425,66 @@ class ChatPageController extends GetxController {
         msg: 'Member Demoted', backgroundColor: IbColors.primaryColor);
   }
 
+  Future<void> leaveChat() async {
+    try {
+      if (!ibChat!.isCircle && ibChatMembers.length <= 2) {
+        Get.dialog(
+          IbDialog(
+            title: 'Are you sure to leave this chat?',
+            subtitle: 'All messages and medias will be deleted',
+            onPositiveTap: () async {
+              Get.back();
+              Get.dialog(const IbLoadingDialog(messageTrKey: 'Deleting...'));
+              await IbChatDbService().leaveChatRoom(ibChat!.chatId);
+              Get.back(closeOverlays: true);
+              Get.back();
+            },
+          ),
+        );
+      } else {
+        final chatMember = ibChatMembers.firstWhereOrNull(
+            (element) => element.member.uid == IbUtils.getCurrentUid()!);
+        if (chatMember == null) {
+          return;
+        }
+
+        if (chatMember.member.role == IbChatMember.kRoleLeader &&
+            ibChatMembers.length >= 2) {
+          Get.dialog(const IbDialog(
+              title: 'Info',
+              showNegativeBtn: false,
+              subtitle:
+                  'You need to transfer your leadership before leaving the circle'));
+          return;
+        }
+
+        Get.dialog(
+          IbDialog(
+            title: 'Are you sure to leave this circle?',
+            subtitle: '',
+            onPositiveTap: () async {
+              Get.back();
+              Get.dialog(const IbLoadingDialog(messageTrKey: 'Leaving...'));
+              await IbChatDbService()
+                  .removeChatMember(member: chatMember.member);
+              await IbChatDbService().uploadMessage(IbMessage(
+                  messageId: IbUtils.getUniqueId(),
+                  content: '${chatMember.user.username} left the circle',
+                  senderUid: IbUtils.getCurrentUid()!,
+                  messageType: IbMessage.kMessageTypeAnnouncement,
+                  chatRoomId: ibChat!.chatId));
+              Get.back(closeOverlays: true);
+              Get.back();
+            },
+          ),
+        );
+      }
+    } catch (e) {
+      Get.back(closeOverlays: true);
+      Get.dialog(IbDialog(title: 'Error', subtitle: e.toString()));
+    }
+  }
+
   Future<void> muteNotification() async {
     isMuted.value = true;
     await IbChatDbService().muteNotification(ibChat!);
@@ -426,13 +499,23 @@ class ChatPageController extends GetxController {
         msg: "Notification ON", backgroundColor: IbColors.primaryColor);
   }
 
-  IbMessage buildMessage() {
+  IbMessage buildTxtMessage() {
     return IbMessage(
         messageId: IbUtils.getUniqueId(),
         content: txtController.text.trim(),
         senderUid: IbUtils.getCurrentUid()!,
         readUids: [IbUtils.getCurrentUid()!],
         messageType: IbMessage.kMessageTypeText,
+        chatRoomId: ibChat!.chatId);
+  }
+
+  IbMessage buildImgMessage(String url) {
+    return IbMessage(
+        messageId: IbUtils.getUniqueId(),
+        content: url,
+        senderUid: IbUtils.getCurrentUid()!,
+        readUids: [IbUtils.getCurrentUid()!],
+        messageType: IbMessage.kMessageTypePic,
         chatRoomId: ibChat!.chatId);
   }
 

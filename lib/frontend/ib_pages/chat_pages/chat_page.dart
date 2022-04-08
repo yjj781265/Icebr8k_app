@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,6 +21,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../backend/controllers/user_controllers/chat_page_controller.dart';
+import '../ib_tenor_page.dart';
 
 class ChatPage extends StatelessWidget {
   const ChatPage(this._controller, {Key? key}) : super(key: key);
@@ -170,8 +173,10 @@ class ChatPage extends StatelessWidget {
         duration:
             const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
+            mediaPreviewer(context),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -265,7 +270,9 @@ class ChatPage extends StatelessWidget {
                     IbActionButton(
                         color: IbColors.primaryColor,
                         iconData: Icons.image,
-                        onPressed: () {},
+                        onPressed: () {
+                          showMediaBtmSheet();
+                        },
                         text: 'Images'),
                   ],
                 ),
@@ -274,6 +281,118 @@ class ChatPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget mediaPreviewer(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 56, right: 16),
+      child: Scrollbar(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            child: Row(
+              children: _controller.urls.map((element) {
+                final image = element.contains('http')
+                    ? Image.network(element, height: 100, fit: BoxFit.fitHeight,
+                        errorBuilder: (context, obj, trace) {
+                        return Container(
+                          height: 100,
+                          width: 100,
+                          color: IbColors.lightGrey,
+                          child: const Text('Failed to load image'),
+                        );
+                      })
+                    : Image.file(
+                        File(
+                          element,
+                        ),
+                        height: 100,
+                        fit: BoxFit.fitHeight,
+                        errorBuilder: (context, obj, stackTrace) {
+                          return Container(
+                            height: 100,
+                            width: 100,
+                            color: IbColors.lightGrey,
+                            child: const Center(
+                                child: Text('Failed to load image')),
+                          );
+                        },
+                      );
+                return Padding(
+                  padding: const EdgeInsets.only(
+                    top: 16,
+                    right: 8,
+                  ),
+                  child: Stack(
+                    children: [
+                      InkWell(
+                          onTap: () {
+                            Get.to(
+                                () => IbMediaViewer(
+                                    urls: _controller.urls,
+                                    currentIndex:
+                                        _controller.urls.indexOf(element)),
+                                transition: Transition.zoom,
+                                fullscreenDialog: true);
+                          },
+                          child: image),
+                      Positioned(
+                          top: 0,
+                          right: 0,
+                          child: CircleAvatar(
+                            radius: 16,
+                            backgroundColor: Theme.of(context).backgroundColor,
+                            child: IconButton(
+                              padding: EdgeInsets.zero,
+                              icon: const Icon(
+                                Icons.remove_circle_outlined,
+                                color: IbColors.errorRed,
+                              ),
+                              onPressed: () {
+                                _controller.urls.remove(element);
+                              },
+                            ),
+                          ))
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void showMediaBtmSheet() {
+    IbUtils.hideKeyboard();
+    final options = IbCard(
+        child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(
+          onTap: () async {
+            IbUtils.hideKeyboard();
+            Get.back();
+            final gifUrl = await Get.to(
+              () => IbTenorPage(),
+            );
+            if (gifUrl != null && gifUrl.toString().isNotEmpty) {
+              _controller.urls.add(gifUrl!.toString());
+            }
+          },
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
+          title: const Text('Choose GIF from Tenor'),
+          leading: const Icon(
+            Icons.gif,
+            color: IbColors.accentColor,
+          ),
+        ),
+      ],
+    ));
+    Get.bottomSheet(options, ignoreSafeArea: false);
   }
 
   Widget _meTextMsgItem(IbMessage message) {
@@ -432,6 +551,129 @@ class ChatPage extends StatelessWidget {
     );
   }
 
+  Widget _meImgMsgItem(IbMessage message) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 8, left: 40, right: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(16),
+                topLeft: Radius.circular(16),
+                bottomRight: Radius.circular(16)),
+            child: Image.network(
+              message.content,
+              height: 120,
+              fit: BoxFit.fitHeight,
+              errorBuilder: (context, obj, trace) {
+                return Container(
+                  height: 120,
+                  width: 120,
+                  color: IbColors.lightGrey,
+                  child: const Text('Failed to load image'),
+                );
+              },
+            ),
+          ),
+          Text(
+            message.timestamp == null
+                ? 'Sending...'
+                : IbUtils.readableDateTime(
+                    DateTime.fromMillisecondsSinceEpoch(
+                        (message.timestamp as Timestamp)
+                            .millisecondsSinceEpoch),
+                    showTime: true),
+            style: const TextStyle(
+                color: IbColors.lightGrey,
+                fontSize: IbConfig.kDescriptionTextSize),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _imgMsgItem(IbMessage message) {
+    final IbUser? senderUser = _controller.ibChatMembers
+        .firstWhereOrNull((element) => element.user.id == message.senderUid)
+        ?.user;
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 8, right: 40, left: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_controller.isCircle.isTrue)
+                IbUserAvatar(
+                  avatarUrl: senderUser == null ? '' : senderUser.avatarUrl,
+                  uid: senderUser == null ? '' : senderUser.id,
+                  radius: 16,
+                ),
+              if (_controller.isCircle.isTrue)
+                const SizedBox(
+                  width: 8,
+                ),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (senderUser != null && _controller.isCircle.isTrue)
+                      Text(senderUser.username),
+                    ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(16),
+                          topRight: Radius.circular(16),
+                          bottomRight: Radius.circular(16)),
+                      child: InkWell(
+                        onTap: () {
+                          Get.to(
+                              () => IbMediaViewer(
+                                  urls: [message.content], currentIndex: 0),
+                              transition: Transition.zoom,
+                              fullscreenDialog: true);
+                        },
+                        child: Image.network(message.content,
+                            height: 120, fit: BoxFit.fitHeight,
+                            errorBuilder: (context, obj, trace) {
+                          return Container(
+                            height: 120,
+                            width: 120,
+                            color: IbColors.lightGrey,
+                            child: const Text('Failed to load image'),
+                          );
+                        }),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: _controller.isCircle.isTrue
+                ? const EdgeInsets.only(left: 40.0)
+                : const EdgeInsets.only(left: 2.0),
+            child: Text(
+              message.timestamp == null
+                  ? 'Sending...'
+                  : IbUtils.readableDateTime(
+                      DateTime.fromMillisecondsSinceEpoch(
+                          (message.timestamp as Timestamp)
+                              .millisecondsSinceEpoch),
+                      showTime: true),
+              style: const TextStyle(
+                  color: IbColors.lightGrey,
+                  fontSize: IbConfig.kDescriptionTextSize),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _buildAvatar(
       {required BuildContext context, required List<IbUser> avatarUsers}) {
     avatarUsers.removeWhere((element) => element.id == IbUtils.getCurrentUid());
@@ -485,6 +727,9 @@ class ChatPage extends StatelessWidget {
     final bool isMe = message.senderUid == IbUtils.getCurrentUid();
     if (message.messageType == IbMessage.kMessageTypeText) {
       return isMe ? _meTextMsgItem(message) : _textMsgItem(message);
+    }
+    if (message.messageType == IbMessage.kMessageTypePic) {
+      return isMe ? _meImgMsgItem(message) : _imgMsgItem(message);
     }
 
     if (message.messageType == IbMessage.kMessageTypeAnnouncement) {

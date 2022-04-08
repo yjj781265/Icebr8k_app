@@ -17,7 +17,8 @@ class ChatTabController extends GetxController {
   final circles = <ChatTabItem>[].obs;
   late StreamSubscription _oneToOneSub;
   late StreamSubscription _circleSub;
-  final isLoading = true.obs;
+  final isLoadingCircles = true.obs;
+  final isLoadingChat = true.obs;
   final totalUnread = 0.obs;
 
   @override
@@ -53,6 +54,7 @@ class ChatTabController extends GetxController {
         calculateTotalUnread();
         oneToOneChats.refresh();
       }
+      isLoadingChat.value = false;
     });
 
     _circleSub = IbChatDbService().listenToCircles().listen((event) async {
@@ -87,7 +89,14 @@ class ChatTabController extends GetxController {
         calculateTotalUnread();
         circles.refresh();
       }
+      isLoadingCircles.value = false;
     });
+
+    await Future.delayed(const Duration(milliseconds: 3000), () {
+      isLoadingCircles.value = false;
+      isLoadingChat.value = false;
+    });
+
     super.onInit();
   }
 
