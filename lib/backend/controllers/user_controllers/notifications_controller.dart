@@ -14,10 +14,13 @@ class NotificationController extends GetxController {
   late StreamSubscription ibNotificationsStream;
   final MainPageController _mainPageController = Get.find();
   final items = <NotificationItem>[].obs;
+  final isLoading = true.obs;
 
   @override
   Future<void> onInit() async {
     _initIbNotificationStream();
+    await Future.delayed(
+        const Duration(milliseconds: 3000), () => isLoading.value = false);
     super.onInit();
   }
 
@@ -29,7 +32,7 @@ class NotificationController extends GetxController {
 
   void _initIbNotificationStream() {
     ibNotificationsStream =
-        IbUserDbService().listenToIbNotifications().listen((event) {
+        IbUserDbService().listenToIbNotifications().listen((event) async {
       for (final docChange in event.docChanges) {
         if (docChange.doc.data() == null) {
           continue;
@@ -50,9 +53,12 @@ class NotificationController extends GetxController {
           _onNotificationRemoved(n);
         }
       }
+
       items.sort((a, b) =>
           b.notification.timestampInMs.compareTo(a.notification.timestampInMs));
       items.refresh();
+      print('finish loading');
+      isLoading.value = false;
     });
   }
 
@@ -64,18 +70,8 @@ class NotificationController extends GetxController {
       if (chat != null) {
         items.add(item);
       }
-      if (_mainPageController.currentIndex.value != 4 && !notification.isRead) {
-        IbUtils.showSimpleSnackBar(
-            msg: item.notification.title,
-            backgroundColor: IbColors.primaryColor);
-      }
     } else if (notification.type == IbNotification.kFriendRequest) {
       items.add(item);
-      if (_mainPageController.currentIndex.value != 4 && !notification.isRead) {
-        IbUtils.showSimpleSnackBar(
-            msg: '${item.notification.title} ${'sent_you_a_friend_request'.tr}',
-            backgroundColor: IbColors.primaryColor);
-      }
     }
   }
 

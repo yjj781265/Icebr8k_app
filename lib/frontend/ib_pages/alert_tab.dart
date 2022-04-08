@@ -10,6 +10,7 @@ import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_info.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
 class AlertTab extends StatelessWidget {
@@ -24,8 +25,13 @@ class AlertTab extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: Obx(
-          () => ListView.separated(
+        child: Obx(() {
+          if (_controller.isLoading.value) {
+            return const Center(
+              child: IbProgressIndicator(),
+            );
+          }
+          return ListView.separated(
             itemBuilder: (context, index) {
               final NotificationItem item = _controller.items[index];
               return _handleNotificationType(item, context);
@@ -36,8 +42,8 @@ class AlertTab extends StatelessWidget {
                 height: 1,
               );
             },
-          ),
-        ),
+          );
+        }),
       ),
     );
   }

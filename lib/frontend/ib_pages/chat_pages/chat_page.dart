@@ -635,16 +635,26 @@ class ChatPage extends StatelessWidget {
                               transition: Transition.zoom,
                               fullscreenDialog: true);
                         },
-                        child: Image.network(message.content,
-                            height: 120, fit: BoxFit.fitHeight,
-                            errorBuilder: (context, obj, trace) {
-                          return Container(
-                            height: 120,
-                            width: 120,
-                            color: IbColors.lightGrey,
-                            child: const Text('Failed to load image'),
-                          );
-                        }),
+                        child: Image.network(
+                          message.content,
+                          height: 120,
+                          fit: BoxFit.fitHeight,
+                          errorBuilder: (context, obj, trace) {
+                            return Container(
+                              height: 120,
+                              width: 120,
+                              color: IbColors.lightGrey,
+                              child: const Text('Failed to load image'),
+                            );
+                          },
+                          loadingBuilder: (context, child, event) {
+                            if (event == null) return child;
+                            return const SizedBox(
+                              height: 120,
+                              child: IbProgressIndicator(),
+                            );
+                          },
+                        ),
                       ),
                     )
                   ],
