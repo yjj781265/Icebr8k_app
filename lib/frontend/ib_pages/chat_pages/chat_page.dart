@@ -566,6 +566,13 @@ class ChatPage extends StatelessWidget {
               message.content,
               height: 120,
               fit: BoxFit.fitHeight,
+              loadingBuilder: (context, child, event) {
+                if (event == null) return child;
+                return const SizedBox(
+                  height: 120,
+                  child: IbProgressIndicator(),
+                );
+              },
               errorBuilder: (context, obj, trace) {
                 return Container(
                   height: 120,
