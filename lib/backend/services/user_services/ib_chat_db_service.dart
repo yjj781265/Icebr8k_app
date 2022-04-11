@@ -33,6 +33,18 @@ class IbChatDbService {
     }, SetOptions(merge: true));
   }
 
+  Future<void> addTypingUid({required String chatId}) async {
+    return _collectionRef.doc(chatId).update({
+      'isTypingUids': FieldValue.arrayUnion([IbUtils.getCurrentUid()])
+    });
+  }
+
+  Future<void> removeTypingUid({required String chatId}) async {
+    return _collectionRef.doc(chatId).update({
+      'isTypingUids': FieldValue.arrayRemove([IbUtils.getCurrentUid()])
+    });
+  }
+
   /// stream of ibMessage in ascending order
   Stream<QuerySnapshot<Map<String, dynamic>>> listenToMessageChanges(
       String chatRoomId) {
@@ -167,6 +179,7 @@ class IbChatDbService {
     });
   }
 
+  /// will delete chat doc and its sub collections and medias
   Future<void> leaveChatRoom(String chatRoomId) async {
     await _collectionRef.doc(chatRoomId).delete();
     final messageSnapShot = await _collectionRef

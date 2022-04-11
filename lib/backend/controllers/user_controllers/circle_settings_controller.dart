@@ -120,6 +120,7 @@ class CircleSettingsController extends GetxController {
       if (ibChat != null) {
         await IbChatDbService().uploadMessage(IbMessage(
             messageId: IbUtils.getUniqueId(),
+            readUids: [IbUtils.getCurrentUid()!],
             content:
                 '${IbUtils.getCurrentIbUser()!.username} updated circle info',
             messageType: IbMessage.kMessageTypeAnnouncement,

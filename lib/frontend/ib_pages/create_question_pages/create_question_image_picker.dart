@@ -175,7 +175,7 @@ class CreateQuestionImagePicker extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          InkWell(
+          ListTile(
             onTap: () async {
               Get.back();
               final _picker = ImagePicker();
@@ -202,28 +202,14 @@ class CreateQuestionImagePicker extends StatelessWidget {
                 list.refresh();
               }
             },
-            child: Ink(
-              height: 56,
-              width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: const [
-                    Icon(
-                      Icons.camera_alt_outlined,
-                      color: IbColors.primaryColor,
-                    ),
-                    SizedBox(
-                      width: 8,
-                    ),
-                    Text('Take a photo',
-                        style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
-                  ],
-                ),
-              ),
+            leading: const Icon(
+              Icons.camera_alt_outlined,
+              color: IbColors.primaryColor,
             ),
+            title: const Text('Take a photo',
+                style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
           ),
-          InkWell(
+          ListTile(
             onTap: () async {
               Get.back();
               final _picker = ImagePicker();
@@ -265,30 +251,16 @@ class CreateQuestionImagePicker extends StatelessWidget {
                 list.refresh();
               }
             },
-            child: Ink(
-              height: 56,
-              width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: const [
-                    Icon(
-                      Icons.photo_album_outlined,
-                      color: IbColors.errorRed,
-                    ),
-                    SizedBox(
-                      width: 8,
-                    ),
-                    Text(
-                      'Choose from gallery',
-                      style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                    ),
-                  ],
-                ),
-              ),
+            leading: const Icon(
+              Icons.photo_album_outlined,
+              color: IbColors.errorRed,
+            ),
+            title: const Text(
+              'Choose from gallery',
+              style: TextStyle(fontSize: IbConfig.kNormalTextSize),
             ),
           ),
-          InkWell(
+          ListTile(
             onTap: () async {
               Get.back();
               final gifUrl = await Get.to(
@@ -311,28 +283,14 @@ class CreateQuestionImagePicker extends StatelessWidget {
                 list.refresh();
               }
             },
-            child: Ink(
-              height: 56,
-              width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: const [
-                    Icon(
-                      Icons.gif,
-                      color: IbColors.accentColor,
-                      size: 24,
-                    ),
-                    SizedBox(
-                      width: 8,
-                    ),
-                    Text(
-                      'Choose GIF from Tenor',
-                      style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                    ),
-                  ],
-                ),
-              ),
+            leading: const Icon(
+              Icons.gif,
+              color: IbColors.accentColor,
+              size: 24,
+            ),
+            title: const Text(
+              'Choose GIF from Tenor',
+              style: TextStyle(fontSize: IbConfig.kNormalTextSize),
             ),
           ),
         ],

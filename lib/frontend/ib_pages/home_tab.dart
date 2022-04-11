@@ -24,7 +24,7 @@ class HomeTab extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.search),
-            onPressed: () {},
+            onPressed: () async {},
           ),
         ],
         leading: Builder(

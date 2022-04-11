@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
 class IbMediaViewer extends StatefulWidget {
   final List<String> urls;
@@ -52,7 +53,15 @@ class _IbMediaViewerState extends State<IbMediaViewer>
                       File(e),
                     );
                   } else {
-                    img = Image.network(e);
+                    img = Image.network(e,
+                        loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) {
+                        return child;
+                      }
+                      return const Center(
+                        child: IbProgressIndicator(),
+                      );
+                    });
                   }
 
                   return GestureDetector(
@@ -60,7 +69,6 @@ class _IbMediaViewerState extends State<IbMediaViewer>
                       Get.back(canPop: false);
                     },
                     child: InteractiveViewer(
-                      minScale: 1.5,
                       boundaryMargin: const EdgeInsets.all(8),
                       child: img,
                     ),

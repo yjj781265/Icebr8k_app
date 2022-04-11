@@ -30,54 +30,52 @@ class IbAnimatedBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final bgColor = backgroundColor ?? Theme.of(context).bottomAppBarColor;
 
-    return SafeArea(
-      child: AnimatedContainer(
-        height: containerHeight,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: bgColor,
-          boxShadow: [
-            if (showElevation)
-              const BoxShadow(
-                color: Colors.black12,
-                blurRadius: 2,
-              ),
-          ],
-        ),
-        duration: const Duration(milliseconds: 200),
+    return AnimatedContainer(
+      height: containerHeight,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: bgColor,
+        boxShadow: [
+          if (showElevation)
+            const BoxShadow(
+              color: Colors.black12,
+              blurRadius: 2,
+            ),
+        ],
+      ),
+      duration: const Duration(milliseconds: 200),
 
-        /// user wrap to prevent overflow at the bottom when nav is not visible
-        child: Wrap(
-          runAlignment: WrapAlignment.center,
-          alignment: WrapAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: Row(
-                mainAxisAlignment: mainAxisAlignment,
-                children: items.map((item) {
-                  final index = items.indexOf(item);
-                  return Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      customBorder: const CircleBorder(),
-                      onTap: () => onItemSelected(index),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: _ItemWidget(
-                          item: item,
-                          iconSize: iconSize,
-                          isSelected: index == selectedIndex,
-                          backgroundColor: bgColor,
-                        ),
+      /// user wrap to prevent overflow at the bottom when nav is not visible
+      child: Wrap(
+        runAlignment: WrapAlignment.center,
+        alignment: WrapAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 24.0),
+            child: Row(
+              mainAxisAlignment: mainAxisAlignment,
+              children: items.map((item) {
+                final index = items.indexOf(item);
+                return Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: () => onItemSelected(index),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: _ItemWidget(
+                        item: item,
+                        iconSize: iconSize,
+                        isSelected: index == selectedIndex,
+                        backgroundColor: bgColor,
                       ),
                     ),
-                  );
-                }).toList(),
-              ),
+                  ),
+                );
+              }).toList(),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

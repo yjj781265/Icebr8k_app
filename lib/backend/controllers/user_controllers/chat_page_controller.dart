@@ -47,6 +47,9 @@ class ChatPageController extends GetxController {
   final ItemPositionsListener itemPositionsListener =
       ItemPositionsListener.create();
   final ibChatMembers = <IbChatMemberModel>[].obs;
+  final isTypingUsers = <IbUser>[].obs;
+  final isTyping = false.obs;
+  final text = ''.obs;
 
   ChatPageController({this.ibChat, this.recipientId = ''});
   final IbMessage loadMessage = IbMessage(
@@ -55,10 +58,31 @@ class ChatPageController extends GetxController {
       senderUid: '',
       messageType: IbMessage.kMessageTypeLoadMore,
       chatRoomId: '');
-
   @override
   Future<void> onInit() async {
     await initData();
+
+    // remove typing after 8s
+    debounce(text, (value) async {
+      await IbChatDbService().removeTypingUid(chatId: ibChat!.chatId);
+      isTyping.value = false;
+    }, time: const Duration(seconds: 8));
+
+    txtController.addListener(() async {
+      if (text.value == txtController.text) {
+        return;
+      }
+      text.value = txtController.text;
+      if (ibChat != null &&
+          txtController.text.trim().isNotEmpty &&
+          isTyping.isFalse) {
+        isTyping.value = true;
+        await IbChatDbService().addTypingUid(chatId: ibChat!.chatId);
+      } else if (ibChat != null && txtController.text.isEmpty) {
+        isTyping.value = false;
+        await IbChatDbService().removeTypingUid(chatId: ibChat!.chatId);
+      }
+    });
     super.onInit();
   }
 
@@ -75,6 +99,10 @@ class ChatPageController extends GetxController {
     if (_chatSub != null) {
       _chatSub!.cancel();
     }
+
+    IbChatDbService().removeTypingUid(chatId: ibChat!.chatId).then((value) {
+      print('Remove my typingUid');
+    });
   }
 
   Future<void> initData() async {
@@ -170,6 +198,7 @@ class ChatPageController extends GetxController {
           }
         }
       }
+      setUpTypingUsers();
 
       ibChatMembers.sort((a, b) {
         if (a.member.role == IbChatMember.kRoleLeader &&
@@ -204,7 +233,7 @@ class ChatPageController extends GetxController {
         IbChatDbService().listenToIbChatChanges(ibChat!.chatId).listen((event) {
       if (event.data() != null) {
         ibChat = IbChat.fromJson(event.data()!);
-        print('update IbChat');
+        setUpTypingUsers();
       }
 
       /// only update if is group chat
@@ -213,6 +242,20 @@ class ChatPageController extends GetxController {
         avatarUrl.value = ibChat!.photoUrl;
       }
     });
+  }
+
+  void setUpTypingUsers() {
+    isTypingUsers.clear();
+    if (ibChat != null) {
+      for (final String uid in ibChat!.isTypingUids) {
+        if (uid == IbUtils.getCurrentUid()) {
+          continue;
+        }
+        final item =
+            ibChatMembers.firstWhereOrNull((element) => element.user.id == uid);
+        isTypingUsers.addIf(item != null, item!.user);
+      }
+    }
   }
 
   void setUpInfo() {
@@ -296,7 +339,7 @@ class ChatPageController extends GetxController {
 
     try {
       if (urls.isNotEmpty) {
-        for (final String url in urls) {
+        for (final String url in urls.toSet()) {
           await IbChatDbService().uploadMessage(buildImgMessage(url));
         }
         urls.clear();
@@ -311,6 +354,7 @@ class ChatPageController extends GetxController {
           msg: "Failed to send message $e", backgroundColor: IbColors.errorRed);
     } finally {
       isSending.value = false;
+      await IbChatDbService().removeTypingUid(chatId: ibChat!.chatId);
     }
   }
 
@@ -328,6 +372,7 @@ class ChatPageController extends GetxController {
                 content:
                     '${IbUtils.getCurrentIbUser()!.username} removed ${model.user.username} from the circle',
                 messageType: IbMessage.kMessageTypeAnnouncement,
+                readUids: [IbUtils.getCurrentUid()!],
                 senderUid: IbUtils.getCurrentUid()!,
                 chatRoomId: ibChat!.chatId));
           } catch (e) {
@@ -369,6 +414,7 @@ class ChatPageController extends GetxController {
                 content: '${model.user.username} is now the new circle leader',
                 messageType: IbMessage.kMessageTypeAnnouncement,
                 senderUid: IbUtils.getCurrentUid()!,
+                readUids: [IbUtils.getCurrentUid()!],
                 chatRoomId: ibChat!.chatId));
           } catch (e) {
             Get.dialog(IbDialog(
@@ -392,6 +438,7 @@ class ChatPageController extends GetxController {
       await IbChatDbService().updateChatMember(member: model.member);
       await IbChatDbService().uploadMessage(IbMessage(
           messageId: IbUtils.getUniqueId(),
+          readUids: [IbUtils.getCurrentUid()!],
           content:
               '${model.user.username} is promoted to be a circle assistant',
           messageType: IbMessage.kMessageTypeAnnouncement,
@@ -465,14 +512,19 @@ class ChatPageController extends GetxController {
             onPositiveTap: () async {
               Get.back();
               Get.dialog(const IbLoadingDialog(messageTrKey: 'Leaving...'));
-              await IbChatDbService()
-                  .removeChatMember(member: chatMember.member);
-              await IbChatDbService().uploadMessage(IbMessage(
-                  messageId: IbUtils.getUniqueId(),
-                  content: '${chatMember.user.username} left the circle',
-                  senderUid: IbUtils.getCurrentUid()!,
-                  messageType: IbMessage.kMessageTypeAnnouncement,
-                  chatRoomId: ibChat!.chatId));
+              if (ibChatMembers.length == 1) {
+                await IbChatDbService().leaveChatRoom(ibChat!.chatId);
+              } else {
+                await IbChatDbService()
+                    .removeChatMember(member: chatMember.member);
+                await IbChatDbService().uploadMessage(IbMessage(
+                    messageId: IbUtils.getUniqueId(),
+                    readUids: [IbUtils.getCurrentUid()!],
+                    content: '${chatMember.user.username} left the circle',
+                    senderUid: IbUtils.getCurrentUid()!,
+                    messageType: IbMessage.kMessageTypeAnnouncement,
+                    chatRoomId: ibChat!.chatId));
+              }
               Get.back(closeOverlays: true);
               Get.back();
             },

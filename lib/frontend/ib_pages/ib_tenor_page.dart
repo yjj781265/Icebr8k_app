@@ -24,8 +24,6 @@ class IbTenorPage extends StatelessWidget {
             Expanded(
               flex: 8,
               child: Container(
-                alignment: Alignment.center,
-                height: 44,
                 decoration: BoxDecoration(
                   color: Theme.of(context).backgroundColor,
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -39,6 +37,9 @@ class IbTenorPage extends StatelessWidget {
                   autofocus: true,
                   decoration: InputDecoration(
                     border: InputBorder.none,
+                    prefixIcon: const Icon(
+                      Icons.search,
+                    ),
                     suffixIcon: Obx(
                       () => _controller.isSearchBoxEmpty.value
                           ? const SizedBox()
@@ -51,7 +52,7 @@ class IbTenorPage extends StatelessWidget {
                                 color: IbColors.lightGrey,
                               )),
                     ),
-                    hintText: '🔍 Search Tenor',
+                    hintText: 'Search Tenor',
                   ),
                 ),
               ),

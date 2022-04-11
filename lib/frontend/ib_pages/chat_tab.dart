@@ -487,35 +487,37 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
     }
 
     final String messageType = item.ibChat.lastMessage!.messageType;
-
-    if (item.ibChat.isCircle) {
-      switch (messageType) {
-        case IbMessage.kMessageTypeAnnouncement:
-          return Text(
-            item.ibChat.lastMessage!.content,
-            style: const TextStyle(
-                fontSize: IbConfig.kSecondaryTextSize,
-                color: IbColors.accentColor),
-          );
-        case IbMessage.kMessageTypeText:
-          return Text(
-            '${item.lastMessageUser == null ? '' : '${item.lastMessageUser!.username}:'} ${item.ibChat.lastMessage!.content}',
-            style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-          );
-        default:
-          return const SizedBox();
-      }
-    } else {
-      return Text(
-        item.ibChat.lastMessage!.content,
-        maxLines: 3,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          fontSize: IbConfig.kSecondaryTextSize,
-        ),
-      );
+    switch (messageType) {
+      case IbMessage.kMessageTypeAnnouncement:
+        return Text(
+          item.ibChat.lastMessage!.content,
+          style: const TextStyle(
+              fontSize: IbConfig.kSecondaryTextSize,
+              color: IbColors.accentColor),
+        );
+      case IbMessage.kMessageTypeText:
+        return Text(
+          '${item.lastMessageUser == null ? '' : '${item.lastMessageUser!.username}: '}${item.ibChat.lastMessage!.content}',
+          style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+        );
+      case IbMessage.kMessageTypePic:
+        return Text(
+          '${item.lastMessageUser == null ? '' : '${item.lastMessageUser!.username}: '}[IMAGE]',
+          style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+        );
+      case IbMessage.kMessageTypePoll:
+        return Text(
+          '${item.lastMessageUser == null ? '' : '${item.lastMessageUser!.username}: '}[POLL]',
+          style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+        );
+      default:
+        return const SizedBox();
     }
   }
 }

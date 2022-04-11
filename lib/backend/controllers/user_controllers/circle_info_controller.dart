@@ -66,6 +66,7 @@ class CircleInfoController extends GetxController {
             content:
                 '${IbUtils.getCurrentIbUser()!.username} joined the circle',
             senderUid: IbUtils.getCurrentUid()!,
+            readUids: [IbUtils.getCurrentUid()!],
             messageType: IbMessage.kMessageTypeAnnouncement,
             chatRoomId: chat!.chatId));
         Get.back(closeOverlays: true);

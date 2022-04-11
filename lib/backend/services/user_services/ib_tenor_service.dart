@@ -5,6 +5,10 @@ import 'package:icebr8k/backend/models/ib_gif.dart';
 
 class IbTenorService extends GetConnect {
   final String kApiKey = 'YGXPQ2ECHA8Q';
+  static final IbTenorService _service = IbTenorService._();
+
+  factory IbTenorService() => _service;
+  IbTenorService._();
 
   Future<List<IbGif>> searchGif(
       {required String searchText, String? next}) async {
