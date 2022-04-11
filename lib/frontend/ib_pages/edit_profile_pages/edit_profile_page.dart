@@ -26,7 +26,7 @@ class EditProfilePage extends StatelessWidget {
         fontWeight: FontWeight.bold, fontSize: IbConfig.kNormalTextSize);
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 50,
+        centerTitle: false,
         title: Text(
           'edit_profile'.tr,
           overflow: TextOverflow.ellipsis,
@@ -289,50 +289,42 @@ class EditProfilePage extends StatelessWidget {
   Widget _editAvatarWidget(BuildContext context) {
     return GestureDetector(
       onTap: () => showEditAvatarBottomSheet(),
-      child: SizedBox(
-        width: 112,
-        height: 112,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.bottomRight,
-            children: [
-              Center(
-                child: Obx(() {
-                  if (_controller.avatarUrl.contains('http')) {
-                    return IbUserAvatar(
-                      avatarUrl: _controller.avatarUrl.value,
-                      disableOnTap: true,
-                      radius: 56,
-                    );
-                  }
-                  return CircleAvatar(
-                    radius: 56,
-                    key: UniqueKey(),
-                    foregroundImage:
-                        FileImage(File(_controller.avatarUrl.value)),
-                  );
-                }),
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          Obx(() {
+            if (_controller.avatarUrl.contains('http')) {
+              return IbUserAvatar(
+                avatarUrl: _controller.avatarUrl.value,
+                disableOnTap: true,
+                radius: 56,
+              );
+            }
+            return CircleAvatar(
+              radius: 56,
+              key: UniqueKey(),
+              foregroundImage: FileImage(File(_controller.avatarUrl.value)),
+            );
+          }),
+          Positioned(
+            bottom: 8,
+            right: 8,
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Theme.of(context).backgroundColor,
               ),
-              Positioned(
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Theme.of(context).backgroundColor,
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(3.0),
-                    child: Icon(
-                      Icons.edit_outlined,
-                      size: 16,
-                    ),
-                  ),
+              child: const Padding(
+                padding: EdgeInsets.all(3.0),
+                child: Icon(
+                  Icons.edit_outlined,
+                  size: 16,
                 ),
-              )
-            ],
-          ),
-        ),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -493,10 +485,12 @@ class EditProfilePage extends StatelessWidget {
   }
 
   void showEditAvatarBottomSheet() {
-    final Widget options = ListView(
-      shrinkWrap: true,
+    final Widget options = Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        InkWell(
+        ListTile(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
           onTap: () async {
             Get.back();
             final _picker = ImagePicker();
@@ -506,35 +500,25 @@ class EditProfilePage extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final File? croppedFile =
-                  await IbUtils.showImageCropper(pickedFile.path);
+              final File? croppedFile = await IbUtils.showImageCropper(
+                  pickedFile.path,
+                  width: 1600,
+                  height: 1600);
               if (croppedFile != null) {
                 _controller.avatarUrl.value = croppedFile.path;
               }
             }
           },
-          child: Ink(
-            height: 56,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.camera_alt_outlined,
-                    color: IbColors.primaryColor,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text('Take a photo',
-                      style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
-                ],
-              ),
-            ),
+          leading: const Icon(
+            Icons.camera_alt_outlined,
+            color: IbColors.primaryColor,
           ),
+          title: const Text('Take a photo',
+              style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
         ),
-        InkWell(
+        ListTile(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
           onTap: () async {
             Get.back();
             final _picker = ImagePicker();
@@ -544,34 +528,23 @@ class EditProfilePage extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final File? croppedFile =
-                  await IbUtils.showImageCropper(pickedFile.path);
+              final File? croppedFile = await IbUtils.showImageCropper(
+                pickedFile.path,
+                width: 1600,
+                height: 1600,
+              );
               if (croppedFile != null) {
                 _controller.avatarUrl.value = croppedFile.path;
               }
             }
           },
-          child: Ink(
-            height: 56,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.photo_album_outlined,
-                    color: IbColors.errorRed,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    'Choose from gallery',
-                    style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                  ),
-                ],
-              ),
-            ),
+          leading: const Icon(
+            Icons.photo_album_outlined,
+            color: IbColors.errorRed,
+          ),
+          title: const Text(
+            'Choose from gallery',
+            style: TextStyle(fontSize: IbConfig.kNormalTextSize),
           ),
         ),
       ],

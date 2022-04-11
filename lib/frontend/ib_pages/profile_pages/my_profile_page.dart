@@ -317,7 +317,7 @@ class MyProfilePage extends StatelessWidget {
 
                 /// user info
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -329,20 +329,27 @@ class MyProfilePage extends StatelessWidget {
                         style:
                             const TextStyle(fontSize: IbConfig.kNormalTextSize),
                       ),
-                      /*      Row(
+                      Row(
                         children: [
-                          Text(_controller.rxIbUser.value.gender),
+                          Text(
+                            _controller.rxIbUser.value.gender,
+                            style: const TextStyle(
+                                fontSize: IbConfig.kNormalTextSize),
+                          ),
                           if (_controller.rxIbUser.value.birthdateInMs != null)
                             Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: Text(
-                                  '🎂 ${IbUtils.readableDateTime(DateTime.fromMillisecondsSinceEpoch(_controller.rxIbUser.value.birthdateInMs ?? 0))}'),
+                                'Age: ${IbUtils.calculateAge(_controller.rxIbUser.value.birthdateInMs!).toString()}',
+                                style: const TextStyle(
+                                    fontSize: IbConfig.kNormalTextSize),
+                              ),
                             ),
                         ],
                       ),
                       const SizedBox(
                         height: 4,
-                      ),*/
+                      ),
                       IbDescriptionText(text: _controller.rxIbUser.value.bio),
                       const Divider(
                         thickness: 2,
@@ -352,73 +359,74 @@ class MyProfilePage extends StatelessWidget {
                 ),
 
                 /// emoPics
-                Obx(() => Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Text(
-                                'My EmoPics',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: IbConfig.kPageTitleSize),
+                Obx(
+                  () => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              'My EmoPics',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: IbConfig.kPageTitleSize),
+                            ),
+                          ),
+                          Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: TextButton.icon(
+                              onPressed: () {
+                                Get.to(() => EditEmoPicsPage(Get.put(
+                                    EditEmoPicController(_controller.rxEmoPics),
+                                    tag: IbUtils.getUniqueId())));
+                              },
+                              label: Text(
+                                _controller.rxEmoPics.isEmpty
+                                    ? 'add'.tr
+                                    : 'edit'.tr,
+                                style: const TextStyle(
+                                    color: IbColors.primaryColor),
+                              ),
+                              icon: const Icon(
+                                Icons.edit,
+                                size: 16,
                               ),
                             ),
-                            Directionality(
-                              textDirection: TextDirection.rtl,
-                              child: TextButton.icon(
-                                onPressed: () {
-                                  Get.to(() => EditEmoPicsPage(Get.put(
-                                      EditEmoPicController(
-                                          _controller.rxEmoPics),
-                                      tag: IbUtils.getUniqueId())));
-                                },
-                                label: Text(
-                                  _controller.rxEmoPics.isEmpty
-                                      ? 'add'.tr
-                                      : 'edit'.tr,
-                                  style: const TextStyle(
-                                      color: IbColors.primaryColor),
-                                ),
-                                icon: const Icon(
-                                  Icons.edit,
-                                  size: 16,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Obx(() => Wrap(
-                              children: _controller.rxEmoPics
-                                  .map((e) => IbEmoPicCard(
-                                        emoPic: e,
-                                        onTap: () {
-                                          Get.to(
-                                              () => IbMediaViewer(
-                                                    urls: [e.url],
-                                                    currentIndex: 0,
-                                                  ),
-                                              transition: Transition.zoom,
-                                              fullscreenDialog: true);
-                                        },
-                                        ignoreOnDoubleTap: true,
-                                      ))
-                                  .toList(),
-                            )),
-                        const SizedBox(
-                          height: 16,
-                        ),
-                        if (_controller.rxEmoPics.isEmpty)
-                          Center(
-                              child: Text(
-                            'nothing'.tr,
-                            style: const TextStyle(color: IbColors.lightGrey),
+                          ),
+                        ],
+                      ),
+                      Obx(() => Wrap(
+                            children: _controller.rxEmoPics
+                                .map((e) => IbEmoPicCard(
+                                      emoPic: e,
+                                      onTap: () {
+                                        Get.to(
+                                            () => IbMediaViewer(
+                                                  urls: [e.url],
+                                                  currentIndex: 0,
+                                                ),
+                                            transition: Transition.zoom,
+                                            fullscreenDialog: true);
+                                      },
+                                      ignoreOnDoubleTap: true,
+                                    ))
+                                .toList(),
                           )),
-                      ],
-                    )),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      if (_controller.rxEmoPics.isEmpty)
+                        Center(
+                            child: Text(
+                          'nothing'.tr,
+                          style: const TextStyle(color: IbColors.lightGrey),
+                        )),
+                    ],
+                  ),
+                ),
               ],
             )),
       ),

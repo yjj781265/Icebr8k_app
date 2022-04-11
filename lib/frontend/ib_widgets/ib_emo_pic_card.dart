@@ -21,126 +21,135 @@ class IbEmoPicCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = Get.width / 2.12;
     return IbCard(
-        child: SizedBox(
-      height: width * 1.618,
-      width: width,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Stack(
-            children: [
-              if (emoPic.url.isEmpty)
-                Container(
-                  height: width * 1.618 - 40,
-                  width: width,
-                  decoration: const BoxDecoration(
-                      color: IbColors.lightGrey,
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          topRight: Radius.circular(8))),
-                  child: const Icon(
-                    Icons.add,
-                    size: 48,
-                  ),
-                ),
-              if (emoPic.url.isNotEmpty && !emoPic.url.contains('http'))
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.file(
-                    File(emoPic.url),
-                    errorBuilder: (context, obj, stackTrace) {
-                      return Container(
-                        height: width * 1.618 - 40,
-                        width: width,
+      child: SizedBox(
+        height: width * 1.618,
+        width: width,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Stack(
+              children: [
+                if (emoPic.url.isEmpty)
+                  Container(
+                    height: width * 1.618 - 40,
+                    width: width,
+                    decoration: const BoxDecoration(
                         color: IbColors.lightGrey,
-                        child:
-                            const Center(child: Text('Failed to load image')),
-                      );
-                    },
-                    fit: BoxFit.cover,
-                    height: width * 1.618 - 40,
-                    width: width,
-                  ),
-                ),
-              if (emoPic.url.isNotEmpty && emoPic.url.contains('http'))
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      topRight: Radius.circular(8)),
-                  child: CachedNetworkImage(
-                    errorWidget: (
-                      context,
-                      string,
-                      d,
-                    ) =>
-                        Container(
-                      color: IbColors.lightGrey,
-                      child: const Center(child: Text('Failed to load image')),
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(8),
+                            topRight: Radius.circular(8))),
+                    child: const Icon(
+                      Icons.add,
+                      size: 48,
                     ),
-                    imageUrl: emoPic.url,
-                    fit: BoxFit.cover,
-                    height: width * 1.618 - 40,
-                    width: width,
                   ),
-                ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Text(
-                  emoPic.emoji,
-                  style: const TextStyle(fontSize: IbConfig.kSloganSize),
-                ),
-              ),
-              Positioned.fill(
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
+                if (emoPic.url.isNotEmpty && !emoPic.url.contains('http'))
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Image.file(
+                      File(emoPic.url),
+                      errorBuilder: (context, obj, stackTrace) {
+                        return Container(
+                          height: width * 1.618 - 40,
+                          width: width,
+                          color: IbColors.lightGrey,
+                          child:
+                              const Center(child: Text('Failed to load image')),
+                        );
+                      },
+                      fit: BoxFit.cover,
+                      height: width * 1.618 - 40,
+                      width: width,
+                    ),
+                  ),
+                if (emoPic.url.isNotEmpty && emoPic.url.contains('http'))
+                  ClipRRect(
                     borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(8),
                         topRight: Radius.circular(8)),
-                    onDoubleTap: () {
-                      if (ignoreOnDoubleTap) {
-                        return;
-                      }
-
-                      if (emoPic.url.isNotEmpty) {
-                        Get.to(
-                            () => IbMediaViewer(
-                                  urls: [emoPic.url],
-                                  currentIndex: 0,
-                                ),
-                            transition: Transition.zoom,
-                            fullscreenDialog: true);
-                      }
-                    },
-                    onTap: () {
-                      if (onTap == null) {
-                        return;
-                      }
-                      onTap!();
-                    },
+                    child: CachedNetworkImage(
+                      errorWidget: (
+                        context,
+                        string,
+                        d,
+                      ) =>
+                          Container(
+                        color: IbColors.lightGrey,
+                        child:
+                            const Center(child: Text('Failed to load image')),
+                      ),
+                      progressIndicatorBuilder: (context, string, progress) {
+                        return Center(
+                          child: CircularProgressIndicator.adaptive(
+                            value: progress.progress,
+                          ),
+                        );
+                      },
+                      imageUrl: emoPic.url,
+                      fit: BoxFit.cover,
+                      height: width * 1.618 - 40,
+                      width: width,
+                    ),
+                  ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Text(
+                    emoPic.emoji,
+                    style: const TextStyle(fontSize: IbConfig.kSloganSize),
                   ),
                 ),
-              ),
-            ],
-          ),
-          Expanded(
-              child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4.0),
-              child: RichText(
-                  overflow: TextOverflow.ellipsis,
-                  text: TextSpan(
-                      text: emoPic.description,
-                      style: TextStyle(
-                          color: Theme.of(context).indicatorColor,
-                          fontSize: IbConfig.kNormalTextSize,
-                          fontWeight: FontWeight.bold),
-                      children: const [])),
+                Positioned.fill(
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(8),
+                          topRight: Radius.circular(8)),
+                      onDoubleTap: () {
+                        if (ignoreOnDoubleTap) {
+                          return;
+                        }
+
+                        if (emoPic.url.isNotEmpty) {
+                          Get.to(
+                              () => IbMediaViewer(
+                                    urls: [emoPic.url],
+                                    currentIndex: 0,
+                                  ),
+                              transition: Transition.zoom,
+                              fullscreenDialog: true);
+                        }
+                      },
+                      onTap: () {
+                        if (onTap == null) {
+                          return;
+                        }
+                        onTap!();
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
-          )),
-        ],
+            Expanded(
+                child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: RichText(
+                    overflow: TextOverflow.ellipsis,
+                    text: TextSpan(
+                        text: emoPic.description,
+                        style: TextStyle(
+                            color: Theme.of(context).indicatorColor,
+                            fontSize: IbConfig.kNormalTextSize,
+                            fontWeight: FontWeight.bold),
+                        children: const [])),
+              ),
+            )),
+          ],
+        ),
       ),
-    ));
+    );
   }
 }

@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_gif.dart';
@@ -82,13 +81,6 @@ class IbTenorController extends GetxController {
 
   @override
   Future<void> onClose() async {
-    for (final IbGif ibGif in trendingGifs) {
-      await CachedNetworkImage.evictFromCache(ibGif.url);
-    }
-
-    for (final IbGif ibGif in resultGifs) {
-      await CachedNetworkImage.evictFromCache(ibGif.url);
-    }
     editingController.dispose();
     refreshController.dispose();
     super.onClose();

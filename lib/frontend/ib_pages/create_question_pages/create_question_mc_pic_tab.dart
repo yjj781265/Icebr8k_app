@@ -289,7 +289,7 @@ class CreateQuestionMcPicTab extends StatelessWidget {
           value: _txtController.text.trim(), index: index),
       subtitle: '',
     );
-    Get.bottomSheet(_widget, persistent: true, ignoreSafeArea: false);
+    Get.bottomSheet(_widget, persistent: true);
   }
 
   void showMediaBottomSheet(
@@ -300,7 +300,9 @@ class CreateQuestionMcPicTab extends StatelessWidget {
     final Widget options = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        InkWell(
+        ListTile(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
           onTap: () async {
             Get.back();
             final _picker = ImagePicker();
@@ -324,28 +326,16 @@ class CreateQuestionMcPicTab extends StatelessWidget {
               list.refresh();
             }
           },
-          child: Ink(
-            height: 56,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.camera_alt_outlined,
-                    color: IbColors.primaryColor,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text('Take a photo',
-                      style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
-                ],
-              ),
-            ),
+          leading: const Icon(
+            Icons.camera_alt_outlined,
+            color: IbColors.primaryColor,
           ),
+          title: const Text('Take a photo',
+              style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
         ),
-        InkWell(
+        ListTile(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
           onTap: () async {
             Get.back();
             final _picker = ImagePicker();
@@ -370,30 +360,18 @@ class CreateQuestionMcPicTab extends StatelessWidget {
               list.refresh();
             }
           },
-          child: Ink(
-            height: 56,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.photo_album_outlined,
-                    color: IbColors.errorRed,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    'Choose from gallery',
-                    style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                  ),
-                ],
-              ),
-            ),
+          leading: const Icon(
+            Icons.photo_album_outlined,
+            color: IbColors.errorRed,
+          ),
+          title: const Text(
+            'Choose from gallery',
+            style: TextStyle(fontSize: IbConfig.kNormalTextSize),
           ),
         ),
-        InkWell(
+        ListTile(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
           onTap: () async {
             Get.back();
             final url = await Get.to(
@@ -416,33 +394,19 @@ class CreateQuestionMcPicTab extends StatelessWidget {
               list.refresh();
             }
           },
-          child: Ink(
-            height: 56,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.gif,
-                    color: IbColors.accentColor,
-                    size: 24,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    'Choose GIF from Tenor',
-                    style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                  ),
-                ],
-              ),
-            ),
+          leading: const Icon(
+            Icons.gif,
+            color: IbColors.accentColor,
+            size: 24,
+          ),
+          title: const Text(
+            'Choose GIF from Tenor',
+            style: TextStyle(fontSize: IbConfig.kNormalTextSize),
           ),
         ),
       ],
     );
 
-    Get.bottomSheet(IbCard(child: options), ignoreSafeArea: false);
+    Get.bottomSheet(SafeArea(child: IbCard(child: options)));
   }
 }

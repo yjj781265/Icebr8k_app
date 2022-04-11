@@ -1,9 +1,9 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
 class IbMediaViewer extends StatefulWidget {
   final List<String> urls;
@@ -53,15 +53,26 @@ class _IbMediaViewerState extends State<IbMediaViewer>
                       File(e),
                     );
                   } else {
-                    img = Image.network(e,
-                        loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) {
-                        return child;
-                      }
-                      return const Center(
-                        child: IbProgressIndicator(),
-                      );
-                    });
+                    img = CachedNetworkImage(
+                      imageUrl: e,
+                      progressIndicatorBuilder: (context, string, progress) {
+                        return Center(
+                          child: CircularProgressIndicator.adaptive(
+                            value: progress.progress,
+                          ),
+                        );
+                      },
+                      errorWidget: (context, str, obj) {
+                        return Container(
+                          height: 100,
+                          width: 50,
+                          color: IbColors.lightGrey,
+                          child: const Center(
+                            child: Text('Failed to load image'),
+                          ),
+                        );
+                      },
+                    );
                   }
 
                   return GestureDetector(

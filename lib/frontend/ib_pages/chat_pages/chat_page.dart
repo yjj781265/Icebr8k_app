@@ -437,7 +437,7 @@ class ChatPage extends StatelessWidget {
         ),
       ],
     ));
-    Get.bottomSheet(options, ignoreSafeArea: false);
+    Get.bottomSheet(SafeArea(child: options), ignoreSafeArea: false);
   }
 
   Widget _meTextMsgItem(IbMessage message) {

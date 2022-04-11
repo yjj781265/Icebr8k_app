@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
@@ -217,30 +216,35 @@ class IbTenorPage extends StatelessWidget {
   Widget iBGifItem(IbGif e) {
     return Stack(
       children: [
-        SizedBox(
-          height: e.height.toDouble(),
-          width: e.width.toDouble(),
-          child: ClipRRect(
-            borderRadius: const BorderRadius.all(
-              Radius.circular(8),
-            ),
-            child: CachedNetworkImage(
-              placeholder: (context, str) => Container(
+        ClipRRect(
+          borderRadius: const BorderRadius.all(
+            Radius.circular(8),
+          ),
+          child: Image.network(
+            e.url,
+            height: e.height.toDouble(),
+            width: e.width.toDouble(),
+            fit: BoxFit.fill,
+            loadingBuilder: (context, child, progress) {
+              if (progress == null) {
+                return child;
+              }
+
+              return Container(
                 decoration: BoxDecoration(
                   color: IbColors.lightGrey.withOpacity(0.8),
                 ),
                 height: e.height.toDouble(),
                 width: e.width.toDouble(),
-              ),
-              imageUrl: e.url,
-              fit: BoxFit.fill,
-            ),
+              );
+            },
           ),
         ),
         Positioned.fill(
           child: Material(
             color: Colors.transparent,
             child: InkWell(
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
               onTap: () => _handleItemClick(e.url),
             ),
           ),

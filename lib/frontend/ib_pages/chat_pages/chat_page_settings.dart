@@ -210,7 +210,7 @@ class ChatPageSettings extends StatelessWidget {
       ),
     );
 
-    Get.bottomSheet(sheet, ignoreSafeArea: false);
+    Get.bottomSheet(SafeArea(child: sheet));
   }
 
   Widget settings(BuildContext context) {

@@ -26,6 +26,25 @@ class IbUtils {
     return isOver13;
   }
 
+  static int calculateAge(int timestampInMs) {
+    final DateTime currentDate = DateTime.now();
+    final DateTime birthDate =
+        DateTime.fromMillisecondsSinceEpoch(timestampInMs);
+    int age = currentDate.year - birthDate.year;
+    final int month1 = currentDate.month;
+    final int month2 = birthDate.month;
+    if (month2 > month1) {
+      age--;
+    } else if (month1 == month2) {
+      final int day1 = currentDate.day;
+      final int day2 = birthDate.day;
+      if (day2 > day1) {
+        age--;
+      }
+    }
+    return age;
+  }
+
   static Future<File?> showImageCropper(String filePath,
       {CropStyle cropStyle = CropStyle.circle,
       List<CropAspectRatioPreset> ratios = const [
@@ -51,8 +70,6 @@ class IbUtils {
           rectWidth: width ?? 1600,
           rectX: width ?? 1600,
           rectY: height ?? 900,
-          aspectRatioLockEnabled: true,
-          aspectRatioLockDimensionSwapEnabled: true,
           resetAspectRatioEnabled: resetAspectRatioEnabled,
           resetButtonHidden: !resetAspectRatioEnabled,
           minimumAspectRatio: minimumAspectRatio,

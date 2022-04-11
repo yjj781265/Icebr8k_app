@@ -514,6 +514,7 @@ class ChatPageController extends GetxController {
               Get.dialog(const IbLoadingDialog(messageTrKey: 'Leaving...'));
               if (ibChatMembers.length == 1) {
                 await IbChatDbService().leaveChatRoom(ibChat!.chatId);
+                print('delete everything');
               } else {
                 await IbChatDbService()
                     .removeChatMember(member: chatMember.member);

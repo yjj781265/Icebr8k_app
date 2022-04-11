@@ -463,21 +463,28 @@ class ProfilePage extends StatelessWidget {
                             style: const TextStyle(
                                 fontSize: IbConfig.kNormalTextSize),
                           ),
-                          /* Row(
+                          Row(
                             children: [
-                              Text(_controller.rxIbUser.value.gender),
+                              Text(
+                                _controller.rxIbUser.value.gender,
+                                style: const TextStyle(
+                                    fontSize: IbConfig.kNormalTextSize),
+                              ),
                               if (_controller.rxIbUser.value.birthdateInMs !=
                                   null)
                                 Padding(
                                   padding: const EdgeInsets.only(left: 8.0),
                                   child: Text(
-                                      '🎂 ${IbUtils.readableDateTime(DateTime.fromMillisecondsSinceEpoch(_controller.rxIbUser.value.birthdateInMs ?? 0))}'),
+                                    'Age: ${IbUtils.calculateAge(_controller.rxIbUser.value.birthdateInMs!).toString()}',
+                                    style: const TextStyle(
+                                        fontSize: IbConfig.kNormalTextSize),
+                                  ),
                                 ),
                             ],
                           ),
                           const SizedBox(
                             height: 4,
-                          ),*/
+                          ),
                           IbDescriptionText(
                               text: _controller.rxIbUser.value.bio),
                           const Divider(
