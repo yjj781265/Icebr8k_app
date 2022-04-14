@@ -6,11 +6,14 @@ part 'ib_question.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class IbQuestion {
+  static const String kPrivacyBoundCircle = 'circle';
+  static const String kPrivacyBoundPublic = 'public';
+  static const String kPrivacyBoundFriends = 'friends';
+
   static const String kMultipleChoice = "mc";
   static const String kScaleOne = "sc_1";
   static const String kScaleTwo = "sc_2";
   static const String kScaleThree = "sc_3";
-  static const String kPic = "pic";
   static const String kMultipleChoicePic = "mc_pic";
 
   List<String> tagIds;
@@ -65,10 +68,49 @@ class IbQuestion {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is IbQuestion && runtimeType == other.runtimeType && id == other.id;
+      other is IbQuestion &&
+          runtimeType == other.runtimeType &&
+          tagIds == other.tagIds &&
+          medias == other.medias &&
+          position == other.position &&
+          privacyBounds == other.privacyBounds &&
+          question == other.question &&
+          description == other.description &&
+          isAnonymous == other.isAnonymous &&
+          isCommentEnabled == other.isCommentEnabled &&
+          isQuiz == other.isQuiz &&
+          correctChoiceId == other.correctChoiceId &&
+          comments == other.comments &&
+          pollSize == other.pollSize &&
+          likes == other.likes &&
+          id == other.id &&
+          creatorId == other.creatorId &&
+          askedTimeInMs == other.askedTimeInMs &&
+          endTimeInMs == other.endTimeInMs &&
+          choices == other.choices &&
+          questionType == other.questionType;
 
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode =>
+      tagIds.hashCode ^
+      medias.hashCode ^
+      position.hashCode ^
+      privacyBounds.hashCode ^
+      question.hashCode ^
+      description.hashCode ^
+      isAnonymous.hashCode ^
+      isCommentEnabled.hashCode ^
+      isQuiz.hashCode ^
+      correctChoiceId.hashCode ^
+      comments.hashCode ^
+      pollSize.hashCode ^
+      likes.hashCode ^
+      id.hashCode ^
+      creatorId.hashCode ^
+      askedTimeInMs.hashCode ^
+      endTimeInMs.hashCode ^
+      choices.hashCode ^
+      questionType.hashCode;
 
   @override
   String toString() {

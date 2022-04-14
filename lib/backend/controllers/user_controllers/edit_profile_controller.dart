@@ -111,6 +111,17 @@ class EditProfileController extends GetxController {
       return;
     }
 
+    if (!IbUtils.isOver13(
+        DateTime.fromMillisecondsSinceEpoch(birthdateInMs.value))) {
+      Get.dialog(const IbDialog(
+        title: 'Age limit',
+        subtitle: "You must be at least 13 to use Icebr8k",
+        showNegativeBtn: false,
+        positiveTextKey: 'ok',
+      ));
+      return;
+    }
+
     if (gender.value.isEmpty) {
       Get.dialog(const IbDialog(
         title: 'Missing Info',

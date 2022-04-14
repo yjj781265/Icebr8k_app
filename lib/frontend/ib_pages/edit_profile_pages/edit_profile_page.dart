@@ -149,8 +149,7 @@ class EditProfilePage extends StatelessWidget {
                               ),
                               textInputType: TextInputType.name,
                               titleTrKey: 'fName',
-                              hintTrKey: 'fNameHint',
-                              onChanged: (text) {}),
+                              hintTrKey: 'fNameHint',),
                         ),
                         Obx(
                           () => IbTextField(
@@ -162,8 +161,7 @@ class EditProfilePage extends StatelessWidget {
                               ),
                               textInputType: TextInputType.name,
                               titleTrKey: 'lName',
-                              hintTrKey: 'lNameHint',
-                              onChanged: (text) {}),
+                              hintTrKey: 'lNameHint',),
                         ),
                         Obx(
                           () => IbTextField(
@@ -334,45 +332,47 @@ class EditProfilePage extends StatelessWidget {
     _controller.birthdateTeController.text = IbUtils.readableDateTime(
         DateTime.fromMillisecondsSinceEpoch(_controller.birthdateInMs.value));
     Get.bottomSheet(
-        IbCard(
-            child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(
-                height: 256,
-                width: Get.width,
-                child: CupertinoDatePicker(
-                  initialDateTime: DateTime.fromMillisecondsSinceEpoch(
-                      _controller.birthdateInMs.value),
-                  mode: CupertinoDatePickerMode.date,
-                  maximumDate: DateTime.now(),
-                  onDateTimeChanged: (value) async {
-                    await HapticFeedback.selectionClick();
-                    _controller.birthdateTeController.text =
-                        IbUtils.readableDateTime(value);
-                    _controller.birthdateTeController.text;
-                    _controller.birthdateInMs.value =
-                        value.millisecondsSinceEpoch;
-                  },
-                  dateOrder: DatePickerDateOrder.mdy,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SizedBox(
+        SafeArea(
+          child: IbCard(
+              child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 256,
                   width: Get.width,
-                  height: 32,
-                  child: IbElevatedButton(
-                    onPressed: () {
-                      Get.back();
+                  child: CupertinoDatePicker(
+                    initialDateTime: DateTime.fromMillisecondsSinceEpoch(
+                        _controller.birthdateInMs.value),
+                    mode: CupertinoDatePickerMode.date,
+                    maximumDate: DateTime.now(),
+                    onDateTimeChanged: (value) async {
+                      await HapticFeedback.selectionClick();
+                      _controller.birthdateTeController.text =
+                          IbUtils.readableDateTime(value);
+                      _controller.birthdateTeController.text;
+                      _controller.birthdateInMs.value =
+                          value.millisecondsSinceEpoch;
                     },
-                    textTrKey: 'ok',
+                    dateOrder: DatePickerDateOrder.mdy,
                   ),
                 ),
-              ),
-            ],
-          ),
-        )),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: Get.width,
+                    height: 32,
+                    child: IbElevatedButton(
+                      onPressed: () {
+                        Get.back();
+                      },
+                      textTrKey: 'ok',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )),
+        ),
         ignoreSafeArea: false);
   }
 

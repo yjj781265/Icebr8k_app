@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/chat_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
@@ -43,6 +44,7 @@ class IbQuestionItemController extends GetxController {
   final compScore = 0.0.obs;
   final resultMap = <IbChoice, double>{}.obs;
   final RxList<IbTag> ibTags = <IbTag>[].obs;
+  final sharedCircles = <ChatTabItem>[].obs;
   //start
   // variables for comment page
   final currentSortOption = 'Top Comments'.obs;

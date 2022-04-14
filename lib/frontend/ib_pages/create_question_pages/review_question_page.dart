@@ -11,6 +11,7 @@ import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_tag_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/create_question_pages/circle_picker_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
@@ -128,6 +129,9 @@ class ReviewQuestionPage extends StatelessWidget {
                         ),
                       ),
                     ListTile(
+                      onTap: () {
+                        _showPrivacyBound();
+                      },
                       tileColor: Theme.of(context).primaryColor,
                       trailing: const Text('ALL'),
                       title: const Text(
@@ -180,34 +184,36 @@ class ReviewQuestionPage extends StatelessWidget {
 
   void _timeLimitBtmSheet() {
     Get.bottomSheet(
-        IbCard(
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              ListTile(
-                leading: const Icon(
-                  Icons.calendar_today,
-                  color: IbColors.primaryColor,
+        SafeArea(
+          child: IbCard(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(
+                    Icons.calendar_today,
+                    color: IbColors.primaryColor,
+                  ),
+                  title: const Text('Pick a date and time'),
+                  onTap: () {
+                    Get.back();
+                    _showDateTimePicker();
+                  },
                 ),
-                title: const Text('Pick a date and time'),
-                onTap: () {
-                  Get.back();
-                  _showDateTimePicker();
-                },
-              ),
-              ListTile(
-                leading: const Icon(
-                  Icons.loop_outlined,
-                  color: IbColors.accentColor,
+                ListTile(
+                  leading: const Icon(
+                    Icons.loop_outlined,
+                    color: IbColors.accentColor,
+                  ),
+                  title: const Text('No Time Limit'),
+                  onTap: () {
+                    itemController.rxIbQuestion.value.endTimeInMs = -1;
+                    itemController.rxIbQuestion.refresh();
+                    Get.back();
+                  },
                 ),
-                title: const Text('No Time Limit'),
-                onTap: () {
-                  itemController.rxIbQuestion.value.endTimeInMs = -1;
-                  itemController.rxIbQuestion.refresh();
-                  Get.back();
-                },
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         ignoreSafeArea: false);
@@ -218,50 +224,144 @@ class ReviewQuestionPage extends StatelessWidget {
         DateTime.now().add(const Duration(minutes: 15)).millisecondsSinceEpoch;
     Get.bottomSheet(
         IbCard(
-            child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Obx(
-                () => Center(
-                  child: Text(
-                    '${DateTime.fromMillisecondsSinceEpoch(itemController.rxIbQuestion.value.endTimeInMs).year}',
-                    style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
-                  ),
+            child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Obx(
+              () => Center(
+                child: Text(
+                  '${DateTime.fromMillisecondsSinceEpoch(itemController.rxIbQuestion.value.endTimeInMs).year}',
+                  style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
                 ),
               ),
-              SizedBox(
-                height: 256,
-                child: CupertinoDatePicker(
-                  maximumDate: DateTime.now().add(const Duration(days: 365)),
-                  maximumYear: 1,
-                  onDateTimeChanged: (value) async {
-                    await HapticFeedback.selectionClick();
-                    itemController.rxIbQuestion.value.endTimeInMs =
-                        value.millisecondsSinceEpoch;
-                    itemController.rxIbQuestion.refresh();
-                  },
-                  initialDateTime:
-                      DateTime.now().add(const Duration(minutes: 20)),
-                  minimumDate: DateTime.now().add(const Duration(minutes: 15)),
-                  dateOrder: DatePickerDateOrder.ymd,
-                ),
+            ),
+            SizedBox(
+              height: 256,
+              child: CupertinoDatePicker(
+                maximumDate: DateTime.now().add(const Duration(days: 365)),
+                maximumYear: 1,
+                onDateTimeChanged: (value) async {
+                  await HapticFeedback.selectionClick();
+                  itemController.rxIbQuestion.value.endTimeInMs =
+                      value.millisecondsSinceEpoch;
+                  itemController.rxIbQuestion.refresh();
+                },
+                initialDateTime:
+                    DateTime.now().add(const Duration(minutes: 20)),
+                minimumDate: DateTime.now().add(const Duration(minutes: 15)),
+                dateOrder: DatePickerDateOrder.ymd,
               ),
-              SizedBox(
-                width: double.infinity,
-                child: IbElevatedButton(
-                    textTrKey: 'ok',
-                    onPressed: () {
-                      Get.back();
-                    }),
-              ),
-              const SizedBox(
-                height: 16,
-              ),
-            ],
-          ),
+            ),
+            SizedBox(
+              width: double.infinity,
+              child: IbElevatedButton(
+                  textTrKey: 'ok',
+                  onPressed: () {
+                    Get.back();
+                  }),
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+          ],
         )),
         ignoreSafeArea: false);
+  }
+
+  void _showPrivacyBound() {
+    final Widget dialog = IbCard(
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'Share with',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: IbConfig.kNormalTextSize),
+              ),
+            ),
+            Obx(
+              () => CheckboxListTile(
+                controlAffinity: ListTileControlAffinity.trailing,
+                value: itemController.rxIbQuestion.value.privacyBounds
+                    .contains(IbQuestion.kPrivacyBoundPublic),
+                onChanged: (flag) {
+                  final bool isPublic = flag ?? false;
+                  final list = <String>[];
+                  if (isPublic) {
+                    list.add(IbQuestion.kPrivacyBoundPublic);
+                    list.addAll(IbUtils.getCurrentIbUserUnblockedFriendsId());
+                  }
+                  itemController.rxIbQuestion.value.privacyBounds = list;
+                  itemController.rxIbQuestion.refresh();
+                },
+                title: const Text(
+                  'Public',
+                  style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                ),
+                subtitle: const Text(
+                  'Every icebr8k users(include your friends) will have access to see it',
+                  style: TextStyle(
+                      fontSize: IbConfig.kDescriptionTextSize,
+                      color: IbColors.lightGrey),
+                ),
+              ),
+            ),
+            Obx(
+              () => CheckboxListTile(
+                controlAffinity: ListTileControlAffinity.trailing,
+                value: itemController.rxIbQuestion.value.privacyBounds
+                    .contains(IbQuestion.kPrivacyBoundFriends),
+                onChanged: (flag) {
+                  final bool isFriendsOnly = flag ?? false;
+                  final list = <String>[];
+                  if (isFriendsOnly) {
+                    list.add(IbQuestion.kPrivacyBoundFriends);
+                    list.addAll(IbUtils.getCurrentIbUserUnblockedFriendsId());
+                  }
+
+                  itemController.rxIbQuestion.value.privacyBounds = list;
+                  itemController.rxIbQuestion.refresh();
+                },
+                title: const Text(
+                  'Friends Only',
+                  style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                ),
+                subtitle: const Text(
+                  'Only your awesome friends will have access to see it',
+                  style: TextStyle(
+                      fontSize: IbConfig.kDescriptionTextSize,
+                      color: IbColors.lightGrey),
+                ),
+              ),
+            ),
+            ListTile(
+              onTap: () {
+                Get.to(() => const CirclePickerPage(), fullscreenDialog: true);
+              },
+              title: const Text(
+                'Circles',
+                style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+              ),
+              subtitle: const Text(
+                'None',
+                style: TextStyle(
+                    fontSize: IbConfig.kDescriptionTextSize,
+                    color: IbColors.lightGrey),
+              ),
+              trailing: Icon(Icons.arrow_forward_ios),
+            ),
+          ],
+        ),
+      ),
+    );
+    Get.dialog(Center(
+      child: dialog,
+    ));
   }
 
   Future<void> submitQuestion(IbQuestion ibQuestion) async {

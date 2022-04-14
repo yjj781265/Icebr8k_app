@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -14,6 +15,7 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../backend/controllers/user_controllers/auth_controller.dart';
+import '../backend/controllers/user_controllers/chat_tab_controller.dart';
 import '../backend/services/user_services/ib_question_db_service.dart';
 import 'ib_config.dart';
 
@@ -239,6 +241,27 @@ class IbUtils {
       return null;
     }
     return Get.find<MainPageController>().rxCurrentIbUser.value;
+  }
+
+  /// return current IbUser friend ids what are not in block list
+  static List<String> getCurrentIbUserUnblockedFriendsId() {
+    if (!Get.isRegistered<SocialTabController>()) {
+      return [];
+    }
+    final friends = List<IbUser>.from(Get.find<SocialTabController>().friends);
+    friends.removeWhere((element) =>
+        getCurrentIbUser()!.blockedFriendUids.contains(element.id));
+
+    return friends.map((e) => e.id).toList();
+  }
+
+  /// return current IbUser friend ids what are not in block list
+  static List<ChatTabItem> getCircleItems() {
+    if (!Get.isRegistered<ChatTabController>()) {
+      return [];
+    }
+    final circleItems = List<ChatTabItem>.from(Get.find<ChatTabController>().circles);
+    return circleItems;
   }
 
   static User? getCurrentFbUser() {
