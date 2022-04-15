@@ -7,6 +7,7 @@ class IbMessage {
   String messageId;
   String content;
   String senderUid;
+  bool edited;
   List<String> mentionUids;
   String messageType;
   String chatRoomId;
@@ -27,6 +28,7 @@ class IbMessage {
       required this.senderUid,
       required this.messageType,
       required this.chatRoomId,
+      this.edited = false,
       this.mentionUids = const <String>[],
       this.extra = const <String>[],
       this.timestamp,

@@ -14,6 +14,7 @@ class IbChat {
   dynamic createdAtTimestamp;
   List<String> memberUids;
   List<String> mutedUids;
+  List<String> mentionOnlyUids;
   bool isCircle;
   bool isPublicCircle;
   int memberCount;
@@ -31,6 +32,7 @@ class IbChat {
       this.description = '',
       this.welcomeMsg = '',
       this.memberUids = const [],
+      this.mentionOnlyUids = const [],
       this.mutedUids = const [],
       this.memberCount = 0,
       this.lastMessage,

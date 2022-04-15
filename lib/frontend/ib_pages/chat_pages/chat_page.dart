@@ -301,26 +301,36 @@ class ChatPage extends StatelessWidget {
       return const SizedBox();
     }
 
-    return IbCard(
-        color: Theme.of(context).backgroundColor.withOpacity(0.9),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Wrap(
-                children: _controller.isTypingUsers
-                    .map((element) => IbUserAvatar(
-                          avatarUrl: element.avatarUrl,
-                          radius: 10,
-                        ))
-                    .toList(),
-              ),
-              SizedBox(
-                  height: 30, child: Lottie.asset('assets/images/typing.json'))
-            ],
-          ),
-        ));
+    HapticFeedback.lightImpact();
+    return LimitedBox(
+      maxWidth: 200,
+      child: IbCard(
+          color: Theme.of(context).backgroundColor.withOpacity(0.9),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Wrap(
+                  children: _controller.ibChatMembers
+                      .map((element) => element.user)
+                      .toList()
+                      .map((element) => Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: IbUserAvatar(
+                              avatarUrl: element.avatarUrl,
+                              radius: 10,
+                            ),
+                          ))
+                      .toList(),
+                ),
+                SizedBox(
+                    height: 30,
+                    child: Lottie.asset('assets/images/typing.json'))
+              ],
+            ),
+          )),
+    );
   }
 
   Widget mediaPreviewer(BuildContext context) {
@@ -446,6 +456,14 @@ class ChatPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          if (message.mentionUids.isNotEmpty)
+            Text(
+              '${message.mentionUids.length} member(s) mentioned',
+              style: const TextStyle(
+                  fontSize: IbConfig.kDescriptionTextSize,
+                  fontStyle: FontStyle.italic,
+                  color: IbColors.lightGrey),
+            ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
@@ -532,6 +550,14 @@ class ChatPage extends StatelessWidget {
                   children: [
                     if (senderUser != null && _controller.isCircle.isTrue)
                       Text(senderUser.username),
+                    if (message.mentionUids.isNotEmpty)
+                      Text(
+                        '${message.mentionUids.length} member(s) mentioned',
+                        style: const TextStyle(
+                            fontSize: IbConfig.kDescriptionTextSize,
+                            fontStyle: FontStyle.italic,
+                            color: IbColors.lightGrey),
+                      ),
                     InkWell(
                       customBorder: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(8))),
@@ -776,29 +802,26 @@ class ChatPage extends StatelessWidget {
 
   Widget _buildReadIndicator(IbMessage message) {
     if (_controller.messages.indexOf(message) == 0) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: message.readUids
-                  .where((element) => element != message.senderUid)
-                  .map((e) {
-                final IbChatMemberModel? model = _controller.ibChatMembers
-                    .firstWhereOrNull((item) => item.user.id == e);
-                if (model != null) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 3),
-                    child: IbUserAvatar(
-                      avatarUrl: model.user.avatarUrl,
-                      radius: 8,
-                    ),
-                  );
-                }
-                return const SizedBox();
-              }).toList()),
-        ),
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: message.readUids
+                .where((element) => element != message.senderUid)
+                .map((e) {
+              final IbChatMemberModel? model = _controller.ibChatMembers
+                  .firstWhereOrNull((item) => item.user.id == e);
+              if (model != null) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 3),
+                  child: IbUserAvatar(
+                    avatarUrl: model.user.avatarUrl,
+                    radius: 8,
+                  ),
+                );
+              }
+              return const SizedBox();
+            }).toList()),
       );
     }
     return const SizedBox();

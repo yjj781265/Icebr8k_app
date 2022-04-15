@@ -18,6 +18,9 @@ import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+import '../../../frontend/ib_widgets/ib_card.dart';
+import '../../../frontend/ib_widgets/ib_user_avatar.dart';
+
 class ChatPageController extends GetxController {
   IbChat? ibChat;
   final String recipientId;
@@ -72,6 +75,17 @@ class ChatPageController extends GetxController {
       if (text.value == txtController.text) {
         return;
       }
+      //detect @
+      if (txtController.text.endsWith('@') &&
+          txtController.text.length > text.value.length) {
+        if (txtController.text.length > 1 &&
+            txtController.text
+                .split('')[txtController.text.length - 2]
+                .isAlphabetOnly) {
+          return;
+        }
+        showMentionList();
+      }
       text.value = txtController.text;
       if (ibChat != null &&
           txtController.text.trim().isNotEmpty &&
@@ -84,6 +98,85 @@ class ChatPageController extends GetxController {
       }
     });
     super.onInit();
+  }
+
+  List<String> generateMentionIds() {
+    final list = <String>[];
+    final uids = <String>[];
+    if (isCircle.isFalse) {
+      return uids;
+    }
+
+    if (txtController.text.trim().contains('@')) {
+      String uid = '';
+      final strArr = txtController.text.split('');
+      for (final c in strArr) {
+        if (c == '@') {
+          uid = '';
+          continue;
+        }
+
+        final StringBuffer buffer = StringBuffer(uid);
+        buffer.write(c);
+        uid = buffer.toString();
+
+        if (c.trim().isEmpty || strArr.indexOf(c) == strArr.length - 1) {
+          list.addIf(uid.trim().isNotEmpty, uid.trim());
+          uid = '';
+          continue;
+        }
+      }
+    }
+    //found the match uid of each user
+    if (list.isNotEmpty) {
+      for (final username in list) {
+        final member = ibChatMembers.firstWhereOrNull(
+            (element) => element.user.username == username.trim());
+        if (member == null) {
+          continue;
+        }
+        uids.add(member.user.id);
+      }
+    }
+
+    print(uids);
+
+    return uids;
+  }
+
+  void showMentionList() {
+    if (isCircle.isFalse) {
+      return;
+    }
+    ibChatMembers.sort((a, b) => a.user.username.compareTo(b.user.username));
+    final options = IbCard(
+        radius: 0,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: ibChatMembers
+                .map((element) => ListTile(
+                      onTap: () {
+                        Get.back();
+                        final text =
+                            '${txtController.text}${element.user.username} ';
+                        txtController.value = TextEditingValue(
+                            text: text,
+                            selection: TextSelection(
+                                baseOffset: text.length,
+                                extentOffset: text.length));
+                      },
+                      title: Text(element.user.username),
+                      leading: IbUserAvatar(
+                        avatarUrl: element.user.avatarUrl,
+                      ),
+                    ))
+                .toList(),
+          ),
+        ));
+    Get.dialog(Center(
+      child: LimitedBox(maxHeight: 300, child: options),
+    ));
   }
 
   @override
@@ -347,6 +440,7 @@ class ChatPageController extends GetxController {
 
       if (txtController.text.trim().isNotEmpty) {
         await IbChatDbService().uploadMessage(buildTxtMessage());
+        generateMentionIds();
         txtController.clear();
       }
     } catch (e) {
@@ -559,6 +653,7 @@ class ChatPageController extends GetxController {
         senderUid: IbUtils.getCurrentUid()!,
         readUids: [IbUtils.getCurrentUid()!],
         messageType: IbMessage.kMessageTypeText,
+        mentionUids: generateMentionIds(),
         chatRoomId: ibChat!.chatId);
   }
 

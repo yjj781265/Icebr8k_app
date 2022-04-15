@@ -16,6 +16,8 @@ import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:reorderables/reorderables.dart';
 
+import '../ib_tenor_page.dart';
+
 class CircleSettings extends StatelessWidget {
   final CircleSettingsController _controller;
 
@@ -36,63 +38,114 @@ class CircleSettings extends StatelessWidget {
           onTap: () {
             IbUtils.hideKeyboard();
           },
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  child: Obx(
-                    () => Column(
-                      children: [
-                        InkWell(
-                          onTap: _controller.isAbleToEdit
-                              ? showEditAvatarBottomSheet
-                              : null,
-                          child: Stack(
-                            children: [
-                              if (_controller.photoUrl.isEmpty)
-                                CircleAvatar(
-                                  backgroundColor: IbColors.lightGrey,
-                                  radius: 56,
-                                  child: Text(
-                                    _controller.photoInit.value,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Theme.of(context).indicatorColor,
-                                        fontSize: 56,
-                                        fontWeight: FontWeight.bold),
+          child: AbsorbPointer(
+            absorbing: !_controller.isAbleToEdit,
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    child: Obx(
+                      () => Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          InkWell(
+                            onTap: _controller.isAbleToEdit
+                                ? showEditAvatarBottomSheet
+                                : null,
+                            child: Stack(
+                              children: [
+                                if (_controller.photoUrl.isEmpty)
+                                  CircleAvatar(
+                                    backgroundColor: IbColors.lightGrey,
+                                    radius: 56,
+                                    child: Text(
+                                      _controller.photoInit.value,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color:
+                                              Theme.of(context).indicatorColor,
+                                          fontSize: 56,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  )
+                                else
+                                  IbUserAvatar(
+                                    avatarUrl: _controller.photoUrl.value,
+                                    radius: 56,
                                   ),
-                                )
-                              else
-                                IbUserAvatar(
-                                  avatarUrl: _controller.photoUrl.value,
-                                  radius: 56,
-                                ),
-                              if (_controller.isAbleToEdit)
-                                Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: CircleAvatar(
-                                      backgroundColor: Theme.of(context)
-                                          .backgroundColor
-                                          .withOpacity(0.8),
-                                      radius: 16,
-                                      child: Icon(
-                                        Icons.edit,
-                                        color: Theme.of(context).indicatorColor,
-                                        size: 16,
-                                      ),
-                                    ))
-                            ],
+                                if (_controller.isAbleToEdit)
+                                  Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: CircleAvatar(
+                                        backgroundColor: Theme.of(context)
+                                            .backgroundColor
+                                            .withOpacity(0.8),
+                                        radius: 16,
+                                        child: Icon(
+                                          Icons.edit,
+                                          color:
+                                              Theme.of(context).indicatorColor,
+                                          size: 16,
+                                        ),
+                                      ))
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 32,
-                        ),
+                          const SizedBox(
+                            height: 32,
+                          ),
 
-                        /// title
-                        Container(
+                          /// title
+                          Container(
+                              margin: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                  color: Theme.of(context).backgroundColor,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(8))),
+                              child: TextField(
+                                enabled: _controller.isAbleToEdit,
+                                maxLength: 50,
+                                controller: _controller.titleTxtController,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: IbConfig.kPageTitleSize),
+                                decoration: InputDecoration(
+                                  counterText: '',
+                                  hintText: 'circle_title_hint'.tr,
+                                  border: InputBorder.none,
+                                  contentPadding:
+                                      const EdgeInsets.symmetric(horizontal: 8),
+                                ),
+                              )),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Container(
+                              margin: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                  color: Theme.of(context).backgroundColor,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(8))),
+                              child: TextField(
+                                enabled: _controller.isAbleToEdit,
+                                controller: _controller.welcomeMsgController,
+                                minLines: 1,
+                                maxLines: 5,
+                                maxLength: 300,
+                                decoration: InputDecoration(
+                                  hintText: 'circle_welcome_message_hint'.tr,
+                                  border: InputBorder.none,
+                                  contentPadding:
+                                      const EdgeInsets.symmetric(horizontal: 8),
+                                ),
+                              )),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Container(
                             margin: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                                 color: Theme.of(context).backgroundColor,
@@ -100,196 +153,155 @@ class CircleSettings extends StatelessWidget {
                                     const BorderRadius.all(Radius.circular(8))),
                             child: TextField(
                               enabled: _controller.isAbleToEdit,
-                              maxLength: 50,
-                              controller: _controller.titleTxtController,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: IbConfig.kPageTitleSize),
-                              decoration: InputDecoration(
-                                counterText: '',
-                                hintText: 'circle_title_hint'.tr,
-                                border: InputBorder.none,
-                                contentPadding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                              ),
-                            )),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        Container(
-                            margin: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                                color: Theme.of(context).backgroundColor,
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(8))),
-                            child: TextField(
-                              enabled: _controller.isAbleToEdit,
-                              controller: _controller.welcomeMsgController,
                               minLines: 1,
                               maxLines: 5,
-                              maxLength: 300,
+                              maxLength: 500,
+                              controller: _controller.descriptionController,
                               decoration: InputDecoration(
-                                hintText: 'circle_welcome_message_hint'.tr,
+                                hintText: 'circle_description_hint'.tr,
                                 border: InputBorder.none,
                                 contentPadding:
                                     const EdgeInsets.symmetric(horizontal: 8),
                               ),
-                            )),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        Container(
-                          margin: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                              color: Theme.of(context).backgroundColor,
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(8))),
-                          child: TextField(
-                            enabled: _controller.isAbleToEdit,
-                            minLines: 1,
-                            maxLines: 5,
-                            maxLength: 500,
-                            controller: _controller.descriptionController,
-                            decoration: InputDecoration(
-                              hintText: 'circle_description_hint'.tr,
-                              border: InputBorder.none,
-                              contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
                             ),
                           ),
-                        ),
 
-                        CheckboxListTile(
-                          value: _controller.isPublicCircle.value,
-                          dense: true,
-                          onChanged: (value) {
-                            if (_controller.isAbleToEdit) {
-                              _controller.isPublicCircle.value = value ?? false;
-                            }
-                          },
-                          controlAffinity: ListTileControlAffinity.trailing,
-                          title: const Text(
-                            'Public',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: IbConfig.kNormalTextSize),
+                          CheckboxListTile(
+                            value: _controller.isPublicCircle.value,
+                            dense: true,
+                            onChanged: (value) {
+                              if (_controller.isAbleToEdit) {
+                                _controller.isPublicCircle.value =
+                                    value ?? false;
+                              }
+                            },
+                            controlAffinity: ListTileControlAffinity.trailing,
+                            title: const Text(
+                              'Public',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: IbConfig.kNormalTextSize),
+                            ),
+                            subtitle: const Text(
+                              'Anyone can join the group',
+                              style: TextStyle(
+                                  color: IbColors.lightGrey,
+                                  fontSize: IbConfig.kSecondaryTextSize),
+                            ),
                           ),
-                          subtitle: const Text(
-                            'Anyone can join the group',
-                            style: TextStyle(
-                                color: IbColors.lightGrey,
-                                fontSize: IbConfig.kSecondaryTextSize),
+                          CheckboxListTile(
+                            value: !_controller.isPublicCircle.value,
+                            dense: true,
+                            onChanged: (value) {
+                              if (_controller.isAbleToEdit) {
+                                _controller.isPublicCircle.value =
+                                    !(value ?? false);
+                              }
+                            },
+                            controlAffinity: ListTileControlAffinity.trailing,
+                            title: const Text(
+                              'Private',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: IbConfig.kNormalTextSize),
+                            ),
+                            subtitle: const Text(
+                              'Joining requires approval from the circle admin',
+                              style: TextStyle(
+                                  color: IbColors.lightGrey,
+                                  fontSize: IbConfig.kSecondaryTextSize),
+                            ),
                           ),
-                        ),
-                        CheckboxListTile(
-                          value: !_controller.isPublicCircle.value,
-                          dense: true,
-                          onChanged: (value) {
-                            if (_controller.isAbleToEdit) {
-                              _controller.isPublicCircle.value =
-                                  !(value ?? false);
-                            }
-                          },
-                          controlAffinity: ListTileControlAffinity.trailing,
-                          title: const Text(
-                            'Private',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: IbConfig.kNormalTextSize),
+                          const Divider(
+                            height: 16,
+                            thickness: 1,
                           ),
-                          subtitle: const Text(
-                            'Joining requires approval from the circle admin',
-                            style: TextStyle(
-                                color: IbColors.lightGrey,
-                                fontSize: IbConfig.kSecondaryTextSize),
-                          ),
-                        ),
-                        const Divider(
-                          height: 16,
-                          thickness: 1,
-                        ),
-                        if (_controller.ibChat == null)
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                'Invites',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: IbConfig.kNormalTextSize),
+                          if (_controller.ibChat == null)
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Invites',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: IbConfig.kNormalTextSize),
+                                ),
                               ),
                             ),
-                          ),
-                        if (_controller.ibChat == null)
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: ReorderableWrap(
-                              spacing: 8,
-                              header: [
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                  child: IbActionButton(
-                                      color: IbColors.primaryColor,
-                                      iconData: Icons.add,
-                                      onPressed: () async {
-                                        IbUtils.hideKeyboard();
-                                        final list = await Get.to(
-                                            () => IbFriendsPicker(
-                                                  Get.put(
-                                                      IbFriendsPickerController(
-                                                          IbUtils
-                                                              .getCurrentUid()!,
-                                                          pickedUids:
-                                                              _controller
-                                                                  .invitees
-                                                                  .map((p0) =>
-                                                                      p0.id)
-                                                                  .toList())),
-                                                ),
-                                            fullscreenDialog: true,
-                                            transition: Transition.zoom);
+                          if (_controller.ibChat == null)
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: ReorderableWrap(
+                                spacing: 8,
+                                header: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8),
+                                    child: IbActionButton(
+                                        color: IbColors.primaryColor,
+                                        iconData: Icons.add,
+                                        onPressed: () async {
+                                          IbUtils.hideKeyboard();
+                                          final list = await Get.to(
+                                              () => IbFriendsPicker(
+                                                    Get.put(
+                                                        IbFriendsPickerController(
+                                                            IbUtils
+                                                                .getCurrentUid()!,
+                                                            pickedUids:
+                                                                _controller
+                                                                    .invitees
+                                                                    .map((p0) =>
+                                                                        p0.id)
+                                                                    .toList())),
+                                                  ),
+                                              fullscreenDialog: true,
+                                              transition: Transition.zoom);
 
-                                        for (final dynamic item in list) {
-                                          _controller.invitees
-                                              .add(item as IbUser);
-                                        }
-                                      },
-                                      text: ''),
-                                ),
-                              ],
-                              onReorder: (int oldIndex, int newIndex) {},
-                              children: _controller.invitees
-                                  .map((element) => Opacity(
-                                      opacity: 0.8,
-                                      child: IbUserAvatar(
-                                          avatarUrl: element.avatarUrl)))
-                                  .toList(),
+                                          for (final dynamic item in list) {
+                                            _controller.invitees
+                                                .add(item as IbUser);
+                                          }
+                                        },
+                                        text: ''),
+                                  ),
+                                ],
+                                onReorder: (int oldIndex, int newIndex) {},
+                                children: _controller.invitees
+                                    .map((element) => Opacity(
+                                        opacity: 0.8,
+                                        child: IbUserAvatar(
+                                            avatarUrl: element.avatarUrl)))
+                                    .toList(),
+                              ),
                             ),
+                          const SizedBox(
+                            height: 16,
                           ),
-                        const SizedBox(
-                          height: 16,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              if (_controller.isAbleToEdit)
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  height: 64,
-                  width: double.infinity,
-                  child: IbElevatedButton(
-                    onPressed: () async {
-                      await _controller.onCreateCircle();
-                    },
-                    textTrKey:
-                        _controller.ibChat == null ? 'Create a circle' : 'Save',
-                  ),
-                )
-            ],
+                if (_controller.isAbleToEdit)
+                  SafeArea(
+                    child: Container(
+                      height: 64,
+                      margin: const EdgeInsets.only(top: 8, bottom: 16),
+                      width: double.infinity,
+                      child: IbElevatedButton(
+                        onPressed: () async {
+                          await _controller.onCreateCircle();
+                        },
+                        textTrKey: _controller.ibChat == null
+                            ? 'Create a circle'
+                            : 'Save',
+                      ),
+                    ),
+                  )
+              ],
+            ),
           ),
         ),
       ),
@@ -300,37 +312,25 @@ class CircleSettings extends StatelessWidget {
     final Widget options = ListView(
       shrinkWrap: true,
       children: [
-        InkWell(
-          borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+        ListTile(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+          ),
           onTap: () {
             _controller.photoUrl.value = '';
             Get.back();
           },
-          child: Ink(
-            height: 56,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.person,
-                    color: IbColors.lightGrey,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    'Circle name initial',
-                    style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                  ),
-                ],
-              ),
-            ),
+          leading: const Icon(
+            Icons.person,
+            color: IbColors.lightGrey,
+          ),
+          title: const Text(
+            'Circle name initial',
+            style: TextStyle(fontSize: IbConfig.kNormalTextSize),
           ),
         ),
-        InkWell(
+        ListTile(
           onTap: () async {
             Get.back();
             final _picker = ImagePicker();
@@ -347,28 +347,14 @@ class CircleSettings extends StatelessWidget {
               }
             }
           },
-          child: Ink(
-            height: 56,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.camera_alt_outlined,
-                    color: IbColors.primaryColor,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text('Take a photo',
-                      style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
-                ],
-              ),
-            ),
+          leading: const Icon(
+            Icons.camera_alt_outlined,
+            color: IbColors.primaryColor,
           ),
+          title: const Text('Take a photo',
+              style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
         ),
-        InkWell(
+        ListTile(
           onTap: () async {
             Get.back();
             final _picker = ImagePicker();
@@ -385,28 +371,31 @@ class CircleSettings extends StatelessWidget {
               }
             }
           },
-          child: Ink(
-            height: 56,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.photo_album_outlined,
-                    color: IbColors.errorRed,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    'Choose from gallery',
-                    style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                  ),
-                ],
-              ),
-            ),
+          leading: const Icon(
+            Icons.photo_album_outlined,
+            color: IbColors.errorRed,
           ),
+          title: const Text(
+            'Choose from gallery',
+            style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+          ),
+        ),
+        ListTile(
+          onTap: () async {
+            Get.back();
+            final url = await Get.to(
+              () => IbTenorPage(),
+            );
+            if (url != null && url.toString().isNotEmpty) {
+              _controller.photoUrl.value = url.toString();
+            }
+          },
+          leading: const Icon(
+            Icons.gif,
+            color: IbColors.accentColor,
+          ),
+          title: const Text('Choose GIF from Tenor',
+              style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
         ),
       ],
     );

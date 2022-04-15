@@ -19,6 +19,10 @@ IbChat _$IbChatFromJson(Map<String, dynamic> json) => IbChat(
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      mentionOnlyUids: (json['mentionOnlyUids'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       mutedUids: (json['mutedUids'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -43,6 +47,7 @@ Map<String, dynamic> _$IbChatToJson(IbChat instance) => <String, dynamic>{
       'createdAtTimestamp': instance.createdAtTimestamp,
       'memberUids': instance.memberUids,
       'mutedUids': instance.mutedUids,
+      'mentionOnlyUids': instance.mentionOnlyUids,
       'isCircle': instance.isCircle,
       'isPublicCircle': instance.isPublicCircle,
       'memberCount': instance.memberCount,
