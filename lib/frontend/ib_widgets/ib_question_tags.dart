@@ -21,7 +21,7 @@ class IbQuestionTags extends StatelessWidget {
     return Obx(() {
       if (_itemController.isSample) {
         return Row(
-            children: _itemController.rxIbQuestion.value.tagIds
+            children: _itemController.rxIbQuestion.value.tags
                 .map(
                   (e) => Padding(
                     padding: const EdgeInsets.only(right: 8.0),

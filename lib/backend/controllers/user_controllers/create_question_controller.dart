@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/chat_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_media.dart';
@@ -36,6 +37,9 @@ class CreateQuestionController extends GetxController {
   final filePath = ''.obs;
   final isCustomTagSelected = false.obs;
   final pickedTags = <IbTag>[].obs;
+  List<ChatTabItem> pickedCircles;
+
+  CreateQuestionController({this.pickedCircles = const []});
 
   @override
   Future<void> onReady() async {
@@ -150,20 +154,28 @@ class CreateQuestionController extends GetxController {
         question: questionEditController.text.trim(),
         description: descriptionEditController.text.trim(),
         id: id,
-        tagIds: pickedTags.map((element) => element.text).toList(),
+        privacyBounds:
+            pickedCircles.isEmpty ? [IbQuestion.kPrivacyBoundPublic] : [],
+        tags: pickedTags.map((element) => element.text).toList(),
         creatorId: IbUtils.getCurrentUid()!,
         medias: picMediaList.toSet().union(videoMediaList.toSet()).toList(),
-        choices: _getCorrectList(),
+        choices: _getIbChoices(),
         questionType: questionType.value,
         askedTimeInMs: DateTime.now().millisecondsSinceEpoch);
-    Get.to(() => ReviewQuestionPage(
-        itemController: Get.put(IbQuestionItemController(
-            rxIbQuestion: question.obs,
-            rxIsExpanded: false.obs,
-            isSample: true))));
+    Get.to(
+      () => ReviewQuestionPage(
+        itemController: Get.put(
+          IbQuestionItemController(
+              rxIbQuestion: question.obs,
+              rxIsExpanded: true.obs,
+              isSample: true)
+            ..sharedCircles.addAll(pickedCircles),
+        ),
+      ),
+    );
   }
 
-  List<IbChoice> _getCorrectList() {
+  List<IbChoice> _getIbChoices() {
     if (questionType.value == IbQuestion.kMultipleChoice) {
       return choiceList;
     }

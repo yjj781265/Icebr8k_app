@@ -19,7 +19,10 @@ class CreateQuestionTagPickerController extends GetxController {
   @override
   Future<void> onInit() async {
     final snapshot = await IbTagDbService().retrieveTrendingIbTags();
-    lastDoc = snapshot.docs.last;
+    if (snapshot.docs.isNotEmpty) {
+      lastDoc = snapshot.docs.last;
+    }
+
     for (final doc in snapshot.docs) {
       trendingTags.add(IbTag.fromJson(doc.data()));
     }
@@ -29,9 +32,10 @@ class CreateQuestionTagPickerController extends GetxController {
 
   Future<void> addNewTag(String text) async {
     Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));
-    final String id = await IbTagDbService().retrieveIbTagId(text);
-    createQuestionController.pickedTags.add(
-        IbTag(text: text.trim(), id: id, creatorId: IbUtils.getCurrentUid()!));
+    createQuestionController.pickedTags
+        .add(IbTag(text: text.trim(), creatorId: IbUtils.getCurrentUid()!));
+    createQuestionController.pickedTags.value =
+        createQuestionController.pickedTags.toSet().toList();
     Get.back();
   }
 

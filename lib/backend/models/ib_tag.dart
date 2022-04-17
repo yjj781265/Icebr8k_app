@@ -5,14 +5,12 @@ part 'ib_tag.g.dart';
 @JsonSerializable()
 class IbTag {
   String text;
-  String id;
   int? questionCount;
   dynamic timestamp;
   String creatorId;
 
   IbTag(
       {required this.text,
-      required this.id,
       required this.creatorId,
       this.timestamp,
       this.questionCount});
@@ -24,11 +22,8 @@ class IbTag {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is IbTag &&
-          runtimeType == other.runtimeType &&
-          text == other.text &&
-          id == other.id;
+      other is IbTag && runtimeType == other.runtimeType && text == other.text;
 
   @override
-  int get hashCode => text.hashCode ^ id.hashCode;
+  int get hashCode => text.hashCode;
 }

@@ -95,7 +95,7 @@ class CircleInfo extends StatelessWidget {
                               .toList()
                             ..sort((a, b) =>
                                 (b.compScore ?? 0).compareTo(a.compScore ?? 0)),
-                        )
+                        ),
                     ],
                   ),
                 ),

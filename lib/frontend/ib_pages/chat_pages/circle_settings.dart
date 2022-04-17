@@ -269,10 +269,39 @@ class CircleSettings extends StatelessWidget {
                                 ],
                                 onReorder: (int oldIndex, int newIndex) {},
                                 children: _controller.invitees
-                                    .map((element) => Opacity(
-                                        opacity: 0.8,
-                                        child: IbUserAvatar(
-                                            avatarUrl: element.avatarUrl)))
+                                    .map((element) => InkWell(
+                                          onTap: () {
+                                            _controller.invitees
+                                                .remove(element);
+                                          },
+                                          child: Stack(
+                                            clipBehavior: Clip.none,
+                                            children: [
+                                              IbUserAvatar(
+                                                  avatarUrl: element.avatarUrl),
+                                              Positioned(
+                                                top: -8,
+                                                right: -8,
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    _controller.invitees
+                                                        .remove(element);
+                                                  },
+                                                  child: CircleAvatar(
+                                                    radius: 12,
+                                                    backgroundColor:
+                                                        Theme.of(context)
+                                                            .backgroundColor,
+                                                    child: const Icon(
+                                                      Icons.cancel,
+                                                      color: IbColors.errorRed,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ))
                                     .toList(),
                               ),
                             ),

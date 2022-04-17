@@ -14,29 +14,22 @@ class IbTagDbService {
 
   IbTagDbService._();
 
-  Future<String> uploadTagAndReturnId(String text) async {
-    final snapshot = await _db
-        .collection(_kTagCollection)
-        .where('text', isEqualTo: text)
-        .get();
-    if (snapshot.size == 0) {
-      final IbTag tag = IbTag(
-          text: text,
-          id: IbUtils.getUniqueId(),
-          creatorId: IbUtils.getCurrentUid()!);
+  Future<void> uploadTag(String tagText) async {
+    final snapshot = await _db.collection(_kTagCollection).doc(tagText).get();
+    if (!snapshot.exists) {
+      final IbTag tag =
+          IbTag(text: tagText, creatorId: IbUtils.getCurrentUid()!);
       tag.timestamp = FieldValue.serverTimestamp();
-      await _db.collection(_kTagCollection).doc(tag.id).set(
+      await _db.collection(_kTagCollection).doc(tag.text).set(
             tag.toJson(),
             SetOptions(merge: true),
           );
-      return tag.id;
-    } else {
-      return snapshot.docs.first.id;
+      print('uploadTag a new tag!');
     }
   }
 
-  Future<IbTag?> retrieveIbTag(String tagId) async {
-    final snapshot = await _db.collection(_kTagCollection).doc(tagId).get();
+  Future<IbTag?> retrieveIbTag(String tagText) async {
+    final snapshot = await _db.collection(_kTagCollection).doc(tagText).get();
 
     if (snapshot.exists) {
       IbCacheManager().cacheIbTag(IbTag.fromJson(snapshot.data()!));

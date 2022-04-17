@@ -6,17 +6,23 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/circle_settings_controller.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/chat_page_settings.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_settings.dart';
+import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:lottie/lottie.dart';
 import 'package:reorderables/reorderables.dart';
@@ -24,6 +30,8 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../backend/controllers/user_controllers/chat_page_controller.dart';
+import '../../../backend/controllers/user_controllers/ib_question_item_controller.dart';
+import '../../../backend/models/ib_question.dart';
 import '../ib_tenor_page.dart';
 
 class ChatPage extends StatelessWidget {
@@ -61,7 +69,24 @@ class ChatPage extends StatelessWidget {
                 const SizedBox(
                   width: 8,
                 ),
-                Expanded(child: _buildTitle()),
+                Expanded(
+                    child: InkWell(
+                        onTap: () {
+                          if (_controller.isCircle.isTrue &&
+                              _controller.ibChat != null) {
+                            final currentMember = _controller.ibChatMembers
+                                .firstWhereOrNull((element) =>
+                                    element.user.id == IbUtils.getCurrentUid());
+                            final isAbleToEdit = currentMember != null &&
+                                currentMember.member.role !=
+                                    IbChatMember.kRoleMember;
+                            Get.to(() => CircleSettings(Get.put(
+                                CircleSettingsController(
+                                    ibChat: _controller.ibChat,
+                                    isAbleToEdit: isAbleToEdit))));
+                          }
+                        },
+                        child: _buildTitle())),
               ],
             ),
           ),
@@ -173,124 +198,140 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget _inputWidget(BuildContext context) {
-    return IbCard(
-      radius: 24,
-      margin: EdgeInsets.zero,
-      color: Theme.of(context).backgroundColor,
-      child: AnimatedSize(
-        alignment: Alignment.topCenter,
-        duration:
-            const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            mediaPreviewer(context),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 10.0),
-                      child: CircleAvatar(
-                        backgroundColor: IbColors.accentColor,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            _controller.showOptions.value =
-                                !_controller.showOptions.value;
-                          },
-                          icon: Icon(
-                              _controller.showOptions.isTrue
-                                  ? Icons.remove
-                                  : Icons.add,
-                              color: Theme.of(context).indicatorColor),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Flexible(
-                    flex: 8,
-                    child: Container(
-                      margin: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: IbColors.lightGrey.withOpacity(0.3),
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(8),
-                        ),
-                      ),
-                      child: TextField(
-                        scrollPadding: EdgeInsets.zero,
-                        minLines: 1,
-                        maxLines: 8,
-                        maxLength: 2000,
-                        onSubmitted: (value) async {
-                          if (value.isNotEmpty) {
-                            _controller.sendMessage();
-                          }
-                        },
-                        textInputAction: TextInputAction.send,
-                        controller: _controller.txtController,
-                        decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                          counterText: '',
-                          fillColor: IbColors.lightGrey,
-                          border: InputBorder.none,
-                          hintText: 'Write a message',
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 10.0),
-                      child: _controller.isSending.isTrue
-                          ? const CircularProgressIndicator(
-                              color: IbColors.primaryColor,
-                            )
-                          : CircleAvatar(
-                              backgroundColor: IbColors.primaryColor,
-                              child: IconButton(
-                                onPressed: () async {
-                                  await _controller.sendMessage();
-                                },
-                                icon: Icon(Icons.send,
-                                    color: Theme.of(context).indicatorColor),
-                              ),
-                            ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (_controller.showOptions.isTrue)
+    return RepaintBoundary(
+      child: IbCard(
+        radius: 24,
+        margin: EdgeInsets.zero,
+        color: Theme.of(context).backgroundColor,
+        child: AnimatedSize(
+          alignment: Alignment.topCenter,
+          duration:
+              const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _mediaPreviewer(context),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    IbActionButton(
-                        color: IbColors.errorRed,
-                        iconData: Icons.mic,
-                        onPressed: () {},
-                        text: 'Voice'),
-                    IbActionButton(
-                        color: IbColors.primaryColor,
-                        iconData: Icons.image,
-                        onPressed: () {
-                          _controller.showOptions.value = false;
-                          showMediaBtmSheet();
-                        },
-                        text: 'Images'),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: CircleAvatar(
+                          backgroundColor: IbColors.accentColor,
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              _controller.showOptions.value =
+                                  !_controller.showOptions.value;
+                            },
+                            icon: Icon(
+                                _controller.showOptions.isTrue
+                                    ? Icons.remove
+                                    : Icons.add,
+                                color: Theme.of(context).indicatorColor),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 8,
+                      child: Container(
+                        margin: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: IbColors.lightGrey.withOpacity(0.3),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(8),
+                          ),
+                        ),
+                        child: TextField(
+                          scrollPadding: EdgeInsets.zero,
+                          minLines: 1,
+                          maxLines: 8,
+                          maxLength: 2000,
+                          onSubmitted: (value) async {
+                            if (value.isNotEmpty) {
+                              _controller.sendMessage();
+                            }
+                          },
+                          textInputAction: TextInputAction.send,
+                          controller: _controller.txtController,
+                          decoration: const InputDecoration(
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 4.0),
+                            counterText: '',
+                            fillColor: IbColors.lightGrey,
+                            border: InputBorder.none,
+                            hintText: 'Write a message',
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: _controller.isSending.isTrue
+                            ? const CircularProgressIndicator(
+                                color: IbColors.primaryColor,
+                              )
+                            : CircleAvatar(
+                                backgroundColor: IbColors.primaryColor,
+                                child: IconButton(
+                                  onPressed: () async {
+                                    await _controller.sendMessage();
+                                  },
+                                  icon: Icon(Icons.send,
+                                      color: Theme.of(context).indicatorColor),
+                                ),
+                              ),
+                      ),
+                    ),
                   ],
                 ),
               ),
-            const SizedBox(
-              height: 16,
-            ),
-          ],
+              if (_controller.showOptions.isTrue)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      if (_controller.isCircle.isTrue)
+                        IbActionButton(
+                            color: IbColors.primaryColor,
+                            iconData: Icons.poll,
+                            onPressed: () {
+                              _controller.showOptions.value = false;
+                              final chatTabItem = IbUtils.getCircleItems()
+                                  .firstWhereOrNull((element) =>
+                                      element.ibChat.chatId ==
+                                      _controller.ibChat!.chatId);
+
+                              Get.to(() => CreateQuestionPage(
+                                    circles: chatTabItem == null
+                                        ? []
+                                        : [chatTabItem],
+                                  ));
+                            },
+                            text: 'Poll'),
+                      IbActionButton(
+                          color: IbColors.accentColor,
+                          iconData: Icons.gif,
+                          onPressed: () {
+                            _controller.showOptions.value = false;
+                            showMediaBtmSheet();
+                          },
+                          text: 'GIF'),
+                    ],
+                  ),
+                ),
+              const SizedBox(
+                height: 16,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -333,7 +374,7 @@ class ChatPage extends StatelessWidget {
     );
   }
 
-  Widget mediaPreviewer(BuildContext context) {
+  Widget _mediaPreviewer(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 56, right: 16),
       child: ReorderableRow(
@@ -442,9 +483,6 @@ class ChatPage extends StatelessWidget {
             color: IbColors.accentColor,
           ),
         ),
-        const SizedBox(
-          height: 16,
-        ),
       ],
     ));
     Get.bottomSheet(SafeArea(child: options), ignoreSafeArea: false);
@@ -458,7 +496,7 @@ class ChatPage extends StatelessWidget {
         children: [
           if (message.mentionUids.isNotEmpty)
             Text(
-              '${message.mentionUids.length} member(s) mentioned',
+              '${message.mentionUids.toSet().length} member(s) mentioned',
               style: const TextStyle(
                   fontSize: IbConfig.kDescriptionTextSize,
                   fontStyle: FontStyle.italic,
@@ -552,7 +590,7 @@ class ChatPage extends StatelessWidget {
                       Text(senderUser.username),
                     if (message.mentionUids.isNotEmpty)
                       Text(
-                        '${message.mentionUids.length} member(s) mentioned',
+                        '${message.mentionUids.toSet().length} member(s) mentioned',
                         style: const TextStyle(
                             fontSize: IbConfig.kDescriptionTextSize,
                             fontStyle: FontStyle.italic,
@@ -800,6 +838,7 @@ class ChatPage extends StatelessWidget {
     );
   }
 
+  ///won't show sender's avatar
   Widget _buildReadIndicator(IbMessage message) {
     if (_controller.messages.indexOf(message) == 0) {
       return SingleChildScrollView(
@@ -848,6 +887,86 @@ class ChatPage extends StatelessWidget {
       _controller.title.value,
       overflow: TextOverflow.ellipsis,
     );
+  }
+
+  Widget _pollMsgItem(
+      {required IbMessage message, required BuildContext context}) {
+    if (message.messageType == IbMessage.kMessageTypePoll) {
+      final IbQuestion? question = _controller.ibQuestions
+          .firstWhereOrNull((element) => element.id == message.content);
+
+      if (question == null) {
+        return const SizedBox();
+      }
+      Widget pollWidget = const SizedBox();
+      final IbQuestionItemController itemController = Get.put(
+          IbQuestionItemController(
+              rxIbQuestion: question.obs, rxIsExpanded: false.obs),
+          tag: question.id);
+
+      if (question.questionType == IbQuestion.kMultipleChoice ||
+          question.questionType == IbQuestion.kMultipleChoicePic) {
+        pollWidget = IbMcQuestionCard(itemController);
+      } else {
+        pollWidget = IbScQuestionCard(itemController);
+      }
+
+      final member = _controller.ibChatMembers
+          .firstWhereOrNull((p0) => p0.user.id == message.senderUid);
+      final avatarUrl = member == null ? '' : member.user.avatarUrl;
+      final username = member == null ? '' : member.user.username;
+
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(
+            height: 16,
+          ),
+
+          /// title
+          Text(
+            message.timestamp == null
+                ? 'Sending...'
+                : IbUtils.readableDateTime(
+                    DateTime.fromMillisecondsSinceEpoch(
+                        (message.timestamp as Timestamp)
+                            .millisecondsSinceEpoch),
+                    showTime: true),
+            style: const TextStyle(
+                color: IbColors.lightGrey,
+                fontSize: IbConfig.kDescriptionTextSize),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IbUserAvatar(
+                avatarUrl: avatarUrl,
+                radius: 11,
+              ),
+              Text(' $username shared a poll')
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+            ),
+            child: pollWidget,
+          ),
+          Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18),
+                child: _buildReadIndicator(message),
+              )),
+          const SizedBox(
+            height: 8,
+          ),
+        ],
+      );
+    }
+
+    return const SizedBox();
   }
 
   Widget _handleMessageType(
@@ -902,6 +1021,11 @@ class ChatPage extends StatelessWidget {
         ),
       );
     }
+
+    if (message.messageType == IbMessage.kMessageTypePoll) {
+      return _pollMsgItem(message: message, context: context);
+    }
+
     return const SizedBox();
   }
 }

@@ -24,7 +24,6 @@ class CreateQuestionTagPicker extends StatelessWidget {
               flex: 8,
               child: Container(
                 alignment: Alignment.center,
-                height: 44,
                 decoration: BoxDecoration(
                   color: Theme.of(context).backgroundColor,
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -37,6 +36,7 @@ class CreateQuestionTagPicker extends StatelessWidget {
                   controller: _controller.textEditingController,
                   decoration: InputDecoration(
                     border: InputBorder.none,
+                    prefixIcon: const Icon(Icons.search),
                     suffixIcon: IconButton(
                         onPressed: () {
                           _controller.textEditingController.clear();
@@ -45,7 +45,7 @@ class CreateQuestionTagPicker extends StatelessWidget {
                           Icons.cancel,
                           color: IbColors.lightGrey,
                         )),
-                    hintText: '🔍 Search Tags',
+                    hintText: 'Search Tags',
                   ),
                 ),
               ),
@@ -161,6 +161,9 @@ class CreateQuestionTagPicker extends StatelessWidget {
               children: _controller.trendingTags
                   .map((element) => FilterChip(
                         backgroundColor: Theme.of(context).backgroundColor,
+                        avatar: _controller
+        .createQuestionController.pickedTags
+        .contains(element)? null: const Icon(Icons.add),
                         label: Text(element.text),
                         selectedColor: IbColors.accentColor,
                         selected: _controller

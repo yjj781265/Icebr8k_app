@@ -22,10 +22,9 @@ IbQuestion _$IbQuestionFromJson(Map<String, dynamic> json) => IbQuestion(
               ?.map((e) => e as String)
               .toList() ??
           const ['public'],
-      tagIds: (json['tagIds'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
+      tags:
+          (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+              const [],
       description: json['description'] as String? ?? '',
       likes: json['likes'] as int? ?? 0,
       comments: json['comments'] as int? ?? 0,
@@ -41,7 +40,7 @@ IbQuestion _$IbQuestionFromJson(Map<String, dynamic> json) => IbQuestion(
 
 Map<String, dynamic> _$IbQuestionToJson(IbQuestion instance) =>
     <String, dynamic>{
-      'tagIds': instance.tagIds,
+      'tags': instance.tags,
       'medias': instance.medias.map((e) => e.toJson()).toList(),
       'position': instance.position,
       'privacyBounds': instance.privacyBounds,

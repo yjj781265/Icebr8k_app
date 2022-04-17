@@ -123,6 +123,11 @@ class IbChatDbService {
 
   Future<void> uploadMessage(IbMessage ibMessage) async {
     ibMessage.timestamp = FieldValue.serverTimestamp();
+    final snapshot = await _collectionRef.doc(ibMessage.chatRoomId).get();
+    if (!snapshot.exists) {
+      return;
+    }
+    ibMessage.readUids = ibMessage.readUids.toSet().toList();
     await _collectionRef
         .doc(ibMessage.chatRoomId)
         .collection(_kMessageSubCollection)
@@ -132,6 +137,11 @@ class IbChatDbService {
 
   Future<void> addChatMember({required IbChatMember member}) async {
     member.joinTimestamp = FieldValue.serverTimestamp();
+    final snapshot = await _collectionRef.doc(member.chatId).get();
+    if (!snapshot.exists) {
+      return;
+    }
+
     return _collectionRef
         .doc(member.chatId)
         .collection(_kMemberSubCollection)

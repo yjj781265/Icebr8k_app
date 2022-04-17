@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/chat_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
@@ -128,18 +131,20 @@ class ReviewQuestionPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                    ListTile(
-                      onTap: () {
-                        _showPrivacyBound();
-                      },
-                      tileColor: Theme.of(context).primaryColor,
-                      trailing: const Text('ALL'),
-                      title: const Text(
-                        'Privacy Bonds',
-                      ),
-                      leading: const Icon(
-                        Icons.remove_red_eye,
-                        color: IbColors.primaryColor,
+                    Obx(
+                      () => ListTile(
+                        onTap: () {
+                          _showPrivacyBound();
+                        },
+                        tileColor: Theme.of(context).primaryColor,
+                        trailing: Text(_getPrivacyBondsString()),
+                        title: const Text(
+                          'Privacy Bonds',
+                        ),
+                        leading: const Icon(
+                          Icons.remove_red_eye,
+                          color: IbColors.primaryColor,
+                        ),
                       ),
                     ),
                     Obx(
@@ -270,6 +275,7 @@ class ReviewQuestionPage extends StatelessWidget {
 
   void _showPrivacyBound() {
     final Widget dialog = IbCard(
+      radius: 8,
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -339,22 +345,50 @@ class ReviewQuestionPage extends StatelessWidget {
                 ),
               ),
             ),
-            ListTile(
-              onTap: () {
-                Get.to(() => const CirclePickerPage(), fullscreenDialog: true);
-              },
-              title: const Text(
-                'Circles',
-                style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-              ),
-              subtitle: const Text(
-                'None',
-                style: TextStyle(
+            Obx(
+              () => ListTile(
+                onTap: () async {
+                  List<ChatTabItem>? circles = await Get.to(
+                      () => CirclePickerPage(
+                            pickedItems: itemController.sharedCircles,
+                          ),
+                      fullscreenDialog: true);
+
+                  circles ??= <ChatTabItem>[...itemController.sharedCircles];
+                  itemController.sharedCircles.value = circles;
+                  print('Shared Circle ${itemController.sharedCircles}');
+                },
+                title: const Text(
+                  'Circles',
+                  style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                ),
+                subtitle: Text(
+                  itemController.sharedCircles.isEmpty
+                      ? 'None'
+                      : _getCircleString(),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
                     fontSize: IbConfig.kDescriptionTextSize,
-                    color: IbColors.lightGrey),
+                  ),
+                ),
+                trailing: const Icon(Icons.arrow_forward_ios),
               ),
-              trailing: Icon(Icons.arrow_forward_ios),
             ),
+            Container(
+                margin: const EdgeInsets.all(16),
+                width: double.infinity,
+                height: 40,
+                child: Obx(
+                  () => IbElevatedButton(
+                    disabled: itemController.sharedCircles.isEmpty &&
+                        itemController.rxIbQuestion.value.privacyBounds.isEmpty,
+                    textTrKey: 'confirm',
+                    onPressed: () {
+                      Get.back();
+                    },
+                  ),
+                ))
           ],
         ),
       ),
@@ -364,9 +398,46 @@ class ReviewQuestionPage extends StatelessWidget {
     ));
   }
 
+  String _getCircleString() {
+    String str = '';
+    for (int i = 0; i < itemController.sharedCircles.length; i++) {
+      if (i == 2) {
+        break;
+      }
+      if (i == itemController.sharedCircles.length - 1) {
+        str = '$str${itemController.sharedCircles[i].title}';
+        continue;
+      }
+      str = '$str${itemController.sharedCircles[i].title}, ';
+    }
+    if (itemController.sharedCircles.length > 2) {
+      str = '$str and ${itemController.sharedCircles.length - 2} others';
+    }
+
+    return str;
+  }
+
+  String _getPrivacyBondsString() {
+    String str = '';
+    final bool includeComma = itemController.sharedCircles.isNotEmpty;
+    if (itemController.rxIbQuestion.value.privacyBounds
+        .contains(IbQuestion.kPrivacyBoundPublic)) {
+      str = includeComma ? 'Public,' : 'Public';
+    }
+    if (itemController.rxIbQuestion.value.privacyBounds
+        .contains(IbQuestion.kPrivacyBoundFriends)) {
+      str = includeComma ? 'Friends Only,' : 'Friends Only';
+    }
+    if (itemController.sharedCircles.isNotEmpty) {
+      str = '$str ${itemController.sharedCircles.length} Circle(s)';
+    }
+
+    return str;
+  }
+
   Future<void> submitQuestion(IbQuestion ibQuestion) async {
     if (ibQuestion.id.isEmpty ||
-        ibQuestion.tagIds.isEmpty ||
+        ibQuestion.tags.isEmpty ||
         ibQuestion.question.isEmpty ||
         ibQuestion.choices.isEmpty) {
       Get.dialog(const IbDialog(
@@ -382,6 +453,16 @@ class ReviewQuestionPage extends StatelessWidget {
       Get.dialog(const IbDialog(
         title: 'Error',
         subtitle: 'Quiz question needs to have a correct choice picked',
+        showNegativeBtn: false,
+      ));
+      return;
+    }
+
+    if (itemController.sharedCircles.isEmpty &&
+        ibQuestion.privacyBounds.isEmpty) {
+      Get.dialog(const IbDialog(
+        title: 'Error',
+        subtitle: 'Privacy Bounds are empty',
         showNegativeBtn: false,
       ));
       return;
@@ -428,13 +509,24 @@ class ReviewQuestionPage extends StatelessWidget {
     }
 
     /// upload all the string in tagIds
-    for (final String text in ibQuestion.tagIds) {
-      final String id = await IbTagDbService().uploadTagAndReturnId(text);
-      ibQuestion.tagIds[ibQuestion.tagIds.indexOf(text)] = id;
+    for (final String text in ibQuestion.tags) {
+      await IbTagDbService().uploadTag(text);
+    }
+
+    /// add IbMessage to selected circles
+    for (final item in itemController.sharedCircles) {
+      await IbChatDbService().uploadMessage(IbMessage(
+          messageId: IbUtils.getUniqueId(),
+          content: ibQuestion.id,
+          readUids: [IbUtils.getCurrentUid()!],
+          senderUid: IbUtils.getCurrentUid()!,
+          messageType: IbMessage.kMessageTypePoll,
+          chatRoomId: item.ibChat.chatId));
     }
 
     await IbQuestionDbService().uploadQuestion(ibQuestion);
-    Navigator.of(Get.context!).popUntil((route) => route.isFirst);
+    Get.back(closeOverlays: true);
+    Get.back(closeOverlays: true);
     IbUtils.showSimpleSnackBar(
         msg: 'Question submitted successfully',
         backgroundColor: IbColors.accentColor);

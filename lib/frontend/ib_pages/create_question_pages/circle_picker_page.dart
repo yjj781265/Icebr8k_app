@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_tab_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -59,15 +60,20 @@ class _CirclePickerPageState extends State<CirclePickerPage> {
             'Add${itemMap.values.where((element) => element == true).isEmpty ? '' : ' ${itemMap.values.where((element) => element == true).length}'} Circle(s)'),
         actions: [
           TextButton(
-            onPressed: () {},
-            child: Text(
-              'Add',
+            onPressed: () {
+              final List selectedItems = <ChatTabItem>[];
+              for (final key in itemMap.keys) {
+                if (itemMap[key] == true) {
+                  selectedItems.add(key);
+                }
+              }
+              Get.back(result: selectedItems);
+            },
+            child: const Text(
+              'Confirm',
               style: TextStyle(
                 fontSize: IbConfig.kNormalTextSize,
-                color:
-                    itemMap.values.where((element) => element == true).isEmpty
-                        ? IbColors.lightGrey
-                        : IbColors.primaryColor,
+                color: IbColors.primaryColor,
               ),
             ),
           ),

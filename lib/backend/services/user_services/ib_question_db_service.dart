@@ -42,6 +42,9 @@ class IbQuestionDbService {
 
   Future<IbQuestion?> querySingleQuestion(String questionId) async {
     print('querySingleQuestion $questionId');
+    if (questionId.isEmpty) {
+      return null;
+    }
     final snapshot = await _collectionRef.doc(questionId).get();
     if (!snapshot.exists) {
       return null;

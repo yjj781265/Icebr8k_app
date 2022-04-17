@@ -28,7 +28,7 @@ class IbCacheManager {
     if (tag == null) {
       return;
     }
-    _ibTagMap[tag.id] = tag;
+    _ibTagMap[tag.text] = tag;
   }
 
   IbTag? getIbTag(String tagId) {

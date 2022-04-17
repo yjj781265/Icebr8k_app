@@ -14,12 +14,15 @@ import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_persistent_header.dart';
 import 'package:showcaseview/showcaseview.dart';
 
+import '../../../backend/controllers/user_controllers/chat_tab_controller.dart';
 import '../../../backend/controllers/user_controllers/create_question_controller.dart';
 import '../../ib_config.dart';
 import 'ib_media_bar.dart';
 
 class CreateQuestionPage extends StatefulWidget {
-  const CreateQuestionPage({Key? key}) : super(key: key);
+  final List<ChatTabItem> circles;
+  const CreateQuestionPage({Key? key, this.circles = const []})
+      : super(key: key);
 
   @override
   _CreateQuestionPageState createState() => _CreateQuestionPageState();
@@ -35,6 +38,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
   @override
   void initState() {
     super.initState();
+    _controller.pickedCircles = widget.circles;
     _tabController = TabController(vsync: this, length: 3);
     _tabController.addListener(() {
       if (_tabController.index == 0) {

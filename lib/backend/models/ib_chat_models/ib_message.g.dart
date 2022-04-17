@@ -21,10 +21,8 @@ IbMessage _$IbMessageFromJson(Map<String, dynamic> json) => IbMessage(
           (json['extra'] as List<dynamic>?)?.map((e) => e as String).toList() ??
               const <String>[],
       timestamp: json['timestamp'],
-      readUids: (json['readUids'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const <String>[],
+      readUids:
+          (json['readUids'] as List<dynamic>).map((e) => e as String).toList(),
     );
 
 Map<String, dynamic> _$IbMessageToJson(IbMessage instance) => <String, dynamic>{

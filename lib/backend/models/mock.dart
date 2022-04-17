@@ -47,202 +47,158 @@ class Mock {
   static List<IbTag> tags = [
     IbTag(
         text: 'Math',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Nature',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Sports',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Seasons',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Movies',
-        id: IbUtils.getUniqueId(),
-        creatorId: IbUtils.getCurrentFbUser()!.uid,
-        questionCount: 0),
-    IbTag(
-        text: 'Movies',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Music',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Games',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Novels',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Cartoons',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Pop',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Picture',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Riddle',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Pets',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Colors',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Dance',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Food',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'News',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Geography',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Funny',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Family',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Animal',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Art',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Bird',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Biology',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Geek',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Ocean',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Sports',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Super Bowl',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Video Game',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Television',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'World',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Science',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Religion',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Christian',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Business',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'General',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Harry Potter',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'Dogs',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
     IbTag(
         text: 'History',
-        id: IbUtils.getUniqueId(),
         creatorId: IbUtils.getCurrentFbUser()!.uid,
         questionCount: 0),
   ];

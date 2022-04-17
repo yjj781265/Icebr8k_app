@@ -382,12 +382,12 @@ class IbQuestionMcItem extends StatelessWidget {
                                       child: !choice.url!.contains('http')
                                           ? Image.file(
                                               File(choice.url!),
-                                              fit: BoxFit.fill,
+                                              fit: BoxFit.cover,
                                               width: IbConfig.kMcPicSize,
                                               height: IbConfig.kMcPicSize,
                                             )
                                           : CachedNetworkImage(
-                                              fit: BoxFit.fill,
+                                              fit: BoxFit.cover,
                                               fadeInDuration: const Duration(
                                                   milliseconds: 300),
                                               width: IbConfig.kMcPicSize,

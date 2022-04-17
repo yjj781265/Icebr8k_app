@@ -16,7 +16,7 @@ class IbQuestion {
   static const String kScaleThree = "sc_3";
   static const String kMultipleChoicePic = "mc_pic";
 
-  List<String> tagIds;
+  List<String> tags;
   List<IbMedia> medias;
   dynamic position;
   List<String> privacyBounds;
@@ -47,7 +47,7 @@ class IbQuestion {
       this.isAnonymous = false,
       this.isCommentEnabled = true,
       this.privacyBounds = const ['public'],
-      this.tagIds = const [],
+      this.tags = const [],
       this.description = '',
       this.likes = 0,
       this.comments = 0,
@@ -70,7 +70,7 @@ class IbQuestion {
       identical(this, other) ||
       other is IbQuestion &&
           runtimeType == other.runtimeType &&
-          tagIds == other.tagIds &&
+          tags == other.tags &&
           medias == other.medias &&
           position == other.position &&
           privacyBounds == other.privacyBounds &&
@@ -92,7 +92,7 @@ class IbQuestion {
 
   @override
   int get hashCode =>
-      tagIds.hashCode ^
+      tags.hashCode ^
       medias.hashCode ^
       position.hashCode ^
       privacyBounds.hashCode ^

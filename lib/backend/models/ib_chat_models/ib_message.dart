@@ -32,7 +32,7 @@ class IbMessage {
       this.mentionUids = const <String>[],
       this.extra = const <String>[],
       this.timestamp,
-      this.readUids = const <String>[]});
+      required this.readUids});
 
   factory IbMessage.fromJson(Map<String, dynamic> json) =>
       _$IbMessageFromJson(json);
