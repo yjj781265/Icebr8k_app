@@ -66,76 +66,80 @@ class ChatPageSettings extends StatelessWidget {
               const SizedBox(
                 height: 8,
               ),
-              Wrap(runSpacing: 8, spacing: 8, children: [
-                Wrap(
+              Wrap(
                   runSpacing: 8,
                   spacing: 8,
-                  children: _controller.ibChatMembers.map((element) {
-                    return InkWell(
-                      onTap: () {
-                        _showMemberBtmSheet(element);
-                      },
-                      child: SizedBox(
-                        width: 72,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IbUserAvatar(
-                              avatarUrl: element.user.avatarUrl,
-                              compScore: element.compScore,
-                            ),
-                            Text(
-                              element.user.username,
-                              style: const TextStyle(
-                                  fontSize: IbConfig.kNormalTextSize),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              element.member.role,
-                              style: TextStyle(
-                                  color: element.member.role ==
-                                          IbChatMember.kRoleLeader
-                                      ? Theme.of(context).indicatorColor
-                                      : IbColors.lightGrey,
-                                  fontSize: IbConfig.kDescriptionTextSize),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-                SizedBox(
-                  width: 72,
-                  child: IbActionButton(
-                    iconData: Icons.add,
-                    text: '',
-                    onPressed: () async {
-                      final items = await Get.to(
-                        () => IbFriendsPicker(
-                          Get.put(
-                            IbFriendsPickerController(
-                              IbUtils.getCurrentUid()!,
-                              pickedUids: _controller.ibChatMembers
-                                  .map((element) => element.user.id)
-                                  .toList(),
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Wrap(
+                      runSpacing: 8,
+                      spacing: 8,
+                      children: _controller.ibChatMembers.map((element) {
+                        return InkWell(
+                          onTap: () {
+                            _showMemberBtmSheet(element);
+                          },
+                          child: SizedBox(
+                            width: 72,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IbUserAvatar(
+                                  avatarUrl: element.user.avatarUrl,
+                                  compScore: element.compScore,
+                                ),
+                                Text(
+                                  element.user.username,
+                                  style: const TextStyle(
+                                      fontSize: IbConfig.kNormalTextSize),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  element.member.role,
+                                  style: TextStyle(
+                                      color: element.member.role ==
+                                              IbChatMember.kRoleLeader
+                                          ? Theme.of(context).indicatorColor
+                                          : IbColors.lightGrey,
+                                      fontSize: IbConfig.kDescriptionTextSize),
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                      );
-                      if (items == null) {
-                        return;
-                      }
-                      final List<IbUser> invitees = [];
-                      for (final dynamic item in items) {
-                        invitees.add(item as IbUser);
-                      }
-                      await _controller.sendCircleInvites(invitees);
-                    },
-                    color: IbColors.lightGrey,
-                  ),
-                ),
-              ]),
+                        );
+                      }).toList(),
+                    ),
+                    SizedBox(
+                      width: 72,
+                      child: IbActionButton(
+                        iconData: Icons.add,
+                        text: 'Invite',
+                        onPressed: () async {
+                          final items = await Get.to(
+                            () => IbFriendsPicker(
+                              Get.put(
+                                IbFriendsPickerController(
+                                  IbUtils.getCurrentUid()!,
+                                  pickedUids: _controller.ibChatMembers
+                                      .map((element) => element.user.id)
+                                      .toList(),
+                                ),
+                              ),
+                            ),
+                          );
+                          if (items == null) {
+                            return;
+                          }
+                          final List<IbUser> invitees = [];
+                          for (final dynamic item in items) {
+                            invitees.add(item as IbUser);
+                          }
+                          await _controller.sendCircleInvites(invitees);
+                        },
+                        color: IbColors.lightGrey,
+                      ),
+                    ),
+                  ]),
               const Divider(
                 thickness: 2,
               ),

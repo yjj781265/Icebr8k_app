@@ -113,11 +113,11 @@ class CreateQuestionImagePicker extends StatelessWidget {
                 child: media.url.contains('http')
                     ? CachedNetworkImage(
                         imageUrl: media.url,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fill,
                       )
                     : Image.file(
                         File(media.url),
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fill,
                       ),
               ),
             ),

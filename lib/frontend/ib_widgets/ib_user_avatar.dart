@@ -73,6 +73,7 @@ class IbUserAvatar extends StatelessWidget {
                     errorWidget: (context, str, value) => CircleAvatar(
                         radius: radius, backgroundColor: IbColors.lightBlue),
                     imageUrl: avatarUrl,
+                    fit: BoxFit.cover,
                     imageBuilder: (context, imageProvider) => Container(
                       height: radius * 2,
                       width: radius * 2,

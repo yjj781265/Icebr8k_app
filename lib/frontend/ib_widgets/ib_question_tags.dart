@@ -13,7 +13,7 @@ class IbQuestionTags extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: SizedBox(height: 30, child: tagList(context)),
+      child: tagList(context),
     );
   }
 
@@ -23,12 +23,16 @@ class IbQuestionTags extends StatelessWidget {
         return Row(
             children: _itemController.rxIbQuestion.value.tags
                 .map(
-                  (e) => Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: Chip(
-                      elevation: 1,
-                      backgroundColor: Theme.of(context).backgroundColor,
-                      label: Text(
+                  (e) => Container(
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).backgroundColor,
+                        border:
+                            Border.all(color: Theme.of(context).indicatorColor),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(16))),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
                         e,
                         style: const TextStyle(
                             fontSize: IbConfig.kDescriptionTextSize),
@@ -40,19 +44,35 @@ class IbQuestionTags extends StatelessWidget {
       }
       return Row(
         children: _itemController.ibTags
-            .map((element) => Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: ActionChip(
-                    elevation: 1,
-                    backgroundColor: Theme.of(context).backgroundColor,
-                    label: Text(
-                      element.text,
-                      style: const TextStyle(
-                          fontSize: IbConfig.kDescriptionTextSize),
+            .map(
+              (element) => Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).backgroundColor,
+                        border:
+                            Border.all(color: Theme.of(context).indicatorColor),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(16))),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(element.text,
+                          style: const TextStyle(
+                              fontSize: IbConfig.kDescriptionTextSize)),
                     ),
-                    onPressed: () {},
                   ),
-                ))
+                  Positioned.fill(
+                      child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      customBorder: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      onTap: () {},
+                    ),
+                  ))
+                ],
+              ),
+            )
             .toList(),
       );
     });

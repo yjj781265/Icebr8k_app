@@ -226,7 +226,7 @@ class CreateQuestionMcPicTab extends StatelessWidget {
         borderRadius: const BorderRadius.all(Radius.circular(8)),
         child: CachedNetworkImage(
           imageUrl: ibChoice.url!,
-          fit: BoxFit.cover,
+          fit: BoxFit.fill,
           width: IbConfig.kMcPicSize,
           height: IbConfig.kMcPicSize,
         ),
@@ -237,7 +237,7 @@ class CreateQuestionMcPicTab extends StatelessWidget {
       borderRadius: const BorderRadius.all(Radius.circular(8)),
       child: Image.file(
         File(ibChoice.url!),
-        fit: BoxFit.cover,
+        fit: BoxFit.fill,
         width: IbConfig.kMcPicSize,
         height: IbConfig.kMcPicSize,
       ),
