@@ -8,58 +8,38 @@ import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 
 import '../ib_colors.dart';
 
-class IbMediaSlide extends StatefulWidget {
+class IbMediaSlide extends StatelessWidget {
   final List<IbMedia> medias;
 
   const IbMediaSlide(this.medias);
 
   @override
-  State<IbMediaSlide> createState() => _IbMediaSlideState();
-}
-
-class _IbMediaSlideState extends State<IbMediaSlide>
-    with TickerProviderStateMixin {
-  TabController? controller;
-  @override
-  void initState() {
-    controller = TabController(length: widget.medias.length, vsync: this);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    if (controller != null) {
-      controller!.dispose();
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (widget.medias.isEmpty) {
+    if (medias.isEmpty) {
       return const SizedBox();
     }
-    return Center(
-      child: Column(
-        children: [
-          SizedBox(
-            height: Get.width / 1.78,
-            width: Get.width,
-            child: TabBarView(
-                controller: controller,
-                children: widget.medias.map((e) {
-                  return Container(
-                      margin: const EdgeInsets.all(8),
-                      color: Theme.of(context).backgroundColor,
-                      child: _itemWidget(e));
-                }).toList()),
-          ),
-          if (widget.medias.length > 1)
-            TabPageSelector(
-              indicatorSize: 6,
-              controller: controller,
+    return DefaultTabController(
+      length: medias.length,
+      child: Center(
+        child: Column(
+          children: [
+            SizedBox(
+              height: Get.width / 1.78,
+              width: Get.width,
+              child: TabBarView(
+                  children: medias.map((e) {
+                return Container(
+                    margin: const EdgeInsets.all(8),
+                    color: Theme.of(context).backgroundColor,
+                    child: _itemWidget(e));
+              }).toList()),
             ),
-        ],
+            if (medias.length > 1)
+              const TabPageSelector(
+                indicatorSize: 6,
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -110,8 +90,8 @@ class _IbMediaSlideState extends State<IbMediaSlide>
       onTap: () {
         Get.to(
             () => IbMediaViewer(
-                urls: widget.medias.map((e) => e.url).toList(),
-                currentIndex: widget.medias.indexOf(media)),
+                urls: medias.map((e) => e.url).toList(),
+                currentIndex: medias.indexOf(media)),
             transition: Transition.zoom,
             fullscreenDialog: true);
       },

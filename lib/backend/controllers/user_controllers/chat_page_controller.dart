@@ -10,11 +10,14 @@ import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
+import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -216,6 +219,114 @@ class ChatPageController extends GetxController {
     setUpInfo();
   }
 
+  void showWelcomeMsg() {
+    final leader = ibChatMembers.firstWhereOrNull(
+        (element) => element.member.role == IbChatMember.kRoleLeader);
+
+    if (ibChat != null &&
+        ibChat!.welcomeMsg.isNotEmpty &&
+        leader != null &&
+        ibChat!.isCircle &&
+        Get.context != null &&
+        !IbLocalDataService().retrieveCustomBoolValue(ibChat!.chatId)) {
+      print('show message');
+      final Widget dialog = Stack(
+        alignment: AlignmentDirectional.topCenter,
+        clipBehavior: Clip.none,
+        children: [
+          SizedBox(
+            width: Get.width * 0.8,
+            child: IbCard(
+                child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(
+                    height: 100,
+                  ),
+                  const Text(
+                    'Glad to have you!',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: IbConfig.kPageTitleSize),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  Text(
+                    ibChat!.welcomeMsg,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(
+                    height: 24,
+                  ),
+                  SizedBox(
+                    height: 48,
+                    width: double.infinity,
+                    child: IbElevatedButton(
+                        textTrKey: 'Enter Circle',
+                        onPressed: () {
+                          Get.back();
+                        },
+                        color: IbColors.primaryColor),
+                  )
+                ],
+              ),
+            )),
+          ),
+          Positioned(
+            top: -24,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            color: Theme.of(Get.context!).backgroundColor,
+                            width: 3),
+                        color: Theme.of(Get.context!).backgroundColor,
+                        shape: BoxShape.circle),
+                    child: IbUserAvatar(
+                      avatarUrl: leader.user.avatarUrl,
+                      radius: 48,
+                    )),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    leader.user.username,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: IbConfig.kNormalTextSize),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    leader.member.role,
+                    style: const TextStyle(
+                        fontSize: IbConfig.kDescriptionTextSize),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
+      );
+      Get.dialog(
+          Center(
+            child: Material(
+              color: Colors.transparent,
+              child: dialog,
+            ),
+          ),
+          barrierDismissible: true);
+      IbLocalDataService()
+          .updateCustomBoolValue(key: ibChat!.chatId, value: true);
+    }
+  }
+
   void setUpStreams() {
     if (ibChat == null) {
       isLoading.value = false;
@@ -335,6 +446,7 @@ class ChatPageController extends GetxController {
         return a.user.username.compareTo(b.user.username);
       });
       ibChatMembers.refresh();
+      showWelcomeMsg();
     });
 
     _chatSub =
@@ -733,7 +845,10 @@ class ChatPageController extends GetxController {
         if (message.messageType == IbMessage.kMessageTypePoll) {
           final ibQuestion =
               await IbQuestionDbService().querySingleQuestion(message.content);
-          ibQuestions.addIf(ibQuestion != null, ibQuestion!);
+          if (ibQuestion == null) {
+            continue;
+          }
+          ibQuestions.add(ibQuestion);
         }
         if (!messages.contains(message)) {
           tempList.add(IbMessage.fromJson(doc.data()));

@@ -12,6 +12,11 @@ class IbLocalDataService {
     return value;
   }
 
+  bool retrieveCustomBoolValue(String key) {
+    final bool value = _box.read(key) ?? false;
+    return value;
+  }
+
   String retrieveStringValue(StorageKey key) {
     final String value = _box.read(key.toString()) ?? '';
     return value;
@@ -19,6 +24,10 @@ class IbLocalDataService {
 
   void updateBoolValue({required StorageKey key, required bool value}) {
     _box.write(key.toString(), value);
+  }
+
+  void updateCustomBoolValue({required String key, required bool value}) {
+    _box.write(key, value);
   }
 
   void updateStringValue({required StorageKey key, required String value}) {

@@ -77,6 +77,7 @@ class CircleSettingsController extends GetxController {
     }
 
     try {
+      ///edit circle
       if (ibChat != null) {
         ibChat!.name = titleTxtController.text.trim();
         ibChat!.photoUrl = photoUrl.value;
@@ -84,6 +85,8 @@ class CircleSettingsController extends GetxController {
         ibChat!.welcomeMsg = welcomeMsgController.text.trim();
         ibChat!.isPublicCircle = isPublicCircle.value;
         await IbChatDbService().addIbChat(ibChat!, isEdit: ibChat != null);
+
+        ///create new circle
       } else {
         final IbChat ibChat2 = IbChat(
             chatId: IbUtils.getUniqueId(),

@@ -133,8 +133,9 @@ class CircleSettings extends StatelessWidget {
                                 enabled: _controller.isAbleToEdit,
                                 controller: _controller.welcomeMsgController,
                                 minLines: 1,
-                                maxLines: 5,
+                                maxLines: 8,
                                 maxLength: 300,
+                                textInputAction: TextInputAction.done,
                                 decoration: InputDecoration(
                                   hintText: 'circle_welcome_message_hint'.tr,
                                   border: InputBorder.none,
