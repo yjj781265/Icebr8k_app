@@ -24,6 +24,7 @@ class IbQuestionTags extends StatelessWidget {
             children: _itemController.rxIbQuestion.value.tags
                 .map(
                   (e) => Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
                     decoration: BoxDecoration(
                         color: Theme.of(context).backgroundColor,
                         border:
@@ -48,6 +49,7 @@ class IbQuestionTags extends StatelessWidget {
               (element) => Stack(
                 children: [
                   Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
                     decoration: BoxDecoration(
                         color: Theme.of(context).backgroundColor,
                         border:

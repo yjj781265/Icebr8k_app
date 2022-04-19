@@ -20,6 +20,11 @@ class IbTag {
   Map<String, dynamic> toJson() => _$IbTagToJson(this);
 
   @override
+  String toString() {
+    return 'IbTag{text: $text, questionCount: $questionCount, timestamp: $timestamp, creatorId: $creatorId}';
+  }
+
+  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is IbTag && runtimeType == other.runtimeType && text == other.text;

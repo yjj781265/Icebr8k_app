@@ -17,27 +17,24 @@ class CreateQuestionTagPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Expanded(
-              flex: 8,
-              child: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).backgroundColor,
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
-                ),
-                child: TextField(
-                  onSubmitted: (value) async {
-                    //TODO use typesense for full text search
-                  },
-                  textInputAction: TextInputAction.search,
-                  controller: _controller.textEditingController,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    prefixIcon: const Icon(Icons.search),
-                    suffixIcon: IconButton(
+        leadingWidth: 40,
+        title: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 8),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Theme.of(context).backgroundColor,
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+          ),
+          child: TextField(
+            textInputAction: TextInputAction.search,
+            controller: _controller.textEditingController,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: Obx(
+                () => _controller.searchText.isEmpty
+                    ? const SizedBox()
+                    : IconButton(
                         onPressed: () {
                           _controller.textEditingController.clear();
                         },
@@ -45,38 +42,104 @@ class CreateQuestionTagPicker extends StatelessWidget {
                           Icons.cancel,
                           color: IbColors.lightGrey,
                         )),
-                    hintText: 'Search Tags',
-                  ),
-                ),
               ),
+              hintText: 'Search Tags',
             ),
-            TextButton(
-              onPressed: () async {
-                //await _controller.search();
-              },
-              child: const Text(
-                'Search',
-                style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-              ),
-            ),
-          ],
+          ),
         ),
+        actions: [
+          TextButton(
+              onPressed: () {
+                Get.back();
+              },
+              child: Text('confirm'.tr))
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: ListView(
-          children: [
-            pickedTags(context),
-            const Divider(
-              height: 1,
-              thickness: 1,
-              color: IbColors.lightGrey,
-            ),
-            trendingTags(context),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              searchResultTags(context),
+              pickedTags(context),
+              const Divider(
+                height: 1,
+                thickness: 1,
+              ),
+              trendingTags(context),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Widget searchResultTags(BuildContext context) {
+    return Obx(() {
+      if (_controller.searchResults.isNotEmpty) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                'Search Results',
+                style: TextStyle(
+                    fontSize: IbConfig.kNormalTextSize,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: _controller.searchResults
+                    .map((element) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: FilterChip(
+                            pressElevation: 0,
+                            backgroundColor: Theme.of(context).backgroundColor,
+                            avatar: _controller
+                                    .createQuestionController.pickedTags
+                                    .contains(element)
+                                ? const SizedBox()
+                                : const Icon(Icons.add),
+                            label: Text(element.text),
+                            selectedColor: IbColors.accentColor,
+                            selected: _controller
+                                .createQuestionController.pickedTags
+                                .contains(element),
+                            onSelected: (bool value) {
+                              if (value) {
+                                if (_controller.createQuestionController
+                                        .pickedTags.length >=
+                                    IbConfig.kMaxTag) {
+                                  IbUtils.showSimpleSnackBar(
+                                      msg: 'max_tag_info'.tr,
+                                      backgroundColor: IbColors.primaryColor);
+                                  return;
+                                }
+                                _controller.createQuestionController.pickedTags
+                                    .add(element);
+                              } else {
+                                _controller.createQuestionController.pickedTags
+                                    .remove(element);
+                              }
+                            },
+                          ),
+                        ))
+                    .toList(),
+              ),
+            ),
+            const Divider(
+              height: 1,
+              thickness: 1,
+            )
+          ],
+        );
+      }
+      return const SizedBox();
+    });
   }
 
   Widget pickedTags(BuildContext context) {
@@ -160,10 +223,12 @@ class CreateQuestionTagPicker extends StatelessWidget {
               spacing: 4,
               children: _controller.trendingTags
                   .map((element) => FilterChip(
+                        pressElevation: 0,
                         backgroundColor: Theme.of(context).backgroundColor,
-                        avatar: _controller
-        .createQuestionController.pickedTags
-        .contains(element)? null: const Icon(Icons.add),
+                        avatar: _controller.createQuestionController.pickedTags
+                                .contains(element)
+                            ? const SizedBox()
+                            : const Icon(Icons.add),
                         label: Text(element.text),
                         selectedColor: IbColors.accentColor,
                         selected: _controller

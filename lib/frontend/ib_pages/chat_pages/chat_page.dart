@@ -157,6 +157,8 @@ class ChatPage extends StatelessWidget {
                         },
                       ),
                       _buildTypingIndicator(context),
+                      Positioned(
+                          bottom: 16, right: 16, child: _newMessageAlert())
                     ],
                   )),
                 _inputWidget(context),
@@ -353,8 +355,8 @@ class ChatPage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Wrap(
-                  children: _controller.ibChatMembers
-                      .map((element) => element.user)
+                  children: _controller.isTypingUsers
+                      .map((element) => element)
                       .toList()
                       .map((element) => Padding(
                             padding: const EdgeInsets.all(2.0),
@@ -486,6 +488,33 @@ class ChatPage extends StatelessWidget {
       ],
     ));
     Get.bottomSheet(SafeArea(child: options), ignoreSafeArea: false);
+  }
+
+  Widget _newMessageAlert() {
+    return Obx(() {
+      return Wrap(
+        children: [
+          AnimatedContainer(
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+                color: IbColors.accentColor,
+                borderRadius: BorderRadius.all(Radius.circular(8))),
+            duration: const Duration(milliseconds: 300),
+            height: _controller.showNewMsgAlert.isTrue ? 49 : 0,
+            width: _controller.showNewMsgAlert.isTrue ? 123 : 0,
+            child: TextButton(
+              child: const Text(
+                'New Message(s) ↓',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                _controller.itemScrollController.jumpTo(index: 0);
+              },
+            ),
+          ),
+        ],
+      );
+    });
   }
 
   Widget _meTextMsgItem(IbMessage message) {

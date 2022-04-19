@@ -66,6 +66,7 @@ class IbMediaBar extends StatelessWidget {
                         child: Text(
                           _controller.pickedTags.length.toString(),
                           style: const TextStyle(
+                              color: Colors.black,
                               fontSize: IbConfig.kDescriptionTextSize),
                         ),
                       ),
@@ -140,7 +141,9 @@ class IbMediaBar extends StatelessWidget {
                     child: Text(
                       '${_controller.picMediaList.isEmpty ? '' : _controller.picMediaList.length}',
                       style: const TextStyle(
-                          fontSize: IbConfig.kDescriptionTextSize),
+                        fontSize: IbConfig.kDescriptionTextSize,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
                 );

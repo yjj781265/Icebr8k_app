@@ -33,6 +33,7 @@ class ChatPageController extends GetxController {
   final isLoadingMore = false.obs;
   final isCircle = false.obs;
   final isPublicCircle = false.obs;
+  final showNewMsgAlert = false.obs;
   final showOptions = false.obs;
   final messages = <IbMessage>[].obs;
 
@@ -74,6 +75,15 @@ class ChatPageController extends GetxController {
       chatRoomId: '');
   @override
   Future<void> onInit() async {
+    itemPositionsListener.itemPositions.addListener(() {
+      if (itemPositionsListener.itemPositions.value
+          .map((e) => e.index)
+          .toList()
+          .contains(0)) {
+        showNewMsgAlert.value = false;
+      }
+    });
+
     await initData();
 
     // remove typing after 8s
@@ -229,7 +239,6 @@ class ChatPageController extends GetxController {
         ibChat!.isCircle &&
         Get.context != null &&
         !IbLocalDataService().retrieveCustomBoolValue(ibChat!.chatId)) {
-      print('show message');
       final Widget dialog = Stack(
         alignment: AlignmentDirectional.topCenter,
         clipBehavior: Clip.none,
@@ -352,6 +361,14 @@ class ChatPageController extends GetxController {
         print('ChatPageController ${docChange.type}');
         if (docChange.type == DocumentChangeType.added) {
           messages.insert(0, ibMessage);
+          if (!itemPositionsListener.itemPositions.value
+                  .map((e) => e.index)
+                  .toList()
+                  .contains(0) &&
+              isLoading.isFalse &&
+              ibMessage.senderUid != IbUtils.getCurrentUid()) {
+            showNewMsgAlert.value = true;
+          }
         } else if (docChange.type == DocumentChangeType.modified) {
           final int index = messages.indexOf(ibMessage);
           if (index != -1) {
@@ -377,6 +394,7 @@ class ChatPageController extends GetxController {
         await IbChatDbService().updateReadUidArray(
             chatRoomId: ibChat!.chatId, messageId: lastMessage.messageId);
       }
+
       isLoading.value = false;
     });
 

@@ -59,6 +59,7 @@ dependencies:
   reorderables: ^0.4.3
   scrollable_positioned_list: ^0.2.3
   showcaseview: ^1.1.5
+  typesense: ^0.2.0
   url_launcher: ^6.0.20
   uuid: ^3.0.6
 

@@ -30,6 +30,7 @@ class MyProfilePage extends StatelessWidget {
         child: Obx(() => ListView(
               controller: _controller.scrollController,
               children: <Widget>[
+                ///cover photo
                 Stack(
                   children: [
                     Obx(
@@ -167,6 +168,24 @@ class MyProfilePage extends StatelessWidget {
                         ],
                       ),
                     ),
+                    Positioned(
+                        bottom: 8,
+                        right: 8,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: IbColors.primaryColor.withOpacity(0.8),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(8))),
+                          child: Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Text(
+                              beautifyProfilePrivacy(
+                                  _controller.rxIbUser.value.profilePrivacy),
+                              style: const TextStyle(
+                                  fontSize: IbConfig.kDescriptionTextSize),
+                            ),
+                          ),
+                        ))
                   ],
                 ),
 
@@ -431,5 +450,15 @@ class MyProfilePage extends StatelessWidget {
             )),
       ),
     );
+  }
+
+  String beautifyProfilePrivacy(String text) {
+    final list = text.split('');
+    list[0] = list[0].toUpperCase();
+    final int index = list.indexOf('_');
+    if (index != -1) {
+      list[index] = ' ';
+    }
+    return list.map((e) => e).join().capitalize ?? '';
   }
 }

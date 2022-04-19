@@ -205,6 +205,24 @@ class ProfilePage extends StatelessWidget {
                         ],
                       ),
                     ),
+                    Positioned(
+                        bottom: 8,
+                        right: 8,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: IbColors.primaryColor.withOpacity(0.8),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(8))),
+                          child: Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Text(
+                              beautifyProfilePrivacy(
+                                  _controller.rxIbUser.value.profilePrivacy),
+                              style: const TextStyle(
+                                  fontSize: IbConfig.kDescriptionTextSize),
+                            ),
+                          ),
+                        ))
                   ],
                 ),
 
@@ -711,6 +729,16 @@ class ProfilePage extends StatelessWidget {
             color: Theme.of(context).indicatorColor),
       ),
     );
+  }
+
+  String beautifyProfilePrivacy(String text) {
+    final list = text.split('');
+    list[0] = list[0].toUpperCase();
+    final int index = list.indexOf('_');
+    if (index != -1) {
+      list[index] = ' ';
+    }
+    return list.map((e) => e).join().capitalize ?? '';
   }
 
   void showFriendRequestDialog() {
