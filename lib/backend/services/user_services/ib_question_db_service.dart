@@ -75,7 +75,7 @@ class IbQuestionDbService {
           .orderBy('askedTimeInMs', descending: true)
           .where('isAnonymous', isEqualTo: false)
           .where('creatorId', isEqualTo: uid)
-          .where('privacyBounds', arrayContains: 'public')
+          .where('privacyBounds', arrayContains: IbQuestion.kPrivacyBoundPublic)
           .limit(limit)
           .get();
     }
@@ -84,7 +84,7 @@ class IbQuestionDbService {
           .orderBy('askedTimeInMs', descending: true)
           .where('creatorId', isEqualTo: uid)
           .where('isAnonymous', isEqualTo: false)
-          .where('privacyBounds', arrayContains: 'public')
+          .where('privacyBounds', arrayContains: IbQuestion.kPrivacyBoundPublic)
           .startAfterDocument(lastDoc)
           .limit(limit)
           .get();

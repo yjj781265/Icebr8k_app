@@ -225,6 +225,16 @@ class CreateQuestionMcPicTab extends StatelessWidget {
       return ClipRRect(
         borderRadius: const BorderRadius.all(Radius.circular(8)),
         child: CachedNetworkImage(
+          placeholder: (context, string) {
+            return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: IbColors.lightGrey,
+              ),
+              width: IbConfig.kMcPicSize,
+              height: IbConfig.kMcPicSize,
+            );
+          },
           imageUrl: ibChoice.url!,
           fit: BoxFit.fill,
           width: IbConfig.kMcPicSize,

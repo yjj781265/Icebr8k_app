@@ -56,8 +56,9 @@ class MyFriendsList extends StatelessWidget {
 
 class FriendListItem extends StatelessWidget {
   final FriendItemController _controller;
+  final bool showThreeDots;
 
-  const FriendListItem(this._controller);
+  const FriendListItem(this._controller, {this.showThreeDots = true});
 
   @override
   Widget build(BuildContext context) {
@@ -68,14 +69,15 @@ class FriendListItem extends StatelessWidget {
 
       return ListTile(
         onLongPress: () {
-          _showBtmSheet(context);
+          if (showThreeDots) {
+            _showBtmSheet(context);
+          }
         },
         onTap: () {
           Get.to(
             () => ProfilePage(
-              Get.put(
-                ProfileController(_controller.user.id),
-              ),
+              Get.put(ProfileController(_controller.user.id),
+                  tag: _controller.user.id),
             ),
           );
         },
@@ -107,11 +109,13 @@ class FriendListItem extends StatelessWidget {
         subtitle: IbLinearIndicator(
           endValue: _controller.compScore.value,
         ),
-        trailing: IconButton(
-            onPressed: () {
-              _showBtmSheet(context);
-            },
-            icon: const Icon(Icons.more_horiz)),
+        trailing: showThreeDots
+            ? IconButton(
+                onPressed: () {
+                  _showBtmSheet(context);
+                },
+                icon: const Icon(Icons.more_horiz))
+            : const SizedBox(),
       );
     });
   }

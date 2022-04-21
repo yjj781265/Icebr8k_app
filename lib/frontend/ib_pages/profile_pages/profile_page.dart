@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/asked_questions_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/compare_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/friend_list_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -15,6 +16,8 @@ import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/asked_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/compare_page.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_pages/friend_list.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_pages/word_cloud_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_description_text.dart';
@@ -25,6 +28,8 @@ import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+
+import '../../../backend/controllers/user_controllers/word_cloud_controller.dart';
 
 class ProfilePage extends StatelessWidget {
   final ProfileController _controller;
@@ -150,7 +155,12 @@ class ProfilePage extends StatelessWidget {
                                             .backgroundColor
                                             .withOpacity(0.8),
                                         child: IconButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              Get.to(() => WordCloudPage(
+                                                  Get.put(WordCloudController(
+                                                      _controller
+                                                          .rxIbUser.value))));
+                                            },
                                             icon: Icon(Icons.cloud,
                                                 color: Theme.of(context)
                                                     .indicatorColor))),
@@ -407,7 +417,14 @@ class ProfilePage extends StatelessWidget {
                             Radius.circular(8),
                           ),
                         ),
-                        onTap: () {},
+                        onTap: () {
+                          if (_controller.isProfileVisible.isFalse) {
+                            return;
+                          }
+                          Get.to(() => FriendList(Get.put(
+                              FriendListController(_controller.rxIbUser.value),
+                              tag: _controller.rxIbUser.value.id)));
+                        },
                         child: Padding(
                           padding: const EdgeInsets.all(4.0),
                           child: Container(

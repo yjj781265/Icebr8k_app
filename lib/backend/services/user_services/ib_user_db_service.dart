@@ -63,6 +63,7 @@ class IbUserDbService {
     });
   }
 
+  /// returned IbUser result will cached locally via IbCacheManager
   Future<IbUser?> queryIbUser(String uid) async {
     final snapshot = await _collectionRef.doc(uid).get();
     if (!snapshot.exists || snapshot.data() == null) {

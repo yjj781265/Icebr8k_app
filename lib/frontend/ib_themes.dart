@@ -39,6 +39,7 @@ class IbThemes {
           backgroundColor: Colors.black,
           elevation: 0,
           titleSpacing: 0,
+          centerTitle: false,
           iconTheme: const IconThemeData(color: Colors.white),
           titleTextStyle: GoogleFonts.sourceSansPro(
               fontSize: IbConfig.kPageTitleSize,

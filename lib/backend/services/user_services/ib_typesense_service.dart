@@ -2,16 +2,19 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/db_config.dart';
+import 'package:icebr8k/backend/managers/ib_api_keys_manager.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
 
 class IbTypeSenseService extends GetConnect {
   static final IbTypeSenseService _ibTypeSense = IbTypeSenseService._();
 
-  // move this to api manager
-  final String _kApiKey = 'TIy4pHOZbzoIromtgHMiRkppOGsnZCDs';
-  final String _kHost = 'os2b361ztjpiue95p-1.a1.typesense.net';
+  late String _kApiKey;
+  late String _kHost;
   factory IbTypeSenseService() => _ibTypeSense;
-  IbTypeSenseService._();
+  IbTypeSenseService._() {
+    _kApiKey = IbApiKeysManager.kTypeSenseSearchApiKey;
+    _kHost = IbApiKeysManager.kTypeSenseNode;
+  }
 
   Future<List<IbTag>> searchIbTags(String text) async {
     List<IbTag> ibTags = [];

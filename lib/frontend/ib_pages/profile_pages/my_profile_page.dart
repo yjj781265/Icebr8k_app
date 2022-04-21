@@ -6,11 +6,15 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/answered_question_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/asked_questions_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/edit_emo_pic_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/friend_list_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/my_profile_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/word_cloud_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/edit_profile_pages/edit_emo_pics_page.dart';
 import 'package:icebr8k/frontend/ib_pages/edit_profile_pages/edit_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/answered_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/asked_page.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_pages/friend_list.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_pages/word_cloud_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_description_text.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_emo_pic_card.dart';
@@ -114,7 +118,11 @@ class MyProfilePage extends StatelessWidget {
                                           .backgroundColor
                                           .withOpacity(0.8),
                                       child: IconButton(
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            Get.to(() => WordCloudPage(Get.put(
+                                                WordCloudController(_controller
+                                                    .rxIbUser.value))));
+                                          },
                                           hoverColor: IbColors.primaryColor,
                                           icon: Icon(Icons.cloud,
                                               color: Theme.of(context)
@@ -294,7 +302,12 @@ class MyProfilePage extends StatelessWidget {
                               Radius.circular(8),
                             ),
                           ),
-                          onTap: () {},
+                          onTap: () {
+                            Get.to(() => FriendList(Get.put(
+                                FriendListController(
+                                    _controller.rxIbUser.value),
+                                tag: _controller.rxIbUser.value.id)));
+                          },
                           child: Padding(
                             padding: const EdgeInsets.all(4.0),
                             child: Container(

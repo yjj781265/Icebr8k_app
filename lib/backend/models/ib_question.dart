@@ -25,6 +25,7 @@ class IbQuestion {
   bool isAnonymous;
   bool isCommentEnabled;
   bool isQuiz;
+  int points;
   String correctChoiceId;
   int comments;
   int pollSize;
@@ -49,6 +50,7 @@ class IbQuestion {
       this.privacyBounds = const ['public'],
       this.tags = const [],
       this.description = '',
+      this.points = 0,
       this.likes = 0,
       this.comments = 0,
       this.position,

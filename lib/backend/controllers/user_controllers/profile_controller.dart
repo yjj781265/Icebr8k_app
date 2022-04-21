@@ -57,6 +57,13 @@ class ProfileController extends GetxController {
     super.onInit();
   }
 
+  @override
+  void onClose() {
+    super.onClose();
+    scrollController.dispose();
+    refreshController.dispose();
+  }
+
   Future<void> onRefresh() async {
     final IbUser? user = await IbUserDbService().queryIbUser(uid);
     if (user != null) {

@@ -1,4 +1,5 @@
 import 'package:icebr8k/backend/models/ib_answer.dart';
+import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
 
 import '../models/ib_user.dart';
@@ -8,6 +9,7 @@ class IbCacheManager {
   final Map<String, IbUser> _ibUsersMap = {};
   final Map<String, IbTag> _ibTagMap = {};
   final Map<String, List<IbAnswer>> _ibAnswersMap = {};
+  final List<IbQuestion> _ibQuestionList = [];
 
   factory IbCacheManager() => _manager;
 
@@ -51,6 +53,23 @@ class IbCacheManager {
       list.add(ibAnswer);
     }
     _ibAnswersMap[uid] = list;
+  }
+
+  void cacheSingleIbQuestion(IbQuestion ibQuestion) {
+    if (_ibQuestionList.contains(ibQuestion)) {
+      return;
+    }
+    _ibQuestionList.add(ibQuestion);
+  }
+
+  IbQuestion? getIbQuestion(String questionId) {
+    final int index =
+        _ibQuestionList.indexWhere((element) => element.id == questionId);
+    if (index == -1) {
+      return null;
+    }
+
+    return _ibQuestionList[index];
   }
 
   void removeSingleIbAnswer({required String uid, required IbAnswer ibAnswer}) {
