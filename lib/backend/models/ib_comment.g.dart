@@ -17,7 +17,7 @@ IbComment _$IbCommentFromJson(Map<String, dynamic> json) => IbComment(
       replyId: json['replyId'] as String?,
       content: json['content'] as String,
       type: json['type'] as String,
-      timestampInMs: json['timestampInMs'] as int,
+      timestamp: json['timestamp'],
     );
 
 Map<String, dynamic> _$IbCommentToJson(IbComment instance) => <String, dynamic>{
@@ -31,5 +31,5 @@ Map<String, dynamic> _$IbCommentToJson(IbComment instance) => <String, dynamic>{
       'isAnonymous': instance.isAnonymous,
       'content': instance.content,
       'type': instance.type,
-      'timestampInMs': instance.timestampInMs,
+      'timestamp': instance.timestamp,
     };

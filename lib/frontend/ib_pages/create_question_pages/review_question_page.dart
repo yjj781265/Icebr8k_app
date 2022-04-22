@@ -293,16 +293,17 @@ class ReviewQuestionPage extends StatelessWidget {
             Obx(
               () => CheckboxListTile(
                 controlAffinity: ListTileControlAffinity.trailing,
-                value: itemController.rxIbQuestion.value.privacyBounds
-                    .contains(IbQuestion.kPrivacyBoundPublic),
+                value: itemController.rxIbQuestion.value.isPublic,
                 onChanged: (flag) {
                   final bool isPublic = flag ?? false;
                   final list = <String>[];
                   if (isPublic) {
-                    list.add(IbQuestion.kPrivacyBoundPublic);
+                    itemController.rxIbQuestion.value.isPublic = true;
                     list.addAll(IbUtils.getCurrentIbUserUnblockedFriendsId());
+                  } else {
+                    itemController.rxIbQuestion.value.isPublic = false;
                   }
-                  itemController.rxIbQuestion.value.privacyBounds = list;
+                  itemController.rxIbQuestion.value.sharedFriendUids = list;
                   itemController.rxIbQuestion.refresh();
                 },
                 title: const Text(
@@ -320,17 +321,18 @@ class ReviewQuestionPage extends StatelessWidget {
             Obx(
               () => CheckboxListTile(
                 controlAffinity: ListTileControlAffinity.trailing,
-                value: itemController.rxIbQuestion.value.privacyBounds
-                    .contains(IbQuestion.kPrivacyBoundFriends),
+                value: !itemController.rxIbQuestion.value.isPublic,
                 onChanged: (flag) {
                   final bool isFriendsOnly = flag ?? false;
                   final list = <String>[];
                   if (isFriendsOnly) {
-                    list.add(IbQuestion.kPrivacyBoundFriends);
+                    itemController.rxIbQuestion.value.isPublic = false;
                     list.addAll(IbUtils.getCurrentIbUserUnblockedFriendsId());
+                  } else {
+                    itemController.rxIbQuestion.value.isPublic = true;
                   }
 
-                  itemController.rxIbQuestion.value.privacyBounds = list;
+                  itemController.rxIbQuestion.value.sharedFriendUids = list;
                   itemController.rxIbQuestion.refresh();
                 },
                 title: const Text(
@@ -382,7 +384,8 @@ class ReviewQuestionPage extends StatelessWidget {
                 child: Obx(
                   () => IbElevatedButton(
                     disabled: itemController.sharedCircles.isEmpty &&
-                        itemController.rxIbQuestion.value.privacyBounds.isEmpty,
+                        itemController
+                            .rxIbQuestion.value.sharedFriendUids.isEmpty,
                     textTrKey: 'confirm',
                     onPressed: () {
                       Get.back();
@@ -420,12 +423,10 @@ class ReviewQuestionPage extends StatelessWidget {
   String _getPrivacyBondsString() {
     String str = '';
     final bool includeComma = itemController.sharedCircles.isNotEmpty;
-    if (itemController.rxIbQuestion.value.privacyBounds
-        .contains(IbQuestion.kPrivacyBoundPublic)) {
+    if (itemController.rxIbQuestion.value.isPublic) {
       str = includeComma ? 'Public,' : 'Public';
     }
-    if (itemController.rxIbQuestion.value.privacyBounds
-        .contains(IbQuestion.kPrivacyBoundFriends)) {
+    if (!itemController.rxIbQuestion.value.isPublic) {
       str = includeComma ? 'Friends Only,' : 'Friends Only';
     }
     if (itemController.sharedCircles.isNotEmpty) {
@@ -459,7 +460,7 @@ class ReviewQuestionPage extends StatelessWidget {
     }
 
     if (itemController.sharedCircles.isEmpty &&
-        ibQuestion.privacyBounds.isEmpty) {
+        ibQuestion.sharedFriendUids.isEmpty) {
       Get.dialog(const IbDialog(
         title: 'Error',
         subtitle: 'Privacy Bounds are empty',

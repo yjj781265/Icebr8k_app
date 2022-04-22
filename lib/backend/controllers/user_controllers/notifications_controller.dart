@@ -54,8 +54,8 @@ class NotificationController extends GetxController {
         }
       }
 
-      items.sort((a, b) =>
-          b.notification.timestampInMs.compareTo(a.notification.timestampInMs));
+      items.sort((a, b) => (b.notification.timestamp as Timestamp)
+          .compareTo(a.notification.timestamp as Timestamp));
       items.refresh();
       print('finish loading');
       isLoading.value = false;

@@ -16,7 +16,7 @@ class IbComment {
   bool isAnonymous;
   String content;
   String type;
-  int timestampInMs;
+  dynamic timestamp;
 
   static const String kCommentTypeText = 'text';
   static const String kCommentTypePic = 'pic';
@@ -33,7 +33,7 @@ class IbComment {
     this.replyId,
     required this.content,
     required this.type,
-    required this.timestampInMs,
+    this.timestamp,
   });
 
   factory IbComment.fromJson(Map<String, dynamic> json) =>
@@ -45,7 +45,7 @@ class IbComment {
   String toString() {
     return 'IbComment{commentId: $commentId, uid: $uid, isAnonymous: '
         '$isAnonymous, content: $content, type: $type, '
-        'replies: $replies, timestampInMs: $timestampInMs}';
+        'replies: $replies, timestamp: $timestamp}';
   }
 
   @override

@@ -18,14 +18,15 @@ IbQuestion _$IbQuestionFromJson(Map<String, dynamic> json) => IbQuestion(
       isQuiz: json['isQuiz'] as bool? ?? false,
       isAnonymous: json['isAnonymous'] as bool? ?? false,
       isCommentEnabled: json['isCommentEnabled'] as bool? ?? true,
-      privacyBounds: (json['privacyBounds'] as List<dynamic>?)
+      sharedFriendUids: (json['sharedFriendUids'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
-          const ['public'],
+          const [],
       tags:
           (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
               const [],
       description: json['description'] as String? ?? '',
+      isPublic: json['isPublic'] as bool? ?? true,
       points: json['points'] as int? ?? 0,
       likes: json['likes'] as int? ?? 0,
       comments: json['comments'] as int? ?? 0,
@@ -44,9 +45,10 @@ Map<String, dynamic> _$IbQuestionToJson(IbQuestion instance) =>
       'tags': instance.tags,
       'medias': instance.medias.map((e) => e.toJson()).toList(),
       'position': instance.position,
-      'privacyBounds': instance.privacyBounds,
+      'sharedFriendUids': instance.sharedFriendUids,
       'question': instance.question,
       'description': instance.description,
+      'isPublic': instance.isPublic,
       'isAnonymous': instance.isAnonymous,
       'isCommentEnabled': instance.isCommentEnabled,
       'isQuiz': instance.isQuiz,

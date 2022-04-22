@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -260,7 +261,9 @@ class CommentItemWidget extends StatelessWidget {
                                   Text(
                                     IbUtils.getAgoDateTimeString(
                                         DateTime.fromMillisecondsSinceEpoch(
-                                            item.ibComment.timestampInMs)),
+                                            (item.ibComment.timestamp
+                                                    as Timestamp)
+                                                .millisecondsSinceEpoch)),
                                     style: const TextStyle(
                                         fontSize: IbConfig.kDescriptionTextSize,
                                         color: IbColors.lightGrey),
@@ -519,7 +522,8 @@ class CommentItemWidget extends StatelessWidget {
                       Text(
                         IbUtils.getChatTabDateString(
                             DateTime.fromMillisecondsSinceEpoch(
-                                e.ibComment.timestampInMs)),
+                                (e.ibComment.timestamp as Timestamp)
+                                    .millisecondsSinceEpoch)),
                         style: const TextStyle(
                             fontSize: IbConfig.kDescriptionTextSize,
                             color: IbColors.lightGrey),

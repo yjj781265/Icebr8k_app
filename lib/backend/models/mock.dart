@@ -1,4 +1,3 @@
-import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
@@ -10,23 +9,6 @@ class Mock {
 
   static String kImageUrl3 =
       'https://media1.giphy.com/media/RtdRhc7TxBxB0YAsK6/giphy.gif?cid=ecf05e47fmai3bmyisbu246kh73wb5vx746sue2f0cna19ff&rid=giphy.gif&ct=g';
-
-  static List<IbAnswer> kCommonIbAnswers = [
-    IbAnswer(
-        choiceId: 'c3f19af1-d065-4652-8c75-1af745437e63',
-        answeredTimeInMs: 0,
-        askedTimeInMs: 123,
-        questionId: 'f52b0b63-034c-48af-bc9a-bfb6ac535061',
-        questionType: 'mc',
-        uid: 'rHxvU2vekdMpgkDlk1ekOACzmlG3'),
-    IbAnswer(
-        choiceId: 'c3f19af1-d065-4652-8c75-1af745437e63',
-        answeredTimeInMs: 0,
-        askedTimeInMs: 123,
-        questionId: 'f52b0b63-034c-48af-bc9a-bfb6ac535061',
-        questionType: 'mc',
-        uid: 'HNwANcBUTpY6L2L3AZYU6x3OIBG3')
-  ];
 
   static List<String> gifUrls = [
     'https://media.tenor.com/images/0299b55a1c548d4af747a30af607f3a1/tenor.gif',

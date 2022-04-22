@@ -44,7 +44,6 @@ class WordCloudPage extends StatelessWidget {
           final List<String> tags = _controller.userIbTagMap.keys.toList();
           tags.sort((a, b) => (_controller.userIbTagMap[b] ?? 0)
               .compareTo(_controller.userIbTagMap[a] ?? 0));
-          print(tags);
           return Center(
             child: FittedBox(
               child: Padding(

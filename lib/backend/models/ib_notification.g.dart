@@ -15,7 +15,7 @@ IbNotification _$IbNotificationFromJson(Map<String, dynamic> json) =>
       attachmentUrl: json['attachmentUrl'] as String?,
       isRead: json['isRead'] as bool? ?? false,
       type: json['type'] as String,
-      timestampInMs: json['timestampInMs'] as int,
+      timestamp: json['timestamp'],
       senderId: json['senderId'] as String,
       recipientId: json['recipientId'] as String,
     );
@@ -28,7 +28,7 @@ Map<String, dynamic> _$IbNotificationToJson(IbNotification instance) =>
       'avatarUrl': instance.avatarUrl,
       'attachmentUrl': instance.attachmentUrl,
       'type': instance.type,
-      'timestampInMs': instance.timestampInMs,
+      'timestamp': instance.timestamp,
       'isRead': instance.isRead,
       'senderId': instance.senderId,
       'recipientId': instance.recipientId,

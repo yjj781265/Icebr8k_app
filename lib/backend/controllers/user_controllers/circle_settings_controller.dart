@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
@@ -111,7 +112,7 @@ class CircleSettingsController extends GetxController {
                   'Group invite from ${IbUtils.getCurrentIbUser()!.username}',
               subtitle: '',
               type: IbNotification.kGroupInvite,
-              timestampInMs: DateTime.now().millisecondsSinceEpoch,
+              timestamp: FieldValue.serverTimestamp(),
               senderId: IbUtils.getCurrentUid()!,
               recipientId: user.id,
               avatarUrl: IbUtils.getCurrentIbUser()!.avatarUrl);

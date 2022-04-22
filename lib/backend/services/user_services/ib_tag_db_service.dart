@@ -38,19 +38,6 @@ class IbTagDbService {
     return null;
   }
 
-  /// find if there are any tags in the database with the same text, if so return its id, otherwise generate a new one
-  Future<String> retrieveIbTagId(String text) async {
-    final snapshot = await _db
-        .collection(_kTagCollection)
-        .where('text', isEqualTo: text.trim())
-        .get();
-
-    if (snapshot.size == 0) {
-      return IbUtils.getUniqueId();
-    }
-    return snapshot.docs.first.id;
-  }
-
   Future<QuerySnapshot<Map<String, dynamic>>> retrieveTrendingIbTags(
       {DocumentSnapshot? lastDocSnapshot}) async {
     if (lastDocSnapshot != null) {

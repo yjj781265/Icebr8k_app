@@ -381,7 +381,8 @@ class IbQuestionItemController extends GetxController {
     for (final doc in snapshot.docs) {
       firstThreeList.add(IbComment.fromJson(doc.data()));
     }
-    firstThreeList.sort((a, b) => b.timestampInMs.compareTo(a.timestampInMs));
+    firstThreeList.sort((a, b) =>
+        (b.timestamp as Timestamp).compareTo(a.timestamp as Timestamp));
 
     for (final reply in firstThreeList) {
       final IbUser? user;

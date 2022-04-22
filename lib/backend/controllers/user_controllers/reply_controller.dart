@@ -125,7 +125,7 @@ class ReplyController extends GetxController {
         questionId: rxCommentItem.value.ibComment.questionId,
         content: text.trim(),
         type: type,
-        timestampInMs: DateTime.now().millisecondsSinceEpoch,
+        timestamp: FieldValue.serverTimestamp(),
         notifyUid: replyUid.value);
     final user = IbUtils.getCurrentIbUser();
 

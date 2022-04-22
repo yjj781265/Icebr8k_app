@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/circle_info_controller.dart';
@@ -88,8 +89,10 @@ class AlertTab extends StatelessWidget {
                               alignment: Alignment.centerRight,
                               child: Text(
                                   IbUtils.getAgoDateTimeString(
-                                    DateTime.fromMillisecondsSinceEpoch(
-                                        item.notification.timestampInMs),
+                                    DateTime.fromMillisecondsSinceEpoch((item
+                                            .notification
+                                            .timestamp as Timestamp)
+                                        .millisecondsSinceEpoch),
                                   ),
                                   style: const TextStyle(
                                       fontSize: IbConfig.kDescriptionTextSize,
@@ -215,7 +218,8 @@ class AlertTab extends StatelessWidget {
                             child: Text(
                               IbUtils.getAgoDateTimeString(
                                   DateTime.fromMillisecondsSinceEpoch(
-                                      item.notification.timestampInMs)),
+                                      (item.notification.timestamp as Timestamp)
+                                          .millisecondsSinceEpoch)),
                               style: const TextStyle(
                                   fontSize: IbConfig.kDescriptionTextSize,
                                   color: IbColors.lightGrey),

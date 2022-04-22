@@ -52,17 +52,6 @@ class IbQuestionDbService {
     return IbQuestion.fromJson(snapshot.data()!);
   }
 
-  Future<List<IbQuestion>> queryFirst8() async {
-    final snapshot = await _db.collection('First8${DbConfig.dbSuffix}').get();
-
-    final List<IbQuestion> list = [];
-    for (final doc in snapshot.docs) {
-      list.add(IbQuestion.fromJson(doc.data()));
-    }
-
-    return list;
-  }
-
   /// query all question this uid asked, public question (no Anonymous question) by default
   Future<QuerySnapshot<Map<String, dynamic>>> queryAskedQuestions({
     int limit = 8,
@@ -75,7 +64,7 @@ class IbQuestionDbService {
           .orderBy('askedTimeInMs', descending: true)
           .where('isAnonymous', isEqualTo: false)
           .where('creatorId', isEqualTo: uid)
-          .where('privacyBounds', arrayContains: IbQuestion.kPrivacyBoundPublic)
+          .where('isPublic', isEqualTo: true)
           .limit(limit)
           .get();
     }
@@ -84,7 +73,7 @@ class IbQuestionDbService {
           .orderBy('askedTimeInMs', descending: true)
           .where('creatorId', isEqualTo: uid)
           .where('isAnonymous', isEqualTo: false)
-          .where('privacyBounds', arrayContains: IbQuestion.kPrivacyBoundPublic)
+          .where('isPublic', isEqualTo: true)
           .startAfterDocument(lastDoc)
           .limit(limit)
           .get();
@@ -147,42 +136,55 @@ class IbQuestionDbService {
     return query.snapshots();
   }
 
-  /// load questions for question tab
-  Future<List<IbQuestion>> queryIbQuestions(int limit,
-      {int? timestamp, bool isGreaterThan = true}) async {
-    late QuerySnapshot<Map<String, dynamic>> snapshot;
+  /// Icebr8k algorithm for loading trending question
+  /// - loading public questions order by points during last 72 hrs;
+  /// then load the rest order by asc time;
+  Future<QuerySnapshot<Map<String, dynamic>>> queryTrendingQuestions(
+      {int limit = 16}) async {
+    final int minTimestampInMs = DateTime.now().millisecondsSinceEpoch -
+        const Duration(days: 3).inMilliseconds;
 
-    if (timestamp == null) {
-      snapshot = await _collectionRef
+    return _collectionRef
+        .where('isPublic', isEqualTo: true)
+        .where('askedTimeInMs', isGreaterThanOrEqualTo: minTimestampInMs)
+        .orderBy('askedTimeInMs', descending: false)
+        .limit(limit)
+        .get();
+  }
+
+  /// query public ibQuestions in chronological order
+  Future<QuerySnapshot<Map<String, dynamic>>> queryIbQuestions(
+      {int limit = 16, required int askedTimeInMs}) async {
+    return _collectionRef
+        .where('isPublic', isEqualTo: true)
+        .where('askedTimeInMs', isLessThan: askedTimeInMs)
+        .orderBy('askedTimeInMs', descending: true)
+        .limit(limit)
+        .get();
+  }
+
+  /// query public ibQuestions in chronological order
+  Future<QuerySnapshot<Map<String, dynamic>>> queryTagIbQuestions({
+    int limit = 16,
+    DocumentSnapshot<Map<String, dynamic>>? lastDoc,
+    required String text,
+  }) async {
+    if (lastDoc != null) {
+      return _collectionRef
+          .where('isPublic', isEqualTo: true)
+          .where('tags', arrayContains: text)
           .orderBy('askedTimeInMs', descending: true)
-          .limit(limit)
-          .get();
-    } else if (isGreaterThan) {
-      snapshot = await _collectionRef
-          .where('askedTimeInMs', isGreaterThan: timestamp)
-          .orderBy('askedTimeInMs', descending: true)
-          .limit(limit)
-          .get();
-    } else {
-      snapshot = await _collectionRef
-          .where('askedTimeInMs', isLessThan: timestamp)
-          .orderBy('askedTimeInMs', descending: true)
+          .startAfterDocument(lastDoc)
           .limit(limit)
           .get();
     }
 
-    final list = <IbQuestion>[];
-
-    for (final doc in snapshot.docs) {
-      try {
-        list.add(IbQuestion.fromJson(doc.data()));
-      } catch (e) {
-        print(e);
-        continue;
-      }
-    }
-
-    return list;
+    return _collectionRef
+        .where('isPublic', isEqualTo: true)
+        .where('tags', arrayContains: text)
+        .orderBy('askedTimeInMs', descending: true)
+        .limit(limit)
+        .get();
   }
 
   /// query all the ibAnswers from a user, this might be time consuming

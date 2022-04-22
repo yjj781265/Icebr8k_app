@@ -161,7 +161,12 @@ class CreateQuestionTagPicker extends StatelessWidget {
           ),
           ReorderableWrap(
             spacing: 4,
-            onReorder: (oldIndex, newIndex) {},
+            onReorder: (oldIndex, newIndex) {
+              final pickedTag = _controller.createQuestionController.pickedTags
+                  .removeAt(oldIndex);
+              _controller.createQuestionController.pickedTags
+                  .insert(newIndex, pickedTag);
+            },
             buildDraggableFeedback: (context, axis, item) {
               return Material(color: Colors.transparent, child: item);
             },

@@ -6,10 +6,6 @@ part 'ib_question.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class IbQuestion {
-  static const String kPrivacyBoundCircle = 'circle';
-  static const String kPrivacyBoundPublic = 'public';
-  static const String kPrivacyBoundFriends = 'friends';
-
   static const String kMultipleChoice = "mc";
   static const String kScaleOne = "sc_1";
   static const String kScaleTwo = "sc_2";
@@ -19,9 +15,10 @@ class IbQuestion {
   List<String> tags;
   List<IbMedia> medias;
   dynamic position;
-  List<String> privacyBounds;
+  List<String> sharedFriendUids;
   String question;
   String description;
+  bool isPublic;
   bool isAnonymous;
   bool isCommentEnabled;
   bool isQuiz;
@@ -47,9 +44,10 @@ class IbQuestion {
       this.isQuiz = false,
       this.isAnonymous = false,
       this.isCommentEnabled = true,
-      this.privacyBounds = const ['public'],
+      this.sharedFriendUids = const [],
       this.tags = const [],
       this.description = '',
+      this.isPublic = true,
       this.points = 0,
       this.likes = 0,
       this.comments = 0,
@@ -75,7 +73,7 @@ class IbQuestion {
           tags == other.tags &&
           medias == other.medias &&
           position == other.position &&
-          privacyBounds == other.privacyBounds &&
+          sharedFriendUids == other.sharedFriendUids &&
           question == other.question &&
           description == other.description &&
           isAnonymous == other.isAnonymous &&
@@ -97,7 +95,7 @@ class IbQuestion {
       tags.hashCode ^
       medias.hashCode ^
       position.hashCode ^
-      privacyBounds.hashCode ^
+      sharedFriendUids.hashCode ^
       question.hashCode ^
       description.hashCode ^
       isAnonymous.hashCode ^

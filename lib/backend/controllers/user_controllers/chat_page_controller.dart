@@ -821,7 +821,7 @@ class ChatPageController extends GetxController {
             title: 'Group invite from ${IbUtils.getCurrentIbUser()!.username}',
             subtitle: '',
             type: IbNotification.kGroupInvite,
-            timestampInMs: DateTime.now().millisecondsSinceEpoch,
+            timestamp: FieldValue.serverTimestamp(),
             senderId: IbUtils.getCurrentUid()!,
             recipientId: user.id,
             avatarUrl: IbUtils.getCurrentIbUser()!.avatarUrl);

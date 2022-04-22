@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
@@ -126,7 +127,7 @@ class ProfileController extends GetxController {
         avatarUrl: currentUser.avatarUrl,
         subtitle: message,
         type: IbNotification.kFriendRequest,
-        timestampInMs: DateTime.now().millisecondsSinceEpoch,
+        timestamp: FieldValue.serverTimestamp(),
         senderId: currentUser.id,
         recipientId: rxIbUser.value.id);
     try {

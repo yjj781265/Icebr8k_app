@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -188,7 +189,8 @@ class ReplyPage extends StatelessWidget {
                   Text(
                     IbUtils.getChatTabDateString(
                         DateTime.fromMillisecondsSinceEpoch(
-                            item.ibComment.timestampInMs)),
+                            (item.ibComment.timestamp as Timestamp)
+                                .millisecondsSinceEpoch)),
                     style: const TextStyle(
                         fontSize: IbConfig.kDescriptionTextSize,
                         color: IbColors.lightGrey),
@@ -270,17 +272,6 @@ class ReplyPage extends StatelessWidget {
                               ],
                             ),
                         ],
-                      ),
-                      Text(
-                        IbUtils.getAgoDateTimeString(
-                            DateTime.fromMillisecondsSinceEpoch(_controller
-                                .rxCommentItem.value.ibComment.timestampInMs)),
-                        style: const TextStyle(
-                            fontSize: IbConfig.kDescriptionTextSize,
-                            color: IbColors.lightGrey),
-                      ),
-                      const SizedBox(
-                        height: 8,
                       ),
                       Linkify(
                         options: const LinkifyOptions(looseUrl: true),

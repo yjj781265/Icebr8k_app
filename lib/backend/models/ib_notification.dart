@@ -10,7 +10,7 @@ class IbNotification {
   String? avatarUrl;
   String? attachmentUrl;
   String type;
-  int timestampInMs;
+  dynamic timestamp;
   bool isRead;
   String senderId;
   String recipientId;
@@ -28,7 +28,7 @@ class IbNotification {
       this.attachmentUrl,
       this.isRead = false,
       required this.type,
-      required this.timestampInMs,
+      this.timestamp,
       required this.senderId,
       required this.recipientId});
 
@@ -48,7 +48,7 @@ class IbNotification {
           avatarUrl == other.avatarUrl &&
           attachmentUrl == other.attachmentUrl &&
           type == other.type &&
-          timestampInMs == other.timestampInMs &&
+          timestamp == other.timestamp &&
           senderId == other.senderId &&
           recipientId == other.recipientId;
 
@@ -60,7 +60,7 @@ class IbNotification {
       avatarUrl.hashCode ^
       attachmentUrl.hashCode ^
       type.hashCode ^
-      timestampInMs.hashCode ^
+      timestamp.hashCode ^
       senderId.hashCode ^
       recipientId.hashCode;
 
@@ -68,7 +68,7 @@ class IbNotification {
   String toString() {
     return 'IbNotification{id: $id, title: $title, subtitle: $subtitle, '
         'url: $avatarUrl, attachmentUrl: $attachmentUrl, '
-        'type: $type, timestampInMs: $timestampInMs, '
+        'type: $type, timestamp: $timestamp, '
         'senderId: $senderId, recipientId: $recipientId}';
   }
 }

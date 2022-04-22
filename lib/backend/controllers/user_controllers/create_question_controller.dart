@@ -154,8 +154,10 @@ class CreateQuestionController extends GetxController {
         question: questionEditController.text.trim(),
         description: descriptionEditController.text.trim(),
         id: id,
-        privacyBounds:
-            pickedCircles.isEmpty ? [IbQuestion.kPrivacyBoundPublic] : [],
+        sharedFriendUids: pickedCircles.isEmpty
+            ? IbUtils.getCurrentIbUserUnblockedFriendsId()
+            : [],
+        isPublic: pickedCircles.isEmpty,
         tags: pickedTags.map((element) => element.text).toList(),
         creatorId: IbUtils.getCurrentUid()!,
         medias: picMediaList.toSet().union(videoMediaList.toSet()).toList(),

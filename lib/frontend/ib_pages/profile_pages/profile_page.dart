@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/asked_questions_controller.dart';
@@ -630,8 +631,9 @@ class ProfilePage extends StatelessWidget {
                                       child: Text(
                                           IbUtils.getAgoDateTimeString(
                                             DateTime.fromMillisecondsSinceEpoch(
-                                                _controller.frNotification!
-                                                    .timestampInMs),
+                                                (_controller.frNotification!
+                                                        .timestamp as Timestamp)
+                                                    .millisecondsSinceEpoch),
                                           ),
                                           style: const TextStyle(
                                               fontSize:

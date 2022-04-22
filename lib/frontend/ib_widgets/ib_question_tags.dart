@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/tag_page_controller.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/tag_page.dart';
 
 import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
 
 class IbQuestionTags extends StatelessWidget {
   final IbQuestionItemController _itemController;
+  final String highlightText;
 
-  const IbQuestionTags(this._itemController);
+  const IbQuestionTags(this._itemController, {this.highlightText = ''});
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +62,10 @@ class IbQuestionTags extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(element.text,
-                          style: const TextStyle(
+                          style: TextStyle(
+                              fontWeight: element.text == highlightText
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
                               fontSize: IbConfig.kDescriptionTextSize)),
                     ),
                   ),
@@ -69,7 +75,10 @@ class IbQuestionTags extends StatelessWidget {
                     child: InkWell(
                       customBorder: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16)),
-                      onTap: () {},
+                      onTap: () {
+                        Get.to(() =>
+                            TagPage(Get.put(TagPageController(element.text))));
+                      },
                     ),
                   ))
                 ],
