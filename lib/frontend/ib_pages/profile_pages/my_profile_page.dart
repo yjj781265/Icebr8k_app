@@ -13,6 +13,7 @@ import 'package:icebr8k/frontend/ib_pages/edit_profile_pages/edit_emo_pics_page.
 import 'package:icebr8k/frontend/ib_pages/edit_profile_pages/edit_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/answered_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/asked_page.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_pages/followed_tags_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/friend_list.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/word_cloud_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
@@ -341,7 +342,52 @@ class MyProfilePage extends StatelessWidget {
                               ),
                             ),
                           ),
-                        )
+                        ),
+                        InkWell(
+                          customBorder: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(8),
+                            ),
+                          ),
+                          onTap: () {
+                            Get.to(() => FollowedTagsPage(
+                                _controller.rxIbUser.value.tags,
+                                _controller.rxIbUser.value.username));
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(8)),
+                                color: Theme.of(context).backgroundColor,
+                              ),
+                              width: 88,
+                              height: 88 / 1.618,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Obx(() => Text(
+                                        IbUtils.getStatsString(_controller
+                                            .rxIbUser.value.tags.length),
+                                        style: const TextStyle(
+                                            overflow: TextOverflow.ellipsis,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: IbConfig.kPageTitleSize),
+                                      )),
+                                  const Text(
+                                    '🏷️ TAGS',
+                                    style: TextStyle(
+                                        overflow: TextOverflow.ellipsis,
+                                        fontSize: IbConfig.kDescriptionTextSize,
+                                        color: IbColors.lightGrey),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),

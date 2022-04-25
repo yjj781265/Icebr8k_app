@@ -859,6 +859,7 @@ class ChatPage extends StatelessWidget {
         runAlignment: WrapAlignment.center,
         children: list
             .map((e) => IbUserAvatar(
+                  uid: e.id,
                   avatarUrl: e.avatarUrl,
                   radius: radius,
                 ))

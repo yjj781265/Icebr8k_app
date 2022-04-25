@@ -5,6 +5,7 @@ import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_tag_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../models/ib_question.dart';
@@ -16,6 +17,7 @@ class TagPageController extends GetxController {
   final creatorUsername = ''.obs;
   final total = 0.obs;
   final ibQuestions = <IbQuestion>[].obs;
+  final isFollower = false.obs;
   final url = ''.obs;
   DocumentSnapshot<Map<String, dynamic>>? lastDoc;
   RefreshController refreshController = RefreshController();
@@ -27,6 +29,7 @@ class TagPageController extends GetxController {
     if (tag != null) {
       ibTag.value = tag;
       total.value = ibTag.value.questionCount ?? 0;
+      isFollower.value = IbUtils.getCurrentIbUser()!.tags.contains(text);
 
       user = await IbUserDbService().queryIbUser(ibTag.value.creatorId);
       if (user != null) {
@@ -67,6 +70,16 @@ class TagPageController extends GetxController {
     if (snapshot.docs.isEmpty) {
       lastDoc = null;
       refreshController.loadNoData();
+    }
+  }
+
+  Future<void> updateTag() async {
+    if (isFollower.isFalse) {
+      await IbUserDbService().followTag(tag: text);
+      isFollower.value = true;
+    } else {
+      await IbUserDbService().unfollowTag(tag: text);
+      isFollower.value = false;
     }
   }
 }

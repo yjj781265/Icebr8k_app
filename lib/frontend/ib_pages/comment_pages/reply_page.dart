@@ -4,351 +4,288 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/models/ib_choice.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/reply_controller.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
-import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../backend/controllers/user_controllers/comment_controller.dart';
-import '../../../backend/controllers/user_controllers/reply_controller.dart';
-import '../../ib_colors.dart';
-import '../../ib_config.dart';
+import '../../../backend/models/ib_choice.dart';
+import '../../../backend/models/ib_question.dart';
 
 class ReplyPage extends StatelessWidget {
   final ReplyController _controller;
 
-  const ReplyPage(this._controller);
+  const ReplyPage(this._controller, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: const Text('Replies'),
-      ),
-      body: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Expanded(child: _handleReplyCommentUI(context)),
-            SafeArea(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 3),
-                margin: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: const BorderRadius.all(
-                      Radius.circular(IbConfig.kTextBoxCornerRadius)),
-                  border: Border.all(
-                    color: IbColors.primaryColor,
-                  ),
-                ),
-                child: Obx(
-                  () => SafeArea(
-                    child: TextField(
-                      minLines: 1,
-                      maxLines: 5,
-                      maxLength: IbConfig.kCommentMaxLen,
-                      focusNode: _controller.focusNode,
-                      controller: _controller.editingController,
-                      textInputAction: TextInputAction.newline,
-                      style:
-                          const TextStyle(fontSize: IbConfig.kNormalTextSize),
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                        counterText: '',
-                        hintStyle: const TextStyle(
-                            color: IbColors.lightGrey,
-                            fontSize: IbConfig.kNormalTextSize),
-                        hintText: _controller.hintText.value,
-                        border: InputBorder.none,
-                        suffixIcon: _controller.isAddingReply.isTrue
-                            ? const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                    height: 16,
-                                    width: 16,
-                                    child: CircularProgressIndicator()),
-                              )
-                            : IconButton(
-                                icon: Icon(
-                                  _controller.replyUid.value !=
-                                          _controller
-                                              .rxCommentItem.value.ibComment.uid
-                                      ? FontAwesomeIcons.reply
-                                      : FontAwesomeIcons.comment,
-                                  color: IbColors.primaryColor,
-                                ),
-                                onPressed: () async {
-                                  _controller.addReply(
-                                      text: _controller.editingController.text
-                                          .trim(),
-                                      type: IbComment.kCommentTypeText);
-                                },
-                              ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            )
-          ],
+        title: Obx(
+          () => Text(
+            'Replies${_controller.count.value == 0 ? '' : '(${_controller.count.value})'}',
+            style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+          ),
         ),
       ),
-    );
-  }
-
-  Widget _handleReplyCommentUI(BuildContext context) {
-    return Obx(() {
-      return SmartRefresher(
-        controller: _controller.refreshController,
-        enablePullDown: false,
-        enablePullUp: true,
-        footer: ClassicFooter(
-          noDataText: 'no_more_replies'.tr,
-        ),
-        onLoading: () async {
-          await _controller.loadMore();
-        },
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _handleFirstIndexUI(context),
-              if (_controller.isLoading.value)
-                const Center(
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Expanded(
+            child: Obx(() {
+              if (_controller.isLoading.isTrue) {
+                return const Center(
                   child: IbProgressIndicator(),
-                )
-              else
-                Column(
-                  children: _controller.replies
-                      .map((element) => _handleReplyItemUI(element, context))
-                      .toList(),
-                ),
-            ],
-          ),
-        ),
-      );
-    });
-  }
+                );
+              }
 
-  Widget _handleReplyItemUI(CommentItem item, BuildContext context) {
-    return InkWell(
-      onTap: () {
-        _controller.focusNode.requestFocus();
-        _controller.replyUid.value = item.ibComment.uid;
-        _controller.hintText.value = 'Reply to ${item.user.username}';
-      },
-      child: Ink(
-        color: Theme.of(context).backgroundColor,
-        padding: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 10),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            IbUserAvatar(
-              avatarUrl: item.user.avatarUrl,
-              radius: 16,
-              uid: item.user.id,
-            ),
-            const SizedBox(
-              width: 16,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${item.user.username} '
-                        '${item.user.id == _controller.commentController.creatorId.value ? ' 👑' : ''}',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: IbConfig.kNormalTextSize),
-                      ),
-                      if (item.ibAnswer != null)
-                        Wrap(
-                          children: [
-                            const Text(
-                              'Vote: ',
-                              style: TextStyle(
-                                  color: IbColors.lightGrey,
-                                  fontSize: IbConfig.kDescriptionTextSize),
-                            ),
-                            _handleIbAnswerUI(item),
-                          ],
-                        ),
-                    ],
-                  ),
-                  Text(
-                    IbUtils.getChatTabDateString(
-                        DateTime.fromMillisecondsSinceEpoch(
-                            (item.ibComment.timestamp as Timestamp)
-                                .millisecondsSinceEpoch)),
-                    style: const TextStyle(
-                        fontSize: IbConfig.kDescriptionTextSize,
-                        color: IbColors.lightGrey),
-                  ),
-                  Linkify(
-                    options: const LinkifyOptions(looseUrl: true),
-                    onOpen: (link) async {
-                      if (await canLaunch(link.url)) {
-                        await launch(link.url);
-                      }
-                    },
-                    text: item.ibComment.content,
-                    style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _handleFirstIndexUI(BuildContext context) {
-    return Hero(
-      tag: _controller.rxCommentItem.value.ibComment.commentId,
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-          ),
-          padding: const EdgeInsets.all(8.0),
-          margin: const EdgeInsets.only(bottom: 4),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              IbUserAvatar(
-                avatarUrl: _controller.rxCommentItem.value.user.avatarUrl,
-                radius: 16,
-                uid: _controller.rxCommentItem.value.ibComment.uid,
-              ),
-              const SizedBox(
-                width: 16,
-              ),
-              Expanded(
-                /// added singChildScrollView to  prevent overflow at hero animation
-                child: SingleChildScrollView(
+              if (_controller.isLoading.isFalse &&
+                  _controller.replyItems.isEmpty) {
+                return Center(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '${_controller.rxCommentItem.value.user.username} '
-                            '${_controller.rxCommentItem.value.user.id == _controller.commentController.creatorId.value ? ' 👑' : ''}',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: IbConfig.kNormalTextSize),
-                          ),
-                          if (_controller.rxCommentItem.value.ibAnswer !=
-                                  null &&
-                              _controller
-                                  .rxCommentItem.value.ibAnswer!.isPublic)
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Text(
-                                  'Vote: ',
-                                  style: TextStyle(
-                                      color: IbColors.lightGrey,
-                                      fontSize: IbConfig.kDescriptionTextSize),
-                                ),
-                                _handleIbAnswerUI(
-                                    _controller.rxCommentItem.value),
-                              ],
-                            ),
-                        ],
-                      ),
-                      Linkify(
-                        options: const LinkifyOptions(looseUrl: true),
-                        onOpen: (link) async {
-                          if (await canLaunch(link.url)) {
-                            await launch(link.url);
-                          }
-                        },
-                        text: _controller.rxCommentItem.value.ibComment.content,
-                        style:
-                            const TextStyle(fontSize: IbConfig.kNormalTextSize),
-                      ),
-                      Obx(
-                        () => Row(
-                          children: [
-                            TextButton.icon(
-                              onPressed: () {
-                                _controller.focusNode.requestFocus();
-                                _controller.replyUid.value = _controller
-                                    .rxCommentItem.value.ibComment.uid;
-                                _controller.hintText.value =
-                                    'Add a creative reply here';
-                              },
-                              icon: const Icon(
-                                FontAwesomeIcons.reply,
-                                size: 16,
-                              ),
-                              label: Text(
-                                IbUtils.statsShortString(
-                                    _controller.replyCount.value),
-                                style: const TextStyle(
-                                    fontSize: IbConfig.kSecondaryTextSize),
-                              ),
-                            ),
-                            TextButton.icon(
-                              onPressed: () async {
-                                if (_controller.isLiked.isTrue) {
-                                  await _controller.commentController
-                                      .dislikeComment(
-                                          _controller.rxCommentItem.value);
-                                  _controller.likes.value--;
-                                  _controller.isLiked.value = false;
-                                } else {
-                                  await _controller.commentController
-                                      .likeComment(
-                                          _controller.rxCommentItem.value);
-                                  _controller.likes.value++;
-                                  _controller.isLiked.value = true;
-                                }
-                              },
-                              icon: Icon(
-                                FontAwesomeIcons.thumbsUp,
-                                color: _controller.isLiked.isTrue
-                                    ? IbColors.errorRed
-                                    : IbColors.lightGrey,
-                                size: 16,
-                              ),
-                              label: Text(
-                                  IbUtils.statsShortString(
-                                      _controller.likes.value),
-                                  style: const TextStyle(
-                                      fontSize: IbConfig.kSecondaryTextSize)),
-                            ),
-                          ],
+                      SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: Lottie.asset('assets/images/monkey_zen.json')),
+                      const Text(
+                        '😞 No replies to see here',
+                        style: TextStyle(
+                          color: IbColors.lightGrey,
+                          fontSize: IbConfig.kPageTitleSize,
                         ),
-                      ),
-                      const Divider(
-                        height: 1,
-                        thickness: 1,
                       ),
                     ],
                   ),
+                );
+              }
+
+              return SmartRefresher(
+                controller: _controller.refreshController,
+                footer: ClassicFooter(
+                  noDataText: 'no_more_replies'.tr,
+                ),
+                enablePullUp: true,
+                enablePullDown: false,
+                onLoading: () async {
+                  await _controller.loadMore();
+                },
+                child: ListView.builder(
+                  itemBuilder: (context, index) {
+                    final item = _controller.replyItems[index];
+                    return Ink(
+                      color: index == 0
+                          ? Theme.of(context).backgroundColor
+                          : Theme.of(context).primaryColor,
+                      child: InkWell(
+                        onTap: () async => _onReplyTap(item),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        IbUserAvatar(
+                                          avatarUrl: item.user.avatarUrl,
+                                          radius: 16,
+                                          uid: item.ibComment.uid,
+                                        ),
+                                        if (item.user.id ==
+                                                _controller.creatorId.value &&
+                                            _controller
+                                                .isQuestionAnonymous.isFalse)
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 4.0),
+                                            child: Container(
+                                              padding: const EdgeInsets.all(2),
+                                              decoration: const BoxDecoration(
+                                                  color: IbColors.primaryColor,
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(4))),
+                                              child: const Text(
+                                                'Creator',
+                                                style: TextStyle(fontSize: 8),
+                                              ),
+                                            ),
+                                          )
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      width: 16,
+                                    ),
+                                    Expanded(
+                                      child: SingleChildScrollView(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  item.user.username,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: IbConfig
+                                                          .kNormalTextSize),
+                                                ),
+                                              ],
+                                            ),
+                                            Text(
+                                              item.ibComment.timestamp == null
+                                                  ? 'Posting...'
+                                                  : IbUtils
+                                                      .getAgoDateTimeString(
+                                                          (item.ibComment
+                                                                      .timestamp
+                                                                  as Timestamp)
+                                                              .toDate()),
+                                              style: const TextStyle(
+                                                  fontSize: IbConfig
+                                                      .kDescriptionTextSize,
+                                                  color: IbColors.lightGrey),
+                                            ),
+                                            const SizedBox(
+                                              height: 8,
+                                            ),
+                                            Linkify(
+                                              onOpen: (link) async {
+                                                if (await canLaunch(link.url)) {
+                                                  await launch(link.url);
+                                                }
+                                              },
+                                              options: const LinkifyOptions(
+                                                  looseUrl: true),
+                                              text: item.ibComment.content,
+                                              style: const TextStyle(
+                                                  fontSize:
+                                                      IbConfig.kNormalTextSize),
+                                            ),
+                                            TextButton(
+                                                onPressed: () async {
+                                                  await _onReplyTap(item);
+                                                },
+                                                child: const Text(
+                                                  'Reply',
+                                                  style: TextStyle(
+                                                      color:
+                                                          IbColors.accentColor),
+                                                ))
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    if (item.ibAnswer != null &&
+                                        item.ibAnswer!.isPublic)
+                                      Wrap(
+                                        children: [
+                                          const Text(
+                                            'Vote: ',
+                                            style: TextStyle(
+                                                color: IbColors.lightGrey,
+                                                fontSize: IbConfig
+                                                    .kDescriptionTextSize),
+                                          ),
+                                          _handleIbAnswerUI(item),
+                                        ],
+                                      ),
+                                  ]),
+                            ),
+                            if (index == 0)
+                              const SizedBox()
+                            else
+                              const Divider(
+                                height: 1,
+                                thickness: 1,
+                              )
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  itemCount: _controller.replyItems.length,
+                ),
+              );
+            }),
+          ),
+          SafeArea(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
+              margin: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: const BorderRadius.all(
+                    Radius.circular(IbConfig.kTextBoxCornerRadius)),
+                border: Border.all(
+                  color: IbColors.primaryColor,
                 ),
               ),
-            ],
-          ),
-        ),
+              child: Obx(
+                () => TextField(
+                  minLines: 1,
+                  maxLines: 5,
+                  focusNode: _controller.node,
+                  maxLength: IbConfig.kCommentMaxLen,
+                  controller: _controller.editingController,
+                  textInputAction: TextInputAction.newline,
+                  style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                  keyboardType: TextInputType.multiline,
+                  decoration: InputDecoration(
+                    counterText: '',
+                    hintStyle: const TextStyle(
+                        color: IbColors.lightGrey,
+                        fontSize: IbConfig.kNormalTextSize),
+                    hintText: 'Add a reply here',
+                    border: InputBorder.none,
+                    suffixIcon: _controller.isAddingReply.isTrue
+                        ? const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: SizedBox(
+                                height: 16,
+                                width: 16,
+                                child: CircularProgressIndicator()),
+                          )
+                        : IconButton(
+                            icon: const Icon(
+                              FontAwesomeIcons.reply,
+                              color: IbColors.primaryColor,
+                            ),
+                            onPressed: () async {
+                              await _controller.addReply(
+                                  text:
+                                      _controller.editingController.text.trim(),
+                                  type: IbComment.kCommentTypeText);
+                            },
+                          ),
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -357,104 +294,122 @@ class ReplyPage extends StatelessWidget {
     if (item.ibAnswer == null) {
       return const SizedBox();
     }
+    final controller = Get.find<CommentController>();
 
-    final IbChoice ibChoice = _controller.commentController.choices
+    final IbChoice ibChoice = Get.find<CommentController>()
+        .itemController
+        .rxIbQuestion
+        .value
+        .choices
         .firstWhere((element) => element.choiceId == item.ibAnswer!.choiceId);
 
-    if (_controller.commentController.questionType.value ==
-        IbQuestion.kScaleOne) {
-      return RatingBar.builder(
-        initialRating: double.parse(ibChoice.content ?? '0'),
-        ignoreGestures: true,
-        itemSize: 20,
-        itemBuilder: (context, _) => const Icon(
-          Icons.star,
-          color: Colors.amber,
-        ),
-        onRatingUpdate: (rating) {},
-      );
-    }
+    return Obx(() {
+      if (controller.itemController.rxIbQuestion.value.questionType ==
+              IbQuestion.kMultipleChoice ||
+          controller.itemController.rxIbQuestion.value.questionType ==
+              IbQuestion.kMultipleChoicePic) {
+        return Text(
+          ibChoice.content ?? '',
+          style: const TextStyle(
+            fontSize: IbConfig.kDescriptionTextSize,
+            fontWeight: FontWeight.bold,
+          ),
+        );
+      }
 
-    if (_controller.commentController.questionType.value ==
-        IbQuestion.kScaleTwo) {
-      return RatingBar.builder(
-        initialRating: double.parse(ibChoice.content ?? '0'),
-        ignoreGestures: true,
-        itemSize: 20,
-        itemBuilder: (context, _) => const Icon(
-          Icons.favorite,
-          color: Colors.red,
-        ),
-        onRatingUpdate: (rating) {},
-      );
-    }
+      if (controller.itemController.rxIbQuestion.value.questionType ==
+          IbQuestion.kScaleOne) {
+        return RatingBar.builder(
+          initialRating: double.parse(ibChoice.content ?? '0'),
+          ignoreGestures: true,
+          itemSize: 16,
+          itemBuilder: (context, _) => const Icon(
+            Icons.star,
+            color: Colors.amber,
+          ),
+          onRatingUpdate: (rating) {},
+        );
+      }
 
-    if (_controller.commentController.questionType.value ==
-        IbQuestion.kScaleThree) {
-      return RatingBar.builder(
-        initialRating: double.parse(ibChoice.content ?? '0'),
-        ignoreGestures: true,
-        itemSize: 20,
-        itemBuilder: (context, index) {
-          switch (index) {
-            case 0:
-              return const Icon(
-                Icons.sentiment_very_dissatisfied,
-                color: Colors.red,
-              );
-            case 1:
-              return const Icon(
-                Icons.sentiment_dissatisfied,
-                color: Colors.redAccent,
-              );
-            case 2:
-              return const Icon(
-                Icons.sentiment_neutral,
-                color: Colors.amber,
-              );
-            case 3:
-              return const Icon(
-                Icons.sentiment_satisfied,
-                color: Colors.lightGreen,
-              );
-            case 4:
-              return const Icon(
-                Icons.sentiment_very_satisfied,
-                color: Colors.green,
-              );
-            default:
-              return const SizedBox();
-          }
-        },
-        onRatingUpdate: (rating) {},
-      );
-    }
+      if (controller.itemController.rxIbQuestion.value.questionType ==
+          IbQuestion.kScaleTwo) {
+        return RatingBar.builder(
+          initialRating: double.parse(ibChoice.content ?? '0'),
+          ignoreGestures: true,
+          itemSize: 16,
+          itemBuilder: (context, _) => const Icon(
+            Icons.favorite,
+            color: Colors.red,
+          ),
+          onRatingUpdate: (rating) {},
+        );
+      }
 
-    if (_controller.commentController.questionType.value ==
-            IbQuestion.kMultipleChoice ||
-        _controller.commentController.questionType.value ==
-            IbQuestion.kMultipleChoicePic) {
-      return Text(
-        _controller.commentController.choices
-            .firstWhere(
-                (element) => element.choiceId == item.ibAnswer!.choiceId)
-            .content!,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      );
-    }
+      if (controller.itemController.rxIbQuestion.value.questionType ==
+          IbQuestion.kScaleThree) {
+        return RatingBar.builder(
+          initialRating: double.parse(ibChoice.content ?? '0'),
+          ignoreGestures: true,
+          itemSize: 16,
+          itemBuilder: (context, index) {
+            switch (index) {
+              case 0:
+                return const Icon(
+                  Icons.sentiment_very_dissatisfied,
+                  color: Colors.red,
+                );
+              case 1:
+                return const Icon(
+                  Icons.sentiment_dissatisfied,
+                  color: Colors.redAccent,
+                );
+              case 2:
+                return const Icon(
+                  Icons.sentiment_neutral,
+                  color: Colors.amber,
+                );
+              case 3:
+                return const Icon(
+                  Icons.sentiment_satisfied,
+                  color: Colors.lightGreen,
+                );
+              case 4:
+                return const Icon(
+                  Icons.sentiment_very_satisfied,
+                  color: Colors.green,
+                );
+              default:
+                return const SizedBox();
+            }
+          },
+          onRatingUpdate: (rating) {},
+        );
+      }
 
-    if (_controller.commentController.choices
-            .firstWhere(
-                (element) => element.choiceId == item.ibAnswer!.choiceId)
-            .content !=
-        null) {
-      return Text(_controller.commentController.choices
-          .firstWhere((element) => element.choiceId == item.ibAnswer!.choiceId)
-          .content!);
-    }
+      if (ibChoice.content != null) {
+        return Text(
+          controller.itemController.rxIbQuestion.value.choices
+              .firstWhere(
+                  (element) => element.choiceId == item.ibAnswer!.choiceId)
+              .content!,
+          style: const TextStyle(
+              fontSize: IbConfig.kDescriptionTextSize,
+              fontWeight: FontWeight.bold),
+        );
+      }
 
-    return const SizedBox();
+      return const SizedBox();
+    });
+  }
+
+  Future<void> _onReplyTap(CommentItem item) async {
+    _controller.editingController.clear();
+    final text = '@${_controller.editingController.text}${item.user.username} ';
+    _controller.editingController.value = TextEditingValue(
+        text: text,
+        selection:
+            TextSelection(baseOffset: text.length, extentOffset: text.length));
+    _controller.node.requestFocus();
+    _controller.notifyUid = item.user.id;
   }
 }

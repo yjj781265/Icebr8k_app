@@ -93,11 +93,7 @@ class IbUtils {
 
   static String getAgoDateTimeString(DateTime _dateTime) {
     final Duration diffDt = DateTime.now().difference(_dateTime);
-    if (diffDt.inSeconds < 0) {
-      return '';
-    }
-
-    if (diffDt.inSeconds == 0) {
+    if (diffDt.inSeconds <= 0) {
       return 'now';
     }
 
@@ -260,7 +256,8 @@ class IbUtils {
     if (!Get.isRegistered<ChatTabController>()) {
       return [];
     }
-    final circleItems = List<ChatTabItem>.from(Get.find<ChatTabController>().circles);
+    final circleItems =
+        List<ChatTabItem>.from(Get.find<ChatTabController>().circles);
     return circleItems;
   }
 

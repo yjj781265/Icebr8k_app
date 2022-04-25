@@ -14,7 +14,7 @@ class IbUser {
   String gender;
   String status;
   int banedEndTimeInMs;
-  int? loginTimeInMs;
+  dynamic loginTimestamp;
 
   /// covert to FireStore Timestamp
   dynamic joinTime;
@@ -30,6 +30,7 @@ class IbUser {
   String bio;
   String voiceMemoUrl;
   List<String> roles;
+  List<String> tags;
   List<IbEmoPic> emoPics;
 
   static String kAdminRole = 'admin';
@@ -46,7 +47,7 @@ class IbUser {
   IbUser({
     this.avatarUrl = '',
     this.coverPhotoUrl = '',
-    this.loginTimeInMs = -1,
+    this.loginTimestamp = -1,
     this.profilePrivacy = 'public',
     this.birthdateInMs = -1,
     this.banedEndTimeInMs = -1,
@@ -57,6 +58,7 @@ class IbUser {
     this.gender = '',
     this.status = '',
     this.voiceMemoUrl = '',
+    this.tags = const [],
     this.emoPics = const [],
     this.roles = const ['user'],
     this.bio = '',
@@ -74,7 +76,7 @@ class IbUser {
 
   @override
   String toString() {
-    return 'IbUser{id: $id, fName: $fName, lName: $lName, email: $email, username: $username, avatarUrl: $avatarUrl, gender: $gender, status: $status, banedEndTimeInMs: $banedEndTimeInMs, loginTimeInMs: $loginTimeInMs, joinTime: $joinTime, birthdateInMs: $birthdateInMs, answeredCount: $answeredCount, askedCount: $askedCount, friendUids: $friendUids, blockedFriendUids: $blockedFriendUids, notificationCount: $notificationCount, profilePrivacy: $profilePrivacy, isOnline: $isOnline, coverPhotoUrl: $coverPhotoUrl, bio: $bio, voiceMemoUrl: $voiceMemoUrl, roles: $roles, emoPics: $emoPics}';
+    return 'IbUser{id: $id, fName: $fName, lName: $lName, email: $email, username: $username, avatarUrl: $avatarUrl, gender: $gender, status: $status, banedEndTimeInMs: $banedEndTimeInMs, loginTimeInMs: $loginTimestamp, joinTime: $joinTime, birthdateInMs: $birthdateInMs, answeredCount: $answeredCount, askedCount: $askedCount, friendUids: $friendUids, blockedFriendUids: $blockedFriendUids, notificationCount: $notificationCount, profilePrivacy: $profilePrivacy, isOnline: $isOnline, coverPhotoUrl: $coverPhotoUrl, bio: $bio, voiceMemoUrl: $voiceMemoUrl, roles: $roles, emoPics: $emoPics}';
   }
 
   @override
@@ -91,7 +93,7 @@ class IbUser {
           gender == other.gender &&
           status == other.status &&
           banedEndTimeInMs == other.banedEndTimeInMs &&
-          loginTimeInMs == other.loginTimeInMs &&
+          loginTimestamp == other.loginTimestamp &&
           joinTime == other.joinTime &&
           birthdateInMs == other.birthdateInMs &&
           answeredCount == other.answeredCount &&
@@ -105,8 +107,8 @@ class IbUser {
           bio == other.bio &&
           voiceMemoUrl == other.voiceMemoUrl &&
           roles == other.roles &&
+          tags == other.tags &&
           emoPics == other.emoPics;
-
   @override
   int get hashCode =>
       id.hashCode ^
@@ -118,7 +120,7 @@ class IbUser {
       gender.hashCode ^
       status.hashCode ^
       banedEndTimeInMs.hashCode ^
-      loginTimeInMs.hashCode ^
+      loginTimestamp.hashCode ^
       joinTime.hashCode ^
       birthdateInMs.hashCode ^
       answeredCount.hashCode ^
@@ -132,5 +134,6 @@ class IbUser {
       bio.hashCode ^
       voiceMemoUrl.hashCode ^
       roles.hashCode ^
+      tags.hashCode ^
       emoPics.hashCode;
 }

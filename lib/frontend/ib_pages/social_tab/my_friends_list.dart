@@ -4,7 +4,9 @@ import 'package:icebr8k/backend/controllers/user_controllers/friend_item_control
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_pages/my_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
@@ -74,6 +76,12 @@ class FriendListItem extends StatelessWidget {
           }
         },
         onTap: () {
+          if (_controller.user.id == IbUtils.getCurrentUid()) {
+            Get.to(
+              () => MyProfilePage(),
+            );
+            return;
+          }
           Get.to(
             () => ProfilePage(
               Get.put(ProfileController(_controller.user.id),

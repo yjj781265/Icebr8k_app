@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
@@ -17,8 +18,7 @@ class IbQuestionDbService {
   static const _kCommentCollectionGroup = 'Comments${DbConfig.dbSuffix}';
   static const _kCommentLikesCollectionGroup =
       'Comments-Likes${DbConfig.dbSuffix}';
-  static const _kCommentRepliesCollectionGroup =
-      'Comments-Replies${DbConfig.dbSuffix}';
+
   late CollectionReference<Map<String, dynamic>> _collectionRef;
 
   factory IbQuestionDbService() => _ibQuestionDbService;
@@ -134,6 +134,39 @@ class IbQuestionDbService {
     }
 
     return query.snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> listenToComments(
+      String questionId,
+      {DocumentSnapshot? lastDoc}) {
+    late Query<Map<String, dynamic>> query;
+    if (lastDoc == null) {
+      query = _collectionRef
+          .doc(questionId)
+          .collection(_kCommentCollectionGroup)
+          .orderBy('timestamp', descending: true)
+          .limit(8);
+    } else {
+      query = _collectionRef
+          .doc(questionId)
+          .collection(_kCommentCollectionGroup)
+          .orderBy('timestamp', descending: true)
+          .startAfterDocument(lastDoc)
+          .limit(8);
+    }
+
+    return query.snapshots();
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> queryTopThreeComments(
+      String questionId) async {
+    return _collectionRef
+        .doc(questionId)
+        .collection(_kCommentCollectionGroup)
+        .where('likes', isGreaterThanOrEqualTo: 1)
+        .orderBy('likes', descending: true)
+        .limit(3)
+        .get();
   }
 
   /// Icebr8k algorithm for loading trending question
@@ -253,6 +286,9 @@ class IbQuestionDbService {
         .collection(_kAnswerCollectionGroup)
         .doc(ibAnswer.uid)
         .set(ibAnswer.toJson(), SetOptions(merge: true));
+
+    IbCacheManager()
+        .cacheSingleIbAnswer(uid: IbUtils.getCurrentUid()!, ibAnswer: ibAnswer);
   }
 
   Future<int> querySpecificAnswerPollSize(
@@ -349,14 +385,25 @@ class IbQuestionDbService {
         .delete();
   }
 
-  /// comments sub collections query and listeners
-
   Future<void> addComment(IbComment comment) async {
     await _collectionRef
         .doc(comment.questionId)
         .collection(_kCommentCollectionGroup)
         .doc(comment.commentId)
         .set(comment.toJson(), SetOptions(merge: true));
+  }
+
+  Future<void> addReply(IbComment comment) async {
+    if (comment.parentId == null || comment.parentId!.isEmpty) {
+      return;
+    }
+    await _collectionRef
+        .doc(comment.questionId)
+        .collection(_kCommentCollectionGroup)
+        .doc(comment.parentId)
+        .update({
+      'replies': FieldValue.arrayUnion([comment.toJson()])
+    });
   }
 
   Future<void> likeComment(IbComment comment) async {
@@ -411,7 +458,7 @@ class IbQuestionDbService {
       final snapshot = await _collectionRef
           .doc(questionId)
           .collection(_kCommentCollectionGroup)
-          .orderBy('timestampInMs', descending: true)
+          .orderBy('timestamp', descending: true)
           .startAfterDocument(lastSnap)
           .limit(8)
           .get();
@@ -421,63 +468,9 @@ class IbQuestionDbService {
     final snapshot = await _collectionRef
         .doc(questionId)
         .collection(_kCommentCollectionGroup)
-        .orderBy('timestampInMs', descending: true)
+        .orderBy('timestamp', descending: true)
         .limit(8)
         .get();
-    return snapshot;
-  }
-
-  Future<QuerySnapshot<Map<String, dynamic>>> queryTopComments(
-      String questionId,
-      {DocumentSnapshot<Map<String, dynamic>>? lastSnap}) async {
-    if (lastSnap != null) {
-      final snapshot = await _collectionRef
-          .doc(questionId)
-          .collection(_kCommentCollectionGroup)
-          .orderBy('likes', descending: true)
-          .startAfterDocument(lastSnap)
-          .limit(8)
-          .get();
-      return snapshot;
-    }
-
-    final snapshot = await _collectionRef
-        .doc(questionId)
-        .collection(_kCommentCollectionGroup)
-        .orderBy('likes', descending: true)
-        .limit(8)
-        .get();
-    return snapshot;
-  }
-
-  /// return replies of a comment in reversed chronological order
-  Future<QuerySnapshot<Map<String, dynamic>>> queryReplies(
-      {required String questionId,
-      required String commentId,
-      int limit = 8,
-      DocumentSnapshot<Map<String, dynamic>>? lastSnap}) async {
-    if (lastSnap != null) {
-      final snapshot = await _collectionRef
-          .doc(questionId)
-          .collection(_kCommentCollectionGroup)
-          .doc(commentId)
-          .collection(_kCommentRepliesCollectionGroup)
-          .orderBy('timestampInMs', descending: true)
-          .startAfterDocument(lastSnap)
-          .limit(limit)
-          .get();
-      return snapshot;
-    }
-
-    final snapshot = await _collectionRef
-        .doc(questionId)
-        .collection(_kCommentCollectionGroup)
-        .doc(commentId)
-        .collection(_kCommentRepliesCollectionGroup)
-        .orderBy('timestampInMs', descending: true)
-        .limit(limit)
-        .get();
-
     return snapshot;
   }
 
@@ -489,32 +482,6 @@ class IbQuestionDbService {
         .get();
 
     return snapshot.size >= 1;
-  }
-
-  Future<void> addReply(
-      {required String questionId,
-      required String commentId,
-      required IbComment reply}) async {
-    await _collectionRef
-        .doc(questionId)
-        .collection(_kCommentCollectionGroup)
-        .doc(commentId)
-        .collection(_kCommentRepliesCollectionGroup)
-        .doc(reply.replyId)
-        .set(reply.toJson(), SetOptions(merge: true));
-  }
-
-  Future<void> removeReply(
-      {required String questionId,
-      required String commentId,
-      required IbComment reply}) async {
-    await _collectionRef
-        .doc(questionId)
-        .collection(_kCommentCollectionGroup)
-        .doc(commentId)
-        .collection(_kCommentRepliesCollectionGroup)
-        .doc(reply.commentId)
-        .delete();
   }
 
   Future<void> copyCollection(String collection1, String collection2) async {

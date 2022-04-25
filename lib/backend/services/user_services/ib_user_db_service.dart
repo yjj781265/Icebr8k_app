@@ -57,6 +57,18 @@ class IbUserDbService {
         SetOptions(merge: true));
   }
 
+  Future<void> followTag({required String tag}) {
+    return _collectionRef.doc(IbUtils.getCurrentUid()).set({
+      'tags': FieldValue.arrayUnion([tag])
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> unfollowTag({required String tag}) {
+    return _collectionRef.doc(IbUtils.getCurrentUid()).set({
+      'tags': FieldValue.arrayRemove([tag])
+    }, SetOptions(merge: true));
+  }
+
   Stream<IbUser> listenToIbUserChanges(String uid) {
     return _collectionRef.doc(uid).snapshots().map((event) {
       return IbUser.fromJson(event.data() ?? {});

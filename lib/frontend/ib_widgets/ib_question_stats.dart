@@ -12,7 +12,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import '../ib_utils.dart';
 import 'ib_media_viewer.dart';
 
-/// show stats for comparision between two users
+/// show stats for comparison between two users
 class IbQuestionStats extends StatelessWidget {
   final IbQuestionStatsController _controller;
   const IbQuestionStats(this._controller);

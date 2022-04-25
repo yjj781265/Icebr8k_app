@@ -9,7 +9,7 @@ part of 'ib_user.dart';
 IbUser _$IbUserFromJson(Map<String, dynamic> json) => IbUser(
       avatarUrl: json['avatarUrl'] as String? ?? '',
       coverPhotoUrl: json['coverPhotoUrl'] as String? ?? '',
-      loginTimeInMs: json['loginTimeInMs'] as int? ?? -1,
+      loginTimestamp: json['loginTimestamp'] ?? -1,
       profilePrivacy: json['profilePrivacy'] as String? ?? 'public',
       birthdateInMs: json['birthdateInMs'] as int? ?? -1,
       banedEndTimeInMs: json['banedEndTimeInMs'] as int? ?? -1,
@@ -26,6 +26,9 @@ IbUser _$IbUserFromJson(Map<String, dynamic> json) => IbUser(
       gender: json['gender'] as String? ?? '',
       status: json['status'] as String? ?? '',
       voiceMemoUrl: json['voiceMemoUrl'] as String? ?? '',
+      tags:
+          (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+              const [],
       emoPics: (json['emoPics'] as List<dynamic>?)
               ?.map((e) => IbEmoPic.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -53,7 +56,7 @@ Map<String, dynamic> _$IbUserToJson(IbUser instance) => <String, dynamic>{
       'gender': instance.gender,
       'status': instance.status,
       'banedEndTimeInMs': instance.banedEndTimeInMs,
-      'loginTimeInMs': instance.loginTimeInMs,
+      'loginTimestamp': instance.loginTimestamp,
       'joinTime': instance.joinTime,
       'birthdateInMs': instance.birthdateInMs,
       'answeredCount': instance.answeredCount,
@@ -67,5 +70,6 @@ Map<String, dynamic> _$IbUserToJson(IbUser instance) => <String, dynamic>{
       'bio': instance.bio,
       'voiceMemoUrl': instance.voiceMemoUrl,
       'roles': instance.roles,
+      'tags': instance.tags,
       'emoPics': instance.emoPics.map((e) => e.toJson()).toList(),
     };

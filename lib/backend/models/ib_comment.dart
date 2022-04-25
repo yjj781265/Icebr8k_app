@@ -6,16 +6,16 @@ part 'ib_comment.g.dart';
 /// notifyUid is the Uid of a comment reply to(for push notification)
 @JsonSerializable(explicitToJson: true)
 class IbComment {
-  String? replyId;
+  String? parentId;
   String notifyUid;
   String commentId;
   String questionId;
   String uid;
   int likes;
-  int replies;
-  bool isAnonymous;
+  List<IbComment> replies;
   String content;
   String type;
+  bool isEdited;
   dynamic timestamp;
 
   static const String kCommentTypeText = 'text';
@@ -26,11 +26,11 @@ class IbComment {
     required this.commentId,
     required this.uid,
     required this.questionId,
-    this.isAnonymous = false,
     required this.notifyUid,
+    this.isEdited = false,
     this.likes = 0,
-    this.replies = 0,
-    this.replyId,
+    this.replies = const [],
+    this.parentId,
     required this.content,
     required this.type,
     this.timestamp,
@@ -42,19 +42,33 @@ class IbComment {
   Map<String, dynamic> toJson() => _$IbCommentToJson(this);
 
   @override
-  String toString() {
-    return 'IbComment{commentId: $commentId, uid: $uid, isAnonymous: '
-        '$isAnonymous, content: $content, type: $type, '
-        'replies: $replies, timestamp: $timestamp}';
-  }
-
-  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is IbComment &&
           runtimeType == other.runtimeType &&
-          commentId == other.commentId;
+          parentId == other.parentId &&
+          notifyUid == other.notifyUid &&
+          commentId == other.commentId &&
+          questionId == other.questionId &&
+          uid == other.uid &&
+          likes == other.likes &&
+          replies == other.replies &&
+          content == other.content &&
+          type == other.type &&
+          isEdited == other.isEdited &&
+          timestamp == other.timestamp;
 
   @override
-  int get hashCode => commentId.hashCode;
+  int get hashCode =>
+      parentId.hashCode ^
+      notifyUid.hashCode ^
+      commentId.hashCode ^
+      questionId.hashCode ^
+      uid.hashCode ^
+      likes.hashCode ^
+      replies.hashCode ^
+      content.hashCode ^
+      type.hashCode ^
+      isEdited.hashCode ^
+      timestamp.hashCode;
 }

@@ -95,14 +95,14 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                         IbQuestion.kMultipleChoice
                     ? 200
                     : 400,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 4.0),
-                  child: Scrollbar(
-                    thickness: 3,
-                    isAlwaysShown: true,
-                    radius: const Radius.circular(8),
-                    showTrackOnHover: true,
-                    controller: _scrollController,
+                child: Scrollbar(
+                  thickness: 3,
+                  isAlwaysShown: true,
+                  radius: const Radius.circular(8),
+                  showTrackOnHover: true,
+                  controller: _scrollController,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 4.0),
                     child: SingleChildScrollView(
                       controller: _scrollController,
                       child: Column(

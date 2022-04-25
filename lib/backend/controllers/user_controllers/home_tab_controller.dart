@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -68,11 +69,21 @@ class HomeTabController extends GetxController {
           trendingList.add(IbQuestion.fromJson(doc.data()));
           lastDoc = doc;
         }
+        await _refreshQuestionItemControllers();
       }
+
       refreshController.refreshCompleted();
     } catch (e) {
       refreshController.loadFailed();
       print(e);
+    }
+  }
+
+  Future<void> _refreshQuestionItemControllers() async {
+    for (final q in trendingList) {
+      if (Get.isRegistered<IbQuestionItemController>(tag: q.id)) {
+        await Get.find<IbQuestionItemController>(tag: q.id).refreshStats();
+      }
     }
   }
 

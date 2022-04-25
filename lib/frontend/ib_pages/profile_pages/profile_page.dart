@@ -17,6 +17,7 @@ import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/asked_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/compare_page.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_pages/followed_tags_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/friend_list.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/word_cloud_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -238,230 +239,274 @@ class ProfilePage extends StatelessWidget {
                 ),
 
                 /// poll stats
-                SingleChildScrollView(
-                  padding: const EdgeInsets.all(4.0),
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      InkWell(
-                        customBorder: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(8),
-                          ),
+                Wrap(
+                  children: [
+                    InkWell(
+                      customBorder: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8),
                         ),
-                        onTap: () {
-                          if (_controller.isProfileVisible.isFalse) {
-                            return;
-                          }
-                          Get.to(
-                            () => ComparePage(
-                              Get.put(
-                                CompareController(
-                                  title: '👍 AGREE',
-                                  questionIds: _controller.commonAnswers,
-                                  uids: [
-                                    _controller.uid,
-                                    IbUtils.getCurrentUid() ?? ''
-                                  ],
-                                ),
+                      ),
+                      onTap: () {
+                        if (_controller.isProfileVisible.isFalse) {
+                          return;
+                        }
+                        Get.to(
+                          () => ComparePage(
+                            Get.put(
+                              CompareController(
+                                title: '👍 AGREE',
+                                questionIds: _controller.commonAnswers,
+                                uids: [
+                                  _controller.uid,
+                                  IbUtils.getCurrentUid() ?? ''
+                                ],
                               ),
                             ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(8)),
-                              color: Theme.of(context).backgroundColor,
-                            ),
-                            width: 88,
-                            height: 88 / 1.618,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Obx(() => Text(
-                                      IbUtils.getStatsString(
-                                          _controller.commonAnswers.length),
-                                      style: const TextStyle(
-                                          overflow: TextOverflow.ellipsis,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: IbConfig.kPageTitleSize),
-                                    )),
-                                const Text(
-                                  '👍 AGREE',
-                                  style: TextStyle(
-                                      overflow: TextOverflow.ellipsis,
-                                      fontSize: IbConfig.kDescriptionTextSize,
-                                      color: IbColors.lightGrey),
-                                )
-                              ],
-                            ),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                            color: Theme.of(context).backgroundColor,
+                          ),
+                          width: 88,
+                          height: 88 / 1.618,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Obx(() => Text(
+                                    IbUtils.getStatsString(
+                                        _controller.commonAnswers.length),
+                                    style: const TextStyle(
+                                        overflow: TextOverflow.ellipsis,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: IbConfig.kPageTitleSize),
+                                  )),
+                              const Text(
+                                '👍 AGREE',
+                                style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    fontSize: IbConfig.kDescriptionTextSize,
+                                    color: IbColors.lightGrey),
+                              )
+                            ],
                           ),
                         ),
                       ),
-                      InkWell(
-                        customBorder: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(8),
-                          ),
+                    ),
+                    InkWell(
+                      customBorder: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8),
                         ),
-                        onTap: () {
-                          if (_controller.isProfileVisible.isFalse) {
-                            return;
-                          }
-                          Get.to(
-                            () => ComparePage(
-                              Get.put(
-                                CompareController(
-                                  title: '👎 DISAGREE',
-                                  questionIds: _controller.uncommonAnswers,
-                                  uids: [
-                                    _controller.uid,
-                                    IbUtils.getCurrentUid() ?? ''
-                                  ],
-                                ),
+                      ),
+                      onTap: () {
+                        if (_controller.isProfileVisible.isFalse) {
+                          return;
+                        }
+                        Get.to(
+                          () => ComparePage(
+                            Get.put(
+                              CompareController(
+                                title: '👎 DISAGREE',
+                                questionIds: _controller.uncommonAnswers,
+                                uids: [
+                                  _controller.uid,
+                                  IbUtils.getCurrentUid() ?? ''
+                                ],
                               ),
                             ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(8)),
-                              color: Theme.of(context).backgroundColor,
-                            ),
-                            width: 88,
-                            height: 88 / 1.618,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Obx(() => Text(
-                                      IbUtils.getStatsString(
-                                          _controller.uncommonAnswers.length),
-                                      style: const TextStyle(
-                                          overflow: TextOverflow.ellipsis,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: IbConfig.kPageTitleSize),
-                                    )),
-                                const Text(
-                                  '👎 DISAGREE',
-                                  style: TextStyle(
-                                      overflow: TextOverflow.ellipsis,
-                                      fontSize: IbConfig.kDescriptionTextSize,
-                                      color: IbColors.lightGrey),
-                                )
-                              ],
-                            ),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                            color: Theme.of(context).backgroundColor,
+                          ),
+                          width: 88,
+                          height: 88 / 1.618,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Obx(() => Text(
+                                    IbUtils.getStatsString(
+                                        _controller.uncommonAnswers.length),
+                                    style: const TextStyle(
+                                        overflow: TextOverflow.ellipsis,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: IbConfig.kPageTitleSize),
+                                  )),
+                              const Text(
+                                '👎 DISAGREE',
+                                style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    fontSize: IbConfig.kDescriptionTextSize,
+                                    color: IbColors.lightGrey),
+                              )
+                            ],
                           ),
                         ),
                       ),
-                      InkWell(
-                        customBorder: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(8),
-                          ),
+                    ),
+                    InkWell(
+                      customBorder: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8),
                         ),
-                        onTap: () {
-                          if (_controller.isProfileVisible.isFalse) {
-                            return;
-                          }
-                          Get.to(
-                            () => AskedPage(
-                              Get.put(AskedQuestionsController(_controller.uid),
-                                  tag: IbUtils.getUniqueId()),
-                            ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(8)),
-                              color: Theme.of(context).backgroundColor,
-                            ),
-                            width: 88,
-                            height: 88 / 1.618,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Obx(() => Text(
-                                      IbUtils.getStatsString(_controller
-                                          .rxIbUser.value.askedCount),
-                                      style: const TextStyle(
-                                          overflow: TextOverflow.ellipsis,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: IbConfig.kPageTitleSize),
-                                    )),
-                                const Text(
-                                  '✋ ASKED',
-                                  style: TextStyle(
-                                      overflow: TextOverflow.ellipsis,
-                                      fontSize: IbConfig.kDescriptionTextSize,
-                                      color: IbColors.lightGrey),
-                                )
-                              ],
-                            ),
+                      ),
+                      onTap: () {
+                        if (_controller.isProfileVisible.isFalse) {
+                          return;
+                        }
+                        Get.to(
+                          () => AskedPage(
+                            Get.put(AskedQuestionsController(_controller.uid),
+                                tag: IbUtils.getUniqueId()),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                            color: Theme.of(context).backgroundColor,
+                          ),
+                          width: 88,
+                          height: 88 / 1.618,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Obx(() => Text(
+                                    IbUtils.getStatsString(
+                                        _controller.rxIbUser.value.askedCount),
+                                    style: const TextStyle(
+                                        overflow: TextOverflow.ellipsis,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: IbConfig.kPageTitleSize),
+                                  )),
+                              const Text(
+                                '✋ ASKED',
+                                style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    fontSize: IbConfig.kDescriptionTextSize,
+                                    color: IbColors.lightGrey),
+                              )
+                            ],
                           ),
                         ),
                       ),
-                      InkWell(
-                        customBorder: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(8),
+                    ),
+                    InkWell(
+                      customBorder: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8),
+                        ),
+                      ),
+                      onTap: () {
+                        if (_controller.isProfileVisible.isFalse) {
+                          return;
+                        }
+                        Get.to(() => FriendList(Get.put(
+                            FriendListController(_controller.rxIbUser.value),
+                            tag: _controller.rxIbUser.value.id)));
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                            color: Theme.of(context).backgroundColor,
+                          ),
+                          width: 88,
+                          height: 88 / 1.618,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Obx(() => Text(
+                                    IbUtils.getStatsString(_controller
+                                        .rxIbUser.value.friendUids.length),
+                                    style: const TextStyle(
+                                        overflow: TextOverflow.ellipsis,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: IbConfig.kPageTitleSize),
+                                  )),
+                              const Text(
+                                '👥 FRIEND(S)',
+                                style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    fontSize: IbConfig.kDescriptionTextSize,
+                                    color: IbColors.lightGrey),
+                              )
+                            ],
                           ),
                         ),
-                        onTap: () {
-                          if (_controller.isProfileVisible.isFalse) {
-                            return;
-                          }
-                          Get.to(() => FriendList(Get.put(
-                              FriendListController(_controller.rxIbUser.value),
-                              tag: _controller.rxIbUser.value.id)));
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(8)),
-                              color: Theme.of(context).backgroundColor,
-                            ),
-                            width: 88,
-                            height: 88 / 1.618,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Obx(() => Text(
-                                      IbUtils.getStatsString(_controller
-                                          .rxIbUser.value.friendUids.length),
-                                      style: const TextStyle(
-                                          overflow: TextOverflow.ellipsis,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: IbConfig.kPageTitleSize),
-                                    )),
-                                const Text(
-                                  '👥 FRIEND(S)',
-                                  style: TextStyle(
-                                      overflow: TextOverflow.ellipsis,
-                                      fontSize: IbConfig.kDescriptionTextSize,
-                                      color: IbColors.lightGrey),
-                                )
-                              ],
-                            ),
+                      ),
+                    ),
+                    InkWell(
+                      customBorder: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8),
+                        ),
+                      ),
+                      onTap: () {
+                        if (_controller.isProfileVisible.isFalse) {
+                          return;
+                        }
+                        Get.to(() => FollowedTagsPage(
+                            _controller.rxIbUser.value.tags,
+                            _controller.rxIbUser.value.username));
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                            color: Theme.of(context).backgroundColor,
+                          ),
+                          width: 88,
+                          height: 88 / 1.618,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Obx(() => Text(
+                                    IbUtils.getStatsString(
+                                        _controller.rxIbUser.value.tags.length),
+                                    style: const TextStyle(
+                                        overflow: TextOverflow.ellipsis,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: IbConfig.kPageTitleSize),
+                                  )),
+                              const Text(
+                                '🏷️ TAGS',
+                                style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    fontSize: IbConfig.kDescriptionTextSize,
+                                    color: IbColors.lightGrey),
+                              )
+                            ],
                           ),
                         ),
-                      )
-                    ],
-                  ),
+                      ),
+                    ),
+                  ],
                 ),
 
                 if (_controller.rxIbUser.value.profilePrivacy ==

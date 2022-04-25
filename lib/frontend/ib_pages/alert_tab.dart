@@ -13,6 +13,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:lottie/lottie.dart';
 
 class AlertTab extends StatelessWidget {
   final NotificationController _controller = Get.find();
@@ -32,6 +33,27 @@ class AlertTab extends StatelessWidget {
               child: IbProgressIndicator(),
             );
           }
+          if (_controller.items.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                      width: 200,
+                      height: 200,
+                      child: Lottie.asset('assets/images/monkey_zen.json')),
+                  const Text(
+                    'No notifications at this time',
+                    style: TextStyle(
+                      color: IbColors.lightGrey,
+                      fontSize: IbConfig.kNormalTextSize,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
           return ListView.separated(
             itemBuilder: (context, index) {
               final NotificationItem item = _controller.items[index];

@@ -20,9 +20,7 @@ class IbQuestionStatsBar extends StatelessWidget {
     return AnimatedSize(
       duration: const Duration(milliseconds: 300),
       child: Obx(
-        () => Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        () => Wrap(
           children: [
             TextButton.icon(
                 onPressed: _itemController.isSample ? null : _handleOnStatsTap,
@@ -47,13 +45,8 @@ class IbQuestionStatsBar extends StatelessWidget {
                   onPressed: _itemController.isSample
                       ? null
                       : () {
-                          Get.to(() => CommentPage(Get.put(
-                              CommentController(
-                                  questionId:
-                                      _itemController.rxIbQuestion.value.id,
-                                  lastSnap: _itemController.lastCommentSnap,
-                                  itemController: _itemController),
-                              tag: _itemController.rxIbQuestion.value.id)));
+                          Get.to(() => CommentPage(Get.put(CommentController(
+                              itemController: _itemController))));
                         },
                   icon: FaIcon(
                     FontAwesomeIcons.comments,
@@ -87,6 +80,25 @@ class IbQuestionStatsBar extends StatelessWidget {
               ),
               label: Text(
                 _itemController.rxIbQuestion.value.likes.toString(),
+                style: TextStyle(
+                    color: Theme.of(context).indicatorColor,
+                    fontSize: IbConfig.kDescriptionTextSize),
+              ),
+            ),
+            TextButton.icon(
+              onPressed: _itemController.isSample ||
+                      (_itemController.rxIbAnswer != null &&
+                          _itemController.rxIbAnswer!.value.uid !=
+                              IbUtils.getCurrentUid())
+                  ? null
+                  : () {},
+              icon: const FaIcon(
+                FontAwesomeIcons.share,
+                color: IbColors.lightGrey,
+                size: 16,
+              ),
+              label: Text(
+                'Share',
                 style: TextStyle(
                     color: Theme.of(context).indicatorColor,
                     fontSize: IbConfig.kDescriptionTextSize),

@@ -39,7 +39,7 @@ class IbConfig {
   static const double kPicHeight = 88;
   static const double kScItemHeight = 48;
   static const double kMcItemCornerRadius = 8;
-  static const int kCommentMaxLen = 2000;
+  static const int kCommentMaxLen = 888;
   static const String kDefaultCoverPhotoUrl =
       'https://firebasestorage.googleapis.com/v0/b/icebr8k-flutter.appspot.com/o/images%2Fheader_img.jpg?alt=media&token=070dea5e-269a-467c-acb8-35ba7a5fde39';
   static const List<String> kFirst8QuestionIds = [

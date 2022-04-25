@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_scatter/flutter_scatter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/tag_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/word_cloud_controller.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
+import 'package:icebr8k/frontend/tag_page.dart';
 import 'package:lottie/lottie.dart';
 
 class WordCloudPage extends StatelessWidget {
@@ -62,7 +64,10 @@ class WordCloudPage extends StatelessWidget {
                                 e,
                                 style: randomFont(e),
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                Get.to(() =>
+                                    TagPage(Get.put(TagPageController(e))));
+                              },
                             ))
                         .toList(),
                   ),

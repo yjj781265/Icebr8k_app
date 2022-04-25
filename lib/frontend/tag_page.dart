@@ -97,10 +97,18 @@ class TagPage extends StatelessWidget {
                         ),
                         SizedBox(
                           width: 150,
-                          child: IbElevatedButton(
-                            onPressed: () {},
-                            textTrKey: 'Follow',
-                            color: IbColors.primaryColor,
+                          child: Obx(
+                            () => IbElevatedButton(
+                              onPressed: () async {
+                                await _controller.updateTag();
+                              },
+                              textTrKey: _controller.isFollower.isTrue
+                                  ? 'Unfollow'
+                                  : "Follow",
+                              color: _controller.isFollower.isTrue
+                                  ? IbColors.errorRed
+                                  : IbColors.accentColor,
+                            ),
                           ),
                         )
                       ],

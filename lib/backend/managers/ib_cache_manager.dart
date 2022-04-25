@@ -42,6 +42,7 @@ class IbCacheManager {
     _ibAnswersMap[uid] = ibAnswers;
   }
 
+  /// this will cache the answer to the list in ibAnswersMap base on the uid
   void cacheSingleIbAnswer({required String uid, required IbAnswer ibAnswer}) {
     final List<IbAnswer> list = _ibAnswersMap[uid] ?? [];
     final int index = list.indexWhere((element) =>
@@ -72,6 +73,7 @@ class IbCacheManager {
     return _ibQuestionList[index];
   }
 
+  /// this will remove the answer to the list in ibAnswersMap base on the uid
   void removeSingleIbAnswer({required String uid, required IbAnswer ibAnswer}) {
     final List<IbAnswer> list = _ibAnswersMap[uid] ?? [];
     final int index = list.indexWhere((element) =>
