@@ -33,7 +33,7 @@ class IbQuestionButtons extends StatelessWidget {
                   await _controller.onVote();
                 },
                 onLongPressed: () async {
-                  await _controller.onVote(isPublic: false);
+                  await _controller.onVote(isAnonymous: true);
                 },
                 textTrKey: _handleVoteButtonText(),
                 color: IbColors.primaryColor,

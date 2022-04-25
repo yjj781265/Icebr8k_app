@@ -251,7 +251,7 @@ class IbUtils {
     return friends.map((e) => e.id).toList();
   }
 
-  /// return current IbUser friend ids what are not in block list
+  /// return current IbUser circle chat items
   static List<ChatTabItem> getCircleItems() {
     if (!Get.isRegistered<ChatTabController>()) {
       return [];
@@ -259,6 +259,21 @@ class IbUtils {
     final circleItems =
         List<ChatTabItem>.from(Get.find<ChatTabController>().circles);
     return circleItems;
+  }
+
+  /// return current IbUser all chat items
+  static List<ChatTabItem> getAllChatTabItems() {
+    if (!Get.isRegistered<ChatTabController>()) {
+      return [];
+    }
+    final circleItems =
+        List<ChatTabItem>.from(Get.find<ChatTabController>().circles);
+    final oneToOneItems =
+        List<ChatTabItem>.from(Get.find<ChatTabController>().oneToOneChats);
+    oneToOneItems.addAll(circleItems);
+    final allItems = oneToOneItems;
+    allItems.sort((a, b) => (a.title).compareTo(b.title));
+    return allItems;
   }
 
   static User? getCurrentFbUser() {
@@ -464,7 +479,7 @@ class IbUtils {
     return uncommonAnswers.map((e) => e.questionId).toList();
   }
 
-  static Future<List<IbAnswer>> getIbAnswers(
+  static Future<List<IbAnswer>> getIbAnswersForDifferentUsers(
       {required List<String> uids,
       required String questionId,
       bool isRefresh = false}) async {
@@ -479,6 +494,7 @@ class IbUtils {
         if (answer == null) {
           continue;
         }
+        IbCacheManager().cacheSingleIbAnswer(uid: uid, ibAnswer: answer);
         theAnswers.add(answer);
       } else {
         final List<IbAnswer> answers = IbCacheManager().getIbAnswers(uid)!;
@@ -493,6 +509,7 @@ class IbUtils {
             continue;
           }
           theAnswers.add(answer);
+          IbCacheManager().cacheSingleIbAnswer(uid: uid, ibAnswer: answer);
         }
       }
     }

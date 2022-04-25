@@ -6,7 +6,8 @@ part 'ib_answer.g.dart';
 class IbAnswer {
   final String choiceId;
   final int answeredTimeInMs;
-  final bool isPublic;
+  final bool isAnonymous;
+  final bool isPublicQuestion;
   final String uid;
   final int askedTimeInMs;
   final String questionId;
@@ -20,7 +21,8 @@ class IbAnswer {
       required this.questionId,
       required this.questionType,
       this.edited = false,
-      this.isPublic = true,
+      this.isAnonymous = false,
+      this.isPublicQuestion = true,
       required this.uid});
 
   factory IbAnswer.fromJson(Map<String, dynamic> json) =>
@@ -35,23 +37,25 @@ class IbAnswer {
           runtimeType == other.runtimeType &&
           choiceId == other.choiceId &&
           answeredTimeInMs == other.answeredTimeInMs &&
-          isPublic == other.isPublic &&
+          isAnonymous == other.isAnonymous &&
           uid == other.uid &&
           askedTimeInMs == other.askedTimeInMs &&
           questionId == other.questionId &&
           questionType == other.questionType &&
-          edited == other.edited;
+          edited == other.edited &&
+          isPublicQuestion == other.isPublicQuestion;
 
   @override
   int get hashCode =>
       choiceId.hashCode ^
       answeredTimeInMs.hashCode ^
-      isPublic.hashCode ^
+      isAnonymous.hashCode ^
       uid.hashCode ^
       askedTimeInMs.hashCode ^
       questionId.hashCode ^
       questionType.hashCode ^
-      edited.hashCode;
+      edited.hashCode ^
+      isPublicQuestion.hashCode;
 
   @override
   String toString() {

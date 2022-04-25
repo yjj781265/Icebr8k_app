@@ -924,10 +924,50 @@ class ChatPage extends StatelessWidget {
     if (message.messageType == IbMessage.kMessageTypePoll) {
       final IbQuestion? question = _controller.ibQuestions
           .firstWhereOrNull((element) => element.id == message.content);
+      final member = _controller.ibChatMembers
+          .firstWhereOrNull((p0) => p0.user.id == message.senderUid);
+      final avatarUrl = member == null ? '' : member.user.avatarUrl;
+      final username = member == null ? '' : member.user.username;
 
       if (question == null) {
-        return const SizedBox();
+        return Column(
+          children: [
+            const SizedBox(
+              height: 16,
+            ),
+
+            /// title
+            Text(
+              message.timestamp == null
+                  ? 'Posting...'
+                  : IbUtils.readableDateTime(
+                      DateTime.fromMillisecondsSinceEpoch(
+                          (message.timestamp as Timestamp)
+                              .millisecondsSinceEpoch),
+                      showTime: true),
+              style: const TextStyle(
+                  color: IbColors.lightGrey,
+                  fontSize: IbConfig.kDescriptionTextSize),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IbUserAvatar(
+                  avatarUrl: avatarUrl,
+                  radius: 11,
+                ),
+                Text(' $username shared a poll')
+              ],
+            ),
+            const IbCard(
+                child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text('This poll is no longer available'),
+            ))
+          ],
+        );
       }
+
       Widget pollWidget = const SizedBox();
       final IbQuestionItemController itemController = Get.put(
           IbQuestionItemController(
@@ -940,11 +980,6 @@ class ChatPage extends StatelessWidget {
       } else {
         pollWidget = IbScQuestionCard(itemController);
       }
-
-      final member = _controller.ibChatMembers
-          .firstWhereOrNull((p0) => p0.user.id == message.senderUid);
-      final avatarUrl = member == null ? '' : member.user.avatarUrl;
-      final username = member == null ? '' : member.user.username;
 
       return Column(
         mainAxisSize: MainAxisSize.min,

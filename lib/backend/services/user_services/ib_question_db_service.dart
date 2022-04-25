@@ -123,14 +123,13 @@ class IbQuestionDbService {
       query = _db
           .collectionGroup(_kAnswerCollectionGroup)
           .where('uid', isEqualTo: uid)
-          .where('isPublic', isEqualTo: true);
+          .where('isAnonymous', isEqualTo: false);
     } else {
       query = _db
           .collectionGroup(_kAnswerCollectionGroup)
           .where('uid', isEqualTo: uid)
-          .where('isPublic', isEqualTo: true)
-          .startAfterDocument(lastDoc)
-          .limit(8);
+          .where('isAnonymous', isEqualTo: false)
+          .startAfterDocument(lastDoc);
     }
 
     return query.snapshots();
@@ -226,7 +225,7 @@ class IbQuestionDbService {
     final _snapshot = await _db
         .collectionGroup(_kAnswerCollectionGroup)
         .where('uid', isEqualTo: uid)
-        .where('isPublic', isEqualTo: true)
+        .where('isAnonymous', isEqualTo: false)
         .get();
     for (final doc in _snapshot.docs) {
       try {
@@ -263,7 +262,7 @@ class IbQuestionDbService {
           .doc(questionId)
           .collection(_kAnswerCollectionGroup)
           .where('choiceId', isEqualTo: choiceId)
-          .where('isPublic', isEqualTo: true)
+          .where('isAnonymous', isEqualTo: false)
           .orderBy('answeredTimeInMs', descending: true)
           .startAfterDocument(lastSnap)
           .limit(limit)
@@ -273,7 +272,7 @@ class IbQuestionDbService {
     return _collectionRef
         .doc(questionId)
         .collection(_kAnswerCollectionGroup)
-        .where('isPublic', isEqualTo: true)
+        .where('isAnonymous', isEqualTo: false)
         .where('choiceId', isEqualTo: choiceId)
         .orderBy('answeredTimeInMs', descending: true)
         .limit(limit)

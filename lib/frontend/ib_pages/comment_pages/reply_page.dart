@@ -199,7 +199,7 @@ class ReplyPage extends StatelessWidget {
                                       ),
                                     ),
                                     if (item.ibAnswer != null &&
-                                        item.ibAnswer!.isPublic)
+                                        !item.ibAnswer!.isAnonymous)
                                       Wrap(
                                         children: [
                                           const Text(

@@ -228,7 +228,7 @@ class IbQuestionItemController extends GetxController {
     }
   }
 
-  Future<void> onVote({bool isPublic = true}) async {
+  Future<void> onVote({bool isAnonymous = false}) async {
     // don't let user vote if poll is closed
     if (rxIbQuestion.value.endTimeInMs <
             DateTime.now().millisecondsSinceEpoch &&
@@ -241,7 +241,7 @@ class IbQuestionItemController extends GetxController {
     }
 
     if (rxIbAnswer != null &&
-        rxIbAnswer!.value.isPublic == isPublic &&
+        rxIbAnswer!.value.isAnonymous == isAnonymous &&
         selectedChoiceId.value == rxIbAnswer!.value.choiceId) {
       return;
     }
@@ -255,7 +255,8 @@ class IbQuestionItemController extends GetxController {
     try {
       final IbAnswer ibAnswer = IbAnswer(
           choiceId: selectedChoiceId.value,
-          isPublic: isPublic,
+          isAnonymous: isAnonymous,
+          isPublicQuestion: rxIbQuestion.value.isPublic,
           edited: rxIbAnswer != null,
           answeredTimeInMs: DateTime.now().millisecondsSinceEpoch,
           askedTimeInMs: rxIbQuestion.value.askedTimeInMs,
@@ -264,7 +265,7 @@ class IbQuestionItemController extends GetxController {
           questionType: rxIbQuestion.value.questionType);
       await IbQuestionDbService().answerQuestion(ibAnswer);
 
-      if (isPublic) {
+      if (!isAnonymous) {
         IbUtils.showSimpleSnackBar(
             msg: 'Answered publicly 📢',
             backgroundColor: IbColors.primaryColor);
