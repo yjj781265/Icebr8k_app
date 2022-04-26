@@ -22,45 +22,48 @@ class EditIbCollectionMainPage extends StatelessWidget {
         title: const Text('Icebreaker Collections'),
       ),
       body: Obx(
-        () => StaggeredGrid.count(
-          crossAxisCount: 2,
-          children: _controller.ibCollections
-              .map((e) => Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        width: Get.width / 2,
-                        height: (Get.width / 2) * 1.44,
-                        child: IbCard(
-                          color: Color(e.bgColor),
-                          child: Center(
-                            child: AutoSizeText(
-                              e.name,
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              minFontSize: IbConfig.kNormalTextSize,
-                              maxFontSize: IbConfig.kSloganSize,
-                              maxLines: 4,
-                              style: IbUtils.getIbFonts(TextStyle(
-                                  fontSize: IbConfig.kNormalTextSize,
-                                  fontStyle: e.isItalic
-                                      ? FontStyle.italic
-                                      : FontStyle.normal,
-                                  color: Color(e.textColor),
-                                  fontWeight:
-                                      FontWeight.bold))[e.textStyleIndex],
+        () => SingleChildScrollView(
+          child: StaggeredGrid.count(
+            crossAxisCount: 2,
+            children: _controller.ibCollections
+                .map((e) => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          width: Get.width / 2,
+                          height: (Get.width / 2) * 1.44,
+                          child: IbCard(
+                            color: Color(e.bgColor),
+                            child: Center(
+                              child: AutoSizeText(
+                                e.name,
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                minFontSize: IbConfig.kNormalTextSize,
+                                maxFontSize: IbConfig.kSloganSize,
+                                maxLines: 4,
+                                style: IbUtils.getIbFonts(TextStyle(
+                                    fontSize: IbConfig.kNormalTextSize,
+                                    fontStyle: e.isItalic
+                                        ? FontStyle.italic
+                                        : FontStyle.normal,
+                                    color: Color(e.textColor),
+                                    fontWeight:
+                                        FontWeight.bold))[e.textStyleIndex],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      TextButton(
-                          onPressed: () {
-                            Get.to(() => EditIbCoverPage(e));
-                          },
-                          child: const Text('Edit Cover'))
-                    ],
-                  ))
-              .toList(),
+                        TextButton(
+                            onPressed: () {
+                              Get.to(() => EditIbCoverPage(e));
+                            },
+                            child: const Text('^ Edit Cover'))
+                      ],
+                    ))
+                .toList(),
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
