@@ -9,6 +9,7 @@ import 'package:icebr8k/backend/models/icebreaker_models/ib_collection.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
@@ -38,14 +39,24 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
         widget._collection.name = nameEtController.text.trim();
       });
     });
-    items = IbUtils.getIbFonts(TextStyle(
-        fontSize: IbConfig.kNormalTextSize,
-        fontStyle: fontStyle,
-        color: IbColors.accentColor));
+
+    linkEtController.addListener(() {
+      if (linkEtController.text.trim().isURL) {
+        setState(() {
+          widget._collection.link = linkEtController.text.trim();
+        });
+      } else {
+        widget._collection.link = '';
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    items = IbUtils.getIbFonts(TextStyle(
+        fontSize: IbConfig.kNormalTextSize,
+        fontStyle: fontStyle,
+        color: Theme.of(context).indicatorColor));
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Cover '),
@@ -61,29 +72,63 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              height: 350 * 1.44,
-              width: 350,
-              child: IbCard(
-                color: Color(widget._collection.bgColor),
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: AutoSizeText(
-                      widget._collection.name,
-                      textAlign: TextAlign.center,
-                      minFontSize: IbConfig.kNormalTextSize,
-                      maxFontSize: IbConfig.kSloganSize,
-                      maxLines: 4,
-                      style: IbUtils.getIbFonts(TextStyle(
-                          color: Color(widget._collection.textColor),
-                          fontStyle: fontStyle,
-                          fontSize: IbConfig.kSloganSize))[selectedIndex ?? 0],
+            Stack(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  height: 350 * 1.44,
+                  width: 350,
+                  child: InkWell(
+                    borderRadius: const BorderRadius.all(Radius.circular(16)),
+                    onTap: () {
+                      showColorPicker();
+                    },
+                    child: IbCard(
+                      color: Color(widget._collection.bgColor),
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: InkWell(
+                            onTap: showNameColorPicker,
+                            child: AutoSizeText(
+                              widget._collection.name,
+                              textAlign: TextAlign.center,
+                              minFontSize: IbConfig.kNormalTextSize,
+                              maxFontSize: IbConfig.kSloganSize,
+                              maxLines: 4,
+                              style: IbUtils.getIbFonts(TextStyle(
+                                  color: Color(widget._collection.textColor),
+                                  fontStyle: fontStyle,
+                                  fontSize: IbConfig
+                                      .kSloganSize))[selectedIndex ?? 0],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+                if (widget._collection.link.trim().isNotEmpty)
+                  Positioned(
+                      top: 16,
+                      right: 16,
+                      child: CircleAvatar(
+                        backgroundColor:
+                            Theme.of(context).backgroundColor.withOpacity(0.8),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.link,
+                            color: Theme.of(context).indicatorColor,
+                          ),
+                          onPressed: () async {
+                            if (await canLaunch(
+                                widget._collection.link.trim())) {
+                              launch(widget._collection.link);
+                            }
+                          },
+                        ),
+                      ))
+              ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -114,20 +159,21 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                     isSelected: fontStyleSelection,
                     children: const [
                       Padding(
-                        padding: EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(4.0),
                         child: Icon(FontAwesomeIcons.font,
-                            color: IbColors.lightGrey),
+                            size: 16, color: IbColors.lightGrey),
                       ),
                       Padding(
-                        padding: EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(4.0),
                         child: Icon(
                           FontAwesomeIcons.italic,
+                          size: 16,
                           color: IbColors.lightGrey,
                         ),
                       ),
                     ]),
                 DropdownButton2(
-                  buttonWidth: 150,
+                  buttonWidth: 120,
                   dropdownWidth: 100,
                   itemHeight: 40,
                   hint: const Text(
@@ -158,12 +204,17 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                 )
               ],
             ),
+            const SizedBox(
+              height: 8,
+            ),
             Column(
               children: [
                 IbTextField(
                   titleIcon: const Icon(Icons.drive_file_rename_outline),
-                  titleTrKey: 'name',
-                  hintTrKey: 'Enter cover name here',
+                  titleTrKey: 'Title',
+                  hintTrKey: 'Enter cover title here',
+                  charLimit: 100,
+                  maxLines: 6,
                   controller: nameEtController,
                   suffixIcon: CircleAvatar(
                     backgroundColor: Theme.of(context).backgroundColor,
@@ -216,7 +267,7 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
   void showNameColorPicker() {
     IbUtils.hideKeyboard();
     Get.dialog(IbDialog(
-      title: 'Pick a color',
+      title: 'Pick a color for title',
       subtitle: '',
       content: SizedBox(
         height: 300,
