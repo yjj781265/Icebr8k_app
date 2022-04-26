@@ -7,16 +7,20 @@ class Icebreaker {
   String text;
   int bgColor;
   int textColor;
+  int textStyleIndex;
   String id;
-  String collectionName;
+  String collectionId;
+  bool isItalic;
   dynamic timestamp;
 
   Icebreaker(
       {required this.text,
       this.bgColor = 4294967295,
       this.textColor = 4278190080,
+      this.textStyleIndex = 0,
+      this.isItalic = false,
       required this.id,
-      required this.collectionName,
+      required this.collectionId,
       required this.timestamp});
 
   factory Icebreaker.fromJson(Map<String, dynamic> json) =>

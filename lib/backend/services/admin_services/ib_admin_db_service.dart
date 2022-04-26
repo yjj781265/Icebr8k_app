@@ -35,7 +35,7 @@ class IbAdminService {
   Future<void> addIcebreaker(Icebreaker icebreaker) async {
     return _db
         .collection(_kIcebreakerCollection)
-        .doc(icebreaker.collectionName)
+        .doc(icebreaker.collectionId)
         .update({
       'icebreakers': FieldValue.arrayUnion([icebreaker.toJson()])
     });
@@ -44,7 +44,7 @@ class IbAdminService {
   Future<void> removeIcebreaker(Icebreaker icebreaker) async {
     return _db
         .collection(_kIcebreakerCollection)
-        .doc(icebreaker.collectionName)
+        .doc(icebreaker.collectionId)
         .update({
       'icebreakers': FieldValue.arrayRemove([icebreaker.toJson()])
     });
@@ -53,15 +53,12 @@ class IbAdminService {
   Future<void> addIcebreakerCollection(IbCollection ibCollection) async {
     return _db
         .collection(_kIcebreakerCollection)
-        .doc(ibCollection.name)
+        .doc(ibCollection.id)
         .set(ibCollection.toJson(), SetOptions(merge: true));
   }
 
   Future<void> removeIcebreakerCollection(IbCollection ibCollection) async {
-    return _db
-        .collection(_kIcebreakerCollection)
-        .doc(ibCollection.name)
-        .delete();
+    return _db.collection(_kIcebreakerCollection).doc(ibCollection.id).delete();
   }
 
   Future<void> updateUserStatus(

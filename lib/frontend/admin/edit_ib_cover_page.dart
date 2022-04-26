@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_html/shims/dart_ui_real.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/ib_collection.dart';
+import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
@@ -26,6 +28,7 @@ class EditIbCoverPage extends StatefulWidget {
 class _EditIbCoverPageState extends State<EditIbCoverPage> {
   TextEditingController nameEtController = TextEditingController();
   TextEditingController linkEtController = TextEditingController();
+  late IbCollection newCollection;
   FontStyle fontStyle = FontStyle.normal;
   int? selectedIndex;
   List<bool> fontStyleSelection = [true, false];
@@ -34,27 +37,51 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
   @override
   void initState() {
     super.initState();
+    newCollection = IbCollection(
+      name: widget._collection.name,
+      link: widget._collection.link,
+      textStyleIndex: widget._collection.textStyleIndex,
+      id: widget._collection.id,
+      timestamp: widget._collection.timestamp,
+      creatorId: widget._collection.creatorId,
+      bgColor: widget._collection.bgColor,
+      textColor: widget._collection.textColor,
+      isItalic: widget._collection.isItalic,
+      icebreakers: widget._collection.icebreakers,
+    );
     nameEtController.addListener(() {
       setState(() {
-        widget._collection.name = nameEtController.text.trim();
+        newCollection.name = nameEtController.text.trim();
       });
     });
 
     linkEtController.addListener(() {
-      if (linkEtController.text.trim().isURL) {
+      if (linkEtController.text.trim().contains('http')) {
         setState(() {
-          widget._collection.link = linkEtController.text.trim();
+          newCollection.link = linkEtController.text.trim();
         });
       } else {
-        widget._collection.link = '';
+        setState(() {
+          newCollection.link = '';
+        });
       }
     });
+    nameEtController.text = widget._collection.name;
+    linkEtController.text = widget._collection.link;
+    fontStyleSelection = [
+      !widget._collection.isItalic,
+      widget._collection.isItalic
+    ];
+    fontStyle =
+        widget._collection.isItalic ? FontStyle.italic : FontStyle.normal;
+    selectedIndex = widget._collection.textStyleIndex;
   }
 
   @override
   Widget build(BuildContext context) {
     items = IbUtils.getIbFonts(TextStyle(
         fontSize: IbConfig.kNormalTextSize,
+        fontWeight: FontWeight.bold,
         fontStyle: fontStyle,
         color: Theme.of(context).indicatorColor));
     return Scaffold(
@@ -66,7 +93,27 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                 showColorPicker();
               },
               icon: const Icon(Icons.color_lens_outlined)),
-          TextButton(onPressed: () {}, child: Text('confirm'.tr))
+          TextButton(
+              onPressed: () async {
+                if (newCollection.name.trim().isNotEmpty) {
+                  newCollection.timestamp = FieldValue.serverTimestamp();
+                  try {
+                    await IbAdminService()
+                        .addIcebreakerCollection(newCollection);
+                    Get.back();
+                    IbUtils.showSimpleSnackBar(
+                        msg: 'Collection Updated',
+                        backgroundColor: IbColors.accentColor);
+                  } catch (e) {
+                    Get.dialog(IbDialog(
+                      title: 'Error',
+                      subtitle: e.toString(),
+                      showNegativeBtn: false,
+                    ));
+                  }
+                }
+              },
+              child: Text('confirm'.tr))
         ],
       ),
       body: SingleChildScrollView(
@@ -84,20 +131,21 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                       showColorPicker();
                     },
                     child: IbCard(
-                      color: Color(widget._collection.bgColor),
+                      color: Color(newCollection.bgColor),
                       child: Center(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: InkWell(
                             onTap: showNameColorPicker,
                             child: AutoSizeText(
-                              widget._collection.name,
+                              newCollection.name,
                               textAlign: TextAlign.center,
                               minFontSize: IbConfig.kNormalTextSize,
                               maxFontSize: IbConfig.kSloganSize,
                               maxLines: 4,
                               style: IbUtils.getIbFonts(TextStyle(
-                                  color: Color(widget._collection.textColor),
+                                  color: Color(newCollection.textColor),
+                                  fontWeight: FontWeight.bold,
                                   fontStyle: fontStyle,
                                   fontSize: IbConfig
                                       .kSloganSize))[selectedIndex ?? 0],
@@ -108,7 +156,7 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                     ),
                   ),
                 ),
-                if (widget._collection.link.trim().isNotEmpty)
+                if (newCollection.link.trim().isNotEmpty)
                   Positioned(
                       top: 16,
                       right: 16,
@@ -121,9 +169,8 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                             color: Theme.of(context).indicatorColor,
                           ),
                           onPressed: () async {
-                            if (await canLaunch(
-                                widget._collection.link.trim())) {
-                              launch(widget._collection.link);
+                            if (await canLaunch(newCollection.link.trim())) {
+                              launch(newCollection.link);
                             }
                           },
                         ),
@@ -147,11 +194,14 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                         fontStyleSelection[index] = !fontStyleSelection[index];
                         if (index == 0 && fontStyleSelection[index]) {
                           fontStyle = FontStyle.normal;
+                          newCollection.isItalic = false;
                         } else {
                           fontStyle = FontStyle.italic;
+                          newCollection.isItalic = true;
                         }
                         items = IbUtils.getIbFonts(TextStyle(
                             fontSize: IbConfig.kNormalTextSize,
+                            fontWeight: FontWeight.bold,
                             fontStyle: fontStyle,
                             color: Theme.of(context).indicatorColor));
                       });
@@ -196,6 +246,7 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                     setState(() {
                       if (style != null) {
                         selectedIndex = items.indexOf(style as TextStyle);
+                        newCollection.textStyleIndex = selectedIndex ?? 0;
                       }
                     });
                   },
@@ -221,7 +272,7 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                     child: IconButton(
                       icon: Icon(
                         Icons.color_lens_outlined,
-                        color: Color(widget._collection.textColor),
+                        color: Color(newCollection.textColor),
                       ),
                       onPressed: () {
                         showNameColorPicker();
@@ -252,10 +303,10 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
         height: 300,
         child: MaterialPicker(
           portraitOnly: true,
-          pickerColor: Color(widget._collection.bgColor),
+          pickerColor: Color(newCollection.bgColor),
           onColorChanged: (Color value) {
             setState(() {
-              widget._collection.bgColor = value.value;
+              newCollection.bgColor = value.value;
             });
           },
         ),
@@ -273,10 +324,10 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
         height: 300,
         child: MaterialPicker(
           portraitOnly: true,
-          pickerColor: Color(widget._collection.textColor),
+          pickerColor: Color(newCollection.textColor),
           onColorChanged: (Color value) {
             setState(() {
-              widget._collection.textColor = value.value;
+              newCollection.textColor = value.value;
             });
           },
         ),

@@ -43,6 +43,7 @@ class AdminMainController extends GetxController {
   @override
   Future<void> dispose() async {
     await applicationSub.cancel();
+    await ibCollectionsSub.cancel();
     super.dispose();
   }
 
@@ -95,14 +96,14 @@ class AdminMainController extends GetxController {
       if (docChange.type == DocumentChangeType.added) {
         ibCollections.add(collection);
       } else if (docChange.type == DocumentChangeType.modified) {
-        final index = ibCollections
-            .indexWhere((element) => element.name == collection.name);
+        final index =
+            ibCollections.indexWhere((element) => element.id == collection.id);
         if (index != -1) {
           ibCollections[index] = collection;
         }
       } else {
-        final index = ibCollections
-            .indexWhere((element) => element.name == collection.name);
+        final index =
+            ibCollections.indexWhere((element) => element.id == collection.id);
         if (index != -1) {
           ibCollections.removeAt(index);
         }

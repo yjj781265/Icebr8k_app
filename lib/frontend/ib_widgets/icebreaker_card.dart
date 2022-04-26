@@ -32,7 +32,7 @@ class IcebreakerCard extends StatelessWidget {
             Align(
               alignment: Alignment.bottomRight,
               child: Text(
-                _icebreaker.collectionName,
+                _icebreaker.collectionId,
                 style: const TextStyle(
                     color: IbColors.lightGrey, fontStyle: FontStyle.italic),
               ),
