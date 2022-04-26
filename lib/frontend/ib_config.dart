@@ -27,8 +27,7 @@ class IbConfig {
   static const int kQuestionDescMaxLength = 500; //characters
   static const int kBioMaxLength = 2000; //characters
   static const int kBioMaxLines = 100; //c
-  static const int kAnswerMaxLength = 30; // characters
-  static const int kScAnswerMaxLength = 20; // characters
+  static const int kAnswerMaxLength = 40; // characters
   static const double kInitChatMessagesLoadSize = 16;
   static const double kChatMessagesTextSize = 18;
   static const int kImageQuality = 70;

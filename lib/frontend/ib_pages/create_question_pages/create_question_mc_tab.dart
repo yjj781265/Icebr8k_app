@@ -122,6 +122,7 @@ class CreateQuestionMcTab extends StatelessWidget {
 
     if (index != null) {
       _controller.choiceList[index].content = value.trim();
+      _controller.choiceList.refresh();
     } else {
       _controller.choiceList.add(IbChoice(
         choiceId: IbUtils.getUniqueId(),

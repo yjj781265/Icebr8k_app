@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:animations/animations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -400,12 +401,12 @@ class IbQuestionMcItem extends StatelessWidget {
                               ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(
+                              child: AutoSizeText(
                                 choice.content.toString(),
                                 maxLines: 1,
-                                style: const TextStyle(
-                                    fontSize: IbConfig.kNormalTextSize,
-                                    color: Colors.black),
+                                overflow: TextOverflow.ellipsis,
+                                maxFontSize: IbConfig.kNormalTextSize,
+                                style: const TextStyle(color: Colors.black),
                               ),
                             ),
                           ],

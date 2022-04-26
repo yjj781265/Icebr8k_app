@@ -10,6 +10,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 
 import '../../backend/controllers/user_controllers/auth_controller.dart';
 import '../ib_utils.dart';
+import 'edit_ib_collection_main_page.dart';
 
 class AdminMainPage extends StatelessWidget {
   final AdminMainController _controller = Get.put(AdminMainController());
@@ -59,6 +60,19 @@ class AdminMainPage extends StatelessWidget {
                   ],
                 ),
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                  height: 56,
+                  width: double.infinity,
+                  child: IbElevatedButton(
+                    textTrKey: 'Icebreaker Collections',
+                    onPressed: () {
+                      Get.to(() => EditIbCollectionMainPage());
+                    },
+                    color: IbColors.primaryColor,
+                  )),
             ),
             const Spacer(),
             Align(

@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
@@ -274,6 +275,22 @@ class IbUtils {
     final allItems = oneToOneItems;
     allItems.sort((a, b) => (a.title).compareTo(b.title));
     return allItems;
+  }
+
+  /// return current ib google fonts
+  static List<TextStyle> getIbFonts(TextStyle style) {
+    return [
+      GoogleFonts.openSans(textStyle: style),
+      GoogleFonts.roboto(textStyle: style),
+      GoogleFonts.breeSerif(textStyle: style),
+      GoogleFonts.comicNeue(textStyle: style),
+      GoogleFonts.pacifico(textStyle: style),
+      GoogleFonts.shadowsIntoLight(textStyle: style),
+      GoogleFonts.permanentMarker(textStyle: style),
+      GoogleFonts.caveat(textStyle: style),
+      GoogleFonts.satisfy(textStyle: style),
+      GoogleFonts.cookie(textStyle: style),
+    ];
   }
 
   static User? getCurrentFbUser() {

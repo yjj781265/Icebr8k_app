@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/setup_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/models/icebreaker_models/ib_collection.dart';
 import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -22,7 +23,9 @@ import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
 class AdminMainController extends GetxController {
   late StreamSubscription applicationSub;
+  late StreamSubscription ibCollectionsSub;
   final pendingUsers = <IbUser>[].obs;
+  final ibCollections = <IbCollection>[].obs;
   final totalMessages = 0.obs;
 
   @override
@@ -31,6 +34,10 @@ class AdminMainController extends GetxController {
     applicationSub = IbAdminService()
         .listenToPendingApplications()
         .listen((event) => _handlePendingApplicationSnapshot(event));
+
+    ibCollectionsSub = IbAdminService()
+        .listenToIcebreakerCollection()
+        .listen((event) => _handleIbCollectionSnapshot(event));
   }
 
   @override
@@ -73,6 +80,35 @@ class AdminMainController extends GetxController {
         totalMessages.value--;
       }
     }
+  }
+
+  void _handleIbCollectionSnapshot(
+      QuerySnapshot<Map<String, dynamic>> snapshot) {
+    for (final docChange in snapshot.docChanges) {
+      if (docChange.doc.data() == null) {
+        print('AdminMainController not a valid IbCollection');
+        continue;
+      }
+
+      final IbCollection collection =
+          IbCollection.fromJson(docChange.doc.data()!);
+      if (docChange.type == DocumentChangeType.added) {
+        ibCollections.add(collection);
+      } else if (docChange.type == DocumentChangeType.modified) {
+        final index = ibCollections
+            .indexWhere((element) => element.name == collection.name);
+        if (index != -1) {
+          ibCollections[index] = collection;
+        }
+      } else {
+        final index = ibCollections
+            .indexWhere((element) => element.name == collection.name);
+        if (index != -1) {
+          ibCollections.removeAt(index);
+        }
+      }
+    }
+    ibCollections.refresh();
   }
 
   Future<void> onUserRoleTap() async {

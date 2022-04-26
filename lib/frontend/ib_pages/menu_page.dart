@@ -2,16 +2,20 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
+import 'package:icebr8k/frontend/admin/admin_main_page.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_themes.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../backend/controllers/user_controllers/auth_controller.dart';
+import '../../backend/models/ib_user.dart';
 import '../../backend/services/user_services/ib_local_data_service.dart';
 import 'profile_pages/my_profile_page.dart';
 
@@ -127,6 +131,21 @@ class _MenuPageState extends State<MenuPage> {
                 },
                 title: const Text('Dark Mode'),
               ),
+              if (IbUtils.getCurrentIbUser() != null &&
+                  IbUtils.getCurrentIbUser()!.roles.contains(IbUser.kAdminRole))
+                ListTile(
+                  onTap: () {
+                    Get.to(() => AdminMainPage());
+                  },
+                  leading: const Icon(
+                    FontAwesomeIcons.chessKing,
+                    color: IbColors.creamYellow,
+                  ),
+                  title: const Text('Admin Page',
+                      style: TextStyle(
+                          fontSize: IbConfig.kNormalTextSize,
+                          fontWeight: FontWeight.bold)),
+                ),
               ListTile(
                 leading: const Icon(
                   Icons.person,

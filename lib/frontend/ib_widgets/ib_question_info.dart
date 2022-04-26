@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -18,8 +19,11 @@ class IbQuestionInfo extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 16, right: 16),
-            child: Text(
+            child: AutoSizeText(
               _controller.rxIbQuestion.value.question,
+              maxLines: 2,
+              minFontSize: IbConfig.kNormalTextSize,
+              maxFontSize: IbConfig.kPageTitleSize,
               style: const TextStyle(
                   fontSize: IbConfig.kPageTitleSize,
                   fontWeight: FontWeight.bold),
