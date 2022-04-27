@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/ib_collection.dart';
 import 'package:icebr8k/frontend/admin/edit_ib_cover_page.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/icebreaker_pages/ib_cover_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 
@@ -29,28 +30,42 @@ class EditIbCollectionMainPage extends StatelessWidget {
                 .map((e) => Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          width: Get.width / 2,
-                          height: (Get.width / 2) * 1.44,
-                          child: IbCard(
-                            color: Color(e.bgColor),
-                            child: Center(
-                              child: AutoSizeText(
-                                e.name,
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                                minFontSize: IbConfig.kNormalTextSize,
-                                maxFontSize: IbConfig.kSloganSize,
-                                maxLines: 4,
-                                style: IbUtils.getIbFonts(TextStyle(
-                                    fontSize: IbConfig.kNormalTextSize,
-                                    fontStyle: e.isItalic
-                                        ? FontStyle.italic
-                                        : FontStyle.normal,
-                                    color: Color(e.textColor),
-                                    fontWeight:
-                                        FontWeight.bold))[e.textStyleIndex],
+                        Hero(
+                          tag: e.id,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              width: Get.width / 2,
+                              height: (Get.width / 2) * 1.44,
+                              child: InkWell(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(8)),
+                                onTap: () => Get.to(() => IbCoverPage(
+                                      e,
+                                      isEdit: true,
+                                    )),
+                                child: IbCard(
+                                  color: Color(e.bgColor),
+                                  child: Center(
+                                    child: AutoSizeText(
+                                      e.name,
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                      minFontSize: IbConfig.kNormalTextSize,
+                                      maxFontSize: IbConfig.kSloganSize,
+                                      maxLines: 4,
+                                      style: IbUtils.getIbFonts(TextStyle(
+                                          fontSize: IbConfig.kNormalTextSize,
+                                          fontStyle: e.isItalic
+                                              ? FontStyle.italic
+                                              : FontStyle.normal,
+                                          color: Color(e.textColor),
+                                          fontWeight: FontWeight
+                                              .bold))[e.textStyleIndex],
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                           ),

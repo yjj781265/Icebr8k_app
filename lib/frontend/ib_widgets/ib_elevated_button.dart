@@ -9,6 +9,7 @@ class IbElevatedButton extends StatelessWidget {
   final Function onPressed;
   final Function? onLongPressed;
   final Color color;
+  final Color? textColor;
   final Widget? icon;
   final bool disabled;
   const IbElevatedButton(
@@ -17,6 +18,7 @@ class IbElevatedButton extends StatelessWidget {
       required this.onPressed,
       this.onLongPressed,
       this.icon,
+      this.textColor,
       this.disabled = false,
       this.color = IbColors.accentColor})
       : super(key: key);
@@ -49,9 +51,9 @@ class IbElevatedButton extends StatelessWidget {
         textTrKey.tr,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
+        style: TextStyle(
             fontSize: IbConfig.kNormalTextSize,
-            color: IbColors.white,
+            color: textColor,
             fontWeight: FontWeight.bold),
       ),
     );
@@ -75,9 +77,9 @@ class IbElevatedButton extends StatelessWidget {
         textTrKey.tr,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
+        style: TextStyle(
             fontSize: IbConfig.kNormalTextSize,
-            color: IbColors.white,
+            color: textColor,
             fontWeight: FontWeight.bold),
       ),
     );

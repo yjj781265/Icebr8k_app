@@ -3,32 +3,33 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:flutter_html/shims/dart_ui_real.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/ib_collection.dart';
 import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart';
+import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 
-import '../ib_colors.dart';
-import '../ib_config.dart';
-import '../ib_widgets/ib_card.dart';
+import '../../backend/models/icebreaker_models/icebreaker.dart';
+import '../ib_widgets/ib_dialog.dart';
+import '../ib_widgets/ib_text_field.dart';
 
-class EditIbCoverPage extends StatefulWidget {
-  final IbCollection _collection;
-  const EditIbCoverPage(this._collection, {Key? key}) : super(key: key);
+class EditIcebreakerPage extends StatefulWidget {
+  final Icebreaker icebreaker;
+  final IbCollection ibCollection;
+  const EditIcebreakerPage(this.icebreaker, this.ibCollection, {Key? key})
+      : super(key: key);
 
   @override
-  State<EditIbCoverPage> createState() => _EditIbCoverPageState();
+  State<EditIcebreakerPage> createState() => _EditIcebreakerPageState();
 }
 
-class _EditIbCoverPageState extends State<EditIbCoverPage> {
+class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
   TextEditingController nameEtController = TextEditingController();
-  TextEditingController linkEtController = TextEditingController();
-  late IbCollection newCollection;
+
+  late Icebreaker newIcebreaker;
   FontStyle fontStyle = FontStyle.normal;
   int? selectedIndex;
   List<bool> fontStyleSelection = [true, false];
@@ -37,44 +38,33 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
   @override
   void initState() {
     super.initState();
-    newCollection = IbCollection(
-      name: widget._collection.name,
-      link: widget._collection.link,
-      textStyleIndex: widget._collection.textStyleIndex,
-      id: widget._collection.id,
-      timestamp: widget._collection.timestamp,
-      creatorId: widget._collection.creatorId,
-      bgColor: widget._collection.bgColor,
-      textColor: widget._collection.textColor,
-      isItalic: widget._collection.isItalic,
-      icebreakers: widget._collection.icebreakers,
-    );
+    newIcebreaker = Icebreaker(
+        text: widget.icebreaker.text,
+        id: widget.icebreaker.id,
+        collectionId: widget.icebreaker.collectionId,
+        textStyleIndex: widget.icebreaker.textStyleIndex,
+        timestamp: widget.icebreaker.timestamp,
+        isItalic: widget.icebreaker.isItalic,
+        textColor: widget.icebreaker.textColor,
+        bgColor: widget.icebreaker.bgColor);
+
+    if (widget.icebreaker.text.isEmpty) {
+      newIcebreaker.bgColor = widget.ibCollection.bgColor;
+      newIcebreaker.textColor = widget.ibCollection.textColor;
+      newIcebreaker.textStyleIndex = widget.ibCollection.textStyleIndex;
+    }
+
     nameEtController.addListener(() {
       setState(() {
-        newCollection.name = nameEtController.text.trim();
+        newIcebreaker.text = nameEtController.text.trim();
       });
     });
 
-    linkEtController.addListener(() {
-      if (linkEtController.text.trim().contains('http')) {
-        setState(() {
-          newCollection.link = linkEtController.text.trim();
-        });
-      } else {
-        setState(() {
-          newCollection.link = '';
-        });
-      }
-    });
-    nameEtController.text = widget._collection.name;
-    linkEtController.text = widget._collection.link;
-    fontStyleSelection = [
-      !widget._collection.isItalic,
-      widget._collection.isItalic
-    ];
-    fontStyle =
-        widget._collection.isItalic ? FontStyle.italic : FontStyle.normal;
-    selectedIndex = widget._collection.textStyleIndex;
+    nameEtController.text = newIcebreaker.text;
+
+    fontStyleSelection = [!newIcebreaker.isItalic, newIcebreaker.isItalic];
+    fontStyle = newIcebreaker.isItalic ? FontStyle.italic : FontStyle.normal;
+    selectedIndex = newIcebreaker.textStyleIndex;
   }
 
   @override
@@ -86,7 +76,7 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
         color: Theme.of(context).indicatorColor));
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Cover '),
+        title: const Text('Edit Icebreaker '),
         actions: [
           IconButton(
               onPressed: () {
@@ -95,14 +85,21 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
               icon: const Icon(Icons.color_lens_outlined)),
           TextButton(
               onPressed: () async {
-                if (newCollection.name.trim().isNotEmpty) {
-                  newCollection.timestamp = FieldValue.serverTimestamp();
+                if (newIcebreaker.text.trim().isNotEmpty) {
+                  newIcebreaker.timestamp = Timestamp.now();
                   try {
+                    final index = widget.ibCollection.icebreakers.indexWhere(
+                        (element) => element.id == newIcebreaker.id);
+                    if (index != -1) {
+                      widget.ibCollection.icebreakers[index] = newIcebreaker;
+                    } else {
+                      widget.ibCollection.icebreakers.add(newIcebreaker);
+                    }
                     await IbAdminDbService()
-                        .addIcebreakerCollection(newCollection);
+                        .addIcebreakerCollection(widget.ibCollection);
                     Get.back();
                     IbUtils.showSimpleSnackBar(
-                        msg: 'Collection Updated',
+                        msg: 'Icebreaker Updated',
                         backgroundColor: IbColors.accentColor);
                   } catch (e) {
                     Get.dialog(IbDialog(
@@ -131,50 +128,51 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                       showColorPicker();
                     },
                     child: IbCard(
-                      color: Color(newCollection.bgColor),
+                      color: Color(newIcebreaker.bgColor),
                       child: Center(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: InkWell(
-                            onTap: showNameColorPicker,
-                            child: AutoSizeText(
-                              newCollection.name,
-                              textAlign: TextAlign.center,
-                              minFontSize: IbConfig.kNormalTextSize,
-                              maxFontSize: IbConfig.kSloganSize,
-                              maxLines: 4,
-                              style: IbUtils.getIbFonts(TextStyle(
-                                  color: Color(newCollection.textColor),
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: fontStyle,
-                                  fontSize: IbConfig
-                                      .kSloganSize))[selectedIndex ?? 0],
-                            ),
-                          ),
+                              onTap: showNameColorPicker,
+                              child: AutoSizeText(
+                                newIcebreaker.text,
+                                textAlign: TextAlign.center,
+                                minFontSize: IbConfig.kNormalTextSize,
+                                maxFontSize: IbConfig.kSloganSize,
+                                maxLines: 5,
+                                style: IbUtils.getIbFonts(TextStyle(
+                                    color: Color(newIcebreaker.textColor),
+                                    fontWeight: FontWeight.bold,
+                                    fontStyle: fontStyle,
+                                    fontSize: IbConfig
+                                        .kSloganSize))[selectedIndex ?? 0],
+                              )),
                         ),
                       ),
                     ),
                   ),
                 ),
-                if (newCollection.link.trim().isNotEmpty)
-                  Positioned(
-                      top: 16,
-                      right: 16,
-                      child: CircleAvatar(
-                        backgroundColor:
-                            Theme.of(context).backgroundColor.withOpacity(0.8),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.link,
-                            color: Theme.of(context).indicatorColor,
-                          ),
-                          onPressed: () async {
-                            if (await canLaunch(newCollection.link.trim())) {
-                              launch(newCollection.link);
-                            }
-                          },
+                Positioned(
+                    bottom: 16,
+                    right: 8,
+                    child: LimitedBox(
+                      maxWidth: 300,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 4, right: 8),
+                        child: Text(
+                          widget.ibCollection.name,
+                          overflow: TextOverflow.ellipsis,
+                          style: IbUtils.getIbFonts(TextStyle(
+                                  fontSize: IbConfig.kDescriptionTextSize,
+                                  color: Color(widget.ibCollection.textColor),
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: widget.ibCollection.isItalic
+                                      ? FontStyle.italic
+                                      : FontStyle.normal))[
+                              widget.ibCollection.textStyleIndex],
                         ),
-                      ))
+                      ),
+                    ))
               ],
             ),
             Row(
@@ -194,10 +192,10 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                         fontStyleSelection[index] = !fontStyleSelection[index];
                         if (index == 0 && fontStyleSelection[index]) {
                           fontStyle = FontStyle.normal;
-                          newCollection.isItalic = false;
+                          newIcebreaker.isItalic = false;
                         } else {
                           fontStyle = FontStyle.italic;
-                          newCollection.isItalic = true;
+                          newIcebreaker.isItalic = true;
                         }
                         items = IbUtils.getIbFonts(TextStyle(
                             fontSize: IbConfig.kNormalTextSize,
@@ -246,7 +244,7 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                     setState(() {
                       if (style != null) {
                         selectedIndex = items.indexOf(style as TextStyle);
-                        newCollection.textStyleIndex = selectedIndex ?? 0;
+                        newIcebreaker.textStyleIndex = selectedIndex ?? 0;
                       }
                     });
                   },
@@ -262,17 +260,17 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
               children: [
                 IbTextField(
                   titleIcon: const Icon(Icons.drive_file_rename_outline),
-                  titleTrKey: 'Title',
-                  hintTrKey: 'Enter cover title here',
-                  charLimit: 100,
-                  maxLines: 6,
+                  titleTrKey: 'Text',
+                  hintTrKey: 'Enter icebreaker text here',
+                  charLimit: 200,
+                  maxLines: 10,
                   controller: nameEtController,
                   suffixIcon: CircleAvatar(
                     backgroundColor: Theme.of(context).backgroundColor,
                     child: IconButton(
                       icon: Icon(
                         Icons.color_lens_outlined,
-                        color: Color(newCollection.textColor),
+                        color: Color(newIcebreaker.textColor),
                       ),
                       onPressed: () {
                         showNameColorPicker();
@@ -282,12 +280,6 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                 ),
               ],
             ),
-            IbTextField(
-              titleIcon: const Icon(Icons.link),
-              titleTrKey: 'Link',
-              hintTrKey: 'Enter source link here',
-              controller: linkEtController,
-            )
           ],
         ),
       ),
@@ -303,10 +295,10 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
         height: 300,
         child: MaterialPicker(
           portraitOnly: true,
-          pickerColor: Color(newCollection.bgColor),
+          pickerColor: Color(newIcebreaker.bgColor),
           onColorChanged: (Color value) {
             setState(() {
-              newCollection.bgColor = value.value;
+              newIcebreaker.bgColor = value.value;
             });
           },
         ),
@@ -324,10 +316,10 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
         height: 300,
         child: MaterialPicker(
           portraitOnly: true,
-          pickerColor: Color(newCollection.textColor),
+          pickerColor: Color(newIcebreaker.textColor),
           onColorChanged: (Color value) {
             setState(() {
-              newCollection.textColor = value.value;
+              newIcebreaker.textColor = value.value;
             });
           },
         ),

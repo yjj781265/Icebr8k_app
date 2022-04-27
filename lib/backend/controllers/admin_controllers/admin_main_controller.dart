@@ -31,11 +31,11 @@ class AdminMainController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    applicationSub = IbAdminService()
+    applicationSub = IbAdminDbService()
         .listenToPendingApplications()
         .listen((event) => _handlePendingApplicationSnapshot(event));
 
-    ibCollectionsSub = IbAdminService()
+    ibCollectionsSub = IbAdminDbService()
         .listenToIcebreakerCollection()
         .listen((event) => _handleIbCollectionSnapshot(event));
   }
@@ -196,9 +196,9 @@ class AdminMainController extends GetxController {
 
   Future<void> approveApplication(IbUser user) async {
     try {
-      await IbAdminService()
+      await IbAdminDbService()
           .updateUserStatus(status: IbUser.kUserStatusApproved, uid: user.id);
-      await IbAdminService().sendStatusEmail(
+      await IbAdminDbService().sendStatusEmail(
           email: user.email,
           fName: user.fName,
           status: IbUser.kUserStatusApproved);
@@ -234,17 +234,17 @@ class AdminMainController extends GetxController {
             }
             Get.back();
             Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));
-            await IbAdminService().updateUserStatus(
+            await IbAdminDbService().updateUserStatus(
                 status: IbUser.kUserStatusRejected,
                 uid: user.id,
                 note: editingController.text.trim());
-            await IbAdminService().sendStatusEmail(
+            await IbAdminDbService().sendStatusEmail(
                 email: user.email,
                 fName: user.fName,
                 note: editingController.text.trim(),
                 status: IbUser.kUserStatusRejected);
-            await IbAdminService().deleteAllEmoPics(user);
-            await IbAdminService().deleteAvatarUrl(user);
+            await IbAdminDbService().deleteAllEmoPics(user);
+            await IbAdminDbService().deleteAvatarUrl(user);
             Get.back();
             Get.back();
             IbUtils.showSimpleSnackBar(

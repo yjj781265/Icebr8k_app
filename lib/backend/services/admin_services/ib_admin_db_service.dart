@@ -4,18 +4,17 @@ import 'package:icebr8k/backend/db_config.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/ib_collection.dart';
-import 'package:icebr8k/backend/models/icebreaker_models/icebreaker.dart';
 import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 
-class IbAdminService {
-  static final _ibAdminDbService = IbAdminService._();
+class IbAdminDbService {
+  static final _ibAdminDbService = IbAdminDbService._();
   static final _db = FirebaseFirestore.instance;
   static const _kUsersCollection = 'IbUsers${DbConfig.dbSuffix}';
   static const _kIcebreakerCollection = 'Icebreakers';
 
-  factory IbAdminService() => _ibAdminDbService;
+  factory IbAdminDbService() => _ibAdminDbService;
 
-  IbAdminService._();
+  IbAdminDbService._();
 
   Stream<QuerySnapshot<Map<String, dynamic>>> listenToPendingApplications() {
     return _db
@@ -30,24 +29,6 @@ class IbAdminService {
         .collection(_kIcebreakerCollection)
         .orderBy('timestamp')
         .snapshots();
-  }
-
-  Future<void> addIcebreaker(Icebreaker icebreaker) async {
-    return _db
-        .collection(_kIcebreakerCollection)
-        .doc(icebreaker.collectionId)
-        .update({
-      'icebreakers': FieldValue.arrayUnion([icebreaker.toJson()])
-    });
-  }
-
-  Future<void> removeIcebreaker(Icebreaker icebreaker) async {
-    return _db
-        .collection(_kIcebreakerCollection)
-        .doc(icebreaker.collectionId)
-        .update({
-      'icebreakers': FieldValue.arrayRemove([icebreaker.toJson()])
-    });
   }
 
   Future<void> addIcebreakerCollection(IbCollection ibCollection) async {

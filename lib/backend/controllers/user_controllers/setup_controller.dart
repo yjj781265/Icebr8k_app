@@ -246,7 +246,7 @@ class SetupController extends GetxController {
             bio: bioTeController.text.trim(),
             emoPics: emoPics);
         await IbUserDbService().registerNewUser(user);
-        await IbAdminService().sendStatusEmail(
+        await IbAdminDbService().sendStatusEmail(
             email: user.email,
             fName: user.fName,
             status: IbUser.kUserStatusPending);
