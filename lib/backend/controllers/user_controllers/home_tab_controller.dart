@@ -42,33 +42,29 @@ class HomeTabController extends GetxController {
     });
   }
 
-  Future<void> onRefresh() async {
+  Future<void> onRefresh({bool refreshStats = false}) async {
     refreshController.resetNoData();
     trendingList.clear();
     lastDoc = null;
+
     try {
       final snapshot = await IbQuestionDbService().queryTrendingQuestions();
+
       for (final doc in snapshot.docs) {
         trendingList.add(IbQuestion.fromJson(doc.data()));
       }
 
       trendingList.sort((a, b) => b.points.compareTo(a.points));
 
-      if (snapshot.docs.isNotEmpty) {
-        lastDoc = snapshot.docs.first;
-        final lastQuestion = trendingList
-            .firstWhereOrNull((element) => element.id == lastDoc!.id);
-        if (lastQuestion == null) {
-          refreshController.refreshCompleted();
-          return;
-        }
-        final snap = await IbQuestionDbService()
-            .queryIbQuestions(askedTimeInMs: lastQuestion.askedTimeInMs);
+      final snap = await IbQuestionDbService().queryIbQuestions(
+          askedTimeInMs: Timestamp.now().millisecondsSinceEpoch);
 
-        for (final doc in snap.docs) {
-          trendingList.add(IbQuestion.fromJson(doc.data()));
-          lastDoc = doc;
-        }
+      for (final doc in snap.docs) {
+        trendingList.add(IbQuestion.fromJson(doc.data()));
+        lastDoc = doc;
+      }
+
+      if (refreshStats) {
         await _refreshQuestionItemControllers();
       }
 

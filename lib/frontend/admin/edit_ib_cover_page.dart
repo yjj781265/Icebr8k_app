@@ -177,116 +177,127 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                       ))
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ToggleButtons(
-                    borderRadius: const BorderRadius.all(Radius.circular(8)),
-                    borderColor: IbColors.lightGrey,
-                    selectedColor: IbColors.primaryColor,
-                    selectedBorderColor: IbColors.accentColor,
-                    borderWidth: 2,
-                    onPressed: (index) {
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ToggleButtons(
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+                      borderColor: IbColors.lightGrey,
+                      selectedColor: IbColors.primaryColor,
+                      selectedBorderColor: IbColors.accentColor,
+                      borderWidth: 2,
+                      onPressed: (index) {
+                        setState(() {
+                          for (int i = 0; i < fontStyleSelection.length; i++) {
+                            fontStyleSelection[i] = false;
+                          }
+                          fontStyleSelection[index] =
+                              !fontStyleSelection[index];
+                          if (index == 0 && fontStyleSelection[index]) {
+                            fontStyle = FontStyle.normal;
+                            newCollection.isItalic = false;
+                          } else {
+                            fontStyle = FontStyle.italic;
+                            newCollection.isItalic = true;
+                          }
+                          items = IbUtils.getIbFonts(TextStyle(
+                              fontSize: IbConfig.kNormalTextSize,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: fontStyle,
+                              color: Theme.of(context).indicatorColor));
+                        });
+                      },
+                      isSelected: fontStyleSelection,
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.all(4.0),
+                          child: Icon(FontAwesomeIcons.font,
+                              size: 16, color: IbColors.lightGrey),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(4.0),
+                          child: Icon(
+                            FontAwesomeIcons.italic,
+                            size: 16,
+                            color: IbColors.lightGrey,
+                          ),
+                        ),
+                      ]),
+                  DropdownButton2(
+                    buttonWidth: 120,
+                    dropdownWidth: 100,
+                    itemHeight: 40,
+                    hint: const Text(
+                      'Select Font',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: IbColors.lightGrey,
+                      ),
+                    ),
+                    items: items
+                        .map((e) => DropdownMenuItem<TextStyle>(
+                              value: e,
+                              child: Text(
+                                'Icebr8k',
+                                style: e,
+                              ),
+                            ))
+                        .toList(),
+                    onChanged: (style) {
                       setState(() {
-                        for (int i = 0; i < fontStyleSelection.length; i++) {
-                          fontStyleSelection[i] = false;
+                        if (style != null) {
+                          selectedIndex = items.indexOf(style as TextStyle);
+                          newCollection.textStyleIndex = selectedIndex ?? 0;
                         }
-                        fontStyleSelection[index] = !fontStyleSelection[index];
-                        if (index == 0 && fontStyleSelection[index]) {
-                          fontStyle = FontStyle.normal;
-                          newCollection.isItalic = false;
-                        } else {
-                          fontStyle = FontStyle.italic;
-                          newCollection.isItalic = true;
-                        }
-                        items = IbUtils.getIbFonts(TextStyle(
-                            fontSize: IbConfig.kNormalTextSize,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: fontStyle,
-                            color: Theme.of(context).indicatorColor));
                       });
                     },
-                    isSelected: fontStyleSelection,
-                    children: const [
-                      Padding(
-                        padding: EdgeInsets.all(4.0),
-                        child: Icon(FontAwesomeIcons.font,
-                            size: 16, color: IbColors.lightGrey),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(4.0),
-                        child: Icon(
-                          FontAwesomeIcons.italic,
-                          size: 16,
-                          color: IbColors.lightGrey,
-                        ),
-                      ),
-                    ]),
-                DropdownButton2(
-                  buttonWidth: 120,
-                  dropdownWidth: 100,
-                  itemHeight: 40,
-                  hint: const Text(
-                    'Select Font',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: IbColors.lightGrey,
-                    ),
-                  ),
-                  items: items
-                      .map((e) => DropdownMenuItem<TextStyle>(
-                            value: e,
-                            child: Text(
-                              'Icebr8k',
-                              style: e,
-                            ),
-                          ))
-                      .toList(),
-                  onChanged: (style) {
-                    setState(() {
-                      if (style != null) {
-                        selectedIndex = items.indexOf(style as TextStyle);
-                        newCollection.textStyleIndex = selectedIndex ?? 0;
-                      }
-                    });
-                  },
-                  value:
-                      selectedIndex == null ? null : items[selectedIndex ?? 0],
-                )
-              ],
+                    value: selectedIndex == null
+                        ? null
+                        : items[selectedIndex ?? 0],
+                  )
+                ],
+              ),
             ),
             const SizedBox(
               height: 8,
             ),
-            Column(
-              children: [
-                IbTextField(
-                  titleIcon: const Icon(Icons.drive_file_rename_outline),
-                  titleTrKey: 'Title',
-                  hintTrKey: 'Enter cover title here',
-                  charLimit: 100,
-                  maxLines: 6,
-                  controller: nameEtController,
-                  suffixIcon: CircleAvatar(
-                    backgroundColor: Theme.of(context).backgroundColor,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.color_lens_outlined,
-                        color: Color(newCollection.textColor),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  IbTextField(
+                    titleIcon: const Icon(Icons.drive_file_rename_outline),
+                    titleTrKey: 'Title',
+                    hintTrKey: 'Enter cover title here',
+                    charLimit: 100,
+                    maxLines: 6,
+                    controller: nameEtController,
+                    suffixIcon: CircleAvatar(
+                      backgroundColor: Theme.of(context).backgroundColor,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.color_lens_outlined,
+                          color: Color(newCollection.textColor),
+                        ),
+                        onPressed: () {
+                          showNameColorPicker();
+                        },
                       ),
-                      onPressed: () {
-                        showNameColorPicker();
-                      },
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            IbTextField(
-              titleIcon: const Icon(Icons.link),
-              titleTrKey: 'Link',
-              hintTrKey: 'Enter source link here',
-              controller: linkEtController,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: IbTextField(
+                titleIcon: const Icon(Icons.link),
+                titleTrKey: 'Link',
+                hintTrKey: 'Enter source link here',
+                controller: linkEtController,
+              ),
             )
           ],
         ),

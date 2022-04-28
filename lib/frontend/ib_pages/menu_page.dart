@@ -139,7 +139,7 @@ class _MenuPageState extends State<MenuPage> {
                   },
                   leading: const Icon(
                     FontAwesomeIcons.chessKing,
-                    color: IbColors.creamYellow,
+                    color: IbColors.lightGrey,
                   ),
                   title: const Text('Admin Page',
                       style: TextStyle(

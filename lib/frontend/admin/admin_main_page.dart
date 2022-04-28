@@ -69,7 +69,9 @@ class AdminMainPage extends StatelessWidget {
                   child: IbElevatedButton(
                     textTrKey: 'Icebreaker Collections',
                     onPressed: () {
-                      Get.to(() => EditIbCollectionMainPage());
+                      Get.to(() => EditIbCollectionMainPage(
+                            isEdit: true,
+                          ));
                     },
                     color: IbColors.primaryColor,
                   )),

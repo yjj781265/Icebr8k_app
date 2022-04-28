@@ -14,7 +14,9 @@ import '../../backend/controllers/admin_controllers/admin_main_controller.dart';
 
 class EditIbCollectionMainPage extends StatelessWidget {
   final AdminMainController _controller = Get.find();
-  EditIbCollectionMainPage({Key? key}) : super(key: key);
+  final bool isEdit;
+
+  EditIbCollectionMainPage({this.isEdit = false, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -48,21 +50,24 @@ class EditIbCollectionMainPage extends StatelessWidget {
                                 child: IbCard(
                                   color: Color(e.bgColor),
                                   child: Center(
-                                    child: AutoSizeText(
-                                      e.name,
-                                      textAlign: TextAlign.center,
-                                      overflow: TextOverflow.ellipsis,
-                                      minFontSize: IbConfig.kNormalTextSize,
-                                      maxFontSize: IbConfig.kSloganSize,
-                                      maxLines: 4,
-                                      style: IbUtils.getIbFonts(TextStyle(
-                                          fontSize: IbConfig.kNormalTextSize,
-                                          fontStyle: e.isItalic
-                                              ? FontStyle.italic
-                                              : FontStyle.normal,
-                                          color: Color(e.textColor),
-                                          fontWeight: FontWeight
-                                              .bold))[e.textStyleIndex],
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: AutoSizeText(
+                                        e.name,
+                                        textAlign: TextAlign.center,
+                                        overflow: TextOverflow.ellipsis,
+                                        minFontSize: IbConfig.kNormalTextSize,
+                                        maxFontSize: IbConfig.kSloganSize,
+                                        maxLines: 4,
+                                        style: IbUtils.getIbFonts(TextStyle(
+                                            fontSize: IbConfig.kNormalTextSize,
+                                            fontStyle: e.isItalic
+                                                ? FontStyle.italic
+                                                : FontStyle.normal,
+                                            color: Color(e.textColor),
+                                            fontWeight: FontWeight
+                                                .bold))[e.textStyleIndex],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -70,11 +75,12 @@ class EditIbCollectionMainPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        TextButton(
-                            onPressed: () {
-                              Get.to(() => EditIbCoverPage(e));
-                            },
-                            child: const Text('^ Edit Cover'))
+                        if (isEdit)
+                          TextButton(
+                              onPressed: () {
+                                Get.to(() => EditIbCoverPage(e));
+                              },
+                              child: const Text('^ Edit Cover'))
                       ],
                     ))
                 .toList(),

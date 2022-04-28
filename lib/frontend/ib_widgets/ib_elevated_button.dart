@@ -11,6 +11,7 @@ class IbElevatedButton extends StatelessWidget {
   final Color color;
   final Color? textColor;
   final Widget? icon;
+  final double textSize;
   final bool disabled;
   const IbElevatedButton(
       {Key? key,
@@ -19,6 +20,7 @@ class IbElevatedButton extends StatelessWidget {
       this.onLongPressed,
       this.icon,
       this.textColor,
+      this.textSize = 18,
       this.disabled = false,
       this.color = IbColors.accentColor})
       : super(key: key);
@@ -39,8 +41,8 @@ class IbElevatedButton extends StatelessWidget {
             //to set border radius to button
             borderRadius: BorderRadius.circular(IbConfig.kButtonCornerRadius),
           ),
-          primary: color),
-      onPressed: disabled ? null : () => onPressed(),
+          primary: disabled ? IbColors.lightGrey : color),
+      onPressed: disabled ? () {} : () => onPressed(),
       onHover: (flag) {
         print(flag);
       },
@@ -52,9 +54,7 @@ class IbElevatedButton extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-            fontSize: IbConfig.kNormalTextSize,
-            color: textColor,
-            fontWeight: FontWeight.bold),
+            fontSize: textSize, color: textColor, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -67,8 +67,8 @@ class IbElevatedButton extends StatelessWidget {
             //to set border radius to button
             borderRadius: BorderRadius.circular(IbConfig.kButtonCornerRadius),
           ),
-          primary: color),
-      onPressed: disabled ? null : () => onPressed(),
+          primary: disabled ? IbColors.lightGrey : color),
+      onPressed: disabled ? () {} : () => onPressed(),
       onLongPress: disabled
           ? null
           : () => onLongPressed == null ? null : onLongPressed!(),
@@ -78,9 +78,7 @@ class IbElevatedButton extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-            fontSize: IbConfig.kNormalTextSize,
-            color: textColor,
-            fontWeight: FontWeight.bold),
+            fontSize: textSize, color: textColor, fontWeight: FontWeight.bold),
       ),
     );
   }

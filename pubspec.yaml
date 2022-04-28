@@ -23,8 +23,8 @@ environment:
 dependencies:
   animations: ^2.0.2
   auto_size_text: ^3.0.0
-  auto_size_text_field: ^1.0.1
   cached_network_image: ^3.2.0
+  carousel_slider: ^4.1.1
   cloud_firestore: ^3.1.11
   cloud_functions: ^3.2.11
   cupertino_icons: ^1.0.2
@@ -62,6 +62,7 @@ dependencies:
   pull_to_refresh: ^2.0.0
   reorderables: ^0.4.3
   scrollable_positioned_list: ^0.2.3
+  shake: ^2.1.0
   showcaseview: ^1.1.5
   typesense: ^0.2.0
   url_launcher: ^6.0.20

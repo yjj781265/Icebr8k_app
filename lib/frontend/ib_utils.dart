@@ -281,15 +281,15 @@ class IbUtils {
   static List<TextStyle> getIbFonts(TextStyle style) {
     return [
       GoogleFonts.openSans(textStyle: style),
-      GoogleFonts.roboto(textStyle: style),
+      GoogleFonts.robotoSlab(textStyle: style),
       GoogleFonts.breeSerif(textStyle: style),
       GoogleFonts.comicNeue(textStyle: style),
-      GoogleFonts.pacifico(textStyle: style),
+      GoogleFonts.nothingYouCouldDo(textStyle: style),
       GoogleFonts.shadowsIntoLight(textStyle: style),
-      GoogleFonts.permanentMarker(textStyle: style),
+      GoogleFonts.abrilFatface(textStyle: style),
       GoogleFonts.caveat(textStyle: style),
-      GoogleFonts.satisfy(textStyle: style),
-      GoogleFonts.cookie(textStyle: style),
+      GoogleFonts.cormorantGaramond(textStyle: style),
+      GoogleFonts.theGirlNextDoor(textStyle: style),
     ];
   }
 

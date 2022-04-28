@@ -41,7 +41,7 @@ class HomeTab extends StatelessWidget {
           () => SmartRefresher(
             enablePullUp: true,
             onRefresh: () async {
-              await _controller.onRefresh();
+              await _controller.onRefresh(refreshStats: true);
             },
             onLoading: () async {
               await _controller.loadMore();

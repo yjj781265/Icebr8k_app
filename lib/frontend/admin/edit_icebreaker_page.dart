@@ -76,16 +76,32 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
         color: Theme.of(context).indicatorColor));
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Icebreaker '),
+        title: const Text('Edit Icebreaker'),
         actions: [
           IconButton(
               onPressed: () {
                 showColorPicker();
               },
               icon: const Icon(Icons.color_lens_outlined)),
+          IconButton(
+              onPressed: () async {
+                widget.ibCollection.icebreakers
+                    .removeWhere((element) => element.id == newIcebreaker.id);
+                await IbAdminDbService()
+                    .addIcebreakerCollection(widget.ibCollection);
+                Get.back();
+              },
+              icon: const Icon(
+                Icons.delete,
+                color: IbColors.errorRed,
+              )),
           TextButton(
               onPressed: () async {
-                if (newIcebreaker.text.trim().isNotEmpty) {
+                if (newIcebreaker.text.trim().isNotEmpty &&
+                    widget.ibCollection.icebreakers.firstWhereOrNull(
+                            (element) =>
+                                element.text == newIcebreaker.text.trim()) ==
+                        null) {
                   newIcebreaker.timestamp = Timestamp.now();
                   try {
                     final index = widget.ibCollection.icebreakers.indexWhere(
@@ -108,6 +124,10 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
                       showNegativeBtn: false,
                     ));
                   }
+                } else {
+                  IbUtils.showSimpleSnackBar(
+                      msg: 'Question already exists',
+                      backgroundColor: IbColors.errorRed);
                 }
               },
               child: Text('confirm'.tr))
@@ -118,35 +138,42 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
           children: [
             Stack(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  height: 350 * 1.44,
-                  width: 350,
-                  child: InkWell(
-                    borderRadius: const BorderRadius.all(Radius.circular(16)),
-                    onTap: () {
-                      showColorPicker();
-                    },
-                    child: IbCard(
-                      color: Color(newIcebreaker.bgColor),
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: InkWell(
-                              onTap: showNameColorPicker,
-                              child: AutoSizeText(
-                                newIcebreaker.text,
-                                textAlign: TextAlign.center,
-                                minFontSize: IbConfig.kNormalTextSize,
-                                maxFontSize: IbConfig.kSloganSize,
-                                maxLines: 5,
-                                style: IbUtils.getIbFonts(TextStyle(
-                                    color: Color(newIcebreaker.textColor),
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: fontStyle,
-                                    fontSize: IbConfig
-                                        .kSloganSize))[selectedIndex ?? 0],
-                              )),
+                Hero(
+                  tag: newIcebreaker.id,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      height: 350 * 1.44,
+                      width: 350,
+                      child: InkWell(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(16)),
+                        onTap: () {
+                          showColorPicker();
+                        },
+                        child: IbCard(
+                          color: Color(newIcebreaker.bgColor),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: InkWell(
+                                  onTap: showNameColorPicker,
+                                  child: AutoSizeText(
+                                    newIcebreaker.text,
+                                    textAlign: TextAlign.center,
+                                    minFontSize: IbConfig.kNormalTextSize,
+                                    maxFontSize: IbConfig.kSloganSize,
+                                    maxLines: 5,
+                                    style: IbUtils.getIbFonts(TextStyle(
+                                        color: Color(newIcebreaker.textColor),
+                                        fontWeight: FontWeight.bold,
+                                        fontStyle: fontStyle,
+                                        fontSize: IbConfig
+                                            .kSloganSize))[selectedIndex ?? 0],
+                                  )),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -175,110 +202,118 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
                     ))
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ToggleButtons(
-                    borderRadius: const BorderRadius.all(Radius.circular(8)),
-                    borderColor: IbColors.lightGrey,
-                    selectedColor: IbColors.primaryColor,
-                    selectedBorderColor: IbColors.accentColor,
-                    borderWidth: 2,
-                    onPressed: (index) {
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ToggleButtons(
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+                      borderColor: IbColors.lightGrey,
+                      selectedColor: IbColors.primaryColor,
+                      selectedBorderColor: IbColors.accentColor,
+                      borderWidth: 2,
+                      onPressed: (index) {
+                        setState(() {
+                          for (int i = 0; i < fontStyleSelection.length; i++) {
+                            fontStyleSelection[i] = false;
+                          }
+                          fontStyleSelection[index] =
+                              !fontStyleSelection[index];
+                          if (index == 0 && fontStyleSelection[index]) {
+                            fontStyle = FontStyle.normal;
+                            newIcebreaker.isItalic = false;
+                          } else {
+                            fontStyle = FontStyle.italic;
+                            newIcebreaker.isItalic = true;
+                          }
+                          items = IbUtils.getIbFonts(TextStyle(
+                              fontSize: IbConfig.kNormalTextSize,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: fontStyle,
+                              color: Theme.of(context).indicatorColor));
+                        });
+                      },
+                      isSelected: fontStyleSelection,
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.all(4.0),
+                          child: Icon(FontAwesomeIcons.font,
+                              size: 16, color: IbColors.lightGrey),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(4.0),
+                          child: Icon(
+                            FontAwesomeIcons.italic,
+                            size: 16,
+                            color: IbColors.lightGrey,
+                          ),
+                        ),
+                      ]),
+                  DropdownButton2(
+                    buttonWidth: 120,
+                    dropdownWidth: 100,
+                    itemHeight: 40,
+                    hint: const Text(
+                      'Select Font',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: IbColors.lightGrey,
+                      ),
+                    ),
+                    items: items
+                        .map((e) => DropdownMenuItem<TextStyle>(
+                              value: e,
+                              child: Text(
+                                'Icebr8k',
+                                style: e,
+                              ),
+                            ))
+                        .toList(),
+                    onChanged: (style) {
                       setState(() {
-                        for (int i = 0; i < fontStyleSelection.length; i++) {
-                          fontStyleSelection[i] = false;
+                        if (style != null) {
+                          selectedIndex = items.indexOf(style as TextStyle);
+                          newIcebreaker.textStyleIndex = selectedIndex ?? 0;
                         }
-                        fontStyleSelection[index] = !fontStyleSelection[index];
-                        if (index == 0 && fontStyleSelection[index]) {
-                          fontStyle = FontStyle.normal;
-                          newIcebreaker.isItalic = false;
-                        } else {
-                          fontStyle = FontStyle.italic;
-                          newIcebreaker.isItalic = true;
-                        }
-                        items = IbUtils.getIbFonts(TextStyle(
-                            fontSize: IbConfig.kNormalTextSize,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: fontStyle,
-                            color: Theme.of(context).indicatorColor));
                       });
                     },
-                    isSelected: fontStyleSelection,
-                    children: const [
-                      Padding(
-                        padding: EdgeInsets.all(4.0),
-                        child: Icon(FontAwesomeIcons.font,
-                            size: 16, color: IbColors.lightGrey),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(4.0),
-                        child: Icon(
-                          FontAwesomeIcons.italic,
-                          size: 16,
-                          color: IbColors.lightGrey,
-                        ),
-                      ),
-                    ]),
-                DropdownButton2(
-                  buttonWidth: 120,
-                  dropdownWidth: 100,
-                  itemHeight: 40,
-                  hint: const Text(
-                    'Select Font',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: IbColors.lightGrey,
-                    ),
-                  ),
-                  items: items
-                      .map((e) => DropdownMenuItem<TextStyle>(
-                            value: e,
-                            child: Text(
-                              'Icebr8k',
-                              style: e,
-                            ),
-                          ))
-                      .toList(),
-                  onChanged: (style) {
-                    setState(() {
-                      if (style != null) {
-                        selectedIndex = items.indexOf(style as TextStyle);
-                        newIcebreaker.textStyleIndex = selectedIndex ?? 0;
-                      }
-                    });
-                  },
-                  value:
-                      selectedIndex == null ? null : items[selectedIndex ?? 0],
-                )
-              ],
+                    value: selectedIndex == null
+                        ? null
+                        : items[selectedIndex ?? 0],
+                  )
+                ],
+              ),
             ),
             const SizedBox(
               height: 8,
             ),
-            Column(
-              children: [
-                IbTextField(
-                  titleIcon: const Icon(Icons.drive_file_rename_outline),
-                  titleTrKey: 'Text',
-                  hintTrKey: 'Enter icebreaker text here',
-                  charLimit: 200,
-                  maxLines: 10,
-                  controller: nameEtController,
-                  suffixIcon: CircleAvatar(
-                    backgroundColor: Theme.of(context).backgroundColor,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.color_lens_outlined,
-                        color: Color(newIcebreaker.textColor),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  IbTextField(
+                    titleIcon: const Icon(Icons.drive_file_rename_outline),
+                    titleTrKey: 'Text',
+                    hintTrKey: 'Enter icebreaker text here',
+                    charLimit: 200,
+                    maxLines: 10,
+                    controller: nameEtController,
+                    suffixIcon: CircleAvatar(
+                      backgroundColor: Theme.of(context).backgroundColor,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.color_lens_outlined,
+                          color: Color(newIcebreaker.textColor),
+                        ),
+                        onPressed: () {
+                          showNameColorPicker();
+                        },
                       ),
-                      onPressed: () {
-                        showNameColorPicker();
-                      },
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

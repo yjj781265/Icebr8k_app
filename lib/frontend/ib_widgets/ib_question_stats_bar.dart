@@ -134,6 +134,9 @@ class IbQuestionStatsBar extends StatelessWidget {
 
   Future<void> _handleOnShareTap() async {
     final list = await Get.to(() => const SelectChatPage());
+    if (list == null) {
+      return;
+    }
     final items = (list as List<dynamic>).map((e) => e as ChatTabItem).toList();
     if (items.isNotEmpty) {
       Get.dialog(const IbLoadingDialog(messageTrKey: 'Sharing...'),

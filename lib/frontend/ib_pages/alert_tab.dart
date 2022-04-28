@@ -233,21 +233,23 @@ class AlertTab extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Expanded(
-                          flex: 2,
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              IbUtils.getAgoDateTimeString(
-                                  DateTime.fromMillisecondsSinceEpoch(
-                                      (item.notification.timestamp as Timestamp)
-                                          .millisecondsSinceEpoch)),
-                              style: const TextStyle(
-                                  fontSize: IbConfig.kDescriptionTextSize,
-                                  color: IbColors.lightGrey),
+                        if (item.notification.timestamp != null)
+                          Expanded(
+                            flex: 2,
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                IbUtils.getAgoDateTimeString(
+                                    DateTime.fromMillisecondsSinceEpoch((item
+                                            .notification
+                                            .timestamp as Timestamp)
+                                        .millisecondsSinceEpoch)),
+                                style: const TextStyle(
+                                    fontSize: IbConfig.kDescriptionTextSize,
+                                    color: IbColors.lightGrey),
+                              ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                     Padding(
