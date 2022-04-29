@@ -92,7 +92,7 @@ class _SelectChatPageState extends State<SelectChatPage> {
     final double radius = avatarUsers.length > 1 ? 10 : 24;
     return CircleAvatar(
       backgroundColor: Theme.of(context).backgroundColor,
-      radius: 26,
+      radius: 24,
       child: Wrap(
         spacing: 1,
         runSpacing: 1,

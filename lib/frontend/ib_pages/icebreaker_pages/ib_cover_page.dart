@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/icebreaker_controller.dart';
@@ -35,104 +36,113 @@ class _IbCoverPageState extends State<IbCoverPage> {
       appBar: AppBar(
         title: Text(widget.ibCollection.name),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Align(
-            child: Hero(
-              tag: widget.ibCollection.id,
-              child: Material(
-                color: Colors.transparent,
-                child: Stack(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      width: Get.width,
-                      height: (Get.width) * 1.44,
-                      child: IbCard(
-                        color: Color(widget.ibCollection.bgColor),
-                        child: Center(
-                          child: AutoSizeText(
-                            widget.ibCollection.name,
-                            textAlign: TextAlign.center,
-                            overflow: TextOverflow.ellipsis,
-                            minFontSize: IbConfig.kPageTitleSize,
-                            maxFontSize: IbConfig.kSloganSize,
-                            maxLines: 4,
-                            style: IbUtils.getIbFonts(TextStyle(
-                                fontSize: IbConfig.kSloganSize,
-                                fontStyle: widget.ibCollection.isItalic
-                                    ? FontStyle.italic
-                                    : FontStyle.normal,
-                                color: Color(widget.ibCollection.textColor),
-                                fontWeight: FontWeight
-                                    .bold))[widget.ibCollection.textStyleIndex],
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Align(
+              child: Hero(
+                tag: widget.ibCollection.id,
+                child: Material(
+                  color: Colors.transparent,
+                  child: Stack(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        width: Get.width,
+                        height: (Get.width) * 1.44,
+                        child: IbCard(
+                          color: Color(widget.ibCollection.bgColor),
+                          child: Center(
+                            child: AutoSizeText(
+                              widget.ibCollection.name,
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
+                              minFontSize: IbConfig.kPageTitleSize,
+                              maxFontSize: IbConfig.kSloganSize,
+                              maxLines: 4,
+                              style: IbUtils.getIbFonts(TextStyle(
+                                  fontSize: IbConfig.kSloganSize,
+                                  fontStyle: widget.ibCollection.isItalic
+                                      ? FontStyle.italic
+                                      : FontStyle.normal,
+                                  color: Color(widget.ibCollection.textColor),
+                                  fontWeight:
+                                      FontWeight.bold))[widget
+                                  .ibCollection.textStyleIndex],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    if (widget.ibCollection.link.trim().isNotEmpty)
-                      Positioned(
-                          top: 16,
-                          right: 16,
-                          child: CircleAvatar(
-                            backgroundColor: Theme.of(context)
-                                .backgroundColor
-                                .withOpacity(0.8),
-                            child: IconButton(
-                              icon: Icon(
-                                Icons.link,
-                                color: Theme.of(context).indicatorColor,
+                      if (widget.ibCollection.link.trim().isNotEmpty)
+                        Positioned(
+                            top: 16,
+                            right: 16,
+                            child: CircleAvatar(
+                              backgroundColor: Theme.of(context)
+                                  .backgroundColor
+                                  .withOpacity(0.8),
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.link,
+                                  color: Theme.of(context).indicatorColor,
+                                ),
+                                onPressed: () async {
+                                  if (await canLaunch(
+                                      widget.ibCollection.link.trim())) {
+                                    launch(widget.ibCollection.link);
+                                  }
+                                },
                               ),
-                              onPressed: () async {
-                                if (await canLaunch(
-                                    widget.ibCollection.link.trim())) {
-                                  launch(widget.ibCollection.link);
-                                }
-                              },
-                            ),
-                          )),
-                    if (widget.ibCollection.icebreakers.isNotEmpty)
-                      Positioned(
-                          bottom: 16,
-                          left: 0,
-                          right: 0,
-                          child: CircleAvatar(
-                            backgroundColor: Theme.of(context).backgroundColor,
-                            child: Text(
-                              '$count',
-                              style: const TextStyle(color: IbColors.lightGrey),
-                            ),
-                          ))
-                  ],
+                            )),
+                      if (widget.ibCollection.icebreakers.isNotEmpty)
+                        Positioned(
+                            bottom: 16,
+                            left: 0,
+                            right: 0,
+                            child: Center(
+                              child: IbCard(
+                                elevation: 0,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    '$count Question(s)',
+                                    style: const TextStyle(
+                                        color: IbColors.lightGrey),
+                                  ),
+                                ),
+                              ),
+                            ))
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(
-            height: 16,
-          ),
-          SizedBox(
-            height: 56,
-            width: Get.width,
-            child: IbElevatedButton(
-              textTrKey: widget.isEdit ? 'Edit ✏️' : "Let's 🧊🔨",
-              onPressed: () async {
-                final ibCollection = await Get.to(() => IcebreakerMainPage(
-                    Get.put(IcebreakerController(widget.ibCollection,
-                        isEdit: widget.isEdit))));
-                setState(() {
-                  count = ibCollection == null
-                      ? 0
-                      : (ibCollection as IbCollection).icebreakers.length;
-                });
-              },
-              textSize: IbConfig.kPageTitleSize,
-              textColor: Color(widget.ibCollection.textColor),
-              color: Color(widget.ibCollection.bgColor).withOpacity(0.8),
+            const SizedBox(
+              height: 16,
             ),
-          )
-        ],
+            SizedBox(
+              height: 56,
+              width: Get.width,
+              child: IbElevatedButton(
+                textTrKey: widget.isEdit ? 'Edit ✏️' : "Let's 🧊🔨",
+                onPressed: () async {
+                  final ibCollection = await Get.to(() => IcebreakerMainPage(
+                      Get.put(IcebreakerController(widget.ibCollection,
+                          isEdit: widget.isEdit))));
+                  setState(() {
+                    count = ibCollection == null
+                        ? 0
+                        : (ibCollection as IbCollection).icebreakers.length;
+                  });
+                },
+                textSize: IbConfig.kPageTitleSize,
+                textColor: Color(widget.ibCollection.textColor),
+                color: Color(widget.ibCollection.bgColor).withOpacity(0.8),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

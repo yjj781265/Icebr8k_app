@@ -95,13 +95,13 @@ class TagPage extends StatelessWidget {
                         const SizedBox(
                           height: 8,
                         ),
-                        SizedBox(
-                          width: 150,
-                          child: Obx(
-                            () => IbElevatedButton(
+                        Obx(
+                          () => Center(
+                            child: IbElevatedButton(
                               onPressed: () async {
                                 await _controller.updateTag();
                               },
+                              textSize: IbConfig.kSecondaryTextSize,
                               textTrKey: _controller.isFollower.isTrue
                                   ? 'Unfollow'
                                   : "Follow",

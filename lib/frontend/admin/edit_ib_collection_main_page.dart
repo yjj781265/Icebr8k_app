@@ -13,7 +13,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import '../../backend/controllers/admin_controllers/admin_main_controller.dart';
 
 class EditIbCollectionMainPage extends StatelessWidget {
-  final AdminMainController _controller = Get.find();
+  final AdminMainController _controller = Get.put(AdminMainController());
   final bool isEdit;
 
   EditIbCollectionMainPage({this.isEdit = false, Key? key}) : super(key: key);
@@ -45,7 +45,7 @@ class EditIbCollectionMainPage extends StatelessWidget {
                                     const BorderRadius.all(Radius.circular(8)),
                                 onTap: () => Get.to(() => IbCoverPage(
                                       e,
-                                      isEdit: true,
+                                      isEdit: isEdit,
                                     )),
                                 child: IbCard(
                                   color: Color(e.bgColor),
@@ -87,15 +87,17 @@ class EditIbCollectionMainPage extends StatelessWidget {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Get.to(() => EditIbCoverPage(IbCollection(
-                id: IbUtils.getUniqueId(),
-                name: '',
-              )));
-        },
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: isEdit
+          ? FloatingActionButton(
+              onPressed: () {
+                Get.to(() => EditIbCoverPage(IbCollection(
+                      id: IbUtils.getUniqueId(),
+                      name: '',
+                    )));
+              },
+              child: const Icon(Icons.add),
+            )
+          : const SizedBox(),
     );
   }
 }

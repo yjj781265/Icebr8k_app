@@ -214,6 +214,7 @@ class IbQuestionMcItem extends StatelessWidget {
         return IbColors.accentColor;
       } else if (_controller.rxIbQuestion.value.isQuiz &&
           choice.choiceId != _controller.rxIbQuestion.value.correctChoiceId &&
+          _controller.rxIbAnswer != null &&
           choice.choiceId == _controller.rxIbAnswer!.value.choiceId) {
         return IbColors.errorRed;
       } else if (_controller.rxIbQuestion.value.isQuiz &&
@@ -276,6 +277,7 @@ class IbQuestionMcItem extends StatelessWidget {
     }
     if (_controller.rxIbQuestion.value.isQuiz &&
         _controller.voted.isTrue &&
+        _controller.rxIbAnswer != null &&
         choice.choiceId == _controller.rxIbAnswer!.value.choiceId &&
         choice.choiceId != _controller.rxIbQuestion.value.correctChoiceId) {
       return const CircleAvatar(

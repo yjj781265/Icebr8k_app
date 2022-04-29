@@ -54,11 +54,12 @@ class IcebreakerCard extends StatelessWidget {
                       Get.to(() => IbCoverPage(ibCollection));
                     },
                     child: LimitedBox(
-                      maxWidth: 300,
+                      maxWidth: 200,
                       child: Padding(
                         padding: const EdgeInsets.all(4.0),
                         child: Text(
                           ibCollection.name,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: IbUtils.getIbFonts(TextStyle(
                               fontSize: IbConfig.kDescriptionTextSize,

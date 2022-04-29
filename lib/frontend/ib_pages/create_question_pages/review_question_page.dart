@@ -460,7 +460,8 @@ class ReviewQuestionPage extends StatelessWidget {
     }
 
     if (itemController.sharedCircles.isEmpty &&
-        ibQuestion.sharedFriendUids.isEmpty) {
+        ibQuestion.sharedFriendUids.isEmpty &&
+        !ibQuestion.isPublic) {
       Get.dialog(const IbDialog(
         title: 'Error',
         subtitle: 'Privacy Bounds are empty',

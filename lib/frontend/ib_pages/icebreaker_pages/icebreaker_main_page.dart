@@ -107,7 +107,7 @@ class IcebreakerMainPage extends StatelessWidget {
                 ),
               SafeArea(
                 child: Container(
-                  margin: EdgeInsets.symmetric(vertical: 16),
+                  margin: const EdgeInsets.symmetric(vertical: 16),
                   child: Row(
                     children: [
                       Expanded(
@@ -161,68 +161,93 @@ class IcebreakerMainPage extends StatelessWidget {
 
         return Material(
           color: Colors.transparent,
-          child: ReorderableWrap(
-            footer: InkWell(
-              borderRadius: const BorderRadius.all(Radius.circular(16)),
-              onTap: () {
-                Get.to(() => EditIcebreakerPage(
-                    Icebreaker(
-                        text: '',
-                        id: IbUtils.getUniqueId(),
-                        collectionId: controller.ibCollection.id,
-                        timestamp: null),
-                    controller.ibCollection));
+          child: Scrollbar(
+            trackVisibility: true,
+            child: ReorderableWrap(
+              controller: controller.scrollController,
+              footer: InkWell(
+                borderRadius: const BorderRadius.all(Radius.circular(16)),
+                onTap: () {
+                  Get.to(() => EditIcebreakerPage(
+                      Icebreaker(
+                          text: '',
+                          id: IbUtils.getUniqueId(),
+                          collectionId: controller.ibCollection.id,
+                          timestamp: null),
+                      controller.ibCollection));
+                },
+                child: SizedBox(
+                    height: Get.width / 2 * 1.44,
+                    width: Get.width / 2,
+                    child: const IbCard(
+                        color: IbColors.lightGrey, child: Icon(Icons.add))),
+              ),
+              onReorder: (int oldIndex, int newIndex) async {
+                final item = controller.icebreakers.removeAt(oldIndex);
+                controller.icebreakers.insert(newIndex, item);
+                controller.ibCollection.icebreakers = controller.icebreakers;
+                await IbAdminDbService()
+                    .addIcebreakerCollection(controller.ibCollection);
               },
-              child: SizedBox(
-                  height: Get.width / 2 * 1.44,
-                  width: Get.width / 2,
-                  child: const IbCard(
-                      color: IbColors.lightGrey, child: Icon(Icons.add))),
+              children: controller.icebreakers
+                  .map((e) => InkWell(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(16)),
+                        onTap: () {
+                          Get.to(() =>
+                              EditIcebreakerPage(e, controller.ibCollection));
+                        },
+                        child: Hero(
+                          tag: e.id,
+                          child: SizedBox(
+                              height: Get.width / 2 * 1.44,
+                              width: Get.width / 2,
+                              child: IcebreakerCard(
+                                ibCollection: controller.ibCollection,
+                                icebreaker: e,
+                                showCollectionName: false,
+                              )),
+                        ),
+                      ))
+                  .toList(),
             ),
-            onReorder: (int oldIndex, int newIndex) async {
-              final item = controller.icebreakers.removeAt(oldIndex);
-              controller.icebreakers.insert(newIndex, item);
-              controller.ibCollection.icebreakers = controller.icebreakers;
-              await IbAdminDbService()
-                  .addIcebreakerCollection(controller.ibCollection);
-            },
-            children: controller.icebreakers
-                .map((e) => InkWell(
-                      borderRadius: const BorderRadius.all(Radius.circular(16)),
-                      onTap: () {
-                        Get.to(() =>
-                            EditIcebreakerPage(e, controller.ibCollection));
-                      },
-                      child: Hero(
-                        tag: e.id,
-                        child: SizedBox(
-                            height: Get.width / 2 * 1.44,
-                            width: Get.width / 2,
-                            child: IcebreakerCard(
-                              ibCollection: controller.ibCollection,
-                              icebreaker: e,
-                              showCollectionName: false,
-                            )),
-                      ),
-                    ))
-                .toList(),
           ),
         );
       }),
       floatingActionButton: Obx(
         () {
           if (controller.isEditing.isTrue) {
-            return FloatingActionButton(
-              onPressed: () {
-                Get.to(() => EditIcebreakerPage(
-                    Icebreaker(
-                        text: '',
-                        id: IbUtils.getUniqueId(),
-                        collectionId: controller.ibCollection.id,
-                        timestamp: null),
-                    controller.ibCollection));
-              },
-              child: const Icon(Icons.add),
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FloatingActionButton(
+                  onPressed: () {
+                    Get.to(() => EditIcebreakerPage(
+                        Icebreaker(
+                            text: '',
+                            id: IbUtils.getUniqueId(),
+                            collectionId: controller.ibCollection.id,
+                            timestamp: null),
+                        controller.ibCollection));
+                  },
+                  child: const Icon(Icons.add),
+                ),
+                const SizedBox(
+                  width: 16,
+                ),
+                FloatingActionButton(
+                  heroTag: null,
+                  mini: true,
+                  onPressed: () {
+                    if (controller.scrollController.hasClients) {
+                      final position =
+                          controller.scrollController.position.maxScrollExtent;
+                      controller.scrollController.jumpTo(position);
+                    }
+                  },
+                  child: const Icon(Icons.arrow_circle_down),
+                ),
+              ],
             );
           }
           return const SizedBox();

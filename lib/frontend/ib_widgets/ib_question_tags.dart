@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/tag_page_controller.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/tag_page.dart';
 
 import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
 
 class IbQuestionTags extends StatelessWidget {
   final IbQuestionItemController _itemController;
-  final String highlightText;
 
-  const IbQuestionTags(this._itemController, {this.highlightText = ''});
+  const IbQuestionTags(this._itemController);
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +21,9 @@ class IbQuestionTags extends StatelessWidget {
   }
 
   Widget tagList(BuildContext context) {
+    List<String> followedTagList = IbUtils.getCurrentIbUser() == null
+        ? []
+        : IbUtils.getCurrentIbUser()!.tags;
     return Obx(() {
       if (_itemController.isSample) {
         return Row(
@@ -46,6 +49,7 @@ class IbQuestionTags extends StatelessWidget {
                 )
                 .toList());
       }
+
       return Row(
         children: _itemController.ibTags
             .map(
@@ -63,7 +67,7 @@ class IbQuestionTags extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: Text(element.text,
                           style: TextStyle(
-                              fontWeight: element.text == highlightText
+                              fontWeight: followedTagList.contains(element.text)
                                   ? FontWeight.bold
                                   : FontWeight.normal,
                               fontSize: IbConfig.kDescriptionTextSize)),
@@ -76,8 +80,16 @@ class IbQuestionTags extends StatelessWidget {
                       customBorder: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16)),
                       onTap: () {
-                        Get.to(() =>
-                            TagPage(Get.put(TagPageController(element.text))));
+                        if (Get.isRegistered<TagPageController>(
+                            tag: element.text)) {
+                          return;
+                        }
+
+                        Get.to(
+                            () => TagPage(Get.put(
+                                TagPageController(element.text),
+                                tag: element.text)),
+                            preventDuplicates: false);
                       },
                     ),
                   ))

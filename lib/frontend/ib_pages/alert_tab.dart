@@ -206,127 +206,124 @@ class AlertTab extends StatelessWidget {
             },
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Opacity(
-                opacity: item.notification.isRead ? 0.5 : 1.0,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: IbUserAvatar(
-                            radius: 21,
-                            avatarUrl: item.notification.avatarUrl ?? '',
-                            uid: item.notification.senderId,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: IbUserAvatar(
+                          radius: 21,
+                          avatarUrl: item.notification.avatarUrl ?? '',
+                          uid: item.notification.senderId,
+                        ),
+                      ),
+                      Expanded(
+                        flex: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            item.notification.title,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontSize: IbConfig.kNormalTextSize,
+                                fontWeight: item.notification.isRead
+                                    ? FontWeight.normal
+                                    : FontWeight.bold),
                           ),
                         ),
+                      ),
+                      if (item.notification.timestamp != null)
                         Expanded(
-                          flex: 5,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                          flex: 2,
+                          child: Align(
+                            alignment: Alignment.centerRight,
                             child: Text(
-                              item.notification.title,
-                              overflow: TextOverflow.ellipsis,
+                              IbUtils.getAgoDateTimeString(
+                                  DateTime.fromMillisecondsSinceEpoch(
+                                      (item.notification.timestamp as Timestamp)
+                                          .millisecondsSinceEpoch)),
                               style: const TextStyle(
-                                  fontSize: IbConfig.kNormalTextSize,
-                                  fontWeight: FontWeight.bold),
+                                  fontSize: IbConfig.kDescriptionTextSize,
+                                  color: IbColors.lightGrey),
                             ),
                           ),
                         ),
-                        if (item.notification.timestamp != null)
-                          Expanded(
-                            flex: 2,
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                IbUtils.getAgoDateTimeString(
-                                    DateTime.fromMillisecondsSinceEpoch((item
-                                            .notification
-                                            .timestamp as Timestamp)
-                                        .millisecondsSinceEpoch)),
-                                style: const TextStyle(
-                                    fontSize: IbConfig.kDescriptionTextSize,
-                                    color: IbColors.lightGrey),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 40.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (item.ibChat!.photoUrl.isEmpty)
+                              CircleAvatar(
+                                backgroundColor: IbColors.lightGrey,
+                                radius: 16,
+                                child: Text(
+                                  item.ibChat!.name[0],
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Theme.of(context).indicatorColor,
+                                      fontSize: IbConfig.kSecondaryTextSize,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              )
+                            else
+                              IbUserAvatar(
+                                avatarUrl: item.ibChat!.photoUrl,
+                                radius: 16,
                               ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            Expanded(
+                              flex: 8,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(item.ibChat!.name,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          color:
+                                              Theme.of(context).indicatorColor,
+                                          fontSize: IbConfig.kSecondaryTextSize,
+                                          fontWeight: item.notification.isRead
+                                              ? FontWeight.normal
+                                              : FontWeight.bold)),
+                                  Text('${item.ibChat!.memberCount} member(s)',
+                                      style: const TextStyle(
+                                          color: IbColors.lightGrey,
+                                          fontSize:
+                                              IbConfig.kDescriptionTextSize,
+                                          fontWeight: FontWeight.normal))
+                                ],
+                              ),
+                            ),
+                            const Expanded(
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Icon(Icons.arrow_forward_ios_rounded),
+                              ),
+                            )
+                          ],
+                        ),
+                        if (item.ibChat!.description.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              item.ibChat!.description,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 3,
                             ),
                           ),
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 40.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (item.ibChat!.photoUrl.isEmpty)
-                                CircleAvatar(
-                                  backgroundColor: IbColors.lightGrey,
-                                  radius: 16,
-                                  child: Text(
-                                    item.ibChat!.name[0],
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Theme.of(context).indicatorColor,
-                                        fontSize: IbConfig.kSecondaryTextSize,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                )
-                              else
-                                IbUserAvatar(
-                                  avatarUrl: item.ibChat!.photoUrl,
-                                  radius: 16,
-                                ),
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              Expanded(
-                                flex: 8,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(item.ibChat!.name,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            color: Theme.of(context)
-                                                .indicatorColor,
-                                            fontSize:
-                                                IbConfig.kSecondaryTextSize,
-                                            fontWeight: FontWeight.bold)),
-                                    Text(
-                                        '${item.ibChat!.memberCount} member(s)',
-                                        style: const TextStyle(
-                                            color: IbColors.lightGrey,
-                                            fontSize:
-                                                IbConfig.kDescriptionTextSize,
-                                            fontWeight: FontWeight.normal))
-                                  ],
-                                ),
-                              ),
-                              const Expanded(
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Icon(Icons.arrow_forward_ios_rounded),
-                                ),
-                              )
-                            ],
-                          ),
-                          if (item.ibChat!.description.isNotEmpty)
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Text(
-                                item.ibChat!.description,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 3,
-                              ),
-                            ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
+                  )
+                ],
               ),
             ),
           ),

@@ -184,6 +184,48 @@ class IbQuestionDbService {
         .get();
   }
 
+  Future<QuerySnapshot<Map<String, dynamic>>> queryFriendsQuestions(
+      {DocumentSnapshot? lastDoc, int limit = 16}) async {
+    if (lastDoc != null) {
+      return _collectionRef
+          .where('sharedFriendUids',
+              arrayContains: IbUtils.getCurrentUid() ?? '')
+          .orderBy('askedTimeInMs', descending: true)
+          .startAfterDocument(lastDoc)
+          .limit(limit)
+          .get();
+    }
+
+    return _collectionRef
+        .where('sharedFriendUids', arrayContains: IbUtils.getCurrentUid() ?? '')
+        .orderBy('askedTimeInMs', descending: true)
+        .limit(limit)
+        .get();
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> queryFollowedTagsQuestions(
+      {DocumentSnapshot? lastDoc, int limit = 16}) async {
+    final List<String> followedTags = IbUtils.getCurrentIbUser() == null
+        ? []
+        : IbUtils.getCurrentIbUser()!.tags;
+    followedTags.shuffle();
+    final tenTags = followedTags.take(10).toList();
+    if (lastDoc != null) {
+      return _collectionRef
+          .where('tags', arrayContainsAny: tenTags)
+          .orderBy('askedTimeInMs', descending: true)
+          .limit(limit)
+          .startAfterDocument(lastDoc)
+          .get();
+    }
+
+    return _collectionRef
+        .where('tags', arrayContainsAny: tenTags)
+        .orderBy('askedTimeInMs', descending: true)
+        .limit(limit)
+        .get();
+  }
+
   /// query public ibQuestions in chronological order
   Future<QuerySnapshot<Map<String, dynamic>>> queryIbQuestions(
       {int limit = 16, required int askedTimeInMs}) async {

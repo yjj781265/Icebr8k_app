@@ -97,11 +97,15 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
               )),
           TextButton(
               onPressed: () async {
-                if (newIcebreaker.text.trim().isNotEmpty &&
-                    widget.ibCollection.icebreakers.firstWhereOrNull(
+                if (newIcebreaker.text.trim().isEmpty) {
+                  return;
+                }
+
+                if (widget.ibCollection.icebreakers.firstWhereOrNull(
                             (element) =>
                                 element.text == newIcebreaker.text.trim()) ==
-                        null) {
+                        null ||
+                    newIcebreaker != widget.icebreaker) {
                   newIcebreaker.timestamp = Timestamp.now();
                   try {
                     final index = widget.ibCollection.icebreakers.indexWhere(
@@ -181,13 +185,14 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
                 ),
                 Positioned(
                     bottom: 16,
-                    right: 8,
+                    right: 4,
                     child: LimitedBox(
-                      maxWidth: 300,
+                      maxWidth: 200,
                       child: Padding(
-                        padding: const EdgeInsets.only(bottom: 4, right: 8),
+                        padding: const EdgeInsets.all(4),
                         child: Text(
                           widget.ibCollection.name,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: IbUtils.getIbFonts(TextStyle(
                                   fontSize: IbConfig.kDescriptionTextSize,

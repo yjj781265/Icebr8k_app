@@ -868,7 +868,7 @@ class ChatPage extends StatelessWidget {
     );
   }
 
-  ///won't show sender's avatar
+  ///won't show sender and current User's avatar
   Widget _buildReadIndicator(IbMessage message) {
     if (_controller.messages.indexOf(message) == 0) {
       return SingleChildScrollView(
@@ -876,7 +876,9 @@ class ChatPage extends StatelessWidget {
         child: Row(
             mainAxisSize: MainAxisSize.min,
             children: message.readUids
-                .where((element) => element != message.senderUid)
+                .where((element) =>
+                    element != message.senderUid &&
+                    element != IbUtils.getCurrentUid())
                 .map((e) {
               final IbChatMemberModel? model = _controller.ibChatMembers
                   .firstWhereOrNull((item) => item.user.id == e);

@@ -34,8 +34,10 @@ class ChatTabController extends GetxController {
         } else if (docChange.type == DocumentChangeType.modified) {
           final index = oneToOneChats
               .indexWhere((element) => element.ibChat.chatId == ibChat.chatId);
-          final item = await _buildItem(ibChat);
-          oneToOneChats[index] = item;
+          if (index != -1) {
+            final item = await _buildItem(ibChat);
+            oneToOneChats[index] = item;
+          }
         } else {
           final index = oneToOneChats
               .indexWhere((element) => element.ibChat.chatId == ibChat.chatId);

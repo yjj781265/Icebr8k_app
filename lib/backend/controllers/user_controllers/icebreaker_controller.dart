@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:carousel_slider/carousel_controller.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/basic.dart';
 import 'package:get/get.dart';
@@ -20,6 +21,7 @@ class IcebreakerController extends GetxController {
   final isShuffling = false.obs;
   final hasEditAccess = false.obs;
   final isEditing = false.obs;
+  final ScrollController scrollController = ScrollController();
 
   late StreamSubscription icebreakerSub;
   late ShakeDetector detector;
