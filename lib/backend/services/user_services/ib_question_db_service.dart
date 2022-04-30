@@ -213,6 +213,7 @@ class IbQuestionDbService {
     if (lastDoc != null) {
       return _collectionRef
           .where('tags', arrayContainsAny: tenTags)
+          .where('isPublic', isEqualTo: true)
           .orderBy('askedTimeInMs', descending: true)
           .limit(limit)
           .startAfterDocument(lastDoc)
@@ -221,6 +222,7 @@ class IbQuestionDbService {
 
     return _collectionRef
         .where('tags', arrayContainsAny: tenTags)
+        .where('isPublic', isEqualTo: true)
         .orderBy('askedTimeInMs', descending: true)
         .limit(limit)
         .get();

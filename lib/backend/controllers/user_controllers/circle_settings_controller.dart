@@ -64,6 +64,10 @@ class CircleSettingsController extends GetxController {
       Get.dialog(const IbLoadingDialog(messageTrKey: 'Creating a new circle'));
     }
 
+    if (ibChat!.photoUrl.contains('http')) {
+      await IbStorageService().deleteFile(ibChat!.photoUrl);
+    }
+
     if (photoUrl.isNotEmpty && !photoUrl.contains('http')) {
       final String? url = await IbStorageService().uploadAndRetrieveImgUrl(
           filePath: photoUrl.value,

@@ -842,85 +842,6 @@ class ChatPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAvatar(
-      {required BuildContext context, required List<IbUser> avatarUsers}) {
-    avatarUsers.removeWhere((element) => element.id == IbUtils.getCurrentUid());
-    final list = avatarUsers.take(4).toList();
-    final double radius = avatarUsers.length > 1 ? 8 : 16;
-    return CircleAvatar(
-      backgroundColor: Theme.of(context).primaryColor,
-      minRadius: 16,
-      maxRadius: 22,
-      child: Wrap(
-        spacing: 1,
-        runSpacing: 1,
-        alignment: WrapAlignment.center,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        runAlignment: WrapAlignment.center,
-        children: list
-            .map((e) => IbUserAvatar(
-                  uid: e.id,
-                  avatarUrl: e.avatarUrl,
-                  radius: radius,
-                ))
-            .toList(),
-      ),
-    );
-  }
-
-  ///won't show sender and current User's avatar
-  Widget _buildReadIndicator(IbMessage message) {
-    if (_controller.messages.indexOf(message) == 0) {
-      return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: message.readUids
-                .where((element) =>
-                    element != message.senderUid &&
-                    element != IbUtils.getCurrentUid())
-                .map((e) {
-              final IbChatMemberModel? model = _controller.ibChatMembers
-                  .firstWhereOrNull((item) => item.user.id == e);
-              if (model != null) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 3),
-                  child: IbUserAvatar(
-                    avatarUrl: model.user.avatarUrl,
-                    radius: 8,
-                  ),
-                );
-              }
-              return const SizedBox();
-            }).toList()),
-      );
-    }
-    return const SizedBox();
-  }
-
-  Widget _buildTitle() {
-    if (_controller.ibChat != null && _controller.ibChat!.name.isNotEmpty) {
-      return Text(
-        _controller.title.value,
-        overflow: TextOverflow.ellipsis,
-      );
-    }
-
-    if (_controller.title.isEmpty) {
-      final avatarUsers =
-          _controller.ibChatMembers.map((element) => element.user).toList();
-      avatarUsers
-          .removeWhere((element) => element.id == IbUtils.getCurrentUid());
-      for (final user in avatarUsers) {
-        _controller.title.value = '${_controller.title.value}${user.username} ';
-      }
-    }
-    return Text(
-      _controller.title.value,
-      overflow: TextOverflow.ellipsis,
-    );
-  }
-
   Widget _pollMsgItem(
       {required IbMessage message, required BuildContext context}) {
     if (message.messageType == IbMessage.kMessageTypePoll) {
@@ -1021,11 +942,10 @@ class ChatPage extends StatelessWidget {
             child: pollWidget,
           ),
           Align(
-              alignment: Alignment.centerLeft,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18),
-                child: _buildReadIndicator(message),
-              )),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: _buildReadIndicator(message),
+          )),
           const SizedBox(
             height: 8,
           ),
@@ -1034,6 +954,86 @@ class ChatPage extends StatelessWidget {
     }
 
     return const SizedBox();
+  }
+
+  Widget _buildAvatar(
+      {required BuildContext context, required List<IbUser> avatarUsers}) {
+    avatarUsers.removeWhere((element) => element.id == IbUtils.getCurrentUid());
+    final list = avatarUsers.take(4).toList();
+    final double radius = avatarUsers.length > 1 ? 8 : 16;
+    return CircleAvatar(
+      backgroundColor: Theme.of(context).primaryColor,
+      minRadius: 16,
+      maxRadius: 22,
+      child: Wrap(
+        spacing: 1,
+        runSpacing: 1,
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        runAlignment: WrapAlignment.center,
+        children: list
+            .map((e) => IbUserAvatar(
+                  uid: e.id,
+                  avatarUrl: e.avatarUrl,
+                  radius: radius,
+                ))
+            .toList(),
+      ),
+    );
+  }
+
+  ///won't show sender and current User's avatar
+  Widget _buildReadIndicator(IbMessage message) {
+    if (_controller.messages.indexOf(message) == 0) {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: message.readUids
+                .where((element) =>
+                    element != message.senderUid &&
+                    element != IbUtils.getCurrentUid())
+                .map((e) {
+              final IbChatMemberModel? model = _controller.ibChatMembers
+                  .firstWhereOrNull((item) => item.user.id == e);
+              if (model != null) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 3),
+                  child: IbUserAvatar(
+                    avatarUrl: model.user.avatarUrl,
+                    radius: 8,
+                  ),
+                );
+              }
+              return const SizedBox();
+            }).toList()),
+      );
+    }
+    return const SizedBox();
+  }
+
+  Widget _buildTitle() {
+    if (_controller.ibChat != null && _controller.ibChat!.name.isNotEmpty) {
+      return Text(
+        _controller.title.value,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+
+    if (_controller.title.isEmpty) {
+      final avatarUsers =
+          _controller.ibChatMembers.map((element) => element.user).toList();
+      avatarUsers
+          .removeWhere((element) => element.id == IbUtils.getCurrentUid());
+      for (final user in avatarUsers) {
+        _controller.title.value = '${_controller.title.value}${user.username} ';
+      }
+    }
+    return Text(
+      _controller.title.value,
+      overflow: TextOverflow.ellipsis,
+    );
   }
 
   Widget _handleMessageType(

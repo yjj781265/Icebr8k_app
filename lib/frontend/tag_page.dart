@@ -58,42 +58,50 @@ class TagPage extends StatelessWidget {
               child: ListView.builder(
                 itemBuilder: (context, index) {
                   if (index == 0) {
-                    return Column(
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text.rich(TextSpan(
-                            text:
-                                IbUtils.getStatsString(_controller.total.value),
-                            style: const TextStyle(
-                                fontSize: IbConfig.kNormalTextSize),
-                            children: const [
-                              TextSpan(
-                                  text: ' poll(s)',
-                                  style: TextStyle(
-                                      fontSize: IbConfig.kSecondaryTextSize,
-                                      color: IbColors.lightGrey))
-                            ])),
-                        if (_controller.user != null)
-                          Text.rich(TextSpan(
-                              text: 'Tag creator: ',
-                              style: const TextStyle(
-                                  color: IbColors.lightGrey,
-                                  fontSize: IbConfig.kSecondaryTextSize),
-                              children: [
-                                TextSpan(
-                                    text: _controller.creatorUsername.value,
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        Get.to(() => ProfilePage(Get.put(
-                                            ProfileController(
-                                                _controller.user!.id))));
-                                      },
-                                    style: TextStyle(
-                                        color: Theme.of(context).indicatorColor,
-                                        fontSize: IbConfig.kSecondaryTextSize,
-                                        fontWeight: FontWeight.bold))
-                              ])),
-                        const SizedBox(
-                          height: 8,
+                        Column(
+                          children: [
+                            Text.rich(TextSpan(
+                                text: IbUtils.getStatsString(
+                                    _controller.total.value),
+                                style: const TextStyle(
+                                    fontSize: IbConfig.kNormalTextSize,
+                                    fontWeight: FontWeight.bold),
+                                children: const [
+                                  TextSpan(
+                                      text: ' Public Poll(s)',
+                                      style: TextStyle(
+                                          fontSize: IbConfig.kSecondaryTextSize,
+                                          color: IbColors.lightGrey))
+                                ])),
+                            if (_controller.user != null)
+                              Text.rich(TextSpan(
+                                  text: 'Tag creator: ',
+                                  style: const TextStyle(
+                                      color: IbColors.lightGrey,
+                                      fontSize: IbConfig.kSecondaryTextSize),
+                                  children: [
+                                    TextSpan(
+                                        text: _controller.creatorUsername.value,
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            Get.to(() => ProfilePage(Get.put(
+                                                ProfileController(
+                                                    _controller.user!.id))));
+                                          },
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .indicatorColor,
+                                            fontSize:
+                                                IbConfig.kSecondaryTextSize,
+                                            fontWeight: FontWeight.bold))
+                                  ])),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                          ],
                         ),
                         Obx(
                           () => Center(

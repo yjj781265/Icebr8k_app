@@ -193,6 +193,8 @@ class AlertTab extends StatelessWidget {
         child: IbCard(
           radius: 0,
           margin: EdgeInsets.zero,
+          color:
+              item.notification.isRead ? Theme.of(context).primaryColor : null,
           child: InkWell(
             onTap: () async {
               item.notification.isRead = true;
