@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_circle_join_request.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -62,6 +63,7 @@ class ChatPageController extends GetxController {
       ItemPositionsListener.create();
   final ibChatMembers = <IbChatMemberModel>[].obs;
   final isTypingUsers = <IbUser>[].obs;
+  final joinCircleRequests = <IbCircleJoinRequest>[].obs;
   final isTyping = false.obs;
   final text = ''.obs;
 
@@ -509,6 +511,7 @@ class ChatPageController extends GetxController {
       isMuted.value = ibChat!.mutedUids.contains(IbUtils.getCurrentUid());
       isCircle.value = ibChat!.isCircle;
       isPublicCircle.value = ibChat!.isPublicCircle;
+      joinCircleRequests.value = ibChat!.joinRequests;
     }
   }
 
@@ -820,7 +823,7 @@ class ChatPageController extends GetxController {
             id: ibChat!.chatId,
             title: 'Group invite from ${IbUtils.getCurrentIbUser()!.username}',
             subtitle: '',
-            type: IbNotification.kGroupInvite,
+            type: IbNotification.kCircleInvite,
             timestamp: FieldValue.serverTimestamp(),
             senderId: IbUtils.getCurrentUid()!,
             recipientId: user.id,
@@ -843,6 +846,7 @@ class ChatPageController extends GetxController {
   }
 
   Future<void> loadMore() async {
+    print('loadmore $lastSnap');
     if (isLoadingMore.isTrue || lastSnap == null) {
       return;
     }
@@ -874,8 +878,11 @@ class ChatPageController extends GetxController {
       }
       messages.remove(loadMessage);
       messages.addAll(tempList);
-
-      lastSnap = tempList.length >= kQueryLimit ? snapshot.docs.last : null;
+      if (snapshot.docs.isNotEmpty) {
+        lastSnap = snapshot.docs.last;
+      } else {
+        lastSnap = null;
+      }
     }
     isLoadingMore.value = false;
   }

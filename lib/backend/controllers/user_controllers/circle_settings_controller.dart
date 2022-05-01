@@ -45,6 +45,7 @@ class CircleSettingsController extends GetxController {
       titleTxtController.text = ibChat!.name;
       descriptionController.text = ibChat!.description;
       welcomeMsgController.text = ibChat!.welcomeMsg;
+      isPublicCircle.value = ibChat!.isPublicCircle;
     }
   }
 
@@ -64,32 +65,43 @@ class CircleSettingsController extends GetxController {
       Get.dialog(const IbLoadingDialog(messageTrKey: 'Creating a new circle'));
     }
 
-    if (ibChat!.photoUrl.contains('http')) {
+    if (ibChat != null &&
+        photoUrl.value != ibChat!.photoUrl &&
+        !ibChat!.photoUrl.contains('.gif') &&
+        ibChat!.photoUrl.contains('http')) {
       await IbStorageService().deleteFile(ibChat!.photoUrl);
     }
 
-    if (photoUrl.isNotEmpty && !photoUrl.contains('http')) {
-      final String? url = await IbStorageService().uploadAndRetrieveImgUrl(
-          filePath: photoUrl.value,
-          oldUrl: ibChat == null ? '' : ibChat!.photoUrl);
-      if (url == null) {
-        Get.back();
-        IbUtils.showSimpleSnackBar(
-            msg: 'Failed to upload image', backgroundColor: IbColors.errorRed);
-        return;
-      }
-      photoUrl.value = url;
+    if (!photoUrl.value.contains('http') && !photoUrl.value.contains('.gif')) {
+      final String? url = await IbStorageService()
+          .uploadAndRetrieveImgUrl(filePath: photoUrl.value);
+      photoUrl.value = url ?? '';
     }
 
     try {
       ///edit circle
       if (ibChat != null) {
+        final String circleUpdateInfo = _generateUpdateCircleString();
         ibChat!.name = titleTxtController.text.trim();
         ibChat!.photoUrl = photoUrl.value;
         ibChat!.description = descriptionController.text.trim();
         ibChat!.welcomeMsg = welcomeMsgController.text.trim();
         ibChat!.isPublicCircle = isPublicCircle.value;
         await IbChatDbService().addIbChat(ibChat!, isEdit: ibChat != null);
+        if (circleUpdateInfo.isNotEmpty) {
+          await IbChatDbService().uploadMessage(IbMessage(
+              messageId: IbUtils.getUniqueId(),
+              readUids: [IbUtils.getCurrentUid()!],
+              content:
+                  '${IbUtils.getCurrentIbUser()!.username} updated following circle info $circleUpdateInfo',
+              messageType: IbMessage.kMessageTypeAnnouncement,
+              senderUid: IbUtils.getCurrentUid()!,
+              chatRoomId: ibChat!.chatId));
+        }
+
+        Get.back(closeOverlays: true);
+        IbUtils.showSimpleSnackBar(
+            msg: 'Circle info updated', backgroundColor: IbColors.accentColor);
 
         ///create new circle
       } else {
@@ -115,28 +127,14 @@ class CircleSettingsController extends GetxController {
               title:
                   'Group invite from ${IbUtils.getCurrentIbUser()!.username}',
               subtitle: '',
-              type: IbNotification.kGroupInvite,
+              type: IbNotification.kCircleInvite,
               timestamp: FieldValue.serverTimestamp(),
               senderId: IbUtils.getCurrentUid()!,
               recipientId: user.id,
               avatarUrl: IbUtils.getCurrentIbUser()!.avatarUrl);
           await IbUserDbService().sendAlertNotification(n);
         }
-      }
-
-      Get.back(closeOverlays: true);
-      if (ibChat != null) {
-        await IbChatDbService().uploadMessage(IbMessage(
-            messageId: IbUtils.getUniqueId(),
-            readUids: [IbUtils.getCurrentUid()!],
-            content:
-                '${IbUtils.getCurrentIbUser()!.username} updated circle info',
-            messageType: IbMessage.kMessageTypeAnnouncement,
-            senderUid: IbUtils.getCurrentUid()!,
-            chatRoomId: ibChat!.chatId));
-        IbUtils.showSimpleSnackBar(
-            msg: 'Circle info updated', backgroundColor: IbColors.accentColor);
-      } else {
+        Get.back(closeOverlays: true);
         IbUtils.showSimpleSnackBar(
             msg: 'Circle created', backgroundColor: IbColors.accentColor);
       }
@@ -148,5 +146,32 @@ class CircleSettingsController extends GetxController {
         showNegativeBtn: false,
       ));
     }
+  }
+
+  String _generateUpdateCircleString() {
+    String str = '';
+    if (ibChat == null) {
+      return str;
+    }
+
+    if (ibChat!.name != titleTxtController.text.trim()) {
+      str = '$str\n - Circle Name';
+    }
+    if (ibChat!.photoUrl != photoUrl.value) {
+      str = '$str\n - Circle Avatar';
+    }
+
+    if (ibChat!.description != descriptionController.text.trim()) {
+      str = '$str\n - Circle Description';
+    }
+
+    if (ibChat!.welcomeMsg != welcomeMsgController.text.trim()) {
+      str = '$str\n - Circle Welcome Message';
+    }
+
+    if (ibChat!.isPublicCircle != isPublicCircle.value) {
+      str = '$str\n - Circle Privacy';
+    }
+    return str;
   }
 }

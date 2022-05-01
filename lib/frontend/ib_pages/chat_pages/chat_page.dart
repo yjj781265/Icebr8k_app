@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -1071,6 +1072,7 @@ class ChatPage extends StatelessWidget {
                   ),
                   Text(
                     message.content,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
                         color: IbColors.lightGrey,
                         fontSize: IbConfig.kSecondaryTextSize),

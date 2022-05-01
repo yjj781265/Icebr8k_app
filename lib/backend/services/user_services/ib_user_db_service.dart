@@ -111,14 +111,13 @@ class IbUserDbService {
     return IbNotification.fromJson(snapshot.docs.first.data());
   }
 
-  Future<bool> isCircleRequestSent(
+  Future<bool> isCircleInviteSent(
       {required String chatId, required String recipientId}) async {
     final snapshot = await _collectionRef
-        .doc(chatId)
+        .doc(recipientId)
         .collection(_kNotificationSubCollection)
-        .where('type', isEqualTo: IbNotification.kGroupRequest)
-        .where('senderId', isEqualTo: IbUtils.getCurrentUid())
-        .where('recipientId', isEqualTo: recipientId)
+        .where('type', isEqualTo: IbNotification.kCircleInvite)
+        .where('id', isEqualTo: chatId)
         .get();
     return snapshot.size > 0;
   }

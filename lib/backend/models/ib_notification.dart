@@ -17,8 +17,7 @@ class IbNotification {
 
   static const String kFriendRequest = 'friend_request';
   static const String kNormal = 'normal';
-  static const String kGroupInvite = 'group_invite';
-  static const String kGroupRequest = 'group_request';
+  static const String kCircleInvite = 'circle_invite';
 
   IbNotification(
       {required this.id,

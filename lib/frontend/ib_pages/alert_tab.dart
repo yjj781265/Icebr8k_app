@@ -163,7 +163,7 @@ class AlertTab extends StatelessWidget {
         ),
       );
     }
-    if (item.notification.type == IbNotification.kGroupInvite &&
+    if (item.notification.type == IbNotification.kCircleInvite &&
         item.ibChat != null) {
       return Dismissible(
         direction: DismissDirection.endToStart,
@@ -201,7 +201,8 @@ class AlertTab extends StatelessWidget {
               await IbUserDbService().sendAlertNotification(item.notification);
               _controller.items.refresh();
               Get.to(
-                  () => CircleInfo(Get.put(CircleInfoController(item.ibChat!),
+                  () => CircleInfo(Get.put(
+                      CircleInfoController(item.ibChat!.obs),
                       tag: IbUtils.getUniqueId())),
                   transition: Transition.downToUp,
                   fullscreenDialog: true);

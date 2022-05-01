@@ -149,15 +149,13 @@ class ChatPageSettings extends StatelessWidget {
   }
 
   void _showMemberBtmSheet(IbChatMemberModel model) {
-    final item = _controller.ibChatMembers.firstWhereOrNull(
+    final me = _controller.ibChatMembers.firstWhereOrNull(
         (element) => element.user.id == IbUtils.getCurrentUid()!);
-    if (item == null) {
+    if (me == null) {
       return;
     }
 
-    final bool isLeader = item.member.role == IbChatMember.kRoleLeader;
-    final bool isAssistant = item.member.role == IbChatMember.kRoleAssistant;
-
+    final bool isLeader = me.member.role == IbChatMember.kRoleLeader;
     final Widget sheet = IbCard(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -174,7 +172,7 @@ class ChatPageSettings extends StatelessWidget {
             },
             title: const Text('View Profile'),
           ),
-          if (isLeader && model != item)
+          if (isLeader && model != me)
             ListTile(
               onTap: () async {
                 Get.back();
@@ -182,8 +180,7 @@ class ChatPageSettings extends StatelessWidget {
               },
               title: const Text('Transfer Leadership'),
             ),
-          if ((isAssistant || isLeader) &&
-              model.member.role == IbChatMember.kRoleMember)
+          if (isLeader && model.member.role == IbChatMember.kRoleMember)
             ListTile(
               onTap: () async {
                 Get.back();
@@ -278,6 +275,7 @@ class ChatPageSettings extends StatelessWidget {
               trailing: const Icon(Icons.info),
             );
           }
+
           return const SizedBox();
         }),
         ListTile(

@@ -19,6 +19,7 @@ class IbQuestion {
   String question;
   String description;
   bool isPublic;
+  bool isCircleOnly;
   bool isAnonymous;
   bool isCommentEnabled;
   bool isQuiz;
@@ -47,6 +48,7 @@ class IbQuestion {
       this.sharedFriendUids = const [],
       this.tags = const [],
       this.description = '',
+      this.isCircleOnly = false,
       this.isPublic = true,
       this.points = 0,
       this.likes = 0,

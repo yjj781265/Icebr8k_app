@@ -26,6 +26,7 @@ IbQuestion _$IbQuestionFromJson(Map<String, dynamic> json) => IbQuestion(
           (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
               const [],
       description: json['description'] as String? ?? '',
+      isCircleOnly: json['isCircleOnly'] as bool? ?? false,
       isPublic: json['isPublic'] as bool? ?? true,
       points: json['points'] as int? ?? 0,
       likes: json['likes'] as int? ?? 0,
@@ -49,6 +50,7 @@ Map<String, dynamic> _$IbQuestionToJson(IbQuestion instance) =>
       'question': instance.question,
       'description': instance.description,
       'isPublic': instance.isPublic,
+      'isCircleOnly': instance.isCircleOnly,
       'isAnonymous': instance.isAnonymous,
       'isCommentEnabled': instance.isCommentEnabled,
       'isQuiz': instance.isQuiz,

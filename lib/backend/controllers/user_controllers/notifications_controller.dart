@@ -64,7 +64,7 @@ class NotificationController extends GetxController {
 
   Future<void> _onNotificationAdded(IbNotification notification) async {
     final item = NotificationItem(notification: notification);
-    if (notification.type == IbNotification.kGroupInvite) {
+    if (notification.type == IbNotification.kCircleInvite) {
       final IbChat? chat = await IbChatDbService().queryChat(notification.id);
       item.ibChat = chat;
       if (chat != null) {
@@ -81,7 +81,7 @@ class NotificationController extends GetxController {
 
     if (index != -1) {
       items[index].notification = notification;
-      if (notification.type == IbNotification.kGroupInvite) {
+      if (notification.type == IbNotification.kCircleInvite) {
         final IbChat? chat = await IbChatDbService().queryChat(notification.id);
         items[index].ibChat = chat;
       }

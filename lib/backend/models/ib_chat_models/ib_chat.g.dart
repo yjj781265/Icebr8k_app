@@ -15,6 +15,10 @@ IbChat _$IbChatFromJson(Map<String, dynamic> json) => IbChat(
       isPublicCircle: json['isPublicCircle'] as bool? ?? false,
       description: json['description'] as String? ?? '',
       welcomeMsg: json['welcomeMsg'] as String? ?? '',
+      blackListUids: (json['blackListUids'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       memberUids: (json['memberUids'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -25,6 +29,11 @@ IbChat _$IbChatFromJson(Map<String, dynamic> json) => IbChat(
           const [],
       mutedUids: (json['mutedUids'] as List<dynamic>?)
               ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      joinRequests: (json['joinRequests'] as List<dynamic>?)
+              ?.map((e) =>
+                  IbCircleJoinRequest.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
       memberCount: json['memberCount'] as int? ?? 0,
@@ -47,7 +56,9 @@ Map<String, dynamic> _$IbChatToJson(IbChat instance) => <String, dynamic>{
       'createdAtTimestamp': instance.createdAtTimestamp,
       'memberUids': instance.memberUids,
       'mutedUids': instance.mutedUids,
+      'blackListUids': instance.blackListUids,
       'mentionOnlyUids': instance.mentionOnlyUids,
+      'joinRequests': instance.joinRequests.map((e) => e.toJson()).toList(),
       'isCircle': instance.isCircle,
       'isPublicCircle': instance.isPublicCircle,
       'memberCount': instance.memberCount,

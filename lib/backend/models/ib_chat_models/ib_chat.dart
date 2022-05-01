@@ -1,3 +1,4 @@
+import 'package:icebr8k/backend/models/ib_chat_models/ib_circle_join_request.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import 'ib_message.dart';
@@ -14,7 +15,9 @@ class IbChat {
   dynamic createdAtTimestamp;
   List<String> memberUids;
   List<String> mutedUids;
+  List<String> blackListUids;
   List<String> mentionOnlyUids;
+  List<IbCircleJoinRequest> joinRequests;
   bool isCircle;
   bool isPublicCircle;
   int memberCount;
@@ -31,9 +34,11 @@ class IbChat {
       this.isPublicCircle = false,
       this.description = '',
       this.welcomeMsg = '',
+      this.blackListUids = const [],
       this.memberUids = const [],
       this.mentionOnlyUids = const [],
       this.mutedUids = const [],
+      this.joinRequests = const [],
       this.memberCount = 0,
       this.lastMessage,
       this.isTypingUids = const [],
@@ -52,8 +57,15 @@ class IbChat {
           name == other.name &&
           photoUrl == other.photoUrl &&
           description == other.description &&
+          welcomeMsg == other.welcomeMsg &&
+          createdAtTimestamp == other.createdAtTimestamp &&
           memberUids == other.memberUids &&
           mutedUids == other.mutedUids &&
+          blackListUids == other.blackListUids &&
+          mentionOnlyUids == other.mentionOnlyUids &&
+          joinRequests == other.joinRequests &&
+          isCircle == other.isCircle &&
+          isPublicCircle == other.isPublicCircle &&
           memberCount == other.memberCount &&
           lastMessage == other.lastMessage &&
           isTypingUids == other.isTypingUids &&
@@ -65,8 +77,15 @@ class IbChat {
       name.hashCode ^
       photoUrl.hashCode ^
       description.hashCode ^
+      welcomeMsg.hashCode ^
+      createdAtTimestamp.hashCode ^
       memberUids.hashCode ^
       mutedUids.hashCode ^
+      blackListUids.hashCode ^
+      mentionOnlyUids.hashCode ^
+      joinRequests.hashCode ^
+      isCircle.hashCode ^
+      isPublicCircle.hashCode ^
       memberCount.hashCode ^
       lastMessage.hashCode ^
       isTypingUids.hashCode ^

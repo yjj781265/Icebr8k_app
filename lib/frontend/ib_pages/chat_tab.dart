@@ -491,6 +491,8 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
       case IbMessage.kMessageTypeAnnouncement:
         return Text(
           item.ibChat.lastMessage!.content,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: const TextStyle(
               fontSize: IbConfig.kSecondaryTextSize,
               color: IbColors.accentColor),
