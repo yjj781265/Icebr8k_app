@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/src/widgets/basic.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/ib_collection.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/icebreaker.dart';
@@ -55,7 +54,6 @@ class IcebreakerController extends GetxController {
 
   @override
   void onReady() {
-    // TODO: implement onReady
     super.onReady();
     showShakePopup();
   }

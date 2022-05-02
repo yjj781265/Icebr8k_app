@@ -20,7 +20,7 @@ class IbElevatedButton extends StatelessWidget {
       this.onLongPressed,
       this.icon,
       this.textColor,
-      this.textSize = 18,
+      this.textSize = 16,
       this.disabled = false,
       this.color = IbColors.accentColor})
       : super(key: key);
@@ -36,7 +36,7 @@ class IbElevatedButton extends StatelessWidget {
   Widget _regularButton() {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.all(4),
+          padding: const EdgeInsets.all(3),
           shape: RoundedRectangleBorder(
             //to set border radius to button
             borderRadius: BorderRadius.circular(IbConfig.kButtonCornerRadius),
@@ -62,7 +62,7 @@ class IbElevatedButton extends StatelessWidget {
   Widget _iconButton() {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.all(4),
+          padding: const EdgeInsets.all(3),
           shape: RoundedRectangleBorder(
             //to set border radius to button
             borderRadius: BorderRadius.circular(IbConfig.kButtonCornerRadius),

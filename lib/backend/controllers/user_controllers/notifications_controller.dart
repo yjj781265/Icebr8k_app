@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
@@ -12,7 +11,6 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 
 class NotificationController extends GetxController {
   late StreamSubscription ibNotificationsStream;
-  final MainPageController _mainPageController = Get.find();
   final items = <NotificationItem>[].obs;
   final isLoading = true.obs;
 

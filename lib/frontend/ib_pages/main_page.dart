@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/alert_tab.dart';
@@ -97,7 +98,10 @@ class _MainPageViewState extends State<MainPageView>
         selectedIndex: _mainPageController.currentIndex.value,
         onItemSelected: (index) async {
           if (index == 2) {
-            Get.to(() => const CreateQuestionPage(),
+            Get.to(
+                () => CreateQuestionPage(
+                      controller: Get.put(CreateQuestionController()),
+                    ),
                 fullscreenDialog: true,
                 popGesture: false,
                 transition: Transition.zoom);

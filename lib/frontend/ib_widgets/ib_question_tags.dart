@@ -21,7 +21,7 @@ class IbQuestionTags extends StatelessWidget {
   }
 
   Widget tagList(BuildContext context) {
-    List<String> followedTagList = IbUtils.getCurrentIbUser() == null
+    final List<String> followedTagList = IbUtils.getCurrentIbUser() == null
         ? []
         : IbUtils.getCurrentIbUser()!.tags;
     return Obx(() {

@@ -185,4 +185,14 @@ class ChatTabItem {
   }) {
     isMuted = ibChat.mutedUids.contains(IbUtils.getCurrentUid());
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChatTabItem &&
+          runtimeType == other.runtimeType &&
+          title == other.title;
+
+  @override
+  int get hashCode => title.hashCode;
 }

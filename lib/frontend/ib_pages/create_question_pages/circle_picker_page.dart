@@ -27,14 +27,17 @@ class _CirclePickerPageState extends State<CirclePickerPage> {
     super.initState();
 
     ///setup itemMap
-
-    for (final item in IbUtils.getCircleItems()) {
-      if (widget.pickedItems.contains(item)) {
+    setState(() {
+      for (final item in widget.pickedItems) {
         itemMap[item] = true;
-      } else {
-        itemMap[item] = false;
       }
-    }
+
+      for (final item in IbUtils.getCircleItems()) {
+        if (!itemMap.containsKey(item)) {
+          itemMap[item] = false;
+        }
+      }
+    });
 
     _editingController.addListener(() {
       searchItemMap.clear();
@@ -57,7 +60,8 @@ class _CirclePickerPageState extends State<CirclePickerPage> {
       appBar: AppBar(
         centerTitle: false,
         title: Text(
-            'Add${itemMap.values.where((element) => element == true).isEmpty ? '' : ' ${itemMap.values.where((element) => element == true).length}'} Circle(s)'),
+            'Add${itemMap.values.where((element) => element == true).isEmpty ? '' : ' ${itemMap.values.where((element) => element == true).length}'} '
+            'Circle(s)'),
         actions: [
           TextButton(
             onPressed: () {
@@ -151,7 +155,7 @@ class _CirclePickerPageState extends State<CirclePickerPage> {
         backgroundColor: IbColors.lightGrey,
         radius: 24,
         child: Text(
-          item.ibChat.name[0],
+          item.title[0],
           textAlign: TextAlign.center,
           style: TextStyle(
               color: Theme.of(context).indicatorColor,

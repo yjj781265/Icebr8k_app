@@ -73,7 +73,7 @@ class TagPageController extends GetxController {
     }
   }
 
-  Future<void> updateTag() async {
+  Future<void> updateFollowTag() async {
     if (isFollower.isFalse) {
       await IbUserDbService().followTag(tag: text);
       isFollower.value = true;

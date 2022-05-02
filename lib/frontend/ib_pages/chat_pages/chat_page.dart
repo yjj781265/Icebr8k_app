@@ -1,13 +1,12 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/circle_settings_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
@@ -313,9 +312,13 @@ class ChatPage extends StatelessWidget {
                                       _controller.ibChat!.chatId);
 
                               Get.to(() => CreateQuestionPage(
-                                    circles: chatTabItem == null
-                                        ? []
-                                        : [chatTabItem],
+                                    controller: Get.put(
+                                        CreateQuestionController(
+                                            pickedCircles: chatTabItem == null
+                                                ? []
+                                                : [chatTabItem],
+                                            isPublic: false,
+                                            isCircleOnly: true)),
                                   ));
                             },
                             text: 'Poll'),

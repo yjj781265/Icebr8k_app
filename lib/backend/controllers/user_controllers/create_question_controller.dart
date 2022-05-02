@@ -38,8 +38,13 @@ class CreateQuestionController extends GetxController {
   final isCustomTagSelected = false.obs;
   final pickedTags = <IbTag>[].obs;
   List<ChatTabItem> pickedCircles;
+  final bool isPublic;
+  final bool isCircleOnly;
 
-  CreateQuestionController({this.pickedCircles = const []});
+  CreateQuestionController(
+      {this.pickedCircles = const [],
+      this.isPublic = true,
+      this.isCircleOnly = false});
 
   @override
   Future<void> onReady() async {
@@ -154,10 +159,10 @@ class CreateQuestionController extends GetxController {
         question: questionEditController.text.trim(),
         description: descriptionEditController.text.trim(),
         id: id,
-        sharedFriendUids: pickedCircles.isEmpty
-            ? IbUtils.getCurrentIbUserUnblockedFriendsId()
-            : [],
-        isPublic: pickedCircles.isEmpty,
+        sharedFriendUids:
+            isPublic ? IbUtils.getCurrentIbUserUnblockedFriendsId() : [],
+        isPublic: isPublic,
+        isCircleOnly: isCircleOnly,
         tags: pickedTags.map((element) => element.text).toList(),
         creatorId: IbUtils.getCurrentUid()!,
         medias: picMediaList.toSet().union(videoMediaList.toSet()).toList(),

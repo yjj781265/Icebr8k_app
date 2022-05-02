@@ -321,17 +321,15 @@ class ReviewQuestionPage extends StatelessWidget {
             Obx(
               () => CheckboxListTile(
                 controlAffinity: ListTileControlAffinity.trailing,
-                value: !itemController.rxIbQuestion.value.isPublic,
+                value: itemController
+                    .rxIbQuestion.value.sharedFriendUids.isNotEmpty,
                 onChanged: (flag) {
                   final bool isFriendsOnly = flag ?? false;
                   final list = <String>[];
                   if (isFriendsOnly) {
                     itemController.rxIbQuestion.value.isPublic = false;
                     list.addAll(IbUtils.getCurrentIbUserUnblockedFriendsId());
-                  } else {
-                    itemController.rxIbQuestion.value.isPublic = true;
                   }
-
                   itemController.rxIbQuestion.value.sharedFriendUids = list;
                   itemController.rxIbQuestion.refresh();
                 },
@@ -350,6 +348,7 @@ class ReviewQuestionPage extends StatelessWidget {
             Obx(
               () => ListTile(
                 onTap: () async {
+                  print(itemController.sharedCircles);
                   List<ChatTabItem>? circles = await Get.to(
                       () => CirclePickerPage(
                             pickedItems: itemController.sharedCircles,
@@ -411,6 +410,7 @@ class ReviewQuestionPage extends StatelessWidget {
         str = '$str${itemController.sharedCircles[i].title}';
         continue;
       }
+      // ignore: use_string_buffers
       str = '$str${itemController.sharedCircles[i].title}, ';
     }
     if (itemController.sharedCircles.length > 2) {
@@ -426,7 +426,8 @@ class ReviewQuestionPage extends StatelessWidget {
     if (itemController.rxIbQuestion.value.isPublic) {
       str = includeComma ? 'Public,' : 'Public';
     }
-    if (!itemController.rxIbQuestion.value.isPublic) {
+    if (!itemController.rxIbQuestion.value.isPublic &&
+        itemController.rxIbQuestion.value.sharedFriendUids.isNotEmpty) {
       str = includeComma ? 'Friends Only,' : 'Friends Only';
     }
     if (itemController.sharedCircles.isNotEmpty) {

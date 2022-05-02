@@ -73,7 +73,9 @@ class TagPage extends StatelessWidget {
                                   TextSpan(
                                       text: ' Public Poll(s)',
                                       style: TextStyle(
-                                          fontSize: IbConfig.kSecondaryTextSize,
+                                          fontSize:
+                                              IbConfig.kDescriptionTextSize,
+                                          fontWeight: FontWeight.normal,
                                           color: IbColors.lightGrey))
                                 ])),
                             if (_controller.user != null)
@@ -81,7 +83,8 @@ class TagPage extends StatelessWidget {
                                   text: 'Tag creator: ',
                                   style: const TextStyle(
                                       color: IbColors.lightGrey,
-                                      fontSize: IbConfig.kSecondaryTextSize),
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: IbConfig.kDescriptionTextSize),
                                   children: [
                                     TextSpan(
                                         text: _controller.creatorUsername.value,
@@ -107,12 +110,12 @@ class TagPage extends StatelessWidget {
                           () => Center(
                             child: IbElevatedButton(
                               onPressed: () async {
-                                await _controller.updateTag();
+                                await _controller.updateFollowTag();
                               },
-                              textSize: IbConfig.kSecondaryTextSize,
+                              textSize: IbConfig.kDescriptionTextSize,
                               textTrKey: _controller.isFollower.isTrue
-                                  ? 'Unfollow'
-                                  : "Follow",
+                                  ? 'Unfollow🏷️'
+                                  : "Follow🏷️",
                               color: _controller.isFollower.isTrue
                                   ? IbColors.errorRed
                                   : IbColors.accentColor,

@@ -36,6 +36,7 @@ class CircleInfoController extends GetxController {
     await initMemberMap();
     hasInvite.value = await IbUserDbService().isCircleInviteSent(
         chatId: ibChat.chatId, recipientId: IbUtils.getCurrentUid() ?? '');
+    isLoading.value = false;
   }
 
   @override
@@ -59,8 +60,6 @@ class CircleInfoController extends GetxController {
         memberScoreMap[user] = compScore;
       }
     }
-
-    isLoading.value = false;
   }
 
   Future<void> joinCircle() async {
