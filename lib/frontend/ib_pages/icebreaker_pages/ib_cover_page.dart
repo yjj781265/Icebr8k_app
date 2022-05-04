@@ -35,11 +35,10 @@ class _IbCoverPageState extends State<IbCoverPage> {
       appBar: AppBar(
         title: Text(widget.ibCollection.name),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Align(
+      body: Column(
+        children: [
+          Expanded(
+            child: Align(
               child: Hero(
                 tag: widget.ibCollection.id,
                 child: Material(
@@ -117,16 +116,16 @@ class _IbCoverPageState extends State<IbCoverPage> {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 16,
-            ),
-            SizedBox(
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SizedBox(
               height: 56,
               width: Get.width,
               child: IbElevatedButton(
                 textTrKey: widget.isEdit ? 'Edit ✏️' : "Let's 🧊🔨",
                 onPressed: () async {
-                  final ibCollection = await Get.to(() => IcebreakerMainPage(
+                  final ibCollection = await Get.off(() => IcebreakerMainPage(
                       Get.put(IcebreakerController(widget.ibCollection,
                           isEdit: widget.isEdit))));
                   setState(() {
@@ -139,9 +138,9 @@ class _IbCoverPageState extends State<IbCoverPage> {
                 textColor: Color(widget.ibCollection.textColor),
                 color: Color(widget.ibCollection.bgColor).withOpacity(0.8),
               ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       ),
     );
   }
