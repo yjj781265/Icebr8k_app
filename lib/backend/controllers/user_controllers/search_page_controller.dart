@@ -58,7 +58,6 @@ class SearchPageController extends GetxController {
       /// search Questions 2nd
       final questionIds =
           await IbTypeSenseService().searchIbQuestions(searchText.value.trim());
-      print(questionIds);
       questions.clear();
       for (final id in questionIds) {
         if (IbCacheManager().getIbQuestion(id) == null) {
@@ -73,6 +72,7 @@ class SearchPageController extends GetxController {
           }
         }
       }
+      questions.sort((a, b) => b.points.compareTo(a.points));
 
       /// search circles
       final chats =

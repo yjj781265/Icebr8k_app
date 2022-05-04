@@ -67,7 +67,6 @@ class IbQuestionHeader extends StatelessWidget {
                     onPressed: _itemController.isSample ? null : () async {},
                     icon: const FaIcon(
                       Icons.more_vert_outlined,
-                      size: 16,
                     )),
               ],
             ),

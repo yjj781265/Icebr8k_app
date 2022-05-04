@@ -140,7 +140,15 @@ class CircleInfo extends StatelessWidget {
                                 }
                               }),
                         ),
-                      ),
+                      )
+                    else if (_controller.rxIbChat.value.memberUids.length >=
+                        IbConfig.kCircleMaxMembers)
+                      const Text(
+                        'Circle is full',
+                        style: TextStyle(
+                            fontSize: IbConfig.kNormalTextSize,
+                            color: IbColors.lightGrey),
+                      )
                   ],
                 ),
         ),

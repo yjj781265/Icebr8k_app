@@ -202,22 +202,21 @@ class ChatPageController extends GetxController {
   }
 
   @override
-  void onClose() {
+  Future<void> onClose() async {
     if (_messageSub != null) {
-      _messageSub!.cancel();
+      await _messageSub!.cancel();
     }
 
     if (_memberSub != null) {
-      _memberSub!.cancel();
+      await _memberSub!.cancel();
     }
 
     if (_chatSub != null) {
-      _chatSub!.cancel();
+      await _chatSub!.cancel();
     }
 
-    IbChatDbService().removeTypingUid(chatId: ibChat!.chatId).then((value) {
-      print('Remove my typingUid');
-    });
+    await IbChatDbService().removeTypingUid(chatId: ibChat!.chatId);
+    super.onClose();
   }
 
   Future<void> initData() async {
@@ -394,6 +393,7 @@ class ChatPageController extends GetxController {
         await IbChatDbService().updateReadUidArray(
             chatRoomId: ibChat!.chatId, messageId: lastMessage.messageId);
       }
+      messages.refresh();
 
       isLoading.value = false;
     });

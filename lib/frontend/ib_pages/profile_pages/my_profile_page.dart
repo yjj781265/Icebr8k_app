@@ -27,7 +27,11 @@ import '../../ib_config.dart';
 import '../../ib_utils.dart';
 
 class MyProfilePage extends StatelessWidget {
+  final bool showBackButton;
   final MyProfileController _controller = Get.put(MyProfileController());
+
+  MyProfilePage({this.showBackButton = true});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,25 +76,28 @@ class MyProfilePage extends StatelessWidget {
                         child: SizedBox(
                           height: 60,
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: showBackButton
+                                ? MainAxisAlignment.spaceBetween
+                                : MainAxisAlignment.end,
                             children: [
-                              CircleAvatar(
-                                backgroundColor: Theme.of(context)
-                                    .backgroundColor
-                                    .withOpacity(0.8),
-                                child: IconButton(
-                                  padding: EdgeInsets.zero,
-                                  icon: Icon(
-                                    Platform.isAndroid
-                                        ? Icons.arrow_back
-                                        : Icons.arrow_back_ios,
-                                    color: Theme.of(context).indicatorColor,
+                              if (showBackButton)
+                                CircleAvatar(
+                                  backgroundColor: Theme.of(context)
+                                      .backgroundColor
+                                      .withOpacity(0.8),
+                                  child: IconButton(
+                                    padding: EdgeInsets.zero,
+                                    icon: Icon(
+                                      Platform.isAndroid
+                                          ? Icons.arrow_back
+                                          : Icons.arrow_back_ios,
+                                      color: Theme.of(context).indicatorColor,
+                                    ),
+                                    onPressed: () {
+                                      Get.back();
+                                    },
                                   ),
-                                  onPressed: () {
-                                    Get.back();
-                                  },
                                 ),
-                              ),
 
                               ///actions
                               Row(

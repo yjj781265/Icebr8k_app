@@ -169,6 +169,7 @@ class IbStrings extends Translations {
                   ' join the circle for the first time',
           'master_search_hint': 'Username/Name/Tag/Circle/Question',
           'nearby': 'Nearby',
+          'me': "Me",
         }
       };
 }

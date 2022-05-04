@@ -159,7 +159,9 @@ class ChatPage extends StatelessWidget {
                       ),
                       _buildTypingIndicator(context),
                       Positioned(
-                          bottom: 16, right: 16, child: _newMessageAlert())
+                          bottom: 16,
+                          right: 16,
+                          child: _newMessageAlert(context))
                     ],
                   )),
                 _inputWidget(context),
@@ -495,22 +497,24 @@ class ChatPage extends StatelessWidget {
     Get.bottomSheet(SafeArea(child: options), ignoreSafeArea: false);
   }
 
-  Widget _newMessageAlert() {
+  Widget _newMessageAlert(BuildContext context) {
     return Obx(() {
       return Wrap(
         children: [
           AnimatedContainer(
             alignment: Alignment.center,
-            decoration: const BoxDecoration(
-                color: IbColors.accentColor,
-                borderRadius: BorderRadius.all(Radius.circular(8))),
+            decoration: BoxDecoration(
+                color: Theme.of(context).backgroundColor,
+                borderRadius: const BorderRadius.all(Radius.circular(8))),
             duration: const Duration(milliseconds: 300),
             height: _controller.showNewMsgAlert.isTrue ? 49 : 0,
             width: _controller.showNewMsgAlert.isTrue ? 123 : 0,
             child: TextButton(
-              child: const Text(
+              child: Text(
                 'New Message(s) ↓',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).indicatorColor),
               ),
               onPressed: () {
                 _controller.itemScrollController.jumpTo(index: 0);
@@ -1096,7 +1100,9 @@ class ChatPage extends StatelessWidget {
 
   ///won't show sender and current User's avatar
   Widget _buildReadIndicator(IbMessage message) {
-    if (_controller.messages.indexOf(message) == 0) {
+    if (_controller.messages.indexWhere(
+            (element) => element.ibMessage.messageId == message.messageId) ==
+        0) {
       return SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(

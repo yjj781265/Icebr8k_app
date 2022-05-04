@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/setup_controller.dart';
+import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/ib_collection.dart';
 import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart';
@@ -95,6 +96,7 @@ class AdminMainController extends GetxController {
           IbCollection.fromJson(docChange.doc.data()!);
       if (docChange.type == DocumentChangeType.added) {
         ibCollections.add(collection);
+        IbCacheManager().cacheIbCollection(collection);
       } else if (docChange.type == DocumentChangeType.modified) {
         final index =
             ibCollections.indexWhere((element) => element.id == collection.id);

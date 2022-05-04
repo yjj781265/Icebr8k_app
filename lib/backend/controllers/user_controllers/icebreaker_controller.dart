@@ -30,11 +30,13 @@ class IcebreakerController extends GetxController {
 
   @override
   Future<void> onInit() async {
-    detector = ShakeDetector.autoStart(
+    detector = ShakeDetector.waitForStart(
         onPhoneShake: () async {
+          print('shake');
           await shuffleCards();
         },
-        minimumShakeCount: 2);
+        shakeThresholdGravity: 1.8);
+    detector.startListening();
 
     icebreakerSub = IcebreakerDbService()
         .listenToIcebreakerChange(ibCollection)

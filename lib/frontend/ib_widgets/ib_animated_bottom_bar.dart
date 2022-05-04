@@ -138,7 +138,8 @@ class _ItemWidget extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: IbColors.white,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
                     fontSize: 10,
                   ),
                 ),

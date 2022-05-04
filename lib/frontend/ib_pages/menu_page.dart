@@ -124,6 +124,8 @@ class _MenuPageState extends State<MenuPage> {
                         : IbThemes(context).buildLightTheme());
                     SystemChrome.setSystemUIOverlayStyle(
                       SystemUiOverlayStyle(
+                          statusBarIconBrightness:
+                              value ? Brightness.light : Brightness.dark,
                           statusBarColor:
                               value ? Colors.black : IbColors.lightBlue),
                     );
@@ -131,108 +133,133 @@ class _MenuPageState extends State<MenuPage> {
                 },
                 title: const Text('Dark Mode'),
               ),
-              if (IbUtils.getCurrentIbUser() != null &&
-                  IbUtils.getCurrentIbUser()!.roles.contains(IbUser.kAdminRole))
-                ListTile(
-                  onTap: () {
-                    Get.to(() => AdminMainPage());
-                  },
-                  leading: const Icon(
-                    FontAwesomeIcons.chessKing,
-                    color: IbColors.lightGrey,
+              Expanded(
+                flex: 6,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (IbUtils.getCurrentIbUser() != null &&
+                          IbUtils.getCurrentIbUser()!
+                              .roles
+                              .contains(IbUser.kAdminRole))
+                        ListTile(
+                          onTap: () {
+                            Get.to(() => AdminMainPage());
+                          },
+                          leading: const Icon(
+                            FontAwesomeIcons.chessKing,
+                            color: IbColors.lightGrey,
+                          ),
+                          title: const Text('Admin Page',
+                              style: TextStyle(
+                                  fontSize: IbConfig.kNormalTextSize,
+                                  fontWeight: FontWeight.bold)),
+                        ),
+                      ListTile(
+                        leading: const Icon(
+                          Icons.person,
+                          color: IbColors.primaryColor,
+                        ),
+                        title: Text(
+                          "my_profile".tr,
+                          style: const TextStyle(
+                              fontSize: IbConfig.kNormalTextSize,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        onTap: () {
+                          Get.back();
+                          Get.to(() => MyProfilePage());
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(
+                          Icons.description_outlined,
+                          color: IbColors.primaryColor,
+                        ),
+                        title: const Text(
+                          "About",
+                          style: TextStyle(
+                              fontSize: IbConfig.kNormalTextSize,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        onTap: () {
+                          showAboutDialog(
+                              context: context,
+                              applicationName: 'Icebr8k',
+                              applicationVersion: IbConfig.kVersion,
+                              applicationIcon: SizedBox(
+                                  height: 80,
+                                  width: 80,
+                                  child: Image.asset(
+                                      'assets/icons/logo_ios.png')));
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(
+                          Icons.settings,
+                          color: IbColors.lightGrey,
+                        ),
+                        title: const Text(
+                          "Settings",
+                          style: TextStyle(
+                              fontSize: IbConfig.kNormalTextSize,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        onTap: () {},
+                      ),
+                      ListTile(
+                        leading: const Icon(
+                          Icons.description,
+                          color: IbColors.accentColor,
+                        ),
+                        title: const Text(
+                          "Privacy Policy",
+                          style: TextStyle(
+                              fontSize: IbConfig.kNormalTextSize,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        onTap: () {
+                          Get.to(() => PrivacyPolicyPage());
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(
+                          Icons.feedback_outlined,
+                          color: IbColors.darkPrimaryColor,
+                        ),
+                        title: const Text(
+                          "Send Feedback",
+                          style: TextStyle(
+                              fontSize: IbConfig.kNormalTextSize,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: const Text("Take our 2 minutes survey"),
+                        onTap: () async {
+                          if (await canLaunch(kBetaSurveyLink)) {
+                            launch(kBetaSurveyLink);
+                          }
+                        },
+                      ),
+                    ],
                   ),
-                  title: const Text('Admin Page',
-                      style: TextStyle(
-                          fontSize: IbConfig.kNormalTextSize,
-                          fontWeight: FontWeight.bold)),
                 ),
-              ListTile(
-                leading: const Icon(
-                  Icons.person,
-                  color: IbColors.primaryColor,
-                ),
-                title: Text(
-                  "my_profile".tr,
-                  style: const TextStyle(
-                      fontSize: IbConfig.kNormalTextSize,
-                      fontWeight: FontWeight.bold),
-                ),
-                onTap: () {
-                  Get.back();
-                  Get.to(() => MyProfilePage());
-                },
               ),
-              ListTile(
-                leading: const Icon(
-                  Icons.description_outlined,
-                  color: IbColors.primaryColor,
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: TextButton.icon(
+                      onPressed: () {
+                        Get.find<AuthController>().signOut();
+                      },
+                      icon: const Icon(
+                        Icons.exit_to_app_outlined,
+                        color: IbColors.errorRed,
+                      ),
+                      label: Text(
+                        'sign_out'.tr,
+                      )),
                 ),
-                title: const Text(
-                  "About",
-                  style: TextStyle(
-                      fontSize: IbConfig.kNormalTextSize,
-                      fontWeight: FontWeight.bold),
-                ),
-                onTap: () {
-                  showAboutDialog(
-                      context: context,
-                      applicationName: 'Icebr8k',
-                      applicationVersion: IbConfig.kVersion,
-                      applicationIcon: SizedBox(
-                          height: 80,
-                          width: 80,
-                          child: Image.asset('assets/icons/logo_ios.png')));
-                },
-              ),
-              ListTile(
-                leading: const Icon(
-                  Icons.description,
-                  color: IbColors.accentColor,
-                ),
-                title: const Text(
-                  "Privacy Policy",
-                  style: TextStyle(
-                      fontSize: IbConfig.kNormalTextSize,
-                      fontWeight: FontWeight.bold),
-                ),
-                onTap: () {
-                  Get.to(() => PrivacyPolicyPage());
-                },
-              ),
-              ListTile(
-                leading: const Icon(
-                  Icons.feedback_outlined,
-                  color: IbColors.darkPrimaryColor,
-                ),
-                title: const Text(
-                  "Send Feedback",
-                  style: TextStyle(
-                      fontSize: IbConfig.kNormalTextSize,
-                      fontWeight: FontWeight.bold),
-                ),
-                subtitle: const Text("Take our 2 minutes survey"),
-                onTap: () async {
-                  if (await canLaunch(kBetaSurveyLink)) {
-                    launch(kBetaSurveyLink);
-                  }
-                },
-              ),
-              const Spacer(
-                flex: 10,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: TextButton.icon(
-                    onPressed: () {
-                      Get.find<AuthController>().signOut();
-                    },
-                    icon: const Icon(
-                      Icons.exit_to_app_outlined,
-                      color: IbColors.errorRed,
-                    ),
-                    label: Text(
-                      'sign_out'.tr,
-                    )),
               ),
             ],
           ),

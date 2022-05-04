@@ -16,6 +16,7 @@ import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_settings.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/ib_friends_picker.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/my_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
+import 'package:icebr8k/frontend/ib_pages/search_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
@@ -56,6 +57,14 @@ class _SocialTabState extends State<SocialTab>
           padding: EdgeInsets.symmetric(horizontal: 16.0),
           child: Text('Social'),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () async {
+              Get.to(() => SearchPage());
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: ExtendedNestedScrollView(
@@ -103,7 +112,8 @@ class _SocialTabState extends State<SocialTab>
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
-                                        color: IbColors.white,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
                                         fontSize: 10,
                                       ),
                                     ),
@@ -123,7 +133,7 @@ class _SocialTabState extends State<SocialTab>
                             children: [
                               Row(
                                 children: const [
-                                  Icon(Icons.person),
+                                  Icon(Icons.chat_rounded),
                                   SizedBox(
                                     width: 8,
                                   ),
@@ -142,7 +152,8 @@ class _SocialTabState extends State<SocialTab>
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
-                                        color: IbColors.white,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
                                         fontSize: 10,
                                       ),
                                     ),
@@ -309,7 +320,8 @@ class _SocialTabState extends State<SocialTab>
                               maxLines: 1,
                               overflow: TextOverflow.fade,
                               style: const TextStyle(
-                                color: IbColors.white,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
                                 fontSize: IbConfig.kDescriptionTextSize,
                               ),
                             ),
@@ -427,7 +439,8 @@ class _SocialTabState extends State<SocialTab>
                               maxLines: 1,
                               overflow: TextOverflow.fade,
                               style: const TextStyle(
-                                color: IbColors.white,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
                                 fontSize: IbConfig.kDescriptionTextSize,
                               ),
                             ),
@@ -539,28 +552,31 @@ class _SocialTabState extends State<SocialTab>
         );
       case IbMessage.kMessageTypeText:
         return Text(
-          '${item.lastMessageUser == null ? '' : '${item.lastMessageUser!.username}: '}${item.ibChat.lastMessage!.content}',
-          style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
+          '${item.lastMessageUser == null || item.ibChat.memberCount <= 2 ? '' : '${item.lastMessageUser!.username}: '}${item.ibChat.lastMessage!.content}',
+          style: TextStyle(
+              fontSize: IbConfig.kSecondaryTextSize,
+              fontWeight:
+                  item.unReadCount <= 0 ? FontWeight.normal : FontWeight.bold),
           maxLines: 3,
           overflow: TextOverflow.ellipsis,
         );
       case IbMessage.kMessageTypePic:
         return Text(
-          '${item.lastMessageUser == null ? '' : '${item.lastMessageUser!.username}: '}[IMAGE]',
+          '${item.lastMessageUser == null || !item.ibChat.isCircle ? '' : '${item.lastMessageUser!.username}: '}[IMAGE]',
           style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
           maxLines: 3,
           overflow: TextOverflow.ellipsis,
         );
       case IbMessage.kMessageTypePoll:
         return Text(
-          '${item.lastMessageUser == null ? '' : '${item.lastMessageUser!.username}: '}[POLL]',
+          '${item.lastMessageUser == null || !item.ibChat.isCircle ? '' : '${item.lastMessageUser!.username}: '}[POLL]',
           style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
           maxLines: 3,
           overflow: TextOverflow.ellipsis,
         );
       case IbMessage.kMessageTypeIcebreaker:
         return Text(
-          '${item.lastMessageUser == null ? '' : '${item.lastMessageUser!.username}: '}[ICEBREAKER]',
+          '${item.lastMessageUser == null || !item.ibChat.isCircle ? '' : '${item.lastMessageUser!.username}: '}[ICEBREAKER]',
           style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
           maxLines: 3,
           overflow: TextOverflow.ellipsis,
