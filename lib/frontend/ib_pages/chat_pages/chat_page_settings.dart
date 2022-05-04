@@ -87,6 +87,7 @@ class ChatPageSettings extends StatelessWidget {
                                 IbUserAvatar(
                                   avatarUrl: element.user.avatarUrl,
                                   compScore: element.compScore,
+                                  uid: element.user.id,
                                 ),
                                 Text(
                                   element.user.username,

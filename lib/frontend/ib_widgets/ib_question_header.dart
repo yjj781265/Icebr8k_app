@@ -24,6 +24,7 @@ class IbQuestionHeader extends StatelessWidget {
         children: [
           Obx(
             () => Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 _handleAvatarImage(),
                 const SizedBox(
@@ -55,24 +56,19 @@ class IbQuestionHeader extends StatelessWidget {
           const Spacer(),
           Obx(
             () => Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 if (_itemController.rxIbQuestion.value.isQuiz)
-                  const IconButton(
-                    iconSize: 16,
-                    icon: Icon(FontAwesomeIcons.question),
-                    disabledColor: IbColors.accentColor,
-                    onPressed: null,
+                  const Icon(
+                    Icons.question_mark,
+                    color: IbColors.accentColor,
+                    size: 16,
                   ),
                 IconButton(
-                    onPressed: _itemController.isSample
-                        ? null
-                        : () async {
-                            /*  await IbQuestionDbService().removeQuestion(
-                                _itemController.rxIbQuestion.value);*/
-                          },
-                    icon: const FaIcon(Icons.more_vert_outlined))
+                    onPressed: _itemController.isSample ? null : () async {},
+                    icon: const FaIcon(
+                      Icons.more_vert_outlined,
+                      size: 16,
+                    )),
               ],
             ),
           )

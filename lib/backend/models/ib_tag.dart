@@ -5,7 +5,7 @@ part 'ib_tag.g.dart';
 @JsonSerializable()
 class IbTag {
   String text;
-  int? questionCount;
+  int questionCount;
   dynamic timestamp;
   String creatorId;
 
@@ -13,7 +13,7 @@ class IbTag {
       {required this.text,
       required this.creatorId,
       this.timestamp,
-      this.questionCount});
+      this.questionCount = 0});
 
   factory IbTag.fromJson(Map<String, dynamic> json) => _$IbTagFromJson(json);
 

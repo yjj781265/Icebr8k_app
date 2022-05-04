@@ -74,7 +74,7 @@ class IbStrings extends Translations {
           'edit_choice': 'Edit a choice',
           'match_interests': 'Match Interests',
           'add': 'Add',
-          'add_tag': 'Add a tag',
+          'add_tag': 'Create a new tag',
           'choice_limit_sc':
               'You can only have max ${IbConfig.kScChoiceLimit} endpoints per scale question.',
           'sc_question_not_valid': 'You need 2 endpoints for a scale question',
@@ -167,6 +167,7 @@ class IbStrings extends Translations {
           'circle_welcome_message_hint':
               'A welcome message(optional), a popup will show when member'
                   ' join the circle for the first time',
+          'master_search_hint': 'Username/Name/Tag/Circle/Question'
         }
       };
 }

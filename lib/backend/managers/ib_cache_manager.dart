@@ -1,8 +1,10 @@
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
+import 'package:icebr8k/backend/models/icebreaker_models/icebreaker.dart';
 
 import '../models/ib_user.dart';
+import '../models/icebreaker_models/ib_collection.dart';
 
 class IbCacheManager {
   static final IbCacheManager _manager = IbCacheManager._();
@@ -10,6 +12,7 @@ class IbCacheManager {
   final Map<String, IbTag> _ibTagMap = {};
   final Map<String, List<IbAnswer>> _ibAnswersMap = {};
   final List<IbQuestion> _ibQuestionList = [];
+  final List<IbCollection> _ibCollectionList = [];
 
   factory IbCacheManager() => _manager;
 
@@ -61,6 +64,42 @@ class IbCacheManager {
       return;
     }
     _ibQuestionList.add(ibQuestion);
+  }
+
+  void cacheIbCollection(IbCollection ibCollection) {
+    if (_ibCollectionList.contains(ibCollection)) {
+      return;
+    }
+    _ibCollectionList.add(ibCollection);
+  }
+
+  IbCollection? retrieveIbCollection(String collectionId) {
+    final index =
+        _ibCollectionList.indexWhere((element) => element.id == collectionId);
+
+    if (index != -1) {
+      return _ibCollectionList[index];
+    }
+
+    return null;
+  }
+
+  Icebreaker? retrieveIcebreaker(
+      {required String collectionId, required String icebreakerId}) {
+    final index = _ibCollectionList.indexWhere((element) =>
+        element.id == collectionId &&
+        element.icebreakers
+                .indexWhere((element) => element.id == icebreakerId) !=
+            -1);
+
+    if (index != -1) {
+      final i = _ibCollectionList[index]
+          .icebreakers
+          .indexWhere((element) => element.id == icebreakerId);
+      return _ibCollectionList[index].icebreakers[i];
+    }
+
+    return null;
   }
 
   IbQuestion? getIbQuestion(String questionId) {

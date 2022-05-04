@@ -10,10 +10,12 @@ import 'package:icebr8k/backend/models/ib_chat_models/ib_circle_join_request.dar
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/models/icebreaker_models/ib_collection.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
+import 'package:icebr8k/backend/services/user_services/icebreaker_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -26,6 +28,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../frontend/ib_widgets/ib_card.dart';
 import '../../../frontend/ib_widgets/ib_user_avatar.dart';
 import '../../models/ib_question.dart';
+import '../../models/icebreaker_models/icebreaker.dart';
 
 class ChatPageController extends GetxController {
   IbChat? ibChat;
@@ -36,13 +39,11 @@ class ChatPageController extends GetxController {
   final isPublicCircle = false.obs;
   final showNewMsgAlert = false.obs;
   final showOptions = false.obs;
-  final messages = <IbMessage>[].obs;
+  final messages = <IbMessageModel>[].obs;
 
   /// for media previewer of input widget
   final urls = <String>[].obs;
 
-  /// store ibQuestion for poll message
-  final ibQuestions = <IbQuestion>[].obs;
   final avatarUrl = ''.obs;
   final title = ''.obs;
   final subtitle = ''.obs;
@@ -68,13 +69,14 @@ class ChatPageController extends GetxController {
   final text = ''.obs;
 
   ChatPageController({this.ibChat, this.recipientId = ''});
-  final IbMessage loadMessage = IbMessage(
-      messageId: '',
-      readUids: [],
-      content: 'content',
-      senderUid: '',
-      messageType: IbMessage.kMessageTypeLoadMore,
-      chatRoomId: '');
+  final IbMessageModel loadMessage = IbMessageModel(
+      ibMessage: IbMessage(
+          messageId: '',
+          readUids: [],
+          content: 'content',
+          senderUid: '',
+          messageType: IbMessage.kMessageTypeLoadMore,
+          chatRoomId: ''));
   @override
   Future<void> onInit() async {
     itemPositionsListener.itemPositions.addListener(() {
@@ -351,18 +353,11 @@ class ChatPageController extends GetxController {
       for (final docChange in event.docChanges) {
         final IbMessage ibMessage = IbMessage.fromJson(docChange.doc.data()!);
 
-        /// store poll message in ibQuestions list
-        if (ibMessage.messageType == IbMessage.kMessageTypePoll) {
-          final ibQuestion = await IbQuestionDbService()
-              .querySingleQuestion(ibMessage.content);
-
-          if (ibQuestion != null) {
-            ibQuestions.add(ibQuestion);
-          }
-        }
         print('ChatPageController ${docChange.type}');
         if (docChange.type == DocumentChangeType.added) {
-          messages.insert(0, ibMessage);
+          messages.insert(0, await _handleOnMessageAdd(ibMessage));
+
+          /// show new message available
           if (!itemPositionsListener.itemPositions.value
                   .map((e) => e.index)
                   .toList()
@@ -372,12 +367,14 @@ class ChatPageController extends GetxController {
             showNewMsgAlert.value = true;
           }
         } else if (docChange.type == DocumentChangeType.modified) {
-          final int index = messages.indexOf(ibMessage);
+          final int index = messages.indexWhere(
+              (element) => element.ibMessage.messageId == ibMessage.messageId);
           if (index != -1) {
-            messages[index] = ibMessage;
+            messages[index].ibMessage = ibMessage;
           }
         } else {
-          final int index = messages.indexOf(ibMessage);
+          final int index = messages.indexWhere(
+              (element) => element.ibMessage.messageId == ibMessage.messageId);
           if (index != -1) {
             messages.removeAt(index);
           }
@@ -390,9 +387,10 @@ class ChatPageController extends GetxController {
 
       /// update readUids
       if (messages.isNotEmpty &&
-          messages.first.senderUid != IbUtils.getCurrentUid() &&
-          !messages.first.readUids.contains(IbUtils.getCurrentUid())) {
-        final IbMessage lastMessage = messages.first;
+          messages.first.ibMessage.senderUid != IbUtils.getCurrentUid() &&
+          !messages.first.ibMessage.readUids
+              .contains(IbUtils.getCurrentUid())) {
+        final IbMessage lastMessage = messages.first.ibMessage;
         await IbChatDbService().updateReadUidArray(
             chatRoomId: ibChat!.chatId, messageId: lastMessage.messageId);
       }
@@ -437,7 +435,6 @@ class ChatPageController extends GetxController {
           }
         }
       }
-      setUpTypingUsers();
 
       ibChatMembers.sort((a, b) {
         if (a.member.role == IbChatMember.kRoleLeader &&
@@ -467,6 +464,7 @@ class ChatPageController extends GetxController {
       });
       ibChatMembers.refresh();
       showWelcomeMsg();
+      setUpTypingUsers();
     });
 
     _chatSub =
@@ -482,6 +480,57 @@ class ChatPageController extends GetxController {
         avatarUrl.value = ibChat!.photoUrl;
       }
     });
+  }
+
+  Future<IbMessageModel> _handleOnMessageAdd(IbMessage ibMessage) async {
+    /// store poll message in ibQuestions list
+    if (ibMessage.messageType == IbMessage.kMessageTypePoll) {
+      final ibQuestion =
+          await IbQuestionDbService().querySingleQuestion(ibMessage.content);
+
+      return IbMessageModel(ibMessage: ibMessage, ibQuestion: ibQuestion);
+    }
+
+    /// store icebreaker message in icebreaker list
+    if (ibMessage.messageType == IbMessage.kMessageTypeIcebreaker) {
+      if (ibMessage.extra.isEmpty) {
+        return IbMessageModel(ibMessage: ibMessage);
+      }
+
+      final ibCollection =
+          IbCacheManager().retrieveIbCollection(ibMessage.extra.first);
+
+      if (ibCollection != null) {
+        Icebreaker? icebreaker = IbCacheManager()
+            .retrieveIbCollection(ibMessage.extra.first)!
+            .icebreakers
+            .firstWhereOrNull((element) => element.id == ibMessage.content);
+        icebreaker ??= IbCacheManager().retrieveIcebreaker(
+            collectionId: ibCollection.id, icebreakerId: ibMessage.content);
+
+        return IbMessageModel(
+            ibMessage: ibMessage,
+            icebreaker: icebreaker,
+            ibCollection:
+                IbCacheManager().retrieveIbCollection(ibMessage.extra.first));
+      }
+
+      final collection =
+          await IcebreakerDbService().queryIbCollection(ibMessage.extra.first);
+      if (collection == null) {
+        return IbMessageModel(ibMessage: ibMessage);
+      } else {
+        Icebreaker? icebreaker = collection.icebreakers
+            .firstWhereOrNull((element) => element.id == ibMessage.content);
+        icebreaker ??= IbCacheManager().retrieveIcebreaker(
+            collectionId: collection.id, icebreakerId: ibMessage.content);
+        return IbMessageModel(
+            ibMessage: ibMessage,
+            icebreaker: icebreaker,
+            ibCollection: ibCollection);
+      }
+    }
+    return IbMessageModel(ibMessage: ibMessage);
   }
 
   void setUpTypingUsers() {
@@ -846,7 +895,6 @@ class ChatPageController extends GetxController {
   }
 
   Future<void> loadMore() async {
-    print('loadmore $lastSnap');
     if (isLoadingMore.isTrue || lastSnap == null) {
       return;
     }
@@ -860,21 +908,16 @@ class ChatPageController extends GetxController {
               snapshot: lastSnap!,
               limit: kQueryLimit));
 
-      final List<IbMessage> tempList = [];
+      final List<IbMessageModel> tempList = [];
 
       for (final doc in snapshot.docs) {
         final IbMessage message = IbMessage.fromJson(doc.data());
-        if (message.messageType == IbMessage.kMessageTypePoll) {
-          final ibQuestion =
-              await IbQuestionDbService().querySingleQuestion(message.content);
-          if (ibQuestion == null) {
-            continue;
-          }
-          ibQuestions.add(ibQuestion);
+        if (messages.indexWhere((element) =>
+                element.ibMessage.messageId == message.messageId) ==
+            -1) {
+          continue;
         }
-        if (!messages.contains(message)) {
-          tempList.add(IbMessage.fromJson(doc.data()));
-        }
+        tempList.add(await _handleOnMessageAdd(message));
       }
       messages.remove(loadMessage);
       messages.addAll(tempList);
@@ -886,6 +929,29 @@ class ChatPageController extends GetxController {
     }
     isLoadingMore.value = false;
   }
+}
+
+class IbMessageModel {
+  IbMessage ibMessage;
+  Icebreaker? icebreaker;
+  IbQuestion? ibQuestion;
+  IbCollection? ibCollection;
+
+  IbMessageModel(
+      {required this.ibMessage,
+      this.icebreaker,
+      this.ibQuestion,
+      this.ibCollection});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is IbMessageModel &&
+          runtimeType == other.runtimeType &&
+          ibMessage.messageId == other.ibMessage.messageId;
+
+  @override
+  int get hashCode => ibMessage.messageId.hashCode;
 }
 
 class IbChatMemberModel {

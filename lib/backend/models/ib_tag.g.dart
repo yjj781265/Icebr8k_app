@@ -10,7 +10,7 @@ IbTag _$IbTagFromJson(Map<String, dynamic> json) => IbTag(
       text: json['text'] as String,
       creatorId: json['creatorId'] as String,
       timestamp: json['timestamp'],
-      questionCount: json['questionCount'] as int?,
+      questionCount: json['questionCount'] as int? ?? 0,
     );
 
 Map<String, dynamic> _$IbTagToJson(IbTag instance) => <String, dynamic>{

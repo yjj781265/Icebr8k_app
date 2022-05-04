@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_tab_controller.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_pages/question_result_pages/question_result_main_page.dart';
+import 'package:icebr8k/frontend/ib_pages/question_pages/question_result_main_page.dart';
 import 'package:icebr8k/frontend/ib_pages/select_chat_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';

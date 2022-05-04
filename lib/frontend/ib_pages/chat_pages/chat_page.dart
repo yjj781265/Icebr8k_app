@@ -24,6 +24,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:icebr8k/frontend/ib_widgets/icebreaker_card.dart';
 import 'package:lottie/lottie.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -142,7 +143,7 @@ class ChatPage extends StatelessWidget {
                               _controller.itemPositionsListener,
                           itemBuilder: (context, index) {
                             return _handleMessageType(
-                                message: _controller.messages[index],
+                                model: _controller.messages[index],
                                 context: context);
                           },
                           itemCount: _controller.messages.length,
@@ -847,10 +848,10 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget _pollMsgItem(
-      {required IbMessage message, required BuildContext context}) {
-    if (message.messageType == IbMessage.kMessageTypePoll) {
-      final IbQuestion? question = _controller.ibQuestions
-          .firstWhereOrNull((element) => element.id == message.content);
+      {required IbMessageModel model, required BuildContext context}) {
+    if (model.ibMessage.messageType == IbMessage.kMessageTypePoll) {
+      final IbQuestion? question = model.ibQuestion;
+      final IbMessage message = model.ibMessage;
       final member = _controller.ibChatMembers
           .firstWhereOrNull((p0) => p0.user.id == message.senderUid);
       final avatarUrl = member == null ? '' : member.user.avatarUrl;
@@ -960,6 +961,113 @@ class ChatPage extends StatelessWidget {
     return const SizedBox();
   }
 
+  Widget _icebreakerMsgItem(
+      {required IbMessageModel model, required BuildContext context}) {
+    if (model.ibMessage.messageType == IbMessage.kMessageTypeIcebreaker) {
+      final icebreaker = model.icebreaker;
+      final message = model.ibMessage;
+      final member = _controller.ibChatMembers
+          .firstWhereOrNull((p0) => p0.user.id == message.senderUid);
+      final avatarUrl = member == null ? '' : member.user.avatarUrl;
+      final username = member == null ? '' : member.user.username;
+
+      if (icebreaker == null) {
+        return Column(
+          children: [
+            const SizedBox(
+              height: 16,
+            ),
+
+            /// title
+            Text(
+              message.timestamp == null
+                  ? 'Posting...'
+                  : IbUtils.readableDateTime(
+                      DateTime.fromMillisecondsSinceEpoch(
+                          (message.timestamp as Timestamp)
+                              .millisecondsSinceEpoch),
+                      showTime: true),
+              style: const TextStyle(
+                  color: IbColors.lightGrey,
+                  fontSize: IbConfig.kDescriptionTextSize),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IbUserAvatar(
+                  avatarUrl: avatarUrl,
+                  radius: 11,
+                ),
+                Text(' $username shared a icebreaker')
+              ],
+            ),
+            const IbCard(
+                child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text('This icebreaker is no longer available'),
+            ))
+          ],
+        );
+      }
+
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(
+            height: 16,
+          ),
+
+          /// title
+          Text(
+            message.timestamp == null
+                ? 'Sending...'
+                : IbUtils.readableDateTime(
+                    DateTime.fromMillisecondsSinceEpoch(
+                        (message.timestamp as Timestamp)
+                            .millisecondsSinceEpoch),
+                    showTime: true),
+            style: const TextStyle(
+                color: IbColors.lightGrey,
+                fontSize: IbConfig.kDescriptionTextSize),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IbUserAvatar(
+                avatarUrl: avatarUrl,
+                radius: 11,
+              ),
+              Text(' $username shared a icebreaker')
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+            ),
+            child: SizedBox(
+              height: Get.width * 1.0,
+              child: IcebreakerCard(
+                icebreaker: icebreaker,
+                ibCollection: model.ibCollection!,
+              ),
+            ),
+          ),
+          Align(
+              child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: _buildReadIndicator(message),
+          )),
+          const SizedBox(
+            height: 8,
+          ),
+        ],
+      );
+    }
+
+    return const SizedBox();
+  }
+
   Widget _buildAvatar(
       {required BuildContext context, required List<IbUser> avatarUsers}) {
     avatarUsers.removeWhere((element) => element.id == IbUtils.getCurrentUid());
@@ -1041,7 +1149,8 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget _handleMessageType(
-      {required IbMessage message, required BuildContext context}) {
+      {required IbMessageModel model, required BuildContext context}) {
+    final message = model.ibMessage;
     final bool isMe = message.senderUid == IbUtils.getCurrentUid();
     if (message.messageType == IbMessage.kMessageTypeText) {
       return isMe ? _meTextMsgItem(message) : _textMsgItem(message);
@@ -1095,7 +1204,11 @@ class ChatPage extends StatelessWidget {
     }
 
     if (message.messageType == IbMessage.kMessageTypePoll) {
-      return _pollMsgItem(message: message, context: context);
+      return _pollMsgItem(model: model, context: context);
+    }
+
+    if (message.messageType == IbMessage.kMessageTypeIcebreaker) {
+      return _icebreakerMsgItem(model: model, context: context);
     }
 
     return const SizedBox();

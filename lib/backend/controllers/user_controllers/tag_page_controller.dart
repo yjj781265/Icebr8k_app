@@ -19,6 +19,7 @@ class TagPageController extends GetxController {
   final ibQuestions = <IbQuestion>[].obs;
   final isFollower = false.obs;
   final url = ''.obs;
+  final isLoading = true.obs;
   DocumentSnapshot<Map<String, dynamic>>? lastDoc;
   RefreshController refreshController = RefreshController();
   TagPageController(this.text);
@@ -28,7 +29,7 @@ class TagPageController extends GetxController {
     final tag = await IbTagDbService().retrieveIbTag(text);
     if (tag != null) {
       ibTag.value = tag;
-      total.value = ibTag.value.questionCount ?? 0;
+      total.value = ibTag.value.questionCount;
       isFollower.value = IbUtils.getCurrentIbUser()!.tags.contains(text);
 
       user = await IbUserDbService().queryIbUser(ibTag.value.creatorId);
@@ -50,6 +51,7 @@ class TagPageController extends GetxController {
         url.value = mediaQ.medias.first.url;
       }
     }
+    isLoading.value = false;
     super.onInit();
   }
 

@@ -31,79 +31,85 @@ class CircleInfo extends StatelessWidget {
                     Expanded(
                       child: SingleChildScrollView(
                         child: Obx(
-                          () => Column(
-                            children: [
-                              if (_controller.rxIbChat.value.photoUrl.isEmpty)
-                                CircleAvatar(
-                                  backgroundColor: IbColors.lightGrey,
-                                  radius: 56,
-                                  child: Text(
-                                    _controller.rxIbChat.value.name[0],
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Theme.of(context).indicatorColor,
-                                        fontSize: 56,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                )
-                              else
-                                GestureDetector(
-                                  child: IbUserAvatar(
-                                    avatarUrl:
-                                        _controller.rxIbChat.value.photoUrl,
+                          () => Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                if (_controller.rxIbChat.value.photoUrl.isEmpty)
+                                  CircleAvatar(
+                                    backgroundColor: IbColors.lightGrey,
                                     radius: 56,
+                                    child: Text(
+                                      _controller.rxIbChat.value.name[0],
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color:
+                                              Theme.of(context).indicatorColor,
+                                          fontSize: 56,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  )
+                                else
+                                  GestureDetector(
+                                    child: IbUserAvatar(
+                                      avatarUrl:
+                                          _controller.rxIbChat.value.photoUrl,
+                                      radius: 56,
+                                    ),
+                                    onTap: () {
+                                      Get.to(
+                                          () => IbMediaViewer(urls: [
+                                                _controller
+                                                    .rxIbChat.value.photoUrl
+                                              ], currentIndex: 0),
+                                          fullscreenDialog: true,
+                                          transition: Transition.zoom);
+                                    },
                                   ),
-                                  onTap: () {
-                                    Get.to(
-                                        () => IbMediaViewer(urls: [
-                                              _controller
-                                                  .rxIbChat.value.photoUrl
-                                            ], currentIndex: 0),
-                                        fullscreenDialog: true,
-                                        transition: Transition.zoom);
-                                  },
+                                Text(
+                                  '${_controller.rxIbChat.value.memberCount} Member(s)',
                                 ),
-                              Text(
-                                '${_controller.rxIbChat.value.memberCount} Member(s)',
-                                style:
-                                    const TextStyle(color: IbColors.lightGrey),
-                              ),
-                              const SizedBox(
-                                height: 16,
-                              ),
-                              Text(
-                                _controller.rxIbChat.value.name,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: IbConfig.kPageTitleSize,
+                                const SizedBox(
+                                  height: 16,
                                 ),
-                              ),
-                              const SizedBox(
-                                height: 8,
-                              ),
-                              Text(_controller.rxIbChat.value.description),
-                              const SizedBox(
-                                height: 24,
-                              ),
-                              SingleChildScrollView(
-                                child: StaggeredGrid.count(
-                                  crossAxisCount: 4,
-                                  mainAxisSpacing: 2,
-                                  crossAxisSpacing: 2,
-                                  children: _controller.memberScoreMap.keys
-                                      .map((e) => IbUserAvatar(
-                                            radius: 32,
-                                            uid: e.id,
-                                            avatarUrl: e.avatarUrl,
-                                            compScore:
-                                                _controller.memberScoreMap[e],
-                                          ))
-                                      .toList()
-                                    ..sort((a, b) => (b.compScore ?? 0)
-                                        .compareTo(a.compScore ?? 0)),
+                                Text(
+                                  _controller.rxIbChat.value.name,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: IbConfig.kPageTitleSize,
+                                  ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                Text(
+                                  _controller.rxIbChat.value.description,
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(
+                                  height: 24,
+                                ),
+                                SingleChildScrollView(
+                                  child: StaggeredGrid.count(
+                                    crossAxisCount: 4,
+                                    mainAxisSpacing: 2,
+                                    crossAxisSpacing: 2,
+                                    children: _controller.memberScoreMap.keys
+                                        .map((e) => IbUserAvatar(
+                                              radius: 32,
+                                              uid: e.id,
+                                              avatarUrl: e.avatarUrl,
+                                              compScore:
+                                                  _controller.memberScoreMap[e],
+                                            ))
+                                        .toList()
+                                      ..sort((a, b) => (b.compScore ?? 0)
+                                          .compareTo(a.compScore ?? 0)),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -116,13 +122,13 @@ class CircleInfo extends StatelessWidget {
                       Container(
                         width: double.infinity,
                         height: 56,
-                        margin: const EdgeInsets.all(8),
+                        margin: const EdgeInsets.all(16),
                         child: Obx(
                           () => IbElevatedButton(
                               textTrKey: _controller.hasInvite.isTrue ||
                                       _controller.rxIbChat.value.isPublicCircle
                                   ? 'Join Circle'
-                                  : 'Request To Join Circle',
+                                  : 'Request to Join Circle',
                               onPressed: () async {
                                 if (_controller.hasInvite.isTrue ||
                                     _controller.rxIbChat.value.isPublicCircle) {

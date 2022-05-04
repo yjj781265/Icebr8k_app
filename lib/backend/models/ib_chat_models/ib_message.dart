@@ -19,6 +19,7 @@ class IbMessage {
   static const String kMessageTypePic = 'pic';
   static const String kMessageTypeAudio = 'audio';
   static const String kMessageTypePoll = 'poll';
+  static const String kMessageTypeIcebreaker = 'icebreaker';
   static const String kMessageTypeLoadMore = 'loadMore';
   static const String kMessageTypeAnnouncement = 'announcement';
 

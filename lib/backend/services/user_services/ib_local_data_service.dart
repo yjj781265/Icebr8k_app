@@ -22,6 +22,11 @@ class IbLocalDataService {
     return value;
   }
 
+  List<String> retrieveStringArrValue(StorageKey key) {
+    final List<String> value = _box.read(key.toString()) ?? [];
+    return value;
+  }
+
   void updateBoolValue({required StorageKey key, required bool value}) {
     _box.write(key.toString(), value);
   }
@@ -34,6 +39,12 @@ class IbLocalDataService {
     _box.write(key.toString(), value);
   }
 
+  void updateStringArrValue({required StorageKey key, required String value}) {
+    final List<String> list = _box.read(key.toString()) ?? [];
+    list.add(value);
+    _box.write(key.toString(), list.toSet().toList());
+  }
+
   void removeKey(StorageKey key) {
     _box.remove(key.toString());
   }
@@ -44,6 +55,7 @@ enum StorageKey {
   isDarkModeBool,
   isLocSharingOnBool,
   loginEmailString,
+  recentSearchStringArr,
   pickAnswerForQuizBool,
   pickTagForQuestionBool,
 }

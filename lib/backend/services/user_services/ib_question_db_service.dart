@@ -40,16 +40,19 @@ class IbQuestionDbService {
     await _collectionRef.doc(question.id).delete();
   }
 
+  /// retrieve single IbQuestion and cache locally via IbCacheManager
   Future<IbQuestion?> querySingleQuestion(String questionId) async {
     print('querySingleQuestion $questionId');
     if (questionId.isEmpty) {
       return null;
     }
     final snapshot = await _collectionRef.doc(questionId).get();
-    if (!snapshot.exists) {
+    if (!snapshot.exists || snapshot.data() == null) {
       return null;
     }
-    return IbQuestion.fromJson(snapshot.data()!);
+    final q = IbQuestion.fromJson(snapshot.data()!);
+    IbCacheManager().cacheSingleIbQuestion(q);
+    return q;
   }
 
   /// query all question this uid asked, public question (no Anonymous question) by default

@@ -1,12 +1,21 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/ib_collection.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/icebreaker.dart';
+import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/icebreaker_pages/ib_cover_page.dart';
+import 'package:icebr8k/frontend/ib_pages/select_chat_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
+
+import '../../backend/controllers/user_controllers/chat_tab_controller.dart';
+import '../../backend/models/ib_chat_models/ib_message.dart';
+import '../ib_colors.dart';
+import 'ib_dialog.dart';
+import 'ib_loading_dialog.dart';
 
 class IcebreakerCard extends StatelessWidget {
   final Icebreaker icebreaker;
@@ -33,7 +42,7 @@ class IcebreakerCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                   minFontSize: IbConfig.kNormalTextSize,
                   maxFontSize: IbConfig.kSloganSize,
-                  maxLines: 5,
+                  maxLines: 4,
                   overflow: TextOverflow.ellipsis,
                   style: IbUtils.getIbFonts(TextStyle(
                       fontSize: IbConfig.kSloganSize,
@@ -43,6 +52,58 @@ class IcebreakerCard extends StatelessWidget {
                           : FontStyle.normal,
                       fontWeight: FontWeight.bold))[icebreaker.textStyleIndex],
                 ),
+              ),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: CircleAvatar(
+                backgroundColor:
+                    Theme.of(context).backgroundColor.withOpacity(0.8),
+                child: IconButton(
+                    onPressed: () async {
+                      final list = await Get.to(() => const SelectChatPage());
+                      if (list == null) {
+                        return;
+                      }
+                      final items = (list as List<dynamic>)
+                          .map((e) => e as ChatTabItem)
+                          .toList();
+                      if (items.isNotEmpty) {
+                        Get.dialog(
+                            const IbLoadingDialog(messageTrKey: 'Sharing...'),
+                            barrierDismissible: false);
+                        try {
+                          for (final item in items) {
+                            final message = IbMessage(
+                                messageId: IbUtils.getUniqueId(),
+                                content: icebreaker.id,
+                                extra: [icebreaker.collectionId],
+                                senderUid: IbUtils.getCurrentUid()!,
+                                messageType: IbMessage.kMessageTypeIcebreaker,
+                                chatRoomId: item.ibChat.chatId,
+                                readUids: [IbUtils.getCurrentUid()!]);
+                            await IbChatDbService().uploadMessage(message);
+                          }
+                          Get.back();
+                          IbUtils.showSimpleSnackBar(
+                              msg: 'Icebreaker shared successfully',
+                              backgroundColor: IbColors.accentColor);
+                        } catch (e) {
+                          Get.back();
+                          Get.dialog(IbDialog(
+                            title: 'Error',
+                            subtitle: e.toString(),
+                            showNegativeBtn: false,
+                          ));
+                        }
+                      }
+                    },
+                    icon: Icon(
+                      FontAwesomeIcons.share,
+                      color: Theme.of(context).indicatorColor,
+                      size: 16,
+                    )),
               ),
             ),
             if (showCollectionName)
@@ -59,7 +120,7 @@ class IcebreakerCard extends StatelessWidget {
                         padding: const EdgeInsets.all(4.0),
                         child: Text(
                           ibCollection.name,
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: IbUtils.getIbFonts(TextStyle(
                               fontSize: IbConfig.kDescriptionTextSize,

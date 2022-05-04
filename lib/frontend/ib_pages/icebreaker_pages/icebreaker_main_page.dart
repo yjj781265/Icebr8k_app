@@ -75,7 +75,7 @@ class IcebreakerMainPage extends StatelessWidget {
                                     icebreaker: controller.icebreakers[index]),
                                 Positioned(
                                   top: 8,
-                                  right: 8,
+                                  left: 8,
                                   child: IbCard(
                                     elevation: 0,
                                     child: Padding(

@@ -518,6 +518,13 @@ class _ChatTabState extends State<ChatTab> with SingleTickerProviderStateMixin {
           maxLines: 3,
           overflow: TextOverflow.ellipsis,
         );
+      case IbMessage.kMessageTypeIcebreaker:
+        return Text(
+          '${item.lastMessageUser == null ? '' : '${item.lastMessageUser!.username}: '}[ICEBREAKER]',
+          style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+        );
       default:
         return const SizedBox();
     }

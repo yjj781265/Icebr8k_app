@@ -5,6 +5,7 @@ import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/admin/edit_ib_collection_main_page.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
+import 'package:icebr8k/frontend/ib_pages/search_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
@@ -59,7 +60,7 @@ class HomeTab extends StatelessWidget {
           IconButton(
             icon: const Text(
               '🧊',
-              style: TextStyle(fontSize: 20),
+              style: TextStyle(fontSize: 24),
             ),
             onPressed: () {
               Get.to(() => EditIbCollectionMainPage());
@@ -67,7 +68,9 @@ class HomeTab extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.search),
-            onPressed: () async {},
+            onPressed: () async {
+              Get.to(() => SearchPage());
+            },
           ),
         ],
         leading: Builder(
