@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/friend_item_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/friend_list_controller.dart';
-import 'package:icebr8k/frontend/ib_pages/social_tab/my_friends_list.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
+
+import '../social_tab.dart';
 
 class FriendList extends StatelessWidget {
   const FriendList(this._controller, {Key? key}) : super(key: key);

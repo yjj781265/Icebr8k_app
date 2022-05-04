@@ -7,16 +7,16 @@ import 'package:icebr8k/backend/controllers/user_controllers/create_question_con
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/alert_tab.dart';
-import 'package:icebr8k/frontend/ib_pages/chat_tab.dart';
+import 'package:icebr8k/frontend/ib_pages/nearby_tab.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
 import 'package:move_to_background/move_to_background.dart';
 
-import '../../backend/controllers/user_controllers/chat_tab_controller.dart';
+import '../../backend/controllers/user_controllers/social_tab_controller.dart';
 import '../../backend/services/user_services/ib_local_data_service.dart';
 import '../ib_colors.dart';
 import 'create_question_pages/create_question_page.dart';
 import 'home_tab.dart';
-import 'social_tab/social_tab.dart';
+import 'social_tab.dart';
 
 class MainPage extends StatelessWidget {
   @override
@@ -76,9 +76,9 @@ class _MainPageViewState extends State<MainPageView>
   Widget getBody() {
     final List<Widget> pages = [
       HomeTab(),
-      const ChatTab(),
+      const SocialTab(),
       const SizedBox(),
-      SocialTab(),
+      NearbyTab(),
       AlertTab(),
     ];
     return Obx(
@@ -117,10 +117,12 @@ class _MainPageViewState extends State<MainPageView>
             textAlign: TextAlign.center,
           ),
           BottomNavyBarItem(
-            icon: const Icon(Icons.chat_bubble),
-            title: 'chat'.tr,
+            icon: const Icon(
+              Icons.people_alt_outlined,
+            ),
+            title: 'social'.tr,
             inactiveColor: _inactiveColor,
-            notification: Get.find<ChatTabController>().totalUnread.value,
+            notification: Get.find<SocialTabController>().totalUnread.value,
             textAlign: TextAlign.center,
           ),
           BottomNavyBarItem(
@@ -133,8 +135,8 @@ class _MainPageViewState extends State<MainPageView>
             textAlign: TextAlign.center,
           ),
           BottomNavyBarItem(
-              icon: const Icon(Icons.group_outlined),
-              title: 'social'.tr,
+              icon: const Icon(Icons.person_pin_circle_rounded),
+              title: 'nearby'.tr,
               inactiveColor: _inactiveColor,
               textAlign: TextAlign.center),
           BottomNavyBarItem(

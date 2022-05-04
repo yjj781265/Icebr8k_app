@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/chat_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
@@ -25,6 +24,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../../backend/controllers/user_controllers/ib_question_item_controller.dart';
+import '../../../backend/controllers/user_controllers/social_tab_controller.dart';
 
 class ReviewQuestionPage extends StatelessWidget {
   final IbQuestionItemController itemController;
@@ -348,7 +348,6 @@ class ReviewQuestionPage extends StatelessWidget {
             Obx(
               () => ListTile(
                 onTap: () async {
-                  print(itemController.sharedCircles);
                   List<ChatTabItem>? circles = await Get.to(
                       () => CirclePickerPage(
                             pickedItems: itemController.sharedCircles,

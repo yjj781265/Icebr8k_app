@@ -7,7 +7,7 @@ class IbConfig {
   static const double kScrollbarCornerRadius = 16;
   static const double kTextBoxCornerRadius = 16;
   static const double kButtonCornerRadius = 16;
-  static const int kFriendsLimit = 200;
+  static const int kFriendsLimit = 150;
   static const double kSloganSize = 32;
   static const double kPageTitleSize = 20;
   static const double kSecondaryTextSize = 14;

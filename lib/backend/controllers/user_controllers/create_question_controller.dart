@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/chat_tab_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_media.dart';

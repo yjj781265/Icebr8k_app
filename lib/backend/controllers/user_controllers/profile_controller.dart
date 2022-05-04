@@ -116,8 +116,8 @@ class ProfileController extends GetxController {
 
     if (currentUser.friendUids.length >= IbConfig.kFriendsLimit) {
       IbUtils.showSimpleSnackBar(
-          msg:
-              'Failed to add friend, you have reach your ${IbConfig.kFriendsLimit} friends limit',
+          msg: 'Failed to add friend, you have reach your '
+              '${IbConfig.kFriendsLimit} friends limit',
           backgroundColor: IbColors.errorRed);
       return;
     }

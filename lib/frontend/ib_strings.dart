@@ -167,7 +167,8 @@ class IbStrings extends Translations {
           'circle_welcome_message_hint':
               'A welcome message(optional), a popup will show when member'
                   ' join the circle for the first time',
-          'master_search_hint': 'Username/Name/Tag/Circle/Question'
+          'master_search_hint': 'Username/Name/Tag/Circle/Question',
+          'nearby': 'Nearby',
         }
       };
 }

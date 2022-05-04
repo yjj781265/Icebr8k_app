@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/friends_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
@@ -16,7 +17,6 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../backend/controllers/user_controllers/auth_controller.dart';
-import '../backend/controllers/user_controllers/chat_tab_controller.dart';
 import '../backend/services/user_services/ib_question_db_service.dart';
 import 'ib_config.dart';
 
@@ -242,10 +242,10 @@ class IbUtils {
 
   /// return current IbUser friend ids what are not in block list
   static List<String> getCurrentIbUserUnblockedFriendsId() {
-    if (!Get.isRegistered<SocialTabController>()) {
+    if (!Get.isRegistered<FriendsController>()) {
       return [];
     }
-    final friends = List<IbUser>.from(Get.find<SocialTabController>().friends);
+    final friends = List<IbUser>.from(Get.find<FriendsController>().friends);
     friends.removeWhere((element) =>
         getCurrentIbUser()!.blockedFriendUids.contains(element.id));
 
@@ -254,23 +254,23 @@ class IbUtils {
 
   /// return current IbUser circle chat items
   static List<ChatTabItem> getCircleItems() {
-    if (!Get.isRegistered<ChatTabController>()) {
+    if (!Get.isRegistered<SocialTabController>()) {
       return [];
     }
     final circleItems =
-        List<ChatTabItem>.from(Get.find<ChatTabController>().circles);
+        List<ChatTabItem>.from(Get.find<SocialTabController>().circles);
     return circleItems;
   }
 
   /// return current IbUser all chat items
   static List<ChatTabItem> getAllChatTabItems() {
-    if (!Get.isRegistered<ChatTabController>()) {
+    if (!Get.isRegistered<SocialTabController>()) {
       return [];
     }
     final circleItems =
-        List<ChatTabItem>.from(Get.find<ChatTabController>().circles);
+        List<ChatTabItem>.from(Get.find<SocialTabController>().circles);
     final oneToOneItems =
-        List<ChatTabItem>.from(Get.find<ChatTabController>().oneToOneChats);
+        List<ChatTabItem>.from(Get.find<SocialTabController>().oneToOneChats);
     oneToOneItems.addAll(circleItems);
     final allItems = oneToOneItems;
     allItems.sort((a, b) => (a.title).compareTo(b.title));

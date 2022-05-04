@@ -218,7 +218,25 @@ class SearchPage extends StatelessWidget {
                                         fontWeight: FontWeight.bold,
                                         fontSize: IbConfig.kNormalTextSize),
                                   ),
-                                  Text('${element.memberCount} member(s)')
+                                  Text('${element.memberCount} member(s)'),
+                                  const SizedBox(
+                                    height: 8,
+                                  ),
+                                  Container(
+                                    decoration: const BoxDecoration(
+                                        color: IbColors.primaryColor,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(8))),
+                                    padding: const EdgeInsets.all(2),
+                                    child: Text(
+                                      element.isPublicCircle
+                                          ? 'Public'
+                                          : 'Private',
+                                      style: const TextStyle(
+                                          fontSize:
+                                              IbConfig.kDescriptionTextSize),
+                                    ),
+                                  )
                                 ],
                               ),
                             ),

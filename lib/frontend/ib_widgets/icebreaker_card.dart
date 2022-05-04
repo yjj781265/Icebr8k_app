@@ -11,7 +11,7 @@ import 'package:icebr8k/frontend/ib_pages/select_chat_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 
-import '../../backend/controllers/user_controllers/chat_tab_controller.dart';
+import '../../backend/controllers/user_controllers/social_tab_controller.dart';
 import '../../backend/models/ib_chat_models/ib_message.dart';
 import '../ib_colors.dart';
 import 'ib_dialog.dart';

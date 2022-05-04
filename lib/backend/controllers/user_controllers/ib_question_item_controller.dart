@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
@@ -14,7 +15,6 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import '../../services/user_services/ib_question_db_service.dart';
 import '../../services/user_services/ib_tag_db_service.dart';
 import '../../services/user_services/ib_user_db_service.dart';
-import 'chat_tab_controller.dart';
 
 class IbQuestionItemController extends GetxController {
   final Rx<IbQuestion> rxIbQuestion;
