@@ -24,7 +24,11 @@ class SearchPageController extends GetxController {
   @override
   Future<void> onInit() async {
     textEtController.addListener(() {
+      if (searchText.value == textEtController.text) {
+        return;
+      }
       searchText.value = textEtController.text;
+      isSearching.value = searchText.trim().isNotEmpty;
     });
 
     debounce(searchText, (value) async {
@@ -34,9 +38,7 @@ class SearchPageController extends GetxController {
   }
 
   Future<void> search() async {
-    if (searchText.isNotEmpty) {
-      isSearching.value = true;
-
+    if (searchText.trim().isNotEmpty) {
       /// search IbUsers first
       final ids =
           await IbTypeSenseService().searchIbUsers(searchText.value.trim());

@@ -27,6 +27,10 @@ Future<void> main() async {
   PaintingBinding.instance!.imageCache?.maximumSizeBytes = 1000 << 20; //1GB
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
+        statusBarIconBrightness:
+            IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
+                ? Brightness.light
+                : Brightness.dark,
         statusBarColor:
             IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
                 ? Colors.black

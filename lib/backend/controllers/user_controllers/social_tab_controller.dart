@@ -21,6 +21,7 @@ class SocialTabController extends GetxController {
   Map<String, IbUser> ibUserMap = {};
   final oneToOneChats = <ChatTabItem>[].obs;
   final circles = <ChatTabItem>[].obs;
+  final currentIndex = 0.obs;
   late StreamSubscription _oneToOneSub;
   late StreamSubscription _circleSub;
   final isLoadingCircles = true.obs;

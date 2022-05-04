@@ -16,6 +16,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../backend/controllers/user_controllers/circle_info_controller.dart';
 import '../../backend/controllers/user_controllers/tag_page_controller.dart';
@@ -35,13 +36,35 @@ class SearchPage extends StatelessWidget {
               child: IbProgressIndicator(),
             );
           }
-          return Column(
-            children: [
-              userWidget(context),
-              questionWidget(context),
-              circleWidget(context),
-              tagWidget(context),
-            ],
+          if (_controller.questions.isEmpty &&
+              _controller.users.isEmpty &&
+              _controller.tags.isEmpty &&
+              _controller.circles.isEmpty &&
+              _controller.isSearching.isFalse &&
+              _controller.searchText.isNotEmpty) {
+            return Center(
+              child: SizedBox(
+                width: 300,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Lottie.asset('assets/images/sloth_zen.json'),
+                    const Text('I could not find anything')
+                  ],
+                ),
+              ),
+            );
+          }
+
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                userWidget(context),
+                questionWidget(context),
+                circleWidget(context),
+                tagWidget(context),
+              ],
+            ),
           );
         }));
   }
@@ -53,6 +76,7 @@ class SearchPage extends StatelessWidget {
           borderRadius: const BorderRadius.all(Radius.circular(8)),
           color: Theme.of(context).backgroundColor),
       child: TextField(
+        autofocus: true,
         controller: _controller.textEtController,
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.search,
@@ -319,7 +343,7 @@ class SearchPage extends StatelessWidget {
                                 width: 150,
                                 child: AutoSizeText(
                                   element.question,
-                                  maxLines: 5,
+                                  maxLines: 3,
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: IbConfig.kNormalTextSize),

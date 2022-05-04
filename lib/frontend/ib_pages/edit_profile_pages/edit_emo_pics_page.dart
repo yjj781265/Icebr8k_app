@@ -4,6 +4,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/edit_emo_pic_contro
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/edit_profile_pages/edit_emo_pics_detail_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_emo_pic_card.dart';
@@ -32,25 +33,27 @@ class EditEmoPicsPage extends StatelessWidget {
                   ),
                 Expanded(
                   child: ReorderableWrap(
-                    footer: IbEmoPicCard(
-                      emoPic: IbEmoPic(
-                        url: '',
-                        id: '',
-                        emoji: '',
-                      ),
-                      ignoreOnDoubleTap: true,
-                      onTap: () {
-                        Get.to(
-                          () => EditEmoPicDetailPage(
-                              IbEmoPic(
-                                url: '',
-                                id: IbUtils.getUniqueId(),
-                                emoji: '',
-                              ),
-                              _controller),
-                        );
-                      },
-                    ),
+                    footer: _controller.rxEmoPics.length >= IbConfig.kMaxEmoPic
+                        ? null
+                        : IbEmoPicCard(
+                            emoPic: IbEmoPic(
+                              url: '',
+                              id: '',
+                              emoji: '',
+                            ),
+                            ignoreOnDoubleTap: true,
+                            onTap: () {
+                              Get.to(
+                                () => EditEmoPicDetailPage(
+                                    IbEmoPic(
+                                      url: '',
+                                      id: IbUtils.getUniqueId(),
+                                      emoji: '',
+                                    ),
+                                    _controller),
+                              );
+                            },
+                          ),
                     runAlignment: WrapAlignment.center,
                     children: _controller.rxEmoPics
                         .map((e) => Stack(

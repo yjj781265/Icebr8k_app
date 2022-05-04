@@ -9,6 +9,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/notifications_contr
 import 'package:icebr8k/frontend/ib_pages/alert_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/my_profile_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:move_to_background/move_to_background.dart';
 
 import '../../backend/controllers/user_controllers/social_tab_controller.dart';
@@ -78,10 +79,10 @@ class _MainPageViewState extends State<MainPageView>
       HomeTab(),
       const SocialTab(),
       const SizedBox(),
+      AlertTab(),
       MyProfilePage(
         showBackButton: false,
       ),
-      AlertTab(),
     ];
     return Obx(
       () => IndexedStack(
@@ -137,20 +138,21 @@ class _MainPageViewState extends State<MainPageView>
             textAlign: TextAlign.center,
           ),
           BottomNavyBarItem(
-            icon: const Icon(
-              Icons.person_outline,
-            ),
-            title: 'me'.tr,
-            inactiveColor: _inactiveColor,
-            textAlign: TextAlign.center,
-          ),
-          BottomNavyBarItem(
             icon: const Icon(Icons.notifications),
             notification: Get.find<NotificationController>()
                 .items
                 .where((p0) => p0.notification.isRead == false)
                 .length,
             title: 'alert'.tr,
+            inactiveColor: _inactiveColor,
+            textAlign: TextAlign.center,
+          ),
+          BottomNavyBarItem(
+            icon: Obx(() => IbUserAvatar(
+                radius: 16,
+                avatarUrl:
+                    _mainPageController.rxCurrentIbUser.value.avatarUrl)),
+            title: '',
             inactiveColor: _inactiveColor,
             textAlign: TextAlign.center,
           ),

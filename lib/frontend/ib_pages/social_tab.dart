@@ -45,6 +45,9 @@ class _SocialTabState extends State<SocialTab>
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      _controller.currentIndex.value = _tabController.index;
+    });
     super.initState();
   }
 
@@ -59,8 +62,12 @@ class _SocialTabState extends State<SocialTab>
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.person_pin_circle_rounded),
+            onPressed: () {},
+          ),
+          IconButton(
             icon: const Icon(Icons.search),
-            onPressed: () async {
+            onPressed: () {
               Get.to(() => SearchPage());
             },
           ),
@@ -193,14 +200,12 @@ class _SocialTabState extends State<SocialTab>
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: title != ('one_to_one_chat'.tr)
-            ? const Icon(Icons.group_add_outlined)
-            : const Icon(Icons.message),
+        child: const Icon(Icons.add),
         onPressed: () async {
-          if (title != ('one_to_one_chat'.tr)) {
+          if (_controller.currentIndex.value == 0) {
             Get.to(() => CircleSettings(Get.put(CircleSettingsController())),
                 fullscreenDialog: true);
-          } else {
+          } else if (_controller.currentIndex.value == 1) {
             final users = await Get.to(
               () => IbFriendsPicker(
                 Get.put(
@@ -217,6 +222,8 @@ class _SocialTabState extends State<SocialTab>
                     ..title.value = user.username
                     ..avatarUrl.value = user.avatarUrl)));
             }
+          } else {
+            Get.to(() => SearchPage());
           }
         },
       ),
