@@ -19,12 +19,12 @@ import 'ib_loading_dialog.dart';
 
 class IcebreakerCard extends StatelessWidget {
   final Icebreaker icebreaker;
-  final IbCollection ibCollection;
+  final IbCollection? ibCollection;
   final bool showCollectionName;
   final double minSize;
   final double maxSize;
   const IcebreakerCard(
-      {required this.ibCollection,
+      {this.ibCollection,
       required this.icebreaker,
       this.minSize = 16,
       this.maxSize = 32,
@@ -110,30 +110,30 @@ class IcebreakerCard extends StatelessWidget {
                     )),
               ),
             ),
-            if (showCollectionName)
+            if (showCollectionName && ibCollection != null)
               Positioned(
                   bottom: 16,
                   right: 4,
                   child: InkWell(
                     onTap: () {
-                      Get.to(() => IbCoverPage(ibCollection));
+                      Get.to(() => IbCoverPage(ibCollection!));
                     },
                     child: LimitedBox(
                       maxWidth: 250,
                       child: Padding(
                         padding: const EdgeInsets.all(4.0),
                         child: Text(
-                          ibCollection.name,
+                          ibCollection!.name,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: IbUtils.getIbFonts(TextStyle(
                               fontSize: IbConfig.kDescriptionTextSize,
-                              color: Color(ibCollection.textColor),
+                              color: Color(ibCollection!.textColor),
                               fontWeight: FontWeight.bold,
-                              fontStyle: ibCollection.isItalic
+                              fontStyle: ibCollection!.isItalic
                                   ? FontStyle.italic
                                   : FontStyle
-                                      .normal))[ibCollection.textStyleIndex],
+                                      .normal))[ibCollection!.textStyleIndex],
                         ),
                       ),
                     ),

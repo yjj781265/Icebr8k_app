@@ -22,10 +22,13 @@ class IbCoverPage extends StatefulWidget {
 }
 
 class _IbCoverPageState extends State<IbCoverPage> {
-  int count = 0;
+  late IcebreakerController _controller;
+
   @override
   void initState() {
-    count = widget.ibCollection.icebreakers.length;
+    _controller = Get.put(
+        IcebreakerController(widget.ibCollection, isEdit: widget.isEdit),
+        tag: widget.ibCollection.id);
     super.initState();
   }
 
@@ -103,10 +106,12 @@ class _IbCoverPageState extends State<IbCoverPage> {
                                 elevation: 0,
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    '$count Question(s)',
-                                    style: const TextStyle(
-                                        color: IbColors.lightGrey),
+                                  child: Obx(
+                                    () => Text(
+                                      '${_controller.icebreakers.length} Question(s)',
+                                      style: const TextStyle(
+                                          color: IbColors.lightGrey),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -125,14 +130,7 @@ class _IbCoverPageState extends State<IbCoverPage> {
               child: IbElevatedButton(
                 textTrKey: widget.isEdit ? 'Edit ✏️' : "Let's 🧊🔨",
                 onPressed: () async {
-                  final ibCollection = await Get.off(() => IcebreakerMainPage(
-                      Get.put(IcebreakerController(widget.ibCollection,
-                          isEdit: widget.isEdit))));
-                  setState(() {
-                    count = ibCollection == null
-                        ? 0
-                        : (ibCollection as IbCollection).icebreakers.length;
-                  });
+                  Get.off(() => IcebreakerMainPage(_controller));
                 },
                 textSize: IbConfig.kPageTitleSize,
                 textColor: Color(widget.ibCollection.textColor),

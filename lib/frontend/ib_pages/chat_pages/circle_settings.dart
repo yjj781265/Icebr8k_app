@@ -28,9 +28,9 @@ class CircleSettings extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: _controller.ibChat == null
-            ? const Text('Create A Circle')
+            ? const Text('Create a Circle')
             : _controller.isAbleToEdit
-                ? const Text('Edit A Circle')
+                ? const Text('Edit a Circle')
                 : const Text('Circle Info'),
       ),
       body: SafeArea(
@@ -324,9 +324,8 @@ class CircleSettings extends StatelessWidget {
                         onPressed: () async {
                           await _controller.onCreateCircle();
                         },
-                        textTrKey: _controller.ibChat == null
-                            ? 'Create a circle'
-                            : 'Save',
+                        textTrKey:
+                            _controller.ibChat == null ? 'Create' : 'Save',
                       ),
                     ),
                   )

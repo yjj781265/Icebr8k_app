@@ -19,14 +19,17 @@ class IbCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: margin,
-      elevation: elevation,
-      color: color,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(radius),
+    return Material(
+      color: Colors.transparent,
+      child: Card(
+        margin: margin,
+        elevation: elevation,
+        color: color,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radius),
+        ),
+        child: child,
       ),
-      child: child,
     );
   }
 }

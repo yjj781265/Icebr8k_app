@@ -168,7 +168,7 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
                                     textAlign: TextAlign.center,
                                     minFontSize: IbConfig.kNormalTextSize,
                                     maxFontSize: IbConfig.kSloganSize,
-                                    maxLines: 5,
+                                    maxLines: 4,
                                     style: IbUtils.getIbFonts(TextStyle(
                                         color: Color(newIcebreaker.textColor),
                                         fontWeight: FontWeight.bold,
@@ -185,9 +185,9 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
                 ),
                 Positioned(
                     bottom: 16,
-                    right: 4,
+                    right: 16,
                     child: LimitedBox(
-                      maxWidth: 200,
+                      maxWidth: 250,
                       child: Padding(
                         padding: const EdgeInsets.all(4),
                         child: Text(

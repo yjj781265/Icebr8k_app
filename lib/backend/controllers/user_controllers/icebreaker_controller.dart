@@ -17,6 +17,7 @@ class IcebreakerController extends GetxController {
   final icebreakers = <Icebreaker>[].obs;
   final currentIndex = 0.obs;
   final bool isEdit;
+  final isLoading = true.obs;
   final isShuffling = false.obs;
   final hasEditAccess = false.obs;
   final isEditing = false.obs;
@@ -42,11 +43,13 @@ class IcebreakerController extends GetxController {
         .listenToIcebreakerChange(ibCollection)
         .listen((event) {
       if (event.data() == null) {
+        isLoading.value = false;
         return;
       }
 
       ibCollection = IbCollection.fromJson(event.data()!);
       icebreakers.value = ibCollection.icebreakers;
+      isLoading.value = false;
     });
 
     hasEditAccess.value = isEdit;

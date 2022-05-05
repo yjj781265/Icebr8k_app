@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/icebreaker_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/search_page_controller.dart';
+import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -16,11 +18,13 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:icebr8k/frontend/ib_widgets/icebreaker_card.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../backend/controllers/user_controllers/circle_info_controller.dart';
 import '../../backend/controllers/user_controllers/tag_page_controller.dart';
 import '../tag_page.dart';
+import 'icebreaker_pages/icebreaker_main_page.dart';
 
 class SearchPage extends StatelessWidget {
   final SearchPageController _controller = Get.put(SearchPageController());
@@ -40,6 +44,7 @@ class SearchPage extends StatelessWidget {
               _controller.users.isEmpty &&
               _controller.tags.isEmpty &&
               _controller.circles.isEmpty &&
+              _controller.icebreakers.isEmpty &&
               _controller.isSearching.isFalse &&
               _controller.searchText.isNotEmpty) {
             return Center(
@@ -61,6 +66,7 @@ class SearchPage extends StatelessWidget {
               children: [
                 userWidget(context),
                 questionWidget(context),
+                icebreakerWidget(context),
                 circleWidget(context),
                 tagWidget(context),
               ],
@@ -106,11 +112,11 @@ class SearchPage extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.all(4.0),
+            Padding(
+              padding: const EdgeInsets.all(4.0),
               child: Text(
-                'Icebr8k Users',
-                style: TextStyle(
+                'Icebr8k Users(${_controller.users.length})',
+                style: const TextStyle(
                     fontSize: IbConfig.kPageTitleSize,
                     fontWeight: FontWeight.bold),
               ),
@@ -186,11 +192,11 @@ class SearchPage extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.all(4.0),
+            Padding(
+              padding: const EdgeInsets.all(4.0),
               child: Text(
-                'Circles',
-                style: TextStyle(
+                'Circles(${_controller.circles.length})',
+                style: const TextStyle(
                     fontSize: IbConfig.kPageTitleSize,
                     fontWeight: FontWeight.bold),
               ),
@@ -282,17 +288,83 @@ class SearchPage extends StatelessWidget {
     });
   }
 
+  Widget icebreakerWidget(BuildContext context) {
+    return Obx(() {
+      if (_controller.icebreakers.isNotEmpty) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Text(
+                'Icebreakers(${_controller.icebreakers.length})',
+                style: const TextStyle(
+                    fontSize: IbConfig.kPageTitleSize,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: _controller.icebreakers
+                    .map(
+                      (element) => SizedBox(
+                        width: 200,
+                        height: 288,
+                        child: InkWell(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(16)),
+                            onTap: () {
+                              final collection = IbCacheManager()
+                                  .retrieveIbCollection(element.collectionId);
+                              if (collection == null) {
+                                return;
+                              }
+                              final controller = Get.put(
+                                  IcebreakerController(collection,
+                                      isEdit: false),
+                                  tag: element.collectionId);
+                              controller.currentIndex.value = controller
+                                  .icebreakers
+                                  .indexWhere((e) => element.id == e.id);
+                              if (controller.currentIndex.value == -1) {
+                                return;
+                              }
+
+                              Get.to(() => IcebreakerMainPage(controller));
+                            },
+                            child: IcebreakerCard(
+                              icebreaker: element,
+                              minSize: IbConfig.kDescriptionTextSize,
+                              maxSize: IbConfig.kSecondaryTextSize,
+                            )),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+            const Divider(
+              height: 10,
+              thickness: 1,
+            ),
+          ],
+        );
+      }
+      return const SizedBox();
+    });
+  }
+
   Widget questionWidget(BuildContext context) {
     return Obx(() {
       if (_controller.questions.isNotEmpty) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.all(4.0),
+            Padding(
+              padding: const EdgeInsets.all(4.0),
               child: Text(
-                'Questions',
-                style: TextStyle(
+                'Questions(${_controller.questions.length})',
+                style: const TextStyle(
                     fontSize: IbConfig.kPageTitleSize,
                     fontWeight: FontWeight.bold),
               ),
@@ -374,11 +446,11 @@ class SearchPage extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.all(4.0),
+            Padding(
+              padding: const EdgeInsets.all(4.0),
               child: Text(
-                'Tags',
-                style: TextStyle(
+                'Tags(${_controller.tags.length})',
+                style: const TextStyle(
                     fontSize: IbConfig.kPageTitleSize,
                     fontWeight: FontWeight.bold),
               ),

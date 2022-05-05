@@ -4,15 +4,19 @@ import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/models/icebreaker_models/icebreaker.dart';
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_typesense_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
+import 'package:icebr8k/backend/services/user_services/icebreaker_db_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 
 import '../../models/ib_tag.dart';
 
 class SearchPageController extends GetxController {
   final recentSearch = <String>[].obs;
+  final allIcebreakers = <Icebreaker>[];
+  final icebreakers = <Icebreaker>[].obs;
   final users = <IbUser>[].obs;
   final questions = <IbQuestion>[].obs;
   final circles = <IbChat>[].obs;
@@ -30,6 +34,12 @@ class SearchPageController extends GetxController {
       searchText.value = textEtController.text;
       isSearching.value = searchText.trim().isNotEmpty;
     });
+
+    final ibCollections = await IcebreakerDbService().queryIbCollections();
+
+    for (final collection in ibCollections) {
+      allIcebreakers.addAll(collection.icebreakers);
+    }
 
     debounce(searchText, (value) async {
       await search();
@@ -87,12 +97,29 @@ class SearchPageController extends GetxController {
           await IbTypeSenseService().searchIbTags(searchText.value.trim());
       tags.clear();
       tags.value = results;
+
+      /// search all icebreakers
+      icebreakers.clear();
+      for (final item in allIcebreakers) {
+        final list = item.text.split(' ');
+        for (final String str in list) {
+          if (str.toLowerCase().startsWith(searchText.value.toLowerCase()) ||
+              searchText.value
+                  .toLowerCase()
+                  .split(' ')
+                  .contains(str.toLowerCase())) {
+            icebreakers.addIf(!icebreakers.contains(item), item);
+          }
+        }
+      }
+
       isSearching.value = false;
     } else {
       tags.clear();
       users.clear();
       circles.clear();
       questions.clear();
+      icebreakers.clear();
       isSearching.value = false;
     }
   }

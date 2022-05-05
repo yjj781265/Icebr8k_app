@@ -19,15 +19,22 @@ class IcebreakerDbService {
     return _collectionRef.doc(ibCollection.id).snapshots();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> listenToIbCollectionChange() {
-    return _collectionRef.snapshots();
+  Future<List<IbCollection>> queryIbCollections() async {
+    final List<IbCollection> collections = [];
+
+    final snapshot = await _collectionRef.get();
+    for (final doc in snapshot.docs) {
+      collections.add(IbCollection.fromJson(doc.data()));
+      IbCacheManager().cacheIbCollection(IbCollection.fromJson(doc.data()));
+    }
+    return collections;
   }
 
   /// query IbCollection and cache locally via IbCacheManager
   Future<IbCollection?> queryIbCollection(String collectionId) async {
     final snapshot = await _collectionRef.doc(collectionId).get();
     if (snapshot.exists) {
-      final collection =  IbCollection.fromJson(snapshot.data()!);
+      final collection = IbCollection.fromJson(snapshot.data()!);
       IbCacheManager().cacheIbCollection(collection);
     }
     return null;
