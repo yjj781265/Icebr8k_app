@@ -21,9 +21,13 @@ class IcebreakerCard extends StatelessWidget {
   final Icebreaker icebreaker;
   final IbCollection ibCollection;
   final bool showCollectionName;
+  final double minSize;
+  final double maxSize;
   const IcebreakerCard(
       {required this.ibCollection,
       required this.icebreaker,
+      this.minSize = 16,
+      this.maxSize = 32,
       this.showCollectionName = true,
       Key? key})
       : super(key: key);
@@ -36,16 +40,16 @@ class IcebreakerCard extends StatelessWidget {
           children: [
             Center(
               child: Padding(
-                padding: const EdgeInsets.all(4.0),
+                padding: const EdgeInsets.all(8),
                 child: AutoSizeText(
                   icebreaker.text,
                   textAlign: TextAlign.center,
-                  minFontSize: IbConfig.kNormalTextSize,
-                  maxFontSize: IbConfig.kSloganSize,
+                  minFontSize: minSize,
+                  maxFontSize: maxSize,
                   maxLines: 4,
                   overflow: TextOverflow.ellipsis,
                   style: IbUtils.getIbFonts(TextStyle(
-                      fontSize: IbConfig.kSloganSize,
+                      fontSize: maxSize,
                       color: Color(icebreaker.textColor),
                       fontStyle: icebreaker.isItalic
                           ? FontStyle.italic
@@ -115,7 +119,7 @@ class IcebreakerCard extends StatelessWidget {
                       Get.to(() => IbCoverPage(ibCollection));
                     },
                     child: LimitedBox(
-                      maxWidth: 200,
+                      maxWidth: 250,
                       child: Padding(
                         padding: const EdgeInsets.all(4.0),
                         child: Text(

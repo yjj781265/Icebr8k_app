@@ -1046,12 +1046,14 @@ class ChatPage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(
-              left: 16,
-              right: 16,
+              left: 32,
+              right: 32,
             ),
             child: SizedBox(
-              height: Get.width * 1.0,
+              height: 300,
               child: IcebreakerCard(
+                minSize: IbConfig.kDescriptionTextSize,
+                maxSize: IbConfig.kPageTitleSize,
                 icebreaker: icebreaker,
                 ibCollection: model.ibCollection!,
               ),
