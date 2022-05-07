@@ -223,4 +223,13 @@ class IbUserDbService {
     }
     return snapshot['cloudMsgToken'] as String?;
   }
+
+  Future<void> updateCurrentUserPosition(GeoPoint geoPoint) async {
+    if (IbUtils.getCurrentUid() != null) {
+      await _collectionRef.doc(IbUtils.getCurrentUid()).update({
+        'geoPoint': geoPoint,
+        'lastLocationTimestampInMs': Timestamp.now().millisecondsSinceEpoch
+      });
+    }
+  }
 }

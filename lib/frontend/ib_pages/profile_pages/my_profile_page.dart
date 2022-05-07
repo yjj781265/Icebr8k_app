@@ -145,43 +145,46 @@ class MyProfilePage extends StatelessWidget {
                     Positioned(
                       bottom: 0,
                       left: 8,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          GestureDetector(
-                            child: Obx(
-                              () => IbUserAvatar(
-                                  radius: 40,
-                                  avatarUrl:
-                                      _controller.rxIbUser.value.avatarUrl),
-                            ),
-                            onTap: () {
-                              Get.to(
-                                  () => IbMediaViewer(urls: [
-                                        _controller.rxIbUser.value.avatarUrl
-                                      ], currentIndex: 0),
-                                  transition: Transition.zoom,
-                                  fullscreenDialog: true);
-                            },
-                          ),
-                          IbCard(
-                            radius: 8,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                      right: 0,
+                      child: LimitedBox(
+                        maxWidth: 300,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            GestureDetector(
                               child: Obx(
-                                () => Text(
-                                  _controller.rxIbUser.value.username,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: IbConfig.kPageTitleSize),
-                                  overflow: TextOverflow.ellipsis,
+                                () => IbUserAvatar(
+                                    radius: 49,
+                                    avatarUrl:
+                                        _controller.rxIbUser.value.avatarUrl),
+                              ),
+                              onTap: () {
+                                Get.to(
+                                    () => IbMediaViewer(urls: [
+                                          _controller.rxIbUser.value.avatarUrl
+                                        ], currentIndex: 0),
+                                    transition: Transition.zoom,
+                                    fullscreenDialog: true);
+                              },
+                            ),
+                            IbCard(
+                              radius: 8,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Obx(
+                                  () => Text(
+                                    _controller.rxIbUser.value.username,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: IbConfig.kPageTitleSize),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     Positioned(

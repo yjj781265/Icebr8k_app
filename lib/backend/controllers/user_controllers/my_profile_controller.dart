@@ -29,6 +29,7 @@ class MyProfileController extends GetxController {
       rxIbUser.value = ibUser;
       rxIbUser.refresh();
     });
+
     scrollController.addListener(() {
       titlePadding.value =
           ((scrollController.offset / 206) * kAppBarCollapseHeight) >

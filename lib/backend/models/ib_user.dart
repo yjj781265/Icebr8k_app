@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -14,6 +15,8 @@ class IbUser {
   String gender;
   String status;
   int banedEndTimeInMs;
+  dynamic geoPoint;
+  int lastLocationTimestampInMs;
   dynamic loginTimestamp;
 
   /// covert to FireStore Timestamp
@@ -55,6 +58,8 @@ class IbUser {
     this.blockedFriendUids = const [],
     this.notificationCount = 0,
     this.isOnline = false,
+    this.geoPoint = const GeoPoint(0, 0),
+    this.lastLocationTimestampInMs = -1,
     this.gender = '',
     this.status = '',
     this.voiceMemoUrl = '',

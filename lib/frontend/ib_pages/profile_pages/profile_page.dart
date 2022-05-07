@@ -176,15 +176,15 @@ class ProfilePage extends StatelessWidget {
                     ),
                     Positioned(
                       bottom: 0,
-                      left: 8,
+                      left: 0,
+                      right: 0,
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           GestureDetector(
                             child: Obx(
                               () => IbUserAvatar(
-                                  radius: 40,
+                                  radius: 49,
                                   compScore: _controller.compScore.value,
                                   avatarUrl:
                                       _controller.rxIbUser.value.avatarUrl),

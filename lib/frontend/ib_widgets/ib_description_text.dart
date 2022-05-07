@@ -6,8 +6,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 class IbDescriptionText extends StatefulWidget {
   final String text;
+  final TextAlign textAlign;
 
-  const IbDescriptionText({required this.text});
+  const IbDescriptionText(
+      {required this.text, this.textAlign = TextAlign.left});
 
   @override
   _DescriptionTextWidgetState createState() => _DescriptionTextWidgetState();
@@ -39,7 +41,7 @@ class _DescriptionTextWidgetState extends State<IbDescriptionText>
         // Use a textpainter to determine if it will exceed max lines
         final tp = TextPainter(
           maxLines: maxLines,
-          textAlign: TextAlign.left,
+          textAlign: widget.textAlign,
           textDirection: TextDirection.ltr,
           text: span,
         );
@@ -58,6 +60,7 @@ class _DescriptionTextWidgetState extends State<IbDescriptionText>
               alignment: Alignment.topCenter,
               child: Linkify(
                 options: const LinkifyOptions(looseUrl: true),
+                textAlign: widget.textAlign,
                 linkStyle: const TextStyle(
                     fontSize: IbConfig.kSecondaryTextSize,
                     color: IbColors.primaryColor),

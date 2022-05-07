@@ -214,13 +214,15 @@ class AlertTab extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Expanded(
-                        child: IbUserAvatar(
-                          radius: 21,
-                          avatarUrl: item.notification.avatarUrl ?? '',
-                          uid: item.notification.senderId,
+                      if (item.notification.avatarUrl != null &&
+                          item.notification.avatarUrl!.isNotEmpty)
+                        Expanded(
+                          child: IbUserAvatar(
+                            radius: 21,
+                            avatarUrl: item.notification.avatarUrl ?? '',
+                            uid: item.notification.senderId,
+                          ),
                         ),
-                      ),
                       Expanded(
                         flex: 5,
                         child: Padding(

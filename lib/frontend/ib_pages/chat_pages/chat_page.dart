@@ -16,6 +16,7 @@ import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/chat_page_settings.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_settings.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_page.dart';
+import 'package:icebr8k/frontend/ib_pages/icebreaker_pages/icebreaker_main_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
@@ -32,6 +33,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../backend/controllers/user_controllers/chat_page_controller.dart';
 import '../../../backend/controllers/user_controllers/ib_question_item_controller.dart';
+import '../../../backend/controllers/user_controllers/icebreaker_controller.dart';
 import '../../../backend/models/ib_question.dart';
 import '../ib_tenor_page.dart';
 
@@ -1049,13 +1051,31 @@ class ChatPage extends StatelessWidget {
               left: 32,
               right: 32,
             ),
-            child: SizedBox(
-              height: 300,
-              child: IcebreakerCard(
-                minSize: IbConfig.kDescriptionTextSize,
-                maxSize: IbConfig.kPageTitleSize,
-                icebreaker: icebreaker,
-                ibCollection: model.ibCollection!,
+            child: InkWell(
+              onTap: () {
+                if (model.ibCollection == null) {
+                  print('return');
+                  return;
+                }
+                final controller = Get.put(
+                    IcebreakerController(model.ibCollection!, isEdit: false),
+                    tag: model.ibCollection!.id);
+                controller.currentIndex.value = controller.icebreakers
+                    .indexWhere((e) => model.icebreaker!.id == e.id);
+                if (controller.currentIndex.value == -1) {
+                  return;
+                }
+
+                Get.to(() => IcebreakerMainPage(controller));
+              },
+              child: SizedBox(
+                height: 300,
+                child: IcebreakerCard(
+                  minSize: IbConfig.kDescriptionTextSize,
+                  maxSize: IbConfig.kPageTitleSize,
+                  icebreaker: icebreaker,
+                  ibCollection: model.ibCollection,
+                ),
               ),
             ),
           ),

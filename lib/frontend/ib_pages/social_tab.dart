@@ -14,6 +14,7 @@ import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_settings.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/ib_friends_picker.dart';
+import 'package:icebr8k/frontend/ib_pages/people_nearby_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/my_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/search_page.dart';
@@ -62,8 +63,10 @@ class _SocialTabState extends State<SocialTab>
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.person_pin_circle_rounded),
-            onPressed: () {},
+            icon: const Icon(Icons.person_pin),
+            onPressed: () {
+              Get.to(() => PeopleNearbyPage());
+            },
           ),
           IconButton(
             icon: const Icon(Icons.search),

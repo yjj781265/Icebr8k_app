@@ -17,6 +17,7 @@ class WordCloudPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
           title: Text("${_controller.user.username}'s Word Cloud"),
         ),
@@ -91,7 +92,6 @@ class WordCloudPage extends StatelessWidget {
         ((count.toDouble() / max.toDouble()) * 32) < IbConfig.kNormalTextSize
             ? IbConfig.kNormalTextSize
             : ((count.toDouble() / max.toDouble()) * 32);
-    print('size: $fontSize');
     final fontColor = IbUtils.getRandomColor();
     fontStyles.shuffle();
     fontWeights.shuffle();

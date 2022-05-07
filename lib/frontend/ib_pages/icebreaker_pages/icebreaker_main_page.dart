@@ -73,46 +73,41 @@ class IcebreakerMainPage extends StatelessWidget {
               else
                 Expanded(
                   child: Center(
-                    child: Stack(
-                      children: [
-                        CarouselSlider.builder(
-                          itemBuilder:
-                              (BuildContext context, int index, int num) {
-                            return Stack(
-                              children: [
-                                IcebreakerCard(
-                                    ibCollection: controller.ibCollection,
-                                    showCollectionName: false,
-                                    icebreaker: controller.icebreakers[index]),
-                                Positioned(
-                                  top: 8,
-                                  left: 8,
-                                  child: IbCard(
-                                    elevation: 0,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(4.0),
-                                      child: Text(
-                                          '${controller.currentIndex.value + 1}/${controller.icebreakers.length}'),
-                                    ),
-                                  ),
+                    child: CarouselSlider.builder(
+                      itemBuilder: (BuildContext context, int index, int num) {
+                        return Stack(
+                          children: [
+                            IcebreakerCard(
+                                ibCollection: controller.ibCollection,
+                                showCollectionName: false,
+                                icebreaker: controller.icebreakers[index]),
+                            Positioned(
+                              top: 8,
+                              left: 8,
+                              child: IbCard(
+                                elevation: 0,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Text(
+                                      '${controller.currentIndex.value + 1}/${controller.icebreakers.length}'),
                                 ),
-                              ],
-                            );
-                          },
-                          carouselController: controller.carouselController,
-                          options: CarouselOptions(
-                              initialPage: controller.currentIndex.value,
-                              aspectRatio: 1.44,
-                              height: Get.width * 1.44,
-                              viewportFraction: 0.95,
-                              enableInfiniteScroll: false,
-                              enlargeCenterPage: true,
-                              onPageChanged: (index, reason) {
-                                controller.currentIndex.value = index;
-                              }),
-                          itemCount: controller.icebreakers.length,
-                        ),
-                      ],
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                      carouselController: controller.carouselController,
+                      options: CarouselOptions(
+                          initialPage: controller.currentIndex.value,
+                          aspectRatio: 1.44,
+                          height: Get.width * 1.44,
+                          viewportFraction: 0.95,
+                          enableInfiniteScroll: false,
+                          enlargeCenterPage: true,
+                          onPageChanged: (index, reason) {
+                            controller.currentIndex.value = index;
+                          }),
+                      itemCount: controller.icebreakers.length,
                     ),
                   ),
                 ),

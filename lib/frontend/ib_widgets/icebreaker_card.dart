@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/ib_collection.dart';
@@ -39,22 +40,32 @@ class IcebreakerCard extends StatelessWidget {
         child: Stack(
           children: [
             Center(
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: AutoSizeText(
-                  icebreaker.text,
-                  textAlign: TextAlign.center,
-                  minFontSize: minSize,
-                  maxFontSize: maxSize,
-                  maxLines: 4,
-                  overflow: TextOverflow.ellipsis,
-                  style: IbUtils.getIbFonts(TextStyle(
-                      fontSize: maxSize,
-                      color: Color(icebreaker.textColor),
-                      fontStyle: icebreaker.isItalic
-                          ? FontStyle.italic
-                          : FontStyle.normal,
-                      fontWeight: FontWeight.bold))[icebreaker.textStyleIndex],
+              child: GestureDetector(
+                onLongPress: () {
+                  HapticFeedback.heavyImpact();
+                  Clipboard.setData(ClipboardData(text: icebreaker.text));
+                  IbUtils.showSimpleSnackBar(
+                      msg: "Text copied to clipboard",
+                      backgroundColor: IbColors.primaryColor);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: AutoSizeText(
+                    icebreaker.text,
+                    textAlign: TextAlign.center,
+                    minFontSize: minSize,
+                    maxFontSize: maxSize,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                    style: IbUtils.getIbFonts(TextStyle(
+                        fontSize: maxSize,
+                        color: Color(icebreaker.textColor),
+                        fontStyle: icebreaker.isItalic
+                            ? FontStyle.italic
+                            : FontStyle.normal,
+                        fontWeight:
+                            FontWeight.bold))[icebreaker.textStyleIndex],
+                  ),
                 ),
               ),
             ),

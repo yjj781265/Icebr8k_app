@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -136,15 +137,16 @@ class IbEmoPicCard extends StatelessWidget {
                 child: Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: RichText(
-                    overflow: TextOverflow.ellipsis,
-                    text: TextSpan(
-                        text: emoPic.description,
-                        style: TextStyle(
-                            color: Theme.of(context).indicatorColor,
-                            fontSize: IbConfig.kNormalTextSize,
-                            fontWeight: FontWeight.bold),
-                        children: const [])),
+                child: AutoSizeText(
+                  emoPic.description,
+                  overflow: TextOverflow.ellipsis,
+                  maxFontSize: IbConfig.kNormalTextSize,
+                  maxLines: 1,
+                  style: TextStyle(
+                      color: Theme.of(context).indicatorColor,
+                      fontSize: IbConfig.kNormalTextSize,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
             )),
           ],

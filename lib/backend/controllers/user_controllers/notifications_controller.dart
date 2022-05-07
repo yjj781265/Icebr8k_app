@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
+import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -64,7 +65,10 @@ class NotificationController extends GetxController {
     final item = NotificationItem(notification: notification);
     if (notification.type == IbNotification.kCircleInvite) {
       final IbChat? chat = await IbChatDbService().queryChat(notification.id);
+      final IbUser? user =
+          await IbUserDbService().queryIbUser(notification.senderId);
       item.ibChat = chat;
+      item.notification.avatarUrl = user == null ? '' : user.avatarUrl;
       if (chat != null) {
         items.add(item);
       }

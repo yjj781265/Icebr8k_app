@@ -33,10 +33,10 @@ class IcebreakerController extends GetxController {
   Future<void> onInit() async {
     detector = ShakeDetector.waitForStart(
         onPhoneShake: () async {
-          print('shake');
           await shuffleCards();
         },
-        shakeThresholdGravity: 1.8);
+        shakeThresholdGravity: 2.5,
+        minimumShakeCount: 2);
     detector.startListening();
 
     icebreakerSub = IcebreakerDbService()
@@ -60,7 +60,7 @@ class IcebreakerController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    showShakePopup();
+    //showShakePopup();
   }
 
   Future<void> shuffleCards() async {

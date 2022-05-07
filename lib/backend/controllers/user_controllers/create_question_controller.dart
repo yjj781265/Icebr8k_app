@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
@@ -31,7 +30,6 @@ class CreateQuestionController extends GetxController {
   final picMediaList = <IbMedia>[].obs;
   final videoMediaList = <IbMedia>[].obs;
   final extLinkList = <String>[].obs;
-  GeoFirePoint? geoFirePoint;
 
   final ibTagModels = <IbTagModel>[].obs;
   final filePath = ''.obs;
