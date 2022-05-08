@@ -34,6 +34,7 @@ class IbConfig {
   static const double kMcTxtItemSize = 48;
   static const double kMcPicItemSize = 88;
   static const int kMaxTag = 8;
+  static const int kIbCardMaxLine = 6;
   static const int kMaxEmoPic = 8;
   static const double kMcPicSize = 72;
   static const double kPicHeight = 88;

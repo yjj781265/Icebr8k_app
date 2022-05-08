@@ -168,7 +168,7 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
                                     textAlign: TextAlign.center,
                                     minFontSize: IbConfig.kNormalTextSize,
                                     maxFontSize: IbConfig.kSloganSize,
-                                    maxLines: 4,
+                                    maxLines: IbConfig.kIbCardMaxLine,
                                     style: IbUtils.getIbFonts(TextStyle(
                                         color: Color(newIcebreaker.textColor),
                                         fontWeight: FontWeight.bold,

@@ -55,7 +55,7 @@ class IcebreakerCard extends StatelessWidget {
                     textAlign: TextAlign.center,
                     minFontSize: minSize,
                     maxFontSize: maxSize,
-                    maxLines: 4,
+                    maxLines: IbConfig.kIbCardMaxLine,
                     overflow: TextOverflow.ellipsis,
                     style: IbUtils.getIbFonts(TextStyle(
                         fontSize: maxSize,
