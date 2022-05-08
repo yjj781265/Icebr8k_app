@@ -3,10 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/user_services/ib_typesense_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 
-//TODO
 class PeopleNearbyController extends GetxController {
   CarouselController carouselController = CarouselController();
 
@@ -82,6 +83,7 @@ class PeopleNearbyController extends GetxController {
     final location = await Geolocator.getCurrentPosition();
     await IbUserDbService().updateCurrentUserPosition(
         GeoPoint(location.latitude, location.longitude));
+    final list = await IbTypeSenseService().searchPplNearby(location);
   }
 
   @override
@@ -95,4 +97,13 @@ class PeopleNearbyController extends GetxController {
 
   @override
   void onReady() {}
+}
+
+class NearbyItem {
+  final IbUser user;
+  final double distance;
+  final double compScore;
+
+  NearbyItem(
+      {required this.user, required this.distance, required this.compScore});
 }

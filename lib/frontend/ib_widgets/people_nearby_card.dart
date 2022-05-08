@@ -22,57 +22,60 @@ class PeopleNearbyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IbCard(
-      child: Scrollbar(
-        radius: const Radius.circular(16),
-        controller: ScrollController(),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                IbUserAvatar(
-                  avatarUrl: user.avatarUrl,
-                  compScore: 0.98,
-                  radius: 40,
-                  uid: user.id,
-                ),
-                AutoSizeText(
-                  user.username,
-                  maxLines: 1,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  maxFontSize: IbConfig.kPageTitleSize,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: IbConfig.kPageTitleSize),
-                ),
-                AutoSizeText(
-                  '${user.fName} • ${user.gender} • ${IbUtils.calculateAge(user.birthdateInMs ?? -1)}',
-                  maxLines: 1,
-                  textAlign: TextAlign.center,
-                  maxFontSize: IbConfig.kNormalTextSize,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontSize: IbConfig.kNormalTextSize),
-                ),
-                const SizedBox(
-                  height: 4,
-                ),
-                IbDescriptionText(
-                  text: user.bio,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                _commonTagsWidget(context),
-                const Divider(
-                  thickness: 2,
-                  height: 16,
-                ),
-                _emoPics(context),
-              ],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Scrollbar(
+          radius: const Radius.circular(16),
+          controller: ScrollController(),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Column(
+                children: [
+                  IbUserAvatar(
+                    avatarUrl: user.avatarUrl,
+                    compScore: 0.98,
+                    radius: 40,
+                    uid: user.id,
+                  ),
+                  AutoSizeText(
+                    user.username,
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    maxFontSize: IbConfig.kPageTitleSize,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: IbConfig.kPageTitleSize),
+                  ),
+                  AutoSizeText(
+                    '${user.fName} • ${user.gender} • ${IbUtils.calculateAge(user.birthdateInMs ?? -1)}',
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    maxFontSize: IbConfig.kNormalTextSize,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: IbConfig.kNormalTextSize),
+                  ),
+                  const SizedBox(
+                    height: 4,
+                  ),
+                  IbDescriptionText(
+                    text: user.bio,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  _commonTagsWidget(context),
+                  const Divider(
+                    thickness: 2,
+                    height: 16,
+                  ),
+                  _emoPics(context),
+                ],
+              ),
             ),
           ),
         ),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/db_config.dart';
 import 'package:icebr8k/backend/managers/ib_api_keys_manager.dart';
@@ -41,6 +42,23 @@ class IbTypeSenseService extends GetConnect {
     final String url =
         'https://$_kHost/collections/IbQuestions${DbConfig.dbSuffix}/documents'
         '/search?q=$text&query_by=question&filter_by=isPublic:=true&x-typesense-api-key=$_kApiKey';
+    final response = await get(url);
+
+    if (response.isOk && response.bodyString != null) {
+      final myMap = jsonDecode(response.bodyString!);
+      final docList = myMap['hits'] as List<dynamic>;
+      print(docList);
+      questionIds = docList.map((e) => e['document']['id'].toString()).toList();
+    }
+
+    return questionIds;
+  }
+
+  Future<List<String>> searchPplNearby(Position position) async {
+    List<String> questionIds = [];
+    final String url =
+        'https://$_kHost/collections/IbUsers${DbConfig.dbSuffix}/documents'
+        '/search?q=*&query_by=username&filter_by=geoPoint:(${position.latitude},${position.longitude},100mi)&x-typesense-api-key=$_kApiKey';
     final response = await get(url);
 
     if (response.isOk && response.bodyString != null) {

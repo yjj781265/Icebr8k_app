@@ -29,9 +29,12 @@ class PeopleNearbyPage extends StatelessWidget {
                     initialPage: 0,
                     height: Get.width * 1.66,
                     aspectRatio: 1.66,
-                    viewportFraction: 0.98,
+                    viewportFraction: 0.96,
+                    enlargeCenterPage: true,
                     enableInfiniteScroll: false,
-                    onPageChanged: (index, reason) {}),
+                    onPageChanged: (index, reason) {
+                      print(index);
+                    }),
                 itemCount: 10,
               ),
             ),
