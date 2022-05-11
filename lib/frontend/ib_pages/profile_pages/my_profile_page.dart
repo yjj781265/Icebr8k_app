@@ -37,7 +37,6 @@ class MyProfilePage extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Obx(() => ListView(
-              controller: _controller.scrollController,
               children: <Widget>[
                 ///cover photo
                 Stack(

@@ -2,7 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/tag_page_controller.dart';
-import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
@@ -12,12 +12,12 @@ import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:icebr8k/frontend/tag_page.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../backend/controllers/user_controllers/people_nearby_controller.dart';
 import 'ib_media_viewer.dart';
 
 class PeopleNearbyCard extends StatelessWidget {
-  IbUser user = IbUtils.getCurrentIbUser()!;
-  int distance = 1000;
-  List<String> commonTags = ['dog', 'cat'];
+  final NearbyItem item;
+  const PeopleNearbyCard(this.item);
 
   @override
   Widget build(BuildContext context) {
@@ -33,13 +33,13 @@ class PeopleNearbyCard extends StatelessWidget {
               child: Column(
                 children: [
                   IbUserAvatar(
-                    avatarUrl: user.avatarUrl,
-                    compScore: 0.98,
-                    radius: 40,
-                    uid: user.id,
+                    avatarUrl: item.user.avatarUrl,
+                    compScore: item.compScore,
+                    radius: 48,
+                    uid: item.user.id,
                   ),
                   AutoSizeText(
-                    user.username,
+                    item.user.username,
                     maxLines: 1,
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
@@ -49,7 +49,7 @@ class PeopleNearbyCard extends StatelessWidget {
                         fontSize: IbConfig.kPageTitleSize),
                   ),
                   AutoSizeText(
-                    '${user.fName} • ${user.gender} • ${IbUtils.calculateAge(user.birthdateInMs ?? -1)}',
+                    '${item.user.fName} • ${item.user.gender} • ${IbUtils.calculateAge(item.user.birthdateInMs ?? -1)}',
                     maxLines: 1,
                     textAlign: TextAlign.center,
                     maxFontSize: IbConfig.kNormalTextSize,
@@ -58,11 +58,25 @@ class PeopleNearbyCard extends StatelessWidget {
                         fontWeight: FontWeight.normal,
                         fontSize: IbConfig.kNormalTextSize),
                   ),
-                  const SizedBox(
-                    height: 4,
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.location_on_outlined,
+                          color: IbColors.primaryColor,
+                          size: 16,
+                        ),
+                        Text(
+                          '${IbUtils.getDistanceString(item.distanceInMeter.toDouble())} away',
+                          style: const TextStyle(color: IbColors.lightGrey),
+                        ),
+                      ],
+                    ),
                   ),
                   IbDescriptionText(
-                    text: user.bio,
+                    text: item.user.bio,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(
@@ -84,7 +98,7 @@ class PeopleNearbyCard extends StatelessWidget {
   }
 
   Widget _commonTagsWidget(BuildContext context) {
-    if (commonTags.isEmpty) {
+    if (item.commonTags.isEmpty) {
       return const SizedBox();
     }
     return Align(
@@ -102,7 +116,7 @@ class PeopleNearbyCard extends StatelessWidget {
             height: 8,
           ),
           Wrap(
-            children: commonTags
+            children: item.commonTags
                 .map((element) => Stack(
                       children: [
                         Container(
@@ -151,14 +165,14 @@ class PeopleNearbyCard extends StatelessWidget {
   }
 
   Widget _emoPics(BuildContext context) {
-    if (user.emoPics.isNotEmpty) {
+    if (item.user.emoPics.isNotEmpty) {
       return Align(
         alignment: Alignment.centerLeft,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'My EmoPics(${user.emoPics.length})',
+              'My EmoPics(${item.user.emoPics.length})',
               style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: IbConfig.kNormalTextSize),
@@ -169,7 +183,7 @@ class PeopleNearbyCard extends StatelessWidget {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: user.emoPics
+                children: item.user.emoPics
                     .map((e) => IbEmoPicCard(
                           emoPic: e,
                           ignoreOnDoubleTap: true,

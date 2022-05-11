@@ -166,6 +166,21 @@ class ProfilePage extends StatelessWidget {
                                             icon: Icon(Icons.cloud,
                                                 color: Theme.of(context)
                                                     .indicatorColor))),
+                                    const SizedBox(
+                                      width: 8,
+                                    ),
+                                    CircleAvatar(
+                                      backgroundColor: Theme.of(context)
+                                          .backgroundColor
+                                          .withOpacity(0.8),
+                                      child: IconButton(
+                                        padding: EdgeInsets.zero,
+                                        onPressed: () {},
+                                        icon: Icon(Icons.more_vert,
+                                            color: Theme.of(context)
+                                                .indicatorColor),
+                                      ),
+                                    )
                                   ],
                                 ),
                               )

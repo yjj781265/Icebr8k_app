@@ -105,7 +105,7 @@ class EditProfilePage extends StatelessWidget {
                               onPressed: (index) {
                                 _controller.onGenderSelect(index);
                               },
-                              isSelected: _controller.genderSelections,
+                              isSelected: _controller.genderSelections.toList(),
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -141,27 +141,29 @@ class EditProfilePage extends StatelessWidget {
                         ),
                         Obx(
                           () => IbTextField(
-                              text: _controller.fName.value,
-                              controller: _controller.fNameTeController,
-                              titleIcon: const Icon(
-                                Icons.person_rounded,
-                                color: IbColors.primaryColor,
-                              ),
-                              textInputType: TextInputType.name,
-                              titleTrKey: 'fName',
-                              hintTrKey: 'fNameHint',),
+                            text: _controller.fName.value,
+                            controller: _controller.fNameTeController,
+                            titleIcon: const Icon(
+                              Icons.person_rounded,
+                              color: IbColors.primaryColor,
+                            ),
+                            textInputType: TextInputType.name,
+                            titleTrKey: 'fName',
+                            hintTrKey: 'fNameHint',
+                          ),
                         ),
                         Obx(
                           () => IbTextField(
-                              text: _controller.lName.value,
-                              controller: _controller.lNameTeController,
-                              titleIcon: const Icon(
-                                Icons.person_rounded,
-                                color: IbColors.primaryColor,
-                              ),
-                              textInputType: TextInputType.name,
-                              titleTrKey: 'lName',
-                              hintTrKey: 'lNameHint',),
+                            text: _controller.lName.value,
+                            controller: _controller.lNameTeController,
+                            titleIcon: const Icon(
+                              Icons.person_rounded,
+                              color: IbColors.primaryColor,
+                            ),
+                            textInputType: TextInputType.name,
+                            titleTrKey: 'lName',
+                            hintTrKey: 'lNameHint',
+                          ),
                         ),
                         Obx(
                           () => IbTextField(

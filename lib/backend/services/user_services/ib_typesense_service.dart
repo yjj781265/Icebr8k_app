@@ -1,11 +1,14 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/db_config.dart';
 import 'package:icebr8k/backend/managers/ib_api_keys_manager.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
+import 'package:icebr8k/backend/models/ib_user.dart';
 
+import '../../../frontend/ib_utils.dart';
 import '../../models/ib_chat_models/ib_chat.dart';
 
 class IbTypeSenseService extends GetConnect {
@@ -47,28 +50,46 @@ class IbTypeSenseService extends GetConnect {
     if (response.isOk && response.bodyString != null) {
       final myMap = jsonDecode(response.bodyString!);
       final docList = myMap['hits'] as List<dynamic>;
-      print(docList);
       questionIds = docList.map((e) => e['document']['id'].toString()).toList();
     }
 
     return questionIds;
   }
 
-  Future<List<String>> searchPplNearby(Position position) async {
-    List<String> questionIds = [];
+  Future<Map<String, dynamic>> searchPplNearby(Position position,
+      {required List<String> genders,
+      required int minAge,
+      required int maxAge,
+      int page = 1,
+      double radiusInMi = 30,
+      int perPage = 16}) async {
+    final sevenDaysAgoTimestamp = Timestamp.now().millisecondsSinceEpoch -
+        (const Duration(days: 7).inMilliseconds);
+    final minAgeInMs = Timestamp.now().millisecondsSinceEpoch -
+        (Duration(days: minAge * 365).inMilliseconds);
+    final maxAgeInMs = Timestamp.now().millisecondsSinceEpoch -
+        (Duration(days: maxAge * 365).inMilliseconds);
+
+    final Map<String, dynamic> map = {};
     final String url =
         'https://$_kHost/collections/IbUsers${DbConfig.dbSuffix}/documents'
-        '/search?q=*&query_by=username&filter_by=geoPoint:(${position.latitude},${position.longitude},100mi)&x-typesense-api-key=$_kApiKey';
+        '/search?q=*&query_by=username&filter_by=geoPoint'
+        ':(${position.latitude},${position.longitude},$radiusInMi mi) '
+        '&sort_by=geoPoint(${position.latitude},${position.longitude}):asc'
+        '&filter_by=lastLocationTimestampInMs:>$sevenDaysAgoTimestamp'
+        '&&profilePrivacy:=${IbUser.kUserPrivacyPublic}'
+        '&&username:!=${IbUtils.getCurrentIbUser()!.username}'
+        '&&birthdateInMs:[$maxAgeInMs..$minAgeInMs]'
+        '&&gender:$genders'
+        '&page=$page&per_page=$perPage&x-typesense-api-key=$_kApiKey';
     final response = await get(url);
 
     if (response.isOk && response.bodyString != null) {
       final myMap = jsonDecode(response.bodyString!);
-      final docList = myMap['hits'] as List<dynamic>;
-      print(docList);
-      questionIds = docList.map((e) => e['document']['id'].toString()).toList();
+      map.addAll(myMap as Map<String, dynamic>);
     }
 
-    return questionIds;
+    return map;
   }
 
   Future<List<String>> searchIbUsers(String text) async {

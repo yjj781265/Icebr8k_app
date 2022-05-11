@@ -3,17 +3,15 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/friend_item_controller.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
-import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import '../../models/ib_answer.dart';
 import '../../services/user_services/ib_chat_db_service.dart';
+import '../../services/user_services/ib_question_db_service.dart';
 import '../../services/user_services/ib_user_db_service.dart';
 
 /// controller for the Social tab in Homepage
@@ -24,19 +22,24 @@ class SocialTabController extends GetxController {
   final currentIndex = 0.obs;
   late StreamSubscription _oneToOneSub;
   late StreamSubscription _circleSub;
+  late StreamSubscription _ibUserSub;
+  late StreamSubscription _ibPublicAnswerSub;
   final isLoadingCircles = true.obs;
   final isLoadingChat = true.obs;
+  final isFriendListLoading = true.obs;
   final totalUnread = 0.obs;
-  final friends = <IbUser>[].obs;
+  final friends = <FriendItem>[].obs;
   final RefreshController friendListRefreshController = RefreshController();
   final ScrollController scrollController = ScrollController();
-  late StreamSubscription ibUserSub;
-  late StreamSubscription ibPublicAnswerSub;
-  final isFriendListLoading = true.obs;
 
   @override
   Future<void> onInit() async {
-    await initFriendList();
+    await setUpStreams();
+
+    super.onInit();
+  }
+
+  Future<void> setUpStreams() async {
     _oneToOneSub =
         IbChatDbService().listenToOneToOneChat().listen((event) async {
       for (final docChange in event.docChanges) {
@@ -108,12 +111,63 @@ class SocialTabController extends GetxController {
       isLoadingCircles.value = false;
     });
 
+    _ibUserSub = IbUserDbService()
+        .listenToIbUserChanges(IbUtils.getCurrentFbUser()!.uid)
+        .listen((event) async {
+      friends.clear();
+      for (final String id in IbUtils.getCurrentIbUser()!.friendUids) {
+        IbUser? user;
+        if (IbCacheManager().getIbUser(id) == null) {
+          user = await IbUserDbService().queryIbUser(id);
+        } else {
+          user = IbCacheManager().getIbUser(id);
+        }
+
+        if (user == null) {
+          continue;
+        }
+        final index =
+            friends.indexWhere((element) => element.user.id == user!.id);
+        if (index == -1) {
+          final compScore = await IbUtils.getCompScore(uid: user.id);
+          friends.add(FriendItem(user: user, compScore: compScore));
+        } else {
+          friends[index].user = user;
+        }
+      }
+      friends.sort((a, b) => b.compScore.compareTo(a.compScore));
+      friends.refresh();
+    });
+
+    _ibPublicAnswerSub = IbQuestionDbService()
+        .listenToUserPublicAnsweredQuestionsChange(IbUtils.getCurrentUid()!)
+        .listen((event) async {
+      for (final docChange in event.docChanges) {
+        final IbAnswer ibAnswer = IbAnswer.fromJson(docChange.doc.data()!);
+        if (docChange.type == DocumentChangeType.removed) {
+          IbCacheManager().removeSingleIbAnswer(
+              uid: IbUtils.getCurrentUid()!, ibAnswer: ibAnswer);
+        } else {
+          IbCacheManager().cacheSingleIbAnswer(
+              uid: IbUtils.getCurrentUid()!, ibAnswer: ibAnswer);
+        }
+      }
+
+      //refresh compScore
+      for (final item in friends) {
+        final compScore = await IbUtils.getCompScore(uid: item.user.id);
+        item.compScore = compScore;
+      }
+      friends.sort((a, b) => b.compScore.compareTo(a.compScore));
+      friends.refresh();
+      isFriendListLoading.value = false;
+    });
+
     await Future.delayed(const Duration(milliseconds: 3000), () {
       isLoadingCircles.value = false;
       isLoadingChat.value = false;
+      isFriendListLoading.value = false;
     });
-
-    super.onInit();
   }
 
   Future<ChatTabItem> _buildItem(IbChat ibChat) async {
@@ -163,92 +217,21 @@ class SocialTabController extends GetxController {
     return item;
   }
 
-  Future<void> initFriendList() async {
-    for (final String id in IbUtils.getCurrentIbUser()!.friendUids) {
-      IbUser? user;
-      if (IbCacheManager().getIbUser(id) == null) {
-        user = await IbUserDbService().queryIbUser(id);
-      } else {
-        user = IbCacheManager().getIbUser(id);
-      }
-
-      if (user == null) {
-        continue;
-      }
-      friends.add(user);
-    }
-
-    friends.sort((a, b) => a.username.compareTo(b.username));
-    isFriendListLoading.value = false;
-
-    ibUserSub = Get.find<MainPageController>()
-        .ibUserBroadcastStream
-        .listen((ibUser) async {
-      friends.clear();
-      for (final String id in ibUser.friendUids) {
-        IbUser? user;
-        if (IbCacheManager().getIbUser(id) == null) {
-          user = await IbUserDbService().queryIbUser(id);
-        } else {
-          user = IbCacheManager().getIbUser(id);
-        }
-
-        if (user == null) {
-          continue;
-        }
-        friends.add(user);
-      }
-      friends.sort((a, b) => a.username.compareTo(b.username));
-      isFriendListLoading.value = false;
-    });
-
-    ibPublicAnswerSub = IbQuestionDbService()
-        .listenToUserPublicAnsweredQuestionsChange(IbUtils.getCurrentUid()!)
-        .listen((event) {
-      for (final docChange in event.docChanges) {
-        final IbAnswer ibAnswer = IbAnswer.fromJson(docChange.doc.data()!);
-        if (docChange.type == DocumentChangeType.removed) {
-          IbCacheManager().removeSingleIbAnswer(
-              uid: IbUtils.getCurrentUid()!, ibAnswer: ibAnswer);
-        } else {
-          IbCacheManager().cacheSingleIbAnswer(
-              uid: IbUtils.getCurrentUid()!, ibAnswer: ibAnswer);
-        }
-      }
-
-      /// refresh friend list
-      for (final user in friends) {
-        if (Get.isRegistered<FriendItemController>(tag: user.username)) {
-          Get.find<FriendItemController>(tag: user.username).refreshItem(false);
-        }
-      }
-    });
-  }
-
   Future<void> onFriendListRefresh() async {
-    isFriendListLoading.value = true;
-    friends.clear();
-
     /// refresh friend list
-    for (final String id in IbUtils.getCurrentIbUser()!.friendUids) {
-      IbUser? user;
-      user = await IbUserDbService().queryIbUser(id);
-      IbCacheManager().cacheIbUser(user);
-
+    for (final item in friends) {
+      final user = await IbUserDbService().queryIbUser(item.user.id);
       if (user == null) {
         continue;
       }
-      friends.add(user);
+      final compScore =
+          await IbUtils.getCompScore(uid: user.id, isRefresh: true);
+      item.user = user;
+      item.compScore = compScore;
     }
-
-    for (final user in friends) {
-      if (Get.isRegistered<FriendItemController>(tag: user.username)) {
-        Get.find<FriendItemController>(tag: user.username).refreshItem(true);
-      }
-    }
-    friends.sort((a, b) => a.username.compareTo(b.username));
+    friends.sort((a, b) => b.compScore.compareTo(a.compScore));
+    friends.refresh();
     friendListRefreshController.refreshCompleted();
-    isFriendListLoading.value = false;
   }
 
   void calculateTotalUnread() {
@@ -266,12 +249,33 @@ class SocialTabController extends GetxController {
   Future<void> onClose() async {
     await _oneToOneSub.cancel();
     await _circleSub.cancel();
-    await ibPublicAnswerSub.cancel();
-    await ibUserSub.cancel();
+    await _ibUserSub.cancel();
+    await _ibPublicAnswerSub.cancel();
     friendListRefreshController.dispose();
 
     super.onClose();
   }
+}
+
+class FriendItem {
+  IbUser user;
+  double compScore;
+
+  FriendItem({
+    required this.user,
+    required this.compScore,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FriendItem &&
+          runtimeType == other.runtimeType &&
+          user == other.user &&
+          compScore == other.compScore;
+
+  @override
+  int get hashCode => user.hashCode ^ compScore.hashCode;
 }
 
 class ChatTabItem {
@@ -280,6 +284,7 @@ class ChatTabItem {
   List<IbUser> avatars;
   IbUser? lastMessageUser;
   bool isMuted = false;
+  bool isBlocked = false;
   int unReadCount;
 
   ChatTabItem({
@@ -290,6 +295,19 @@ class ChatTabItem {
     required this.lastMessageUser,
   }) {
     isMuted = ibChat.mutedUids.contains(IbUtils.getCurrentUid());
+    if (!ibChat.isCircle) {
+      final list =
+          avatars.where((element) => element.id != IbUtils.getCurrentUid());
+      if (list.isEmpty) {
+        isBlocked = false;
+      } else {
+        isBlocked = IbUtils.getCurrentIbUser()!
+            .blockedFriendUids
+            .contains(list.first.id);
+      }
+    } else {
+      isBlocked = false;
+    }
   }
 
   @override
@@ -297,8 +315,21 @@ class ChatTabItem {
       identical(this, other) ||
       other is ChatTabItem &&
           runtimeType == other.runtimeType &&
-          title == other.title;
+          ibChat == other.ibChat &&
+          title == other.title &&
+          avatars == other.avatars &&
+          lastMessageUser == other.lastMessageUser &&
+          isMuted == other.isMuted &&
+          isBlocked == other.isBlocked &&
+          unReadCount == other.unReadCount;
 
   @override
-  int get hashCode => title.hashCode;
+  int get hashCode =>
+      ibChat.hashCode ^
+      title.hashCode ^
+      avatars.hashCode ^
+      lastMessageUser.hashCode ^
+      isMuted.hashCode ^
+      isBlocked.hashCode ^
+      unReadCount.hashCode;
 }

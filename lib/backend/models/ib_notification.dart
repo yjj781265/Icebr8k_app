@@ -8,6 +8,8 @@ class IbNotification {
   String title;
   String subtitle;
   String? avatarUrl;
+
+  /// can be use for doc id
   String? attachmentUrl;
   String type;
   dynamic timestamp;
@@ -16,8 +18,15 @@ class IbNotification {
   String recipientId;
 
   static const String kFriendRequest = 'friend_request';
+
+  /// will go open the app if it is in background
   static const String kNormal = 'normal';
   static const String kCircleInvite = 'circle_invite';
+  static const String kChatMessage = 'chat_message';
+  static const String kComment = 'comment';
+  static const String kNewVote = 'new_vote';
+  static const String kNewLikeQuestion = 'new_like_question';
+  static const String kNewLikeComment = 'new_like_comment';
 
   IbNotification(
       {required this.id,

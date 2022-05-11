@@ -23,12 +23,14 @@ IbUser _$IbUserFromJson(Map<String, dynamic> json) => IbUser(
           const [],
       notificationCount: json['notificationCount'] as int? ?? 0,
       isOnline: json['isOnline'] as bool? ?? false,
-      geoPoint: json['geoPoint'],
+      geoPoint: json['geoPoint'] ?? const GeoPoint(0, 0),
       lastLocationTimestampInMs:
           json['lastLocationTimestampInMs'] as int? ?? -1,
       gender: json['gender'] as String? ?? '',
       status: json['status'] as String? ?? '',
       voiceMemoUrl: json['voiceMemoUrl'] as String? ?? '',
+      fcmToken: json['fcmToken'] as String? ?? '',
+      fcmTokenTimestamp: json['fcmTokenTimestamp'],
       tags:
           (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
               const [],
@@ -62,6 +64,7 @@ Map<String, dynamic> _$IbUserToJson(IbUser instance) => <String, dynamic>{
       'geoPoint': instance.geoPoint,
       'lastLocationTimestampInMs': instance.lastLocationTimestampInMs,
       'loginTimestamp': instance.loginTimestamp,
+      'fcmTokenTimestamp': instance.fcmTokenTimestamp,
       'joinTime': instance.joinTime,
       'birthdateInMs': instance.birthdateInMs,
       'answeredCount': instance.answeredCount,
@@ -70,6 +73,7 @@ Map<String, dynamic> _$IbUserToJson(IbUser instance) => <String, dynamic>{
       'blockedFriendUids': instance.blockedFriendUids,
       'notificationCount': instance.notificationCount,
       'profilePrivacy': instance.profilePrivacy,
+      'fcmToken': instance.fcmToken,
       'isOnline': instance.isOnline,
       'coverPhotoUrl': instance.coverPhotoUrl,
       'bio': instance.bio,

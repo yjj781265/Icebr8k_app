@@ -76,6 +76,7 @@ class EditProfileController extends GetxController {
     } else {
       gender.value = '';
     }
+    genderSelections.refresh();
   }
 
   void onPrivacySelect(String text) {

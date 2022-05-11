@@ -2,18 +2,16 @@ import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/Ib_notification_manager.dart';
 import 'package:icebr8k/backend/managers/ib_api_keys_manager.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
-import 'package:icebr8k/frontend/ib_utils.dart';
 
 /// this controller control info of current IbUser, index current home page tab and api keys
 class MainPageController extends GetxController {
   final currentIndex = 0.obs;
 
-  final Stream<IbUser> ibUserBroadcastStream = IbUserDbService()
-      .listenToIbUserChanges(IbUtils.getCurrentFbUser()!.uid)
-      .asBroadcastStream();
+  late StreamSubscription ibUserSub;
   final isNavBarVisible = true.obs;
   Rx<IbUser> rxCurrentIbUser;
   late String kGooglePlacesApiKey;
@@ -23,15 +21,27 @@ class MainPageController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
-    ibUserBroadcastStream.listen((ibUser) {
-      print('MainPageController user update');
-      rxCurrentIbUser = ibUser.obs;
+    ibUserSub = IbUserDbService()
+        .listenToIbUserChanges(rxCurrentIbUser.value.id)
+        .listen((event) {
+      rxCurrentIbUser.value = event;
       rxCurrentIbUser.refresh();
     });
+  }
 
-    await IbApiKeysManager.init();
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbNotificationManager().init();
+    await IbApiKeysManager().init();
     // todo add manager to handle this
     await setupInteractedMessage();
+  }
+
+  @override
+  Future<void> onClose() async {
+    super.onClose();
+    await ibUserSub.cancel();
   }
 
   // It is assumed that all messages contain a data field with the key 'type'

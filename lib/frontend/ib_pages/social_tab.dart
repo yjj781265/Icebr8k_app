@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/circle_settings_controller.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/friend_item_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
@@ -15,12 +14,9 @@ import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_settings.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/ib_friends_picker.dart';
 import 'package:icebr8k/frontend/ib_pages/people_nearby_page.dart';
-import 'package:icebr8k/frontend/ib_pages/profile_pages/my_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/search_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_persistent_header.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
@@ -63,7 +59,10 @@ class _SocialTabState extends State<SocialTab>
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.person_pin),
+            icon: const Icon(
+              Icons.person_pin_circle_rounded,
+              color: IbColors.errorRed,
+            ),
             onPressed: () {
               Get.to(() => PeopleNearbyPage());
             },
@@ -265,7 +264,23 @@ class _SocialTabState extends State<SocialTab>
                         size: 16,
                       ),
                     ),
-                  )
+                  ),
+                if (item.isBlocked)
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).backgroundColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.block,
+                        color: IbColors.errorRed,
+                        size: 16,
+                      ),
+                    ),
+                  ),
               ],
             ),
             onTap: () {
@@ -492,9 +507,7 @@ class _SocialTabState extends State<SocialTab>
           controller: _controller.scrollController,
           itemBuilder: (context, index) {
             final item = _controller.friends[index];
-            return FriendListItem(
-              Get.put(FriendItemController(item), tag: item.username),
-            );
+            return FriendListItem(item);
           },
           itemCount: _controller.friends.length,
         ),
@@ -598,179 +611,24 @@ class _SocialTabState extends State<SocialTab>
 }
 
 class FriendListItem extends StatelessWidget {
-  final FriendItemController _controller;
-  final bool showThreeDots;
+  final FriendItem item;
 
-  const FriendListItem(this._controller, {this.showThreeDots = true});
+  const FriendListItem(this.item);
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      if (_controller.isLoading.isTrue) {
-        return const SizedBox();
-      }
-
-      return ListTile(
-        onLongPress: () {
-          if (showThreeDots) {
-            _showBtmSheet(context);
-          }
-        },
-        onTap: () {
-          if (_controller.user.id == IbUtils.getCurrentUid()) {
-            Get.to(
-              () => MyProfilePage(),
-            );
-            return;
-          }
-          Get.to(
-            () => ProfilePage(
-              Get.put(ProfileController(_controller.user.id),
-                  tag: _controller.user.id),
-            ),
-          );
-        },
-        leading: Stack(
-          children: [
-            IbUserAvatar(
-              avatarUrl: _controller.avatarUrl.value,
-            ),
-            if (_controller.isBlocked.isTrue)
-              Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Theme.of(context).backgroundColor),
-                    child: const Icon(
-                      Icons.block_flipped,
-                      size: 16,
-                      color: IbColors.errorRed,
-                    ),
-                  ))
-          ],
-        ),
-        title: Text(
-          _controller.username.value,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: IbLinearIndicator(
-          endValue: _controller.compScore.value,
-        ),
-        trailing: showThreeDots
-            ? IconButton(
-                onPressed: () {
-                  _showBtmSheet(context);
-                },
-                icon: const Icon(Icons.more_vert))
-            : const SizedBox(),
-      );
-    });
-  }
-
-  void _showBtmSheet(BuildContext context) {
-    final Widget menu = IbCard(
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(
-                Icons.person_remove,
-                color: IbColors.errorRed,
-              ),
-              onTap: () async {
-                Get.back();
-                Get.dialog(IbDialog(
-                  title:
-                      'Are you sure to unfriend ${_controller.username.value}?',
-                  subtitle: '',
-                  onPositiveTap: () async {
-                    Get.back();
-                    await _controller.removeFriend();
-                  },
-                ));
-              },
-              title: Text.rich(
-                TextSpan(
-                    text: 'Unfriend ',
-                    style: const TextStyle(color: IbColors.errorRed),
-                    children: [
-                      TextSpan(
-                          text: _controller.username.value,
-                          style: TextStyle(
-                              color: Theme.of(context).indicatorColor))
-                    ]),
-              ),
-            ),
-            if (_controller.isBlocked.isTrue)
-              ListTile(
-                onTap: () {
-                  Get.back();
-                  Get.dialog(IbDialog(
-                    title:
-                        'Are you sure to unblock ${_controller.username.value}?',
-                    subtitle: '',
-                    onPositiveTap: () async {
-                      Get.back();
-                      await _controller.unblockFriend();
-                    },
-                  ));
-                },
-                leading: const Icon(
-                  Icons.check_circle_rounded,
-                  color: IbColors.accentColor,
-                ),
-                title: Text.rich(
-                  TextSpan(
-                      text: 'Unblock ',
-                      style: const TextStyle(color: IbColors.accentColor),
-                      children: [
-                        TextSpan(
-                            text: _controller.username.value,
-                            style: TextStyle(
-                                color: Theme.of(context).indicatorColor))
-                      ]),
-                ),
-              ),
-            if (_controller.isBlocked.isFalse)
-              ListTile(
-                onTap: () {
-                  Get.back();
-                  Get.dialog(IbDialog(
-                    title:
-                        'Are you sure to block ${_controller.username.value}?',
-                    subtitle:
-                        'You will not able to receive messages from this user',
-                    onPositiveTap: () async {
-                      Get.back();
-                      await _controller.blockFriend();
-                    },
-                  ));
-                },
-                leading: const Icon(
-                  Icons.block_flipped,
-                  color: IbColors.errorRed,
-                ),
-                title: Text.rich(
-                  TextSpan(
-                      text: 'Block ',
-                      style: const TextStyle(color: IbColors.errorRed),
-                      children: [
-                        TextSpan(
-                            text: _controller.username.value,
-                            style: TextStyle(
-                                color: Theme.of(context).indicatorColor))
-                      ]),
-                ),
-              ),
-          ],
-        ),
+    return ListTile(
+      onTap: () {
+        Get.to(() => ProfilePage(Get.put(ProfileController(item.user.id))));
+      },
+      leading: IbUserAvatar(
+        avatarUrl: item.user.avatarUrl,
       ),
+      title: Text(
+        item.user.username,
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      subtitle: IbLinearIndicator(endValue: item.compScore),
     );
-
-    Get.bottomSheet(menu, ignoreSafeArea: false);
   }
 }

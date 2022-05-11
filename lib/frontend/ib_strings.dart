@@ -170,6 +170,8 @@ class IbStrings extends Translations {
           'master_search_hint': 'Username/Name/Tag/Circle/Question',
           'nearby': 'Nearby',
           'me': "Me",
+          'distance': 'Distance',
+          'age': 'Age',
         }
       };
 }

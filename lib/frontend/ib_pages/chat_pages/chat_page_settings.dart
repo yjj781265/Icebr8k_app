@@ -17,6 +17,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
+import '../../ib_widgets/ib_dialog.dart';
 import 'ib_friends_picker.dart';
 
 class ChatPageSettings extends StatelessWidget {
@@ -241,6 +242,82 @@ class ChatPageSettings extends StatelessWidget {
             title: const Text('Mute Notifications'),
           ),
         ),
+        Obx(() {
+          if (_controller.isCircle.isFalse) {
+            final member = _controller.ibChatMembers.firstWhereOrNull(
+                (element) => element.user.id != IbUtils.getCurrentUid());
+            if (member == null) {
+              return const SizedBox();
+            }
+            if (IbUtils.getCurrentIbUser() == null) {
+              return const SizedBox();
+            }
+
+            if (IbUtils.getCurrentIbUser()!
+                .blockedFriendUids
+                .contains(member.user.id)) {
+              return ListTile(
+                onTap: () {
+                  Get.back();
+                  Get.dialog(IbDialog(
+                    title: 'Are you sure to unblock ${member.user.username}?',
+                    subtitle: '',
+                    onPositiveTap: () async {
+                      Get.back();
+                      await _controller.unblockUser(member.user.id);
+                    },
+                  ));
+                },
+                leading: const Icon(
+                  Icons.check_circle_rounded,
+                  color: IbColors.accentColor,
+                ),
+                title: Text.rich(
+                  TextSpan(
+                      text: 'Unblock ',
+                      style: const TextStyle(color: IbColors.accentColor),
+                      children: [
+                        TextSpan(
+                            text: member.user.username,
+                            style: TextStyle(
+                                color: Theme.of(context).indicatorColor))
+                      ]),
+                ),
+              );
+            }
+
+            return ListTile(
+              onTap: () {
+                Get.back();
+                Get.dialog(IbDialog(
+                  title: 'Are you sure to block ${member.user.username}?',
+                  subtitle:
+                      'You will not able to receive messages from this user',
+                  onPositiveTap: () async {
+                    Get.back();
+                    await _controller.blockUser(member.user.id);
+                  },
+                ));
+              },
+              leading: const Icon(
+                Icons.block_flipped,
+                color: IbColors.errorRed,
+              ),
+              title: Text.rich(
+                TextSpan(
+                    text: 'Block ',
+                    style: const TextStyle(color: IbColors.errorRed),
+                    children: [
+                      TextSpan(
+                          text: member.user.username,
+                          style: TextStyle(
+                              color: Theme.of(context).indicatorColor))
+                    ]),
+              ),
+            );
+          }
+          return const SizedBox();
+        }),
         Obx(() {
           final chatMember = _controller.ibChatMembers.firstWhereOrNull(
               (element) => element.member.uid == IbUtils.getCurrentUid()!);

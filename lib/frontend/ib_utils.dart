@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/friends_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
@@ -131,9 +130,9 @@ class IbUtils {
     return '${diffDt.inDays} days ago';
   }
 
-  static String getDistanceString(double distanceInKm,
+  static String getDistanceString(double distanceInMeter,
       {bool isMetric = false}) {
-    final double foot = 3.28084 * distanceInKm * 1000;
+    final double foot = 3.28084 * distanceInMeter;
     if (foot < 528) {
       return '${foot.toPrecision(1)} ft';
     }
@@ -242,14 +241,14 @@ class IbUtils {
 
   /// return current IbUser friend ids what are not in block list
   static List<String> getCurrentIbUserUnblockedFriendsId() {
-    if (!Get.isRegistered<FriendsController>()) {
+    if (getCurrentIbUser() == null) {
       return [];
     }
-    final friends = List<IbUser>.from(Get.find<FriendsController>().friends);
-    friends.removeWhere((element) =>
-        getCurrentIbUser()!.blockedFriendUids.contains(element.id));
-
-    return friends.map((e) => e.id).toList();
+    return getCurrentIbUser()!
+        .friendUids
+        .where((element) =>
+            !getCurrentIbUser()!.blockedFriendUids.contains(element))
+        .toList();
   }
 
   /// return current IbUser circle chat items
@@ -346,6 +345,7 @@ class IbUtils {
       IbCacheManager()
           .cacheIbAnswers(uid: getCurrentUid()!, ibAnswers: tempList);
       uid1QuestionAnswers.addAll(tempList);
+      print('refresh list1');
     } else {
       uid1QuestionAnswers
           .addAll(IbCacheManager().getIbAnswers(getCurrentUid()!)!);
@@ -355,6 +355,7 @@ class IbUtils {
       final tempList = await IbQuestionDbService().queryUserAnswers(uid);
       IbCacheManager().cacheIbAnswers(uid: uid, ibAnswers: tempList);
       uid2QuestionAnswers.addAll(tempList);
+      print('refresh list2');
     } else {
       uid2QuestionAnswers.addAll(IbCacheManager().getIbAnswers(uid)!);
     }

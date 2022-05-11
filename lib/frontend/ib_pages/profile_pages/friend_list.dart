@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/friend_item_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/friend_list_controller.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
@@ -26,13 +25,9 @@ class FriendList extends StatelessWidget {
 
         return ListView.builder(
           itemBuilder: (context, index) {
-            return FriendListItem(
-              Get.put(FriendItemController(_controller.users[index]),
-                  tag: _controller.users[index].id),
-              showThreeDots: false,
-            );
+            return FriendListItem(_controller.items[index]);
           },
-          itemCount: _controller.users.length,
+          itemCount: _controller.items.length,
         );
       }),
     );

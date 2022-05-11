@@ -198,9 +198,8 @@ class IbUserDbService {
       return;
     }
 
-    await _collectionRef.doc(userId).set({
-      'cloudMsgToken': token,
-    }, SetOptions(merge: true));
+    await _collectionRef.doc(userId).update(
+        {'fcmToken': token, 'fcmTokenTimestamp': FieldValue.serverTimestamp()});
   }
 
   Future<void> removeTokenFromDatabase() async {
@@ -210,18 +209,20 @@ class IbUserDbService {
       return;
     }
 
-    await _collectionRef.doc(userId).set({
-      'cloudMsgToken': null,
-    }, SetOptions(merge: true));
+    await _collectionRef.doc(userId).update(
+      {
+        'fcmToken': '',
+      },
+    );
   }
 
-  Future<String?> retrieveTokenFromDatabase(String uid) async {
+  Future<String> retrieveTokenFromDatabase(String uid) async {
     final snapshot = await _collectionRef.doc(uid).get();
 
     if (!snapshot.exists) {
-      return null;
+      return '';
     }
-    return snapshot['cloudMsgToken'] as String?;
+    return snapshot['fcmToken'] as String;
   }
 
   Future<void> updateCurrentUserPosition(GeoPoint geoPoint) async {

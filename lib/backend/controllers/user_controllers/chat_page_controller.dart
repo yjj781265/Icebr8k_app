@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
@@ -928,6 +929,50 @@ class ChatPageController extends GetxController {
       }
     }
     isLoadingMore.value = false;
+  }
+
+  Future<void> blockUser(String uid) async {
+    final IbUser? currentUser = IbUtils.getCurrentIbUser();
+    if (currentUser == null) {
+      return;
+    }
+    try {
+      final SocialTabController _controller = Get.find();
+      await IbUserDbService().blockFriend(uid);
+      final item = _controller.oneToOneChats.firstWhereOrNull(
+          (element) => element.ibChat.chatId == ibChat!.chatId);
+      if (item != null) {
+        item.isBlocked = true;
+      }
+      _controller.oneToOneChats.refresh();
+      IbUtils.showSimpleSnackBar(
+          msg: 'User blocked!', backgroundColor: IbColors.errorRed);
+    } catch (e) {
+      IbUtils.showSimpleSnackBar(
+          msg: 'Block user failed $e', backgroundColor: IbColors.errorRed);
+    }
+  }
+
+  Future<void> unblockUser(String uid) async {
+    final IbUser? currentUser = IbUtils.getCurrentIbUser();
+    if (currentUser == null) {
+      return;
+    }
+    try {
+      final SocialTabController _controller = Get.find();
+      await IbUserDbService().unblockFriend(uid);
+      final item = _controller.oneToOneChats.firstWhereOrNull(
+          (element) => element.ibChat.chatId == ibChat!.chatId);
+      if (item != null) {
+        item.isBlocked = false;
+      }
+      _controller.oneToOneChats.refresh();
+      IbUtils.showSimpleSnackBar(
+          msg: 'User unblocked!', backgroundColor: IbColors.accentColor);
+    } catch (e) {
+      IbUtils.showSimpleSnackBar(
+          msg: 'Unblock user failed $e', backgroundColor: IbColors.errorRed);
+    }
   }
 }
 

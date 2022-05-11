@@ -160,4 +160,36 @@ class ProfileController extends GetxController {
           msg: 'Delete friend failed $e', backgroundColor: IbColors.errorRed);
     }
   }
+
+  Future<void> blockFriend() async {
+    final IbUser? currentUser = IbUtils.getCurrentIbUser();
+    if (currentUser == null) {
+      return;
+    }
+    try {
+      await IbUserDbService().blockFriend(rxIbUser.value.id);
+      isBlocked.value = true;
+      IbUtils.showSimpleSnackBar(
+          msg: 'Friend blocked!', backgroundColor: IbColors.errorRed);
+    } catch (e) {
+      IbUtils.showSimpleSnackBar(
+          msg: 'Block friend failed $e', backgroundColor: IbColors.errorRed);
+    }
+  }
+
+  Future<void> unblockFriend() async {
+    final IbUser? currentUser = IbUtils.getCurrentIbUser();
+    if (currentUser == null) {
+      return;
+    }
+    try {
+      await IbUserDbService().unblockFriend(rxIbUser.value.id);
+      isBlocked.value = false;
+      IbUtils.showSimpleSnackBar(
+          msg: 'Friend unblocked!', backgroundColor: IbColors.accentColor);
+    } catch (e) {
+      IbUtils.showSimpleSnackBar(
+          msg: 'Unblock friend failed $e', backgroundColor: IbColors.errorRed);
+    }
+  }
 }

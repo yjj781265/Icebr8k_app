@@ -18,6 +18,7 @@ class IbUser {
   dynamic geoPoint;
   int lastLocationTimestampInMs;
   dynamic loginTimestamp;
+  dynamic fcmTokenTimestamp;
 
   /// covert to FireStore Timestamp
   dynamic joinTime;
@@ -28,6 +29,7 @@ class IbUser {
   List<String> blockedFriendUids;
   int notificationCount;
   String profilePrivacy;
+  String fcmToken;
   bool isOnline;
   String coverPhotoUrl;
   String bio;
@@ -63,6 +65,8 @@ class IbUser {
     this.gender = '',
     this.status = '',
     this.voiceMemoUrl = '',
+    this.fcmToken = '',
+    this.fcmTokenTimestamp,
     this.tags = const [],
     this.emoPics = const [],
     this.roles = const ['user'],

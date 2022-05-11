@@ -12,7 +12,6 @@ import 'main_page_controller.dart';
 
 /// controller for Question tab in Homepage
 class HomeTabController extends GetxController {
-  final avatarUrl = ''.obs;
   double _lastOffset = 0;
   final double hideShowNavBarSensitivity = 10;
   final trendingList = <IbQuestion>[].obs;
@@ -32,11 +31,6 @@ class HomeTabController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
-    ibUserSub =
-        Get.find<MainPageController>().ibUserBroadcastStream.listen((ibUser) {
-      avatarUrl.value = ibUser.avatarUrl;
-    });
-
     scrollController.addListener(() {
       if (scrollController.offset > _lastOffset &&
           scrollController.offset - _lastOffset > hideShowNavBarSensitivity) {
