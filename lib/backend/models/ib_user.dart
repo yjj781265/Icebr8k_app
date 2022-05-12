@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'ib_settings.dart';
+
 part 'ib_user.g.dart';
 
 @JsonSerializable(explicitToJson: true)
@@ -14,13 +16,14 @@ class IbUser {
   String avatarUrl;
   String gender;
   String status;
+  IbSettings? settings;
   int banedEndTimeInMs;
   dynamic geoPoint;
   int lastLocationTimestampInMs;
   dynamic loginTimestamp;
   dynamic fcmTokenTimestamp;
 
-  /// covert to FireStore Timestamp
+  //convert to FireStore Timestamp
   dynamic joinTime;
   int? birthdateInMs;
   int answeredCount;
@@ -65,6 +68,8 @@ class IbUser {
     this.gender = '',
     this.status = '',
     this.voiceMemoUrl = '',
+    this.joinTime,
+    IbSettings? settings,
     this.fcmToken = '',
     this.fcmTokenTimestamp,
     this.tags = const [],
@@ -78,7 +83,7 @@ class IbUser {
     this.askedCount = 0,
     required this.id,
     this.username = '',
-  });
+  }) : settings = settings ?? IbSettings();
 
   factory IbUser.fromJson(Map<String, dynamic> json) => _$IbUserFromJson(json);
   Map<String, dynamic> toJson() => _$IbUserToJson(this);
@@ -101,8 +106,12 @@ class IbUser {
           avatarUrl == other.avatarUrl &&
           gender == other.gender &&
           status == other.status &&
+          settings == other.settings &&
           banedEndTimeInMs == other.banedEndTimeInMs &&
+          geoPoint == other.geoPoint &&
+          lastLocationTimestampInMs == other.lastLocationTimestampInMs &&
           loginTimestamp == other.loginTimestamp &&
+          fcmTokenTimestamp == other.fcmTokenTimestamp &&
           joinTime == other.joinTime &&
           birthdateInMs == other.birthdateInMs &&
           answeredCount == other.answeredCount &&
@@ -111,6 +120,7 @@ class IbUser {
           blockedFriendUids == other.blockedFriendUids &&
           notificationCount == other.notificationCount &&
           profilePrivacy == other.profilePrivacy &&
+          fcmToken == other.fcmToken &&
           isOnline == other.isOnline &&
           coverPhotoUrl == other.coverPhotoUrl &&
           bio == other.bio &&
@@ -118,6 +128,7 @@ class IbUser {
           roles == other.roles &&
           tags == other.tags &&
           emoPics == other.emoPics;
+
   @override
   int get hashCode =>
       id.hashCode ^
@@ -128,8 +139,12 @@ class IbUser {
       avatarUrl.hashCode ^
       gender.hashCode ^
       status.hashCode ^
+      settings.hashCode ^
       banedEndTimeInMs.hashCode ^
+      geoPoint.hashCode ^
+      lastLocationTimestampInMs.hashCode ^
       loginTimestamp.hashCode ^
+      fcmTokenTimestamp.hashCode ^
       joinTime.hashCode ^
       birthdateInMs.hashCode ^
       answeredCount.hashCode ^
@@ -138,6 +153,7 @@ class IbUser {
       blockedFriendUids.hashCode ^
       notificationCount.hashCode ^
       profilePrivacy.hashCode ^
+      fcmToken.hashCode ^
       isOnline.hashCode ^
       coverPhotoUrl.hashCode ^
       bio.hashCode ^

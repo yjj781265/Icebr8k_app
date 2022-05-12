@@ -7,7 +7,6 @@ import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/setup_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_auth_service.dart';
-import 'package:icebr8k/backend/services/user_services/ib_cloud_messaging_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/admin/admin_main_page.dart';
@@ -316,7 +315,7 @@ class AuthController extends GetxService {
     Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_out'));
 
     if (firebaseUser != null) {
-      await IbCloudMessagingService().removeMyToken();
+      await IbUserDbService().removeTokenFromDatabase();
     }
     await _ibAuthService.signOut();
   }

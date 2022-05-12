@@ -123,9 +123,7 @@ class ProfileController extends GetxController {
     }
     final IbNotification n = IbNotification(
         id: IbUtils.getUniqueId(),
-        title: currentUser.username,
-        avatarUrl: currentUser.avatarUrl,
-        subtitle: message,
+        body: message,
         type: IbNotification.kFriendRequest,
         timestamp: FieldValue.serverTimestamp(),
         senderId: currentUser.id,

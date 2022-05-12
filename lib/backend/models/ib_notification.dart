@@ -5,12 +5,10 @@ part 'ib_notification.g.dart';
 @JsonSerializable()
 class IbNotification {
   String id;
-  String title;
-  String subtitle;
-  String? avatarUrl;
+  String body;
 
   /// can be use for doc id
-  String? attachmentUrl;
+  String url;
   String type;
   dynamic timestamp;
   bool isRead;
@@ -22,18 +20,17 @@ class IbNotification {
   /// will go open the app if it is in background
   static const String kNormal = 'normal';
   static const String kCircleInvite = 'circle_invite';
+  static const String kCircleRequest = 'circle_request';
   static const String kChatMessage = 'chat_message';
-  static const String kComment = 'comment';
+  static const String kPollComment = 'poll_comment';
   static const String kNewVote = 'new_vote';
-  static const String kNewLikeQuestion = 'new_like_question';
-  static const String kNewLikeComment = 'new_like_comment';
+  static const String kPollLike = 'new_like_poll';
+  static const String kPollCommentLike = 'new_like_comment';
 
   IbNotification(
       {required this.id,
-      required this.title,
-      required this.subtitle,
-      this.avatarUrl,
-      this.attachmentUrl,
+      required this.body,
+      this.url = '',
       this.isRead = false,
       required this.type,
       this.timestamp,
@@ -51,32 +48,27 @@ class IbNotification {
       other is IbNotification &&
           runtimeType == other.runtimeType &&
           id == other.id &&
-          title == other.title &&
-          subtitle == other.subtitle &&
-          avatarUrl == other.avatarUrl &&
-          attachmentUrl == other.attachmentUrl &&
+          body == other.body &&
+          url == other.url &&
           type == other.type &&
           timestamp == other.timestamp &&
+          isRead == other.isRead &&
           senderId == other.senderId &&
           recipientId == other.recipientId;
 
   @override
   int get hashCode =>
       id.hashCode ^
-      title.hashCode ^
-      subtitle.hashCode ^
-      avatarUrl.hashCode ^
-      attachmentUrl.hashCode ^
+      body.hashCode ^
+      url.hashCode ^
       type.hashCode ^
       timestamp.hashCode ^
+      isRead.hashCode ^
       senderId.hashCode ^
       recipientId.hashCode;
 
   @override
   String toString() {
-    return 'IbNotification{id: $id, title: $title, subtitle: $subtitle, '
-        'url: $avatarUrl, attachmentUrl: $attachmentUrl, '
-        'type: $type, timestamp: $timestamp, '
-        'senderId: $senderId, recipientId: $recipientId}';
+    return 'IbNotification{id: $id, body: $body, url: $url, type: $type, timestamp: $timestamp, isRead: $isRead, senderId: $senderId, recipientId: $recipientId}';
   }
 }

@@ -1,4 +1,3 @@
-import 'package:icebr8k/backend/models/ib_chat_models/ib_circle_join_request.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import 'ib_message.dart';
@@ -17,7 +16,6 @@ class IbChat {
   List<String> mutedUids;
   List<String> blackListUids;
   List<String> mentionOnlyUids;
-  List<IbCircleJoinRequest> joinRequests;
   bool isCircle;
   bool isPublicCircle;
   int memberCount;
@@ -38,7 +36,6 @@ class IbChat {
       this.memberUids = const [],
       this.mentionOnlyUids = const [],
       this.mutedUids = const [],
-      this.joinRequests = const [],
       this.memberCount = 0,
       this.lastMessage,
       this.isTypingUids = const [],
@@ -63,7 +60,6 @@ class IbChat {
           mutedUids == other.mutedUids &&
           blackListUids == other.blackListUids &&
           mentionOnlyUids == other.mentionOnlyUids &&
-          joinRequests == other.joinRequests &&
           isCircle == other.isCircle &&
           isPublicCircle == other.isPublicCircle &&
           memberCount == other.memberCount &&
@@ -83,7 +79,6 @@ class IbChat {
       mutedUids.hashCode ^
       blackListUids.hashCode ^
       mentionOnlyUids.hashCode ^
-      joinRequests.hashCode ^
       isCircle.hashCode ^
       isPublicCircle.hashCode ^
       memberCount.hashCode ^

@@ -29,6 +29,10 @@ IbUser _$IbUserFromJson(Map<String, dynamic> json) => IbUser(
       gender: json['gender'] as String? ?? '',
       status: json['status'] as String? ?? '',
       voiceMemoUrl: json['voiceMemoUrl'] as String? ?? '',
+      joinTime: json['joinTime'],
+      settings: json['settings'] == null
+          ? null
+          : IbSettings.fromJson(json['settings'] as Map<String, dynamic>),
       fcmToken: json['fcmToken'] as String? ?? '',
       fcmTokenTimestamp: json['fcmTokenTimestamp'],
       tags:
@@ -49,7 +53,7 @@ IbUser _$IbUserFromJson(Map<String, dynamic> json) => IbUser(
       askedCount: json['askedCount'] as int? ?? 0,
       id: json['id'] as String,
       username: json['username'] as String? ?? '',
-    )..joinTime = json['joinTime'];
+    );
 
 Map<String, dynamic> _$IbUserToJson(IbUser instance) => <String, dynamic>{
       'id': instance.id,
@@ -60,6 +64,7 @@ Map<String, dynamic> _$IbUserToJson(IbUser instance) => <String, dynamic>{
       'avatarUrl': instance.avatarUrl,
       'gender': instance.gender,
       'status': instance.status,
+      'settings': instance.settings?.toJson(),
       'banedEndTimeInMs': instance.banedEndTimeInMs,
       'geoPoint': instance.geoPoint,
       'lastLocationTimestampInMs': instance.lastLocationTimestampInMs,

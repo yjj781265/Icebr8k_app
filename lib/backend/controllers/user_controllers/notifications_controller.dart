@@ -24,8 +24,8 @@ class NotificationController extends GetxController {
   }
 
   @override
-  void onClose() {
-    ibNotificationsStream.cancel();
+  Future<void> onClose() async {
+    await ibNotificationsStream.cancel();
     super.onClose();
   }
 
@@ -41,38 +41,43 @@ class NotificationController extends GetxController {
 
         final IbNotification n = IbNotification.fromJson(docChange.doc.data()!);
         if (docChange.type == DocumentChangeType.added) {
-          _onNotificationAdded(n);
+          await _onNotificationAdded(n);
         }
 
         if (docChange.type == DocumentChangeType.modified) {
-          _onNotificationModified(n);
+          await _onNotificationModified(n);
         }
 
         if (docChange.type == DocumentChangeType.removed) {
-          _onNotificationRemoved(n);
+          await _onNotificationRemoved(n);
         }
       }
-
       items.sort((a, b) => (b.notification.timestamp as Timestamp)
           .compareTo(a.notification.timestamp as Timestamp));
       items.refresh();
-      print('finish loading');
       isLoading.value = false;
     });
   }
 
   Future<void> _onNotificationAdded(IbNotification notification) async {
-    final item = NotificationItem(notification: notification);
+    final senderUser =
+        await IbUserDbService().queryIbUser(notification.senderId);
+
+    if (senderUser == null) {
+      return;
+    }
+
+    final item =
+        NotificationItem(notification: notification, senderUser: senderUser);
     if (notification.type == IbNotification.kCircleInvite) {
-      final IbChat? chat = await IbChatDbService().queryChat(notification.id);
-      final IbUser? user =
-          await IbUserDbService().queryIbUser(notification.senderId);
+      final IbChat? chat = await IbChatDbService().queryChat(notification.url);
       item.ibChat = chat;
-      item.notification.avatarUrl = user == null ? '' : user.avatarUrl;
+      item.avatarUrl = senderUser.avatarUrl;
       if (chat != null) {
         items.add(item);
       }
     } else if (notification.type == IbNotification.kFriendRequest) {
+      item.avatarUrl = senderUser.avatarUrl;
       items.add(item);
     }
   }
@@ -81,12 +86,9 @@ class NotificationController extends GetxController {
     final int index = items
         .indexWhere((element) => element.notification.id == notification.id);
 
+    print(index);
     if (index != -1) {
       items[index].notification = notification;
-      if (notification.type == IbNotification.kCircleInvite) {
-        final IbChat? chat = await IbChatDbService().queryChat(notification.id);
-        items[index].ibChat = chat;
-      }
     }
   }
 
@@ -128,7 +130,30 @@ class NotificationController extends GetxController {
 
 class NotificationItem {
   IbNotification notification;
+  IbUser senderUser;
+  String avatarUrl;
   IbChat? ibChat;
 
-  NotificationItem({required this.notification, this.ibChat});
+  NotificationItem(
+      {required this.notification,
+      required this.senderUser,
+      this.ibChat,
+      this.avatarUrl = ''});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NotificationItem &&
+          runtimeType == other.runtimeType &&
+          notification == other.notification &&
+          senderUser == other.senderUser &&
+          avatarUrl == other.avatarUrl &&
+          ibChat == other.ibChat;
+
+  @override
+  int get hashCode =>
+      notification.hashCode ^
+      senderUser.hashCode ^
+      avatarUrl.hashCode ^
+      ibChat.hashCode;
 }

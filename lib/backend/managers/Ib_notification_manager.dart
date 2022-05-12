@@ -12,9 +12,9 @@ class IbNotificationManager {
     if (fcmToken == null) {
       print('fcm token return null value!!');
     } else {
-      await IbUserDbService().saveTokenToDatabase(fcmToken);
       await FirebaseMessaging.instance
           .subscribeToTopic('Users${DbConfig.dbSuffix}');
+      await IbUserDbService().saveTokenToDatabase(fcmToken);
     }
   }
 }

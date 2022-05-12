@@ -31,6 +31,7 @@ class PeopleNearbyCard extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   IbUserAvatar(
                     avatarUrl: item.user.avatarUrl,

@@ -123,15 +123,13 @@ class CircleSettingsController extends GetxController {
         );
         for (final IbUser user in invitees) {
           final n = IbNotification(
-              id: ibChat2.chatId,
-              title:
-                  'Group invite from ${IbUtils.getCurrentIbUser()!.username}',
-              subtitle: '',
+              id: IbUtils.getUniqueId(),
+              body: '',
               type: IbNotification.kCircleInvite,
               timestamp: FieldValue.serverTimestamp(),
               senderId: IbUtils.getCurrentUid()!,
               recipientId: user.id,
-              avatarUrl: IbUtils.getCurrentIbUser()!.avatarUrl);
+              url: ibChat2.chatId);
           await IbUserDbService().sendAlertNotification(n);
         }
         Get.back(closeOverlays: true);

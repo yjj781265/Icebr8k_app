@@ -870,14 +870,13 @@ class ChatPageController extends GetxController {
     try {
       for (final IbUser user in users) {
         final n = IbNotification(
-            id: ibChat!.chatId,
-            title: 'Group invite from ${IbUtils.getCurrentIbUser()!.username}',
-            subtitle: '',
+            id: IbUtils.getUniqueId(),
             type: IbNotification.kCircleInvite,
             timestamp: FieldValue.serverTimestamp(),
             senderId: IbUtils.getCurrentUid()!,
             recipientId: user.id,
-            avatarUrl: IbUtils.getCurrentIbUser()!.avatarUrl);
+            url: ibChat!.chatId,
+            body: '');
         await IbUserDbService().sendAlertNotification(n);
       }
       Get.back();

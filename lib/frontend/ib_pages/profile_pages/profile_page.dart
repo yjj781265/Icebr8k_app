@@ -662,8 +662,7 @@ class ProfilePage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           IbUserAvatar(
-                            avatarUrl:
-                                _controller.frNotification!.avatarUrl ?? '',
+                            avatarUrl: _controller.rxIbUser.value.avatarUrl,
                             uid: _controller.frNotification!.senderId,
                           ),
                           const SizedBox(
@@ -678,7 +677,7 @@ class ProfilePage extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      _controller.frNotification!.title,
+                                      _controller.rxIbUser.value.username,
                                       style: const TextStyle(
                                           fontSize: IbConfig.kNormalTextSize,
                                           fontWeight: FontWeight.bold),
@@ -707,12 +706,11 @@ class ProfilePage extends StatelessWidget {
                                   style: const TextStyle(
                                       color: IbColors.lightGrey),
                                 ),
-                                if (_controller
-                                    .frNotification!.subtitle.isNotEmpty)
+                                if (_controller.frNotification!.body.isNotEmpty)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 8),
-                                    child: Text(
-                                        _controller.frNotification!.subtitle),
+                                    child:
+                                        Text(_controller.frNotification!.body),
                                   ),
                               ],
                             ),

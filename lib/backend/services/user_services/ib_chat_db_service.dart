@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
-import 'package:icebr8k/backend/models/ib_chat_models/ib_circle_join_request.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -156,17 +155,6 @@ class IbChatDbService {
         .collection(_kMemberSubCollection)
         .doc(member.uid)
         .set(member.toJson(), SetOptions(merge: true));
-  }
-
-  Future<void> updateCircleRequest(
-      {required IbChat chat, required IbCircleJoinRequest request}) async {
-    if (!chat.isCircle) {
-      return;
-    }
-
-    return _collectionRef.doc(chat.chatId).set({
-      'joinRequests': FieldValue.arrayUnion([request.toJson()])
-    }, SetOptions(merge: true));
   }
 
   Future<void> removeChatMember({required IbChatMember member}) async {

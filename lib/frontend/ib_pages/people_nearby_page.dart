@@ -90,8 +90,7 @@ class PeopleNearbyPage extends StatelessWidget {
                   carouselController: _controller.carouselController,
                   options: CarouselOptions(
                       initialPage: 0,
-                      height: Get.width * 1.66,
-                      aspectRatio: 1.66,
+                      aspectRatio: 0.65,
                       viewportFraction: 0.96,
                       enlargeCenterPage: true,
                       enableInfiniteScroll: false,

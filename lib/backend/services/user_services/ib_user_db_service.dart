@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/db_config.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
+import 'package:icebr8k/backend/models/ib_settings.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
@@ -23,6 +24,7 @@ class IbUserDbService {
 
   Future<void> registerNewUser(IbUser _ibUser) {
     _ibUser.joinTime = FieldValue.serverTimestamp();
+    _ibUser.settings = IbSettings();
     print('IbUserDbService registerNewUser');
     return _collectionRef
         .doc(_ibUser.id)
@@ -89,6 +91,7 @@ class IbUserDbService {
 
   /// send an alert message in the app, will appear under Alert tab
   Future<void> sendAlertNotification(IbNotification n) async {
+    n.timestamp = FieldValue.serverTimestamp();
     //my sub collection
     await _collectionRef
         .doc(n.recipientId)
@@ -187,7 +190,8 @@ class IbUserDbService {
     return _collectionRef
         .doc(IbUtils.getCurrentUid())
         .collection(_kNotificationSubCollection)
-        .orderBy('timestampInMs', descending: true)
+        .where('recipientId', isEqualTo: IbUtils.getCurrentUid())
+        .orderBy('timestamp', descending: true)
         .snapshots();
   }
 

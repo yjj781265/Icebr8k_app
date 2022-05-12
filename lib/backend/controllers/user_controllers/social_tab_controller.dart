@@ -16,10 +16,10 @@ import '../../services/user_services/ib_user_db_service.dart';
 
 /// controller for the Social tab in Homepage
 class SocialTabController extends GetxController {
-  Map<String, IbUser> ibUserMap = {};
   final oneToOneChats = <ChatTabItem>[].obs;
   final circles = <ChatTabItem>[].obs;
   final currentIndex = 0.obs;
+  List<String> lastFriendUids = <String>[];
   late StreamSubscription _oneToOneSub;
   late StreamSubscription _circleSub;
   late StreamSubscription _ibUserSub;
@@ -114,8 +114,13 @@ class SocialTabController extends GetxController {
     _ibUserSub = IbUserDbService()
         .listenToIbUserChanges(IbUtils.getCurrentFbUser()!.uid)
         .listen((event) async {
+      if (lastFriendUids == event.friendUids) {
+        return;
+      }
+      lastFriendUids = event.friendUids;
       friends.clear();
-      for (final String id in IbUtils.getCurrentIbUser()!.friendUids) {
+      print('friends: ${event.friendUids.length}');
+      for (final String id in event.friendUids) {
         IbUser? user;
         if (IbCacheManager().getIbUser(id) == null) {
           user = await IbUserDbService().queryIbUser(id);
@@ -126,17 +131,19 @@ class SocialTabController extends GetxController {
         if (user == null) {
           continue;
         }
-        final index =
-            friends.indexWhere((element) => element.user.id == user!.id);
+        final index = friends.indexWhere((element) => element.user.id == id);
         if (index == -1) {
-          final compScore = await IbUtils.getCompScore(uid: user.id);
+          final compScore = await IbUtils.getCompScore(uid: id);
           friends.add(FriendItem(user: user, compScore: compScore));
         } else {
           friends[index].user = user;
         }
       }
+      friends.value = friends.toSet().toList();
       friends.sort((a, b) => b.compScore.compareTo(a.compScore));
       friends.refresh();
+
+      isFriendListLoading.value = false;
     });
 
     _ibPublicAnswerSub = IbQuestionDbService()
@@ -152,7 +159,6 @@ class SocialTabController extends GetxController {
               uid: IbUtils.getCurrentUid()!, ibAnswer: ibAnswer);
         }
       }
-
       //refresh compScore
       for (final item in friends) {
         final compScore = await IbUtils.getCompScore(uid: item.user.id);
@@ -160,7 +166,6 @@ class SocialTabController extends GetxController {
       }
       friends.sort((a, b) => b.compScore.compareTo(a.compScore));
       friends.refresh();
-      isFriendListLoading.value = false;
     });
 
     await Future.delayed(const Duration(milliseconds: 3000), () {

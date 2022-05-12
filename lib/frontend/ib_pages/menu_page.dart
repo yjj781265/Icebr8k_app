@@ -9,6 +9,7 @@ import 'package:icebr8k/frontend/admin/admin_main_page.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/people_nearby_page.dart';
+import 'package:icebr8k/frontend/ib_pages/settings_pages/settings_main_page.dart';
 import 'package:icebr8k/frontend/ib_themes.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
@@ -222,7 +223,9 @@ class _MenuPageState extends State<MenuPage> {
                               fontSize: IbConfig.kNormalTextSize,
                               fontWeight: FontWeight.bold),
                         ),
-                        onTap: () {},
+                        onTap: () {
+                          Get.to(()=> SettingsMainPage());
+                        },
                       ),
                       ListTile(
                         leading: const Icon(

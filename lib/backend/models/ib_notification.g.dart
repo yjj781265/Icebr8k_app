@@ -9,10 +9,8 @@ part of 'ib_notification.dart';
 IbNotification _$IbNotificationFromJson(Map<String, dynamic> json) =>
     IbNotification(
       id: json['id'] as String,
-      title: json['title'] as String,
-      subtitle: json['subtitle'] as String,
-      avatarUrl: json['avatarUrl'] as String?,
-      attachmentUrl: json['attachmentUrl'] as String?,
+      body: json['body'] as String,
+      url: json['url'] as String? ?? '',
       isRead: json['isRead'] as bool? ?? false,
       type: json['type'] as String,
       timestamp: json['timestamp'],
@@ -23,10 +21,8 @@ IbNotification _$IbNotificationFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$IbNotificationToJson(IbNotification instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'title': instance.title,
-      'subtitle': instance.subtitle,
-      'avatarUrl': instance.avatarUrl,
-      'attachmentUrl': instance.attachmentUrl,
+      'body': instance.body,
+      'url': instance.url,
       'type': instance.type,
       'timestamp': instance.timestamp,
       'isRead': instance.isRead,

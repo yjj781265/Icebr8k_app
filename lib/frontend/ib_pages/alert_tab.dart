@@ -85,7 +85,7 @@ class AlertTab extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   IbUserAvatar(
-                    avatarUrl: item.notification.avatarUrl ?? '',
+                    avatarUrl: item.avatarUrl,
                     uid: item.notification.senderId,
                   ),
                   const SizedBox(
@@ -99,7 +99,7 @@ class AlertTab extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              item.notification.title,
+                              item.senderUser.username,
                               style: const TextStyle(
                                   fontSize: IbConfig.kNormalTextSize,
                                   fontWeight: FontWeight.bold),
@@ -126,10 +126,10 @@ class AlertTab extends StatelessWidget {
                           'sent_you_a_friend_request'.tr,
                           style: const TextStyle(color: IbColors.lightGrey),
                         ),
-                        if (item.notification.subtitle.isNotEmpty)
+                        if (item.notification.body.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(top: 8),
-                            child: Text(item.notification.subtitle),
+                            child: Text(item.notification.body),
                           ),
                       ],
                     ),
@@ -197,9 +197,14 @@ class AlertTab extends StatelessWidget {
               item.notification.isRead ? Theme.of(context).primaryColor : null,
           child: InkWell(
             onTap: () async {
-              item.notification.isRead = true;
-              await IbUserDbService().sendAlertNotification(item.notification);
-              _controller.items.refresh();
+              if (!item.notification.isRead) {
+                item.notification.isRead = true;
+                await IbUserDbService()
+                    .sendAlertNotification(item.notification);
+              }
+              if (item.ibChat == null) {
+                return;
+              }
               Get.to(
                   () => CircleInfo(Get.put(
                       CircleInfoController(item.ibChat!.obs),
@@ -214,12 +219,11 @@ class AlertTab extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      if (item.notification.avatarUrl != null &&
-                          item.notification.avatarUrl!.isNotEmpty)
+                      if (item.avatarUrl.isNotEmpty)
                         Expanded(
                           child: IbUserAvatar(
                             radius: 21,
-                            avatarUrl: item.notification.avatarUrl ?? '',
+                            avatarUrl: item.avatarUrl,
                             uid: item.notification.senderId,
                           ),
                         ),
@@ -227,14 +231,20 @@ class AlertTab extends StatelessWidget {
                         flex: 5,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            item.notification.title,
+                          child: Text.rich(
+                            TextSpan(text: 'Group invite from ', children: [
+                              TextSpan(
+                                  text: item.senderUser.username,
+                                  style: TextStyle(
+                                      fontSize: IbConfig.kNormalTextSize,
+                                      fontWeight: item.notification.isRead
+                                          ? FontWeight.normal
+                                          : FontWeight.bold))
+                            ]),
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                fontSize: IbConfig.kNormalTextSize,
-                                fontWeight: item.notification.isRead
-                                    ? FontWeight.normal
-                                    : FontWeight.bold),
+                            style: const TextStyle(
+                              fontSize: IbConfig.kNormalTextSize,
+                            ),
                           ),
                         ),
                       ),
@@ -335,6 +345,6 @@ class AlertTab extends StatelessWidget {
         ),
       );
     }
-    return const SizedBox();
+    return const FlutterLogo();
   }
 }
