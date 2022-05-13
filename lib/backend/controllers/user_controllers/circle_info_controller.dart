@@ -5,8 +5,8 @@ import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controlle
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
-import 'package:icebr8k/backend/models/ib_chat_models/ib_circle_join_request.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
+import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
@@ -19,6 +19,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 class CircleInfoController extends GetxController {
   final Rx<IbChat> rxIbChat;
   final hasInvite = false.obs;
+  final requested = false.obs;
   final memberScoreMap = <IbUser, double>{}.obs;
   final isLoading = true.obs;
   final TextEditingController editingController = TextEditingController();
@@ -33,9 +34,11 @@ class CircleInfoController extends GetxController {
       return;
     }
     rxIbChat.value = ibChat;
-    await initMemberMap();
+    await initMemberScoreMap();
     hasInvite.value = await IbUserDbService().isCircleInviteSent(
         chatId: ibChat.chatId, recipientId: IbUtils.getCurrentUid() ?? '');
+    requested.value =
+        await IbUserDbService().isCircleRequestSent(chatId: ibChat.chatId);
     isLoading.value = false;
   }
 
@@ -45,7 +48,7 @@ class CircleInfoController extends GetxController {
     editingController.dispose();
   }
 
-  Future<void> initMemberMap() async {
+  Future<void> initMemberScoreMap() async {
     final first16Uids = rxIbChat.value.memberUids.take(16);
     for (final String uid in first16Uids) {
       final IbUser? user;
@@ -107,20 +110,33 @@ class CircleInfoController extends GetxController {
         return;
       }
 
-      final request = IbCircleJoinRequest(
-          id: IbUtils.getUniqueId(),
-          timestamp: Timestamp.now(),
-          text: editingController.text.trim(),
-          uid: IbUtils.getCurrentUid()!,
-          title:
-              '${IbUtils.getCurrentIbUser()?.username} requests to join the circle',
-          avatarUrl: IbUtils.getCurrentIbUser()!.avatarUrl);
-      await IbChatDbService()
-          .updateCircleRequest(chat: rxIbChat.value, request: request);
+      if (requested.isTrue) {
+        IbUtils.showSimpleSnackBar(
+            msg: 'Request Sent', backgroundColor: IbColors.accentColor);
+        return;
+      }
+
+      final list =
+          await IbChatDbService().queryChatMembers(rxIbChat.value.chatId);
+
+      for (final member in list) {
+        if (member.role == IbChatMember.kRoleLeader ||
+            member.role == IbChatMember.kRoleAssistant) {
+          final IbNotification n = IbNotification(
+              id: IbUtils.getUniqueId(),
+              body: '',
+              timestamp: FieldValue.serverTimestamp(),
+              url: rxIbChat.value.chatId,
+              type: IbNotification.kCircleRequest,
+              senderId: IbUtils.getCurrentIbUser()!.id,
+              recipientId: member.uid);
+          await IbUserDbService().sendAlertNotification(n);
+        }
+      }
+
       IbUtils.showSimpleSnackBar(
           msg: 'Request Sent', backgroundColor: IbColors.accentColor);
     } catch (e) {
-      print(e);
       Get.dialog(IbDialog(
         title: "Error",
         subtitle: e.toString(),

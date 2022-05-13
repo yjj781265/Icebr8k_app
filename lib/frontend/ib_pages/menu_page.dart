@@ -191,29 +191,6 @@ class _MenuPageState extends State<MenuPage> {
                       ),
                       ListTile(
                         leading: const Icon(
-                          Icons.description_outlined,
-                          color: IbColors.primaryColor,
-                        ),
-                        title: const Text(
-                          "About",
-                          style: TextStyle(
-                              fontSize: IbConfig.kNormalTextSize,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        onTap: () {
-                          showAboutDialog(
-                              context: context,
-                              applicationName: 'Icebr8k',
-                              applicationVersion: IbConfig.kVersion,
-                              applicationIcon: SizedBox(
-                                  height: 80,
-                                  width: 80,
-                                  child: Image.asset(
-                                      'assets/icons/logo_ios.png')));
-                        },
-                      ),
-                      ListTile(
-                        leading: const Icon(
                           Icons.settings,
                           color: IbColors.lightGrey,
                         ),
@@ -224,22 +201,7 @@ class _MenuPageState extends State<MenuPage> {
                               fontWeight: FontWeight.bold),
                         ),
                         onTap: () {
-                          Get.to(()=> SettingsMainPage());
-                        },
-                      ),
-                      ListTile(
-                        leading: const Icon(
-                          Icons.description,
-                          color: IbColors.accentColor,
-                        ),
-                        title: const Text(
-                          "Privacy Policy",
-                          style: TextStyle(
-                              fontSize: IbConfig.kNormalTextSize,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        onTap: () {
-                          Get.to(() => PrivacyPolicyPage());
+                          Get.to(() => SettingsMainPage());
                         },
                       ),
                       ListTile(

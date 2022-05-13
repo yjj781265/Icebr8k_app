@@ -114,12 +114,11 @@ class SocialTabController extends GetxController {
     _ibUserSub = IbUserDbService()
         .listenToIbUserChanges(IbUtils.getCurrentFbUser()!.uid)
         .listen((event) async {
-      if (lastFriendUids == event.friendUids) {
+      if (_listEquals(list1: lastFriendUids, list2: event.friendUids)) {
         return;
       }
       lastFriendUids = event.friendUids;
       friends.clear();
-      print('friends: ${event.friendUids.length}');
       for (final String id in event.friendUids) {
         IbUser? user;
         if (IbCacheManager().getIbUser(id) == null) {
@@ -173,6 +172,20 @@ class SocialTabController extends GetxController {
       isLoadingChat.value = false;
       isFriendListLoading.value = false;
     });
+  }
+
+  bool _listEquals({required List<String> list1, required List<String> list2}) {
+    list1.sort();
+    list2.sort();
+    if (list1.length != list2.length) {
+      return false;
+    }
+    for (int i = 0; i < list1.length; i++) {
+      if (list1[i] != list2[i]) {
+        return false;
+      }
+    }
+    return true;
   }
 
   Future<ChatTabItem> _buildItem(IbChat ibChat) async {

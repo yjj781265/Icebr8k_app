@@ -130,6 +130,12 @@ class CircleSettingsController extends GetxController {
               senderId: IbUtils.getCurrentUid()!,
               recipientId: user.id,
               url: ibChat2.chatId);
+          final bool isSent = await IbUserDbService()
+              .isCircleInviteSent(chatId: ibChat2.chatId, recipientId: user.id);
+          if (isSent) {
+            print('invite already sent');
+            continue;
+          }
           await IbUserDbService().sendAlertNotification(n);
         }
         Get.back(closeOverlays: true);

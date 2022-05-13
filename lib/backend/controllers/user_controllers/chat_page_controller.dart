@@ -7,7 +7,6 @@ import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controll
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
-import 'package:icebr8k/backend/models/ib_chat_models/ib_circle_join_request.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -65,7 +64,6 @@ class ChatPageController extends GetxController {
       ItemPositionsListener.create();
   final ibChatMembers = <IbChatMemberModel>[].obs;
   final isTypingUsers = <IbUser>[].obs;
-  final joinCircleRequests = <IbCircleJoinRequest>[].obs;
   final isTyping = false.obs;
   final text = ''.obs;
 
@@ -561,7 +559,6 @@ class ChatPageController extends GetxController {
       isMuted.value = ibChat!.mutedUids.contains(IbUtils.getCurrentUid());
       isCircle.value = ibChat!.isCircle;
       isPublicCircle.value = ibChat!.isPublicCircle;
-      joinCircleRequests.value = ibChat!.joinRequests;
     }
   }
 
@@ -877,6 +874,12 @@ class ChatPageController extends GetxController {
             recipientId: user.id,
             url: ibChat!.chatId,
             body: '');
+        final bool isSent = await IbUserDbService()
+            .isCircleInviteSent(chatId: ibChat!.chatId, recipientId: user.id);
+        if (isSent) {
+          print('invite already sent');
+          continue;
+        }
         await IbUserDbService().sendAlertNotification(n);
       }
       Get.back();

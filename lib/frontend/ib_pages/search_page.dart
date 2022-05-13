@@ -248,7 +248,8 @@ class SearchPage extends StatelessWidget {
                                         fontWeight: FontWeight.bold,
                                         fontSize: IbConfig.kNormalTextSize),
                                   ),
-                                  Text('${element.memberCount} member(s)'),
+                                  Text(
+                                      '${element.memberUids.length} member(s)'),
                                   const SizedBox(
                                     height: 8,
                                   ),

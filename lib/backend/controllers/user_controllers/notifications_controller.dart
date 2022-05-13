@@ -9,6 +9,11 @@ import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
+
+import '../../../frontend/ib_widgets/ib_dialog.dart';
+import '../../models/ib_chat_models/ib_chat_member.dart';
+import '../../models/ib_chat_models/ib_message.dart';
 
 class NotificationController extends GetxController {
   late StreamSubscription ibNotificationsStream;
@@ -69,7 +74,8 @@ class NotificationController extends GetxController {
 
     final item =
         NotificationItem(notification: notification, senderUser: senderUser);
-    if (notification.type == IbNotification.kCircleInvite) {
+    if (notification.type == IbNotification.kCircleInvite ||
+        notification.type == IbNotification.kCircleRequest) {
       final IbChat? chat = await IbChatDbService().queryChat(notification.url);
       item.ibChat = chat;
       item.avatarUrl = senderUser.avatarUrl;
@@ -114,7 +120,7 @@ class NotificationController extends GetxController {
     }
   }
 
-  Future<void> declineFr(IbNotification ibNotification) async {
+  Future<void> removeNotification(IbNotification ibNotification) async {
     try {
       await IbUserDbService().removeNotification(ibNotification);
       IbUtils.showSimpleSnackBar(
@@ -124,6 +130,52 @@ class NotificationController extends GetxController {
       IbUtils.showSimpleSnackBar(
           msg: 'Failed to decline request $e',
           backgroundColor: IbColors.accentColor);
+    }
+  }
+
+  Future<void> joinCircle(NotificationItem item) async {
+    try {
+      if (item.ibChat == null) {
+        return;
+      }
+      Get.dialog(
+          const IbLoadingDialog(messageTrKey: 'Adding new member to a circle'));
+      final chat = await IbChatDbService().queryChat(item.ibChat!.chatId);
+      final user = item.senderUser;
+      if (chat != null &&
+          chat.memberUids.contains(
+            user.id,
+          )) {
+        Get.back();
+        IbUtils.showSimpleSnackBar(
+            msg: 'New circle member added',
+            backgroundColor: IbColors.accentColor);
+      } else {
+        await IbChatDbService().addChatMember(
+            member: IbChatMember(
+                chatId: chat!.chatId,
+                uid: user.id,
+                role: IbChatMember.kRoleMember));
+        await IbChatDbService().uploadMessage(IbMessage(
+            messageId: IbUtils.getUniqueId(),
+            content: '${user.username} joined the circle',
+            senderUid: user.id,
+            readUids: [user.id],
+            messageType: IbMessage.kMessageTypeAnnouncement,
+            chatRoomId: chat.chatId));
+        await IbUserDbService().removeNotification(item.notification);
+        Get.back();
+        IbUtils.showSimpleSnackBar(
+            msg: 'New circle member added',
+            backgroundColor: IbColors.accentColor);
+      }
+    } catch (e) {
+      Get.back();
+      Get.dialog(IbDialog(
+        title: "Error",
+        subtitle: e.toString(),
+        showNegativeBtn: false,
+      ));
     }
   }
 }

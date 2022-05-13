@@ -145,7 +145,7 @@ class AlertTab extends StatelessWidget {
                       child: IbElevatedButton(
                     textTrKey: 'decline',
                     onPressed: () async {
-                      await _controller.declineFr(item.notification);
+                      await _controller.removeNotification(item.notification);
                     },
                     color: IbColors.errorRed,
                   )),
@@ -232,7 +232,7 @@ class AlertTab extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text.rich(
-                            TextSpan(text: 'Group invite from ', children: [
+                            TextSpan(text: 'Circle invite from ', children: [
                               TextSpan(
                                   text: item.senderUser.username,
                                   style: TextStyle(
@@ -345,6 +345,190 @@ class AlertTab extends StatelessWidget {
         ),
       );
     }
-    return const FlutterLogo();
+
+    if (item.notification.type == IbNotification.kCircleRequest &&
+        item.ibChat != null) {
+      return Dismissible(
+        direction: DismissDirection.endToStart,
+        key: ValueKey(item.notification.id),
+        onDismissed: (direction) async {
+          await IbUserDbService().removeNotification(item.notification);
+        },
+        background: Container(
+          color: IbColors.errorRed,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: const [
+                Icon(
+                  Icons.delete,
+                  color: Colors.white,
+                ),
+                Text(
+                  'DELETE',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ),
+        child: IbCard(
+          radius: 0,
+          margin: EdgeInsets.zero,
+          color:
+              item.notification.isRead ? Theme.of(context).primaryColor : null,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    if (item.avatarUrl.isNotEmpty)
+                      Expanded(
+                        child: IbUserAvatar(
+                          radius: 21,
+                          avatarUrl: item.avatarUrl,
+                          uid: item.notification.senderId,
+                        ),
+                      ),
+                    Expanded(
+                      flex: 5,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text.rich(
+                          TextSpan(
+                              text: 'Request to join a circle from ',
+                              children: [
+                                TextSpan(
+                                    text: item.senderUser.username,
+                                    style: TextStyle(
+                                        fontSize: IbConfig.kNormalTextSize,
+                                        fontWeight: item.notification.isRead
+                                            ? FontWeight.normal
+                                            : FontWeight.bold))
+                              ]),
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: IbConfig.kNormalTextSize,
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (item.notification.timestamp != null)
+                      Expanded(
+                        flex: 2,
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            IbUtils.getAgoDateTimeString(
+                                DateTime.fromMillisecondsSinceEpoch(
+                                    (item.notification.timestamp as Timestamp)
+                                        .millisecondsSinceEpoch)),
+                            style: const TextStyle(
+                                fontSize: IbConfig.kDescriptionTextSize,
+                                color: IbColors.lightGrey),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 40.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (item.ibChat!.photoUrl.isEmpty)
+                            CircleAvatar(
+                              backgroundColor: IbColors.lightGrey,
+                              radius: 16,
+                              child: Text(
+                                item.ibChat!.name[0],
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Theme.of(context).indicatorColor,
+                                    fontSize: IbConfig.kSecondaryTextSize,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            )
+                          else
+                            IbUserAvatar(
+                              avatarUrl: item.ibChat!.photoUrl,
+                              radius: 16,
+                            ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Expanded(
+                            flex: 8,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(item.ibChat!.name,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        color: Theme.of(context).indicatorColor,
+                                        fontSize: IbConfig.kSecondaryTextSize,
+                                        fontWeight: item.notification.isRead
+                                            ? FontWeight.normal
+                                            : FontWeight.bold)),
+                                Text('${item.ibChat!.memberCount} member(s)',
+                                    style: const TextStyle(
+                                        color: IbColors.lightGrey,
+                                        fontSize: IbConfig.kDescriptionTextSize,
+                                        fontWeight: FontWeight.normal))
+                              ],
+                            ),
+                          ),
+                          const Expanded(
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Icon(Icons.arrow_forward_ios_rounded),
+                            ),
+                          )
+                        ],
+                      ),
+                      if (item.ibChat!.description.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text(
+                            item.ibChat!.description,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 3,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                        child: IbElevatedButton(
+                      textTrKey: 'decline',
+                      onPressed: () async {
+                        await _controller.removeNotification(item.notification);
+                      },
+                      color: IbColors.errorRed,
+                    )),
+                    Expanded(
+                      child: IbElevatedButton(
+                          textTrKey: 'accept',
+                          onPressed: () async {
+                            await _controller.joinCircle(item);
+                          }),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    return const SizedBox();
   }
 }

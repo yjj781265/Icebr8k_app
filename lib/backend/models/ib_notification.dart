@@ -18,7 +18,7 @@ class IbNotification {
   static const String kFriendRequest = 'friend_request';
 
   /// will go open the app if it is in background
-  static const String kNormal = 'normal';
+  static const String kChat = 'chat';
   static const String kCircleInvite = 'circle_invite';
   static const String kCircleRequest = 'circle_request';
   static const String kChatMessage = 'chat_message';
@@ -33,7 +33,7 @@ class IbNotification {
       this.url = '',
       this.isRead = false,
       required this.type,
-      this.timestamp,
+      required this.timestamp,
       required this.senderId,
       required this.recipientId});
 

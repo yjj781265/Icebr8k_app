@@ -182,6 +182,7 @@ class CircleInfo extends StatelessWidget {
       onPositiveTap: () async {
         Get.back();
         await _controller.sendJoinCircleRequest();
+        _controller.requested.value = true;
       },
     ));
   }

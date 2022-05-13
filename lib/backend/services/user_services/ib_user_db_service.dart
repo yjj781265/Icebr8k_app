@@ -91,7 +91,6 @@ class IbUserDbService {
 
   /// send an alert message in the app, will appear under Alert tab
   Future<void> sendAlertNotification(IbNotification n) async {
-    n.timestamp = FieldValue.serverTimestamp();
     //my sub collection
     await _collectionRef
         .doc(n.recipientId)
@@ -120,7 +119,17 @@ class IbUserDbService {
         .doc(recipientId)
         .collection(_kNotificationSubCollection)
         .where('type', isEqualTo: IbNotification.kCircleInvite)
-        .where('id', isEqualTo: chatId)
+        .where('url', isEqualTo: chatId)
+        .get();
+    return snapshot.size > 0;
+  }
+
+  Future<bool> isCircleRequestSent({required String chatId}) async {
+    final snapshot = await _db
+        .collectionGroup(_kNotificationSubCollection)
+        .where('type', isEqualTo: IbNotification.kCircleRequest)
+        .where('senderId', isEqualTo: IbUtils.getCurrentUid())
+        .where('url', isEqualTo: chatId)
         .get();
     return snapshot.size > 0;
   }

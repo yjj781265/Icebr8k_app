@@ -10,14 +10,17 @@ class IbSettings {
   bool pollVoteN;
   bool circleInviteN;
   bool circleRequestN;
+  bool friendRequestN;
 
-  IbSettings(
-      {this.pollCommentN = true,
-      this.pollLikesN = true,
-      this.pollCommentLikesN = true,
-      this.pollVoteN = true,
-      this.circleRequestN = true,
-      this.circleInviteN = true});
+  IbSettings({
+    this.pollCommentN = true,
+    this.pollLikesN = true,
+    this.pollCommentLikesN = true,
+    this.pollVoteN = true,
+    this.friendRequestN = true,
+    this.circleRequestN = true,
+    this.circleInviteN = true,
+  });
 
   factory IbSettings.fromJson(Map<String, dynamic> json) =>
       _$IbSettingsFromJson(json);

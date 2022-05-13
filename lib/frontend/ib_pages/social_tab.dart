@@ -506,10 +506,10 @@ class _SocialTabState extends State<SocialTab>
         child: ListView.builder(
           controller: _controller.scrollController,
           itemBuilder: (context, index) {
-            final item = _controller.friends[index];
+            final item = _controller.friends.toSet().toList()[index];
             return FriendListItem(item);
           },
-          itemCount: _controller.friends.length,
+          itemCount: _controller.friends.toSet().length,
         ),
       );
     });

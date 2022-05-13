@@ -19,6 +19,16 @@ class SettingsNotificationPage extends StatelessWidget {
         () => ListView(
           children: [
             SwitchListTile.adaptive(
+              value: _controller.rxCurrentIbUser.value.settings!.friendRequestN,
+              onChanged: (value) async {
+                _controller.rxCurrentIbUser.value.settings!.friendRequestN =
+                    value;
+                await IbUserDbService()
+                    .updateIbUser(_controller.rxCurrentIbUser.value);
+              },
+              title: const Text('New Friend Requests'),
+            ),
+            SwitchListTile.adaptive(
               value: _controller.rxCurrentIbUser.value.settings!.pollCommentN,
               onChanged: (value) async {
                 _controller.rxCurrentIbUser.value.settings!.pollCommentN =

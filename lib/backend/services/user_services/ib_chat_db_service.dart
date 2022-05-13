@@ -121,6 +121,7 @@ class IbChatDbService {
         .get();
   }
 
+  /// will update ibMessage with serverTimestamp
   Future<void> uploadMessage(IbMessage ibMessage) async {
     ibMessage.timestamp = FieldValue.serverTimestamp();
     final snapshot = await _collectionRef.doc(ibMessage.chatRoomId).get();
@@ -163,6 +164,18 @@ class IbChatDbService {
         .collection(_kMemberSubCollection)
         .doc(member.uid)
         .delete();
+  }
+
+  Future<List<IbChatMember>> queryChatMembers(String chatId) async {
+    final snapshot = await _collectionRef
+        .doc(chatId)
+        .collection(_kMemberSubCollection)
+        .get();
+    if (snapshot.size == 0) {
+      return [];
+    }
+
+    return snapshot.docs.map((e) => IbChatMember.fromJson(e.data())).toList();
   }
 
   Future<void> addIbChat(IbChat ibChat, {bool isEdit = false}) async {

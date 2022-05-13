@@ -87,12 +87,12 @@ class SearchPageController extends GetxController {
       questions.sort((a, b) => b.points.compareTo(a.points));
 
       /// search circles
+
       final chats =
           await IbTypeSenseService().searchIbCircles(searchText.value.trim());
       circles.clear();
       circles.value = chats;
 
-      /// search Questions tags
       final results =
           await IbTypeSenseService().searchIbTags(searchText.value.trim());
       tags.clear();
