@@ -1,7 +1,6 @@
 import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
@@ -14,7 +13,6 @@ import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:move_to_background/move_to_background.dart';
 
 import '../../backend/controllers/user_controllers/social_tab_controller.dart';
-import '../../backend/services/user_services/ib_local_data_service.dart';
 import '../ib_colors.dart';
 import 'create_question_pages/create_question_page.dart';
 import 'home_tab.dart';
@@ -55,7 +53,7 @@ class _MainPageViewState extends State<MainPageView>
 
   @override
   Widget build(BuildContext context) {
-   IbUtils.changeStatusBarColor();
+    IbUtils.changeStatusBarColor();
     return WillPopScope(
       onWillPop: () async {
         if (Platform.isAndroid) {
@@ -135,11 +133,13 @@ class _MainPageViewState extends State<MainPageView>
           ),
           BottomNavyBarItem(
             icon: const Icon(Icons.notifications),
-            notification: Get.find<NotificationController>()
-                .items
-                .where((p0) => p0.notification.isRead == false)
-                .toList()
-                .length,
+            notification: Get.find<NotificationController>().isLoading.isTrue
+                ? -1
+                : Get.find<NotificationController>()
+                    .items
+                    .where((p0) => p0.notification.isRead == false)
+                    .toList()
+                    .length,
             title: 'alert'.tr,
             inactiveColor: _inactiveColor,
             textAlign: TextAlign.center,

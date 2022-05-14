@@ -7,7 +7,6 @@ import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -25,7 +24,6 @@ class CommentController extends GetxController {
   final commentItems = <CommentItem>[].obs;
   final TextEditingController editingController = TextEditingController();
   final RefreshController refreshController = RefreshController();
-  late StreamSubscription commentSub;
   DocumentSnapshot<Map<String, dynamic>>? lastSnap;
 
   CommentController({
@@ -35,22 +33,68 @@ class CommentController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
-    await loadList();
+    await loadComments();
   }
 
   @override
   void onClose() {
+    editingController.dispose();
+    refreshController.dispose();
     super.onClose();
-    commentSub.cancel();
   }
 
-  Future<void> loadList() async {
-    isLoading.value = true;
-    if (isLoading.isTrue) {
-      /// add top three comments on top
+  Future<void> loadComments() async {
+    /// add top three comments on top
+    final snapshot = await IbQuestionDbService()
+        .queryTopThreeComments(itemController.rxIbQuestion.value.id);
+    final List<CommentItem> temp = [];
+    for (final doc in snapshot.docs) {
+      final IbComment comment = IbComment.fromJson(doc.data());
+      if (commentItems.indexWhere(
+              (element) => element.ibComment.commentId == comment.commentId) ==
+          -1) {
+        final user = await retrieveUser(comment);
+        if (user != null) {
+          final ibAnswer = await retrieveIbAnswer(comment);
+          final isLiked = await IbQuestionDbService().isCommentLiked(comment);
+          temp.add(CommentItem(
+              ibComment: comment,
+              user: user,
+              ibAnswer: ibAnswer,
+              isLiked: isLiked));
+        }
+      }
+    }
+    commentItems.insertAll(0, temp);
+
+    /// add all my comments first on top
+    final myCommentSnap = await IbQuestionDbService()
+        .queryAllMyComments(itemController.rxIbQuestion.value.id);
+    final List<CommentItem> myComments = [];
+    for (final doc in myCommentSnap.docs) {
+      final IbComment comment = IbComment.fromJson(doc.data());
+      if (commentItems.indexWhere(
+              (element) => element.ibComment.commentId == comment.commentId) ==
+          -1) {
+        final user = await retrieveUser(comment);
+        if (user != null) {
+          final ibAnswer = await retrieveIbAnswer(comment);
+          final isLiked = await IbQuestionDbService().isCommentLiked(comment);
+          myComments.add(CommentItem(
+              ibComment: comment,
+              user: user,
+              ibAnswer: ibAnswer,
+              isLiked: isLiked));
+        }
+      }
+    }
+    myComments.sort((a, b) => (b.ibComment.timestamp as Timestamp)
+        .compareTo(a.ibComment.timestamp as Timestamp));
+    commentItems.insertAll(0, myComments);
+
+    try {
       final snapshot = await IbQuestionDbService()
-          .queryTopThreeComments(itemController.rxIbQuestion.value.id);
-      final List<CommentItem> temp = [];
+          .queryNewestComments(itemController.rxIbQuestion.value.id);
       for (final doc in snapshot.docs) {
         final IbComment comment = IbComment.fromJson(doc.data());
         if (commentItems.indexWhere((element) =>
@@ -60,119 +104,21 @@ class CommentController extends GetxController {
           if (user != null) {
             final ibAnswer = await retrieveIbAnswer(comment);
             final isLiked = await IbQuestionDbService().isCommentLiked(comment);
-            temp.add(CommentItem(
+            commentItems.add(CommentItem(
                 ibComment: comment,
                 user: user,
                 ibAnswer: ibAnswer,
                 isLiked: isLiked));
           }
         }
+        lastSnap = doc;
       }
-      commentItems.insertAll(0, temp);
-
-      /// add all my comments first on top
-      final myCommentSnap = await IbQuestionDbService()
-          .queryAllMyComments(itemController.rxIbQuestion.value.id);
-      final List<CommentItem> myComments = [];
-      for (final doc in myCommentSnap.docs) {
-        final IbComment comment = IbComment.fromJson(doc.data());
-        if (commentItems.indexWhere((element) =>
-                element.ibComment.commentId == comment.commentId) ==
-            -1) {
-          final user = await retrieveUser(comment);
-          if (user != null) {
-            final ibAnswer = await retrieveIbAnswer(comment);
-            final isLiked = await IbQuestionDbService().isCommentLiked(comment);
-            myComments.add(CommentItem(
-                ibComment: comment,
-                user: user,
-                ibAnswer: ibAnswer,
-                isLiked: isLiked));
-          }
-        }
-      }
-      myComments.sort((a, b) => (b.ibComment.timestamp as Timestamp)
-          .compareTo(a.ibComment.timestamp as Timestamp));
-      commentItems.insertAll(0, myComments);
-    }
-
-    commentSub = IbQuestionDbService()
-        .listenToComments(itemController.rxIbQuestion.value.id)
-        .listen((event) async {
-      for (final docChange in event.docChanges) {
-        print(docChange.type);
-        final IbComment comment = IbComment.fromJson(docChange.doc.data()!);
-        if (docChange.type == DocumentChangeType.added) {
-          /// insert to index 0 for new comment added after init load
-          if (commentItems.indexWhere((element) =>
-                      element.ibComment.commentId == comment.commentId) ==
-                  -1 &&
-              isLoading.isFalse) {
-            final user = await retrieveUser(comment);
-            if (user != null) {
-              final ibAnswer = await retrieveIbAnswer(comment);
-              final isLiked =
-                  await IbQuestionDbService().isCommentLiked(comment);
-              commentItems.insert(
-                  0,
-                  CommentItem(
-                      ibComment: comment,
-                      user: user,
-                      ibAnswer: ibAnswer,
-                      isLiked: isLiked));
-              final int newCount =
-                  itemController.rxIbQuestion.value.comments + 1;
-              await _updateParentQuestionCommentCount(newCount);
-            }
-            return;
-          }
-
-          if (commentItems.indexWhere((element) =>
-                  element.ibComment.commentId == comment.commentId) ==
-              -1) {
-            final user = await retrieveUser(comment);
-            if (user != null) {
-              final ibAnswer = await retrieveIbAnswer(comment);
-              final isLiked =
-                  await IbQuestionDbService().isCommentLiked(comment);
-              commentItems.add(CommentItem(
-                  ibComment: comment,
-                  user: user,
-                  ibAnswer: ibAnswer,
-                  isLiked: isLiked));
-            }
-          }
-        }
-
-        if (docChange.type == DocumentChangeType.modified) {
-          print('modified');
-          await Future.delayed(
-              const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
-              () {
-            final index = commentItems.indexWhere(
-                (element) => element.ibComment.commentId == comment.commentId);
-            if (index != -1) {
-              commentItems[index].ibComment = comment;
-            }
-          });
-        }
-
-        if (docChange.type == DocumentChangeType.removed) {
-          final index = commentItems.indexWhere(
-              (element) => element.ibComment.commentId == comment.commentId);
-          if (index != -1) {
-            commentItems.removeAt(index);
-          }
-        }
-      }
-
-      commentItems.refresh();
-
-      if (isLoading.isTrue && event.docs.isNotEmpty) {
-        lastSnap = event.docs.last;
-      }
+    } catch (e) {
+      print(e);
+    } finally {
       isLoading.value = false;
-    });
+      commentItems.refresh();
+    }
   }
 
   Future<void> loadMore() async {
@@ -202,13 +148,14 @@ class CommentController extends GetxController {
           }
         }
         lastSnap = doc;
-        refreshController.loadComplete();
       }
 
       if (snapshot.docs.isEmpty) {
         refreshController.loadNoData();
         lastSnap = null;
+        return;
       }
+      refreshController.loadComplete();
     } catch (e) {
       refreshController.loadFailed();
     }
@@ -262,9 +209,17 @@ class CommentController extends GetxController {
         questionId: itemController.rxIbQuestion.value.id,
         content: text.trim(),
         type: type,
-        timestamp: FieldValue.serverTimestamp());
+        timestamp: Timestamp.now());
     try {
       await IbQuestionDbService().addComment(ibComment);
+      final ibAnswer = await retrieveIbAnswer(ibComment);
+      commentItems.insert(
+          0,
+          CommentItem(
+              ibComment: ibComment,
+              user: IbUtils.getCurrentIbUser()!,
+              ibAnswer: ibAnswer));
+      _updateParentQuestionCommentCount();
       editingController.clear();
       IbUtils.showSimpleSnackBar(
           msg: 'Comment added!', backgroundColor: IbColors.accentColor);
@@ -275,15 +230,13 @@ class CommentController extends GetxController {
     } finally {
       IbUtils.hideKeyboard();
       isAddingComment.value = false;
+      commentItems.refresh();
     }
   }
 
-  Future<void> _updateParentQuestionCommentCount(int count) async {
-    print('_updateParentQuestionCommentCount $count');
-    await itemController.refreshStats();
-
+  Future<void> _updateParentQuestionCommentCount() async {
     ///update item controller comments if available
-    itemController.rxIbQuestion.value.comments = count;
+    itemController.rxIbQuestion.value.comments++;
     itemController.rxIbQuestion.refresh();
   }
 
@@ -322,13 +275,6 @@ class CommentController extends GetxController {
     } finally {
       commentItems.refresh();
     }
-  }
-
-  @override
-  void dispose() {
-    editingController.dispose();
-    refreshController.dispose();
-    super.dispose();
   }
 }
 

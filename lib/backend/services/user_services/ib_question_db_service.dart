@@ -148,14 +148,14 @@ class IbQuestionDbService {
           .doc(questionId)
           .collection(_kCommentCollectionGroup)
           .orderBy('timestamp', descending: true)
-          .limit(8);
+          .limit(IbConfig.kPerPage);
     } else {
       query = _collectionRef
           .doc(questionId)
           .collection(_kCommentCollectionGroup)
           .orderBy('timestamp', descending: true)
           .startAfterDocument(lastDoc)
-          .limit(8);
+          .limit(IbConfig.kPerPage);
     }
 
     return query.snapshots();
@@ -516,7 +516,7 @@ class IbQuestionDbService {
           .collection(_kCommentCollectionGroup)
           .orderBy('timestamp', descending: true)
           .startAfterDocument(lastSnap)
-          .limit(8)
+          .limit(IbConfig.kPerPage)
           .get();
       return snapshot;
     }
@@ -525,7 +525,7 @@ class IbQuestionDbService {
         .doc(questionId)
         .collection(_kCommentCollectionGroup)
         .orderBy('timestamp', descending: true)
-        .limit(8)
+        .limit(IbConfig.kPerPage)
         .get();
     return snapshot;
   }

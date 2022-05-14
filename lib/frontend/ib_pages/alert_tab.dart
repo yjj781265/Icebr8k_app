@@ -22,82 +22,90 @@ class AlertTab extends StatelessWidget {
   final NotificationController _controller = Get.find();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text('Alert'),
-        ),
-      ),
-      body: SafeArea(
-        child: Obx(() {
-          if (_controller.isLoading.value) {
-            return const Center(
-              child: IbProgressIndicator(),
-            );
-          }
-          if (_controller.items.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                      width: 200,
-                      height: 200,
-                      child: Lottie.asset('assets/images/monkey_zen.json')),
-                  const Text(
-                    'No notifications at this time',
-                    style: TextStyle(
-                      color: IbColors.lightGrey,
-                      fontSize: IbConfig.kNormalTextSize,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return ListView.separated(
-            itemBuilder: (context, index) {
-              final NotificationItem item = _controller.items[index];
-              return Dismissible(
-                  direction: DismissDirection.endToStart,
-                  key: ValueKey(item.notification.id),
-                  onDismissed: (direction) async {
-                    await IbUserDbService()
-                        .removeNotification(item.notification);
-                  },
-                  background: Container(
-                    color: IbColors.errorRed,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: const [
-                          Icon(
-                            Icons.delete,
-                            color: Colors.white,
-                          ),
-                          Text(
-                            'DELETE',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
+    return Obx(() => Scaffold(
+          appBar: AppBar(
+            title: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text('Alert'),
+            ),
+            actions: [
+              if (_controller.items.isNotEmpty)
+                TextButton(
+                    onPressed: () async {
+                      await _controller.clearAllNotifications();
+                    },
+                    child: const Text('Clear All'))
+            ],
+          ),
+          body: SafeArea(
+            child: Obx(() {
+              if (_controller.isLoading.value) {
+                return const Center(
+                  child: IbProgressIndicator(),
+                );
+              }
+              if (_controller.items.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: Lottie.asset('assets/images/monkey_zen.json')),
+                      const Text(
+                        'No notifications at this time',
+                        style: TextStyle(
+                          color: IbColors.lightGrey,
+                          fontSize: IbConfig.kNormalTextSize,
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                  child: _handleNotificationType(item, context));
-            },
-            itemCount: _controller.items.length,
-            separatorBuilder: (BuildContext context, int index) {
-              return const Divider(
-                height: 1,
+                );
+              }
+
+              return ListView.separated(
+                itemBuilder: (context, index) {
+                  final NotificationItem item = _controller.items[index];
+                  return Dismissible(
+                      direction: DismissDirection.endToStart,
+                      key: ValueKey(item.notification.id),
+                      onDismissed: (direction) async {
+                        await IbUserDbService()
+                            .removeNotification(item.notification);
+                      },
+                      background: Container(
+                        color: IbColors.errorRed,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: const [
+                              Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                'DELETE',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      child: _handleNotificationType(item, context));
+                },
+                itemCount: _controller.items.length,
+                separatorBuilder: (BuildContext context, int index) {
+                  return const Divider(
+                    height: 1,
+                  );
+                },
               );
-            },
-          );
-        }),
-      ),
-    );
+            }),
+          ),
+        ));
   }
 
   Widget _handleNotificationType(NotificationItem item, BuildContext context) {
@@ -174,7 +182,7 @@ class AlertTab extends StatelessWidget {
                       child: IbElevatedButton(
                     textTrKey: 'decline',
                     onPressed: () async {
-                      await _controller.removeNotification(item.notification);
+                      await _controller.declineFr(item.notification);
                     },
                     color: IbColors.errorRed,
                   )),
@@ -214,7 +222,7 @@ class AlertTab extends StatelessWidget {
                 fullscreenDialog: true);
           },
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -351,7 +359,7 @@ class AlertTab extends StatelessWidget {
         margin: EdgeInsets.zero,
         color: item.notification.isRead ? Theme.of(context).primaryColor : null,
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -474,7 +482,7 @@ class AlertTab extends StatelessWidget {
                       child: IbElevatedButton(
                     textTrKey: 'decline',
                     onPressed: () async {
-                      await _controller.removeNotification(item.notification);
+                      await _controller.declineFr(item.notification);
                     },
                     color: IbColors.errorRed,
                   )),
@@ -651,7 +659,7 @@ class AlertTab extends StatelessWidget {
           subtitle: Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Text(item.ibQuestion!.question),
+              Text(item.ibComment!.content),
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Text(
@@ -694,6 +702,7 @@ class AlertTab extends StatelessWidget {
                           rxIbQuestion: item.ibQuestion!.obs,
                           rxIsExpanded: true.obs),
                       tag: item.ibQuestion!.id),
+                  toCommentPage: true,
                 ));
           },
           leading: IbUserAvatar(
@@ -711,7 +720,7 @@ class AlertTab extends StatelessWidget {
           subtitle: Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Text(item.ibQuestion!.question),
+              Text(item.ibComment!.content),
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Text(

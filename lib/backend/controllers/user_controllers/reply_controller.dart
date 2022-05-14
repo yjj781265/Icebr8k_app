@@ -5,6 +5,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/comment_controller.
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
+import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -121,6 +122,14 @@ class ReplyController extends GetxController {
 
     try {
       await IbQuestionDbService().addReply(ibComment);
+      await IbUserDbService().sendAlertNotification(IbNotification(
+          id: IbUtils.getUniqueId(),
+          body: '',
+          type: IbNotification.kPollCommentReply,
+          timestamp: FieldValue.serverTimestamp(),
+          senderId: IbUtils.getCurrentUid()!,
+          recipientId: ibComment.notifyUid,
+          url: ibComment.parentId ?? ""));
       final user = await retrieveUser(ibComment);
       if (user == null) {
         return;

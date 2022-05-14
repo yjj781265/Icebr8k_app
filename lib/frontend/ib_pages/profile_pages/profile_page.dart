@@ -729,8 +729,8 @@ class ProfilePage extends StatelessWidget {
                               final NotificationController nController =
                                   Get.find();
                               Get.back();
-                              await nController.removeNotification(
-                                  _controller.frNotification!);
+                              await nController
+                                  .declineFr(_controller.frNotification!);
                               await _controller.onRefresh();
                             },
                             color: IbColors.errorRed,

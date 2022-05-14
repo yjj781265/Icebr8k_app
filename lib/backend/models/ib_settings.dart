@@ -11,6 +11,7 @@ class IbSettings {
   bool circleInviteN;
   bool circleRequestN;
   bool friendRequestN;
+  bool pollCommentReplyN;
 
   IbSettings({
     this.pollCommentN = true,
@@ -20,6 +21,7 @@ class IbSettings {
     this.friendRequestN = true,
     this.circleRequestN = true,
     this.circleInviteN = true,
+    this.pollCommentReplyN = true,
   });
 
   factory IbSettings.fromJson(Map<String, dynamic> json) =>
@@ -36,7 +38,9 @@ class IbSettings {
           pollCommentLikesN == other.pollCommentLikesN &&
           pollVoteN == other.pollVoteN &&
           circleInviteN == other.circleInviteN &&
-          circleRequestN == other.circleRequestN;
+          circleRequestN == other.circleRequestN &&
+          friendRequestN == other.friendRequestN &&
+          pollCommentReplyN == other.pollCommentReplyN;
 
   @override
   int get hashCode =>
@@ -45,5 +49,7 @@ class IbSettings {
       pollCommentLikesN.hashCode ^
       pollVoteN.hashCode ^
       circleInviteN.hashCode ^
-      circleRequestN.hashCode;
+      circleRequestN.hashCode ^
+      friendRequestN.hashCode ^
+      pollCommentReplyN.hashCode;
 }

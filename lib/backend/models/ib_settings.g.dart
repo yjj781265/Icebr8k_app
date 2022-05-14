@@ -14,6 +14,7 @@ IbSettings _$IbSettingsFromJson(Map<String, dynamic> json) => IbSettings(
       friendRequestN: json['friendRequestN'] as bool? ?? true,
       circleRequestN: json['circleRequestN'] as bool? ?? true,
       circleInviteN: json['circleInviteN'] as bool? ?? true,
+      pollCommentReplyN: json['pollCommentReplyN'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$IbSettingsToJson(IbSettings instance) =>
@@ -25,4 +26,5 @@ Map<String, dynamic> _$IbSettingsToJson(IbSettings instance) =>
       'circleInviteN': instance.circleInviteN,
       'circleRequestN': instance.circleRequestN,
       'friendRequestN': instance.friendRequestN,
+      'pollCommentReplyN': instance.pollCommentReplyN,
     };

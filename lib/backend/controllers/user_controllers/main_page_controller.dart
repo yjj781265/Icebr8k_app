@@ -1,8 +1,6 @@
 import 'dart:async';
 
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/managers/Ib_notification_manager.dart';
 import 'package:icebr8k/backend/managers/ib_api_keys_manager.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
@@ -27,39 +25,14 @@ class MainPageController extends GetxController {
       rxCurrentIbUser.value = event;
       rxCurrentIbUser.refresh();
     });
-  }
 
-  @override
-  Future<void> onReady() async {
-    super.onReady();
-    await IbNotificationManager().init();
     await IbApiKeysManager().init();
-    // todo add manager to handle this
-    await setupInteractedMessage();
   }
 
   @override
   Future<void> onClose() async {
     super.onClose();
     await ibUserSub.cancel();
-  }
-
-  // It is assumed that all messages contain a data field with the key 'type'
-  Future<void> setupInteractedMessage() async {
-    // Get any messages which caused the application to open from
-    // a terminated state.
-    final RemoteMessage? initialMessage =
-        await FirebaseMessaging.instance.getInitialMessage();
-
-    // If the message also contains a data property with a "type" of "chat",
-    // navigate to a chat screen
-    if (initialMessage != null) {
-      _handleMessage(initialMessage);
-    }
-
-    // Also handle any interaction when the app is in the background via a
-    // Stream listener
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
   }
 
   void showNavBar() {
@@ -74,20 +47,5 @@ class MainPageController extends GetxController {
       return;
     }
     isNavBarVisible.value = false;
-  }
-
-  void _handleMessage(RemoteMessage message) {
-    /*final data = message.data;
-    final type = data['type'];
-    if (IbCloudMessagingService.kNotificationTypeChat == type) {
-      final String? chatRoomId = data['chatRoomId'] as String?;
-      if (chatRoomId == null || chatRoomId.isEmpty) {
-        return;
-      }
-
-      IbChatDbService().queryMemberUids(chatRoomId).then((value) {
-        Get.to(() => ChatPage(Get.put(ChatPageController(value))));
-      });
-    }*/
   }
 }

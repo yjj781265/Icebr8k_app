@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -23,15 +22,14 @@ import 'frontend/ib_strings.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   /// prevent blinking for cached images
   PaintingBinding.instance!.imageCache?.maximumSizeBytes = 1000 << 20; //1GB
   IbUtils.changeStatusBarColor();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
-  debugRepaintRainbowEnabled = false;
   runApp(MainApp());
 }
 
@@ -39,13 +37,12 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
   await Firebase.initializeApp();
-  print("Handling a background message: ${message.data}");
+
+  print("Handling a background message: ${message.messageId}");
 }
 
 class MainApp extends StatelessWidget {
   final InitController _controller = Get.put(InitController());
-  final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-
   @override
   Widget build(BuildContext context) {
     return Obx(() {
@@ -60,9 +57,6 @@ class MainApp extends StatelessWidget {
       return RefreshConfiguration(
         headerBuilder: () => const ClassicHeader(),
         child: GetMaterialApp(
-          navigatorObservers: [
-            FirebaseAnalyticsObserver(analytics: analytics),
-          ],
           defaultTransition: Transition.cupertino,
           debugShowCheckedModeBanner: false,
           home: SplashPage(),

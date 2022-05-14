@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
@@ -14,6 +15,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
 import '../../../frontend/ib_widgets/ib_dialog.dart';
+import '../../db_config.dart';
 import '../../models/ib_chat_models/ib_chat_member.dart';
 import '../../models/ib_chat_models/ib_message.dart';
 import '../../models/ib_question.dart';
@@ -22,17 +24,22 @@ class NotificationController extends GetxController {
   late StreamSubscription ibNotificationsStream;
   final items = <NotificationItem>[].obs;
   final isLoading = true.obs;
+  final fcm = FirebaseMessaging.instance;
 
   @override
   Future<void> onInit() async {
-    _initData();
-    await Future.delayed(
-        const Duration(milliseconds: 3000), () => isLoading.value = false);
+    await _initData();
     super.onInit();
   }
 
   @override
+  Future<void> onReady() async {
+    await initPushNotification();
+  }
+
+  @override
   Future<void> onClose() async {
+    print('NotificationController onClose');
     await ibNotificationsStream.cancel();
     super.onClose();
   }
@@ -41,6 +48,7 @@ class NotificationController extends GetxController {
     ibNotificationsStream =
         IbUserDbService().listenToNewIbNotifications().listen((event) async {
       for (final docChange in event.docChanges) {
+        print('notification ${docChange.type}');
         if (docChange.doc.data() == null) {
           continue;
         }
@@ -64,6 +72,34 @@ class NotificationController extends GetxController {
       items.refresh();
       isLoading.value = false;
     });
+  }
+
+  Future<void> initPushNotification() async {
+    final NotificationSettings settings = await fcm.requestPermission();
+    if (settings.authorizationStatus != AuthorizationStatus.authorized) {
+      return;
+    }
+
+    final fcmToken = await fcm.getToken();
+    if (fcmToken == null) {
+      print('fcm token return null value!!');
+    } else {
+      await fcm.subscribeToTopic('Users${DbConfig.dbSuffix}');
+      await IbUserDbService().saveTokenToDatabase(fcmToken);
+      await handleRemoteMessageFromTerminatedState();
+      FirebaseMessaging.onMessageOpenedApp.listen((event) {
+        print("click ${event.notification}");
+        print("click ${event.data}");
+      });
+    }
+  }
+
+  Future<void> handleRemoteMessageFromTerminatedState() async {
+    final message = await fcm.getInitialMessage();
+    if (message != null) {
+      print(message.messageType);
+      print(message.data);
+    }
   }
 
   Future<void> _onNotificationAdded(IbNotification notification) async {
@@ -97,6 +133,20 @@ class NotificationController extends GetxController {
       }
     } else if (notification.type == IbNotification.kPollComment ||
         notification.type == IbNotification.kPollCommentLike) {
+      final IbComment? comment =
+          await IbQuestionDbService().queryComment(notification.url);
+      if (comment == null) {
+        return;
+      }
+      final IbQuestion? question =
+          await IbQuestionDbService().querySingleQuestion(comment.questionId);
+
+      if (question != null) {
+        item.ibQuestion = question;
+        item.ibComment = comment;
+        items.add(item);
+      }
+    } else if (notification.type == IbNotification.kPollCommentReply) {
       final IbComment? comment =
           await IbQuestionDbService().queryComment(notification.url);
       if (comment == null) {
@@ -144,7 +194,7 @@ class NotificationController extends GetxController {
     }
   }
 
-  Future<void> removeNotification(IbNotification ibNotification) async {
+  Future<void> declineFr(IbNotification ibNotification) async {
     try {
       await IbUserDbService().removeNotification(ibNotification);
       IbUtils.showSimpleSnackBar(
@@ -201,6 +251,16 @@ class NotificationController extends GetxController {
         showNegativeBtn: false,
       ));
     }
+  }
+
+  Future<void> clearAllNotifications() async {
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'Clearing...'));
+    final tempList = <NotificationItem>[];
+    tempList.addAll(items);
+    for (final item in tempList) {
+      await IbUserDbService().removeNotification(item.notification);
+    }
+    Get.back();
   }
 }
 

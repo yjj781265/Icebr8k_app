@@ -29,6 +29,24 @@ class SettingsNotificationPage extends StatelessWidget {
               title: const Text('New Friend Requests'),
             ),
             SwitchListTile.adaptive(
+              value: _controller.rxCurrentIbUser.value.settings!.pollLikesN,
+              onChanged: (value) async {
+                _controller.rxCurrentIbUser.value.settings!.pollLikesN = value;
+                await IbUserDbService()
+                    .updateIbUser(_controller.rxCurrentIbUser.value);
+              },
+              title: const Text('New Likes on Polls'),
+            ),
+            SwitchListTile.adaptive(
+              value: _controller.rxCurrentIbUser.value.settings!.pollVoteN,
+              onChanged: (value) async {
+                _controller.rxCurrentIbUser.value.settings!.pollVoteN = value;
+                await IbUserDbService()
+                    .updateIbUser(_controller.rxCurrentIbUser.value);
+              },
+              title: const Text('New Votes on Polls'),
+            ),
+            SwitchListTile.adaptive(
               value: _controller.rxCurrentIbUser.value.settings!.pollCommentN,
               onChanged: (value) async {
                 _controller.rxCurrentIbUser.value.settings!.pollCommentN =
@@ -50,22 +68,15 @@ class SettingsNotificationPage extends StatelessWidget {
               title: const Text("New Likes on Comments"),
             ),
             SwitchListTile.adaptive(
-              value: _controller.rxCurrentIbUser.value.settings!.pollLikesN,
+              value:
+                  _controller.rxCurrentIbUser.value.settings!.pollCommentReplyN,
               onChanged: (value) async {
-                _controller.rxCurrentIbUser.value.settings!.pollLikesN = value;
+                _controller.rxCurrentIbUser.value.settings!.pollCommentReplyN =
+                    value;
                 await IbUserDbService()
                     .updateIbUser(_controller.rxCurrentIbUser.value);
               },
-              title: const Text('New Likes on Polls'),
-            ),
-            SwitchListTile.adaptive(
-              value: _controller.rxCurrentIbUser.value.settings!.pollVoteN,
-              onChanged: (value) async {
-                _controller.rxCurrentIbUser.value.settings!.pollVoteN = value;
-                await IbUserDbService()
-                    .updateIbUser(_controller.rxCurrentIbUser.value);
-              },
-              title: const Text('New Votes on Polls'),
+              title: const Text('New Replies on Comments'),
             ),
             SwitchListTile.adaptive(
               value: _controller.rxCurrentIbUser.value.settings!.circleInviteN,
