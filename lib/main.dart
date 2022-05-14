@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_themes.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -25,17 +26,7 @@ Future<void> main() async {
 
   /// prevent blinking for cached images
   PaintingBinding.instance!.imageCache?.maximumSizeBytes = 1000 << 20; //1GB
-  SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle(
-        statusBarIconBrightness:
-            IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
-                ? Brightness.light
-                : Brightness.dark,
-        statusBarColor:
-            IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
-                ? Colors.black
-                : IbColors.lightBlue),
-  );
+  IbUtils.changeStatusBarColor();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
 import '../../backend/controllers/user_controllers/auth_controller.dart';
-import '../../backend/services/user_services/ib_local_data_service.dart';
-import '../ib_colors.dart';
 
 class SplashPage extends StatelessWidget {
   SplashPage({Key? key}) : super(key: key);
@@ -14,13 +12,7 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-          statusBarColor:
-              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
-                  ? Colors.black
-                  : IbColors.lightBlue),
-    );
+    IbUtils.changeStatusBarColor();
 
     return Scaffold(
       body: Obx(() {

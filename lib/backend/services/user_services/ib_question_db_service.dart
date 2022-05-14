@@ -5,6 +5,7 @@ import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 import '../../db_config.dart';
@@ -171,11 +172,21 @@ class IbQuestionDbService {
         .get();
   }
 
+  Future<QuerySnapshot<Map<String, dynamic>>> queryAllMyComments(
+      String questionId) async {
+    print('queryAllMyComments');
+    return _collectionRef
+        .doc(questionId)
+        .collection(_kCommentCollectionGroup)
+        .where('uid', isEqualTo: IbUtils.getCurrentUid())
+        .get();
+  }
+
   /// Icebr8k algorithm for loading trending question
   /// - loading public questions order by points during last 72 hrs;
   /// then load the rest order by asc time;
   Future<QuerySnapshot<Map<String, dynamic>>> queryTrendingQuestions(
-      {int limit = 16}) async {
+      {int limit = IbConfig.kPerPage}) async {
     final int minTimestampInMs = DateTime.now().millisecondsSinceEpoch -
         const Duration(days: 3).inMilliseconds;
 
@@ -188,7 +199,7 @@ class IbQuestionDbService {
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> queryFriendsQuestions(
-      {DocumentSnapshot? lastDoc, int limit = 16}) async {
+      {DocumentSnapshot? lastDoc, int limit = IbConfig.kPerPage}) async {
     if (lastDoc != null) {
       return _collectionRef
           .where('sharedFriendUids',
@@ -207,12 +218,11 @@ class IbQuestionDbService {
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> queryFollowedTagsQuestions(
-      {DocumentSnapshot? lastDoc, int limit = 16}) async {
-    final List<String> followedTags = IbUtils.getCurrentIbUser() == null
-        ? []
-        : IbUtils.getCurrentIbUser()!.tags;
-    followedTags.shuffle();
-    final tenTags = followedTags.take(10).toList();
+      {DocumentSnapshot? lastDoc,
+      int limit = IbConfig.kPerPage,
+      required List<String> tags}) async {
+    tags.shuffle();
+    final tenTags = tags.take(8).toList();
     if (lastDoc != null) {
       return _collectionRef
           .where('tags', arrayContainsAny: tenTags)
@@ -233,7 +243,7 @@ class IbQuestionDbService {
 
   /// query public ibQuestions in chronological order
   Future<QuerySnapshot<Map<String, dynamic>>> queryIbQuestions(
-      {int limit = 16, required int askedTimeInMs}) async {
+      {int limit = IbConfig.kPerPage, required int askedTimeInMs}) async {
     return _collectionRef
         .where('isPublic', isEqualTo: true)
         .where('askedTimeInMs', isLessThan: askedTimeInMs)
@@ -528,6 +538,18 @@ class IbQuestionDbService {
         .get();
 
     return snapshot.size >= 1;
+  }
+
+  Future<IbComment?> queryComment(String commentId) async {
+    print('queryComment');
+    final snapshot = await _db
+        .collectionGroup(_kCommentCollectionGroup)
+        .where('commentId', isEqualTo: commentId)
+        .get();
+    if (snapshot.size == 0) {
+      return null;
+    }
+    return IbComment.fromJson(snapshot.docs.first.data());
   }
 
   Future<void> copyCollection(String collection1, String collection2) async {

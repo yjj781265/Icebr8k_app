@@ -7,7 +7,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/answered_question_c
 import 'package:icebr8k/backend/controllers/user_controllers/asked_questions_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/edit_emo_pic_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/friend_list_controller.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/my_profile_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/word_cloud_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/edit_profile_pages/edit_emo_pics_page.dart';
 import 'package:icebr8k/frontend/ib_pages/edit_profile_pages/edit_profile_page.dart';
@@ -28,7 +28,7 @@ import '../../ib_utils.dart';
 
 class MyProfilePage extends StatelessWidget {
   final bool showBackButton;
-  final MyProfileController _controller = Get.put(MyProfileController());
+  final MainPageController _controller = Get.find();
 
   MyProfilePage({this.showBackButton = true});
 
@@ -46,11 +46,12 @@ class MyProfilePage extends StatelessWidget {
                         onTap: () {
                           Get.to(
                               () => IbMediaViewer(urls: [
-                                    if (_controller
-                                        .rxIbUser.value.coverPhotoUrl.isEmpty)
+                                    if (_controller.rxCurrentIbUser.value
+                                        .coverPhotoUrl.isEmpty)
                                       IbConfig.kDefaultCoverPhotoUrl
                                     else
-                                      _controller.rxIbUser.value.coverPhotoUrl
+                                      _controller
+                                          .rxCurrentIbUser.value.coverPhotoUrl
                                   ], currentIndex: 0),
                               transition: Transition.zoom,
                               fullscreenDialog: true);
@@ -59,10 +60,11 @@ class MyProfilePage extends StatelessWidget {
                           width: Get.width,
                           height: Get.width / 1.78,
                           child: CachedNetworkImage(
-                            imageUrl:
-                                _controller.rxIbUser.value.coverPhotoUrl.isEmpty
-                                    ? IbConfig.kDefaultCoverPhotoUrl
-                                    : _controller.rxIbUser.value.coverPhotoUrl,
+                            imageUrl: _controller
+                                    .rxCurrentIbUser.value.coverPhotoUrl.isEmpty
+                                ? IbConfig.kDefaultCoverPhotoUrl
+                                : _controller
+                                    .rxCurrentIbUser.value.coverPhotoUrl,
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -128,7 +130,7 @@ class MyProfilePage extends StatelessWidget {
                                           onPressed: () {
                                             Get.to(() => WordCloudPage(Get.put(
                                                 WordCloudController(_controller
-                                                    .rxIbUser.value))));
+                                                    .rxCurrentIbUser.value))));
                                           },
                                           hoverColor: IbColors.primaryColor,
                                           icon: Icon(Icons.cloud,
@@ -154,13 +156,14 @@ class MyProfilePage extends StatelessWidget {
                               child: Obx(
                                 () => IbUserAvatar(
                                     radius: 49,
-                                    avatarUrl:
-                                        _controller.rxIbUser.value.avatarUrl),
+                                    avatarUrl: _controller
+                                        .rxCurrentIbUser.value.avatarUrl),
                               ),
                               onTap: () {
                                 Get.to(
                                     () => IbMediaViewer(urls: [
-                                          _controller.rxIbUser.value.avatarUrl
+                                          _controller
+                                              .rxCurrentIbUser.value.avatarUrl
                                         ], currentIndex: 0),
                                     transition: Transition.zoom,
                                     fullscreenDialog: true);
@@ -173,7 +176,7 @@ class MyProfilePage extends StatelessWidget {
                                     const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: Obx(
                                   () => Text(
-                                    _controller.rxIbUser.value.username,
+                                    _controller.rxCurrentIbUser.value.username,
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: IbConfig.kPageTitleSize),
@@ -197,8 +200,8 @@ class MyProfilePage extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(3.0),
                             child: Text(
-                              beautifyProfilePrivacy(
-                                  _controller.rxIbUser.value.profilePrivacy),
+                              beautifyProfilePrivacy(_controller
+                                  .rxCurrentIbUser.value.profilePrivacy),
                               style: const TextStyle(
                                   fontSize: IbConfig.kDescriptionTextSize),
                             ),
@@ -222,7 +225,7 @@ class MyProfilePage extends StatelessWidget {
                           onTap: () {
                             Get.to(() => AnsweredPage(Get.put(
                                 AnsweredQuestionController(
-                                    _controller.rxIbUser.value.id),
+                                    _controller.rxCurrentIbUser.value.id),
                                 tag: IbUtils.getUniqueId())));
                           },
                           child: Padding(
@@ -241,7 +244,9 @@ class MyProfilePage extends StatelessWidget {
                                 children: [
                                   Obx(() => Text(
                                         IbUtils.getStatsString(_controller
-                                            .rxIbUser.value.answeredCount),
+                                            .rxCurrentIbUser
+                                            .value
+                                            .answeredCount),
                                         style: const TextStyle(
                                             overflow: TextOverflow.ellipsis,
                                             fontWeight: FontWeight.bold,
@@ -268,7 +273,7 @@ class MyProfilePage extends StatelessWidget {
                           onTap: () {
                             Get.to(() => AskedPage(Get.put(
                                 AskedQuestionsController(
-                                    _controller.rxIbUser.value.id,
+                                    _controller.rxCurrentIbUser.value.id,
                                     showPublicOnly: false),
                                 tag: IbUtils.getUniqueId())));
                           },
@@ -288,7 +293,7 @@ class MyProfilePage extends StatelessWidget {
                                 children: [
                                   Obx(() => Text(
                                         IbUtils.getStatsString(_controller
-                                            .rxIbUser.value.askedCount),
+                                            .rxCurrentIbUser.value.askedCount),
                                         style: const TextStyle(
                                             overflow: TextOverflow.ellipsis,
                                             fontWeight: FontWeight.bold,
@@ -315,8 +320,8 @@ class MyProfilePage extends StatelessWidget {
                           onTap: () {
                             Get.to(() => FriendList(Get.put(
                                 FriendListController(
-                                    _controller.rxIbUser.value),
-                                tag: _controller.rxIbUser.value.id)));
+                                    _controller.rxCurrentIbUser.value),
+                                tag: _controller.rxCurrentIbUser.value.id)));
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(4.0),
@@ -334,7 +339,10 @@ class MyProfilePage extends StatelessWidget {
                                 children: [
                                   Obx(() => Text(
                                         IbUtils.getStatsString(_controller
-                                            .rxIbUser.value.friendUids.length),
+                                            .rxCurrentIbUser
+                                            .value
+                                            .friendUids
+                                            .length),
                                         style: const TextStyle(
                                             overflow: TextOverflow.ellipsis,
                                             fontWeight: FontWeight.bold,
@@ -360,8 +368,8 @@ class MyProfilePage extends StatelessWidget {
                           ),
                           onTap: () {
                             Get.to(() => FollowedTagsPage(
-                                _controller.rxIbUser.value.tags,
-                                _controller.rxIbUser.value.username));
+                                _controller.rxCurrentIbUser.value.tags,
+                                _controller.rxCurrentIbUser.value.username));
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(4.0),
@@ -379,7 +387,7 @@ class MyProfilePage extends StatelessWidget {
                                 children: [
                                   Obx(() => Text(
                                         IbUtils.getStatsString(_controller
-                                            .rxIbUser.value.tags.length),
+                                            .rxCurrentIbUser.value.tags.length),
                                         style: const TextStyle(
                                             overflow: TextOverflow.ellipsis,
                                             fontWeight: FontWeight.bold,
@@ -412,22 +420,23 @@ class MyProfilePage extends StatelessWidget {
                         height: 16,
                       ),
                       Text(
-                        '${_controller.rxIbUser.value.fName} ${_controller.rxIbUser.value.lName} ',
+                        '${_controller.rxCurrentIbUser.value.fName} ${_controller.rxCurrentIbUser.value.lName} ',
                         style:
                             const TextStyle(fontSize: IbConfig.kNormalTextSize),
                       ),
                       Row(
                         children: [
                           Text(
-                            _controller.rxIbUser.value.gender,
+                            _controller.rxCurrentIbUser.value.gender,
                             style: const TextStyle(
                                 fontSize: IbConfig.kNormalTextSize),
                           ),
-                          if (_controller.rxIbUser.value.birthdateInMs != null)
+                          if (_controller.rxCurrentIbUser.value.birthdateInMs !=
+                              null)
                             Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: Text(
-                                'Age: ${IbUtils.calculateAge(_controller.rxIbUser.value.birthdateInMs!).toString()}',
+                                'Age: ${IbUtils.calculateAge(_controller.rxCurrentIbUser.value.birthdateInMs!).toString()}',
                                 style: const TextStyle(
                                     fontSize: IbConfig.kNormalTextSize),
                               ),
@@ -437,7 +446,8 @@ class MyProfilePage extends StatelessWidget {
                       const SizedBox(
                         height: 4,
                       ),
-                      IbDescriptionText(text: _controller.rxIbUser.value.bio),
+                      IbDescriptionText(
+                          text: _controller.rxCurrentIbUser.value.bio),
                       const Divider(
                         thickness: 2,
                       ),
@@ -467,11 +477,13 @@ class MyProfilePage extends StatelessWidget {
                             child: TextButton.icon(
                               onPressed: () {
                                 Get.to(() => EditEmoPicsPage(Get.put(
-                                    EditEmoPicController(_controller.rxEmoPics),
+                                    EditEmoPicController(_controller
+                                        .rxCurrentIbUser.value.emoPics.obs),
                                     tag: IbUtils.getUniqueId())));
                               },
                               label: Text(
-                                _controller.rxEmoPics.isEmpty
+                                _controller
+                                        .rxCurrentIbUser.value.emoPics.isEmpty
                                     ? 'add'.tr
                                     : 'edit'.tr,
                                 style: const TextStyle(
@@ -486,7 +498,7 @@ class MyProfilePage extends StatelessWidget {
                         ],
                       ),
                       Obx(() => Wrap(
-                            children: _controller.rxEmoPics
+                            children: _controller.rxCurrentIbUser.value.emoPics
                                 .map((e) => IbEmoPicCard(
                                       emoPic: e,
                                       onTap: () {
@@ -505,7 +517,7 @@ class MyProfilePage extends StatelessWidget {
                       const SizedBox(
                         height: 16,
                       ),
-                      if (_controller.rxEmoPics.isEmpty)
+                      if (_controller.rxCurrentIbUser.value.emoPics.isEmpty)
                         Center(
                             child: Text(
                           'nothing'.tr,

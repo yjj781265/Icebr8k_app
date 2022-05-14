@@ -195,12 +195,14 @@ class IbUserDbService {
         .delete();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> listenToIbNotifications() {
+  /// this will only listen to last 64 notifications
+  Stream<QuerySnapshot<Map<String, dynamic>>> listenToNewIbNotifications() {
     return _collectionRef
         .doc(IbUtils.getCurrentUid())
         .collection(_kNotificationSubCollection)
         .where('recipientId', isEqualTo: IbUtils.getCurrentUid())
         .orderBy('timestamp', descending: true)
+        .limit(64)
         .snapshots();
   }
 

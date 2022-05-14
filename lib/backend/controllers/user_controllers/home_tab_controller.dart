@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'main_page_controller.dart';
@@ -14,10 +15,11 @@ import 'main_page_controller.dart';
 class HomeTabController extends GetxController {
   double _lastOffset = 0;
   final double hideShowNavBarSensitivity = 10;
+  bool canHideNavBar = true;
   final trendingList = <IbQuestion>[].obs;
   final forYourList = <IbQuestion>[].obs;
   final categories = ['Trending', 'For You'];
-  final selectedCategory = 'For You'.obs;
+  final selectedCategory = 'Trending'.obs;
   final isLoading = true.obs;
 
   DocumentSnapshot<Map<String, dynamic>>? lastFriendQuestionDoc;
@@ -32,6 +34,9 @@ class HomeTabController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
     scrollController.addListener(() {
+      if (!canHideNavBar) {
+        return;
+      }
       if (scrollController.offset > _lastOffset &&
           scrollController.offset - _lastOffset > hideShowNavBarSensitivity) {
         Get.find<MainPageController>().hideNavBar();
@@ -47,10 +52,11 @@ class HomeTabController extends GetxController {
   }
 
   Future<void> onRefresh({bool refreshStats = false}) async {
+    Get.find<MainPageController>().showNavBar();
     if (selectedCategory.value == categories[0]) {
-      _loadTrending(refreshStats: refreshStats);
+      await _loadTrending(refreshStats: refreshStats);
     } else {
-      _loadForYou(refreshStats: refreshStats);
+      await _loadForYou(refreshStats: refreshStats);
     }
   }
 
@@ -90,6 +96,7 @@ class HomeTabController extends GetxController {
       if (refreshStats) {
         await _refreshQuestionItemControllers();
       }
+      canHideNavBar = trendingList.length > 6;
     } catch (e) {
       refreshController.loadFailed();
       print(e);
@@ -103,11 +110,13 @@ class HomeTabController extends GetxController {
     lastTagDoc = null;
     isLoading.value = true;
     try {
-      final snapshot = await IbQuestionDbService().queryFollowedTagsQuestions();
-
-      for (final doc in snapshot.docs) {
-        forYourList.add(IbQuestion.fromJson(doc.data()));
-        lastTagDoc = doc;
+      if (IbUtils.getCurrentIbUser()!.tags.isNotEmpty) {
+        final snapshot = await IbQuestionDbService()
+            .queryFollowedTagsQuestions(tags: IbUtils.getCurrentIbUser()!.tags);
+        for (final doc in snapshot.docs) {
+          forYourList.add(IbQuestion.fromJson(doc.data()));
+          lastTagDoc = doc;
+        }
       }
 
       final snapshot2 = await IbQuestionDbService().queryFriendsQuestions();
@@ -125,6 +134,7 @@ class HomeTabController extends GetxController {
       if (refreshStats) {
         await _refreshQuestionItemControllers();
       }
+      canHideNavBar = forYourList.length > 6;
     } catch (e) {
       refreshController.loadFailed();
       print(e);
@@ -188,17 +198,19 @@ class HomeTabController extends GetxController {
 
       try {
         final tempList = <IbQuestion>[];
-        final snap = await IbQuestionDbService()
-            .queryFollowedTagsQuestions(lastDoc: lastTagDoc);
+        if (IbUtils.getCurrentIbUser()!.tags.isNotEmpty) {
+          final snap = await IbQuestionDbService().queryFollowedTagsQuestions(
+              tags: IbUtils.getCurrentIbUser()!.tags);
+          for (final doc in snap.docs) {
+            tempList.addIf(
+                forYourList.indexWhere((element) => element.id == doc.id) == -1,
+                IbQuestion.fromJson(doc.data()));
+            lastTagDoc = doc;
+          }
+        }
+
         final snap2 = await IbQuestionDbService()
             .queryFriendsQuestions(lastDoc: lastTagDoc);
-
-        for (final doc in snap.docs) {
-          tempList.addIf(
-              forYourList.indexWhere((element) => element.id == doc.id) == -1,
-              IbQuestion.fromJson(doc.data()));
-          lastTagDoc = doc;
-        }
 
         for (final doc in snap2.docs) {
           tempList.addIf(

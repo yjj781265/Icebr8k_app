@@ -22,13 +22,7 @@ class SignInPage extends StatelessWidget {
   final ResetPwdController _resetPwdController = Get.put(ResetPwdController());
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-          statusBarColor:
-              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
-                  ? Colors.black
-                  : IbColors.lightBlue),
-    );
+    IbUtils.changeStatusBarColor();
     return Scaffold(
       body: SafeArea(
         child: GestureDetector(

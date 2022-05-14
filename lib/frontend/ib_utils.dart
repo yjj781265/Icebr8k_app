@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
@@ -16,6 +17,7 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../backend/controllers/user_controllers/auth_controller.dart';
+import '../backend/services/user_services/ib_local_data_service.dart';
 import '../backend/services/user_services/ib_question_db_service.dart';
 import 'ib_config.dart';
 
@@ -26,6 +28,20 @@ class IbUtils {
     final bool isOver13 =
         DateTime.now().difference(dateTime).inDays > IbConfig.kAgeLimitInDays;
     return isOver13;
+  }
+
+  static void changeStatusBarColor() {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+          statusBarIconBrightness:
+              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
+                  ? Brightness.light
+                  : Brightness.dark,
+          statusBarColor:
+              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
+                  ? Colors.black
+                  : IbColors.lightBlue),
+    );
   }
 
   static int calculateAge(int timestampInMs) {

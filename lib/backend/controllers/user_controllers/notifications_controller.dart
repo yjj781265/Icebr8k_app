@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
+import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
+import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -14,6 +16,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import '../../../frontend/ib_widgets/ib_dialog.dart';
 import '../../models/ib_chat_models/ib_chat_member.dart';
 import '../../models/ib_chat_models/ib_message.dart';
+import '../../models/ib_question.dart';
 
 class NotificationController extends GetxController {
   late StreamSubscription ibNotificationsStream;
@@ -22,7 +25,7 @@ class NotificationController extends GetxController {
 
   @override
   Future<void> onInit() async {
-    _initIbNotificationStream();
+    _initData();
     await Future.delayed(
         const Duration(milliseconds: 3000), () => isLoading.value = false);
     super.onInit();
@@ -34,15 +37,13 @@ class NotificationController extends GetxController {
     super.onClose();
   }
 
-  void _initIbNotificationStream() {
+  Future<void> _initData() async {
     ibNotificationsStream =
-        IbUserDbService().listenToIbNotifications().listen((event) async {
+        IbUserDbService().listenToNewIbNotifications().listen((event) async {
       for (final docChange in event.docChanges) {
         if (docChange.doc.data() == null) {
           continue;
         }
-
-        print('NotificationController ${docChange.type}');
 
         final IbNotification n = IbNotification.fromJson(docChange.doc.data()!);
         if (docChange.type == DocumentChangeType.added) {
@@ -57,6 +58,7 @@ class NotificationController extends GetxController {
           await _onNotificationRemoved(n);
         }
       }
+
       items.sort((a, b) => (b.notification.timestamp as Timestamp)
           .compareTo(a.notification.timestamp as Timestamp));
       items.refresh();
@@ -74,17 +76,40 @@ class NotificationController extends GetxController {
 
     final item =
         NotificationItem(notification: notification, senderUser: senderUser);
+    item.avatarUrl = senderUser.avatarUrl;
     if (notification.type == IbNotification.kCircleInvite ||
         notification.type == IbNotification.kCircleRequest) {
       final IbChat? chat = await IbChatDbService().queryChat(notification.url);
       item.ibChat = chat;
-      item.avatarUrl = senderUser.avatarUrl;
+
       if (chat != null) {
         items.add(item);
       }
     } else if (notification.type == IbNotification.kFriendRequest) {
-      item.avatarUrl = senderUser.avatarUrl;
       items.add(item);
+    } else if (notification.type == IbNotification.kNewVote ||
+        notification.type == IbNotification.kPollLike) {
+      final IbQuestion? question =
+          await IbQuestionDbService().querySingleQuestion(notification.url);
+      item.ibQuestion = question;
+      if (question != null) {
+        items.add(item);
+      }
+    } else if (notification.type == IbNotification.kPollComment ||
+        notification.type == IbNotification.kPollCommentLike) {
+      final IbComment? comment =
+          await IbQuestionDbService().queryComment(notification.url);
+      if (comment == null) {
+        return;
+      }
+      final IbQuestion? question =
+          await IbQuestionDbService().querySingleQuestion(comment.questionId);
+
+      if (question != null) {
+        item.ibQuestion = question;
+        item.ibComment = comment;
+        items.add(item);
+      }
     }
   }
 
@@ -92,7 +117,6 @@ class NotificationController extends GetxController {
     final int index = items
         .indexWhere((element) => element.notification.id == notification.id);
 
-    print(index);
     if (index != -1) {
       items[index].notification = notification;
     }
@@ -185,10 +209,14 @@ class NotificationItem {
   IbUser senderUser;
   String avatarUrl;
   IbChat? ibChat;
+  IbQuestion? ibQuestion;
+  IbComment? ibComment;
 
   NotificationItem(
       {required this.notification,
       required this.senderUser,
+      this.ibQuestion,
+      this.ibComment,
       this.ibChat,
       this.avatarUrl = ''});
 

@@ -8,6 +8,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/main_page_controlle
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/alert_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/my_profile_page.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:move_to_background/move_to_background.dart';
@@ -54,13 +55,7 @@ class _MainPageViewState extends State<MainPageView>
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-          statusBarColor:
-              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
-                  ? Colors.black
-                  : IbColors.lightBlue),
-    );
+   IbUtils.changeStatusBarColor();
     return WillPopScope(
       onWillPop: () async {
         if (Platform.isAndroid) {
@@ -69,8 +64,9 @@ class _MainPageViewState extends State<MainPageView>
         return false;
       },
       child: Scaffold(
-          body: SafeArea(child: getBody()),
-          bottomNavigationBar: _buildBottomBar()),
+        body: SafeArea(child: getBody()),
+        bottomNavigationBar: _buildBottomBar(),
+      ),
     );
   }
 
@@ -142,6 +138,7 @@ class _MainPageViewState extends State<MainPageView>
             notification: Get.find<NotificationController>()
                 .items
                 .where((p0) => p0.notification.isRead == false)
+                .toList()
                 .length,
             title: 'alert'.tr,
             inactiveColor: _inactiveColor,

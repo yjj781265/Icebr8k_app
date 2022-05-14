@@ -21,8 +21,8 @@ class IbNotification {
   static const String kChat = 'chat';
   static const String kCircleInvite = 'circle_invite';
   static const String kCircleRequest = 'circle_request';
-  static const String kChatMessage = 'chat_message';
   static const String kPollComment = 'poll_comment';
+  static const String kPollCommentReply = 'poll_comment_reply';
   static const String kNewVote = 'new_vote';
   static const String kPollLike = 'new_like_poll';
   static const String kPollCommentLike = 'new_like_comment';

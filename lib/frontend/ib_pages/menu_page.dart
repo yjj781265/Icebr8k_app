@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -14,7 +13,6 @@ import 'package:icebr8k/frontend/ib_themes.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../backend/controllers/user_controllers/auth_controller.dart';
 import '../../backend/models/ib_user.dart';
@@ -124,13 +122,7 @@ class _MenuPageState extends State<MenuPage> {
                     Get.changeTheme(value
                         ? IbThemes(context).buildDarkTheme()
                         : IbThemes(context).buildLightTheme());
-                    SystemChrome.setSystemUIOverlayStyle(
-                      SystemUiOverlayStyle(
-                          statusBarIconBrightness:
-                              value ? Brightness.light : Brightness.dark,
-                          statusBarColor:
-                              value ? Colors.black : IbColors.lightBlue),
-                    );
+                    IbUtils.changeStatusBarColor();
                   });
                 },
                 title: const Text('Dark Mode'),
@@ -201,6 +193,7 @@ class _MenuPageState extends State<MenuPage> {
                               fontWeight: FontWeight.bold),
                         ),
                         onTap: () {
+                          Get.back();
                           Get.to(() => SettingsMainPage());
                         },
                       ),
@@ -215,12 +208,7 @@ class _MenuPageState extends State<MenuPage> {
                               fontSize: IbConfig.kNormalTextSize,
                               fontWeight: FontWeight.bold),
                         ),
-                        subtitle: const Text("Take our 2 minutes survey"),
-                        onTap: () async {
-                          if (await canLaunch(kBetaSurveyLink)) {
-                            launch(kBetaSurveyLink);
-                          }
-                        },
+                        onTap: () async {},
                       ),
                     ],
                   ),

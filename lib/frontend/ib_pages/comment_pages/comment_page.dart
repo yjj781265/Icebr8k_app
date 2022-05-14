@@ -90,7 +90,8 @@ class CommentPage extends StatelessWidget {
                 footer: ClassicFooter(
                   noDataText: 'no_more_comments'.tr,
                 ),
-                enablePullUp: true,
+                enablePullUp:
+                    _controller.commentItems.length >= IbConfig.kPerPage,
                 enablePullDown: false,
                 onLoading: () async {
                   await _controller.loadMore();
@@ -126,7 +127,7 @@ class CommentPage extends StatelessWidget {
                 borderRadius: const BorderRadius.all(
                     Radius.circular(IbConfig.kTextBoxCornerRadius)),
                 border: Border.all(
-                  color: IbColors.primaryColor,
+                  color: IbColors.accentColor,
                 ),
               ),
               child: Obx(
@@ -157,7 +158,7 @@ class CommentPage extends StatelessWidget {
                         : IconButton(
                             icon: const Icon(
                               FontAwesomeIcons.comment,
-                              color: IbColors.primaryColor,
+                              color: IbColors.accentColor,
                             ),
                             onPressed: () async {
                               await _controller.addComment(

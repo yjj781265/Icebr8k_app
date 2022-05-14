@@ -35,17 +35,13 @@ class CommentController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
-    await initData();
+    await loadList();
   }
 
   @override
   void onClose() {
     super.onClose();
     commentSub.cancel();
-  }
-
-  Future<void> initData() async {
-    await loadList();
   }
 
   Future<void> loadList() async {
@@ -73,6 +69,31 @@ class CommentController extends GetxController {
         }
       }
       commentItems.insertAll(0, temp);
+
+      /// add all my comments first on top
+      final myCommentSnap = await IbQuestionDbService()
+          .queryAllMyComments(itemController.rxIbQuestion.value.id);
+      final List<CommentItem> myComments = [];
+      for (final doc in myCommentSnap.docs) {
+        final IbComment comment = IbComment.fromJson(doc.data());
+        if (commentItems.indexWhere((element) =>
+                element.ibComment.commentId == comment.commentId) ==
+            -1) {
+          final user = await retrieveUser(comment);
+          if (user != null) {
+            final ibAnswer = await retrieveIbAnswer(comment);
+            final isLiked = await IbQuestionDbService().isCommentLiked(comment);
+            myComments.add(CommentItem(
+                ibComment: comment,
+                user: user,
+                ibAnswer: ibAnswer,
+                isLiked: isLiked));
+          }
+        }
+      }
+      myComments.sort((a, b) => (b.ibComment.timestamp as Timestamp)
+          .compareTo(a.ibComment.timestamp as Timestamp));
+      commentItems.insertAll(0, myComments);
     }
 
     commentSub = IbQuestionDbService()
@@ -103,6 +124,7 @@ class CommentController extends GetxController {
                   itemController.rxIbQuestion.value.comments + 1;
               await _updateParentQuestionCommentCount(newCount);
             }
+            return;
           }
 
           if (commentItems.indexWhere((element) =>
@@ -193,7 +215,7 @@ class CommentController extends GetxController {
   }
 
   Future<IbAnswer?> retrieveIbAnswer(IbComment comment) async {
-    final IbAnswer? ibAnswer;
+    IbAnswer? ibAnswer;
     final ibAnswers = IbCacheManager().getIbAnswers(comment.uid);
 
     if (ibAnswers == null || ibAnswers.isEmpty) {
@@ -205,8 +227,15 @@ class CommentController extends GetxController {
       }
       return ibAnswer;
     } else {
-      return ibAnswers.firstWhereOrNull(
+      ibAnswer = ibAnswers.firstWhereOrNull(
           (element) => element.questionId == comment.questionId);
+      ibAnswer ??= await IbQuestionDbService()
+          .querySingleIbAnswer(comment.uid, comment.questionId);
+      if (ibAnswer != null) {
+        IbCacheManager()
+            .cacheSingleIbAnswer(uid: comment.uid, ibAnswer: ibAnswer);
+      }
+      return ibAnswer;
     }
   }
 

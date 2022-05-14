@@ -4,6 +4,7 @@ class IbConfig {
   static const double kLoadingIndicatorSize = 40;
   static const double kAppLogoSize = 96;
   static const double kCardCornerRadius = 16;
+  static const int kPerPage = 16;
   static const double kScrollbarCornerRadius = 16;
   static const double kTextBoxCornerRadius = 16;
   static const double kButtonCornerRadius = 16;

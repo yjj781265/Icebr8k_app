@@ -88,7 +88,7 @@ class HomeTab extends StatelessWidget {
                   child: IbProgressIndicator(),
                 )
               : SmartRefresher(
-                  enablePullUp: true,
+                  enablePullUp: _handlePullUp(),
                   onRefresh: () async {
                     await _controller.onRefresh(refreshStats: true);
                   },
@@ -118,6 +118,13 @@ class HomeTab extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  bool _handlePullUp() {
+    if (_controller.selectedCategory.value == _controller.categories[1]) {
+      return _controller.forYourList.length >= IbConfig.kPerPage;
+    }
+    return _controller.trendingList.length >= IbConfig.kPerPage;
   }
 
   Widget _handleQuestionType(IbQuestion question) {
