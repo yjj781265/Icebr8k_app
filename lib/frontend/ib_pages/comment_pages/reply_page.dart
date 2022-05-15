@@ -16,7 +16,6 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../backend/controllers/user_controllers/comment_controller.dart';
-import '../../../backend/models/ib_choice.dart';
 import '../../../backend/models/ib_question.dart';
 
 class ReplyPage extends StatelessWidget {
@@ -48,7 +47,7 @@ class ReplyPage extends StatelessWidget {
               }
 
               if (_controller.isLoading.isFalse &&
-                  _controller.replyItems.isEmpty) {
+                  _controller.comments.isEmpty) {
                 return Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -74,14 +73,15 @@ class ReplyPage extends StatelessWidget {
                 footer: ClassicFooter(
                   noDataText: 'no_more_replies'.tr,
                 ),
-                enablePullUp: true,
+                enablePullUp:
+                    _controller.comments.length >= _controller.kPerPageMax,
                 enablePullDown: false,
                 onLoading: () async {
                   await _controller.loadMore();
                 },
                 child: ListView.builder(
                   itemBuilder: (context, index) {
-                    final item = _controller.replyItems[index];
+                    final item = _controller.comments[index];
                     return Ink(
                       color: index == 0
                           ? Theme.of(context).backgroundColor
@@ -190,9 +190,6 @@ class ReplyPage extends StatelessWidget {
                                                 },
                                                 child: const Text(
                                                   'Reply',
-                                                  style: TextStyle(
-                                                      color:
-                                                          IbColors.accentColor),
                                                 ))
                                           ],
                                         ),
@@ -226,7 +223,7 @@ class ReplyPage extends StatelessWidget {
                       ),
                     );
                   },
-                  itemCount: _controller.replyItems.length,
+                  itemCount: _controller.comments.length,
                 ),
               );
             }),
@@ -294,112 +291,100 @@ class ReplyPage extends StatelessWidget {
     if (item.ibAnswer == null) {
       return const SizedBox();
     }
-    final controller = Get.find<CommentController>();
 
-    final IbChoice ibChoice = Get.find<CommentController>()
-        .itemController
-        .rxIbQuestion
-        .value
-        .choices
+    final ibChoice = _controller.ibQuestion.choices
         .firstWhere((element) => element.choiceId == item.ibAnswer!.choiceId);
 
-    return Obx(() {
-      if (controller.itemController.rxIbQuestion.value.questionType ==
-              IbQuestion.kMultipleChoice ||
-          controller.itemController.rxIbQuestion.value.questionType ==
-              IbQuestion.kMultipleChoicePic) {
-        return Text(
-          ibChoice.content ?? '',
-          style: const TextStyle(
+    if (_controller.ibQuestion.questionType == IbQuestion.kMultipleChoice ||
+        _controller.ibQuestion.questionType == IbQuestion.kMultipleChoicePic) {
+      return Text(
+        ibChoice.content ?? '',
+        style: const TextStyle(
+          fontSize: IbConfig.kDescriptionTextSize,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }
+
+    if (_controller.ibQuestion.questionType == IbQuestion.kScaleOne) {
+      return RatingBar.builder(
+        initialRating: double.parse(ibChoice.content ?? '0'),
+        ignoreGestures: true,
+        itemSize: 16,
+        itemBuilder: (context, _) => const Icon(
+          Icons.star,
+          color: Colors.amber,
+        ),
+        onRatingUpdate: (rating) {},
+      );
+    }
+
+    if (_controller.ibQuestion.questionType == IbQuestion.kScaleTwo) {
+      return RatingBar.builder(
+        initialRating: double.parse(ibChoice.content ?? '0'),
+        ignoreGestures: true,
+        itemSize: 16,
+        itemBuilder: (context, _) => const Icon(
+          Icons.favorite,
+          color: Colors.red,
+        ),
+        onRatingUpdate: (rating) {},
+      );
+    }
+
+    if (_controller.ibQuestion.questionType == IbQuestion.kScaleThree) {
+      return RatingBar.builder(
+        initialRating: double.parse(ibChoice.content ?? '0'),
+        ignoreGestures: true,
+        itemSize: 16,
+        itemBuilder: (context, index) {
+          switch (index) {
+            case 0:
+              return const Icon(
+                Icons.sentiment_very_dissatisfied,
+                color: Colors.red,
+              );
+            case 1:
+              return const Icon(
+                Icons.sentiment_dissatisfied,
+                color: Colors.redAccent,
+              );
+            case 2:
+              return const Icon(
+                Icons.sentiment_neutral,
+                color: Colors.amber,
+              );
+            case 3:
+              return const Icon(
+                Icons.sentiment_satisfied,
+                color: Colors.lightGreen,
+              );
+            case 4:
+              return const Icon(
+                Icons.sentiment_very_satisfied,
+                color: Colors.green,
+              );
+            default:
+              return const SizedBox();
+          }
+        },
+        onRatingUpdate: (rating) {},
+      );
+    }
+
+    if (ibChoice.content != null) {
+      return Text(
+        _controller.ibQuestion.choices
+            .firstWhere(
+                (element) => element.choiceId == item.ibAnswer!.choiceId)
+            .content!,
+        style: const TextStyle(
             fontSize: IbConfig.kDescriptionTextSize,
-            fontWeight: FontWeight.bold,
-          ),
-        );
-      }
+            fontWeight: FontWeight.bold),
+      );
+    }
 
-      if (controller.itemController.rxIbQuestion.value.questionType ==
-          IbQuestion.kScaleOne) {
-        return RatingBar.builder(
-          initialRating: double.parse(ibChoice.content ?? '0'),
-          ignoreGestures: true,
-          itemSize: 16,
-          itemBuilder: (context, _) => const Icon(
-            Icons.star,
-            color: Colors.amber,
-          ),
-          onRatingUpdate: (rating) {},
-        );
-      }
-
-      if (controller.itemController.rxIbQuestion.value.questionType ==
-          IbQuestion.kScaleTwo) {
-        return RatingBar.builder(
-          initialRating: double.parse(ibChoice.content ?? '0'),
-          ignoreGestures: true,
-          itemSize: 16,
-          itemBuilder: (context, _) => const Icon(
-            Icons.favorite,
-            color: Colors.red,
-          ),
-          onRatingUpdate: (rating) {},
-        );
-      }
-
-      if (controller.itemController.rxIbQuestion.value.questionType ==
-          IbQuestion.kScaleThree) {
-        return RatingBar.builder(
-          initialRating: double.parse(ibChoice.content ?? '0'),
-          ignoreGestures: true,
-          itemSize: 16,
-          itemBuilder: (context, index) {
-            switch (index) {
-              case 0:
-                return const Icon(
-                  Icons.sentiment_very_dissatisfied,
-                  color: Colors.red,
-                );
-              case 1:
-                return const Icon(
-                  Icons.sentiment_dissatisfied,
-                  color: Colors.redAccent,
-                );
-              case 2:
-                return const Icon(
-                  Icons.sentiment_neutral,
-                  color: Colors.amber,
-                );
-              case 3:
-                return const Icon(
-                  Icons.sentiment_satisfied,
-                  color: Colors.lightGreen,
-                );
-              case 4:
-                return const Icon(
-                  Icons.sentiment_very_satisfied,
-                  color: Colors.green,
-                );
-              default:
-                return const SizedBox();
-            }
-          },
-          onRatingUpdate: (rating) {},
-        );
-      }
-
-      if (ibChoice.content != null) {
-        return Text(
-          controller.itemController.rxIbQuestion.value.choices
-              .firstWhere(
-                  (element) => element.choiceId == item.ibAnswer!.choiceId)
-              .content!,
-          style: const TextStyle(
-              fontSize: IbConfig.kDescriptionTextSize,
-              fontWeight: FontWeight.bold),
-        );
-      }
-
-      return const SizedBox();
-    });
+    return const SizedBox();
   }
 
   Future<void> _onReplyTap(CommentItem item) async {

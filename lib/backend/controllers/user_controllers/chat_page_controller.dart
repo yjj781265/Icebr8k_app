@@ -124,6 +124,34 @@ class ChatPageController extends GetxController {
     super.onInit();
   }
 
+  @override
+  void onReady() {
+    /// reset unread count
+    if (ibChat != null && Get.isRegistered<SocialTabController>()) {
+      if (ibChat!.isCircle) {
+        final item = Get.find<SocialTabController>().circles.firstWhereOrNull(
+            (element) => element.ibChat.chatId == ibChat!.chatId);
+        if (item != null) {
+          item.unReadCount = 0;
+          Get.find<SocialTabController>().circles.refresh();
+          Get.find<SocialTabController>().calculateTotalUnread();
+        }
+      }
+
+      if (!ibChat!.isCircle) {
+        final item = Get.find<SocialTabController>()
+            .oneToOneChats
+            .firstWhereOrNull(
+                (element) => element.ibChat.chatId == ibChat!.chatId);
+        if (item != null) {
+          item.unReadCount = 0;
+          Get.find<SocialTabController>().oneToOneChats.refresh();
+          Get.find<SocialTabController>().calculateTotalUnread();
+        }
+      }
+    }
+  }
+
   List<String> _generateMentionIds() {
     final list = <String>[];
     final uids = <String>[];

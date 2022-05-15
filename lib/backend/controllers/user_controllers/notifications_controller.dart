@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
@@ -11,6 +12,7 @@ import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
@@ -87,9 +89,15 @@ class NotificationController extends GetxController {
       await fcm.subscribeToTopic('Users${DbConfig.dbSuffix}');
       await IbUserDbService().saveTokenToDatabase(fcmToken);
       await handleRemoteMessageFromTerminatedState();
-      FirebaseMessaging.onMessageOpenedApp.listen((event) {
-        print("click ${event.notification}");
-        print("click ${event.data}");
+      FirebaseMessaging.onMessageOpenedApp.listen((event) async {
+        if (event.data['type'] == IbNotification.kChat) {
+          final chatId = event.data['url'] as String;
+          final ibChat = await IbChatDbService().queryChat(chatId);
+          if (ibChat != null) {
+            Get.to(() => ChatPage(Get.put(ChatPageController(ibChat: ibChat),
+                tag: ibChat.chatId)));
+          }
+        }
       });
     }
   }
@@ -97,8 +105,14 @@ class NotificationController extends GetxController {
   Future<void> handleRemoteMessageFromTerminatedState() async {
     final message = await fcm.getInitialMessage();
     if (message != null) {
-      print(message.messageType);
-      print(message.data);
+      if (message.data['type'] == IbNotification.kChat) {
+        final chatId = message.data['url'] as String;
+        final ibChat = await IbChatDbService().queryChat(chatId);
+        if (ibChat != null) {
+          Get.to(() => ChatPage(
+              Get.put(ChatPageController(ibChat: ibChat), tag: ibChat.chatId)));
+        }
+      }
     }
   }
 
@@ -152,12 +166,18 @@ class NotificationController extends GetxController {
       if (comment == null) {
         return;
       }
+      final IbComment? reply = comment.replies
+          .firstWhereOrNull((element) => element.commentId == notification.id);
+      if (reply == null) {
+        print('reply not found');
+        return;
+      }
       final IbQuestion? question =
           await IbQuestionDbService().querySingleQuestion(comment.questionId);
 
       if (question != null) {
         item.ibQuestion = question;
-        item.ibComment = comment;
+        item.ibComment = reply;
         items.add(item);
       }
     }

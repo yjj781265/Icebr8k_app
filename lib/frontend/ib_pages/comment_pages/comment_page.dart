@@ -189,7 +189,9 @@ class CommentItemWidget extends StatelessWidget {
     return Material(
       child: InkWell(
         onTap: () {
-          Get.to(() => ReplyPage(Get.put(ReplyController(commentItem: item))));
+          Get.to(() => ReplyPage(Get.put(ReplyController(
+              parentCommentId: item.ibComment.commentId,
+              ibQuestion: controller.itemController.rxIbQuestion.value))));
         },
         child: Ink(
           color: Theme.of(context).backgroundColor,
@@ -283,7 +285,13 @@ class CommentItemWidget extends StatelessWidget {
                                   TextButton.icon(
                                     onPressed: () {
                                       Get.to(() => ReplyPage(Get.put(
-                                          ReplyController(commentItem: item))));
+                                          ReplyController(
+                                              parentCommentId:
+                                                  item.ibComment.commentId,
+                                              ibQuestion: controller
+                                                  .itemController
+                                                  .rxIbQuestion
+                                                  .value))));
                                     },
                                     icon: const Icon(
                                       FontAwesomeIcons.reply,

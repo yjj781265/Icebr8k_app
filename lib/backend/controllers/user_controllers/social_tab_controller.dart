@@ -261,6 +261,9 @@ class SocialTabController extends GetxController {
     for (final item in circles) {
       totalUnread.value += item.unReadCount;
     }
+    IbUserDbService()
+        .updateIbUserNotificationCount(totalUnread.value)
+        .then((value) => print('updated notification count'));
   }
 
   @override

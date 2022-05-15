@@ -408,9 +408,8 @@ class _SocialTabState extends State<SocialTab>
               _controller.calculateTotalUnread();
               Get.to(
                 () => ChatPage(
-                  Get.put(
-                    ChatPageController(ibChat: item.ibChat),
-                  ),
+                  Get.put(ChatPageController(ibChat: item.ibChat),
+                      tag: item.ibChat.chatId),
                 ),
               );
             },

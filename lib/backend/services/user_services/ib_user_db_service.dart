@@ -43,6 +43,12 @@ class IbUserDbService {
         .set(_ibUser.toJson(), SetOptions(merge: true));
   }
 
+  Future<void> updateIbUserNotificationCount(int count) async {
+    return _collectionRef
+        .doc(IbUtils.getCurrentUid())
+        .update({'notificationCount': count});
+  }
+
   Future<bool> isUsernameTaken(String username) async {
     final snapshot = await _collectionRef
         .where('username', isEqualTo: username.toLowerCase())

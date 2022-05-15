@@ -521,7 +521,7 @@ class AlertTab extends StatelessWidget {
                           rxIbQuestion: item.ibQuestion!.obs,
                           rxIsExpanded: true.obs),
                       tag: item.ibQuestion!.id),
-                  toCommentPage: true,
+                  toPage: ToPage.comment,
                 ));
           },
           leading: IbUserAvatar(
@@ -641,7 +641,7 @@ class AlertTab extends StatelessWidget {
                           rxIbQuestion: item.ibQuestion!.obs,
                           rxIsExpanded: true.obs),
                       tag: item.ibQuestion!.id),
-                  toCommentPage: true,
+                  toPage: ToPage.comment,
                 ));
           },
           leading: IbUserAvatar(
@@ -702,7 +702,8 @@ class AlertTab extends StatelessWidget {
                           rxIbQuestion: item.ibQuestion!.obs,
                           rxIsExpanded: true.obs),
                       tag: item.ibQuestion!.id),
-                  toCommentPage: true,
+                  toPage: ToPage.reply,
+                  commentId: item.ibComment!.parentId,
                 ));
           },
           leading: IbUserAvatar(
@@ -721,18 +722,19 @@ class AlertTab extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(item.ibComment!.content),
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: Text(
-                  IbUtils.getAgoDateTimeString(
-                      DateTime.fromMillisecondsSinceEpoch(
-                          (item.notification.timestamp as Timestamp)
-                              .millisecondsSinceEpoch)),
-                  style: const TextStyle(
-                      fontSize: IbConfig.kDescriptionTextSize,
-                      color: IbColors.lightGrey),
-                ),
-              )
+              if (item.notification.timestamp != null)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: Text(
+                    IbUtils.getAgoDateTimeString(
+                        DateTime.fromMillisecondsSinceEpoch(
+                            (item.notification.timestamp as Timestamp)
+                                .millisecondsSinceEpoch)),
+                    style: const TextStyle(
+                        fontSize: IbConfig.kDescriptionTextSize,
+                        color: IbColors.lightGrey),
+                  ),
+                )
             ],
           ),
           trailing: const Icon(
