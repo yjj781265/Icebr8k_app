@@ -122,7 +122,9 @@ class PeopleNearbyPage extends StatelessWidget {
                           return;
                         }
                         Get.to(() => ChatPage(
-                            Get.put(ChatPageController(recipientId: user.id))));
+                              Get.put(ChatPageController(recipientId: user.id),
+                                  tag: user.id),
+                            ));
                       },
                       icon: const Icon(Icons.message),
                     ),

@@ -8,7 +8,6 @@ import 'package:icebr8k/backend/controllers/user_controllers/circle_settings_con
 import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
-import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_settings.dart';
@@ -290,7 +289,10 @@ class _SocialTabState extends State<SocialTab>
               Get.to(
                 () => ChatPage(
                   Get.put(
-                    ChatPageController(ibChat: item.ibChat),
+                    ChatPageController(
+                      ibChat: item.ibChat,
+                    ),
+                    tag: item.ibChat.chatId,
                   ),
                 ),
               );
@@ -328,7 +330,7 @@ class _SocialTabState extends State<SocialTab>
               children: [
                 Expanded(
                   flex: 9,
-                  child: _buildSubtitle(item),
+                  child: _controller.buildSubtitle(item),
                 ),
                 Expanded(
                   child: Container(
@@ -384,7 +386,7 @@ class _SocialTabState extends State<SocialTab>
             tileColor: Theme.of(context).backgroundColor,
             leading: Stack(
               children: [
-                _buildCircleAvatar(item),
+                _controller.buildCircleAvatar(item),
                 if (item.isMuted)
                   Positioned(
                     bottom: 0,
@@ -446,7 +448,7 @@ class _SocialTabState extends State<SocialTab>
               children: [
                 Expanded(
                   flex: 9,
-                  child: _buildSubtitle(item),
+                  child: _controller.buildSubtitle(item),
                 ),
                 Expanded(
                   child: Container(
@@ -514,27 +516,6 @@ class _SocialTabState extends State<SocialTab>
     });
   }
 
-  Widget _buildCircleAvatar(ChatTabItem item) {
-    if (item.ibChat.photoUrl.isEmpty) {
-      return CircleAvatar(
-        backgroundColor: IbColors.lightGrey,
-        radius: 24,
-        child: Text(
-          item.ibChat.name[0],
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              color: Theme.of(context).indicatorColor,
-              fontSize: 24,
-              fontWeight: FontWeight.bold),
-        ),
-      );
-    } else {
-      return IbUserAvatar(
-        avatarUrl: item.ibChat.photoUrl,
-      );
-    }
-  }
-
   Widget _buildAvatar(List<IbUser> avatarUsers) {
     final double radius = avatarUsers.length > 1 ? 10 : 24;
     return CircleAvatar(
@@ -554,58 +535,6 @@ class _SocialTabState extends State<SocialTab>
             .toList(),
       ),
     );
-  }
-
-  Widget _buildSubtitle(ChatTabItem item) {
-    if (item.ibChat.lastMessage == null) {
-      return const SizedBox();
-    }
-
-    final String messageType = item.ibChat.lastMessage!.messageType;
-    switch (messageType) {
-      case IbMessage.kMessageTypeAnnouncement:
-        return Text(
-          item.ibChat.lastMessage!.content,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-              fontSize: IbConfig.kSecondaryTextSize,
-              color: IbColors.accentColor),
-        );
-      case IbMessage.kMessageTypeText:
-        return Text(
-          '${item.lastMessageUser == null || item.ibChat.memberCount <= 2 ? '' : '${item.lastMessageUser!.username}: '}${item.ibChat.lastMessage!.content}',
-          style: TextStyle(
-              fontSize: IbConfig.kSecondaryTextSize,
-              fontWeight:
-                  item.unReadCount <= 0 ? FontWeight.normal : FontWeight.bold),
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
-        );
-      case IbMessage.kMessageTypePic:
-        return Text(
-          '${item.lastMessageUser == null || !item.ibChat.isCircle ? '' : '${item.lastMessageUser!.username}: '}[IMAGE]',
-          style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
-        );
-      case IbMessage.kMessageTypePoll:
-        return Text(
-          '${item.lastMessageUser == null || !item.ibChat.isCircle ? '' : '${item.lastMessageUser!.username}: '}[POLL]',
-          style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
-        );
-      case IbMessage.kMessageTypeIcebreaker:
-        return Text(
-          '${item.lastMessageUser == null || !item.ibChat.isCircle ? '' : '${item.lastMessageUser!.username}: '}[ICEBREAKER]',
-          style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
-        );
-      default:
-        return const SizedBox();
-    }
   }
 }
 

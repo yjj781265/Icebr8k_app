@@ -2,14 +2,21 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import '../../../frontend/ib_colors.dart';
+import '../../../frontend/ib_config.dart';
 import '../../models/ib_answer.dart';
+import '../../models/ib_chat_models/ib_message.dart';
 import '../../services/user_services/ib_chat_db_service.dart';
 import '../../services/user_services/ib_question_db_service.dart';
 import '../../services/user_services/ib_user_db_service.dart';
@@ -53,6 +60,7 @@ class SocialTabController extends GetxController {
               .indexWhere((element) => element.ibChat.chatId == ibChat.chatId);
           if (index != -1) {
             final item = await _buildItem(ibChat);
+            _showChatNotification(oldItem: oneToOneChats[index], item: item);
             oneToOneChats[index] = item;
           }
         } else {
@@ -70,7 +78,6 @@ class SocialTabController extends GetxController {
           return (b.ibChat.lastMessage!.timestamp as Timestamp)
               .compareTo(a.ibChat.lastMessage!.timestamp as Timestamp);
         });
-        calculateTotalUnread();
         oneToOneChats.refresh();
       }
       isLoadingChat.value = false;
@@ -88,6 +95,7 @@ class SocialTabController extends GetxController {
               .indexWhere((element) => element.ibChat.chatId == ibChat.chatId);
           if (index != -1) {
             final item = await _buildItem(ibChat);
+            _showChatNotification(oldItem: circles[index], item: item);
             circles[index] = item;
           }
         } else {
@@ -105,7 +113,6 @@ class SocialTabController extends GetxController {
           return (b.ibChat.lastMessage!.timestamp as Timestamp)
               .compareTo(a.ibChat.lastMessage!.timestamp as Timestamp);
         });
-        calculateTotalUnread();
         circles.refresh();
       }
       isLoadingCircles.value = false;
@@ -264,6 +271,154 @@ class SocialTabController extends GetxController {
     IbUserDbService()
         .updateIbUserNotificationCount(totalUnread.value)
         .then((value) => print('updated notification count'));
+  }
+
+  void _showChatNotification(
+      {required ChatTabItem oldItem, required ChatTabItem item}) {
+    if (item.lastMessageUser == null ||
+        item.ibChat.lastMessage == null ||
+        item.ibChat.lastMessage!.senderUid == IbUtils.getCurrentUid()) {
+      return;
+    }
+
+    if (oldItem.ibChat.lastMessage != null &&
+        oldItem.ibChat.lastMessage!.content ==
+            item.ibChat.lastMessage!.content) {
+      return;
+    }
+    GetSnackBar notification = const GetSnackBar();
+
+    if (!item.ibChat.isCircle) {
+      notification = GetSnackBar(
+        snackPosition: SnackPosition.TOP,
+        duration: const Duration(seconds: 3),
+        margin: const EdgeInsets.only(left: 8, right: 8, top: 16),
+        borderRadius: IbConfig.kCardCornerRadius,
+        icon: IbUserAvatar(
+          avatarUrl: item.lastMessageUser!.avatarUrl,
+          radius: 16,
+        ),
+        titleText: Text(
+          item.ibChat.name.isEmpty
+              ? item.lastMessageUser!.username
+              : item.ibChat.name,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        messageText: buildSubtitle(item),
+        backgroundColor: Theme.of(Get.context!).backgroundColor,
+      );
+    } else {
+      notification = GetSnackBar(
+        borderRadius: IbConfig.kCardCornerRadius,
+        duration: const Duration(seconds: 3),
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.only(left: 8, right: 8, top: 16),
+        icon: buildCircleAvatar(item, size: 16),
+        titleText: Text(
+          item.ibChat.name.isEmpty
+              ? item.lastMessageUser!.username
+              : item.ibChat.name,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        messageText: buildSubtitle(item),
+        backgroundColor: Theme.of(Get.context!).backgroundColor,
+      );
+    }
+
+    if (Get.isRegistered<ChatPageController>(tag: item.ibChat.chatId)) {
+      print('${Get.isRegistered<ChatPageController>(tag: item.ibChat.chatId)}');
+      return;
+    } else {
+      HapticFeedback.vibrate();
+      Get.showSnackbar(notification);
+      calculateTotalUnread();
+    }
+  }
+
+  Widget buildCircleAvatar(ChatTabItem item, {double size = 24}) {
+    if (Get.context == null) {
+      return const SizedBox();
+    }
+    if (item.ibChat.photoUrl.isEmpty) {
+      return CircleAvatar(
+        backgroundColor: IbColors.lightGrey,
+        radius: size,
+        child: Text(
+          item.ibChat.name[0],
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              color: Theme.of(Get.context!).indicatorColor,
+              fontSize: size,
+              fontWeight: FontWeight.bold),
+        ),
+      );
+    } else {
+      return IbUserAvatar(
+        radius: size,
+        avatarUrl: item.ibChat.photoUrl,
+      );
+    }
+  }
+
+  Widget buildSubtitle(ChatTabItem item) {
+    if (item.ibChat.lastMessage == null) {
+      return const SizedBox();
+    }
+
+    final String messageType = item.ibChat.lastMessage!.messageType;
+    switch (messageType) {
+      case IbMessage.kMessageTypeAnnouncement:
+        return Text(
+          item.ibChat.lastMessage!.content,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+              fontSize: IbConfig.kSecondaryTextSize,
+              color: IbColors.accentColor),
+        );
+      case IbMessage.kMessageTypeText:
+        return Text(
+          '${item.lastMessageUser == null || !item.ibChat.isCircle ? '' : '${item.lastMessageUser!.username}: '}${item.ibChat.lastMessage!.content}',
+          style: TextStyle(
+              fontSize: IbConfig.kSecondaryTextSize,
+              fontWeight:
+                  item.unReadCount <= 0 ? FontWeight.normal : FontWeight.bold),
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+        );
+      case IbMessage.kMessageTypePic:
+        return Text(
+          '${item.lastMessageUser == null || !item.ibChat.isCircle ? '' : '${item.lastMessageUser!.username}: '}[IMAGE]',
+          style: TextStyle(
+              fontSize: IbConfig.kSecondaryTextSize,
+              fontWeight:
+                  item.unReadCount <= 0 ? FontWeight.normal : FontWeight.bold),
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+        );
+      case IbMessage.kMessageTypePoll:
+        return Text(
+          '${item.lastMessageUser == null || !item.ibChat.isCircle ? '' : '${item.lastMessageUser!.username}: '}[POLL]',
+          style: TextStyle(
+              fontSize: IbConfig.kSecondaryTextSize,
+              fontWeight:
+                  item.unReadCount <= 0 ? FontWeight.normal : FontWeight.bold),
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+        );
+      case IbMessage.kMessageTypeIcebreaker:
+        return Text(
+          '${item.lastMessageUser == null || !item.ibChat.isCircle ? '' : '${item.lastMessageUser!.username}: '}[ICEBREAKER]',
+          style: TextStyle(
+              fontSize: IbConfig.kSecondaryTextSize,
+              fontWeight:
+                  item.unReadCount <= 0 ? FontWeight.normal : FontWeight.bold),
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+        );
+      default:
+        return const SizedBox();
+    }
   }
 
   @override

@@ -5,6 +5,7 @@ import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
+import '../../../frontend/ib_config.dart';
 import '../../db_config.dart';
 
 class IbChatDbService {
@@ -23,26 +24,35 @@ class IbChatDbService {
   }
 
   Future<void> updateReadUidArray(
-      {required String chatRoomId, required String messageId}) {
-    return _collectionRef
-        .doc(chatRoomId)
-        .collection(_kMessageSubCollection)
-        .doc(messageId)
-        .set({
-      'readUids': FieldValue.arrayUnion([IbUtils.getCurrentUid()])
-    }, SetOptions(merge: true));
+      {required String chatRoomId, required String messageId}) async {
+    final snapshot = await _collectionRef.doc(chatRoomId).get();
+    if (snapshot.exists) {
+      return _collectionRef
+          .doc(chatRoomId)
+          .collection(_kMessageSubCollection)
+          .doc(messageId)
+          .update({
+        'readUids': FieldValue.arrayUnion([IbUtils.getCurrentUid()])
+      });
+    }
   }
 
   Future<void> addTypingUid({required String chatId}) async {
-    return _collectionRef.doc(chatId).update({
-      'isTypingUids': FieldValue.arrayUnion([IbUtils.getCurrentUid()])
-    });
+    final snapshot = await _collectionRef.doc(chatId).get();
+    if (snapshot.exists) {
+      return _collectionRef.doc(chatId).update({
+        'isTypingUids': FieldValue.arrayUnion([IbUtils.getCurrentUid()])
+      });
+    }
   }
 
   Future<void> removeTypingUid({required String chatId}) async {
-    return _collectionRef.doc(chatId).update({
-      'isTypingUids': FieldValue.arrayRemove([IbUtils.getCurrentUid()])
-    });
+    final snapshot = await _collectionRef.doc(chatId).get();
+    if (snapshot.exists) {
+      return _collectionRef.doc(chatId).update({
+        'isTypingUids': FieldValue.arrayRemove([IbUtils.getCurrentUid()])
+      });
+    }
   }
 
   /// stream of ibMessage in ascending order
@@ -111,7 +121,7 @@ class IbChatDbService {
   Future<QuerySnapshot<Map<String, dynamic>>> queryMessages(
       {required String chatRoomId,
       required DocumentSnapshot<Map<String, dynamic>> snapshot,
-      int limit = 16}) {
+      int limit = IbConfig.kPerPage}) {
     return _collectionRef
         .doc(chatRoomId)
         .collection(_kMessageSubCollection)

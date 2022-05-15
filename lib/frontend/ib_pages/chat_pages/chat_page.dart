@@ -96,23 +96,27 @@ class ChatPage extends StatelessWidget {
         ),
         actions: [
           Obx(
-            () => IconButton(
-                onPressed: () async {
-                  if (_controller.isMuted.isTrue) {
-                    await _controller.unMuteNotification();
-                  } else {
-                    await _controller.muteNotification();
-                  }
-                },
-                icon: Icon(_controller.isMuted.isTrue
-                    ? Icons.notifications_off
-                    : Icons.notifications_on)),
+            () => _controller.showSettings.isTrue
+                ? IconButton(
+                    onPressed: () async {
+                      if (_controller.isMuted.isTrue) {
+                        await _controller.unMuteNotification();
+                      } else {
+                        await _controller.muteNotification();
+                      }
+                    },
+                    icon: Icon(_controller.isMuted.isTrue
+                        ? Icons.notifications_off
+                        : Icons.notifications_on))
+                : const SizedBox(),
           ),
-          IconButton(
-              onPressed: () {
-                Get.to(() => ChatPageSettings(_controller));
-              },
-              icon: const Icon(Icons.settings))
+          Obx(() => _controller.showSettings.isTrue
+              ? IconButton(
+                  onPressed: () {
+                    Get.to(() => ChatPageSettings(_controller));
+                  },
+                  icon: const Icon(Icons.settings))
+              : const SizedBox()),
         ],
       ),
       body: Obx(
@@ -232,11 +236,11 @@ class ChatPage extends StatelessWidget {
                           child: IconButton(
                             padding: EdgeInsets.zero,
                             onPressed: () {
-                              _controller.showOptions.value =
-                                  !_controller.showOptions.value;
+                              _controller.showMsgOptions.value =
+                                  !_controller.showMsgOptions.value;
                             },
                             icon: Icon(
-                                _controller.showOptions.isTrue
+                                _controller.showMsgOptions.isTrue
                                     ? Icons.remove
                                     : Icons.add,
                                 color: Theme.of(context).indicatorColor),
@@ -299,7 +303,7 @@ class ChatPage extends StatelessWidget {
                   ],
                 ),
               ),
-              if (_controller.showOptions.isTrue)
+              if (_controller.showMsgOptions.isTrue)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
@@ -310,7 +314,7 @@ class ChatPage extends StatelessWidget {
                             color: IbColors.primaryColor,
                             iconData: Icons.poll,
                             onPressed: () {
-                              _controller.showOptions.value = false;
+                              _controller.showMsgOptions.value = false;
                               final chatTabItem = IbUtils.getCircleItems()
                                   .firstWhereOrNull((element) =>
                                       element.ibChat.chatId ==
@@ -331,7 +335,7 @@ class ChatPage extends StatelessWidget {
                           color: IbColors.accentColor,
                           iconData: Icons.gif,
                           onPressed: () {
-                            _controller.showOptions.value = false;
+                            _controller.showMsgOptions.value = false;
                             showMediaBtmSheet();
                           },
                           text: 'GIF'),

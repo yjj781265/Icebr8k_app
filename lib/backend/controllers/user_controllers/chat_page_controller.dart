@@ -38,7 +38,8 @@ class ChatPageController extends GetxController {
   final isCircle = false.obs;
   final isPublicCircle = false.obs;
   final showNewMsgAlert = false.obs;
-  final showOptions = false.obs;
+  final showMsgOptions = false.obs;
+  final showSettings = false.obs;
   final messages = <IbMessageModel>[].obs;
 
   /// for media previewer of input widget
@@ -52,7 +53,6 @@ class ChatPageController extends GetxController {
   StreamSubscription? _chatSub;
   final isSending = false.obs;
   final isMuted = false.obs;
-  final int kQueryLimit = 16;
   DocumentSnapshot<Map<String, dynamic>>? lastSnap;
   final txtController = TextEditingController();
   final TextEditingController titleTxtController = TextEditingController();
@@ -78,6 +78,37 @@ class ChatPageController extends GetxController {
           chatRoomId: ''));
   @override
   Future<void> onInit() async {
+    super.onInit();
+  }
+
+  @override
+  Future<void> onReady() async {
+    await initData();
+
+    /// reset unread count
+    if (ibChat != null && Get.isRegistered<SocialTabController>()) {
+      if (ibChat!.isCircle) {
+        final item = Get.find<SocialTabController>().circles.firstWhereOrNull(
+            (element) => element.ibChat.chatId == ibChat!.chatId);
+        if (item != null) {
+          item.unReadCount = 0;
+          Get.find<SocialTabController>().circles.refresh();
+          Get.find<SocialTabController>().calculateTotalUnread();
+        }
+      }
+
+      if (!ibChat!.isCircle) {
+        final item = Get.find<SocialTabController>()
+            .oneToOneChats
+            .firstWhereOrNull(
+                (element) => element.ibChat.chatId == ibChat!.chatId);
+        if (item != null) {
+          item.unReadCount = 0;
+          Get.find<SocialTabController>().oneToOneChats.refresh();
+          Get.find<SocialTabController>().calculateTotalUnread();
+        }
+      }
+    }
     itemPositionsListener.itemPositions.addListener(() {
       if (itemPositionsListener.itemPositions.value
           .map((e) => e.index)
@@ -86,8 +117,6 @@ class ChatPageController extends GetxController {
         showNewMsgAlert.value = false;
       }
     });
-
-    await initData();
 
     // remove typing after 8s
     debounce(text, (value) async {
@@ -121,35 +150,8 @@ class ChatPageController extends GetxController {
         await IbChatDbService().removeTypingUid(chatId: ibChat!.chatId);
       }
     });
-    super.onInit();
-  }
 
-  @override
-  void onReady() {
-    /// reset unread count
-    if (ibChat != null && Get.isRegistered<SocialTabController>()) {
-      if (ibChat!.isCircle) {
-        final item = Get.find<SocialTabController>().circles.firstWhereOrNull(
-            (element) => element.ibChat.chatId == ibChat!.chatId);
-        if (item != null) {
-          item.unReadCount = 0;
-          Get.find<SocialTabController>().circles.refresh();
-          Get.find<SocialTabController>().calculateTotalUnread();
-        }
-      }
-
-      if (!ibChat!.isCircle) {
-        final item = Get.find<SocialTabController>()
-            .oneToOneChats
-            .firstWhereOrNull(
-                (element) => element.ibChat.chatId == ibChat!.chatId);
-        if (item != null) {
-          item.unReadCount = 0;
-          Get.find<SocialTabController>().oneToOneChats.refresh();
-          Get.find<SocialTabController>().calculateTotalUnread();
-        }
-      }
-    }
+    showWelcomeMsg();
   }
 
   List<String> _generateMentionIds() {
@@ -241,8 +243,10 @@ class ChatPageController extends GetxController {
     if (_chatSub != null) {
       await _chatSub!.cancel();
     }
+    if (ibChat != null) {
+      await IbChatDbService().removeTypingUid(chatId: ibChat!.chatId);
+    }
 
-    await IbChatDbService().removeTypingUid(chatId: ibChat!.chatId);
     super.onClose();
   }
 
@@ -264,7 +268,6 @@ class ChatPageController extends GetxController {
         (element) => element.member.role == IbChatMember.kRoleLeader);
 
     if (ibChat != null &&
-        ibChat!.welcomeMsg.isNotEmpty &&
         leader != null &&
         ibChat!.isCircle &&
         Get.context != null &&
@@ -576,6 +579,7 @@ class ChatPageController extends GetxController {
 
   void setUpInfo() {
     if (ibChat != null) {
+      showSettings.value = true;
       if (title.value.isEmpty) {
         title.value = ibChat!.name;
       }
@@ -587,6 +591,13 @@ class ChatPageController extends GetxController {
       isMuted.value = ibChat!.mutedUids.contains(IbUtils.getCurrentUid());
       isCircle.value = ibChat!.isCircle;
       isPublicCircle.value = ibChat!.isPublicCircle;
+    } else if (recipientId.isNotEmpty) {
+      IbUserDbService().queryIbUser(recipientId).then((value) {
+        title.value = value == null ? '' : value.username;
+        avatarUrl.value = value == null ? '' : value.avatarUrl;
+        isCircle.value = false;
+        isPublicCircle.value = false;
+      });
     }
   }
 
@@ -663,7 +674,6 @@ class ChatPageController extends GetxController {
 
       if (txtController.text.trim().isNotEmpty) {
         await IbChatDbService().uploadMessage(buildTxtMessage());
-        _generateMentionIds();
         txtController.clear();
       }
     } catch (e) {
@@ -934,17 +944,17 @@ class ChatPageController extends GetxController {
       messages.add(loadMessage);
       final snapshot = await Future.delayed(
           const Duration(milliseconds: 1000),
-          () => IbChatDbService().queryMessages(
-              chatRoomId: ibChat!.chatId,
-              snapshot: lastSnap!,
-              limit: kQueryLimit));
+          () async => IbChatDbService().queryMessages(
+                chatRoomId: ibChat!.chatId,
+                snapshot: lastSnap!,
+              ));
 
       final List<IbMessageModel> tempList = [];
 
       for (final doc in snapshot.docs) {
         final IbMessage message = IbMessage.fromJson(doc.data());
         if (messages.indexWhere((element) =>
-                element.ibMessage.messageId == message.messageId) ==
+                element.ibMessage.messageId == message.messageId) !=
             -1) {
           continue;
         }
