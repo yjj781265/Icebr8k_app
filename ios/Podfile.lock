@@ -397,7 +397,7 @@ PODS:
     - Firebase/Crashlytics (= 8.14.0)
     - firebase_core
     - Flutter
-  - firebase_messaging (11.2.12):
+  - firebase_messaging (11.3.0):
     - Firebase/Messaging (= 8.14.0)
     - firebase_core
     - Flutter
@@ -602,6 +602,8 @@ PODS:
   - path_provider_ios (0.0.1):
     - Flutter
   - PromisesObjC (2.1.0)
+  - sensors_plus (0.0.1):
+    - Flutter
   - shared_preferences_ios (0.0.1):
     - Flutter
   - sqflite (0.0.2):
@@ -636,6 +638,7 @@ DEPENDENCIES:
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - move_to_background (from `.symlinks/plugins/move_to_background/ios`)
   - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
+  - sensors_plus (from `.symlinks/plugins/sensors_plus/ios`)
   - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
@@ -706,6 +709,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/move_to_background/ios"
   path_provider_ios:
     :path: ".symlinks/plugins/path_provider_ios/ios"
+  sensors_plus:
+    :path: ".symlinks/plugins/sensors_plus/ios"
   shared_preferences_ios:
     :path: ".symlinks/plugins/shared_preferences_ios/ios"
   sqflite:
@@ -730,7 +735,7 @@ SPEC CHECKSUMS:
   firebase_auth: e720e83a58c9efe4f3b8a96b4afe2fbf84fdb28e
   firebase_core: b0b382f1497ab407aceb25e41e3036c8798c1609
   firebase_crashlytics: 4855a96241cfc4cb92a81bebedc29ea29488373a
-  firebase_messaging: 34dd10d1aa6d8f40d03660eeacd0452d62eec7aa
+  firebase_messaging: 1ff739d548cc5afebf9b5e7cbfb145dce8541fad
   firebase_performance: e91b4072bd7e3be2c74112c923a290f018598ad9
   firebase_storage: f8843a3d37aafd048659f2cb523107bb54e36f69
   FirebaseABTesting: aaa0e096c9fc9972ce6806d596e8fcc077d4371f
@@ -762,6 +767,7 @@ SPEC CHECKSUMS:
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
   PromisesObjC: 99b6f43f9e1044bd87a95a60beff28c2c44ddb72
+  sensors_plus: 5717760720f7e6acd96fdbd75b7428f5ad755ec2
   shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
   sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863

@@ -26,7 +26,6 @@ class PeopleNearbyCard extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Scrollbar(
           radius: const Radius.circular(16),
-          controller: ScrollController(),
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
