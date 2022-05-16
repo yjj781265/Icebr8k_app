@@ -397,7 +397,7 @@ PODS:
     - Firebase/Crashlytics (= 8.14.0)
     - firebase_core
     - Flutter
-  - firebase_messaging (11.3.0):
+  - firebase_messaging (11.4.0):
     - Firebase/Messaging (= 8.14.0)
     - firebase_core
     - Flutter
@@ -528,17 +528,6 @@ PODS:
     - GoogleUtilities/Environment (~> 7.2)
     - nanopb (~> 2.30908.0)
     - PromisesObjC (< 3.0, >= 1.2)
-  - GoogleUtilities (7.7.0):
-    - GoogleUtilities/AppDelegateSwizzler (= 7.7.0)
-    - GoogleUtilities/Environment (= 7.7.0)
-    - GoogleUtilities/ISASwizzler (= 7.7.0)
-    - GoogleUtilities/Logger (= 7.7.0)
-    - GoogleUtilities/MethodSwizzler (= 7.7.0)
-    - GoogleUtilities/Network (= 7.7.0)
-    - "GoogleUtilities/NSData+zlib (= 7.7.0)"
-    - GoogleUtilities/Reachability (= 7.7.0)
-    - GoogleUtilities/SwizzlerTestHelpers (= 7.7.0)
-    - GoogleUtilities/UserDefaults (= 7.7.0)
   - GoogleUtilities/AppDelegateSwizzler (7.7.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
@@ -557,8 +546,6 @@ PODS:
   - "GoogleUtilities/NSData+zlib (7.7.0)"
   - GoogleUtilities/Reachability (7.7.0):
     - GoogleUtilities/Logger
-  - GoogleUtilities/SwizzlerTestHelpers (7.7.0):
-    - GoogleUtilities/MethodSwizzler
   - GoogleUtilities/UserDefaults (7.7.0):
     - GoogleUtilities/Logger
   - "gRPC-C++ (1.28.2)":
@@ -623,7 +610,6 @@ DEPENDENCIES:
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - cloud_functions (from `.symlinks/plugins/cloud_functions/ios`)
   - emoji_picker_flutter (from `.symlinks/plugins/emoji_picker_flutter/ios`)
-  - Firebase/Messaging
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
@@ -633,7 +619,6 @@ DEPENDENCIES:
   - firebase_storage (from `.symlinks/plugins/firebase_storage/ios`)
   - Flutter (from `Flutter`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
-  - GoogleUtilities
   - image_cropper (from `.symlinks/plugins/image_cropper/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - move_to_background (from `.symlinks/plugins/move_to_background/ios`)
@@ -735,7 +720,7 @@ SPEC CHECKSUMS:
   firebase_auth: e720e83a58c9efe4f3b8a96b4afe2fbf84fdb28e
   firebase_core: b0b382f1497ab407aceb25e41e3036c8798c1609
   firebase_crashlytics: 4855a96241cfc4cb92a81bebedc29ea29488373a
-  firebase_messaging: 1ff739d548cc5afebf9b5e7cbfb145dce8541fad
+  firebase_messaging: 93a33994ae5ba316ffebf35443243694828ad845
   firebase_performance: e91b4072bd7e3be2c74112c923a290f018598ad9
   firebase_storage: f8843a3d37aafd048659f2cb523107bb54e36f69
   FirebaseABTesting: aaa0e096c9fc9972ce6806d596e8fcc077d4371f
@@ -776,6 +761,6 @@ SPEC CHECKSUMS:
   wakelock: d0fc7c864128eac40eba1617cb5264d9c940b46f
   webview_flutter_wkwebview: b7e70ef1ddded7e69c796c7390ee74180182971f
 
-PODFILE CHECKSUM: 39d8a982fabf4318dc9f67b5bdf5590d4752c763
+PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 
 COCOAPODS: 1.11.3

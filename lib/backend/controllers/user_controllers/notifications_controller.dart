@@ -86,10 +86,12 @@ class NotificationController extends GetxController {
     if (fcmToken == null) {
       print('fcm token return null value!!');
     } else {
+      print('fcm token is granted!');
       await fcm.subscribeToTopic('Users${DbConfig.dbSuffix}');
       await IbUserDbService().saveTokenToDatabase(fcmToken);
       await handleRemoteMessageFromTerminatedState();
       FirebaseMessaging.onMessageOpenedApp.listen((event) async {
+        print(event.data);
         if (event.data['type'] == IbNotification.kChat) {
           final chatId = event.data['url'] as String;
           final ibChat = await IbChatDbService().queryChat(chatId);
