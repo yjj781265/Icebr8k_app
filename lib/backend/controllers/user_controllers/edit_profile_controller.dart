@@ -142,6 +142,16 @@ class EditProfileController extends GetxController {
       return;
     }
 
+    if (usernameTeController.text.trim().length < IbConfig.kUsernameMinLength) {
+      Get.dialog(const IbDialog(
+        title: 'Error',
+        subtitle: "Username needs at least 3 characters",
+        showNegativeBtn: false,
+        positiveTextKey: 'ok',
+      ));
+      return;
+    }
+
     if (!GetUtils.isUsername(usernameTeController.text.trim()) ||
         usernameTeController.text.trim().toLowerCase() == 'anonymous') {
       Get.dialog(const IbDialog(

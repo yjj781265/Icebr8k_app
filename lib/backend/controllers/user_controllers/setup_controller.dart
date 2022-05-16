@@ -6,12 +6,14 @@ import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart
 import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
-import 'package:icebr8k/frontend/ib_pages/review_page.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_three.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_two.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
+
+import '../../../frontend/ib_pages/review_page.dart';
 
 class SetupController extends GetxController {
   final TextEditingController birthdateTeController = TextEditingController();
@@ -160,6 +162,16 @@ class SetupController extends GetxController {
       Get.dialog(const IbDialog(
         title: 'Missing Info',
         subtitle: "Avatar is empty",
+        showNegativeBtn: false,
+        positiveTextKey: 'ok',
+      ));
+      return;
+    }
+
+    if (usernameTeController.text.trim().length < IbConfig.kUsernameMinLength) {
+      Get.dialog(const IbDialog(
+        title: 'Error',
+        subtitle: "Username needs at least 3 characters",
         showNegativeBtn: false,
         positiveTextKey: 'ok',
       ));
