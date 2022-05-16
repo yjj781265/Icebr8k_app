@@ -514,6 +514,7 @@ class ReviewQuestionPage extends StatelessWidget {
     for (final String text in ibQuestion.tags) {
       await IbTagDbService().uploadTag(text);
     }
+    await IbQuestionDbService().uploadQuestion(ibQuestion);
 
     /// add IbMessage to selected circles
     for (final item in itemController.sharedCircles) {
@@ -526,7 +527,6 @@ class ReviewQuestionPage extends StatelessWidget {
           chatRoomId: item.ibChat.chatId));
     }
 
-    await IbQuestionDbService().uploadQuestion(ibQuestion);
     Get.back(closeOverlays: true);
     Get.back(closeOverlays: true);
     IbUtils.showSimpleSnackBar(
