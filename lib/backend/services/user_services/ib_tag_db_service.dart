@@ -28,6 +28,7 @@ class IbTagDbService {
     }
   }
 
+  /// retrieve IbTag and cache locally
   Future<IbTag?> retrieveIbTag(String tagText) async {
     final snapshot = await _db.collection(_kTagCollection).doc(tagText).get();
 
