@@ -363,29 +363,26 @@ class ChatPage extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: LimitedBox(
         maxWidth: 200,
-        child: IbCard(
-            color: Theme.of(context).backgroundColor.withOpacity(0.9),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Wrap(
-                  children: _controller.isTypingUsers
-                      .map((element) => element)
-                      .toList()
-                      .map((element) => Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: IbUserAvatar(
-                              avatarUrl: element.avatarUrl,
-                              radius: 8,
-                            ),
-                          ))
-                      .toList(),
-                ),
-                SizedBox(
-                    height: 30,
-                    child: Lottie.asset('assets/images/typing.json'))
-              ],
-            )),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Wrap(
+              children: _controller.isTypingUsers
+                  .map((element) => element)
+                  .toList()
+                  .map((element) => Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: IbUserAvatar(
+                          avatarUrl: element.avatarUrl,
+                          radius: 10,
+                        ),
+                      ))
+                  .toList(),
+            ),
+            SizedBox(
+                height: 30, child: Lottie.asset('assets/images/typing.json'))
+          ],
+        ),
       ),
     );
   }

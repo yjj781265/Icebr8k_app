@@ -363,6 +363,17 @@ class SocialTabController extends GetxController {
     if (item.ibChat.lastMessage == null) {
       return const SizedBox();
     }
+    if (item.ibChat.isTypingUids.isNotEmpty) {
+      return const Text(
+        'someone is typing...',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+            fontSize: IbConfig.kSecondaryTextSize,
+            fontStyle: FontStyle.italic,
+            color: IbColors.lightGrey),
+      );
+    }
 
     final String messageType = item.ibChat.lastMessage!.messageType;
     switch (messageType) {
