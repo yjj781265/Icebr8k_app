@@ -125,21 +125,33 @@ class ChatPageController extends GetxController {
     }, time: const Duration(seconds: 8));
 
     txtController.addListener(() async {
+      print('text:$text, textController: ${txtController.text}');
       if (text.value == txtController.text) {
         return;
       }
-      //detect @
-      if (txtController.text.endsWith('@') &&
-          txtController.text.length > text.value.length) {
-        if (txtController.text.length > 1 &&
-            txtController.text
-                .split('')[txtController.text.length - 2]
-                .isAlphabetOnly) {
-          return;
+      final list = txtController.text.split(' ');
+
+      /// new text value length has increased
+      if (txtController.text.length > text.value.length) {
+        final str = list[list.length - 1];
+        if (str.startsWith('@')) {
+          showMentionList();
         }
-        showMentionList();
+      } else {
+        /// new text value length has decreasedfinal
+        final str = list[list.length - 1];
+        if (str.startsWith('@')) {
+          list.removeAt(list.length - 1);
+          final text = list.join(' ');
+          txtController.value = TextEditingValue(
+              text: text,
+              selection: TextSelection(
+                  baseOffset: text.length, extentOffset: text.length));
+        }
       }
+
       text.value = txtController.text;
+
       if (ibChat != null &&
           txtController.text.trim().isNotEmpty &&
           isTyping.isFalse) {
@@ -201,7 +213,7 @@ class ChatPageController extends GetxController {
     }
     ibChatMembers.sort((a, b) => a.user.username.compareTo(b.user.username));
     final options = IbCard(
-        radius: 0,
+        radius: 8,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
