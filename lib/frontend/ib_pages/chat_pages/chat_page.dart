@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/circle_settings_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
@@ -23,13 +22,13 @@ import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_rich_text.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:icebr8k/frontend/ib_widgets/icebreaker_card.dart';
 import 'package:lottie/lottie.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../backend/controllers/user_controllers/chat_page_controller.dart';
 import '../../../backend/controllers/user_controllers/ib_question_item_controller.dart';
@@ -334,9 +333,16 @@ class ChatPage extends StatelessWidget {
                       IbActionButton(
                           color: IbColors.accentColor,
                           iconData: Icons.gif,
-                          onPressed: () {
+                          onPressed: () async {
                             _controller.showMsgOptions.value = false;
-                            showMediaBtmSheet();
+                            IbUtils.hideKeyboard();
+                            final gifUrl = await Get.to(
+                              () => IbTenorPage(),
+                            );
+                            if (gifUrl != null &&
+                                gifUrl.toString().isNotEmpty) {
+                              _controller.urls.add(gifUrl!.toString());
+                            }
                           },
                           text: 'GIF'),
                     ],
@@ -473,23 +479,14 @@ class ChatPage extends StatelessWidget {
     );
   }
 
-  void showMediaBtmSheet() {
+/*  void showMediaBtmSheet() {
     IbUtils.hideKeyboard();
     final options = IbCard(
         child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         ListTile(
-          onTap: () async {
-            IbUtils.hideKeyboard();
-            Get.back();
-            final gifUrl = await Get.to(
-              () => IbTenorPage(),
-            );
-            if (gifUrl != null && gifUrl.toString().isNotEmpty) {
-              _controller.urls.add(gifUrl!.toString());
-            }
-          },
+          onTap: () async {},
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(16))),
           title: const Text('Choose GIF from Tenor'),
@@ -501,7 +498,7 @@ class ChatPage extends StatelessWidget {
       ],
     ));
     Get.bottomSheet(SafeArea(child: options), ignoreSafeArea: false);
-  }
+  }*/
 
   Widget _newMessageAlert(BuildContext context) {
     return Obx(() {
@@ -570,16 +567,10 @@ class ChatPage extends StatelessWidget {
                             bottomRight: Radius.circular(16))),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Linkify(
-                        linkStyle: const TextStyle(color: IbColors.creamYellow),
-                        options: const LinkifyOptions(looseUrl: true),
-                        onOpen: (link) async {
-                          if (await canLaunch(link.url)) {
-                            launch(link.url);
-                          }
-                        },
-                        text: message.content,
-                        style: const TextStyle(
+                      child: IbRichText(
+                        highlightColor: Colors.greenAccent,
+                        string: message.content,
+                        defaultTextStyle: const TextStyle(
                             color: Colors.black,
                             fontSize: IbConfig.kNormalTextSize),
                       ),
@@ -659,15 +650,9 @@ class ChatPage extends StatelessWidget {
                                 bottomRight: Radius.circular(16))),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Linkify(
-                            options: const LinkifyOptions(looseUrl: true),
-                            text: message.content,
-                            onOpen: (link) async {
-                              if (await canLaunch(link.url)) {
-                                launch(link.url);
-                              }
-                            },
-                            style: const TextStyle(
+                          child: IbRichText(
+                            string: message.content,
+                            defaultTextStyle: const TextStyle(
                                 color: Colors.black,
                                 fontSize: IbConfig.kNormalTextSize),
                           ),
@@ -1008,7 +993,7 @@ class ChatPage extends StatelessWidget {
                   avatarUrl: avatarUrl,
                   radius: 11,
                 ),
-                Text(' $username shared a icebreaker')
+                Text(' $username shared an icebreaker')
               ],
             ),
             const IbCard(
@@ -1047,7 +1032,7 @@ class ChatPage extends StatelessWidget {
                 avatarUrl: avatarUrl,
                 radius: 11,
               ),
-              Text(' $username shared a icebreaker')
+              Text(' $username shared an icebreaker')
             ],
           ),
           Padding(

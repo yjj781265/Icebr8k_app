@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
@@ -62,6 +61,7 @@ class SocialTabController extends GetxController {
             final item = await _buildItem(ibChat);
             _showChatNotification(oldItem: oneToOneChats[index], item: item);
             oneToOneChats[index] = item;
+            calculateTotalUnread();
           }
         } else {
           final index = oneToOneChats
@@ -80,6 +80,7 @@ class SocialTabController extends GetxController {
         });
         oneToOneChats.refresh();
       }
+      calculateTotalUnread();
       isLoadingChat.value = false;
     });
 
@@ -115,6 +116,7 @@ class SocialTabController extends GetxController {
         });
         circles.refresh();
       }
+      calculateTotalUnread();
       isLoadingCircles.value = false;
     });
 
@@ -148,7 +150,6 @@ class SocialTabController extends GetxController {
       friends.value = friends.toSet().toList();
       friends.sort((a, b) => b.compScore.compareTo(a.compScore));
       friends.refresh();
-
       isFriendListLoading.value = false;
     });
 
@@ -315,23 +316,21 @@ class SocialTabController extends GetxController {
         margin: const EdgeInsets.only(left: 8, right: 8, top: 16),
         icon: buildCircleAvatar(item, size: 16),
         titleText: Text(
-          item.ibChat.name.isEmpty
-              ? item.lastMessageUser!.username
-              : item.ibChat.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+            item.ibChat.name.isEmpty
+                ? item.lastMessageUser!.username
+                : item.ibChat.name,
+            style: const TextStyle(fontWeight: FontWeight.bold)),
         messageText: buildSubtitle(item),
         backgroundColor: Theme.of(Get.context!).backgroundColor,
       );
     }
 
-    if (Get.isRegistered<ChatPageController>(tag: item.ibChat.chatId)) {
-      print('${Get.isRegistered<ChatPageController>(tag: item.ibChat.chatId)}');
+    if (Get.isRegistered<ChatPageController>(tag: item.ibChat.chatId) ||
+        Get.isRegistered<ChatPageController>(tag: item.lastMessageUser!.id) ||
+        item.ibChat.mutedUids.contains(IbUtils.getCurrentUid())) {
       return;
     } else {
-      HapticFeedback.vibrate();
       Get.showSnackbar(notification);
-      calculateTotalUnread();
     }
   }
 

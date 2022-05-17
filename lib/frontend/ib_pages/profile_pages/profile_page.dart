@@ -133,12 +133,7 @@ class ProfilePage extends StatelessWidget {
                                             Get.to(() => ChatPage(Get.put(
                                                 ChatPageController(
                                                     recipientId: _controller
-                                                        .rxIbUser.value.id)
-                                                  ..title.value = _controller
-                                                      .rxIbUser.value.username
-                                                  ..avatarUrl.value =
-                                                      _controller.rxIbUser.value
-                                                          .avatarUrl,
+                                                        .rxIbUser.value.id),
                                                 tag: _controller
                                                     .rxIbUser.value.id)));
                                           },

@@ -28,7 +28,7 @@ class ReplyPage extends StatelessWidget {
       appBar: AppBar(
         centerTitle: false,
         title: Obx(
-              () => Text(
+          () => Text(
             'Replies${_controller.count.value == 0 ? '' : '(${_controller.count.value})'}',
             style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
           ),
@@ -73,7 +73,7 @@ class ReplyPage extends StatelessWidget {
                   noDataText: 'no_more_replies'.tr,
                 ),
                 enablePullUp:
-                _controller.comments.length >= _controller.kPerPageMax,
+                    _controller.comments.length >= _controller.kPerPageMax,
                 enablePullDown: false,
                 onLoading: () async {
                   await _controller.loadMore();
@@ -94,7 +94,7 @@ class ReplyPage extends StatelessWidget {
                               child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Column(
@@ -105,19 +105,19 @@ class ReplyPage extends StatelessWidget {
                                           uid: item.ibComment.uid,
                                         ),
                                         if (item.user.id ==
-                                            _controller.creatorId.value &&
+                                                _controller.creatorId.value &&
                                             _controller
                                                 .isQuestionAnonymous.isFalse)
                                           Padding(
                                             padding:
-                                            const EdgeInsets.only(top: 4.0),
+                                                const EdgeInsets.only(top: 4.0),
                                             child: Container(
                                               padding: const EdgeInsets.all(2),
                                               decoration: const BoxDecoration(
                                                   color: IbColors.primaryColor,
                                                   borderRadius:
-                                                  BorderRadius.all(
-                                                      Radius.circular(4))),
+                                                      BorderRadius.all(
+                                                          Radius.circular(4))),
                                               child: const Text(
                                                 'Creator',
                                                 style: TextStyle(fontSize: 8),
@@ -133,21 +133,21 @@ class ReplyPage extends StatelessWidget {
                                       child: SingleChildScrollView(
                                         child: Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Row(
                                               mainAxisAlignment:
-                                              MainAxisAlignment
-                                                  .spaceBetween,
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: [
                                                 Text(
                                                   item.user.username,
                                                   overflow:
-                                                  TextOverflow.ellipsis,
+                                                      TextOverflow.ellipsis,
                                                   style: const TextStyle(
                                                       fontWeight:
-                                                      FontWeight.bold,
+                                                          FontWeight.bold,
                                                       fontSize: IbConfig
                                                           .kNormalTextSize),
                                                 ),
@@ -157,11 +157,11 @@ class ReplyPage extends StatelessWidget {
                                               item.ibComment.timestamp == null
                                                   ? 'Posting...'
                                                   : IbUtils
-                                                  .getAgoDateTimeString(
-                                                  (item.ibComment
-                                                      .timestamp
-                                                  as Timestamp)
-                                                      .toDate()),
+                                                      .getAgoDateTimeString(
+                                                          (item.ibComment
+                                                                      .timestamp
+                                                                  as Timestamp)
+                                                              .toDate()),
                                               style: const TextStyle(
                                                   fontSize: IbConfig
                                                       .kDescriptionTextSize,
@@ -172,9 +172,9 @@ class ReplyPage extends StatelessWidget {
                                             ),
                                             IbRichText(
                                               string: item.ibComment.content,
-                                              defaultTextStyle :const TextStyle(
+                                              defaultTextStyle: const TextStyle(
                                                   fontSize:
-                                                  IbConfig.kNormalTextSize),
+                                                      IbConfig.kNormalTextSize),
                                             ),
                                             TextButton(
                                                 onPressed: () async {
@@ -233,7 +233,7 @@ class ReplyPage extends StatelessWidget {
                 ),
               ),
               child: Obx(
-                    () => TextField(
+                () => TextField(
                   minLines: 1,
                   maxLines: 5,
                   focusNode: _controller.node,
@@ -251,24 +251,24 @@ class ReplyPage extends StatelessWidget {
                     border: InputBorder.none,
                     suffixIcon: _controller.isAddingReply.isTrue
                         ? const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: SizedBox(
-                          height: 16,
-                          width: 16,
-                          child: CircularProgressIndicator()),
-                    )
+                            padding: EdgeInsets.all(8.0),
+                            child: SizedBox(
+                                height: 16,
+                                width: 16,
+                                child: CircularProgressIndicator()),
+                          )
                         : IconButton(
-                      icon: const Icon(
-                        FontAwesomeIcons.reply,
-                        color: IbColors.primaryColor,
-                      ),
-                      onPressed: () async {
-                        await _controller.addReply(
-                            text:
-                            _controller.editingController.text.trim(),
-                            type: IbComment.kCommentTypeText);
-                      },
-                    ),
+                            icon: const Icon(
+                              FontAwesomeIcons.reply,
+                              color: IbColors.primaryColor,
+                            ),
+                            onPressed: () async {
+                              await _controller.addReply(
+                                  text:
+                                      _controller.editingController.text.trim(),
+                                  type: IbComment.kCommentTypeText);
+                            },
+                          ),
                   ),
                 ),
               ),
@@ -385,7 +385,7 @@ class ReplyPage extends StatelessWidget {
     _controller.editingController.value = TextEditingValue(
         text: text,
         selection:
-        TextSelection(baseOffset: text.length, extentOffset: text.length));
+            TextSelection(baseOffset: text.length, extentOffset: text.length));
     _controller.node.requestFocus();
     _controller.notifyUid = item.user.id;
   }
