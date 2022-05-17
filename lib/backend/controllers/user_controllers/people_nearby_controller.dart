@@ -13,7 +13,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 
 class PeopleNearbyController extends GetxController {
   CarouselController carouselController = CarouselController();
-  final rangeInMi = 10.0.obs;
+  final rangeInMi = 50.0.obs;
   final genderSelections = [true, true, true].obs;
   final currentIndex = 0.obs;
   final rangeValue = const RangeValues(13, 60).obs;
@@ -262,14 +262,6 @@ class PeopleNearbyController extends GetxController {
       items.addAll(tempList);
     } else {}
   }
-
-  @override
-  Future<void> onInit() async {
-    super.onInit();
-  }
-
-  @override
-  void onClose() {}
 
   @override
   Future<void> onReady() async {

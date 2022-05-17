@@ -22,6 +22,8 @@ class PeopleNearbyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IbCard(
+      margin: EdgeInsets.zero,
+      elevation: 0,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Scrollbar(
@@ -107,7 +109,7 @@ class PeopleNearbyCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Common Tags',
+            'You Both Followed',
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: IbConfig.kNormalTextSize),
