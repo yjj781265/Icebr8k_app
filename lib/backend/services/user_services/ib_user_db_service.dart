@@ -254,4 +254,15 @@ class IbUserDbService {
       });
     }
   }
+
+  static const String userNameFieldName= "username";
+  Future<String?> queryUserIdFromUserName(String userName) async {
+    final snapshot = await _collectionRef
+        .where(userNameFieldName, isEqualTo: userName)
+        .get();
+    if (snapshot.size == 0) {
+      return null;
+    }
+    return snapshot.docs.first.data()["id"] as String;
+  }
 }

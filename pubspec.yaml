@@ -63,7 +63,7 @@ dependencies:
   scrollable_positioned_list: ^0.2.3
   shake: ^2.1.0
   showcaseview: ^1.1.5
-  url_launcher: ^6.0.20
+  url_launcher: 6.1.2
   uuid: ^3.0.6
 
 
