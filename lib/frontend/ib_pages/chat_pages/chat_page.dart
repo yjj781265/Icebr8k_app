@@ -133,30 +133,33 @@ class ChatPage extends StatelessWidget {
                 Expanded(
                   child: Stack(
                     children: [
-                      NotificationListener<ScrollNotification>(
-                        child: ScrollablePositionedList.builder(
-                          shrinkWrap: true,
-                          physics: const BouncingScrollPhysics(),
-                          reverse: true,
-                          itemScrollController:
-                              _controller.itemScrollController,
-                          itemPositionsListener:
-                              _controller.itemPositionsListener,
-                          itemBuilder: (context, index) {
-                            return _handleMessageType(
-                                model: _controller.messages[index],
-                                context: context);
+                      GestureDetector(
+                        onTap: () => IbUtils.hideKeyboard(),
+                        child: NotificationListener<ScrollNotification>(
+                          child: ScrollablePositionedList.builder(
+                            shrinkWrap: true,
+                            physics: const BouncingScrollPhysics(),
+                            reverse: true,
+                            itemScrollController:
+                                _controller.itemScrollController,
+                            itemPositionsListener:
+                                _controller.itemPositionsListener,
+                            itemBuilder: (context, index) {
+                              return _handleMessageType(
+                                  model: _controller.messages[index],
+                                  context: context);
+                            },
+                            itemCount: _controller.messages.length,
+                          ),
+                          onNotification: (info) {
+                            if (info.metrics.pixels -
+                                    info.metrics.maxScrollExtent >
+                                32) {
+                              _controller.loadMore();
+                            }
+                            return true;
                           },
-                          itemCount: _controller.messages.length,
                         ),
-                        onNotification: (info) {
-                          if (info.metrics.pixels -
-                                  info.metrics.maxScrollExtent >
-                              32) {
-                            _controller.loadMore();
-                          }
-                          return true;
-                        },
                       ),
                       Positioned(
                           bottom: 16,
