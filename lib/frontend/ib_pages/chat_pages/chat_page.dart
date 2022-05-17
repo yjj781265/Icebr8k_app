@@ -120,26 +120,22 @@ class ChatPage extends StatelessWidget {
       ),
       body: Obx(
         () {
-          return GestureDetector(
-            onTap: () {
-              IbUtils.hideKeyboard();
-            },
+          if (_controller.isLoading.isTrue) {
+            return const Center(
+              child: IbProgressIndicator(),
+            );
+          }
+          return AnimatedSize(
+            duration: const Duration(
+                milliseconds: IbConfig.kEventTriggerDelayInMillis),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if (_controller.isLoading.isTrue)
-                  const Expanded(
-                    child: Center(
-                      child: IbProgressIndicator(),
-                    ),
-                  )
-                else
-                  Expanded(
-                      child: Stack(
-                    alignment: Alignment.topCenter,
+                Expanded(
+                  child: Stack(
                     children: [
                       NotificationListener<ScrollNotification>(
                         child: ScrollablePositionedList.builder(
+                          shrinkWrap: true,
                           physics: const BouncingScrollPhysics(),
                           reverse: true,
                           itemScrollController:
@@ -162,13 +158,17 @@ class ChatPage extends StatelessWidget {
                           return true;
                         },
                       ),
-                      _buildTypingIndicator(context),
                       Positioned(
                           bottom: 16,
                           right: 16,
                           child: _newMessageAlert(context))
                     ],
-                  )),
+                  ),
+                ),
+                if (_controller.isTypingUsers.isNotEmpty)
+                  Align(
+                      alignment: Alignment.bottomLeft,
+                      child: _buildTypingIndicator(context)),
                 _inputWidget(context),
               ],
             ),
@@ -359,18 +359,13 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget _buildTypingIndicator(BuildContext context) {
-    if (_controller.isTypingUsers.isEmpty) {
-      return const SizedBox();
-    }
-
-    HapticFeedback.lightImpact();
-    return LimitedBox(
-      maxWidth: 200,
-      child: IbCard(
-          color: Theme.of(context).backgroundColor.withOpacity(0.9),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: LimitedBox(
+        maxWidth: 200,
+        child: IbCard(
+            color: Theme.of(context).backgroundColor.withOpacity(0.9),
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Wrap(
@@ -381,7 +376,7 @@ class ChatPage extends StatelessWidget {
                             padding: const EdgeInsets.all(2.0),
                             child: IbUserAvatar(
                               avatarUrl: element.avatarUrl,
-                              radius: 10,
+                              radius: 8,
                             ),
                           ))
                       .toList(),
@@ -390,8 +385,8 @@ class ChatPage extends StatelessWidget {
                     height: 30,
                     child: Lottie.asset('assets/images/typing.json'))
               ],
-            ),
-          )),
+            )),
+      ),
     );
   }
 

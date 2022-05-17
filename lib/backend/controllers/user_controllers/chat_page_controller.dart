@@ -76,10 +76,6 @@ class ChatPageController extends GetxController {
           senderUid: '',
           messageType: IbMessage.kMessageTypeLoadMore,
           chatRoomId: ''));
-  @override
-  Future<void> onInit() async {
-    super.onInit();
-  }
 
   @override
   Future<void> onReady() async {
@@ -131,14 +127,14 @@ class ChatPageController extends GetxController {
       }
       final list = txtController.text.split(' ');
 
-      /// new text value length has increased
+      // new text value length has increased
       if (txtController.text.length > text.value.length) {
         final str = list[list.length - 1];
         if (str.startsWith('@')) {
           showMentionList();
         }
       } else {
-        /// new text value length has decreasedfinal
+        // new text value length has decreased
         final str = list[list.length - 1];
         if (str.startsWith('@')) {
           list.removeAt(list.length - 1);
