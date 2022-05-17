@@ -214,7 +214,8 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                 ),
               ),
-              Flexible(
+              Align(
+                alignment: Alignment.bottomLeft,
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: TextButton.icon(

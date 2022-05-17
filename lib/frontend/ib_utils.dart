@@ -559,6 +559,10 @@ class IbUtils {
     ];
     _colors.addAll(Colors.accents);
     _colors.addAll(Colors.primaries);
+    _colors.remove(Colors.greenAccent);
+    _colors.remove(Colors.green);
+    _colors.remove(Colors.lightGreen);
+    _colors.remove(Colors.lightGreenAccent);
     _colors.remove(Colors.yellowAccent);
     _colors.remove(Colors.yellow);
     _colors.remove(Colors.amberAccent);

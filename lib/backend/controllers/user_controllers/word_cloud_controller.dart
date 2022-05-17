@@ -14,7 +14,7 @@ class WordCloudController extends GetxController {
   WordCloudController(this.user);
 
   @override
-  Future<void> onInit() async {
+  Future<void> onReady() async {
     List<IbAnswer> ibAnswers = [];
     if (IbCacheManager().getIbAnswers(user.id) == null) {
       ibAnswers = await IbQuestionDbService().queryUserAnswers(user.id);
@@ -48,7 +48,6 @@ class WordCloudController extends GetxController {
     } else {
       isLoading.value = false;
     }
-
-    super.onInit();
+    super.onReady();
   }
 }
