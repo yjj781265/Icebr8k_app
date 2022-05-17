@@ -94,10 +94,10 @@ class PeopleNearbyPage extends StatelessWidget {
                       viewportFraction: 0.96,
                       enlargeCenterPage: true,
                       enableInfiniteScroll: false,
-                      onPageChanged: (index, reason) {
+                      onPageChanged: (index, reason) async {
                         _controller.currentIndex.value = index;
                         if (index == _controller.items.length - 1) {
-                          print('loadmore');
+                          await _controller.loadMore();
                         }
                       }),
                   itemCount: _controller.items.length,

@@ -260,7 +260,7 @@ class PeopleNearbyController extends GetxController {
       hasMore = found > items.length;
       tempList.sort((a, b) => b.compScore.compareTo(a.compScore));
       items.addAll(tempList);
-    }
+    } else {}
   }
 
   @override
