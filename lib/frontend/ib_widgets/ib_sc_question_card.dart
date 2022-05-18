@@ -177,7 +177,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
             ? 0
             : double.parse(choice.content ?? '0');
     if (widget._controller.rxIbQuestion.value.questionType ==
-        IbQuestion.kScaleOne) {
+        QuestionType.scaleOne) {
       return RatingBar.builder(
         ignoreGestures: widget._controller.isPollClosed.isTrue,
         allowHalfRating: widget._controller.isPollClosed.isTrue,
@@ -195,7 +195,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     }
 
     if (widget._controller.rxIbQuestion.value.questionType ==
-        IbQuestion.kScaleTwo) {
+        QuestionType.scaleTwo) {
       return RatingBar.builder(
         ignoreGestures: widget._controller.isPollClosed.isTrue,
         allowHalfRating: widget._controller.isPollClosed.isTrue,
@@ -213,7 +213,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     }
 
     if (widget._controller.rxIbQuestion.value.questionType ==
-        IbQuestion.kScaleThree) {
+        QuestionType.scaleThree) {
       return RatingBar.builder(
         ignoreGestures: widget._controller.isPollClosed.isTrue,
         itemPadding: const EdgeInsets.all(4),

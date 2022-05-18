@@ -1,3 +1,4 @@
+import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'ib_answer.g.dart';
@@ -11,7 +12,7 @@ class IbAnswer {
   final String uid;
   final int askedTimeInMs;
   final String questionId;
-  final String questionType;
+  final QuestionType questionType;
   final bool edited;
 
   IbAnswer(

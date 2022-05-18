@@ -3,13 +3,10 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/comment_pages/reply_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../../backend/controllers/user_controllers/comment_controller.dart';
 import '../../../backend/controllers/user_controllers/reply_controller.dart';
-import '../../../backend/models/ib_question.dart';
-import '../../ib_widgets/ib_mc_question_card.dart';
 import '../comment_pages/comment_page.dart';
 
 class QuestionMainPage extends StatefulWidget {
@@ -29,7 +26,7 @@ class _QuestionMainPageState extends State<QuestionMainPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       switch (widget.toPage) {
         case ToPage.none:
           break;
@@ -66,23 +63,10 @@ class _QuestionMainPageState extends State<QuestionMainPage> {
               .then((value) => refreshController.refreshCompleted());
         },
         child: SingleChildScrollView(
-            child: _handleQuestionType(widget._controller.rxIbQuestion.value)),
+            child: IbUtils.handleQuestionType(
+                widget._controller.rxIbQuestion.value)),
       ),
     );
-  }
-
-  Widget _handleQuestionType(IbQuestion question) {
-    final IbQuestionItemController itemController = Get.put(
-        IbQuestionItemController(
-            rxIbQuestion: question.obs, rxIsExpanded: false.obs),
-        tag: question.id);
-
-    if (question.questionType == IbQuestion.kMultipleChoice ||
-        question.questionType == IbQuestion.kMultipleChoicePic) {
-      return IbMcQuestionCard(itemController);
-    }
-
-    return IbScQuestionCard(itemController);
   }
 }
 

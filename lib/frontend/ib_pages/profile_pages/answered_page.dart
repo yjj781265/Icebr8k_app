@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/answered_question_controller.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
-import 'package:icebr8k/backend/models/ib_question.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+
+import '../../ib_utils.dart';
 
 class AnsweredPage extends StatelessWidget {
   final AnsweredQuestionController _controller;
@@ -39,7 +37,8 @@ class AnsweredPage extends StatelessWidget {
             child: ListView.builder(
               controller: _scrollController,
               itemBuilder: (context, index) {
-                return _handleQuestionType(_controller.answeredQs[index]);
+                return IbUtils.handleQuestionType(
+                    _controller.answeredQs[index].ibQuestion);
               },
               itemCount: _controller.answeredQs.length,
             ),
@@ -47,21 +46,5 @@ class AnsweredPage extends StatelessWidget {
         }),
       ),
     );
-  }
-
-  Widget _handleQuestionType(AnsweredQuestionItem item) {
-    final IbQuestionItemController itemController = Get.put(
-        IbQuestionItemController(
-          rxIbQuestion: (item.ibQuestion).obs,
-          rxIsExpanded: false.obs,
-        )..rxIbAnswer = item.ibAnswer.obs,
-        tag: item.ibQuestion.id);
-
-    if (item.ibQuestion.questionType == IbQuestion.kMultipleChoice ||
-        item.ibQuestion.questionType == IbQuestion.kMultipleChoicePic) {
-      return IbMcQuestionCard(itemController);
-    }
-
-    return IbScQuestionCard(itemController);
   }
 }

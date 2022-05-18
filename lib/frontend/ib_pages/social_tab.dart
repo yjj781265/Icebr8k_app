@@ -1,6 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
@@ -17,7 +15,6 @@ import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/search_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_persistent_header.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -56,8 +53,115 @@ class _SocialTabState extends State<SocialTab>
           padding: EdgeInsets.symmetric(horizontal: 16.0),
           child: Text('Social'),
         ),
+        bottom: TabBar(
+          padding: EdgeInsets.zero,
+          indicatorSize: TabBarIndicatorSize.label,
+          controller: _tabController,
+          tabs: [
+            Obx(() {
+              int total = 0;
+              for (final item in _controller.circles) {
+                total += item.unReadCount;
+              }
+
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Row(
+                      children: const [
+                        Icon(Icons.people),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text('Circles')
+                      ],
+                    ),
+                    if (total > 0)
+                      Positioned(
+                        right: -10,
+                        top: 0,
+                        child: CircleAvatar(
+                          backgroundColor: IbColors.errorRed,
+                          radius: 10,
+                          child: Text(
+                            total >= 99 ? '99+' : total.toString(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            }),
+            Obx(() {
+              int total = 0;
+              for (final item in _controller.oneToOneChats) {
+                total += item.unReadCount;
+              }
+
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Row(
+                      children: const [
+                        Icon(Icons.chat_rounded),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text('Chats'),
+                      ],
+                    ),
+                    if (total > 0)
+                      Positioned(
+                        right: -10,
+                        top: 0,
+                        child: CircleAvatar(
+                          backgroundColor: IbColors.errorRed,
+                          radius: 10,
+                          child: Text(
+                            total >= 99 ? '99+' : total.toString(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            }),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(Icons.contacts),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Text('Friends'),
+                ],
+              ),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
+            tooltip: 'People Nearby',
             icon: const Icon(
               Icons.person_pin_circle_rounded,
               color: IbColors.errorRed,
@@ -67,6 +171,7 @@ class _SocialTabState extends State<SocialTab>
             },
           ),
           IconButton(
+            tooltip: 'Search all',
             icon: const Icon(Icons.search),
             onPressed: () {
               Get.to(() => SearchPage());
@@ -74,130 +179,15 @@ class _SocialTabState extends State<SocialTab>
           ),
         ],
       ),
-      body: SafeArea(
-        child: ExtendedNestedScrollView(
-          onlyOneScrollInBody: true,
-          dragStartBehavior: DragStartBehavior.down,
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return [
-              SliverOverlapAbsorber(
-                handle: ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
-                    context),
-                sliver: SliverPersistentHeader(
-                  pinned: true,
-                  delegate: IbPersistentHeader(
-                    height: 32,
-                    widget: TabBar(
-                      controller: _tabController,
-                      tabs: [
-                        Obx(() {
-                          int total = 0;
-                          for (final item in _controller.circles) {
-                            total += item.unReadCount;
-                          }
-
-                          return Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              Row(
-                                children: const [
-                                  Icon(Icons.people),
-                                  SizedBox(
-                                    width: 8,
-                                  ),
-                                  Text('Circles')
-                                ],
-                              ),
-                              if (total > 0)
-                                Positioned(
-                                  right: -10,
-                                  top: 0,
-                                  child: CircleAvatar(
-                                    backgroundColor: IbColors.errorRed,
-                                    radius: 10,
-                                    child: Text(
-                                      total >= 99 ? '99+' : total.toString(),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          );
-                        }),
-                        Obx(() {
-                          int total = 0;
-                          for (final item in _controller.oneToOneChats) {
-                            total += item.unReadCount;
-                          }
-
-                          return Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              Row(
-                                children: const [
-                                  Icon(Icons.chat_rounded),
-                                  SizedBox(
-                                    width: 8,
-                                  ),
-                                  Text('Chats'),
-                                ],
-                              ),
-                              if (total > 0)
-                                Positioned(
-                                  right: -10,
-                                  top: 0,
-                                  child: CircleAvatar(
-                                    backgroundColor: IbColors.errorRed,
-                                    radius: 10,
-                                    child: Text(
-                                      total >= 99 ? '99+' : total.toString(),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          );
-                        }),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Icon(Icons.contacts),
-                            SizedBox(
-                              width: 8,
-                            ),
-                            Text('Friends'),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              )
-            ];
-          },
-          body: Padding(
-            padding: const EdgeInsets.only(top: 34),
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                buildCircle(),
-                buildOneToOneList(),
-                buildFriendList(),
-              ],
-            ),
-          ),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 2),
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            buildCircle(),
+            buildOneToOneList(),
+            buildFriendList(),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(

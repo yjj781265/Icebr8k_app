@@ -68,7 +68,7 @@ class IbQuestionStats extends StatelessWidget {
 
   Widget _handleScType(IbChoice choice) {
     final double initRating = double.parse(choice.content!);
-    if (_controller.ibQuestion.questionType == IbQuestion.kScaleOne) {
+    if (_controller.ibQuestion.questionType == QuestionType.scaleOne) {
       return RatingBar.builder(
         ignoreGestures: true,
         itemSize: 20,
@@ -81,7 +81,7 @@ class IbQuestionStats extends StatelessWidget {
       );
     }
 
-    if (_controller.ibQuestion.questionType == IbQuestion.kScaleTwo) {
+    if (_controller.ibQuestion.questionType == QuestionType.scaleTwo) {
       return RatingBar.builder(
         ignoreGestures: true,
         itemSize: 20,
@@ -94,7 +94,7 @@ class IbQuestionStats extends StatelessWidget {
       );
     }
 
-    if (_controller.ibQuestion.questionType == IbQuestion.kScaleThree) {
+    if (_controller.ibQuestion.questionType == QuestionType.scaleThree) {
       return RatingBar.builder(
         ignoreGestures: true,
         itemSize: 20,
@@ -144,7 +144,7 @@ class IbQuestionStats extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (_controller.ibQuestion.questionType.contains('sc'))
+        if (_controller.ibQuestion.questionType.toString().contains('sc'))
           _handleScType(choice),
         if (choice.url != null && choice.url!.isNotEmpty)
           GestureDetector(

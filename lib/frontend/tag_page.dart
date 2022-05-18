@@ -9,13 +9,8 @@ import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-
-import '../backend/controllers/user_controllers/ib_question_item_controller.dart';
-import '../backend/models/ib_question.dart';
-import 'ib_widgets/ib_mc_question_card.dart';
 
 class TagPage extends StatelessWidget {
   final TagPageController _controller;
@@ -133,26 +128,13 @@ class TagPage extends StatelessWidget {
                       );
                     }
                     index -= 1;
-                    return _handleQuestionType(_controller.ibQuestions[index]);
+                    return IbUtils.handleQuestionType(
+                        _controller.ibQuestions[index]);
                   },
                   itemCount: _controller.ibQuestions.isEmpty
                       ? 1
                       : _controller.ibQuestions.length + 1,
                 ),
               )));
-  }
-
-  Widget _handleQuestionType(IbQuestion question) {
-    final IbQuestionItemController itemController = Get.put(
-        IbQuestionItemController(
-            rxIbQuestion: question.obs, rxIsExpanded: false.obs),
-        tag: question.id);
-
-    if (question.questionType == IbQuestion.kMultipleChoice ||
-        question.questionType == IbQuestion.kMultipleChoicePic) {
-      return IbMcQuestionCard(itemController);
-    }
-
-    return IbScQuestionCard(itemController);
   }
 }

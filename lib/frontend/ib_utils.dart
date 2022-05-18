@@ -6,17 +6,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../backend/controllers/user_controllers/auth_controller.dart';
+import '../backend/models/ib_question.dart';
 import '../backend/services/user_services/ib_local_data_service.dart';
 import '../backend/services/user_services/ib_question_db_service.dart';
 import 'ib_config.dart';
@@ -707,5 +711,22 @@ class IbUtils {
     }
 
     return '10B+';
+  }
+
+  static Widget handleQuestionType(IbQuestion question,
+      {bool uniqueTag = false}) {
+    final tag = uniqueTag ? getUniqueId() : question.id;
+
+    final IbQuestionItemController itemController = Get.put(
+        IbQuestionItemController(
+            rxIbQuestion: question.obs, rxIsExpanded: false.obs),
+        tag: tag);
+
+    if (question.questionType == QuestionType.multipleChoice ||
+        question.questionType == QuestionType.multipleChoicePic) {
+      return IbMcQuestionCard(itemController);
+    }
+
+    return IbScQuestionCard(itemController);
   }
 }

@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/asked_questions_controller.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
-import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+
+import '../../ib_utils.dart';
 
 class AskedPage extends StatelessWidget {
   final AskedQuestionsController _controller;
@@ -56,7 +54,8 @@ class AskedPage extends StatelessWidget {
                   return const SizedBox();
                 }
                 index -= 1;
-                return _handleQuestionType(_controller.createdQuestions[index]);
+                return IbUtils.handleQuestionType(
+                    _controller.createdQuestions[index]);
               },
               itemCount: _controller.createdQuestions.length + 1,
             ),
@@ -64,19 +63,5 @@ class AskedPage extends StatelessWidget {
         }),
       ),
     );
-  }
-
-  Widget _handleQuestionType(IbQuestion question) {
-    final IbQuestionItemController itemController = Get.put(
-        IbQuestionItemController(
-            rxIbQuestion: question.obs, rxIsExpanded: false.obs),
-        tag: question.id);
-
-    if (question.questionType == IbQuestion.kMultipleChoice ||
-        question.questionType == IbQuestion.kMultipleChoicePic) {
-      return IbMcQuestionCard(itemController);
-    }
-
-    return IbScQuestionCard(itemController);
   }
 }

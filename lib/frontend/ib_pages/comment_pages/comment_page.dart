@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -13,10 +12,10 @@ import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/comment_pages/reply_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_rich_text.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../backend/controllers/user_controllers/comment_controller.dart';
 
@@ -268,17 +267,10 @@ class CommentItemWidget extends StatelessWidget {
                               const SizedBox(
                                 height: 8,
                               ),
-                              Linkify(
-                                onOpen: (link) async {
-                                  if (await canLaunch(link.url)) {
-                                    await launch(link.url);
-                                  }
-                                },
-                                options: const LinkifyOptions(looseUrl: true),
-                                text: item.ibComment.content,
-                                style: const TextStyle(
-                                    fontSize: IbConfig.kNormalTextSize),
-                              ),
+                              IbRichText(
+                                  string: item.ibComment.content,
+                                  defaultTextStyle: const TextStyle(
+                                      fontSize: IbConfig.kNormalTextSize)),
                               Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -369,9 +361,9 @@ class CommentItemWidget extends StatelessWidget {
 
     return Obx(() {
       if (controller.itemController.rxIbQuestion.value.questionType ==
-              IbQuestion.kMultipleChoice ||
+              QuestionType.multipleChoice ||
           controller.itemController.rxIbQuestion.value.questionType ==
-              IbQuestion.kMultipleChoicePic) {
+              QuestionType.multipleChoicePic) {
         return Text(
           ibChoice.content ?? '',
           style: const TextStyle(
@@ -382,7 +374,7 @@ class CommentItemWidget extends StatelessWidget {
       }
 
       if (controller.itemController.rxIbQuestion.value.questionType ==
-          IbQuestion.kScaleOne) {
+          QuestionType.scaleOne) {
         return RatingBar.builder(
           initialRating: double.parse(ibChoice.content ?? '0'),
           ignoreGestures: true,
@@ -396,7 +388,7 @@ class CommentItemWidget extends StatelessWidget {
       }
 
       if (controller.itemController.rxIbQuestion.value.questionType ==
-          IbQuestion.kScaleTwo) {
+          QuestionType.scaleTwo) {
         return RatingBar.builder(
           initialRating: double.parse(ibChoice.content ?? '0'),
           ignoreGestures: true,
@@ -410,7 +402,7 @@ class CommentItemWidget extends StatelessWidget {
       }
 
       if (controller.itemController.rxIbQuestion.value.questionType ==
-          IbQuestion.kScaleThree) {
+          QuestionType.scaleThree) {
         return RatingBar.builder(
           initialRating: double.parse(ibChoice.content ?? '0'),
           ignoreGestures: true,

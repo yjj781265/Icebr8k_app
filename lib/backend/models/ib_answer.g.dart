@@ -11,7 +11,7 @@ IbAnswer _$IbAnswerFromJson(Map<String, dynamic> json) => IbAnswer(
       answeredTimeInMs: json['answeredTimeInMs'] as int,
       askedTimeInMs: json['askedTimeInMs'] as int,
       questionId: json['questionId'] as String,
-      questionType: json['questionType'] as String,
+      questionType: $enumDecode(_$QuestionTypeEnumMap, json['questionType']),
       edited: json['edited'] as bool? ?? false,
       isAnonymous: json['isAnonymous'] as bool? ?? false,
       isPublicQuestion: json['isPublicQuestion'] as bool? ?? true,
@@ -26,6 +26,14 @@ Map<String, dynamic> _$IbAnswerToJson(IbAnswer instance) => <String, dynamic>{
       'uid': instance.uid,
       'askedTimeInMs': instance.askedTimeInMs,
       'questionId': instance.questionId,
-      'questionType': instance.questionType,
+      'questionType': _$QuestionTypeEnumMap[instance.questionType],
       'edited': instance.edited,
     };
+
+const _$QuestionTypeEnumMap = {
+  QuestionType.multipleChoice: 'mc',
+  QuestionType.multipleChoicePic: 'mc_pic',
+  QuestionType.scaleOne: 'sc_1',
+  QuestionType.scaleTwo: 'sc_2',
+  QuestionType.scaleThree: 'sc_3',
+};

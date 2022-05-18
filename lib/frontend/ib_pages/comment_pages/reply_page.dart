@@ -287,8 +287,8 @@ class ReplyPage extends StatelessWidget {
     final ibChoice = _controller.ibQuestion.choices
         .firstWhere((element) => element.choiceId == item.ibAnswer!.choiceId);
 
-    if (_controller.ibQuestion.questionType == IbQuestion.kMultipleChoice ||
-        _controller.ibQuestion.questionType == IbQuestion.kMultipleChoicePic) {
+    if (_controller.ibQuestion.questionType == QuestionType.multipleChoice ||
+        _controller.ibQuestion.questionType == QuestionType.multipleChoicePic) {
       return Text(
         ibChoice.content ?? '',
         style: const TextStyle(
@@ -298,7 +298,7 @@ class ReplyPage extends StatelessWidget {
       );
     }
 
-    if (_controller.ibQuestion.questionType == IbQuestion.kScaleOne) {
+    if (_controller.ibQuestion.questionType == QuestionType.scaleOne) {
       return RatingBar.builder(
         initialRating: double.parse(ibChoice.content ?? '0'),
         ignoreGestures: true,
@@ -311,7 +311,7 @@ class ReplyPage extends StatelessWidget {
       );
     }
 
-    if (_controller.ibQuestion.questionType == IbQuestion.kScaleTwo) {
+    if (_controller.ibQuestion.questionType == QuestionType.scaleTwo) {
       return RatingBar.builder(
         initialRating: double.parse(ibChoice.content ?? '0'),
         ignoreGestures: true,
@@ -324,7 +324,7 @@ class ReplyPage extends StatelessWidget {
       );
     }
 
-    if (_controller.ibQuestion.questionType == IbQuestion.kScaleThree) {
+    if (_controller.ibQuestion.questionType == QuestionType.scaleThree) {
       return RatingBar.builder(
         initialRating: double.parse(ibChoice.content ?? '0'),
         ignoreGestures: true,

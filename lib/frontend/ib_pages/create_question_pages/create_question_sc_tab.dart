@@ -26,17 +26,17 @@ class CreateQuestionScTab extends StatelessWidget {
                 () => DropdownButton2(
                     itemHeight: IbConfig.kScItemHeight + 18,
                     isExpanded: true,
-                    value: <String>[
-                      IbQuestion.kScaleOne,
-                      IbQuestion.kScaleTwo,
-                      IbQuestion.kScaleThree
+                    value: <QuestionType>[
+                      QuestionType.scaleOne,
+                      QuestionType.scaleTwo,
+                      QuestionType.scaleThree,
                     ].contains(_controller.questionType.value)
                         ? _controller.questionType.value
-                        : IbQuestion.kScaleOne,
+                        : QuestionType.scaleOne,
                     items: [
                       DropdownMenuItem(
                         alignment: Alignment.center,
-                        value: IbQuestion.kScaleOne,
+                        value: QuestionType.scaleOne,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: RatingBar.builder(
@@ -56,7 +56,7 @@ class CreateQuestionScTab extends StatelessWidget {
                       ),
                       DropdownMenuItem(
                         alignment: Alignment.center,
-                        value: IbQuestion.kScaleTwo,
+                        value: QuestionType.scaleTwo,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: RatingBar.builder(
@@ -76,7 +76,7 @@ class CreateQuestionScTab extends StatelessWidget {
                       ),
                       DropdownMenuItem(
                           alignment: Alignment.center,
-                          value: IbQuestion.kScaleThree,
+                          value: QuestionType.scaleThree,
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: RatingBar.builder(
@@ -122,7 +122,10 @@ class CreateQuestionScTab extends StatelessWidget {
                           )),
                     ],
                     onChanged: (value) {
-                      _controller.questionType.value = value.toString();
+                      if (value == null) {
+                        return;
+                      }
+                      _controller.questionType.value = value as QuestionType;
                     }),
               ),
             ),

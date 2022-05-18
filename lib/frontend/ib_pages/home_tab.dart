@@ -1,18 +1,15 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/admin/edit_ib_collection_main_page.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
 import 'package:icebr8k/frontend/ib_pages/search_page.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../backend/controllers/user_controllers/home_tab_controller.dart';
-import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
 
 class HomeTab extends StatelessWidget {
   HomeTab({Key? key}) : super(key: key);
@@ -103,10 +100,10 @@ class HomeTab extends StatelessWidget {
                     itemBuilder: (context, index) {
                       if (_controller.selectedCategory.value ==
                           _controller.categories[1]) {
-                        return _handleQuestionType(
+                        return IbUtils.handleQuestionType(
                             _controller.forYourList[index]);
                       }
-                      return _handleQuestionType(
+                      return IbUtils.handleQuestionType(
                           _controller.trendingList[index]);
                     },
                     itemCount: _controller.selectedCategory.value ==
@@ -125,19 +122,5 @@ class HomeTab extends StatelessWidget {
       return _controller.forYourList.length >= IbConfig.kPerPage;
     }
     return _controller.trendingList.length >= IbConfig.kPerPage;
-  }
-
-  Widget _handleQuestionType(IbQuestion question) {
-    final IbQuestionItemController itemController = Get.put(
-        IbQuestionItemController(
-            rxIbQuestion: question.obs, rxIsExpanded: false.obs),
-        tag: question.id);
-
-    if (question.questionType == IbQuestion.kMultipleChoice ||
-        question.questionType == IbQuestion.kMultipleChoicePic) {
-      return IbMcQuestionCard(itemController);
-    }
-
-    return IbScQuestionCard(itemController);
   }
 }

@@ -113,7 +113,7 @@ class QuestionResultMainPage extends StatelessWidget {
 
   Widget _handleScType(IbChoice ibChoice) {
     if (_itemController.rxIbQuestion.value.questionType ==
-        IbQuestion.kScaleOne) {
+        QuestionType.scaleOne) {
       return RatingBar.builder(
         initialRating: double.parse(ibChoice.content ?? '0'),
         ignoreGestures: true,
@@ -127,7 +127,7 @@ class QuestionResultMainPage extends StatelessWidget {
     }
 
     if (_itemController.rxIbQuestion.value.questionType ==
-        IbQuestion.kScaleTwo) {
+        QuestionType.scaleTwo) {
       return RatingBar.builder(
         initialRating: double.parse(ibChoice.content ?? '0'),
         ignoreGestures: true,
@@ -141,7 +141,7 @@ class QuestionResultMainPage extends StatelessWidget {
     }
 
     if (_itemController.rxIbQuestion.value.questionType ==
-        IbQuestion.kScaleThree) {
+        QuestionType.scaleThree) {
       return RatingBar.builder(
         initialRating: double.parse(ibChoice.content ?? '0'),
         ignoreGestures: true,

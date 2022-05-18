@@ -13,7 +13,7 @@ IbQuestion _$IbQuestionFromJson(Map<String, dynamic> json) => IbQuestion(
       choices: (json['choices'] as List<dynamic>)
           .map((e) => IbChoice.fromJson(e as Map<String, dynamic>))
           .toList(),
-      questionType: json['questionType'] as String,
+      questionType: $enumDecode(_$QuestionTypeEnumMap, json['questionType']),
       correctChoiceId: json['correctChoiceId'] as String? ?? '',
       isQuiz: json['isQuiz'] as bool? ?? false,
       isAnonymous: json['isAnonymous'] as bool? ?? false,
@@ -64,5 +64,13 @@ Map<String, dynamic> _$IbQuestionToJson(IbQuestion instance) =>
       'askedTimeInMs': instance.askedTimeInMs,
       'endTimeInMs': instance.endTimeInMs,
       'choices': instance.choices.map((e) => e.toJson()).toList(),
-      'questionType': instance.questionType,
+      'questionType': _$QuestionTypeEnumMap[instance.questionType],
     };
+
+const _$QuestionTypeEnumMap = {
+  QuestionType.multipleChoice: 'mc',
+  QuestionType.multipleChoicePic: 'mc_pic',
+  QuestionType.scaleOne: 'sc_1',
+  QuestionType.scaleTwo: 'sc_2',
+  QuestionType.scaleThree: 'sc_3',
+};

@@ -39,13 +39,13 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     _controller.tabController = TabController(vsync: this, length: 3);
     _controller.tabController.addListener(() {
       if (_controller.tabController.index == 0) {
-        _controller.questionType.value = IbQuestion.kMultipleChoice;
+        _controller.questionType.value = QuestionType.multipleChoice;
         _controller.title.value = 'text only';
       } else if (_controller.tabController.index == 1) {
-        _controller.questionType.value = IbQuestion.kMultipleChoicePic;
+        _controller.questionType.value = QuestionType.multipleChoicePic;
         _controller.title.value = 'text with picture';
       } else {
-        _controller.questionType.value = IbQuestion.kScaleOne;
+        _controller.questionType.value = QuestionType.scaleOne;
         _controller.title.value = 'scale';
       }
     });

@@ -892,8 +892,8 @@ class ChatPage extends StatelessWidget {
               rxIbQuestion: question.obs, rxIsExpanded: false.obs),
           tag: question.id);
 
-      if (question.questionType == IbQuestion.kMultipleChoice ||
-          question.questionType == IbQuestion.kMultipleChoicePic) {
+      if (question.questionType == QuestionType.multipleChoice ||
+          question.questionType == QuestionType.multipleChoicePic) {
         pollWidget = IbMcQuestionCard(itemController);
       } else {
         pollWidget = IbScQuestionCard(itemController);

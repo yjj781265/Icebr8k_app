@@ -379,11 +379,11 @@ class SearchPage extends StatelessWidget {
                     size: 16,
                     color: IbColors.primaryColor,
                   );
-                  if (element.questionType == IbQuestion.kMultipleChoicePic) {
+                  if (element.questionType == QuestionType.multipleChoicePic) {
                     icon = const Icon(FontAwesomeIcons.listUl,
                         size: 16, color: IbColors.primaryColor);
                   } else if (element.questionType ==
-                      IbQuestion.kMultipleChoice) {
+                      QuestionType.multipleChoice) {
                     icon = const Icon(
                       FontAwesomeIcons.bars,
                       size: 16,

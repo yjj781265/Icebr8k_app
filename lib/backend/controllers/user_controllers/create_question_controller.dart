@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
@@ -17,7 +16,7 @@ import 'package:showcaseview/showcaseview.dart';
 import 'ib_question_item_controller.dart';
 
 class CreateQuestionController extends GetxController {
-  final questionType = IbQuestion.kMultipleChoice.obs;
+  final questionType = QuestionType.multipleChoice.obs;
   final IbQuestion? ibQuestion;
   final TextEditingController questionEditController = TextEditingController();
   final TextEditingController descriptionEditController =
@@ -69,25 +68,25 @@ class CreateQuestionController extends GetxController {
       }
     }
 
-    if (ibQuestion!.questionType == IbQuestion.kMultipleChoicePic) {
+    if (ibQuestion!.questionType == QuestionType.multipleChoicePic) {
       tabController.index = 1;
       picChoiceList.value = ibQuestion!.choices;
     }
 
-    if (ibQuestion!.questionType == IbQuestion.kMultipleChoice) {
+    if (ibQuestion!.questionType == QuestionType.multipleChoice) {
       tabController.index = 0;
       choiceList.value = ibQuestion!.choices;
     }
   }
 
   void swapIndex(int oldIndex, int newIndex) {
-    if (questionType.value == IbQuestion.kMultipleChoice) {
+    if (questionType.value == QuestionType.multipleChoice) {
       final IbChoice item = choiceList.removeAt(oldIndex);
       choiceList.insert(oldIndex < newIndex ? newIndex - 1 : newIndex, item);
       return;
     }
 
-    if (questionType.value == IbQuestion.kMultipleChoicePic) {
+    if (questionType.value == QuestionType.multipleChoicePic) {
       final IbChoice item = picChoiceList.removeAt(oldIndex);
       picChoiceList.insert(oldIndex < newIndex ? newIndex - 1 : newIndex, item);
       return;
@@ -95,22 +94,20 @@ class CreateQuestionController extends GetxController {
   }
 
   bool isChoiceDuplicated(String text) {
-    if (IbQuestion.kMultipleChoice == questionType.value) {
+    if (QuestionType.multipleChoice == questionType.value) {
       for (final IbChoice choice in choiceList) {
         if (text.trim() == choice.content) {
           return true;
         }
       }
       return false;
-    } else if (IbQuestion.kMultipleChoicePic == questionType.value) {
+    } else if (QuestionType.multipleChoicePic == questionType.value) {
       for (final IbChoice choice in picChoiceList) {
         if (text.trim() == choice.content) {
           return true;
         }
       }
       return false;
-    } else if (questionType.contains('sc')) {
-      return true;
     }
 
     return false;
@@ -143,7 +140,7 @@ class CreateQuestionController extends GetxController {
       ));
       return;
     }
-    if (questionType.value == IbQuestion.kMultipleChoice &&
+    if (questionType.value == QuestionType.multipleChoice &&
         choiceList.length < 2) {
       Get.dialog(IbDialog(
           subtitle: 'mc_question_not_valid'.tr,
@@ -153,7 +150,7 @@ class CreateQuestionController extends GetxController {
       return;
     }
 
-    if (questionType.value == IbQuestion.kMultipleChoicePic &&
+    if (questionType.value == QuestionType.multipleChoicePic &&
         picChoiceList.length < 2) {
       Get.dialog(IbDialog(
           showNegativeBtn: false,
@@ -163,7 +160,7 @@ class CreateQuestionController extends GetxController {
       return;
     }
 
-    if (questionType.value == IbQuestion.kMultipleChoicePic) {
+    if (questionType.value == QuestionType.multipleChoicePic) {
       for (final IbChoice ibChoice in picChoiceList) {
         if (ibChoice.url == null ||
             ibChoice.url!.isEmpty ||
@@ -209,14 +206,14 @@ class CreateQuestionController extends GetxController {
   }
 
   List<IbChoice> _getIbChoices() {
-    if (questionType.value == IbQuestion.kMultipleChoice) {
+    if (questionType.value == QuestionType.multipleChoice) {
       return choiceList;
     }
-    if (questionType.value == IbQuestion.kMultipleChoicePic) {
+    if (questionType.value == QuestionType.multipleChoicePic) {
       return picChoiceList;
     }
 
-    if (questionType.value.contains('sc')) {
+    if (questionType.value.toString().contains('sc')) {
       return _generateScaleChoiceList();
     }
     return [];

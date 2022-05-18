@@ -6,12 +6,6 @@ part 'ib_question.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class IbQuestion {
-  static const String kMultipleChoice = "mc";
-  static const String kScaleOne = "sc_1";
-  static const String kScaleTwo = "sc_2";
-  static const String kScaleThree = "sc_3";
-  static const String kMultipleChoicePic = "mc_pic";
-
   List<String> tags;
   List<IbMedia> medias;
   dynamic position;
@@ -33,7 +27,7 @@ class IbQuestion {
   int askedTimeInMs;
   int endTimeInMs;
   List<IbChoice> choices;
-  String questionType;
+  QuestionType questionType;
 
   IbQuestion(
       {required this.question,
@@ -117,5 +111,26 @@ class IbQuestion {
   @override
   String toString() {
     return 'IbQuestion{question: $question, id: $id}';
+  }
+}
+
+enum QuestionType {
+  @JsonValue('mc')
+  multipleChoice('mc'),
+  @JsonValue('mc_pic')
+  multipleChoicePic('mc_pic'),
+  @JsonValue('sc_1')
+  scaleOne('sc_1'),
+  @JsonValue('sc_2')
+  scaleTwo('sc_2'),
+  @JsonValue('sc_3')
+  scaleThree('sc_3');
+
+  final String type;
+  const QuestionType(this.type);
+
+  @override
+  String toString() {
+    return type;
   }
 }

@@ -93,14 +93,13 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
             else
               LimitedBox(
                 maxHeight: widget._controller.rxIbQuestion.value.questionType ==
-                        IbQuestion.kMultipleChoice
+                        QuestionType.multipleChoice
                     ? 200
                     : 400,
                 child: Scrollbar(
                   thickness: 3,
-                  isAlwaysShown: true,
+                  thumbVisibility: true,
                   radius: const Radius.circular(8),
-                  showTrackOnHover: true,
                   controller: _scrollController,
                   child: Padding(
                     padding: const EdgeInsets.only(right: 4.0),
@@ -115,7 +114,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                   ),
                 ),
               ),
-            if (IbQuestion.kMultipleChoicePic ==
+            if (QuestionType.multipleChoicePic ==
                     widget._controller.rxIbQuestion.value.questionType &&
                 widget._controller.showComparison.isFalse)
               Padding(
@@ -316,7 +315,7 @@ class IbQuestionMcItem extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
                         width: Get.width,
                         height: _controller.rxIbQuestion.value.questionType ==
-                                IbQuestion.kMultipleChoice
+                                QuestionType.multipleChoice
                             ? IbConfig.kMcTxtItemSize
                             : IbConfig.kMcPicItemSize,
                         decoration: BoxDecoration(
@@ -326,7 +325,7 @@ class IbQuestionMcItem extends StatelessWidget {
                       ),
                       AnimatedContainer(
                         height: _controller.rxIbQuestion.value.questionType ==
-                                IbQuestion.kMultipleChoice
+                                QuestionType.multipleChoice
                             ? IbConfig.kMcTxtItemSize
                             : IbConfig.kMcPicItemSize,
                         decoration: BoxDecoration(
@@ -341,7 +340,7 @@ class IbQuestionMcItem extends StatelessWidget {
                       SizedBox(
                         width: Get.width,
                         height: _controller.rxIbQuestion.value.questionType ==
-                                IbQuestion.kMultipleChoice
+                                QuestionType.multipleChoice
                             ? IbConfig.kMcTxtItemSize
                             : IbConfig.kMcPicItemSize,
                         child: Row(

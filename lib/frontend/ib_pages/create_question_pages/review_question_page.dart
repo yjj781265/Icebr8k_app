@@ -54,7 +54,7 @@ class ReviewQuestionPage extends StatelessWidget {
           },
           builder: Builder(
             builder: (context) => Scrollbar(
-              isAlwaysShown: true,
+              thumbVisibility: true,
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,6 +107,7 @@ class ReviewQuestionPage extends StatelessWidget {
                       ),
                     ),
                     if (!itemController.rxIbQuestion.value.questionType
+                        .toString()
                         .contains('sc'))
                       Obx(
                         () => SwitchListTile.adaptive(
@@ -177,9 +178,9 @@ class ReviewQuestionPage extends StatelessWidget {
 
   Widget _handleQuestionType() {
     if (itemController.rxIbQuestion.value.questionType ==
-            IbQuestion.kMultipleChoice ||
+            QuestionType.multipleChoice ||
         itemController.rxIbQuestion.value.questionType ==
-            IbQuestion.kMultipleChoicePic) {
+            QuestionType.multipleChoicePic) {
       return IbMcQuestionCard(itemController);
     }
     return IbScQuestionCard(
