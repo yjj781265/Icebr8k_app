@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
@@ -64,7 +66,14 @@ class IbQuestionHeader extends StatelessWidget {
                     size: 16,
                   ),
                 IconButton(
-                    onPressed: _itemController.isSample ? null : () async {},
+                    onPressed: _itemController.isSample
+                        ? null
+                        : () async {
+                            Get.to(() => CreateQuestionPage(
+                                controller: Get.put(CreateQuestionController(
+                                    ibQuestion:
+                                        _itemController.rxIbQuestion.value))));
+                          },
                     icon: const FaIcon(
                       Icons.more_vert_outlined,
                     )),

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
@@ -7,6 +8,7 @@ import 'package:icebr8k/backend/models/ib_media.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
+import 'package:icebr8k/backend/services/user_services/ib_tag_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/review_question_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
@@ -16,17 +18,17 @@ import 'ib_question_item_controller.dart';
 
 class CreateQuestionController extends GetxController {
   final questionType = IbQuestion.kMultipleChoice.obs;
+  final IbQuestion? ibQuestion;
   final TextEditingController questionEditController = TextEditingController();
   final TextEditingController descriptionEditController =
       TextEditingController();
+  late TabController tabController;
   final title = 'text only'.obs;
   // list for mc tab
   final choiceList = <IbChoice>[].obs;
   // list for mc pic tab
   final picChoiceList = <IbChoice>[].obs;
   final picList = <IbChoice>[].obs;
-  final scaleEndPoints = <IbChoice>[].obs;
-
   final picMediaList = <IbMedia>[].obs;
   final videoMediaList = <IbMedia>[].obs;
   final extLinkList = <String>[].obs;
@@ -41,12 +43,41 @@ class CreateQuestionController extends GetxController {
 
   CreateQuestionController(
       {this.pickedCircles = const [],
+      this.ibQuestion,
       this.isPublic = true,
       this.isCircleOnly = false});
 
   @override
   Future<void> onReady() async {
+    await preFillInfo();
     super.onReady();
+  }
+
+  Future<void> preFillInfo() async {
+    if (ibQuestion == null) {
+      return;
+    }
+
+    picMediaList.value = ibQuestion!.medias;
+    questionEditController.text = ibQuestion!.question;
+    descriptionEditController.text = ibQuestion!.description;
+
+    for (final text in ibQuestion!.tags) {
+      final tag = await IbTagDbService().retrieveIbTag(text);
+      if (tag != null) {
+        pickedTags.add(tag);
+      }
+    }
+
+    if (ibQuestion!.questionType == IbQuestion.kMultipleChoicePic) {
+      tabController.index = 1;
+      picChoiceList.value = ibQuestion!.choices;
+    }
+
+    if (ibQuestion!.questionType == IbQuestion.kMultipleChoice) {
+      tabController.index = 0;
+      choiceList.value = ibQuestion!.choices;
+    }
   }
 
   void swapIndex(int oldIndex, int newIndex) {
@@ -61,9 +92,6 @@ class CreateQuestionController extends GetxController {
       picChoiceList.insert(oldIndex < newIndex ? newIndex - 1 : newIndex, item);
       return;
     }
-
-    final IbChoice item = scaleEndPoints.removeAt(oldIndex);
-    scaleEndPoints.insert(oldIndex < newIndex ? newIndex - 1 : newIndex, item);
   }
 
   bool isChoiceDuplicated(String text) {

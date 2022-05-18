@@ -30,18 +30,18 @@ class CreateQuestionPage extends StatefulWidget {
 class _CreateQuestionPageState extends State<CreateQuestionPage>
     with SingleTickerProviderStateMixin {
   final CreateQuestionController _controller = Get.find();
-  late TabController _tabController;
+
   late List<Widget> chips;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 3);
-    _tabController.addListener(() {
-      if (_tabController.index == 0) {
+    _controller.tabController = TabController(vsync: this, length: 3);
+    _controller.tabController.addListener(() {
+      if (_controller.tabController.index == 0) {
         _controller.questionType.value = IbQuestion.kMultipleChoice;
         _controller.title.value = 'text only';
-      } else if (_tabController.index == 1) {
+      } else if (_controller.tabController.index == 1) {
         _controller.questionType.value = IbQuestion.kMultipleChoicePic;
         _controller.title.value = 'text with picture';
       } else {
@@ -154,7 +154,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                     delegate: IbPersistentHeader(
                       widget: IbCard(
                         child: TabBar(
-                          controller: _tabController,
+                          controller: _controller.tabController,
                           tabs: [
                             Tooltip(
                                 message: 'mc'.tr,
@@ -181,7 +181,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
             body: Padding(
               padding: const EdgeInsets.only(top: 56),
               child: TabBarView(
-                controller: _tabController,
+                controller: _controller.tabController,
                 children: [
                   CreateQuestionMcTab(_controller),
                   CreateQuestionMcPicTab(_controller),
