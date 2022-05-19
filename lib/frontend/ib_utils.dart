@@ -291,7 +291,7 @@ class IbUtils {
     final oneToOneItems =
         List<ChatTabItem>.from(Get.find<SocialTabController>().oneToOneChats);
     oneToOneItems.addAll(circleItems);
-    final allItems = oneToOneItems;
+    final allItems = oneToOneItems.toSet().toList();
     allItems.sort((a, b) => (a.title).compareTo(b.title));
     return allItems;
   }

@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,6 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     with SingleTickerProviderStateMixin {
   final CreateQuestionController _controller = Get.find();
 
-
   @override
   void initState() {
     super.initState();
@@ -39,13 +39,13 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     _controller.tabController.addListener(() {
       if (_controller.tabController.index == 0) {
         _controller.questionType.value = QuestionType.multipleChoice;
-        _controller.title.value = 'text only';
+        _controller.title.value = 'Text Only';
       } else if (_controller.tabController.index == 1) {
         _controller.questionType.value = QuestionType.multipleChoicePic;
-        _controller.title.value = 'text with picture';
+        _controller.title.value = 'Text with Pictures';
       } else {
         _controller.questionType.value = QuestionType.scaleOne;
-        _controller.title.value = 'scale';
+        _controller.title.value = 'Scale';
       }
     });
   }
@@ -62,9 +62,15 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
           appBar: AppBar(
             centerTitle: false,
             title: Obx(
-              () => Text(
-                'create_question'.trParams({'type': _controller.title.value}),
-                style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+              () => SizedBox(
+                width: 300,
+                child: AutoSizeText(
+                  'create_question'.trParams({'type': _controller.title.value}),
+                  maxFontSize: IbConfig.kPageTitleSize,
+                  overflow: TextOverflow.ellipsis,
+                  minFontSize: IbConfig.kSecondaryTextSize,
+                  style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
+                ),
               ),
             ),
             actions: [

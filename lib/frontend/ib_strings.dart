@@ -86,7 +86,7 @@ class IbStrings extends Translations {
           'pic_question_not_valid_min': 'Need at least 2 picture choices',
           'answer': 'Answer',
           'description_option': 'Description(optional), links',
-          'create_question': 'Create a @type question',
+          'create_question': 'Create a @type Question',
           'mc': 'Multiple Choice',
           'mc_p': 'Multiple Choice with Pictures and Text',
           'pic': 'Multiple Choice with Pictures Only',

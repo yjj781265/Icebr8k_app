@@ -4,19 +4,19 @@ import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controll
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
-import '../../ib_config.dart';
-import '../../ib_widgets/ib_user_avatar.dart';
+import '../ib_config.dart';
+import '../ib_widgets/ib_user_avatar.dart';
 
-class CirclePickerPage extends StatefulWidget {
+class ChatPickerPage extends StatefulWidget {
   final List<ChatTabItem> pickedItems;
-  const CirclePickerPage({this.pickedItems = const [], Key? key})
+  const ChatPickerPage({this.pickedItems = const [], Key? key})
       : super(key: key);
 
   @override
-  _CirclePickerPageState createState() => _CirclePickerPageState();
+  _ChatPickerPageState createState() => _ChatPickerPageState();
 }
 
-class _CirclePickerPageState extends State<CirclePickerPage> {
+class _ChatPickerPageState extends State<ChatPickerPage> {
   final Map<ChatTabItem, bool> itemMap = {};
   final Map<ChatTabItem, bool> searchItemMap = {};
   final TextEditingController _editingController = TextEditingController();
@@ -32,7 +32,7 @@ class _CirclePickerPageState extends State<CirclePickerPage> {
         itemMap[item] = true;
       }
 
-      for (final item in IbUtils.getCircleItems()) {
+      for (final item in IbUtils.getAllChatTabItems()) {
         if (!itemMap.containsKey(item)) {
           itemMap[item] = false;
         }
@@ -61,7 +61,7 @@ class _CirclePickerPageState extends State<CirclePickerPage> {
         centerTitle: false,
         title: Text(
             'Add${itemMap.values.where((element) => element == true).isEmpty ? '' : ' ${itemMap.values.where((element) => element == true).length}'} '
-            'Circle(s)'),
+            'Chat(s)'),
         actions: [
           TextButton(
             onPressed: () {
@@ -93,7 +93,7 @@ class _CirclePickerPageState extends State<CirclePickerPage> {
                   borderRadius: const BorderRadius.all(Radius.circular(8))),
               child: TextField(
                   decoration: const InputDecoration(
-                      hintText: 'Search Circle',
+                      hintText: 'Search Chats',
                       prefixIcon: Icon(Icons.search),
                       border: InputBorder.none),
                   controller: _editingController),
@@ -111,7 +111,7 @@ class _CirclePickerPageState extends State<CirclePickerPage> {
                         value: searchItemMap[item] ?? false,
                         controlAffinity: ListTileControlAffinity.trailing,
                         title: Text(item.title),
-                        secondary: _buildCircleAvatar(item),
+                        secondary: _buildChatAvatar(item),
                         onChanged: (value) {
                           final bool isSelected = value ?? false;
                           setState(() {
@@ -126,7 +126,7 @@ class _CirclePickerPageState extends State<CirclePickerPage> {
                   return CheckboxListTile(
                       value: itemMap[item] ?? false,
                       controlAffinity: ListTileControlAffinity.trailing,
-                      secondary: _buildCircleAvatar(item),
+                      secondary: _buildChatAvatar(item),
                       title: Text(item.title),
                       onChanged: (value) {
                         final bool isSelected = value ?? false;
@@ -149,7 +149,15 @@ class _CirclePickerPageState extends State<CirclePickerPage> {
     );
   }
 
-  Widget _buildCircleAvatar(ChatTabItem item) {
+  Widget _buildChatAvatar(ChatTabItem item) {
+    if (!item.ibChat.isCircle) {
+      final user = item.avatars.firstWhereOrNull(
+          (element) => element.id != IbUtils.getCurrentUid()!);
+      return IbUserAvatar(
+        avatarUrl: user == null ? '' : user.avatarUrl,
+      );
+    }
+
     if (item.ibChat.photoUrl.isEmpty) {
       return CircleAvatar(
         backgroundColor: IbColors.lightGrey,

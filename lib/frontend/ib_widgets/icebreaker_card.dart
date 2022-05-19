@@ -8,13 +8,13 @@ import 'package:icebr8k/backend/models/icebreaker_models/icebreaker.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/icebreaker_pages/ib_cover_page.dart';
-import 'package:icebr8k/frontend/ib_pages/select_chat_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 
 import '../../backend/controllers/user_controllers/social_tab_controller.dart';
 import '../../backend/models/ib_chat_models/ib_message.dart';
 import '../ib_colors.dart';
+import '../ib_pages/chat_picker_page.dart';
 import 'ib_dialog.dart';
 import 'ib_loading_dialog.dart';
 
@@ -77,7 +77,7 @@ class IcebreakerCard extends StatelessWidget {
                     Theme.of(context).backgroundColor.withOpacity(0.8),
                 child: IconButton(
                     onPressed: () async {
-                      final list = await Get.to(() => const SelectChatPage());
+                      final list = await Get.to(() => const ChatPickerPage());
                       if (list == null) {
                         return;
                       }
@@ -123,8 +123,8 @@ class IcebreakerCard extends StatelessWidget {
             ),
             if (showCollectionName && ibCollection != null)
               Positioned(
-                  bottom: 16,
-                  right: 4,
+                  bottom: 0,
+                  right: 0,
                   child: InkWell(
                     onTap: () {
                       Get.to(() => IbCoverPage(ibCollection!));

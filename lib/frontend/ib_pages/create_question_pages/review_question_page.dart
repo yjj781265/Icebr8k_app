@@ -13,13 +13,13 @@ import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dar
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/ib_friends_picker.dart';
-import 'package:icebr8k/frontend/ib_pages/create_question_pages/circle_picker_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../../backend/controllers/user_controllers/social_tab_controller.dart';
+import '../chat_picker_page.dart';
 
 /// p.s all changes need to be made in rxIbQuestion except the shared chats and shared friends
 class ReviewQuestionPage extends StatelessWidget {
@@ -362,7 +362,7 @@ class ReviewQuestionPage extends StatelessWidget {
               () => ListTile(
                 onTap: () async {
                   List<ChatTabItem>? chats = await Get.to(
-                    () => CirclePickerPage(
+                    () => ChatPickerPage(
                       pickedItems: createQuestionController.pickedChats,
                     ),
                   );

@@ -28,7 +28,7 @@ class CreateQuestionController extends GetxController {
   final TextEditingController descriptionEditController =
       TextEditingController();
   late TabController tabController;
-  final title = 'text only'.obs;
+  final title = 'Text Only'.obs;
   // list for mc tab
   final choiceList = <IbChoice>[].obs;
   // list for mc pic tab
@@ -242,10 +242,11 @@ class CreateQuestionController extends GetxController {
   }
 
   Future<void> submitQuestion(IbQuestion ibQuestion) async {
+    //use toSet to ensure uniqueness
     ibQuestion.sharedChatIds =
-        pickedChats.map((element) => element.ibChat.chatId).toList();
+        pickedChats.map((element) => element.ibChat.chatId).toSet().toList();
     ibQuestion.sharedFriendUids =
-        pickedFriends.map((element) => element.id).toList();
+        pickedFriends.map((element) => element.id).toSet().toList();
     if (ibQuestion.isPublic) {
       ibQuestion.sharedFriendUids
           .addAll(IbUtils.getCurrentIbUserUnblockedFriendsId());
