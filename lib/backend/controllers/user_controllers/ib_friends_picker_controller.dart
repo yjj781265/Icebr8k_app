@@ -9,10 +9,12 @@ class IbFriendsPickerController extends GetxController {
   final isSearching = false.obs;
   final TextEditingController txtEditController = TextEditingController();
   final String uid;
+  final bool allowEdit;
   final searchItems = <IbUser, bool>{}.obs;
   final List<String> pickedUids;
 
-  IbFriendsPickerController(this.uid, {this.pickedUids = const []});
+  IbFriendsPickerController(this.uid,
+      {this.pickedUids = const [], this.allowEdit = false});
 
   @override
   Future<void> onInit() async {
@@ -48,22 +50,13 @@ class IbFriendsPickerController extends GetxController {
     super.onInit();
   }
 
-  /*Future<void> sendInvites() async {
-    final List<IbUser> users = items.keys
-        .where((element) =>
-            !pickedUids.contains(element.id) && items[element] == true)
-        .toList();
-
-    for (final IbUser user in users) {
-      final IbNotification notification = IbNotification(
-          id: ibChat.chatId,
-          title: '',
-          subtitle: '',
-          type: IbNotification.kGroupInvite,
-          timestampInMs: DateTime.now().millisecondsSinceEpoch,
-          senderId: ibChat.photoUrl,
-          recipientId: user.id);
-      await IbUserDbService().sendAlertNotification(notification);
+  void selectAll() {
+    for (final key in items.keys) {
+      items[key] = true;
     }
-  }*/
+
+    for (final key in searchItems.keys) {
+      searchItems[key] = true;
+    }
+  }
 }

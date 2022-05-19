@@ -57,12 +57,6 @@ class IcebreakerController extends GetxController {
     super.onInit();
   }
 
-  @override
-  void onReady() {
-    super.onReady();
-    //showShakePopup();
-  }
-
   Future<void> shuffleCards() async {
     if (isShuffling.isTrue || isEditing.isTrue) {
       return;

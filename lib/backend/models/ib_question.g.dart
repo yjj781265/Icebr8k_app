@@ -25,10 +25,15 @@ IbQuestion _$IbQuestionFromJson(Map<String, dynamic> json) => IbQuestion(
       tags:
           (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
               const [],
+      sharedChatIds: (json['sharedChatIds'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       description: json['description'] as String? ?? '',
-      isCircleOnly: json['isCircleOnly'] as bool? ?? false,
       isPublic: json['isPublic'] as bool? ?? true,
+      isShareable: json['isShareable'] as bool? ?? true,
       points: json['points'] as int? ?? 0,
+      shares: json['shares'] as int? ?? 0,
       likes: json['likes'] as int? ?? 0,
       comments: json['comments'] as int? ?? 0,
       position: json['position'],
@@ -47,16 +52,18 @@ Map<String, dynamic> _$IbQuestionToJson(IbQuestion instance) =>
       'medias': instance.medias.map((e) => e.toJson()).toList(),
       'position': instance.position,
       'sharedFriendUids': instance.sharedFriendUids,
+      'sharedChatIds': instance.sharedChatIds,
       'question': instance.question,
       'description': instance.description,
       'isPublic': instance.isPublic,
-      'isCircleOnly': instance.isCircleOnly,
+      'isShareable': instance.isShareable,
       'isAnonymous': instance.isAnonymous,
       'isCommentEnabled': instance.isCommentEnabled,
       'isQuiz': instance.isQuiz,
       'points': instance.points,
       'correctChoiceId': instance.correctChoiceId,
       'comments': instance.comments,
+      'shares': instance.shares,
       'pollSize': instance.pollSize,
       'likes': instance.likes,
       'id': instance.id,

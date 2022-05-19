@@ -10,16 +10,18 @@ class IbQuestion {
   List<IbMedia> medias;
   dynamic position;
   List<String> sharedFriendUids;
+  List<String> sharedChatIds;
   String question;
   String description;
   bool isPublic;
-  bool isCircleOnly;
+  bool isShareable;
   bool isAnonymous;
   bool isCommentEnabled;
   bool isQuiz;
   int points;
   String correctChoiceId;
   int comments;
+  int shares;
   int pollSize;
   int likes;
   String id;
@@ -41,10 +43,12 @@ class IbQuestion {
       this.isCommentEnabled = true,
       this.sharedFriendUids = const [],
       this.tags = const [],
+      this.sharedChatIds = const [],
       this.description = '',
-      this.isCircleOnly = false,
       this.isPublic = true,
+      this.isShareable = true,
       this.points = 0,
+      this.shares = 0,
       this.likes = 0,
       this.comments = 0,
       this.position,
@@ -70,11 +74,14 @@ class IbQuestion {
           medias == other.medias &&
           position == other.position &&
           sharedFriendUids == other.sharedFriendUids &&
+          sharedChatIds == other.sharedChatIds &&
           question == other.question &&
           description == other.description &&
+          isPublic == other.isPublic &&
           isAnonymous == other.isAnonymous &&
           isCommentEnabled == other.isCommentEnabled &&
           isQuiz == other.isQuiz &&
+          points == other.points &&
           correctChoiceId == other.correctChoiceId &&
           comments == other.comments &&
           pollSize == other.pollSize &&
@@ -92,11 +99,14 @@ class IbQuestion {
       medias.hashCode ^
       position.hashCode ^
       sharedFriendUids.hashCode ^
+      sharedChatIds.hashCode ^
       question.hashCode ^
       description.hashCode ^
+      isPublic.hashCode ^
       isAnonymous.hashCode ^
       isCommentEnabled.hashCode ^
       isQuiz.hashCode ^
+      points.hashCode ^
       correctChoiceId.hashCode ^
       comments.hashCode ^
       pollSize.hashCode ^

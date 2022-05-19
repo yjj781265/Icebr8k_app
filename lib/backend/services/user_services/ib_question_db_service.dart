@@ -470,7 +470,7 @@ class IbQuestionDbService {
         .collection(_kCommentLikesCollectionGroup)
         .doc(IbUtils.getCurrentUid())
         .set({
-      'uid': IbUtils.getCurrentUid()!,
+      'uid': IbUtils.getCurrentUid(),
       'commentId': comment.commentId,
       'questionId': comment.questionId
     });

@@ -33,7 +33,7 @@ class _IbMediaSlideState extends State<IbMediaSlide> {
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: CarouselSlider.builder(
             itemCount: widget.medias.length,
-            itemBuilder: (context, index, num) {
+            itemBuilder: (context, index, _) {
               return _itemWidget(widget.medias[index]);
             },
             options: CarouselOptions(

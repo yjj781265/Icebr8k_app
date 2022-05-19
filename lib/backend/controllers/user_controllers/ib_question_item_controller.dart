@@ -21,7 +21,7 @@ class IbQuestionItemController extends GetxController {
   Timer? _timer;
   final voted = false.obs;
   final isAnswering = false.obs;
-  final bool isSample;
+  bool isSample;
 
   /// for compare two users answers
   final List<IbAnswer>? ibAnswers;

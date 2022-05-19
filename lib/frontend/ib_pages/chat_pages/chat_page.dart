@@ -311,28 +311,28 @@ class ChatPage extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      if (_controller.isCircle.isTrue)
-                        IbActionButton(
-                            color: IbColors.primaryColor,
-                            iconData: Icons.poll,
-                            onPressed: () {
-                              _controller.showMsgOptions.value = false;
-                              final chatTabItem = IbUtils.getCircleItems()
-                                  .firstWhereOrNull((element) =>
-                                      element.ibChat.chatId ==
-                                      _controller.ibChat!.chatId);
+                      IbActionButton(
+                          color: IbColors.primaryColor,
+                          iconData: Icons.poll,
+                          onPressed: () {
+                            _controller.showMsgOptions.value = false;
+                            final chatTabItem = IbUtils.getCircleItems()
+                                .firstWhereOrNull((element) =>
+                                    element.ibChat.chatId ==
+                                    _controller.ibChat!.chatId);
+                            final createQuestionController =
+                                Get.put(CreateQuestionController());
 
-                              Get.to(() => CreateQuestionPage(
-                                    controller: Get.put(
-                                        CreateQuestionController(
-                                            pickedCircles: chatTabItem == null
-                                                ? []
-                                                : [chatTabItem],
-                                            isPublic: false,
-                                            isCircleOnly: true)),
-                                  ));
-                            },
-                            text: 'Poll'),
+                            if (chatTabItem != null) {
+                              createQuestionController.pickedChats
+                                  .add(chatTabItem);
+                            }
+
+                            Get.to(() => CreateQuestionPage(
+                                  controller: createQuestionController,
+                                ));
+                          },
+                          text: 'Poll'),
                       IbActionButton(
                           color: IbColors.accentColor,
                           iconData: Icons.gif,

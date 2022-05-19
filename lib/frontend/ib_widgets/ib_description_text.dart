@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class IbDescriptionText extends StatefulWidget {
   final String text;
@@ -59,20 +59,21 @@ class _DescriptionTextWidgetState extends State<IbDescriptionText>
               duration: const Duration(milliseconds: 300),
               alignment: Alignment.topCenter,
               child: Linkify(
-                options: const LinkifyOptions(looseUrl: true),
-                textAlign: widget.textAlign,
-                linkStyle: const TextStyle(
-                    fontSize: IbConfig.kSecondaryTextSize,
-                    color: IbColors.primaryColor),
-                style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
-                maxLines: isExpanded ? null : maxLines,
-                overflow:
-                    isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
-                text: widget.text,
-                onOpen: (link) async {
-                  await launch(link.url);
-                },
-              ),
+                  options: const LinkifyOptions(looseUrl: true),
+                  textAlign: widget.textAlign,
+                  linkStyle: const TextStyle(
+                      fontSize: IbConfig.kSecondaryTextSize,
+                      color: IbColors.primaryColor),
+                  style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
+                  maxLines: isExpanded ? null : maxLines,
+                  overflow:
+                      isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                  text: widget.text,
+                  onOpen: (link) async {
+                    if (await canLaunchUrlString(link.url)) {
+                      await launchUrlString(link.url);
+                    }
+                  }),
             ),
             if (isOverflow)
               Align(

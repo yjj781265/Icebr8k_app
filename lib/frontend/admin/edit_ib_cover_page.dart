@@ -10,7 +10,7 @@ import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
@@ -168,8 +168,9 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                             color: Theme.of(context).indicatorColor,
                           ),
                           onPressed: () async {
-                            if (await canLaunch(newCollection.link.trim())) {
-                              launch(newCollection.link);
+                            if (await canLaunchUrlString(
+                                newCollection.link.trim())) {
+                              launchUrlString(newCollection.link);
                             }
                           },
                         ),

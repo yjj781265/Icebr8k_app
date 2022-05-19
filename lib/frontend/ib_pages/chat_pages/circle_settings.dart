@@ -260,6 +260,9 @@ class CircleSettings extends StatelessWidget {
                                               fullscreenDialog: true,
                                               transition: Transition.zoom);
 
+                                          if (list == null) {
+                                            return;
+                                          }
                                           for (final dynamic item in list) {
                                             _controller.invitees
                                                 .add(item as IbUser);

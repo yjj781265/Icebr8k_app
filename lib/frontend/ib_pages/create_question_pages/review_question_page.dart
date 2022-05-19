@@ -3,32 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
-import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
-import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
+import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
-import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
-import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
-import 'package:icebr8k/backend/services/user_services/ib_tag_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/ib_friends_picker.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/circle_picker_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:showcaseview/showcaseview.dart';
 
-import '../../../backend/controllers/user_controllers/ib_question_item_controller.dart';
 import '../../../backend/controllers/user_controllers/social_tab_controller.dart';
 
+/// p.s all changes need to be made in rxIbQuestion except the shared chats and shared friends
 class ReviewQuestionPage extends StatelessWidget {
-  final IbQuestionItemController itemController;
-  const ReviewQuestionPage({Key? key, required this.itemController})
+  final CreateQuestionController createQuestionController;
+  final Rx<IbQuestion> rxIbQuestion;
+
+  const ReviewQuestionPage(
+      {Key? key,
+      required this.createQuestionController,
+      required this.rxIbQuestion})
       : super(key: key);
 
   @override
@@ -39,7 +40,7 @@ class ReviewQuestionPage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () async {
-              await submitQuestion(itemController.rxIbQuestion.value);
+              await createQuestionController.submitQuestion(rxIbQuestion.value);
             },
             child: Text('submit'.tr,
                 style: const TextStyle(fontSize: IbConfig.kNormalTextSize)),
@@ -60,7 +61,10 @@ class ReviewQuestionPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _handleQuestionType(),
+                    Obx(
+                      () => IbUtils.handleQuestionType(rxIbQuestion.value,
+                          isSample: true, expanded: true),
+                    ),
                     const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Text(
@@ -81,57 +85,13 @@ class ReviewQuestionPage extends StatelessWidget {
                       },
                       title: const Text('Time Limit'),
                       trailing: Obx(() {
-                        if (itemController.rxIbQuestion.value.endTimeInMs ==
-                            -1) {
+                        if (rxIbQuestion.value.endTimeInMs == -1) {
                           return const Text('No Time Limit');
                         }
                         return IbUtils.leftTimeText(
-                            itemController.rxIbQuestion.value.endTimeInMs);
+                            rxIbQuestion.value.endTimeInMs);
                       }),
                     ),
-                    Obx(
-                      () => SwitchListTile.adaptive(
-                        tileColor: Theme.of(context).primaryColor,
-                        value:
-                            itemController.rxIbQuestion.value.isCommentEnabled,
-                        onChanged: (value) {
-                          itemController.rxIbQuestion.value.isCommentEnabled =
-                              value;
-                          itemController.rxIbQuestion.refresh();
-                        },
-                        title: const Text('Comment'),
-                        secondary: const Icon(
-                          FontAwesomeIcons.comment,
-                          color: IbColors.primaryColor,
-                        ),
-                      ),
-                    ),
-                    if (!itemController.rxIbQuestion.value.questionType
-                        .toString()
-                        .contains('sc'))
-                      Obx(
-                        () => SwitchListTile.adaptive(
-                          tileColor: Theme.of(context).primaryColor,
-                          value: itemController.rxIbQuestion.value.isQuiz,
-                          onChanged: (value) {
-                            if (value) {
-                              itemController.rxIsExpanded.value = true;
-                              ShowCaseWidget.of(context)!.startShowCase(
-                                  [IbShowCaseManager.kPickAnswerForQuizKey]);
-                            } else {
-                              itemController
-                                  .rxIbQuestion.value.correctChoiceId = '';
-                            }
-                            itemController.rxIbQuestion.value.isQuiz = value;
-                            itemController.rxIbQuestion.refresh();
-                          },
-                          title: const Text('Quiz'),
-                          secondary: const Icon(
-                            FontAwesomeIcons.question,
-                            color: IbColors.accentColor,
-                          ),
-                        ),
-                      ),
                     Obx(
                       () => ListTile(
                         onTap: () {
@@ -151,10 +111,72 @@ class ReviewQuestionPage extends StatelessWidget {
                     Obx(
                       () => SwitchListTile.adaptive(
                         tileColor: Theme.of(context).primaryColor,
-                        value: itemController.rxIbQuestion.value.isAnonymous,
+                        value: rxIbQuestion.value.isCommentEnabled,
                         onChanged: (value) {
-                          itemController.rxIbQuestion.value.isAnonymous = value;
-                          itemController.rxIbQuestion.refresh();
+                          rxIbQuestion.value.isCommentEnabled = value;
+                          rxIbQuestion.refresh();
+                        },
+                        title: const Text('Comment'),
+                        secondary: const Icon(
+                          FontAwesomeIcons.comment,
+                          color: IbColors.primaryColor,
+                        ),
+                      ),
+                    ),
+                    Obx(
+                      () => SwitchListTile.adaptive(
+                        tileColor: Theme.of(context).primaryColor,
+                        value: rxIbQuestion.value.isShareable,
+                        onChanged: (value) {
+                          rxIbQuestion.value.isShareable = value;
+                          rxIbQuestion.refresh();
+                        },
+                        title: const Text('Shareable'),
+                        secondary: const Icon(
+                          FontAwesomeIcons.share,
+                          color: IbColors.lightGrey,
+                        ),
+                      ),
+                    ),
+                    if (!rxIbQuestion.value.questionType
+                        .toString()
+                        .contains('sc'))
+                      Obx(
+                        () => SwitchListTile.adaptive(
+                          tileColor: Theme.of(context).primaryColor,
+                          value: rxIbQuestion.value.isQuiz,
+                          onChanged: (value) {
+                            final itemController =
+                                Get.find<IbQuestionItemController>(
+                                    tag: rxIbQuestion.value.id);
+                            if (value) {
+                              itemController.rxIsExpanded.value = true;
+                              //give time to animate
+                              Future.delayed(const Duration(seconds: 1))
+                                  .then((value) {
+                                ShowCaseWidget.of(context)!.startShowCase(
+                                    [IbShowCaseManager.kPickAnswerForQuizKey]);
+                              });
+                            } else {
+                              rxIbQuestion.value.correctChoiceId = '';
+                            }
+                            rxIbQuestion.value.isQuiz = value;
+                            rxIbQuestion.refresh();
+                          },
+                          title: const Text('Quiz'),
+                          secondary: const Icon(
+                            FontAwesomeIcons.question,
+                            color: IbColors.accentColor,
+                          ),
+                        ),
+                      ),
+                    Obx(
+                      () => SwitchListTile.adaptive(
+                        tileColor: Theme.of(context).primaryColor,
+                        value: rxIbQuestion.value.isAnonymous,
+                        onChanged: (value) {
+                          rxIbQuestion.value.isAnonymous = value;
+                          rxIbQuestion.refresh();
                         },
                         title: const Text('Anonymous'),
                         secondary: const Icon(
@@ -173,18 +195,6 @@ class ReviewQuestionPage extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _handleQuestionType() {
-    if (itemController.rxIbQuestion.value.questionType ==
-            QuestionType.multipleChoice ||
-        itemController.rxIbQuestion.value.questionType ==
-            QuestionType.multipleChoicePic) {
-      return IbMcQuestionCard(itemController);
-    }
-    return IbScQuestionCard(
-      itemController,
     );
   }
 
@@ -213,8 +223,8 @@ class ReviewQuestionPage extends StatelessWidget {
                   ),
                   title: const Text('No Time Limit'),
                   onTap: () {
-                    itemController.rxIbQuestion.value.endTimeInMs = -1;
-                    itemController.rxIbQuestion.refresh();
+                    rxIbQuestion.value.endTimeInMs = -1;
+                    rxIbQuestion.refresh();
                     Get.back();
                   },
                 ),
@@ -226,7 +236,7 @@ class ReviewQuestionPage extends StatelessWidget {
   }
 
   void _showDateTimePicker() {
-    itemController.rxIbQuestion.value.endTimeInMs =
+    rxIbQuestion.value.endTimeInMs =
         DateTime.now().add(const Duration(minutes: 15)).millisecondsSinceEpoch;
     Get.bottomSheet(
         IbCard(
@@ -236,7 +246,7 @@ class ReviewQuestionPage extends StatelessWidget {
             Obx(
               () => Center(
                 child: Text(
-                  '${DateTime.fromMillisecondsSinceEpoch(itemController.rxIbQuestion.value.endTimeInMs).year}',
+                  '${DateTime.fromMillisecondsSinceEpoch(rxIbQuestion.value.endTimeInMs).year}',
                   style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
                 ),
               ),
@@ -248,9 +258,8 @@ class ReviewQuestionPage extends StatelessWidget {
                 maximumYear: 1,
                 onDateTimeChanged: (value) async {
                   await HapticFeedback.selectionClick();
-                  itemController.rxIbQuestion.value.endTimeInMs =
-                      value.millisecondsSinceEpoch;
-                  itemController.rxIbQuestion.refresh();
+                  rxIbQuestion.value.endTimeInMs = value.millisecondsSinceEpoch;
+                  rxIbQuestion.refresh();
                 },
                 initialDateTime:
                     DateTime.now().add(const Duration(minutes: 20)),
@@ -294,18 +303,15 @@ class ReviewQuestionPage extends StatelessWidget {
             Obx(
               () => CheckboxListTile(
                 controlAffinity: ListTileControlAffinity.trailing,
-                value: itemController.rxIbQuestion.value.isPublic,
+                value: rxIbQuestion.value.isPublic,
                 onChanged: (flag) {
                   final bool isPublic = flag ?? false;
-                  final list = <String>[];
                   if (isPublic) {
-                    itemController.rxIbQuestion.value.isPublic = true;
-                    list.addAll(IbUtils.getCurrentIbUserUnblockedFriendsId());
+                    rxIbQuestion.value.isPublic = true;
                   } else {
-                    itemController.rxIbQuestion.value.isPublic = false;
+                    rxIbQuestion.value.isPublic = false;
                   }
-                  itemController.rxIbQuestion.value.sharedFriendUids = list;
-                  itemController.rxIbQuestion.refresh();
+                  rxIbQuestion.refresh();
                 },
                 title: const Text(
                   'Public',
@@ -320,57 +326,64 @@ class ReviewQuestionPage extends StatelessWidget {
               ),
             ),
             Obx(
-              () => CheckboxListTile(
-                controlAffinity: ListTileControlAffinity.trailing,
-                value: itemController
-                    .rxIbQuestion.value.sharedFriendUids.isNotEmpty,
-                onChanged: (flag) {
-                  final bool isFriendsOnly = flag ?? false;
-                  final list = <String>[];
-                  if (isFriendsOnly) {
-                    itemController.rxIbQuestion.value.isPublic = false;
-                    list.addAll(IbUtils.getCurrentIbUserUnblockedFriendsId());
-                  }
-                  itemController.rxIbQuestion.value.sharedFriendUids = list;
-                  itemController.rxIbQuestion.refresh();
-                },
-                title: const Text(
-                  'Friends Only',
-                  style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                ),
-                subtitle: const Text(
-                  'Only your awesome friends will have access to see it',
-                  style: TextStyle(
-                      fontSize: IbConfig.kDescriptionTextSize,
-                      color: IbColors.lightGrey),
-                ),
-              ),
+              () => rxIbQuestion.value.isPublic
+                  ? const SizedBox()
+                  : ListTile(
+                      onTap: () async {
+                        final users = await Get.to(() => IbFriendsPicker(
+                              Get.put(IbFriendsPickerController(
+                                IbUtils.getCurrentUid()!,
+                                allowEdit: true,
+                                pickedUids: createQuestionController
+                                    .pickedFriends
+                                    .map((element) => element.id)
+                                    .toList(),
+                              )),
+                              buttonTxt: 'confirm'.tr,
+                            ));
+                        if (users != null) {
+                          createQuestionController.pickedFriends.value =
+                              users as List<IbUser>;
+                        }
+                      },
+                      title: const Text(
+                        'Friends Only',
+                        style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                      ),
+                      subtitle: Text(
+                        _getFriendString(),
+                        style: const TextStyle(
+                            fontSize: IbConfig.kSecondaryTextSize),
+                      ),
+                      trailing: const Icon(Icons.arrow_forward_ios),
+                    ),
             ),
             Obx(
               () => ListTile(
                 onTap: () async {
-                  List<ChatTabItem>? circles = await Get.to(
-                      () => CirclePickerPage(
-                            pickedItems: itemController.sharedCircles,
-                          ),
-                      fullscreenDialog: true);
+                  List<ChatTabItem>? chats = await Get.to(
+                    () => CirclePickerPage(
+                      pickedItems: createQuestionController.pickedChats,
+                    ),
+                  );
 
-                  circles ??= <ChatTabItem>[...itemController.sharedCircles];
-                  itemController.sharedCircles.value = circles;
-                  print('Shared Circle ${itemController.sharedCircles}');
+                  chats ??= <ChatTabItem>[
+                    ...createQuestionController.pickedChats
+                  ];
+                  createQuestionController.pickedChats.value = chats;
                 },
                 title: const Text(
-                  'Circles',
+                  'Chats',
                   style: TextStyle(fontSize: IbConfig.kNormalTextSize),
                 ),
                 subtitle: Text(
-                  itemController.sharedCircles.isEmpty
+                  createQuestionController.pickedChats.isEmpty
                       ? 'None'
-                      : _getCircleString(),
+                      : _getChatString(),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: IbConfig.kDescriptionTextSize,
+                    fontSize: IbConfig.kSecondaryTextSize,
                   ),
                 ),
                 trailing: const Icon(Icons.arrow_forward_ios),
@@ -382,9 +395,9 @@ class ReviewQuestionPage extends StatelessWidget {
                 height: 40,
                 child: Obx(
                   () => IbElevatedButton(
-                    disabled: itemController.sharedCircles.isEmpty &&
-                        itemController
-                            .rxIbQuestion.value.sharedFriendUids.isEmpty,
+                    disabled: createQuestionController.pickedChats.isEmpty &&
+                        createQuestionController.pickedFriends.isEmpty &&
+                        !rxIbQuestion.value.isPublic,
                     textTrKey: 'confirm',
                     onPressed: () {
                       Get.back();
@@ -400,138 +413,82 @@ class ReviewQuestionPage extends StatelessWidget {
     ));
   }
 
-  String _getCircleString() {
-    String str = '';
-    for (int i = 0; i < itemController.sharedCircles.length; i++) {
-      if (i == 2) {
-        break;
-      }
-      if (i == itemController.sharedCircles.length - 1) {
-        str = '$str${itemController.sharedCircles[i].title}';
-        continue;
-      }
-      // ignore: use_string_buffers
-      str = '$str${itemController.sharedCircles[i].title}, ';
-    }
-    if (itemController.sharedCircles.length > 2) {
-      str = '$str and ${itemController.sharedCircles.length - 2} others';
+  String _getChatString() {
+    final StringBuffer sb = StringBuffer();
+    final int chatCount = createQuestionController.pickedChats
+        .where((p0) => !p0.ibChat.isCircle)
+        .length;
+    final int circleCount = createQuestionController.pickedChats
+        .where((p0) => p0.ibChat.isCircle)
+        .length;
+    if (chatCount > 0 && circleCount > 0) {
+      sb.write('$chatCount Chat(s), ');
+    } else if (chatCount > 0 && circleCount == 0) {
+      sb.write('$chatCount Chat(s)');
     }
 
-    return str;
+    if (circleCount > 0) {
+      sb.write('$circleCount Circle(s)');
+    }
+
+    return sb.toString();
+  }
+
+  String _getFriendString() {
+    final StringBuffer sb = StringBuffer();
+    final int friendCount = createQuestionController.pickedFriends.length;
+    if (friendCount == 0) {
+      return 'None';
+    }
+
+    if (friendCount == 1) {
+      for (final friend in createQuestionController.pickedFriends) {
+        sb.write(friend.username);
+      }
+    }
+
+    if (friendCount > 1 && friendCount <= 2) {
+      for (final friend in createQuestionController.pickedFriends) {
+        sb.write('${friend.username}, ');
+      }
+    }
+
+    if (friendCount > 2) {
+      int counter = 0;
+      for (final friend in createQuestionController.pickedFriends) {
+        if (counter == 2) {
+          break;
+        }
+        sb.write('${friend.username}, ');
+        counter++;
+      }
+      sb.write(
+          'and ${createQuestionController.pickedFriends.length - 2} others ');
+    }
+
+    return sb.toString();
   }
 
   String _getPrivacyBondsString() {
-    String str = '';
-    final bool includeComma = itemController.sharedCircles.isNotEmpty;
-    if (itemController.rxIbQuestion.value.isPublic) {
-      str = includeComma ? 'Public,' : 'Public';
+    final StringBuffer sb = StringBuffer();
+    final bool includeComma = createQuestionController.pickedFriends.isNotEmpty;
+    if (rxIbQuestion.value.isPublic) {
+      final str = includeComma ? 'Public, ' : 'Public';
+      sb.write(str);
     }
-    if (!itemController.rxIbQuestion.value.isPublic &&
-        itemController.rxIbQuestion.value.sharedFriendUids.isNotEmpty) {
-      str = includeComma ? 'Friends Only,' : 'Friends Only';
-    }
-    if (itemController.sharedCircles.isNotEmpty) {
-      str = '$str ${itemController.sharedCircles.length} Circle(s)';
-    }
-
-    return str;
-  }
-
-  Future<void> submitQuestion(IbQuestion ibQuestion) async {
-    if (ibQuestion.id.isEmpty ||
-        ibQuestion.tags.isEmpty ||
-        ibQuestion.question.isEmpty ||
-        ibQuestion.choices.isEmpty) {
-      Get.dialog(const IbDialog(
-        title: 'Error',
-        subtitle:
-            'Question is not valid, make sure all required field are filled',
-        showNegativeBtn: false,
-      ));
-      return;
+    if (createQuestionController.pickedFriends.isNotEmpty &&
+        !rxIbQuestion.value.isPublic) {
+      final str = createQuestionController.pickedChats.isEmpty
+          ? '${createQuestionController.pickedFriends.length} Friend(s)'
+          : '${createQuestionController.pickedFriends.length} Friend(s),';
+      sb.write(str);
     }
 
-    if (ibQuestion.isQuiz && ibQuestion.correctChoiceId.isEmpty) {
-      Get.dialog(const IbDialog(
-        title: 'Error',
-        subtitle: 'Quiz question needs to have a correct choice picked',
-        showNegativeBtn: false,
-      ));
-      return;
+    if (createQuestionController.pickedChats.isNotEmpty) {
+      final str = ' ${createQuestionController.pickedChats.length} Chats(s)';
+      sb.write(str);
     }
 
-    if (itemController.sharedCircles.isEmpty &&
-        ibQuestion.sharedFriendUids.isEmpty &&
-        !ibQuestion.isPublic) {
-      Get.dialog(const IbDialog(
-        title: 'Error',
-        subtitle: 'Privacy Bounds are empty',
-        showNegativeBtn: false,
-      ));
-      return;
-    }
-
-    Get.dialog(const IbLoadingDialog(messageTrKey: 'Uploading...'),
-        barrierDismissible: false);
-
-    /// upload all url in choices
-    for (final choice in ibQuestion.choices) {
-      if (choice.url == null || choice.url!.contains('http')) {
-        continue;
-      }
-
-      final String? url = await IbStorageService()
-          .uploadAndRetrieveImgUrl(filePath: choice.url!);
-      if (url == null) {
-        IbUtils.showSimpleSnackBar(
-            msg: 'Failed to upload images...',
-            backgroundColor: IbColors.errorRed);
-        break;
-      } else {
-        choice.url = url;
-      }
-    }
-
-    /// upload all url in medias
-    for (final media in ibQuestion.medias) {
-      if (media.url.contains('http')) {
-        continue;
-      }
-
-      final String? url = await IbStorageService().uploadAndRetrieveImgUrl(
-        filePath: media.url,
-      );
-      if (url == null) {
-        IbUtils.showSimpleSnackBar(
-            msg: 'Failed to upload images...',
-            backgroundColor: IbColors.errorRed);
-        break;
-      } else {
-        media.url = url;
-      }
-    }
-
-    /// upload all the string in tagIds
-    for (final String text in ibQuestion.tags) {
-      await IbTagDbService().uploadTag(text);
-    }
-    await IbQuestionDbService().uploadQuestion(ibQuestion);
-
-    /// add IbMessage to selected circles
-    for (final item in itemController.sharedCircles) {
-      await IbChatDbService().uploadMessage(IbMessage(
-          messageId: IbUtils.getUniqueId(),
-          content: ibQuestion.id,
-          readUids: [IbUtils.getCurrentUid()!],
-          senderUid: IbUtils.getCurrentUid()!,
-          messageType: IbMessage.kMessageTypePoll,
-          chatRoomId: item.ibChat.chatId));
-    }
-
-    Get.back(closeOverlays: true);
-    Get.back(closeOverlays: true);
-    IbUtils.showSimpleSnackBar(
-        msg: 'Question submitted successfully',
-        backgroundColor: IbColors.accentColor);
+    return sb.toString();
   }
 }

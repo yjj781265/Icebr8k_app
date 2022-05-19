@@ -656,8 +656,6 @@ class IbUtils {
     Navigator.of(context).push(
       PageRouteBuilder(
         opaque: false,
-        transitionDuration:
-            const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
         barrierColor: Colors.black.withOpacity(0.8),
         barrierDismissible: true,
         pageBuilder: (BuildContext context, _, __) => Stack(
@@ -714,13 +712,13 @@ class IbUtils {
   }
 
   static Widget handleQuestionType(IbQuestion question,
-      {bool uniqueTag = false}) {
+      {bool uniqueTag = false, bool expanded = false, bool isSample = false}) {
     final tag = uniqueTag ? getUniqueId() : question.id;
-
     final IbQuestionItemController itemController = Get.put(
         IbQuestionItemController(
-            rxIbQuestion: question.obs, rxIsExpanded: false.obs),
+            rxIbQuestion: question.obs, rxIsExpanded: expanded.obs),
         tag: tag);
+    itemController.isSample = isSample;
 
     if (question.questionType == QuestionType.multipleChoice ||
         question.questionType == QuestionType.multipleChoicePic) {

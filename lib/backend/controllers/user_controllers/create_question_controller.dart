@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_media.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
+import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_tag_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/review_question_page.dart';
@@ -13,11 +15,15 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:showcaseview/showcaseview.dart';
 
-import 'ib_question_item_controller.dart';
+import '../../../frontend/ib_colors.dart';
+import '../../../frontend/ib_widgets/ib_loading_dialog.dart';
+import '../../models/ib_user.dart';
+import '../../services/user_services/ib_question_db_service.dart';
+import '../../services/user_services/ib_storage_service.dart';
 
 class CreateQuestionController extends GetxController {
   final questionType = QuestionType.multipleChoice.obs;
-  final IbQuestion? ibQuestion;
+  IbQuestion? ibQuestion;
   final TextEditingController questionEditController = TextEditingController();
   final TextEditingController descriptionEditController =
       TextEditingController();
@@ -36,15 +42,12 @@ class CreateQuestionController extends GetxController {
   final filePath = ''.obs;
   final isCustomTagSelected = false.obs;
   final pickedTags = <IbTag>[].obs;
-  List<ChatTabItem> pickedCircles;
-  final bool isPublic;
-  final bool isCircleOnly;
+  final pickedChats = <ChatTabItem>[].obs;
+  final pickedFriends = <IbUser>[].obs;
+  bool isPublic;
 
-  CreateQuestionController(
-      {this.pickedCircles = const [],
-      this.ibQuestion,
-      this.isPublic = true,
-      this.isCircleOnly = false});
+  /// use .. operator to update pickedChats  pickedFriends list or set it separately
+  CreateQuestionController({this.ibQuestion, this.isPublic = true});
 
   @override
   Future<void> onReady() async {
@@ -60,11 +63,22 @@ class CreateQuestionController extends GetxController {
     picMediaList.value = ibQuestion!.medias;
     questionEditController.text = ibQuestion!.question;
     descriptionEditController.text = ibQuestion!.description;
+    isPublic = ibQuestion!.isPublic;
 
     for (final text in ibQuestion!.tags) {
       final tag = await IbTagDbService().retrieveIbTag(text);
       if (tag != null) {
         pickedTags.add(tag);
+      }
+    }
+    for (final id in ibQuestion!.sharedChatIds) {
+      final ibChat = await IbChatDbService().queryChat(id);
+      if (ibChat != null) {
+        final item = IbUtils.getAllChatTabItems().firstWhereOrNull(
+            (element) => element.ibChat.chatId == ibChat.chatId);
+        if (item != null) {
+          pickedChats.add(item);
+        }
       }
     }
 
@@ -177,15 +191,19 @@ class CreateQuestionController extends GetxController {
     }
 
     IbUtils.hideKeyboard();
-    final String id = IbUtils.getUniqueId();
-    final question = IbQuestion(
+    String questionId = IbUtils.getUniqueId();
+    if (ibQuestion != null) {
+      questionId = ibQuestion!.id;
+    }
+
+    ibQuestion = IbQuestion(
         question: questionEditController.text.trim(),
         description: descriptionEditController.text.trim(),
-        id: id,
-        sharedFriendUids:
-            isPublic ? IbUtils.getCurrentIbUserUnblockedFriendsId() : [],
+        id: questionId,
+        sharedFriendUids: pickedFriends.map((element) => element.id).toList(),
+        sharedChatIds:
+            pickedChats.map((element) => element.ibChat.chatId).toList(),
         isPublic: isPublic,
-        isCircleOnly: isCircleOnly,
         tags: pickedTags.map((element) => element.text).toList(),
         creatorId: IbUtils.getCurrentUid()!,
         medias: picMediaList.toSet().union(videoMediaList.toSet()).toList(),
@@ -194,13 +212,8 @@ class CreateQuestionController extends GetxController {
         askedTimeInMs: DateTime.now().millisecondsSinceEpoch);
     Get.to(
       () => ReviewQuestionPage(
-        itemController: Get.put(
-          IbQuestionItemController(
-              rxIbQuestion: question.obs,
-              rxIsExpanded: true.obs,
-              isSample: true)
-            ..sharedCircles.addAll(pickedCircles),
-        ),
+        createQuestionController: this,
+        rxIbQuestion: ibQuestion!.obs,
       ),
     );
   }
@@ -226,6 +239,113 @@ class CreateQuestionController extends GetxController {
           IbChoice(content: i.toString(), choiceId: IbUtils.getUniqueId()));
     }
     return choices;
+  }
+
+  Future<void> submitQuestion(IbQuestion ibQuestion) async {
+    ibQuestion.sharedChatIds =
+        pickedChats.map((element) => element.ibChat.chatId).toList();
+    ibQuestion.sharedFriendUids =
+        pickedFriends.map((element) => element.id).toList();
+    if (ibQuestion.isPublic) {
+      ibQuestion.sharedFriendUids
+          .addAll(IbUtils.getCurrentIbUserUnblockedFriendsId());
+    }
+
+    if (ibQuestion.id.isEmpty ||
+        ibQuestion.tags.isEmpty ||
+        ibQuestion.question.isEmpty ||
+        ibQuestion.choices.isEmpty) {
+      Get.dialog(const IbDialog(
+        title: 'Error',
+        subtitle:
+            'Question is not valid, make sure all required field are filled',
+        showNegativeBtn: false,
+      ));
+      return;
+    }
+
+    if (ibQuestion.isQuiz && ibQuestion.correctChoiceId.isEmpty) {
+      Get.dialog(const IbDialog(
+        title: 'Error',
+        subtitle: 'Quiz question needs to have a correct choice picked',
+        showNegativeBtn: false,
+      ));
+      return;
+    }
+
+    if (ibQuestion.sharedChatIds.isEmpty &&
+        ibQuestion.sharedFriendUids.isEmpty &&
+        !ibQuestion.isPublic) {
+      Get.dialog(const IbDialog(
+        title: 'Error',
+        subtitle: 'Privacy Bounds are empty',
+        showNegativeBtn: false,
+      ));
+      return;
+    }
+
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'Uploading...'),
+        barrierDismissible: false);
+
+    /// upload all url in choices
+    for (final choice in ibQuestion.choices) {
+      if (choice.url == null || choice.url!.contains('http')) {
+        continue;
+      }
+
+      final String? url = await IbStorageService()
+          .uploadAndRetrieveImgUrl(filePath: choice.url!);
+      if (url == null) {
+        IbUtils.showSimpleSnackBar(
+            msg: 'Failed to upload images...',
+            backgroundColor: IbColors.errorRed);
+        break;
+      } else {
+        choice.url = url;
+      }
+    }
+
+    /// upload all url in medias
+    for (final media in ibQuestion.medias) {
+      if (media.url.contains('http')) {
+        continue;
+      }
+
+      final String? url = await IbStorageService().uploadAndRetrieveImgUrl(
+        filePath: media.url,
+      );
+      if (url == null) {
+        IbUtils.showSimpleSnackBar(
+            msg: 'Failed to upload images...',
+            backgroundColor: IbColors.errorRed);
+        break;
+      } else {
+        media.url = url;
+      }
+    }
+
+    /// upload all the string in tagIds
+    for (final String text in ibQuestion.tags) {
+      await IbTagDbService().uploadTag(text);
+    }
+    await IbQuestionDbService().uploadQuestion(ibQuestion);
+
+    /// add IbMessage to selected circles
+    for (final item in ibQuestion.sharedChatIds) {
+      await IbChatDbService().uploadMessage(IbMessage(
+          messageId: IbUtils.getUniqueId(),
+          content: ibQuestion.id,
+          readUids: [IbUtils.getCurrentUid()!],
+          senderUid: IbUtils.getCurrentUid()!,
+          messageType: IbMessage.kMessageTypePoll,
+          chatRoomId: item));
+    }
+
+    Get.back(closeOverlays: true);
+    Get.back(closeOverlays: true);
+    IbUtils.showSimpleSnackBar(
+        msg: 'Question submitted successfully',
+        backgroundColor: IbColors.accentColor);
   }
 }
 

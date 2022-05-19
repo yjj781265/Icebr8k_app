@@ -91,27 +91,28 @@ class IbQuestionStatsBar extends StatelessWidget {
                     fontSize: IbConfig.kDescriptionTextSize),
               ),
             ),
-            TextButton.icon(
-              onPressed: _itemController.isSample ||
-                      (_itemController.rxIbAnswer != null &&
-                          _itemController.rxIbAnswer!.value.uid !=
-                              IbUtils.getCurrentUid())
-                  ? null
-                  : () async {
-                      await _handleOnShareTap();
-                    },
-              icon: const FaIcon(
-                FontAwesomeIcons.share,
-                color: IbColors.lightGrey,
-                size: 16,
+            if (_itemController.rxIbQuestion.value.isShareable)
+              TextButton.icon(
+                onPressed: _itemController.isSample ||
+                        (_itemController.rxIbAnswer != null &&
+                            _itemController.rxIbAnswer!.value.uid !=
+                                IbUtils.getCurrentUid())
+                    ? null
+                    : () async {
+                        await _handleOnShareTap();
+                      },
+                icon: const FaIcon(
+                  FontAwesomeIcons.share,
+                  color: IbColors.lightGrey,
+                  size: 16,
+                ),
+                label: Text(
+                  'Share',
+                  style: TextStyle(
+                      color: Theme.of(context).indicatorColor,
+                      fontSize: IbConfig.kDescriptionTextSize),
+                ),
               ),
-              label: Text(
-                'Share',
-                style: TextStyle(
-                    color: Theme.of(context).indicatorColor,
-                    fontSize: IbConfig.kDescriptionTextSize),
-              ),
-            ),
           ],
         ),
       ),

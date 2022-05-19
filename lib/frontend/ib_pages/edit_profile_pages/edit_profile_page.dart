@@ -70,7 +70,7 @@ class EditProfilePage extends StatelessWidget {
           children: [
             Expanded(
               child: Scrollbar(
-                isAlwaysShown: true,
+                thumbVisibility: true,
                 radius: const Radius.circular(8),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),

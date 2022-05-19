@@ -31,7 +31,6 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     with SingleTickerProviderStateMixin {
   final CreateQuestionController _controller = Get.find();
 
-  late List<Widget> chips;
 
   @override
   void initState() {

@@ -9,7 +9,7 @@ import 'package:icebr8k/frontend/ib_pages/icebreaker_pages/icebreaker_main_page.
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class IbCoverPage extends StatelessWidget {
   final IbCollection ibCollection;
@@ -82,9 +82,9 @@ class IbCoverPage extends StatelessWidget {
                                   color: Theme.of(context).indicatorColor,
                                 ),
                                 onPressed: () async {
-                                  if (await canLaunch(
+                                  if (await canLaunchUrlString(
                                       ibCollection.link.trim())) {
-                                    launch(ibCollection.link);
+                                    launchUrlString(ibCollection.link);
                                   }
                                 },
                               ),
