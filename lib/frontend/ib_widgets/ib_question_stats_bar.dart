@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_picker_page.dart';
 import 'package:icebr8k/frontend/ib_pages/question_pages/question_result_main_page.dart';
-import 'package:icebr8k/frontend/ib_pages/select_chat_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
@@ -134,7 +134,7 @@ class IbQuestionStatsBar extends StatelessWidget {
   }
 
   Future<void> _handleOnShareTap() async {
-    final list = await Get.to(() => const SelectChatPage());
+    final list = await Get.to(() => const ChatPickerPage());
     if (list == null) {
       return;
     }

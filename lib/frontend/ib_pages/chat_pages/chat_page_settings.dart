@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
@@ -13,7 +14,6 @@ import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_settings.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/my_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
@@ -26,13 +26,55 @@ class ChatPageSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Obx(
-          () => Text(_controller.title.value),
+    return Obx(
+      () => Scaffold(
+        appBar: AppBar(
+          title: Obx(
+            () => Text(_controller.title.value),
+          ),
+          actions: [
+            if (_controller.isCircle.isTrue)
+              IconButton(
+                  onPressed: () async {
+                    if (_controller.ibChatMembers.length >=
+                        IbConfig.kCircleMaxMembers) {
+                      IbUtils.showSimpleSnackBar(
+                          msg:
+                              'Circle reached ${IbConfig.kCircleMaxMembers} members limit',
+                          backgroundColor: IbColors.primaryColor);
+                      return;
+                    }
+                    final items = await Get.to(
+                      () => IbFriendsPicker(
+                        Get.put(
+                          IbFriendsPickerController(
+                            IbUtils.getCurrentUid()!,
+                            pickedUids: _controller.ibChatMembers
+                                .map((element) => element.user.id)
+                                .toList(),
+                          ),
+                        ),
+                      ),
+                    );
+                    if (items == null) {
+                      return;
+                    }
+                    final List<IbUser> invitees = [];
+                    for (final dynamic item in items) {
+                      final user = item as IbUser;
+                      if (_controller.ibChatMembers.indexWhere(
+                              (element) => element.user.id == user.id) ==
+                          -1) {
+                        invitees.add(user);
+                      }
+                    }
+                    await _controller.sendCircleInvites(invitees);
+                  },
+                  icon: const Icon(Icons.person_add_alt_1))
+          ],
         ),
+        body: getBody(context),
       ),
-      body: getBody(context),
     );
   }
 
@@ -67,81 +109,46 @@ class ChatPageSettings extends StatelessWidget {
               const SizedBox(
                 height: 8,
               ),
-              Wrap(
-                  runSpacing: 8,
-                  spacing: 8,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    Wrap(
-                      runSpacing: 8,
-                      spacing: 8,
-                      children: _controller.ibChatMembers.map((element) {
-                        return InkWell(
-                          onTap: () {
-                            _showMemberBtmSheet(element);
-                          },
-                          child: SizedBox(
-                            width: 72,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IbUserAvatar(
-                                  avatarUrl: element.user.avatarUrl,
-                                  compScore: element.compScore,
-                                  uid: element.user.id,
-                                ),
-                                Text(
-                                  element.user.username,
-                                  style: const TextStyle(
-                                      fontSize: IbConfig.kNormalTextSize),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  element.member.role,
-                                  style: TextStyle(
-                                      color: element.member.role ==
-                                              IbChatMember.kRoleLeader
-                                          ? Theme.of(context).indicatorColor
-                                          : IbColors.lightGrey,
-                                      fontSize: IbConfig.kDescriptionTextSize),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                    SizedBox(
+              StaggeredGrid.count(
+                crossAxisCount: 5,
+                crossAxisSpacing: 4,
+                mainAxisSpacing: 4,
+                children: _controller.ibChatMembers.map((element) {
+                  return InkWell(
+                    onTap: () {
+                      _showMemberBtmSheet(element);
+                    },
+                    child: SizedBox(
                       width: 72,
-                      child: IbActionButton(
-                        iconData: Icons.add,
-                        text: 'Invite',
-                        onPressed: () async {
-                          final items = await Get.to(
-                            () => IbFriendsPicker(
-                              Get.put(
-                                IbFriendsPickerController(
-                                  IbUtils.getCurrentUid()!,
-                                  pickedUids: _controller.ibChatMembers
-                                      .map((element) => element.user.id)
-                                      .toList(),
-                                ),
-                              ),
-                            ),
-                          );
-                          if (items == null) {
-                            return;
-                          }
-                          final List<IbUser> invitees = [];
-                          for (final dynamic item in items) {
-                            invitees.add(item as IbUser);
-                          }
-                          await _controller.sendCircleInvites(invitees);
-                        },
-                        color: IbColors.lightGrey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IbUserAvatar(
+                            avatarUrl: element.user.avatarUrl,
+                            compScore: element.compScore,
+                            uid: element.user.id,
+                          ),
+                          Text(
+                            element.user.username,
+                            style: const TextStyle(
+                                fontSize: IbConfig.kNormalTextSize),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            element.member.role,
+                            style: TextStyle(
+                                color: element.member.role ==
+                                        IbChatMember.kRoleLeader
+                                    ? Theme.of(context).indicatorColor
+                                    : IbColors.lightGrey,
+                                fontSize: IbConfig.kDescriptionTextSize),
+                          ),
+                        ],
                       ),
                     ),
-                  ]),
+                  );
+                }).toList(),
+              ),
               const Divider(
                 thickness: 2,
               ),

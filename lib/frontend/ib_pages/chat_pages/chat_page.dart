@@ -114,7 +114,7 @@ class ChatPage extends StatelessWidget {
                   onPressed: () {
                     Get.to(() => ChatPageSettings(_controller));
                   },
-                  icon: const Icon(Icons.settings))
+                  icon: const Icon(Icons.more_vert))
               : const SizedBox()),
         ],
       ),

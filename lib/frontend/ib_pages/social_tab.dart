@@ -191,7 +191,19 @@ class _SocialTabState extends State<SocialTab>
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
+        child: Obx(() {
+          if (_controller.currentIndex.value == 0) {
+            return const Icon(Icons.group_add_outlined);
+          }
+          if (_controller.currentIndex.value == 1) {
+            return const Icon(Icons.message);
+          }
+
+          if (_controller.currentIndex.value == 2) {
+            return const Icon(Icons.person_search);
+          }
+          return const SizedBox();
+        }),
         onPressed: () async {
           if (_controller.currentIndex.value == 0) {
             Get.to(() => CircleSettings(Get.put(CircleSettingsController())),

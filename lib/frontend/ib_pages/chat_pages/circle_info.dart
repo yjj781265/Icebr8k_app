@@ -93,8 +93,8 @@ class CircleInfo extends StatelessWidget {
                                 SingleChildScrollView(
                                   child: StaggeredGrid.count(
                                     crossAxisCount: 4,
-                                    mainAxisSpacing: 2,
-                                    crossAxisSpacing: 2,
+                                    mainAxisSpacing: 4,
+                                    crossAxisSpacing: 4,
                                     children: _controller.memberScoreMap.keys
                                         .map((e) => IbUserAvatar(
                                               radius: 32,

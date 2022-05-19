@@ -909,6 +909,9 @@ class ChatPageController extends GetxController {
   }
 
   Future<void> sendCircleInvites(List<IbUser> users) async {
+    if (users.isEmpty) {
+      return;
+    }
     Get.dialog(const IbLoadingDialog(messageTrKey: 'Sending invites....'));
     try {
       for (final IbUser user in users) {

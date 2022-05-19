@@ -40,34 +40,31 @@ class IbFriendsPicker extends StatelessWidget {
                       },
                       child: const Text('Select All')),
                   Obx(() {
-                    final int pickedCount = _controller.allowEdit
-                        ? _controller.items.keys
-                            .where(
-                                (element) => _controller.items[element] == true)
-                            .length
-                        : _controller.items.keys
-                            .where((element) =>
-                                !_controller.pickedUids.contains(element.id) &&
-                                _controller.items[element] == true)
-                            .length;
+                    final result = _controller.allowEdit
+                        ? _controller.items.keys.where(
+                            (element) => _controller.items[element] == true)
+                        : _controller.items.keys.where((element) =>
+                            !_controller.pickedUids.contains(element.id) &&
+                            _controller.items[element] == true);
                     return TextButton(
                         onPressed: () {
-                          if (pickedCount > limit && limit != -1) {
+                          if (result.length > limit && limit != -1) {
                             IbUtils.showSimpleSnackBar(
                                 msg: 'You can only pick up to $limit friend(s)',
                                 backgroundColor: IbColors.primaryColor);
                             return;
                           }
-                          Get.back(
-                              result: _controller.items.keys
-                                  .where((element) =>
-                                      !_controller.pickedUids
-                                          .contains(element.id) &&
-                                      _controller.items[element] == true)
-                                  .toList());
+
+                          Get.back(result: result.toList());
                         },
                         child: Text(
                           buttonTxt,
+                          style: TextStyle(
+                              color: _controller.allowEdit
+                                  ? null
+                                  : result.isEmpty
+                                      ? IbColors.lightGrey
+                                      : null),
                         ));
                   }),
                 ],
