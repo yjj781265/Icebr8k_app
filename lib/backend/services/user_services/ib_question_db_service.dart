@@ -416,31 +416,6 @@ class IbQuestionDbService {
         .delete();
   }
 
-  Future<void> eraseAllAnsweredQuestions(String uid) async {
-    print('eraseAllAnsweredQuestions');
-    final _snapshot = await _db
-        .collectionGroup(_kAnswerCollectionGroup)
-        .where('uid', isEqualTo: uid)
-        .get();
-    for (final doc in _snapshot.docs) {
-      final questionId = doc.data()['questionId'].toString();
-      await _collectionRef
-          .doc(questionId)
-          .collection(_kAnswerCollectionGroup)
-          .doc(uid)
-          .delete();
-    }
-  }
-
-  Future<void> eraseSingleAnsweredQuestions(
-      String uid, String questionId) async {
-    return _collectionRef
-        .doc(questionId)
-        .collection(_kAnswerCollectionGroup)
-        .doc(uid)
-        .delete();
-  }
-
   Future<void> addComment(IbComment comment) async {
     await _collectionRef
         .doc(comment.questionId)
@@ -550,6 +525,45 @@ class IbQuestionDbService {
       return null;
     }
     return IbComment.fromJson(snapshot.docs.first.data());
+  }
+
+  Future<void> deleteQuestion(String questionId) async {
+    final snapshot1 = await _collectionRef
+        .doc(questionId)
+        .collection(_kAnswerCollectionGroup)
+        .get();
+
+    /// delete all answers
+    for (final doc in snapshot1.docs) {
+      await doc.reference.delete();
+    }
+
+    final snapshot2 = await _collectionRef
+        .doc(questionId)
+        .collection(_kCommentCollectionGroup)
+        .get();
+
+    /// delete all comments and it's likes
+    for (final doc in snapshot2.docs) {
+      final commentLikesSnapshot =
+          await doc.reference.collection(_kCommentLikesCollectionGroup).get();
+      for (final commentLikesDoc in commentLikesSnapshot.docs) {
+        await commentLikesDoc.reference.delete();
+      }
+      await doc.reference.delete();
+    }
+
+    final snapshot3 = await _collectionRef
+        .doc(questionId)
+        .collection(_kLikesCollectionGroup)
+        .get();
+
+    /// delete all likes
+    for (final doc in snapshot3.docs) {
+      await doc.reference.delete();
+    }
+    // delete the top node
+    await _collectionRef.doc(questionId).delete();
   }
 
   Future<void> copyCollection(String collection1, String collection2) async {

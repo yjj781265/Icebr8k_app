@@ -4,71 +4,77 @@ import 'dart:ui';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_media.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 
 import '../ib_colors.dart';
 
-class IbMediaSlide extends StatefulWidget {
-  final List<IbMedia> medias;
-
-  const IbMediaSlide(this.medias);
+class IbQuestionMediaSlide extends StatefulWidget {
+  final IbQuestionItemController itemController;
+  const IbQuestionMediaSlide(this.itemController);
 
   @override
-  State<IbMediaSlide> createState() => _IbMediaSlideState();
+  State<IbQuestionMediaSlide> createState() => _IbQuestionMediaSlideState();
 }
 
-class _IbMediaSlideState extends State<IbMediaSlide> {
+class _IbQuestionMediaSlideState extends State<IbQuestionMediaSlide> {
   final CarouselController _controller = CarouselController();
   int _current = 0;
 
   @override
   Widget build(BuildContext context) {
-    if (widget.medias.isEmpty) {
-      return const SizedBox();
-    }
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: CarouselSlider.builder(
-            itemCount: widget.medias.length,
-            itemBuilder: (context, index, _) {
-              return _itemWidget(widget.medias[index]);
-            },
-            options: CarouselOptions(
-              onPageChanged: (index, reason) {
-                setState(() {
-                  _current = index;
-                });
+    return Obx(() {
+      if (widget.itemController.rxIbQuestion.value.medias.isEmpty) {
+        return const SizedBox();
+      }
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: CarouselSlider.builder(
+              itemCount: widget.itemController.rxIbQuestion.value.medias.length,
+              itemBuilder: (context, index, _) {
+                return _itemWidget(
+                    widget.itemController.rxIbQuestion.value.medias[index]);
               },
-              enlargeCenterPage: true,
-              viewportFraction: 0.9,
-              enableInfiniteScroll: false,
-              aspectRatio: 1.78,
+              options: CarouselOptions(
+                onPageChanged: (index, reason) {
+                  setState(() {
+                    _current = index;
+                  });
+                },
+                enlargeCenterPage: true,
+                viewportFraction: 0.9,
+                enableInfiniteScroll: false,
+                aspectRatio: 1.78,
+              ),
             ),
           ),
-        ),
-        if (widget.medias.length > 1)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: widget.medias.asMap().entries.map((entry) {
-              return GestureDetector(
-                onTap: () => _controller.animateToPage(entry.key),
-                child: Container(
-                  width: 8.0,
-                  height: 8.0,
-                  margin: const EdgeInsets.symmetric(horizontal: 2),
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: IbColors.accentColor
-                          .withOpacity(_current == entry.key ? 0.9 : 0.4)),
-                ),
-              );
-            }).toList(),
-          ),
-      ],
-    );
+          if (widget.itemController.rxIbQuestion.value.medias.length > 1)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: widget.itemController.rxIbQuestion.value.medias
+                  .asMap()
+                  .entries
+                  .map((entry) {
+                return GestureDetector(
+                  onTap: () => _controller.animateToPage(entry.key),
+                  child: Container(
+                    width: 8.0,
+                    height: 8.0,
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: IbColors.accentColor
+                            .withOpacity(_current == entry.key ? 0.9 : 0.4)),
+                  ),
+                );
+              }).toList(),
+            ),
+        ],
+      );
+    });
   }
 
   Widget _itemWidget(IbMedia media) {
@@ -107,8 +113,11 @@ class _IbMediaSlideState extends State<IbMediaSlide> {
       onTap: () {
         Get.to(
             () => IbMediaViewer(
-                urls: widget.medias.map((e) => e.url).toList(),
-                currentIndex: widget.medias.indexOf(media)),
+                urls: widget.itemController.rxIbQuestion.value.medias
+                    .map((e) => e.url)
+                    .toList(),
+                currentIndex: widget.itemController.rxIbQuestion.value.medias
+                    .indexOf(media)),
             transition: Transition.zoom,
             fullscreenDialog: true);
       },

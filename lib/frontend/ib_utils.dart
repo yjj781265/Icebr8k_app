@@ -6,9 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/answered_question_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/home_tab_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/tag_page_controller.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -19,6 +22,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+import '../backend/controllers/user_controllers/asked_questions_controller.dart';
 import '../backend/controllers/user_controllers/auth_controller.dart';
 import '../backend/models/ib_question.dart';
 import '../backend/services/user_services/ib_local_data_service.dart';
@@ -27,7 +31,9 @@ import 'ib_config.dart';
 
 class IbUtils {
   IbUtils._();
+
   static void hideKeyboard() => FocusManager.instance.primaryFocus?.unfocus();
+
   static bool isOver13(DateTime dateTime) {
     final bool isOver13 =
         DateTime.now().difference(dateTime).inDays > IbConfig.kAgeLimitInDays;
@@ -712,13 +718,25 @@ class IbUtils {
   }
 
   static Widget handleQuestionType(IbQuestion question,
-      {bool uniqueTag = false, bool expanded = false, bool isSample = false}) {
-    final tag = uniqueTag ? getUniqueId() : question.id;
-    final IbQuestionItemController itemController = Get.put(
-        IbQuestionItemController(
-            rxIbQuestion: question.obs, rxIsExpanded: expanded.obs),
-        tag: tag);
-    itemController.isSample = isSample;
+      {bool uniqueTag = false,
+      bool expanded = false,
+      bool isSample = false,
+      IbQuestionItemController? itemController}) {
+    if (itemController == null) {
+      final tag = uniqueTag ? getUniqueId() : question.id;
+      final IbQuestionItemController controller = Get.put(
+          IbQuestionItemController(
+              rxIbQuestion: question.obs,
+              rxIsExpanded: expanded.obs,
+              rxIsSample: isSample.obs),
+          tag: tag);
+      if (question.questionType == QuestionType.multipleChoice ||
+          question.questionType == QuestionType.multipleChoicePic) {
+        return IbMcQuestionCard(controller);
+      }
+
+      return IbScQuestionCard(controller);
+    }
 
     if (question.questionType == QuestionType.multipleChoice ||
         question.questionType == QuestionType.multipleChoicePic) {
@@ -726,5 +744,36 @@ class IbUtils {
     }
 
     return IbScQuestionCard(itemController);
+  }
+
+  static void masterDeleteSingleQuestion(IbQuestion ibQuestion) {
+    if (Get.isRegistered<HomeTabController>()) {
+      Get.find<HomeTabController>()
+          .forYourList
+          .removeWhere((element) => element.id == ibQuestion.id);
+      Get.find<HomeTabController>()
+          .trendingList
+          .removeWhere((element) => element.id == ibQuestion.id);
+    }
+
+    if (Get.isRegistered<AnsweredQuestionController>()) {
+      Get.find<AnsweredQuestionController>()
+          .answeredQs
+          .removeWhere((element) => element.id == ibQuestion.id);
+    }
+
+    if (Get.isRegistered<AskedQuestionsController>(tag: getCurrentUid())) {
+      Get.find<AskedQuestionsController>(tag: getCurrentUid())
+          .createdQuestions
+          .removeWhere((element) => element.id == ibQuestion.id);
+    }
+
+    for (final tag in ibQuestion.tags) {
+      if (Get.isRegistered<TagPageController>(tag: tag)) {
+        Get.find<TagPageController>(tag: tag)
+            .ibQuestions
+            .removeWhere((element) => element.id == ibQuestion.id);
+      }
+    }
   }
 }

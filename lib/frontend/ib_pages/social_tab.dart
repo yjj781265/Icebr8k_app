@@ -55,7 +55,7 @@ class _SocialTabState extends State<SocialTab>
         ),
         bottom: TabBar(
           padding: EdgeInsets.zero,
-          indicatorSize: TabBarIndicatorSize.label,
+          indicatorSize: TabBarIndicatorSize.tab,
           controller: _tabController,
           tabs: [
             Obx(() {

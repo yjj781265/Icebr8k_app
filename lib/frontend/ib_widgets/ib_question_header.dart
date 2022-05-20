@@ -5,6 +5,8 @@ import 'package:icebr8k/backend/controllers/user_controllers/create_question_con
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 
 import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
 import '../ib_config.dart';
@@ -66,13 +68,10 @@ class IbQuestionHeader extends StatelessWidget {
                     size: 16,
                   ),
                 IconButton(
-                    onPressed: _itemController.isSample
+                    onPressed: _itemController.rxIsSample.isTrue
                         ? null
                         : () async {
-                            Get.to(() => CreateQuestionPage(
-                                controller: Get.put(CreateQuestionController(
-                                    ibQuestion:
-                                        _itemController.rxIbQuestion.value))));
+                            await _showMoreOptions();
                           },
                     icon: const FaIcon(
                       Icons.more_vert_outlined,
@@ -89,7 +88,7 @@ class IbQuestionHeader extends StatelessWidget {
     return Obx(() {
       if (!_itemController.rxIbQuestion.value.isAnonymous) {
         return IbUserAvatar(
-          disableOnTap: _itemController.isSample,
+          disableOnTap: _itemController.rxIsSample.isTrue,
           avatarUrl: _itemController.avatarUrl.value,
           uid: _itemController.rxIbQuestion.value.creatorId,
           radius: 20,
@@ -128,5 +127,78 @@ class IbQuestionHeader extends StatelessWidget {
           IbUtils.leftTimeText(_itemController.rxIbQuestion.value.endTimeInMs)
       ]);
     });
+  }
+
+  Future<void> _showMoreOptions() async {
+    final options = Column(
+      children: [
+        if (_itemController.rxIbQuestion.value.creatorId ==
+                IbUtils.getCurrentUid() &&
+            _itemController.rxIbQuestion.value.pollSize == 0)
+          ListTile(
+            onTap: () {
+              Get.back();
+              Get.to(() => CreateQuestionPage(
+                  controller: Get.put(CreateQuestionController(
+                      itemController: _itemController))));
+            },
+            leading: const Icon(
+              Icons.edit,
+              color: IbColors.primaryColor,
+            ),
+            title: const Text("Edit"),
+          ),
+        ListTile(
+          leading: const Icon(
+            Icons.remove_red_eye,
+            color: IbColors.primaryColor,
+          ),
+          title: const Text("Privacy Bound"),
+          subtitle: Text(
+            _itemController.rxIbQuestion.value.isPublic
+                ? 'Public'
+                : 'Friends Only',
+            style: const TextStyle(color: IbColors.lightGrey),
+          ),
+        ),
+        if (_itemController.rxIbQuestion.value.creatorId ==
+                IbUtils.getCurrentUid() &&
+            _itemController.showComparison.isFalse)
+          ListTile(
+            onTap: () async {
+              Get.back();
+              await _itemController.deleteQuestion();
+            },
+            leading: const Icon(
+              Icons.delete,
+              color: IbColors.errorRed,
+            ),
+            title: const Text(
+              "Delete",
+              style: TextStyle(color: IbColors.errorRed),
+            ),
+          ),
+        const ListTile(
+          leading: Icon(
+            Icons.report,
+            color: IbColors.errorRed,
+          ),
+          title: Text(
+            "Report",
+            style: TextStyle(color: IbColors.errorRed),
+          ),
+        ),
+        const Spacer(),
+        SizedBox(
+            width: double.infinity,
+            child: IbElevatedButton(
+                textTrKey: 'cancel',
+                color: IbColors.primaryColor,
+                onPressed: () {
+                  Get.back();
+                }))
+      ],
+    );
+    Get.bottomSheet(Center(child: IbCard(child: options)));
   }
 }

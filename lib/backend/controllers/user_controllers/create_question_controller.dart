@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
@@ -23,7 +24,7 @@ import '../../services/user_services/ib_storage_service.dart';
 
 class CreateQuestionController extends GetxController {
   final questionType = QuestionType.multipleChoice.obs;
-  IbQuestion? ibQuestion;
+  IbQuestionItemController? itemController;
   final TextEditingController questionEditController = TextEditingController();
   final TextEditingController descriptionEditController =
       TextEditingController();
@@ -47,7 +48,7 @@ class CreateQuestionController extends GetxController {
   bool isPublic;
 
   /// use .. operator to update pickedChats  pickedFriends list or set it separately
-  CreateQuestionController({this.ibQuestion, this.isPublic = true});
+  CreateQuestionController({this.itemController, this.isPublic = true});
 
   @override
   Future<void> onReady() async {
@@ -56,22 +57,22 @@ class CreateQuestionController extends GetxController {
   }
 
   Future<void> preFillInfo() async {
-    if (ibQuestion == null) {
+    if (itemController == null) {
       return;
     }
+    final ibQuestion = itemController!.rxIbQuestion.value;
+    picMediaList.value = ibQuestion.medias;
+    questionEditController.text = ibQuestion.question;
+    descriptionEditController.text = ibQuestion.description;
+    isPublic = ibQuestion.isPublic;
 
-    picMediaList.value = ibQuestion!.medias;
-    questionEditController.text = ibQuestion!.question;
-    descriptionEditController.text = ibQuestion!.description;
-    isPublic = ibQuestion!.isPublic;
-
-    for (final text in ibQuestion!.tags) {
+    for (final text in ibQuestion.tags) {
       final tag = await IbTagDbService().retrieveIbTag(text);
       if (tag != null) {
         pickedTags.add(tag);
       }
     }
-    for (final id in ibQuestion!.sharedChatIds) {
+    for (final id in ibQuestion.sharedChatIds) {
       final ibChat = await IbChatDbService().queryChat(id);
       if (ibChat != null) {
         final item = IbUtils.getAllChatTabItems().firstWhereOrNull(
@@ -82,14 +83,14 @@ class CreateQuestionController extends GetxController {
       }
     }
 
-    if (ibQuestion!.questionType == QuestionType.multipleChoicePic) {
+    if (ibQuestion.questionType == QuestionType.multipleChoicePic) {
       tabController.index = 1;
-      picChoiceList.value = ibQuestion!.choices;
+      picChoiceList.value = ibQuestion.choices;
     }
 
-    if (ibQuestion!.questionType == QuestionType.multipleChoice) {
+    if (ibQuestion.questionType == QuestionType.multipleChoice) {
       tabController.index = 0;
-      choiceList.value = ibQuestion!.choices;
+      choiceList.value = ibQuestion.choices;
     }
   }
 
@@ -191,15 +192,12 @@ class CreateQuestionController extends GetxController {
     }
 
     IbUtils.hideKeyboard();
-    String questionId = IbUtils.getUniqueId();
-    if (ibQuestion != null) {
-      questionId = ibQuestion!.id;
-    }
-
-    ibQuestion = IbQuestion(
+    final q = IbQuestion(
         question: questionEditController.text.trim(),
         description: descriptionEditController.text.trim(),
-        id: questionId,
+        id: itemController == null
+            ? IbUtils.getUniqueId()
+            : itemController!.rxIbQuestion.value.id,
         sharedFriendUids: pickedFriends.map((element) => element.id).toList(),
         sharedChatIds:
             pickedChats.map((element) => element.ibChat.chatId).toList(),
@@ -210,10 +208,23 @@ class CreateQuestionController extends GetxController {
         choices: _getIbChoices(),
         questionType: questionType.value,
         askedTimeInMs: DateTime.now().millisecondsSinceEpoch);
+
+    if (itemController != null) {
+      itemController!.rxIbQuestion.value = q;
+    } else {
+      itemController = Get.put(IbQuestionItemController(
+          rxIsSample: true.obs, rxIbQuestion: q.obs, rxIsExpanded: true.obs));
+    }
+
+    ///IMPORTANT
+    itemController!.rxIsExpanded.value = true;
+    itemController!.selectedChoiceId.value = '';
+    itemController!.rxIsSample.value = true;
+
     Get.to(
       () => ReviewQuestionPage(
         createQuestionController: this,
-        rxIbQuestion: ibQuestion!.obs,
+        itemController: itemController!,
       ),
     );
   }
@@ -241,7 +252,42 @@ class CreateQuestionController extends GetxController {
     return choices;
   }
 
+  Future<void> removeMediaAtIndex(int index) async {
+    if (index < 0) {
+      return;
+    }
+
+    try {
+      if (picMediaList[index].url.isURL &&
+          picMediaList[index].url.isImageFileName) {
+        Get.dialog(const IbLoadingDialog(messageTrKey: 'Deleting...'));
+        await IbStorageService().deleteFile(picMediaList[index].url);
+        Get.back();
+      }
+      picMediaList.removeAt(index);
+    } catch (e) {
+      Get.back();
+      Get.dialog(IbDialog(
+        title: "Error",
+        subtitle: e.toString(),
+        showNegativeBtn: false,
+      ));
+    }
+  }
+
   Future<void> submitQuestion(IbQuestion ibQuestion) async {
+    if (ibQuestion.pollSize != 0) {
+      Get.dialog(IbDialog(
+        title: 'Error',
+        subtitle: "You can't edit a question with votes",
+        onPositiveTap: () {
+          Navigator.of(Get.context!).popUntil((route) => route.isFirst);
+        },
+        showNegativeBtn: false,
+      ));
+      return;
+    }
+
     //use toSet to ensure uniqueness
     ibQuestion.sharedChatIds =
         pickedChats.map((element) => element.ibChat.chatId).toSet().toList();
@@ -342,8 +388,13 @@ class CreateQuestionController extends GetxController {
           chatRoomId: item));
     }
 
-    Get.back(closeOverlays: true);
-    Get.back(closeOverlays: true);
+    Navigator.of(Get.context!).popUntil((route) => route.isFirst);
+
+    /// DO NOT ERASE THIS LINE BELOW
+    itemController!.rxIsSample.value = false;
+    itemController!.rxIbQuestion.value = ibQuestion;
+    itemController!.rxIbQuestion.refresh();
+    print(itemController!.rxIbQuestion.value.medias);
     IbUtils.showSimpleSnackBar(
         msg: 'Question submitted successfully',
         backgroundColor: IbColors.accentColor);

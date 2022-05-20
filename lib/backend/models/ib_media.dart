@@ -26,8 +26,14 @@ class IbMedia {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is IbMedia && runtimeType == other.runtimeType && id == other.id;
+      other is IbMedia &&
+          runtimeType == other.runtimeType &&
+          url == other.url &&
+          id == other.id &&
+          type == other.type &&
+          description == other.description;
 
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode =>
+      url.hashCode ^ id.hashCode ^ type.hashCode ^ description.hashCode;
 }

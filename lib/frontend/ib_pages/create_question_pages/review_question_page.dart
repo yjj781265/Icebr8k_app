@@ -7,7 +7,6 @@ import 'package:icebr8k/backend/controllers/user_controllers/create_question_con
 import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
-import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -24,12 +23,12 @@ import '../chat_picker_page.dart';
 /// p.s all changes need to be made in rxIbQuestion except the shared chats and shared friends
 class ReviewQuestionPage extends StatelessWidget {
   final CreateQuestionController createQuestionController;
-  final Rx<IbQuestion> rxIbQuestion;
+  final IbQuestionItemController itemController;
 
   const ReviewQuestionPage(
       {Key? key,
       required this.createQuestionController,
-      required this.rxIbQuestion})
+      required this.itemController})
       : super(key: key);
 
   @override
@@ -40,7 +39,8 @@ class ReviewQuestionPage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () async {
-              await createQuestionController.submitQuestion(rxIbQuestion.value);
+              await createQuestionController
+                  .submitQuestion(itemController.rxIbQuestion.value);
             },
             child: Text('submit'.tr,
                 style: const TextStyle(fontSize: IbConfig.kNormalTextSize)),
@@ -62,8 +62,9 @@ class ReviewQuestionPage extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Obx(
-                      () => IbUtils.handleQuestionType(rxIbQuestion.value,
-                          isSample: true, expanded: true),
+                      () => IbUtils.handleQuestionType(
+                          itemController.rxIbQuestion.value,
+                          itemController: itemController),
                     ),
                     const Padding(
                       padding: EdgeInsets.all(8.0),
@@ -85,11 +86,12 @@ class ReviewQuestionPage extends StatelessWidget {
                       },
                       title: const Text('Time Limit'),
                       trailing: Obx(() {
-                        if (rxIbQuestion.value.endTimeInMs == -1) {
+                        if (itemController.rxIbQuestion.value.endTimeInMs ==
+                            -1) {
                           return const Text('No Time Limit');
                         }
                         return IbUtils.leftTimeText(
-                            rxIbQuestion.value.endTimeInMs);
+                            itemController.rxIbQuestion.value.endTimeInMs);
                       }),
                     ),
                     Obx(
@@ -111,10 +113,12 @@ class ReviewQuestionPage extends StatelessWidget {
                     Obx(
                       () => SwitchListTile.adaptive(
                         tileColor: Theme.of(context).primaryColor,
-                        value: rxIbQuestion.value.isCommentEnabled,
+                        value:
+                            itemController.rxIbQuestion.value.isCommentEnabled,
                         onChanged: (value) {
-                          rxIbQuestion.value.isCommentEnabled = value;
-                          rxIbQuestion.refresh();
+                          itemController.rxIbQuestion.value.isCommentEnabled =
+                              value;
+                          itemController.rxIbQuestion.refresh();
                         },
                         title: const Text('Comment'),
                         secondary: const Icon(
@@ -126,10 +130,10 @@ class ReviewQuestionPage extends StatelessWidget {
                     Obx(
                       () => SwitchListTile.adaptive(
                         tileColor: Theme.of(context).primaryColor,
-                        value: rxIbQuestion.value.isShareable,
+                        value: itemController.rxIbQuestion.value.isShareable,
                         onChanged: (value) {
-                          rxIbQuestion.value.isShareable = value;
-                          rxIbQuestion.refresh();
+                          itemController.rxIbQuestion.value.isShareable = value;
+                          itemController.rxIbQuestion.refresh();
                         },
                         title: const Text('Shareable'),
                         secondary: const Icon(
@@ -138,17 +142,14 @@ class ReviewQuestionPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (!rxIbQuestion.value.questionType
+                    if (!itemController.rxIbQuestion.value.questionType
                         .toString()
                         .contains('sc'))
                       Obx(
                         () => SwitchListTile.adaptive(
                           tileColor: Theme.of(context).primaryColor,
-                          value: rxIbQuestion.value.isQuiz,
+                          value: itemController.rxIbQuestion.value.isQuiz,
                           onChanged: (value) {
-                            final itemController =
-                                Get.find<IbQuestionItemController>(
-                                    tag: rxIbQuestion.value.id);
                             if (value) {
                               itemController.rxIsExpanded.value = true;
                               //give time to animate
@@ -158,10 +159,11 @@ class ReviewQuestionPage extends StatelessWidget {
                                     [IbShowCaseManager.kPickAnswerForQuizKey]);
                               });
                             } else {
-                              rxIbQuestion.value.correctChoiceId = '';
+                              itemController
+                                  .rxIbQuestion.value.correctChoiceId = '';
                             }
-                            rxIbQuestion.value.isQuiz = value;
-                            rxIbQuestion.refresh();
+                            itemController.rxIbQuestion.value.isQuiz = value;
+                            itemController.rxIbQuestion.refresh();
                           },
                           title: const Text('Quiz'),
                           secondary: const Icon(
@@ -173,10 +175,10 @@ class ReviewQuestionPage extends StatelessWidget {
                     Obx(
                       () => SwitchListTile.adaptive(
                         tileColor: Theme.of(context).primaryColor,
-                        value: rxIbQuestion.value.isAnonymous,
+                        value: itemController.rxIbQuestion.value.isAnonymous,
                         onChanged: (value) {
-                          rxIbQuestion.value.isAnonymous = value;
-                          rxIbQuestion.refresh();
+                          itemController.rxIbQuestion.value.isAnonymous = value;
+                          itemController.rxIbQuestion.refresh();
                         },
                         title: const Text('Anonymous'),
                         secondary: const Icon(
@@ -223,8 +225,8 @@ class ReviewQuestionPage extends StatelessWidget {
                   ),
                   title: const Text('No Time Limit'),
                   onTap: () {
-                    rxIbQuestion.value.endTimeInMs = -1;
-                    rxIbQuestion.refresh();
+                    itemController.rxIbQuestion.value.endTimeInMs = -1;
+                    itemController.rxIbQuestion.refresh();
                     Get.back();
                   },
                 ),
@@ -236,7 +238,7 @@ class ReviewQuestionPage extends StatelessWidget {
   }
 
   void _showDateTimePicker() {
-    rxIbQuestion.value.endTimeInMs =
+    itemController.rxIbQuestion.value.endTimeInMs =
         DateTime.now().add(const Duration(minutes: 15)).millisecondsSinceEpoch;
     Get.bottomSheet(
         IbCard(
@@ -246,7 +248,7 @@ class ReviewQuestionPage extends StatelessWidget {
             Obx(
               () => Center(
                 child: Text(
-                  '${DateTime.fromMillisecondsSinceEpoch(rxIbQuestion.value.endTimeInMs).year}',
+                  '${DateTime.fromMillisecondsSinceEpoch(itemController.rxIbQuestion.value.endTimeInMs).year}',
                   style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
                 ),
               ),
@@ -258,8 +260,9 @@ class ReviewQuestionPage extends StatelessWidget {
                 maximumYear: 1,
                 onDateTimeChanged: (value) async {
                   await HapticFeedback.selectionClick();
-                  rxIbQuestion.value.endTimeInMs = value.millisecondsSinceEpoch;
-                  rxIbQuestion.refresh();
+                  itemController.rxIbQuestion.value.endTimeInMs =
+                      value.millisecondsSinceEpoch;
+                  itemController.rxIbQuestion.refresh();
                 },
                 initialDateTime:
                     DateTime.now().add(const Duration(minutes: 20)),
@@ -303,15 +306,15 @@ class ReviewQuestionPage extends StatelessWidget {
             Obx(
               () => CheckboxListTile(
                 controlAffinity: ListTileControlAffinity.trailing,
-                value: rxIbQuestion.value.isPublic,
+                value: itemController.rxIbQuestion.value.isPublic,
                 onChanged: (flag) {
                   final bool isPublic = flag ?? false;
                   if (isPublic) {
-                    rxIbQuestion.value.isPublic = true;
+                    itemController.rxIbQuestion.value.isPublic = true;
                   } else {
-                    rxIbQuestion.value.isPublic = false;
+                    itemController.rxIbQuestion.value.isPublic = false;
                   }
-                  rxIbQuestion.refresh();
+                  itemController.rxIbQuestion.refresh();
                 },
                 title: const Text(
                   'Public',
@@ -326,7 +329,7 @@ class ReviewQuestionPage extends StatelessWidget {
               ),
             ),
             Obx(
-              () => rxIbQuestion.value.isPublic
+              () => itemController.rxIbQuestion.value.isPublic
                   ? const SizedBox()
                   : ListTile(
                       onTap: () async {
@@ -397,7 +400,7 @@ class ReviewQuestionPage extends StatelessWidget {
                   () => IbElevatedButton(
                     disabled: createQuestionController.pickedChats.isEmpty &&
                         createQuestionController.pickedFriends.isEmpty &&
-                        !rxIbQuestion.value.isPublic,
+                        !itemController.rxIbQuestion.value.isPublic,
                     textTrKey: 'confirm',
                     onPressed: () {
                       Get.back();
@@ -472,12 +475,12 @@ class ReviewQuestionPage extends StatelessWidget {
   String _getPrivacyBondsString() {
     final StringBuffer sb = StringBuffer();
     final bool includeComma = createQuestionController.pickedFriends.isNotEmpty;
-    if (rxIbQuestion.value.isPublic) {
+    if (itemController.rxIbQuestion.value.isPublic) {
       final str = includeComma ? 'Public, ' : 'Public';
       sb.write(str);
     }
     if (createQuestionController.pickedFriends.isNotEmpty &&
-        !rxIbQuestion.value.isPublic) {
+        !itemController.rxIbQuestion.value.isPublic) {
       final str = createQuestionController.pickedChats.isEmpty
           ? '${createQuestionController.pickedFriends.length} Friend(s)'
           : '${createQuestionController.pickedFriends.length} Friend(s),';

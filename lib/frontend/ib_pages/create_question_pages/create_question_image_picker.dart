@@ -164,8 +164,8 @@ class CreateQuestionImagePicker extends StatelessWidget {
                 child: Center(
                   child: IconButton(
                     padding: EdgeInsets.zero,
-                    onPressed: () {
-                      _controller.picMediaList.removeAt(i);
+                    onPressed: () async {
+                      await _controller.removeMediaAtIndex(i);
                     },
                     icon: const Icon(Icons.remove),
                     color: IbColors.errorRed,

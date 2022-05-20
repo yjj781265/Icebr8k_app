@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -10,7 +11,7 @@ import '../../services/user_services/ib_question_db_service.dart';
 
 class AnsweredQuestionController extends GetxController {
   final refreshController = RefreshController();
-  final answeredQs = <AnsweredQuestionItem>[].obs;
+  final answeredQs = <IbQuestion>[].obs;
   final isLoading = true.obs;
   DocumentSnapshot? lastDoc;
   final String uid;
@@ -23,11 +24,12 @@ class AnsweredQuestionController extends GetxController {
     lastDoc = snapshot.size == 0 ? null : snapshot.docs.last;
     for (final doc in snapshot.docs) {
       final IbAnswer ibAnswer = IbAnswer.fromJson(doc.data());
+      IbCacheManager()
+          .cacheSingleIbAnswer(uid: ibAnswer.uid, ibAnswer: ibAnswer);
       final IbQuestion? question =
           await IbQuestionDbService().querySingleQuestion(ibAnswer.questionId);
       if (question != null) {
-        answeredQs.add(
-            AnsweredQuestionItem(ibQuestion: question, ibAnswer: ibAnswer));
+        answeredQs.add(question);
       }
     }
     isLoading.value = false;
@@ -45,11 +47,12 @@ class AnsweredQuestionController extends GetxController {
     lastDoc = snapshot.size == 0 ? null : snapshot.docs.last;
     for (final doc in snapshot.docs) {
       final IbAnswer ibAnswer = IbAnswer.fromJson(doc.data());
+      IbCacheManager()
+          .cacheSingleIbAnswer(uid: ibAnswer.uid, ibAnswer: ibAnswer);
       final IbQuestion? question =
           await IbQuestionDbService().querySingleQuestion(ibAnswer.questionId);
       if (question != null) {
-        answeredQs.add(
-            AnsweredQuestionItem(ibQuestion: question, ibAnswer: ibAnswer));
+        answeredQs.add(question);
       }
     }
 
@@ -59,28 +62,5 @@ class AnsweredQuestionController extends GetxController {
     }
 
     refreshController.loadComplete();
-  }
-}
-
-class AnsweredQuestionItem {
-  IbQuestion ibQuestion;
-  IbAnswer ibAnswer;
-
-  AnsweredQuestionItem({required this.ibQuestion, required this.ibAnswer});
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AnsweredQuestionItem &&
-          runtimeType == other.runtimeType &&
-          ibQuestion.id == other.ibQuestion.id;
-
-  @override
-  int get hashCode => ibQuestion.id.hashCode;
-
-  @override
-  String toString() {
-    final String str = '${ibQuestion.question} : ${ibAnswer.choiceId}';
-    return str;
   }
 }

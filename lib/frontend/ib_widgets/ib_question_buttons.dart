@@ -42,7 +42,7 @@ class IbQuestionButtons extends StatelessWidget {
           if (_controller.rxIbQuestion.value.isCommentEnabled)
             Expanded(
               child: IbElevatedButton(
-                disabled: _controller.isSample,
+                disabled: _controller.rxIsSample.isTrue,
                 onPressed: () {
                   Get.to(() => CommentPage(Get.put(
                         CommentController(itemController: _controller),
@@ -69,10 +69,10 @@ class IbQuestionButtons extends StatelessWidget {
   }
 
   bool _handleVoteButtonDisableState() {
-    return _controller.isSample ||
+    return _controller.rxIsSample.isTrue ||
         _controller.selectedChoiceId.isEmpty ||
-        (_controller.rxIbAnswer != null &&
-            _controller.rxIbAnswer!.value.uid != IbUtils.getCurrentUid()) ||
+        (_controller.myAnswer != null &&
+            _controller.myAnswer!.uid != IbUtils.getCurrentUid()) ||
         _controller.isAnswering.isTrue ||
         _controller.voted.isTrue && _controller.rxIbQuestion.value.isQuiz;
   }

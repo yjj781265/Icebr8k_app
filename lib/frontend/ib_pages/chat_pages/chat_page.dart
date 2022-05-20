@@ -889,7 +889,9 @@ class ChatPage extends StatelessWidget {
       Widget pollWidget = const SizedBox();
       final IbQuestionItemController itemController = Get.put(
           IbQuestionItemController(
-              rxIbQuestion: question.obs, rxIsExpanded: false.obs),
+              rxIsSample: false.obs,
+              rxIbQuestion: question.obs,
+              rxIsExpanded: false.obs),
           tag: question.id);
 
       if (question.questionType == QuestionType.multipleChoice ||

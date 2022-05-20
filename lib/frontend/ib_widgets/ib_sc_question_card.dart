@@ -84,7 +84,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
             if (widget._controller.showComparison.isTrue)
               IbQuestionStats(Get.put(
                   IbQuestionStatsController(
-                      ibAnswers: widget._controller.ibAnswers!,
+                      ibAnswers: widget._controller.ibAnswers,
                       ibQuestion: widget._controller.rxIbQuestion.value),
                   tag: widget._controller.rxIbQuestion.value.id))
             else
@@ -128,7 +128,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
           const SizedBox(
             height: 8,
           ),
-          IbMediaSlide(widget._controller.rxIbQuestion.value.medias),
+          IbQuestionMediaSlide(widget._controller),
           IbQuestionInfo(widget._controller),
           const SizedBox(
             height: 8,

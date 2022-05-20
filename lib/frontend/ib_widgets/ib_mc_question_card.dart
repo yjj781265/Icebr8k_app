@@ -87,7 +87,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
             if (widget._controller.showComparison.isTrue)
               IbQuestionStats(Get.put(
                   IbQuestionStatsController(
-                      ibAnswers: widget._controller.ibAnswers!,
+                      ibAnswers: widget._controller.ibAnswers,
                       ibQuestion: widget._controller.rxIbQuestion.value),
                   tag: widget._controller.rxIbQuestion.value.id))
             else
@@ -152,7 +152,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
           const SizedBox(
             height: 8,
           ),
-          IbMediaSlide(widget._controller.rxIbQuestion.value.medias),
+          IbQuestionMediaSlide(widget._controller),
           IbQuestionInfo(widget._controller),
           SizeTransition(
             sizeFactor: animation,
@@ -213,8 +213,8 @@ class IbQuestionMcItem extends StatelessWidget {
         return IbColors.accentColor;
       } else if (_controller.rxIbQuestion.value.isQuiz &&
           choice.choiceId != _controller.rxIbQuestion.value.correctChoiceId &&
-          _controller.rxIbAnswer != null &&
-          choice.choiceId == _controller.rxIbAnswer!.value.choiceId) {
+          _controller.myAnswer != null &&
+          choice.choiceId == _controller.myAnswer!.choiceId) {
         return IbColors.errorRed;
       } else if (_controller.rxIbQuestion.value.isQuiz &&
           (_controller.resultMap[choice] ?? 0) == 0) {
@@ -248,8 +248,8 @@ class IbQuestionMcItem extends StatelessWidget {
   Widget getItemIcon() {
     if (!_controller.rxIbQuestion.value.isQuiz &&
         _controller.voted.isTrue &&
-        _controller.rxIbAnswer != null &&
-        choice.choiceId == _controller.rxIbAnswer!.value.choiceId) {
+        _controller.myAnswer != null &&
+        choice.choiceId == _controller.myAnswer!.choiceId) {
       return const CircleAvatar(
         radius: 8,
         backgroundColor: IbColors.white,
@@ -276,8 +276,8 @@ class IbQuestionMcItem extends StatelessWidget {
     }
     if (_controller.rxIbQuestion.value.isQuiz &&
         _controller.voted.isTrue &&
-        _controller.rxIbAnswer != null &&
-        choice.choiceId == _controller.rxIbAnswer!.value.choiceId &&
+        _controller.myAnswer != null &&
+        choice.choiceId == _controller.myAnswer!.choiceId &&
         choice.choiceId != _controller.rxIbQuestion.value.correctChoiceId) {
       return const CircleAvatar(
         radius: 8,
@@ -444,7 +444,8 @@ class IbQuestionMcItem extends StatelessWidget {
               ),
 
               /// show radios if is sample and quiz option is on
-              if (_controller.rxIbQuestion.value.isQuiz && _controller.isSample)
+              if (_controller.rxIbQuestion.value.isQuiz &&
+                  _controller.rxIsSample.isTrue)
                 _handleShowCaseQuizWidget()
             ],
           ),
@@ -480,19 +481,23 @@ class IbQuestionMcItem extends StatelessWidget {
   }
 
   void onItemTap() {
+    print('onItemTap');
     if (_controller.rxIbQuestion.value.isQuiz && _controller.voted.isTrue) {
+      print('onItemTap2');
       return;
     }
 
     if (DateTime.now().millisecondsSinceEpoch >
             _controller.rxIbQuestion.value.endTimeInMs &&
         _controller.rxIbQuestion.value.endTimeInMs > 0) {
+      print('onItemTap3');
       return;
     }
 
-    if (_controller.isSample ||
-        (_controller.rxIbAnswer != null &&
-            _controller.rxIbAnswer!.value.uid != IbUtils.getCurrentUid())) {
+    if (_controller.rxIsSample.isTrue ||
+        (_controller.myAnswer != null &&
+            _controller.myAnswer!.uid != IbUtils.getCurrentUid())) {
+      print('onItemTap4');
       return;
     }
 
@@ -501,5 +506,6 @@ class IbQuestionMcItem extends StatelessWidget {
     } else {
       _controller.selectedChoiceId.value = choice.choiceId;
     }
+    print('onItemTap5');
   }
 }

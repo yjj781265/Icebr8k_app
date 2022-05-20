@@ -38,7 +38,7 @@ class AnsweredPage extends StatelessWidget {
               controller: _scrollController,
               itemBuilder: (context, index) {
                 return IbUtils.handleQuestionType(
-                    _controller.answeredQs[index].ibQuestion);
+                    _controller.answeredQs[index]);
               },
               itemCount: _controller.answeredQs.length,
             ),

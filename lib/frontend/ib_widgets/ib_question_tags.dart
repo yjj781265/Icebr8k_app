@@ -25,7 +25,7 @@ class IbQuestionTags extends StatelessWidget {
         ? []
         : IbUtils.getCurrentIbUser()!.tags;
     return Obx(() {
-      if (_itemController.isSample) {
+      if (_itemController.rxIsSample.isTrue) {
         return Row(
             children: _itemController.rxIbQuestion.value.tags
                 .map(
@@ -51,7 +51,7 @@ class IbQuestionTags extends StatelessWidget {
       }
 
       return Row(
-        children: _itemController.ibTags
+        children: _itemController.rxIbQuestion.value.tags
             .map(
               (element) => Stack(
                 children: [
@@ -65,9 +65,9 @@ class IbQuestionTags extends StatelessWidget {
                             const BorderRadius.all(Radius.circular(16))),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text(element.text,
+                      child: Text(element,
                           style: TextStyle(
-                              fontWeight: followedTagList.contains(element.text)
+                              fontWeight: followedTagList.contains(element)
                                   ? FontWeight.bold
                                   : FontWeight.normal,
                               fontSize: IbConfig.kDescriptionTextSize)),
@@ -80,16 +80,14 @@ class IbQuestionTags extends StatelessWidget {
                       customBorder: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16)),
                       onTap: () {
-                        if (Get.isRegistered<TagPageController>(
-                            tag: element.text)) {
+                        if (Get.isRegistered<TagPageController>(tag: element)) {
                           return;
                         }
 
                         Get.to(
-                            () => TagPage(Get.put(
-                                TagPageController(element.text),
-                                tag: element.text)),
-                            preventDuplicates: false);
+                          () => TagPage(Get.put(TagPageController(element),
+                              tag: element)),
+                        );
                       },
                     ),
                   ))

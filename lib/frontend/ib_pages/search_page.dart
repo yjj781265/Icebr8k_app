@@ -400,6 +400,7 @@ class SearchPage extends StatelessWidget {
                       Get.to(() => QuestionMainPage(Get.put(
                           IbQuestionItemController(
                               rxIbQuestion: element.obs,
+                              rxIsSample: false.obs,
                               rxIsExpanded: true.obs),
                           tag: element.id)));
                     },

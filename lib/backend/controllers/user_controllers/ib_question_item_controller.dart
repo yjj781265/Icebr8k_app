@@ -7,13 +7,13 @@ import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
-import 'package:icebr8k/backend/models/ib_tag.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
 import '../../services/user_services/ib_question_db_service.dart';
-import '../../services/user_services/ib_tag_db_service.dart';
 import '../../services/user_services/ib_user_db_service.dart';
 
 class IbQuestionItemController extends GetxController {
@@ -21,17 +21,15 @@ class IbQuestionItemController extends GetxController {
   Timer? _timer;
   final voted = false.obs;
   final isAnswering = false.obs;
-  bool isSample;
+  final RxBool rxIsSample;
 
   /// for compare two users answers
-  final List<IbAnswer>? ibAnswers;
+  final List<IbAnswer> ibAnswers;
+  IbAnswer? myAnswer;
   final RxBool rxIsExpanded;
 
   /// show the picked option from multiple people
   final showComparison = false.obs;
-
-  /// if user already answered, pass the answer here
-  Rx<IbAnswer>? rxIbAnswer;
   final answeredUsername = ''.obs;
   final liked = false.obs;
   final commented = false.obs;
@@ -40,7 +38,6 @@ class IbQuestionItemController extends GetxController {
   final avatarUrl = ''.obs;
   final compScore = 0.0.obs;
   final resultMap = <IbChoice, double>{}.obs;
-  final RxList<IbTag> ibTags = <IbTag>[].obs;
   final sharedCircles = <ChatTabItem>[].obs;
 
   //start
@@ -60,22 +57,21 @@ class IbQuestionItemController extends GetxController {
   IbQuestionItemController({
     required this.rxIbQuestion,
     required this.rxIsExpanded,
-    this.isSample = false,
-    this.ibAnswers,
+    required this.rxIsSample,
+    this.ibAnswers = const [],
   });
 
   @override
-  Future<void> onInit() async {
+  Future<void> onReady() async {
     await initData();
-    super.onInit();
+    super.onReady();
   }
 
   Future<void> initData() async {
     countMap.clear();
-    ibTags.clear();
     resultMap.clear();
     choiceUserMap.clear();
-    showComparison.value = ibAnswers != null && ibAnswers!.isNotEmpty;
+    showComparison.value = ibAnswers.isNotEmpty;
 
     /// query question poll creator user info
     creatorUser =
@@ -86,35 +82,14 @@ class IbQuestionItemController extends GetxController {
       avatarUrl.value = creatorUser!.avatarUrl;
       compScore.value = await IbUtils.getCompScore(uid: creatorUser!.id);
     }
-    if (!isSample) {
-      if (rxIbAnswer == null) {
-        /// query my answer to this question
-        final myAnswer = await IbQuestionDbService().querySingleIbAnswer(
-            IbUtils.getCurrentUid()!, rxIbQuestion.value.id);
-        if (myAnswer != null) {
-          rxIbAnswer = myAnswer.obs;
-          selectedChoiceId.value = rxIbAnswer!.value.choiceId;
-          rxIbAnswer!.refresh();
-        }
-      } else {
-        selectedChoiceId.value = rxIbAnswer!.value.choiceId;
-      }
-
-      voted.value = rxIbAnswer != null;
-
+    if (rxIsSample.isFalse) {
       commented.value =
           await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
       liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
-      await _generateIbTags();
+      await _getMyAnswerAndDeterminedPollCloseStatus();
       await generatePollStats();
       await _generateChoiceUserMap();
       _setUpCountDownTimer();
-      isPollClosed.value = DateTime.now().millisecondsSinceEpoch >
-              rxIbQuestion.value.endTimeInMs &&
-          rxIbQuestion.value.endTimeInMs > 0;
-
-      /// flag for enabling user to open result page
-      voted.value = rxIbAnswer != null || isPollClosed.value;
     }
   }
 
@@ -132,6 +107,7 @@ class IbQuestionItemController extends GetxController {
         await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
     liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
     await generatePollStats();
+    await _getMyAnswerAndDeterminedPollCloseStatus();
   }
 
   @override
@@ -165,20 +141,6 @@ class IbQuestionItemController extends GetxController {
     }
   }
 
-  Future<void> _generateIbTags() async {
-    ibTags.clear();
-    for (final String id in rxIbQuestion.value.tags) {
-      if (IbCacheManager().getIbTag(id) != null) {
-        ibTags.add(IbCacheManager().getIbTag(id)!);
-      } else {
-        final IbTag? tag = await IbTagDbService().retrieveIbTag(id);
-        if (tag != null) {
-          ibTags.add(tag);
-        }
-      }
-    }
-  }
-
   Future<Map<String, int>> _getChoiceCountMap() async {
     final map = <String, int>{};
     for (final ibChoice in rxIbQuestion.value.choices) {
@@ -187,6 +149,23 @@ class IbQuestionItemController extends GetxController {
               questionId: rxIbQuestion.value.id, choiceId: ibChoice.choiceId);
     }
     return map;
+  }
+
+  Future<void> _getMyAnswerAndDeterminedPollCloseStatus() async {
+    myAnswer = await IbQuestionDbService()
+        .querySingleIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id);
+    if (myAnswer != null) {
+      selectedChoiceId.value = myAnswer!.choiceId;
+    } else {
+      selectedChoiceId.value = '';
+    }
+    isPollClosed.value = DateTime.now().millisecondsSinceEpoch >
+            rxIbQuestion.value.endTimeInMs &&
+        rxIbQuestion.value.endTimeInMs > 0;
+
+    /// flag for enabling user to open result page
+    voted.value = myAnswer != null || isPollClosed.value;
+    voted.refresh();
   }
 
   Future<void> generatePollStats() async {
@@ -240,9 +219,9 @@ class IbQuestionItemController extends GetxController {
       return;
     }
 
-    if (rxIbAnswer != null &&
-        rxIbAnswer!.value.isAnonymous == isAnonymous &&
-        selectedChoiceId.value == rxIbAnswer!.value.choiceId) {
+    if (myAnswer != null &&
+        myAnswer!.isAnonymous == isAnonymous &&
+        selectedChoiceId.value == myAnswer!.choiceId) {
       return;
     }
 
@@ -257,7 +236,7 @@ class IbQuestionItemController extends GetxController {
           choiceId: selectedChoiceId.value,
           isAnonymous: isAnonymous,
           isPublicQuestion: rxIbQuestion.value.isPublic,
-          edited: rxIbAnswer != null,
+          edited: myAnswer != null,
           answeredTimeInMs: DateTime.now().millisecondsSinceEpoch,
           askedTimeInMs: rxIbQuestion.value.askedTimeInMs,
           uid: IbUtils.getCurrentUid()!,
@@ -274,15 +253,14 @@ class IbQuestionItemController extends GetxController {
             msg: 'Answered anonymously 🕵️', backgroundColor: Colors.black);
       }
 
-      if (rxIbAnswer != null) {
+      if (myAnswer != null) {
         ///decrement old countMap;
-        final int decrementedCount =
-            (countMap[rxIbAnswer!.value.choiceId] ?? 0) - 1;
-        countMap[rxIbAnswer!.value.choiceId] =
+        final int decrementedCount = (countMap[myAnswer!.choiceId] ?? 0) - 1;
+        countMap[myAnswer!.choiceId] =
             decrementedCount < 0 ? 0 : decrementedCount;
-        rxIbAnswer!.value = ibAnswer;
+        myAnswer = ibAnswer;
       } else {
-        rxIbAnswer = ibAnswer.obs;
+        myAnswer = ibAnswer;
         rxIbQuestion.value.pollSize++;
       }
 
@@ -301,7 +279,6 @@ class IbQuestionItemController extends GetxController {
         compScore.value = await IbUtils.getCompScore(uid: creatorUser!.id);
       }
       isAnswering.value = false;
-      rxIbAnswer!.refresh();
       rxIbQuestion.refresh();
       choiceUserMap.refresh();
       countMap.refresh();
@@ -328,5 +305,31 @@ class IbQuestionItemController extends GetxController {
       user = IbCacheManager().getIbUser(uid);
     }
     return user;
+  }
+
+  Future<void> deleteQuestion() async {
+    if (rxIbQuestion.value.creatorId != IbUtils.getCurrentUid()) {
+      return;
+    }
+
+    try {
+      Get.dialog(
+        IbDialog(
+            title: 'Are you sure to delete this question?',
+            subtitle: 'All votes, comments, and likes will be erased',
+            onPositiveTap: () async {
+              Get.back();
+              Get.dialog(const IbLoadingDialog(messageTrKey: 'Deleting...'),
+                  barrierDismissible: false);
+              await IbQuestionDbService().deleteQuestion(rxIbQuestion.value.id);
+              IbUtils.masterDeleteSingleQuestion(rxIbQuestion.value);
+              Get.back();
+              IbUtils.showSimpleSnackBar(
+                  msg: 'Question Deleted', backgroundColor: IbColors.errorRed);
+            }),
+      );
+    } catch (e) {
+      Get.dialog(IbDialog(title: "Error", subtitle: e.toString()));
+    }
   }
 }

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_pages/main_page.dart';
 import 'package:icebr8k/frontend/ib_themes.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:lottie/lottie.dart';
@@ -58,7 +59,11 @@ class MainApp extends StatelessWidget {
         child: GetMaterialApp(
           defaultTransition: Transition.cupertino,
           debugShowCheckedModeBanner: false,
-          home: SplashPage(),
+          initialRoute: './',
+          routes: {
+            './': (context) => SplashPage(),
+            './home': (context) => MainPage()
+          },
           enableLog: false,
           translations: IbStrings(),
           locale: const Locale('en', 'US'),

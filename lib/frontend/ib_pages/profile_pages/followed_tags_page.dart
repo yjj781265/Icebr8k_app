@@ -69,8 +69,8 @@ class FollowedTagsPage extends StatelessWidget {
                               customBorder: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16)),
                               onTap: () {
-                                Get.to(() =>
-                                    TagPage(Get.put(TagPageController(e))));
+                                Get.to(() => TagPage(
+                                    Get.put(TagPageController(e), tag: e)));
                               },
                             ),
                           ))

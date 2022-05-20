@@ -386,7 +386,7 @@ class ProfilePage extends StatelessWidget {
                           Get.to(
                             () => AskedPage(
                               Get.put(AskedQuestionsController(_controller.uid),
-                                  tag: IbUtils.getUniqueId()),
+                                  tag: _controller.uid),
                             ),
                           );
                         },

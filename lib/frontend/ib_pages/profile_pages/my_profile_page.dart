@@ -226,8 +226,7 @@ class MyProfilePage extends StatelessWidget {
                         onTap: () {
                           Get.to(() => AnsweredPage(Get.put(
                               AnsweredQuestionController(
-                                  _controller.rxCurrentIbUser.value.id),
-                              tag: IbUtils.getUniqueId())));
+                                  _controller.rxCurrentIbUser.value.id))));
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(4.0),
@@ -274,7 +273,7 @@ class MyProfilePage extends StatelessWidget {
                               AskedQuestionsController(
                                   _controller.rxCurrentIbUser.value.id,
                                   showPublicOnly: false),
-                              tag: IbUtils.getUniqueId())));
+                              tag: _controller.rxCurrentIbUser.value.id)));
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(4.0),

@@ -65,8 +65,8 @@ class WordCloudPage extends StatelessWidget {
                                 style: randomFont(e),
                               ),
                               onPressed: () {
-                                Get.to(() =>
-                                    TagPage(Get.put(TagPageController(e))));
+                                Get.to(() => TagPage(
+                                    Get.put(TagPageController(e), tag: e)));
                               },
                             ))
                         .toList(),

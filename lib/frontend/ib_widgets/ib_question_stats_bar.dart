@@ -29,12 +29,14 @@ class IbQuestionStatsBar extends StatelessWidget {
         () => Wrap(
           children: [
             TextButton.icon(
-                onPressed: _itemController.isSample ? null : _handleOnStatsTap,
+                onPressed: _itemController.rxIsSample.isTrue
+                    ? null
+                    : _handleOnStatsTap,
                 icon: FaIcon(
                   FontAwesomeIcons.checkToSlot,
-                  color: _itemController.rxIbAnswer != null
-                      ? (_itemController.rxIbAnswer != null &&
-                              !_itemController.rxIbAnswer!.value.isAnonymous
+                  color: _itemController.voted.isTrue
+                      ? (_itemController.myAnswer != null &&
+                              !_itemController.myAnswer!.isAnonymous
                           ? IbColors.primaryColor
                           : Colors.black)
                       : IbColors.lightGrey,
@@ -48,7 +50,7 @@ class IbQuestionStatsBar extends StatelessWidget {
                 )),
             if (_itemController.rxIbQuestion.value.isCommentEnabled)
               TextButton.icon(
-                  onPressed: _itemController.isSample
+                  onPressed: _itemController.rxIsSample.isTrue
                       ? null
                       : () {
                           Get.to(() => CommentPage(Get.put(CommentController(
@@ -69,9 +71,9 @@ class IbQuestionStatsBar extends StatelessWidget {
                         fontSize: IbConfig.kDescriptionTextSize),
                   )),
             TextButton.icon(
-              onPressed: _itemController.isSample ||
-                      (_itemController.rxIbAnswer != null &&
-                          _itemController.rxIbAnswer!.value.uid !=
+              onPressed: _itemController.rxIsSample.isTrue ||
+                      (_itemController.myAnswer != null &&
+                          _itemController.myAnswer!.uid !=
                               IbUtils.getCurrentUid())
                   ? null
                   : () {
@@ -93,9 +95,9 @@ class IbQuestionStatsBar extends StatelessWidget {
             ),
             if (_itemController.rxIbQuestion.value.isShareable)
               TextButton.icon(
-                onPressed: _itemController.isSample ||
-                        (_itemController.rxIbAnswer != null &&
-                            _itemController.rxIbAnswer!.value.uid !=
+                onPressed: _itemController.rxIsSample.isTrue ||
+                        (_itemController.myAnswer != null &&
+                            _itemController.myAnswer!.uid !=
                                 IbUtils.getCurrentUid())
                     ? null
                     : () async {
