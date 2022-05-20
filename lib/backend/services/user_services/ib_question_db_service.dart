@@ -58,7 +58,7 @@ class IbQuestionDbService {
 
   /// query all question this uid asked, public question (no Anonymous question) by default
   Future<QuerySnapshot<Map<String, dynamic>>> queryAskedQuestions({
-    int limit = 8,
+    int limit = IbConfig.kPerPage,
     bool publicOnly = true,
     required String uid,
     DocumentSnapshot? lastDoc,

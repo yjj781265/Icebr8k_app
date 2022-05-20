@@ -54,7 +54,6 @@ class _SocialTabState extends State<SocialTab>
           child: Text('Social'),
         ),
         bottom: TabBar(
-          padding: EdgeInsets.zero,
           indicatorSize: TabBarIndicatorSize.tab,
           controller: _tabController,
           tabs: [
@@ -80,8 +79,8 @@ class _SocialTabState extends State<SocialTab>
                     ),
                     if (total > 0)
                       Positioned(
-                        right: -10,
-                        top: 0,
+                        right: -16,
+                        top: -4,
                         child: CircleAvatar(
                           backgroundColor: IbColors.errorRed,
                           radius: 10,
@@ -123,8 +122,8 @@ class _SocialTabState extends State<SocialTab>
                     ),
                     if (total > 0)
                       Positioned(
-                        right: -10,
-                        top: 0,
+                        right: -16,
+                        top: -4,
                         child: CircleAvatar(
                           backgroundColor: IbColors.errorRed,
                           radius: 10,
