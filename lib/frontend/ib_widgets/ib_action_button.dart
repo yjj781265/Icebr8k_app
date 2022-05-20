@@ -4,6 +4,7 @@ import 'package:icebr8k/frontend/ib_config.dart';
 class IbActionButton extends StatelessWidget {
   final Color color;
   final Color bgColor;
+
   final bool showCircle;
   final double size;
   final double fontSize;

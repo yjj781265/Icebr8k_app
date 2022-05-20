@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/asked_questions_controller.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
@@ -15,7 +16,6 @@ class ProfileController extends GetxController {
   final isLoading = true.obs;
   final isFriend = false.obs;
   final isProfileVisible = false.obs;
-  final isBlocked = false.obs;
 
   /// is friend request waiting for me for approval
   IbNotification? frNotification;
@@ -27,11 +27,14 @@ class ProfileController extends GetxController {
   final compScore = 0.0.obs;
   late Rx<IbUser> rxIbUser;
   final double kAppBarCollapseHeight = 56;
+  late AskedQuestionsController askedQuestionsController;
   final RefreshController refreshController = RefreshController();
   final ScrollController scrollController = ScrollController();
   final commonAnswers = <String>[].obs;
   final uncommonAnswers = <String>[].obs;
-  ProfileController(this.uid);
+  ProfileController(this.uid) {
+    askedQuestionsController = Get.put(AskedQuestionsController(uid), tag: uid);
+  }
 
   @override
   Future<void> onInit() async {
@@ -49,8 +52,6 @@ class ProfileController extends GetxController {
       isFrSent.value = frSentNotification != null;
       frNotification = await IbUserDbService()
           .isFriendRequestWaitingForMeForApproval(user.id);
-      isBlocked.value =
-          user.blockedFriendUids.contains(IbUtils.getCurrentUid());
       isProfileVisible.value = _handleProfileVisibility();
       isLoading.value = false;
     }
@@ -80,8 +81,6 @@ class ProfileController extends GetxController {
       isFrSent.value = frSentNotification != null;
       frNotification = await IbUserDbService()
           .isFriendRequestWaitingForMeForApproval(user.id);
-      isBlocked.value =
-          user.blockedFriendUids.contains(IbUtils.getCurrentUid());
       isProfileVisible.value = _handleProfileVisibility();
       rxIbUser.refresh();
       refreshController.refreshCompleted();
@@ -91,8 +90,7 @@ class ProfileController extends GetxController {
   }
 
   bool _handleProfileVisibility() {
-    if (isBlocked.isTrue ||
-        rxIbUser.value.profilePrivacy == IbUser.kUserPrivacyPrivate) {
+    if (rxIbUser.value.profilePrivacy == IbUser.kUserPrivacyPrivate) {
       return false;
     }
 
@@ -159,35 +157,10 @@ class ProfileController extends GetxController {
     }
   }
 
-  Future<void> blockFriend() async {
-    final IbUser? currentUser = IbUtils.getCurrentIbUser();
-    if (currentUser == null) {
-      return;
-    }
-    try {
-      await IbUserDbService().blockFriend(rxIbUser.value.id);
-      isBlocked.value = true;
-      IbUtils.showSimpleSnackBar(
-          msg: 'Friend blocked!', backgroundColor: IbColors.errorRed);
-    } catch (e) {
-      IbUtils.showSimpleSnackBar(
-          msg: 'Block friend failed $e', backgroundColor: IbColors.errorRed);
-    }
-  }
-
-  Future<void> unblockFriend() async {
-    final IbUser? currentUser = IbUtils.getCurrentIbUser();
-    if (currentUser == null) {
-      return;
-    }
-    try {
-      await IbUserDbService().unblockFriend(rxIbUser.value.id);
-      isBlocked.value = false;
-      IbUtils.showSimpleSnackBar(
-          msg: 'Friend unblocked!', backgroundColor: IbColors.accentColor);
-    } catch (e) {
-      IbUtils.showSimpleSnackBar(
-          msg: 'Unblock friend failed $e', backgroundColor: IbColors.errorRed);
+  Future<void> cancelFriendRequest() async {
+    if (frSentNotification != null) {
+      IbUserDbService().removeNotification(frSentNotification!);
+      isFrSent.value = false;
     }
   }
 }

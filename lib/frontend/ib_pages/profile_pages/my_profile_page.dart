@@ -50,6 +50,7 @@ class MyProfilePage extends StatelessWidget {
         child: DefaultTabController(
           length: 2,
           child: ExtendedNestedScrollView(
+            onlyOneScrollInBody: true,
             headerSliverBuilder:
                 (BuildContext context, bool innerBoxIsScrolled) {
               return [
@@ -372,7 +373,8 @@ class MyProfilePage extends StatelessWidget {
                 ),
               ],
             ),
-            Obx(() => Wrap(
+            Obx(() => StaggeredGrid.count(
+                  crossAxisCount: 2,
                   children: _controller.rxCurrentIbUser.value.emoPics
                       .map((e) => IbEmoPicCard(
                             emoPic: e,
@@ -434,40 +436,43 @@ class MyProfilePage extends StatelessWidget {
   Widget _userInfo() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(
-            height: 16,
-          ),
-          Text(
-            '${_controller.rxCurrentIbUser.value.fName} ${_controller.rxCurrentIbUser.value.lName} ',
-            style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
-          ),
-          Row(
-            children: [
-              Text(
-                _controller.rxCurrentIbUser.value.gender,
-                style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
-              ),
-              if (_controller.rxCurrentIbUser.value.birthdateInMs != null)
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Text(
-                    'Age: ${IbUtils.calculateAge(_controller.rxCurrentIbUser.value.birthdateInMs!).toString()}',
-                    style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
-                  ),
+      child: Obx(
+        () => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 16,
+            ),
+            Text(
+              '${_controller.rxCurrentIbUser.value.fName} ${_controller.rxCurrentIbUser.value.lName} ',
+              style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+            ),
+            Row(
+              children: [
+                Text(
+                  _controller.rxCurrentIbUser.value.gender,
+                  style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
                 ),
-            ],
-          ),
-          const SizedBox(
-            height: 4,
-          ),
-          IbDescriptionText(text: _controller.rxCurrentIbUser.value.bio),
-          const Divider(
-            thickness: 2,
-          ),
-        ],
+                if (_controller.rxCurrentIbUser.value.birthdateInMs != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text(
+                      'Age: ${IbUtils.calculateAge(_controller.rxCurrentIbUser.value.birthdateInMs!).toString()}',
+                      style:
+                          const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(
+              height: 4,
+            ),
+            IbDescriptionText(text: _controller.rxCurrentIbUser.value.bio),
+            const Divider(
+              thickness: 2,
+            ),
+          ],
+        ),
       ),
     );
   }
