@@ -35,6 +35,10 @@ IbUser _$IbUserFromJson(Map<String, dynamic> json) => IbUser(
           : IbSettings.fromJson(json['settings'] as Map<String, dynamic>),
       fcmToken: json['fcmToken'] as String? ?? '',
       fcmTokenTimestamp: json['fcmTokenTimestamp'],
+      intentions: (json['intentions'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const ['Dating', 'Friendship'],
       tags:
           (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
               const [],
@@ -85,5 +89,6 @@ Map<String, dynamic> _$IbUserToJson(IbUser instance) => <String, dynamic>{
       'voiceMemoUrl': instance.voiceMemoUrl,
       'roles': instance.roles,
       'tags': instance.tags,
+      'intentions': instance.intentions,
       'emoPics': instance.emoPics.map((e) => e.toJson()).toList(),
     };

@@ -13,6 +13,10 @@ class IbSettings {
   bool friendRequestN;
   bool pollCommentReplyN;
 
+  // poll specific
+  bool pollExpandedByDefault;
+  bool voteAnonymousByDefault;
+
   IbSettings({
     this.pollCommentN = true,
     this.pollLikesN = true,
@@ -22,6 +26,8 @@ class IbSettings {
     this.circleRequestN = true,
     this.circleInviteN = true,
     this.pollCommentReplyN = true,
+    this.pollExpandedByDefault = false,
+    this.voteAnonymousByDefault = false,
   });
 
   factory IbSettings.fromJson(Map<String, dynamic> json) =>

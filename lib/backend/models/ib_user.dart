@@ -39,6 +39,7 @@ class IbUser {
   String voiceMemoUrl;
   List<String> roles;
   List<String> tags;
+  List<String> intentions;
   List<IbEmoPic> emoPics;
 
   static String kAdminRole = 'admin';
@@ -50,7 +51,10 @@ class IbUser {
   static const String kUserPrivacyPrivate = 'private';
   static const String kUserPrivacyFrOnly = 'friends_only';
   static const String kUserStatusPending = 'pending';
+  static const String kUserIntentionDating = 'Dating';
+  static const String kUserIntentionFriendship = 'Friendship';
   static List<String> kGenders = ['🧑 Male', '👩 Female', '🌈 Other'];
+  static List<String> kIntentions = ['Dating', 'Friendship'];
 
   IbUser({
     this.avatarUrl = '',
@@ -72,6 +76,7 @@ class IbUser {
     IbSettings? settings,
     this.fcmToken = '',
     this.fcmTokenTimestamp,
+    this.intentions = const ['Dating', 'Friendship'],
     this.tags = const [],
     this.emoPics = const [],
     this.roles = const ['user'],
@@ -90,7 +95,17 @@ class IbUser {
 
   @override
   String toString() {
-    return 'IbUser{id: $id, fName: $fName, lName: $lName, email: $email, username: $username, avatarUrl: $avatarUrl, gender: $gender, status: $status, banedEndTimeInMs: $banedEndTimeInMs, loginTimeInMs: $loginTimestamp, joinTime: $joinTime, birthdateInMs: $birthdateInMs, answeredCount: $answeredCount, askedCount: $askedCount, friendUids: $friendUids, blockedFriendUids: $blockedFriendUids, notificationCount: $notificationCount, profilePrivacy: $profilePrivacy, isOnline: $isOnline, coverPhotoUrl: $coverPhotoUrl, bio: $bio, voiceMemoUrl: $voiceMemoUrl, roles: $roles, emoPics: $emoPics}';
+    return 'IbUser{id: $id, fName: $fName, lName: $lName, email: $email, '
+        'username: $username, avatarUrl: $avatarUrl, gender: $gender, '
+        'status: $status, banedEndTimeInMs: $banedEndTimeInMs, '
+        'loginTimeInMs: $loginTimestamp, joinTime: $joinTime, '
+        'birthdateInMs: $birthdateInMs, answeredCount: $answeredCount, '
+        'askedCount: $askedCount, friendUids: $friendUids, '
+        'blockedFriendUids: $blockedFriendUids, notificationCount: $notificationCount, '
+        'profilePrivacy: $profilePrivacy, isOnline: $isOnline, '
+        'coverPhotoUrl: $coverPhotoUrl, bio: $bio, '
+        'voiceMemoUrl: $voiceMemoUrl, '
+        'roles: $roles, emoPics: $emoPics}';
   }
 
   @override
