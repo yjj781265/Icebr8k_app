@@ -16,8 +16,7 @@ class IbNotification {
   String recipientId;
 
   static const String kFriendRequest = 'friend_request';
-
-  /// will go open the app if it is in background
+  static const String kFriendAccepted = 'friend_accepted';
   static const String kChat = 'chat';
   static const String kCircleInvite = 'circle_invite';
   static const String kCircleRequest = 'circle_request';
@@ -69,6 +68,8 @@ class IbNotification {
 
   @override
   String toString() {
-    return 'IbNotification{id: $id, body: $body, url: $url, type: $type, timestamp: $timestamp, isRead: $isRead, senderId: $senderId, recipientId: $recipientId}';
+    return 'IbNotification{id: $id, body: $body, url: $url, type: $type, '
+        'timestamp: $timestamp, isRead: $isRead, '
+        'senderId: $senderId, recipientId: $recipientId}';
   }
 }

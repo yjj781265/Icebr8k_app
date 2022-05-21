@@ -130,14 +130,20 @@ class IbUserDbService {
     return snapshot.size > 0;
   }
 
-  Future<bool> isCircleRequestSent({required String chatId}) async {
+  Future<List<IbNotification>> isCircleRequestSent(
+      {required String chatId}) async {
+    final list = <IbNotification>[];
     final snapshot = await _db
         .collectionGroup(_kNotificationSubCollection)
         .where('type', isEqualTo: IbNotification.kCircleRequest)
         .where('senderId', isEqualTo: IbUtils.getCurrentUid())
         .where('url', isEqualTo: chatId)
         .get();
-    return snapshot.size > 0;
+    for (final doc in snapshot.docs) {
+      list.add(IbNotification.fromJson(doc.data()));
+    }
+
+    return list;
   }
 
   Future<IbNotification?> isFriendRequestWaitingForMeForApproval(
@@ -255,7 +261,7 @@ class IbUserDbService {
     }
   }
 
-  static const String userNameFieldName= "username";
+  static const String userNameFieldName = "username";
   Future<String?> queryUserIdFromUserName(String userName) async {
     final snapshot = await _collectionRef
         .where(userNameFieldName, isEqualTo: userName)

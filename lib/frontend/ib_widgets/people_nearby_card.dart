@@ -1,10 +1,14 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/tag_page_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_description_text.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_emo_pic_card.dart';
@@ -13,6 +17,7 @@ import 'package:icebr8k/frontend/tag_page.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../backend/controllers/user_controllers/people_nearby_controller.dart';
+import '../ib_pages/chat_pages/chat_page.dart';
 import 'ib_media_viewer.dart';
 
 class PeopleNearbyCard extends StatelessWidget {
@@ -81,14 +86,8 @@ class PeopleNearbyCard extends StatelessWidget {
                     text: item.user.bio,
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  _actions(),
                   _commonTagsWidget(context),
-                  const Divider(
-                    thickness: 2,
-                    height: 16,
-                  ),
                   _emoPics(context),
                 ],
               ),
@@ -161,6 +160,9 @@ class PeopleNearbyCard extends StatelessWidget {
                     ))
                 .toList(),
           ),
+          const Divider(
+            thickness: 2,
+          ),
         ],
       ),
     );
@@ -211,6 +213,42 @@ class PeopleNearbyCard extends StatelessWidget {
           width: 300,
           height: 300,
           child: Lottie.asset('assets/images/monkey_zen.json')),
+    );
+  }
+
+  Widget _actions() {
+    return Column(
+      children: [
+        const Divider(
+          thickness: 2,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            IbActionButton(
+                color: IbColors.primaryColor,
+                iconData: Icons.message,
+                onPressed: () {
+                  Get.to(() => ChatPage(Get.put(
+                      ChatPageController(recipientId: item.user.id),
+                      tag: item.user.id)));
+                },
+                text: 'Message'),
+            IbActionButton(
+                color: IbColors.accentColor,
+                iconData: Icons.remove_red_eye_rounded,
+                onPressed: () {
+                  Get.to(() => ProfilePage(Get.put(
+                      ProfileController(item.user.id),
+                      tag: item.user.id)));
+                },
+                text: 'View Profile'),
+          ],
+        ),
+        const Divider(
+          thickness: 2,
+        ),
+      ],
     );
   }
 }

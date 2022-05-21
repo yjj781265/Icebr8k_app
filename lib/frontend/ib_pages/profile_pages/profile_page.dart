@@ -17,6 +17,7 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/chat_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/asked_page.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_pages/circles_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/compare_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/followed_tags_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/friend_list.dart';
@@ -494,6 +495,18 @@ class ProfilePage extends StatelessWidget {
                 _controller.rxIbUser.value.username));
           },
           subText: '🏷️ TAG(S)')),
+      Obx(
+        () => IbProfileStats(
+            number: _controller.circles.length,
+            onTap: () {
+              if (_controller.isProfileVisible.isFalse ||
+                  _controller.circles.isEmpty) {
+                return;
+              }
+              Get.to(() => CirclesPage(_controller.circles));
+            },
+            subText: "⭕ CIRCLE(S)"),
+      ),
     ]);
   }
 
@@ -505,9 +518,6 @@ class ProfilePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
-                height: 16,
-              ),
               Text(
                 '${_controller.rxIbUser.value.fName} ${_controller.rxIbUser.value.lName} ',
                 style: const TextStyle(fontSize: IbConfig.kNormalTextSize),

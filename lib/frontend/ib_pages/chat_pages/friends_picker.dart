@@ -8,11 +8,11 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:lottie/lottie.dart';
 
-class IbFriendsPicker extends StatelessWidget {
+class FriendsPicker extends StatelessWidget {
   final IbFriendsPickerController _controller;
   final int limit;
   final String buttonTxt;
-  const IbFriendsPicker(this._controller,
+  const FriendsPicker(this._controller,
       {this.limit = -1, this.buttonTxt = 'Invite', Key? key})
       : super(key: key);
 
@@ -34,11 +34,12 @@ class IbFriendsPicker extends StatelessWidget {
           actions: _controller.items.isEmpty
               ? null
               : [
-                  TextButton(
-                      onPressed: () {
-                        _controller.selectAll();
-                      },
-                      child: const Text('Select All')),
+                  if (limit == -1)
+                    TextButton(
+                        onPressed: () {
+                          _controller.selectAll();
+                        },
+                        child: const Text('Select All')),
                   Obx(() {
                     final result = _controller.allowEdit
                         ? _controller.items.keys.where(

@@ -11,7 +11,7 @@ import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/chat_pages/ib_friends_picker.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/friends_picker.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
@@ -333,7 +333,7 @@ class ReviewQuestionPage extends StatelessWidget {
                   ? const SizedBox()
                   : ListTile(
                       onTap: () async {
-                        final users = await Get.to(() => IbFriendsPicker(
+                        final users = await Get.to(() => FriendsPicker(
                               Get.put(IbFriendsPickerController(
                                 IbUtils.getCurrentUid()!,
                                 allowEdit: true,

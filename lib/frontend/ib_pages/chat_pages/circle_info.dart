@@ -124,18 +124,26 @@ class CircleInfo extends StatelessWidget {
                         margin: const EdgeInsets.all(16),
                         child: Obx(
                           () => IbElevatedButton(
+                              color: _controller.requests.isNotEmpty
+                                  ? Colors.orange
+                                  : IbColors.accentColor,
                               textTrKey: _controller.hasInvite.isTrue ||
                                       _controller.rxIbChat.value.isPublicCircle
                                   ? 'Join Circle'
-                                  : 'Request to Join Circle',
+                                  : _controller.requests.isNotEmpty
+                                      ? 'Cancel Request'
+                                      : 'Request to Join Circle',
                               onPressed: () async {
                                 if (_controller.hasInvite.isTrue ||
                                     _controller.rxIbChat.value.isPublicCircle) {
                                   _controller.joinCircle();
                                 } else if (!_controller
                                         .rxIbChat.value.isPublicCircle &&
-                                    _controller.rxIbChat.value.isCircle) {
+                                    _controller.rxIbChat.value.isCircle &&
+                                    _controller.requests.isEmpty) {
                                   _showJoinRequestBtmSheet(context);
+                                } else if (_controller.requests.isNotEmpty) {
+                                  await _controller.cancelCircleRequest();
                                 }
                               }),
                         ),
@@ -145,7 +153,7 @@ class CircleInfo extends StatelessWidget {
                       const Text(
                         'Circle is full',
                         style: TextStyle(
-                            fontSize: IbConfig.kNormalTextSize,
+                            fontSize: IbConfig.kPageTitleSize,
                             color: IbColors.lightGrey),
                       )
                   ],
@@ -181,7 +189,6 @@ class CircleInfo extends StatelessWidget {
       onPositiveTap: () async {
         Get.back();
         await _controller.sendJoinCircleRequest();
-        _controller.requested.value = true;
       },
     ));
   }

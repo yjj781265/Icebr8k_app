@@ -7,7 +7,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_c
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/chat_pages/ib_friends_picker.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/friends_picker.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
@@ -245,7 +245,7 @@ class CircleSettings extends StatelessWidget {
                                         onPressed: () async {
                                           IbUtils.hideKeyboard();
                                           final list = await Get.to(
-                                              () => IbFriendsPicker(
+                                              () => FriendsPicker(
                                                     Get.put(
                                                         IbFriendsPickerController(
                                                             IbUtils

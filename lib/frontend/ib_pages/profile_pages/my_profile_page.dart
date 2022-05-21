@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/asked_questions_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/my_profile_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/word_cloud_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/edit_profile_pages/edit_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/word_cloud_page.dart';
@@ -31,6 +32,7 @@ import '../../ib_utils.dart';
 import '../edit_profile_pages/edit_emo_pics_page.dart';
 import 'answered_page.dart';
 import 'asked_page.dart';
+import 'circles_page.dart';
 import 'followed_tags_page.dart';
 import 'friend_list.dart';
 
@@ -38,6 +40,8 @@ class MyProfilePage extends StatelessWidget {
   final bool showBackButton;
   final MainPageController _controller = Get.find();
   final RefreshController _askedRefreshController = RefreshController();
+  final MyProfileController _myProfileController =
+      Get.put(MyProfileController());
   final AskedQuestionsController _askedQuestionsController = Get.put(
       AskedQuestionsController(IbUtils.getCurrentUid()!, showPublicOnly: false),
       tag: IbUtils.getCurrentUid());
@@ -293,6 +297,14 @@ class MyProfilePage extends StatelessWidget {
                 },
                 subText: "🏷️ TAG(S)"),
           ),
+          Obx(
+            () => IbProfileStats(
+                number: _myProfileController.circles.length,
+                onTap: () {
+                  Get.to(() => CirclesPage(_myProfileController.circles));
+                },
+                subText: "⭕ CIRCLE(S)"),
+          ),
         ],
       ),
     );
@@ -440,9 +452,6 @@ class MyProfilePage extends StatelessWidget {
         () => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(
-              height: 16,
-            ),
             Text(
               '${_controller.rxCurrentIbUser.value.fName} ${_controller.rxCurrentIbUser.value.lName} ',
               style: const TextStyle(fontSize: IbConfig.kNormalTextSize),

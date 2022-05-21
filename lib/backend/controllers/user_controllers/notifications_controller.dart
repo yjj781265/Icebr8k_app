@@ -182,6 +182,8 @@ class NotificationController extends GetxController {
         item.ibComment = reply;
         items.add(item);
       }
+    } else if (notification.type == IbNotification.kFriendAccepted) {
+      items.add(item);
     }
   }
 
@@ -206,6 +208,13 @@ class NotificationController extends GetxController {
     try {
       await IbUserDbService().addFriend(ibNotification.senderId);
       await IbUserDbService().removeNotification(ibNotification);
+      await IbUserDbService().sendAlertNotification(IbNotification(
+          id: IbUtils.getUniqueId(),
+          body: '',
+          type: IbNotification.kFriendAccepted,
+          timestamp: FieldValue.serverTimestamp(),
+          senderId: IbUtils.getCurrentUid()!,
+          recipientId: ibNotification.senderId));
       IbUtils.showSimpleSnackBar(
           msg: 'Friend request accepted',
           backgroundColor: IbColors.accentColor);

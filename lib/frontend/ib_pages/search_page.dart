@@ -10,18 +10,17 @@ import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_info.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/my_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/question_pages/question_main_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_circle_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:icebr8k/frontend/ib_widgets/icebreaker_card.dart';
 import 'package:lottie/lottie.dart';
 
-import '../../backend/controllers/user_controllers/circle_info_controller.dart';
 import '../../backend/controllers/user_controllers/tag_page_controller.dart';
 import '../tag_page.dart';
 import 'icebreaker_pages/icebreaker_main_page.dart';
@@ -206,74 +205,7 @@ class SearchPage extends StatelessWidget {
               child: Row(
                 children: _controller.circles
                     .map(
-                      (element) => SizedBox(
-                        width: 200,
-                        child: InkWell(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(16)),
-                          onTap: () {
-                            Get.to(() => CircleInfo(
-                                Get.put(CircleInfoController(element.obs))));
-                          },
-                          child: IbCard(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (element.photoUrl.isEmpty)
-                                    CircleAvatar(
-                                      backgroundColor: IbColors.lightGrey,
-                                      radius: 24,
-                                      child: Text(
-                                        element.name[0],
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            color: Theme.of(context)
-                                                .indicatorColor,
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    )
-                                  else
-                                    IbUserAvatar(
-                                      avatarUrl: element.photoUrl,
-                                    ),
-                                  Text(
-                                    element.name,
-                                    textAlign: TextAlign.center,
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: IbConfig.kNormalTextSize),
-                                  ),
-                                  Text(
-                                      '${element.memberUids.length} member(s)'),
-                                  const SizedBox(
-                                    height: 8,
-                                  ),
-                                  Container(
-                                    decoration: const BoxDecoration(
-                                        color: IbColors.primaryColor,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(8))),
-                                    padding: const EdgeInsets.all(2),
-                                    child: Text(
-                                      element.isPublicCircle
-                                          ? 'Public'
-                                          : 'Private',
-                                      style: const TextStyle(
-                                          fontSize:
-                                              IbConfig.kDescriptionTextSize),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                      (element) => IbCircleCard(element),
                     )
                     .toList(),
               ),

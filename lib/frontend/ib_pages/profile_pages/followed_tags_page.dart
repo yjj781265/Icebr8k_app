@@ -43,6 +43,8 @@ class FollowedTagsPage extends StatelessWidget {
                 ),
               )
             : Wrap(
+                spacing: 4,
+                runSpacing: 4,
                 children: tags
                     .map(
                       (e) => Stack(

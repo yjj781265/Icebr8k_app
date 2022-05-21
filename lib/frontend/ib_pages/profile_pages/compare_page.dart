@@ -35,6 +35,9 @@ class ComparePage extends StatelessWidget {
               itemBuilder: (context, index) {
                 return IbUtils.handleQuestionType(
                     _controller.items.keys.toList()[index],
+                    ibAnswers: _controller
+                            .items[_controller.items.keys.toList()[index]] ??
+                        [],
                     uniqueTag: true);
               },
               itemCount: _controller.items.keys.toList().length,

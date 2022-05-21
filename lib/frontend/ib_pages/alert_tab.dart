@@ -5,11 +5,13 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/circle_info_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_info.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/question_pages/question_main_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
@@ -196,6 +198,37 @@ class AlertTab extends StatelessWidget {
                 ],
               )
             ],
+          ),
+        ),
+      );
+    }
+    if (item.notification.type == IbNotification.kFriendAccepted) {
+      return IbCard(
+        radius: 0,
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        color: item.notification.isRead ? Theme.of(context).primaryColor : null,
+        child: ListTile(
+          onTap: () async {
+            if (!item.notification.isRead) {
+              item.notification.isRead = true;
+              await IbUserDbService().sendAlertNotification(item.notification);
+            }
+            Get.to(() => ProfilePage(
+                  Get.put(ProfileController(item.senderUser.id),
+                      tag: item.senderUser.id),
+                ));
+          },
+          leading: IbUserAvatar(
+              avatarUrl: item.senderUser.avatarUrl, uid: item.senderUser.id),
+          title: Text(item.senderUser.username,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: IbConfig.kNormalTextSize)),
+          subtitle: Text('accept_your_friend_request'.tr),
+          trailing: const Icon(
+            Icons.person_add_alt_1,
+            color: IbColors.accentColor,
           ),
         ),
       );
@@ -387,6 +420,7 @@ class AlertTab extends StatelessWidget {
                                       fontSize: IbConfig.kNormalTextSize,
                                       fontWeight: FontWeight.normal))
                             ]),
+                        maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                             fontSize: IbConfig.kNormalTextSize,
@@ -464,13 +498,13 @@ class AlertTab extends StatelessWidget {
                         ),
                       ],
                     ),
-                    if (item.ibChat!.description.isNotEmpty)
+                    if (item.notification.body.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Text(
-                          item.ibChat!.description,
+                          item.notification.body,
                           overflow: TextOverflow.ellipsis,
-                          maxLines: 3,
+                          maxLines: 5,
                         ),
                       ),
                   ],

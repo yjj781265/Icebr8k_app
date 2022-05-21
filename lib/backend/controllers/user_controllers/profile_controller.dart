@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/asked_questions_controller.dart';
+import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
@@ -12,10 +13,13 @@ import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import '../../services/user_services/ib_chat_db_service.dart';
+
 class ProfileController extends GetxController {
   final isLoading = true.obs;
   final isFriend = false.obs;
   final isProfileVisible = false.obs;
+  final circles = <IbChat>[].obs;
 
   /// is friend request waiting for me for approval
   IbNotification? frNotification;
@@ -52,6 +56,7 @@ class ProfileController extends GetxController {
       isFrSent.value = frSentNotification != null;
       frNotification = await IbUserDbService()
           .isFriendRequestWaitingForMeForApproval(user.id);
+      circles.value = await IbChatDbService().queryUserCircles(user.id);
       isProfileVisible.value = _handleProfileVisibility();
       isLoading.value = false;
     }

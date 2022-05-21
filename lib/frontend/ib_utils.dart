@@ -719,6 +719,7 @@ class IbUtils {
 
   static Widget handleQuestionType(IbQuestion question,
       {bool uniqueTag = false,
+      List<IbAnswer> ibAnswers = const [],
       bool expanded = false,
       bool isSample = false,
       IbQuestionItemController? itemController}) {
@@ -726,6 +727,7 @@ class IbUtils {
       final tag = uniqueTag ? getUniqueId() : question.id;
       final IbQuestionItemController controller = Get.put(
           IbQuestionItemController(
+              ibAnswers: ibAnswers,
               rxIbQuestion: question.obs,
               rxIsExpanded: expanded.obs,
               rxIsSample: isSample.obs),

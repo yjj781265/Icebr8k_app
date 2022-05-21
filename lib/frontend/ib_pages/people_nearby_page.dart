@@ -1,13 +1,9 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/people_nearby_controller.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/chat_pages/chat_page.dart';
-import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
@@ -107,54 +103,41 @@ class PeopleNearbyPage extends StatelessWidget {
               height: 8,
             ),
             SafeArea(
-              child: Row(
-                children: [
-                  Expanded(
-                      child: SizedBox(
-                    height: 48,
-                    child: IbElevatedButton(
-                      textTrKey: 'Message',
-                      onPressed: () {
-                        final user = _controller
-                            .items[_controller.currentIndex.value].user;
-                        if (user.profilePrivacy != IbUser.kUserPrivacyPublic) {
-                          return;
-                        }
-                        Get.to(() => ChatPage(
-                              Get.put(ChatPageController(recipientId: user.id),
-                                  tag: user.id),
-                            ));
-                      },
-                      icon: const Icon(Icons.message),
-                    ),
-                  )),
-                  Expanded(
-                    child: SizedBox(
-                      height: 48,
-                      child: IbElevatedButton(
-                        textTrKey: 'View Profile',
-                        icon: const Icon(
-                          Icons.remove_red_eye_sharp,
+              child: Obx(
+                () => Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    if (_controller.currentIndex.value != 0)
+                      SizedBox(
+                        height: 48,
+                        width: 100,
+                        child: IbElevatedButton(
+                          textTrKey: 'Prev',
+                          color: IbColors.errorRed,
+                          onPressed: () {
+                            _controller.carouselController.previousPage();
+                          },
                         ),
-                        onPressed: () {
-                          final user = _controller
-                              .items[_controller.currentIndex.value].user;
-                          if (user.profilePrivacy !=
-                              IbUser.kUserPrivacyPublic) {
-                            return;
-                          }
-                          Get.to(() =>
-                              ProfilePage(Get.put(ProfileController(user.id))));
-                        },
-                        color: IbColors.primaryColor,
+                      )
+                    else
+                      const SizedBox(
+                        width: 100,
                       ),
-                    ),
-                  ),
-                ],
+                    if (_controller.currentIndex.value !=
+                        _controller.items.length - 1)
+                      SizedBox(
+                        height: 48,
+                        width: 100,
+                        child: IbElevatedButton(
+                          textTrKey: 'Next',
+                          onPressed: () {
+                            _controller.carouselController.nextPage();
+                          },
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 16,
             ),
           ],
         );
@@ -163,6 +146,10 @@ class PeopleNearbyPage extends StatelessWidget {
   }
 
   void _showFilterDialog(BuildContext context) {
+    final oldDistance = _controller.rangeInMi.value;
+    final oldGenderSelection = _controller.genderSelections.toList();
+    final oldRange = _controller.rangeValue.value;
+
     const TextStyle headerStyle = TextStyle(
         fontWeight: FontWeight.bold, fontSize: IbConfig.kNormalTextSize);
     final Widget _content = Obx(
@@ -254,6 +241,13 @@ class PeopleNearbyPage extends StatelessWidget {
         title: 'Preference',
         subtitle: '',
         content: _content,
+        onNegativeTap: () {
+          _controller.rangeValue.value = oldRange;
+          _controller.genderSelections.value = oldGenderSelection.toList();
+          _controller.rangeInMi.value = oldDistance;
+          _controller.genderSelections.refresh();
+          Get.back();
+        },
         onPositiveTap: () {
           if (_controller.genderSelections.contains(true)) {
             Get.back();

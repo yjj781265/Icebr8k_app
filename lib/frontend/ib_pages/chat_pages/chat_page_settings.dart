@@ -11,6 +11,7 @@ import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_settings.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/friends_picker.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/my_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -18,7 +19,6 @@ import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
 import '../../ib_widgets/ib_dialog.dart';
-import 'ib_friends_picker.dart';
 
 class ChatPageSettings extends StatelessWidget {
   const ChatPageSettings(this._controller, {Key? key}) : super(key: key);
@@ -45,7 +45,7 @@ class ChatPageSettings extends StatelessWidget {
                       return;
                     }
                     final items = await Get.to(
-                      () => IbFriendsPicker(
+                      () => FriendsPicker(
                         Get.put(
                           IbFriendsPickerController(
                             IbUtils.getCurrentUid()!,

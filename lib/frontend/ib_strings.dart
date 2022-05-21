@@ -109,6 +109,7 @@ class IbStrings extends Translations {
           'send_friend_request': 'Send a friend request',
           'send_friend_request_success': 'Friend request sent',
           'sent_you_a_friend_request': 'Sent you a friend request',
+          'accept_your_friend_request': 'Accepted your friend request',
           'accept': 'Accept',
           'decline': 'Decline',
           'chat': 'Chat',

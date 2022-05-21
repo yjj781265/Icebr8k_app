@@ -9,7 +9,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controll
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_settings.dart';
-import 'package:icebr8k/frontend/ib_pages/chat_pages/ib_friends_picker.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/friends_picker.dart';
 import 'package:icebr8k/frontend/ib_pages/people_nearby_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/search_page.dart';
@@ -209,7 +209,7 @@ class _SocialTabState extends State<SocialTab>
                 fullscreenDialog: true);
           } else if (_controller.currentIndex.value == 1) {
             final users = await Get.to(
-              () => IbFriendsPicker(
+              () => FriendsPicker(
                 Get.put(
                   IbFriendsPickerController(IbUtils.getCurrentUid()!),
                 ),

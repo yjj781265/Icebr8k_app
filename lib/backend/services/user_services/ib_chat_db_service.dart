@@ -23,6 +23,20 @@ class IbChatDbService {
     _collectionRef = _db.collection(_kChatRoomCollection);
   }
 
+  Future<List<IbChat>> queryUserCircles(String uid) async {
+    final list = <IbChat>[];
+    final snapshot = await _collectionRef
+        .where('isCircle', isEqualTo: true)
+        .where('memberUids', arrayContains: uid)
+        .get();
+    for (final doc in snapshot.docs) {
+      list.add(IbChat.fromJson(doc.data()));
+    }
+    list.sort((a, b) => a.name.compareTo(b.name));
+
+    return list;
+  }
+
   Future<void> updateReadUidArray(
       {required String chatRoomId, required String messageId}) async {
     final snapshot = await _collectionRef.doc(chatRoomId).get();

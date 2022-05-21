@@ -12,6 +12,7 @@ class IbDialog extends StatelessWidget {
   final Widget? content;
   final Widget? actionButtons;
   final Function? onPositiveTap;
+  final Function? onNegativeTap;
   final bool showNegativeBtn;
 
   const IbDialog(
@@ -20,6 +21,7 @@ class IbDialog extends StatelessWidget {
       this.actionButtons,
       this.positiveTextKey = 'confirm',
       this.content,
+      this.onNegativeTap,
       this.onPositiveTap,
       this.showNegativeBtn = true});
 
@@ -71,7 +73,13 @@ class IbDialog extends StatelessWidget {
                             size: 16,
                           ),
                           textTrKey: 'cancel'.tr,
-                          onPressed: Get.back,
+                          onPressed: () {
+                            if (onNegativeTap == null) {
+                              Get.back();
+                            } else {
+                              onNegativeTap!();
+                            }
+                          },
                           color: IbColors.lightGrey,
                         ),
                       ),

@@ -19,7 +19,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 class CircleInfoController extends GetxController {
   final Rx<IbChat> rxIbChat;
   final hasInvite = false.obs;
-  final requested = false.obs;
+  final requests = <IbNotification>[].obs;
   final memberScoreMap = <IbUser, double>{}.obs;
   final isLoading = true.obs;
   final TextEditingController editingController = TextEditingController();
@@ -37,7 +37,7 @@ class CircleInfoController extends GetxController {
     await initMemberScoreMap();
     hasInvite.value = await IbUserDbService().isCircleInviteSent(
         chatId: ibChat.chatId, recipientId: IbUtils.getCurrentUid() ?? '');
-    requested.value =
+    requests.value =
         await IbUserDbService().isCircleRequestSent(chatId: ibChat.chatId);
     isLoading.value = false;
   }
@@ -110,7 +110,7 @@ class CircleInfoController extends GetxController {
         return;
       }
 
-      if (requested.isTrue) {
+      if (requests.isNotEmpty) {
         IbUtils.showSimpleSnackBar(
             msg: 'Request Sent', backgroundColor: IbColors.accentColor);
         return;
@@ -124,7 +124,7 @@ class CircleInfoController extends GetxController {
             member.role == IbChatMember.kRoleAssistant) {
           final IbNotification n = IbNotification(
               id: IbUtils.getUniqueId(),
-              body: '',
+              body: editingController.text,
               timestamp: FieldValue.serverTimestamp(),
               url: rxIbChat.value.chatId,
               type: IbNotification.kCircleRequest,
@@ -134,8 +134,36 @@ class CircleInfoController extends GetxController {
         }
       }
 
+      requests.value = await IbUserDbService()
+          .isCircleRequestSent(chatId: rxIbChat.value.chatId);
+
       IbUtils.showSimpleSnackBar(
           msg: 'Request Sent', backgroundColor: IbColors.accentColor);
+    } catch (e) {
+      Get.dialog(IbDialog(
+        title: "Error",
+        subtitle: e.toString(),
+        showNegativeBtn: false,
+      ));
+    }
+  }
+
+  Future<void> cancelCircleRequest() async {
+    try {
+      if (IbUtils.getCurrentIbUser() == null) {
+        IbUtils.showSimpleSnackBar(
+            msg: 'Request failed, can not find current Icebr8k user',
+            backgroundColor: IbColors.errorRed);
+        return;
+      }
+
+      if (requests.isNotEmpty) {
+        for (final request in requests) {
+          await IbUserDbService().removeNotification(request);
+        }
+      }
+      IbUtils.showSimpleSnackBar(
+          msg: 'Request Canceled', backgroundColor: IbColors.primaryColor);
     } catch (e) {
       Get.dialog(IbDialog(
         title: "Error",

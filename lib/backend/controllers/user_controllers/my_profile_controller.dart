@@ -1,18 +1,18 @@
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/models/ib_emo_pic.dart';
-import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 
-import 'main_page_controller.dart';
+import '../../models/ib_chat_models/ib_chat.dart';
 
 class MyProfileController extends GetxController {
-  final Rx<IbUser> rxIbUser = Get.find<MainPageController>().rxCurrentIbUser;
-  final RxList<IbEmoPic> rxEmoPics = <IbEmoPic>[].obs;
+  final circles = <IbChat>[].obs;
 
   MyProfileController();
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
-    rxEmoPics.value = rxIbUser.value.emoPics;
+    circles.value =
+        await IbChatDbService().queryUserCircles(IbUtils.getCurrentUid()!);
   }
 }
