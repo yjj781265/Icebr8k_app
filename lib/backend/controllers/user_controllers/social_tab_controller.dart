@@ -52,6 +52,9 @@ class SocialTabController extends GetxController {
         final IbChat ibChat = IbChat.fromJson(docChange.doc.data()!);
         if (docChange.type == DocumentChangeType.added) {
           final item = await _buildItem(ibChat);
+          if (item.avatars.isEmpty) {
+            continue;
+          }
           oneToOneChats.add(item);
         } else if (docChange.type == DocumentChangeType.modified) {
           final index = oneToOneChats
@@ -216,6 +219,8 @@ class SocialTabController extends GetxController {
       if (user != null) {
         title = '$title${user.username} ';
         avatarUsers.add(user);
+      } else {
+        continue;
       }
     }
 
