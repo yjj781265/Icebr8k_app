@@ -235,8 +235,12 @@ class IbUserDbService {
     if (userId == null) {
       return;
     }
+    final snapshot = await _collectionRef.doc(userId).get();
+    if (!snapshot.exists) {
+      return;
+    }
 
-    await _collectionRef.doc(userId).update(
+    await _collectionRef.doc(userId).set(
       {
         'fcmToken': '',
       },

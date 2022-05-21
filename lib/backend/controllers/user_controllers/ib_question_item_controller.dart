@@ -246,11 +246,10 @@ class IbQuestionItemController extends GetxController {
 
       if (!isAnonymous) {
         IbUtils.showSimpleSnackBar(
-            msg: 'Answered publicly 📢',
-            backgroundColor: IbColors.primaryColor);
+            msg: 'Voted Publicly 📢', backgroundColor: IbColors.primaryColor);
       } else {
         IbUtils.showSimpleSnackBar(
-            msg: 'Answered anonymously 🕵️', backgroundColor: Colors.black);
+            msg: 'Voted Anonymously 🤫', backgroundColor: Colors.black);
       }
 
       if (myAnswer != null) {

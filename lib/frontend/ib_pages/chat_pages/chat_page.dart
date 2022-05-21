@@ -137,7 +137,6 @@ class ChatPage extends StatelessWidget {
                         onTap: () => IbUtils.hideKeyboard(),
                         child: NotificationListener<ScrollNotification>(
                           child: ScrollablePositionedList.builder(
-                            shrinkWrap: true,
                             physics: const BouncingScrollPhysics(),
                             reverse: true,
                             itemScrollController:

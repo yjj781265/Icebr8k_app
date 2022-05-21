@@ -30,10 +30,14 @@ class IbQuestionButtons extends StatelessWidget {
               child: IbElevatedButton(
                 disabled: _handleVoteButtonDisableState(),
                 onPressed: () async {
-                  await _controller.onVote();
+                  await _controller.onVote(
+                      isAnonymous: IbUtils.getCurrentUserSettings()
+                          .voteAnonymousByDefault);
                 },
                 onLongPressed: () async {
-                  await _controller.onVote(isAnonymous: true);
+                  await _controller.onVote(
+                      isAnonymous: !IbUtils.getCurrentUserSettings()
+                          .voteAnonymousByDefault);
                 },
                 textTrKey: _handleVoteButtonText(),
                 color: IbColors.primaryColor,

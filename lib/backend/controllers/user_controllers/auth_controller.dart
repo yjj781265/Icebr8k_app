@@ -162,12 +162,15 @@ class AuthController extends GetxService {
           title: "Verify your email",
           subtitle: 'sign_up_email_verification'.tr,
           positiveTextKey: 'ok',
-          onPositiveTap: () {
+          onPositiveTap: () async {
+            await _ibAuthService.signOut();
             Get.offAll(() => WelcomePage(),
                 transition: Transition.circularReveal);
           },
           showNegativeBtn: false,
         ));
+      } else {
+        await _ibAuthService.signOut();
       }
     } on FirebaseAuthException catch (e) {
       Get.back();
@@ -188,7 +191,6 @@ class AuthController extends GetxService {
         positiveTextKey: 'ok',
       ));
     } finally {
-      await _ibAuthService.signOut();
       isSigningUp.value = false;
     }
   }

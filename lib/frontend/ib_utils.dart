@@ -14,6 +14,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controll
 import 'package:icebr8k/backend/controllers/user_controllers/tag_page_controller.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
+import 'package:icebr8k/backend/models/ib_settings.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
@@ -692,6 +693,14 @@ class IbUtils {
         ),
       ),
     );
+  }
+
+  static IbSettings getCurrentUserSettings() {
+    if (getCurrentIbUser() == null || getCurrentIbUser()!.settings == null) {
+      return IbSettings();
+    } else {
+      return getCurrentIbUser()!.settings!;
+    }
   }
 
   static String statsShortString(int number) {

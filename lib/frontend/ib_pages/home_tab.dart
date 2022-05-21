@@ -101,10 +101,14 @@ class HomeTab extends StatelessWidget {
                       if (_controller.selectedCategory.value ==
                           _controller.categories[1]) {
                         return IbUtils.handleQuestionType(
-                            _controller.forYourList[index]);
+                            _controller.forYourList[index],
+                            expanded: IbUtils.getCurrentUserSettings()
+                                .pollExpandedByDefault);
                       }
                       return IbUtils.handleQuestionType(
-                          _controller.trendingList[index]);
+                          _controller.trendingList[index],
+                          expanded: IbUtils.getCurrentUserSettings()
+                              .pollExpandedByDefault);
                     },
                     itemCount: _controller.selectedCategory.value ==
                             _controller.categories[1]

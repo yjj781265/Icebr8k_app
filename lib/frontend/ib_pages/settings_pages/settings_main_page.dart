@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_pages/settings_pages/settings_notification_page.dart';
+import 'package:icebr8k/frontend/ib_pages/settings_pages/settings_poll_page.dart';
 
 import '../../ib_colors.dart';
 import '../../ib_config.dart';
@@ -25,6 +27,22 @@ class SettingsMainPage extends StatelessWidget {
               ),
               title: const Text(
                 'Notification',
+                style: TextStyle(
+                    fontSize: IbConfig.kNormalTextSize,
+                    fontWeight: FontWeight.bold),
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios),
+            ),
+            ListTile(
+              onTap: () {
+                Get.to(() => SettingsPollPage());
+              },
+              leading: const Icon(
+                FontAwesomeIcons.checkToSlot,
+                color: IbColors.primaryColor,
+              ),
+              title: const Text(
+                'Poll',
                 style: TextStyle(
                     fontSize: IbConfig.kNormalTextSize,
                     fontWeight: FontWeight.bold),
