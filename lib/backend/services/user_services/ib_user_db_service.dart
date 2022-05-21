@@ -240,7 +240,7 @@ class IbUserDbService {
       return;
     }
 
-    await _collectionRef.doc(userId).set(
+    await _collectionRef.doc(userId).update(
       {
         'fcmToken': '',
       },
