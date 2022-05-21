@@ -85,14 +85,19 @@ class IbUserDbService {
 
   /// returned IbUser result will cached locally via IbCacheManager
   Future<IbUser?> queryIbUser(String uid) async {
-    final snapshot = await _collectionRef.doc(uid).get();
-    if (!snapshot.exists || snapshot.data() == null) {
+    try {
+      final snapshot = await _collectionRef.doc(uid).get();
+      if (!snapshot.exists || snapshot.data() == null) {
+        return null;
+      }
+
+      final IbUser user = IbUser.fromJson(snapshot.data()!);
+      IbCacheManager().cacheIbUser(user);
+      return user;
+    } catch (e) {
+      print(e);
       return null;
     }
-
-    final IbUser user = IbUser.fromJson(snapshot.data()!);
-    IbCacheManager().cacheIbUser(user);
-    return user;
   }
 
   /// send an alert message in the app, will appear under Alert tab

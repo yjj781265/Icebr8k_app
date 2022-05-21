@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/setup_controller.dart';
@@ -138,14 +139,20 @@ class SetupPageTwo extends StatelessWidget {
             const SizedBox(
               height: 8,
             ),
-            Obx(() => Wrap(
-                  children: _controller.emoPics
+            Obx(() => CarouselSlider(
+                  items: _controller.emoPics
                       .map((element) => IbEmoPicCard(
                             emoPic: element,
                             onTap: () => showEditAvatarBottomSheet(
                                 context: context, emoPic: element),
                           ))
                       .toList(),
+                  options: CarouselOptions(
+                      height: 350,
+                      padEnds: false,
+                      enableInfiniteScroll: false,
+                      viewportFraction: 0.6,
+                      aspectRatio: 0.618),
                 )),
             const Padding(
               padding: EdgeInsets.all(8.0),

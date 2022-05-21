@@ -13,7 +13,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
-import '../../../frontend/ib_pages/review_page.dart';
+import '../../../frontend/ib_pages/setup_pages/review_page.dart';
 
 class SetupController extends GetxController {
   final TextEditingController birthdateTeController = TextEditingController();

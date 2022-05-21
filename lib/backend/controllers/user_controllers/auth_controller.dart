@@ -11,13 +11,13 @@ import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/admin/admin_main_page.dart';
 import 'package:icebr8k/frontend/admin/role_select_page.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/review_page.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_one.dart';
 import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
 import '../../../frontend/ib_pages/main_page.dart';
+import '../../../frontend/ib_pages/setup_pages/review_page.dart';
 import '../../bindings/home_binding.dart';
 
 class AuthController extends GetxService {
