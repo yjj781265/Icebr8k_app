@@ -15,6 +15,7 @@ class PeopleNearbyController extends GetxController {
   CarouselController carouselController = CarouselController();
   final rangeInMi = 50.0.obs;
   final genderSelections = [true, true, true].obs;
+  final intentionSelection = [true, true].obs;
   final currentIndex = 0.obs;
   final rangeValue = const RangeValues(13, 60).obs;
   final int perPage = 16;
@@ -22,6 +23,7 @@ class PeopleNearbyController extends GetxController {
   bool hasMore = false;
   Position? currentPosition;
   final items = <NearbyItem>[].obs;
+  int loadedCount = 0;
   final isLoading = false.obs;
 
   /// Determine the current position of the device.
@@ -120,6 +122,7 @@ class PeopleNearbyController extends GetxController {
 
   Future<void> loadItem() async {
     final currentUser = IbUtils.getCurrentIbUser();
+    loadedCount = 0;
     if (currentUser == null) {
       return;
     }
@@ -157,6 +160,7 @@ class PeopleNearbyController extends GetxController {
       print(currentPosition);
       await IbUserDbService().updateCurrentUserPosition(
           GeoPoint(currentPosition!.latitude, currentPosition!.longitude));
+
       final List<String> genders = [];
 
       for (int i = 0; i < genderSelections.length; i++) {
@@ -164,6 +168,16 @@ class PeopleNearbyController extends GetxController {
           genders.add(IbUser.kGenders[i]);
         }
       }
+
+      final List<String> intentions = [];
+
+      for (int i = 0; i < intentionSelection.length; i++) {
+        if (intentionSelection[i]) {
+          intentions.add(IbUser.kIntentions[i]);
+        }
+      }
+
+      await IbUserDbService().updateUserIntention(intentions);
 
       final data = await IbTypeSenseService().searchPplNearby(currentPosition!,
           perPage: perPage,
@@ -175,11 +189,19 @@ class PeopleNearbyController extends GetxController {
       final found = data['found'] as int;
       page = data['page'] as int;
       final docList = data['hits'] as List<dynamic>;
+      loadedCount += docList.length;
 
       for (final item in docList) {
         final String id = item['document']['id'].toString();
         final IbUser? user = await IbUserDbService().queryIbUser(id);
         if (user == null) {
+          continue;
+        }
+        if (user.intentions
+            .toSet()
+            .intersection(intentions.toSet())
+            .toList()
+            .isEmpty) {
           continue;
         }
         final int distanceInMeter =
@@ -196,10 +218,12 @@ class PeopleNearbyController extends GetxController {
             commonTags: commonTags.toList());
         items.add(nearbyItem);
       }
-      hasMore = found > items.length;
+      hasMore = found > loadedCount;
       items.sort((a, b) => b.compScore.compareTo(a.compScore));
+      print(hasMore);
       isLoading.value = false;
     } catch (e) {
+      print(e);
       Get.dialog(
         const IbDialog(
           title: 'Error',
@@ -226,6 +250,14 @@ class PeopleNearbyController extends GetxController {
         }
       }
 
+      final List<String> intentions = [];
+
+      for (int i = 0; i < intentionSelection.length; i++) {
+        if (intentionSelection[i]) {
+          intentions.add(IbUser.kIntentions[i]);
+        }
+      }
+
       final data = await IbTypeSenseService().searchPplNearby(currentPosition!,
           perPage: perPage,
           radiusInMi: rangeInMi.value,
@@ -236,6 +268,7 @@ class PeopleNearbyController extends GetxController {
       final found = data['found'] as int;
       page = data['page'] as int;
       final docList = data['hits'] as List<dynamic>;
+      loadedCount += docList.length;
       final tempList = <NearbyItem>[];
       for (final item in docList) {
         final String id = item['document']['id'].toString();
@@ -243,6 +276,14 @@ class PeopleNearbyController extends GetxController {
         if (user == null) {
           continue;
         }
+        if (user.intentions
+            .toSet()
+            .intersection(intentions.toSet())
+            .toList()
+            .isEmpty) {
+          continue;
+        }
+
         final int distanceInMeter =
             item['geo_distance_meters']['geoPoint'] as int;
         final commonTags = IbUtils.getCurrentIbUser()!
@@ -257,14 +298,26 @@ class PeopleNearbyController extends GetxController {
             commonTags: commonTags.toList());
         tempList.add(nearbyItem);
       }
-      hasMore = found > items.length;
+      hasMore = found > loadedCount;
       tempList.sort((a, b) => b.compScore.compareTo(a.compScore));
       items.addAll(tempList);
-    } else {}
+    }
+  }
+
+  Future<void> clearLocation() async {
+    await IbUserDbService().clearLocation();
   }
 
   @override
   Future<void> onReady() async {
+    intentionSelection.value = [
+      IbUtils.getCurrentIbUser()!
+          .intentions
+          .contains(IbUser.kUserIntentionDating),
+      IbUtils.getCurrentIbUser()!
+          .intentions
+          .contains(IbUser.kUserIntentionFriendship)
+    ];
     await _determinePosition();
   }
 }

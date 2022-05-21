@@ -316,7 +316,7 @@ class ChatPage extends StatelessWidget {
                           iconData: Icons.poll,
                           onPressed: () {
                             _controller.showMsgOptions.value = false;
-                            final chatTabItem = IbUtils.getCircleItems()
+                            final chatTabItem = IbUtils.getAllChatTabItems()
                                 .firstWhereOrNull((element) =>
                                     element.ibChat.chatId ==
                                     _controller.ibChat!.chatId);

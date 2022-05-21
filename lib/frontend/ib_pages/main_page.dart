@@ -135,11 +135,16 @@ class _MainPageViewState extends State<MainPageView>
             icon: const Icon(Icons.notifications),
             notification: Get.find<NotificationController>().isLoading.isTrue
                 ? -1
-                : Get.find<NotificationController>()
-                    .items
-                    .where((p0) => p0.notification.isRead == false)
-                    .toList()
-                    .length,
+                : (Get.find<NotificationController>()
+                        .items
+                        .where((p0) => p0.notification.isRead == false)
+                        .toList()
+                        .length +
+                    Get.find<NotificationController>()
+                        .requests
+                        .where((p0) => p0.notification.isRead == false)
+                        .toList()
+                        .length),
             title: 'alert'.tr,
             inactiveColor: _inactiveColor,
             textAlign: TextAlign.center,

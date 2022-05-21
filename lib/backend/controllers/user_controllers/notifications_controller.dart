@@ -25,6 +25,7 @@ import '../../models/ib_question.dart';
 class NotificationController extends GetxController {
   late StreamSubscription ibNotificationsStream;
   final items = <NotificationItem>[].obs;
+  final requests = <NotificationItem>[].obs;
   final isLoading = true.obs;
   final fcm = FirebaseMessaging.instance;
 
@@ -72,6 +73,9 @@ class NotificationController extends GetxController {
       items.sort((a, b) => (b.notification.timestamp as Timestamp)
           .compareTo(a.notification.timestamp as Timestamp));
       items.refresh();
+      requests.sort((a, b) => (b.notification.timestamp as Timestamp)
+          .compareTo(a.notification.timestamp as Timestamp));
+      requests.refresh();
       isLoading.value = false;
     });
   }
@@ -135,10 +139,10 @@ class NotificationController extends GetxController {
       item.ibChat = chat;
 
       if (chat != null) {
-        items.add(item);
+        requests.add(item);
       }
     } else if (notification.type == IbNotification.kFriendRequest) {
-      items.add(item);
+      requests.add(item);
     } else if (notification.type == IbNotification.kNewVote ||
         notification.type == IbNotification.kPollLike) {
       final IbQuestion? question =
@@ -190,17 +194,29 @@ class NotificationController extends GetxController {
   Future<void> _onNotificationModified(IbNotification notification) async {
     final int index = items
         .indexWhere((element) => element.notification.id == notification.id);
+    final int index2 = requests
+        .indexWhere((element) => element.notification.id == notification.id);
 
     if (index != -1) {
       items[index].notification = notification;
+    }
+
+    if (index2 != -1) {
+      requests[index2].notification = notification;
     }
   }
 
   Future<void> _onNotificationRemoved(IbNotification notification) async {
     final int index = items
         .indexWhere((element) => element.notification.id == notification.id);
+    final int index2 = requests
+        .indexWhere((element) => element.notification.id == notification.id);
     if (index != -1) {
       items.removeAt(index);
+    }
+
+    if (index2 != -1) {
+      requests.removeAt(index2);
     }
   }
 

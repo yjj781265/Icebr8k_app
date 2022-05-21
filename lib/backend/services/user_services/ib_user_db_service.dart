@@ -271,4 +271,16 @@ class IbUserDbService {
     }
     return snapshot.docs.first.data()["id"] as String;
   }
+
+  static const String intentionIndex = "intentions";
+  Future<void> updateUserIntention(List<String> intentions) async {
+    return _collectionRef
+        .doc(IbUtils.getCurrentUid())
+        .update({intentionIndex: intentions});
+  }
+
+  Future<void> clearLocation() async {
+    return _collectionRef.doc(IbUtils.getCurrentUid()).update(
+        {'geoPoint': const GeoPoint(0, 0), 'lastLocationTimestampInMs': -1});
+  }
 }

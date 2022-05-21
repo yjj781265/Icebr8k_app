@@ -24,90 +24,261 @@ class AlertTab extends StatelessWidget {
   final NotificationController _controller = Get.find();
   @override
   Widget build(BuildContext context) {
-    return Obx(() => Scaffold(
-          appBar: AppBar(
-            title: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text('Alert'),
-            ),
-            actions: [
-              if (_controller.items.isNotEmpty)
-                TextButton(
-                    onPressed: () async {
-                      await _controller.clearAllNotifications();
-                    },
-                    child: const Text('Clear All'))
-            ],
-          ),
-          body: SafeArea(
-            child: Obx(() {
-              if (_controller.isLoading.value) {
-                return const Center(
-                  child: IbProgressIndicator(),
-                );
-              }
-              if (_controller.items.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                          width: 200,
-                          height: 200,
-                          child: Lottie.asset('assets/images/monkey_zen.json')),
-                      const Text(
-                        'No notifications at this time',
-                        style: TextStyle(
-                          color: IbColors.lightGrey,
-                          fontSize: IbConfig.kNormalTextSize,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              return ListView.separated(
-                itemBuilder: (context, index) {
-                  final NotificationItem item = _controller.items[index];
-                  return Dismissible(
-                      direction: DismissDirection.endToStart,
-                      key: ValueKey(item.notification.id),
-                      onDismissed: (direction) async {
-                        await IbUserDbService()
-                            .removeNotification(item.notification);
-                      },
-                      background: Container(
-                        color: IbColors.errorRed,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+    return Obx(() => DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text('Alert'),
+              ),
+              bottom: TabBar(
+                indicatorSize: TabBarIndicatorSize.tab,
+                tabs: [
+                  Obx(() {
+                    final int count = _controller.items
+                        .where((p0) => !p0.notification.isRead)
+                        .length;
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Row(
                             children: const [
-                              Icon(
-                                Icons.delete,
-                                color: Colors.white,
+                              Icon(Icons.notifications),
+                              SizedBox(
+                                width: 8,
                               ),
-                              Text(
-                                'DELETE',
-                                style: TextStyle(color: Colors.white),
-                              ),
+                              Text('Notification(s)')
                             ],
                           ),
-                        ),
+                          if (count != 0)
+                            Positioned(
+                              right: -16,
+                              top: -4,
+                              child: CircleAvatar(
+                                backgroundColor: IbColors.errorRed,
+                                radius: 10,
+                                child: Text(
+                                  count >= 99 ? '99+' : count.toString(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                      child: _handleNotificationType(item, context));
-                },
-                itemCount: _controller.items.length,
-                separatorBuilder: (BuildContext context, int index) {
-                  return const Divider(
-                    height: 1,
-                  );
-                },
-              );
-            }),
+                    );
+                  }),
+                  Obx(() {
+                    final int count = _controller.requests
+                        .where((p0) => !p0.notification.isRead)
+                        .length;
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Row(
+                            children: const [
+                              Icon(Icons.group_add_outlined),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Text('Request(s)'),
+                            ],
+                          ),
+                          if (count != 0)
+                            Positioned(
+                              right: -16,
+                              top: -4,
+                              child: CircleAvatar(
+                                backgroundColor: IbColors.errorRed,
+                                radius: 10,
+                                child: Text(
+                                  count >= 99 ? '99+' : count.toString(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
+              ),
+              actions: [
+                if (_controller.items.isNotEmpty)
+                  TextButton(
+                      onPressed: () async {
+                        await _controller.clearAllNotifications();
+                      },
+                      child: const Text('Clear All'))
+              ],
+            ),
+            body: Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: TabBarView(
+                children: [
+                  _itemsTab(),
+                  _requestsTab(),
+                ],
+              ),
+            ),
           ),
         ));
+  }
+
+  Widget _itemsTab() {
+    return SafeArea(
+      child: Obx(() {
+        if (_controller.isLoading.value) {
+          return const Center(
+            child: IbProgressIndicator(),
+          );
+        }
+        if (_controller.items.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: Lottie.asset('assets/images/monkey_zen.json')),
+                const Text(
+                  'No notifications at this time',
+                  style: TextStyle(
+                    color: IbColors.lightGrey,
+                    fontSize: IbConfig.kNormalTextSize,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView.separated(
+          itemBuilder: (context, index) {
+            final NotificationItem item = _controller.items[index];
+            return Dismissible(
+                direction: DismissDirection.endToStart,
+                key: ValueKey(item.notification.id),
+                onDismissed: (direction) async {
+                  await IbUserDbService().removeNotification(item.notification);
+                },
+                background: Container(
+                  color: IbColors.errorRed,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: const [
+                        Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ),
+                        Text(
+                          'DELETE',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                child: _handleNotificationType(item, context));
+          },
+          itemCount: _controller.items.length,
+          separatorBuilder: (BuildContext context, int index) {
+            return const Divider(
+              height: 1,
+            );
+          },
+        );
+      }),
+    );
+  }
+
+  Widget _requestsTab() {
+    return SafeArea(
+      child: Obx(() {
+        if (_controller.isLoading.value) {
+          return const Center(
+            child: IbProgressIndicator(),
+          );
+        }
+        if (_controller.requests.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: Lottie.asset('assets/images/monkey_zen.json')),
+                const Text(
+                  'No requests at this time',
+                  style: TextStyle(
+                    color: IbColors.lightGrey,
+                    fontSize: IbConfig.kNormalTextSize,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView.separated(
+          itemBuilder: (context, index) {
+            final NotificationItem item = _controller.requests[index];
+            return Dismissible(
+                direction: DismissDirection.endToStart,
+                key: ValueKey(item.notification.id),
+                onDismissed: (direction) async {
+                  await IbUserDbService().removeNotification(item.notification);
+                },
+                background: Container(
+                  color: IbColors.errorRed,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: const [
+                        Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ),
+                        Text(
+                          'DELETE',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                child: _handleNotificationType(item, context));
+          },
+          itemCount: _controller.requests.length,
+          separatorBuilder: (BuildContext context, int index) {
+            return const Divider(
+              height: 1,
+            );
+          },
+        );
+      }),
+    );
   }
 
   Widget _handleNotificationType(NotificationItem item, BuildContext context) {

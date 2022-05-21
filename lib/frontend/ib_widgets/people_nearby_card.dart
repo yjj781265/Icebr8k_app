@@ -65,6 +65,9 @@ class PeopleNearbyCard extends StatelessWidget {
                         fontWeight: FontWeight.normal,
                         fontSize: IbConfig.kNormalTextSize),
                   ),
+                  Text(
+                    item.user.intentions.join(' • '),
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: Row(

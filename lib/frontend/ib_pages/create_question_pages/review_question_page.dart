@@ -474,7 +474,9 @@ class ReviewQuestionPage extends StatelessWidget {
 
   String _getPrivacyBondsString() {
     final StringBuffer sb = StringBuffer();
-    final bool includeComma = createQuestionController.pickedFriends.isNotEmpty;
+    final bool includeComma =
+        createQuestionController.pickedFriends.isNotEmpty ||
+            createQuestionController.pickedChats.isNotEmpty;
     if (itemController.rxIbQuestion.value.isPublic) {
       final str = includeComma ? 'Public, ' : 'Public';
       sb.write(str);

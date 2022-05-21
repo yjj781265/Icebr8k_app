@@ -32,6 +32,19 @@ class PeopleNearbyPage extends StatelessWidget {
                 _showFilterDialog(context);
               },
               icon: const Icon(Icons.tune)),
+          IconButton(
+              onPressed: () {
+                Get.dialog(IbDialog(
+                  title: 'Clear Location History',
+                  subtitle:
+                      'clear your location history will prevent others seeing you in people nearby',
+                  onPositiveTap: () async {
+                    await _controller.clearLocation();
+                    Get.close(2);
+                  },
+                ));
+              },
+              icon: const Icon(Icons.location_off))
         ],
       ),
       body: Obx(() {
@@ -148,6 +161,7 @@ class PeopleNearbyPage extends StatelessWidget {
   void _showFilterDialog(BuildContext context) {
     final oldDistance = _controller.rangeInMi.value;
     final oldGenderSelection = _controller.genderSelections.toList();
+    final oldIntentionSelection = _controller.intentionSelection.toList();
     final oldRange = _controller.rangeValue.value;
 
     const TextStyle headerStyle = TextStyle(
@@ -233,6 +247,40 @@ class PeopleNearbyPage extends StatelessWidget {
                   )
                 ]),
           ),
+          const SizedBox(
+            height: 4,
+          ),
+          const Text('Intention', style: headerStyle),
+          Obx(
+            () => ToggleButtons(
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                borderColor: IbColors.lightGrey,
+                selectedColor: IbColors.primaryColor,
+                selectedBorderColor: IbColors.accentColor,
+                borderWidth: 2,
+                onPressed: (index) {
+                  _controller.intentionSelection[index] =
+                      !_controller.intentionSelection[index];
+                  _controller.intentionSelection.refresh();
+                },
+                isSelected: _controller.intentionSelection.toList(),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      IbUser.kIntentions[0],
+                      style: TextStyle(color: Theme.of(context).indicatorColor),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      IbUser.kIntentions[1],
+                      style: TextStyle(color: Theme.of(context).indicatorColor),
+                    ),
+                  ),
+                ]),
+          ),
         ],
       ),
     );
@@ -245,6 +293,8 @@ class PeopleNearbyPage extends StatelessWidget {
           _controller.rangeValue.value = oldRange;
           _controller.genderSelections.value = oldGenderSelection.toList();
           _controller.rangeInMi.value = oldDistance;
+          _controller.intentionSelection.value = oldIntentionSelection.toList();
+          _controller.intentionSelection.refresh();
           _controller.genderSelections.refresh();
           Get.back();
         },
