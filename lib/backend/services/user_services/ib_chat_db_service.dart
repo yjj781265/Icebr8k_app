@@ -23,6 +23,51 @@ class IbChatDbService {
     _collectionRef = _db.collection(_kChatRoomCollection);
   }
 
+  Future<QuerySnapshot<Map<String, dynamic>>> queryPollMessages(String chatId,
+      {DocumentSnapshot? lastDoc}) async {
+    if (lastDoc != null) {
+      return _collectionRef
+          .doc(chatId)
+          .collection(_kMessageSubCollection)
+          .where('messageType', isEqualTo: IbMessage.kMessageTypePoll)
+          .limit(IbConfig.kPerPage)
+          .startAfterDocument(lastDoc)
+          .orderBy('timestamp', descending: true)
+          .get();
+    }
+
+    return _collectionRef
+        .doc(chatId)
+        .collection(_kMessageSubCollection)
+        .where('messageType', isEqualTo: IbMessage.kMessageTypePoll)
+        .limit(IbConfig.kPerPage)
+        .orderBy('timestamp', descending: true)
+        .get();
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> queryIcebreakerMessages(
+      String chatId,
+      {DocumentSnapshot? lastDoc}) async {
+    if (lastDoc != null) {
+      return _collectionRef
+          .doc(chatId)
+          .collection(_kMessageSubCollection)
+          .where('messageType', isEqualTo: IbMessage.kMessageTypeIcebreaker)
+          .limit(IbConfig.kPerPage)
+          .startAfterDocument(lastDoc)
+          .orderBy('timestamp', descending: true)
+          .get();
+    }
+
+    return _collectionRef
+        .doc(chatId)
+        .collection(_kMessageSubCollection)
+        .where('messageType', isEqualTo: IbMessage.kMessageTypeIcebreaker)
+        .limit(IbConfig.kPerPage)
+        .orderBy('timestamp', descending: true)
+        .get();
+  }
+
   Future<List<IbChat>> queryUserCircles(String uid) async {
     final list = <IbChat>[];
     final snapshot = await _collectionRef

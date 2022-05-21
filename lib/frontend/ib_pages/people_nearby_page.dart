@@ -88,67 +88,65 @@ class PeopleNearbyPage extends StatelessWidget {
         }
 
         return Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              child: Center(
-                child: CarouselSlider.builder(
-                  itemBuilder: (BuildContext context, int index, int num) {
-                    return PeopleNearbyCard(_controller.items[index]);
-                  },
-                  carouselController: _controller.carouselController,
-                  options: CarouselOptions(
-                      aspectRatio: 0.65,
-                      viewportFraction: 1,
-                      enlargeCenterPage: true,
-                      enableInfiniteScroll: false,
-                      onPageChanged: (index, reason) async {
-                        _controller.currentIndex.value = index;
-                        if (index == _controller.items.length - 1) {
-                          await _controller.loadMore();
-                        }
-                      }),
-                  itemCount: _controller.items.length,
-                ),
-              ),
+            CarouselSlider.builder(
+              itemBuilder: (BuildContext context, int index, int num) {
+                return PeopleNearbyCard(_controller.items[index]);
+              },
+              carouselController: _controller.carouselController,
+              options: CarouselOptions(
+                  aspectRatio: 0.65,
+                  viewportFraction: 1,
+                  enlargeCenterPage: true,
+                  enableInfiniteScroll: false,
+                  onPageChanged: (index, reason) async {
+                    _controller.currentIndex.value = index;
+                    if (index == _controller.items.length - 1) {
+                      await _controller.loadMore();
+                    }
+                  }),
+              itemCount: _controller.items.length,
             ),
-            const SizedBox(
-              height: 8,
-            ),
-            SafeArea(
-              child: Obx(
-                () => Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    if (_controller.currentIndex.value != 0)
-                      SizedBox(
-                        height: 48,
-                        width: 100,
-                        child: IbElevatedButton(
-                          textTrKey: 'Prev',
-                          color: IbColors.errorRed,
-                          onPressed: () {
-                            _controller.carouselController.previousPage();
-                          },
-                        ),
-                      )
-                    else
-                      const SizedBox(
-                        width: 100,
-                      ),
-                    if (_controller.currentIndex.value !=
-                        _controller.items.length - 1)
-                      SizedBox(
-                        height: 48,
-                        width: 100,
-                        child: IbElevatedButton(
-                          textTrKey: 'Next',
-                          onPressed: () {
-                            _controller.carouselController.nextPage();
-                          },
-                        ),
-                      ),
-                  ],
+            Flexible(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Obx(
+                  () => Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (_controller.currentIndex.value != 0)
+                          SizedBox(
+                            height: 48,
+                            width: 100,
+                            child: IbElevatedButton(
+                              textTrKey: 'Prev',
+                              color: IbColors.errorRed,
+                              onPressed: () {
+                                _controller.carouselController.previousPage();
+                              },
+                            ),
+                          )
+                        else
+                          const SizedBox(
+                            width: 100,
+                          ),
+                        if (_controller.currentIndex.value !=
+                            _controller.items.length - 1)
+                          SizedBox(
+                            height: 48,
+                            width: 100,
+                            child: IbElevatedButton(
+                              textTrKey: 'Next',
+                              onPressed: () {
+                                _controller.carouselController.nextPage();
+                              },
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),

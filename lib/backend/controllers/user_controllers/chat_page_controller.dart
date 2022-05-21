@@ -15,7 +15,6 @@ import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
-import 'package:icebr8k/backend/services/user_services/icebreaker_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -34,6 +33,7 @@ class ChatPageController extends GetxController {
   IbChat? ibChat;
   final String recipientId;
   final isLoading = true.obs;
+  final isLoadingPastPolls = true.obs;
   final isLoadingMore = false.obs;
   final isCircle = false.obs;
   final isPublicCircle = false.obs;
@@ -41,6 +41,8 @@ class ChatPageController extends GetxController {
   final showMsgOptions = false.obs;
   final showSettings = false.obs;
   final messages = <IbMessageModel>[].obs;
+  final pastPolls = <IbQuestion>[].obs;
+  final pastIcebreakers = <Icebreaker, IbCollection>{}.obs;
 
   /// for media previewer of input widget
   final urls = <String>[].obs;
@@ -54,12 +56,15 @@ class ChatPageController extends GetxController {
   final isSending = false.obs;
   final isMuted = false.obs;
   DocumentSnapshot<Map<String, dynamic>>? lastSnap;
+  DocumentSnapshot<Map<String, dynamic>>? lastPastPollDoc;
+  DocumentSnapshot<Map<String, dynamic>>? lastPastIcebreakerDoc;
   final txtController = TextEditingController();
   final TextEditingController titleTxtController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController welcomeMsgController = TextEditingController();
   final ItemScrollController itemScrollController = ItemScrollController();
-  final RefreshController refreshController = RefreshController();
+  final RefreshController pastPollRefresh = RefreshController();
+  final RefreshController pastIcebreakerRefresh = RefreshController();
   final ItemPositionsListener itemPositionsListener =
       ItemPositionsListener.create();
   final ibChatMembers = <IbChatMemberModel>[].obs;
@@ -269,6 +274,8 @@ class ChatPageController extends GetxController {
     }
     setUpStreams();
     setUpInfo();
+    loadPastPolls();
+    loadPastIcebreakers();
   }
 
   void showWelcomeMsg() {
@@ -535,37 +542,14 @@ class ChatPageController extends GetxController {
         return IbMessageModel(ibMessage: ibMessage);
       }
 
-      final ibCollection =
-          IbCacheManager().retrieveIbCollection(ibMessage.extra.first);
-
-      if (ibCollection != null) {
-        Icebreaker? icebreaker = IbCacheManager()
-            .retrieveIbCollection(ibMessage.extra.first)!
-            .icebreakers
-            .firstWhereOrNull((element) => element.id == ibMessage.content);
-        icebreaker ??= IbCacheManager().retrieveIcebreaker(
-            collectionId: ibCollection.id, icebreakerId: ibMessage.content);
-
+      final icebreaker =
+          IbCacheManager().retrieveIcebreaker(icebreakerId: ibMessage.content);
+      if (icebreaker != null) {
         return IbMessageModel(
             ibMessage: ibMessage,
             icebreaker: icebreaker,
             ibCollection:
-                IbCacheManager().retrieveIbCollection(ibMessage.extra.first));
-      }
-
-      final collection =
-          await IcebreakerDbService().queryIbCollection(ibMessage.extra.first);
-      if (collection == null) {
-        return IbMessageModel(ibMessage: ibMessage);
-      } else {
-        Icebreaker? icebreaker = collection.icebreakers
-            .firstWhereOrNull((element) => element.id == ibMessage.content);
-        icebreaker ??= IbCacheManager().retrieveIcebreaker(
-            collectionId: collection.id, icebreakerId: ibMessage.content);
-        return IbMessageModel(
-            ibMessage: ibMessage,
-            icebreaker: icebreaker,
-            ibCollection: ibCollection);
+                IbCacheManager().retrieveIbCollection(icebreaker.collectionId));
       }
     }
     return IbMessageModel(ibMessage: ibMessage);
@@ -607,6 +591,104 @@ class ChatPageController extends GetxController {
         isPublicCircle.value = false;
       });
     }
+  }
+
+  Future<void> loadPastPolls({bool isRefresh = false}) async {
+    try {
+      if (ibChat != null) {
+        if (isRefresh) {
+          lastPastPollDoc = null;
+          pastPolls.clear();
+        }
+        late QuerySnapshot<Map<String, dynamic>> snapshot;
+        if (lastPastPollDoc != null) {
+          snapshot = await IbChatDbService()
+              .queryPollMessages(ibChat!.chatId, lastDoc: lastPastPollDoc);
+        } else {
+          snapshot = await IbChatDbService().queryPollMessages(ibChat!.chatId);
+        }
+
+        if (snapshot.size == 0) {
+          lastPastPollDoc = null;
+          pastPollRefresh.loadNoData();
+          pastPollRefresh.refreshToIdle();
+          return;
+        }
+
+        for (final doc in snapshot.docs) {
+          final questionId = doc.data()['content'] as String;
+          if (pastPolls
+                  .firstWhereOrNull((element) => element.id == questionId) ==
+              null) {
+            final ibQuestion =
+                await IbQuestionDbService().querySingleQuestion(questionId);
+            if (ibQuestion != null) {
+              pastPolls.add(ibQuestion);
+            }
+          }
+          lastPastPollDoc = doc;
+        }
+
+        if (isRefresh) {
+          pastPollRefresh.refreshCompleted(resetFooterState: true);
+        } else {
+          pastPollRefresh.loadComplete();
+        }
+      }
+    } catch (e) {
+      pastPollRefresh.loadFailed();
+    }
+  }
+
+  Future<void> loadPastIcebreakers({bool isRefresh = false}) async {
+    if (ibChat != null) {
+      if (isRefresh) {
+        lastPastIcebreakerDoc = null;
+        pastIcebreakers.clear();
+      }
+      late QuerySnapshot<Map<String, dynamic>> snapshot;
+      if (lastPastIcebreakerDoc != null) {
+        snapshot = await IbChatDbService()
+            .queryIcebreakerMessages(ibChat!.chatId, lastDoc: lastPastPollDoc);
+      } else {
+        snapshot =
+            await IbChatDbService().queryIcebreakerMessages(ibChat!.chatId);
+      }
+
+      if (snapshot.size == 0) {
+        lastPastIcebreakerDoc = null;
+        pastIcebreakerRefresh.refreshToIdle();
+        pastIcebreakerRefresh.loadNoData();
+        return;
+      }
+
+      for (final doc in snapshot.docs) {
+        final id = doc.data()['content'] as String;
+        if (pastIcebreakers.keys
+                .toList()
+                .firstWhereOrNull((element) => element.id == id) ==
+            null) {
+          final icebreaker =
+              IbCacheManager().retrieveIcebreaker(icebreakerId: id);
+          if (icebreaker == null) {
+            continue;
+          }
+          final ibCollection =
+              IbCacheManager().retrieveIbCollection(icebreaker.collectionId);
+          if (ibCollection == null) {
+            continue;
+          }
+          pastIcebreakers[icebreaker] = ibCollection;
+        }
+        lastPastIcebreakerDoc = doc;
+      }
+      if (isRefresh) {
+        pastIcebreakerRefresh.refreshCompleted(resetFooterState: true);
+      } else {
+        pastIcebreakerRefresh.loadComplete();
+      }
+    }
+    isLoadingPastPolls.value = false;
   }
 
   Future<void> sendMessage() async {

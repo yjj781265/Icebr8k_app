@@ -84,21 +84,14 @@ class IbCacheManager {
     return null;
   }
 
-  Icebreaker? retrieveIcebreaker(
-      {required String collectionId, required String icebreakerId}) {
-    final index = _ibCollectionList.indexWhere((element) =>
-        element.id == collectionId &&
-        element.icebreakers
-                .indexWhere((element) => element.id == icebreakerId) !=
-            -1);
-
-    if (index != -1) {
-      final i = _ibCollectionList[index]
-          .icebreakers
+  Icebreaker? retrieveIcebreaker({required String icebreakerId}) {
+    for (final ibCollection in _ibCollectionList) {
+      final index = ibCollection.icebreakers
           .indexWhere((element) => element.id == icebreakerId);
-      return _ibCollectionList[index].icebreakers[i];
+      if (index != -1) {
+        return ibCollection.icebreakers[index];
+      }
     }
-
     return null;
   }
 

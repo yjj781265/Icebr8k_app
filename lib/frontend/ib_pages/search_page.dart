@@ -1,22 +1,18 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/icebreaker_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/search_page_controller.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
-import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/my_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
-import 'package:icebr8k/frontend/ib_pages/question_pages/question_main_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_circle_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_question_snippet_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:icebr8k/frontend/ib_widgets/icebreaker_card.dart';
 import 'package:lottie/lottie.dart';
@@ -306,60 +302,8 @@ class SearchPage extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: _controller.questions.map((element) {
-                  Icon icon = const Icon(
-                    FontAwesomeIcons.bars,
-                    size: 16,
-                    color: IbColors.primaryColor,
-                  );
-                  if (element.questionType == QuestionType.multipleChoicePic) {
-                    icon = const Icon(FontAwesomeIcons.listUl,
-                        size: 16, color: IbColors.primaryColor);
-                  } else if (element.questionType ==
-                      QuestionType.multipleChoice) {
-                    icon = const Icon(
-                      FontAwesomeIcons.bars,
-                      size: 16,
-                      color: IbColors.primaryColor,
-                    );
-                  } else {
-                    icon = const Icon(FontAwesomeIcons.star,
-                        size: 16, color: IbColors.primaryColor);
-                  }
-
-                  return InkWell(
-                    borderRadius: const BorderRadius.all(Radius.circular(16)),
-                    onTap: () {
-                      Get.to(() => QuestionMainPage(Get.put(
-                          IbQuestionItemController(
-                              rxIbQuestion: element.obs,
-                              rxIsSample: false.obs,
-                              rxIsExpanded: true.obs),
-                          tag: element.id)));
-                    },
-                    child: IbCard(
-                      child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              icon,
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              SizedBox(
-                                width: 150,
-                                child: AutoSizeText(
-                                  element.question,
-                                  maxLines: 3,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: IbConfig.kNormalTextSize),
-                                  maxFontSize: IbConfig.kNormalTextSize,
-                                ),
-                              ),
-                            ],
-                          )),
-                    ),
-                  );
+                  return SizedBox(
+                      height: 200, child: IbQuestionSnippetCard(element));
                 }).toList(),
               ),
             ),

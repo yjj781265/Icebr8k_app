@@ -12,6 +12,8 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_settings.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/friends_picker.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/past_icebreakers.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/past_polls.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/my_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -86,6 +88,7 @@ class ChatPageSettings extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (_controller.isCircle.isTrue) membersList(context),
+              _options(context),
               settings(context),
             ],
           ),
@@ -221,6 +224,42 @@ class ChatPageSettings extends StatelessWidget {
     );
 
     Get.bottomSheet(SafeArea(child: sheet));
+  }
+
+  Widget _options(BuildContext context) {
+    return Obx(
+      () => Column(
+        children: [
+          if (_controller.pastPolls.isNotEmpty)
+            ListTile(
+              onTap: () {
+                Get.to(() => PastPolls(_controller));
+              },
+              title: const Text('View All Past Polls'),
+              trailing: const Icon(
+                FontAwesomeIcons.checkToSlot,
+                color: IbColors.primaryColor,
+              ),
+            ),
+          if (_controller.pastIcebreakers.isNotEmpty)
+            ListTile(
+              onTap: () {
+                Get.to(() => PastIcebreakers(_controller));
+              },
+              title: const Text('View All Past Icebreakers'),
+              trailing: const Text(
+                '🧊',
+                style: TextStyle(fontSize: 21),
+              ),
+            ),
+          if (_controller.pastPolls.isNotEmpty ||
+              _controller.pastIcebreakers.isNotEmpty)
+            const Divider(
+              thickness: 2,
+            ),
+        ],
+      ),
+    );
   }
 
   Widget settings(BuildContext context) {

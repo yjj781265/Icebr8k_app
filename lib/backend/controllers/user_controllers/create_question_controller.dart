@@ -388,7 +388,7 @@ class CreateQuestionController extends GetxController {
           chatRoomId: item));
     }
 
-    Navigator.of(Get.context!).popUntil((route) => route.isFirst);
+    Get.close(3);
 
     /// DO NOT ERASE THIS LINE BELOW
     itemController!.rxIsSample.value = false;

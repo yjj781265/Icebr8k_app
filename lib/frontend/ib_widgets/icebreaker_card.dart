@@ -35,121 +35,124 @@ class IcebreakerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IbCard(
-        color: Color(icebreaker.bgColor),
-        child: Stack(
-          children: [
-            Center(
-              child: GestureDetector(
-                onLongPress: () {
-                  HapticFeedback.heavyImpact();
-                  Clipboard.setData(ClipboardData(text: icebreaker.text));
-                  IbUtils.showSimpleSnackBar(
-                      msg: "Text copied to clipboard",
-                      backgroundColor: IbColors.primaryColor);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: AutoSizeText(
-                    icebreaker.text,
-                    textAlign: TextAlign.center,
-                    minFontSize: minSize,
-                    maxFontSize: maxSize,
-                    maxLines: IbConfig.kIbCardMaxLine,
-                    overflow: TextOverflow.ellipsis,
-                    style: IbUtils.getIbFonts(TextStyle(
-                        fontSize: maxSize,
-                        color: Color(icebreaker.textColor),
-                        fontStyle: icebreaker.isItalic
-                            ? FontStyle.italic
-                            : FontStyle.normal,
-                        fontWeight:
-                            FontWeight.bold))[icebreaker.textStyleIndex],
+    return AspectRatio(
+      aspectRatio: 0.618,
+      child: IbCard(
+          color: Color(icebreaker.bgColor),
+          child: Stack(
+            children: [
+              Center(
+                child: GestureDetector(
+                  onLongPress: () {
+                    HapticFeedback.heavyImpact();
+                    Clipboard.setData(ClipboardData(text: icebreaker.text));
+                    IbUtils.showSimpleSnackBar(
+                        msg: "Text copied to clipboard",
+                        backgroundColor: IbColors.primaryColor);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: AutoSizeText(
+                      icebreaker.text,
+                      textAlign: TextAlign.center,
+                      minFontSize: minSize,
+                      maxFontSize: maxSize,
+                      maxLines: IbConfig.kIbCardMaxLine,
+                      overflow: TextOverflow.ellipsis,
+                      style: IbUtils.getIbFonts(TextStyle(
+                          fontSize: maxSize,
+                          color: Color(icebreaker.textColor),
+                          fontStyle: icebreaker.isItalic
+                              ? FontStyle.italic
+                              : FontStyle.normal,
+                          fontWeight:
+                              FontWeight.bold))[icebreaker.textStyleIndex],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Positioned(
-              top: 8,
-              right: 8,
-              child: CircleAvatar(
-                backgroundColor:
-                    Theme.of(context).backgroundColor.withOpacity(0.8),
-                child: IconButton(
-                    onPressed: () async {
-                      final list = await Get.to(() => const ChatPickerPage());
-                      if (list == null) {
-                        return;
-                      }
-                      final items = (list as List<dynamic>)
-                          .map((e) => e as ChatTabItem)
-                          .toList();
-                      if (items.isNotEmpty) {
-                        Get.dialog(
-                            const IbLoadingDialog(messageTrKey: 'Sharing...'),
-                            barrierDismissible: false);
-                        try {
-                          for (final item in items) {
-                            final message = IbMessage(
-                                messageId: IbUtils.getUniqueId(),
-                                content: icebreaker.id,
-                                extra: [icebreaker.collectionId],
-                                senderUid: IbUtils.getCurrentUid()!,
-                                messageType: IbMessage.kMessageTypeIcebreaker,
-                                chatRoomId: item.ibChat.chatId,
-                                readUids: [IbUtils.getCurrentUid()!]);
-                            await IbChatDbService().uploadMessage(message);
-                          }
-                          Get.back();
-                          IbUtils.showSimpleSnackBar(
-                              msg: 'Icebreaker shared successfully',
-                              backgroundColor: IbColors.accentColor);
-                        } catch (e) {
-                          Get.back();
-                          Get.dialog(IbDialog(
-                            title: 'Error',
-                            subtitle: e.toString(),
-                            showNegativeBtn: false,
-                          ));
-                        }
-                      }
-                    },
-                    icon: Icon(
-                      FontAwesomeIcons.share,
-                      color: Theme.of(context).indicatorColor,
-                      size: 16,
-                    )),
-              ),
-            ),
-            if (showCollectionName && ibCollection != null)
               Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: InkWell(
-                    onTap: () {
-                      Get.to(() => IbCoverPage(ibCollection!));
-                    },
-                    child: LimitedBox(
-                      maxWidth: 250,
-                      child: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Text(
-                          ibCollection!.name,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: IbUtils.getIbFonts(TextStyle(
-                              fontSize: IbConfig.kDescriptionTextSize,
-                              color: Color(ibCollection!.textColor),
-                              fontWeight: FontWeight.bold,
-                              fontStyle: ibCollection!.isItalic
-                                  ? FontStyle.italic
-                                  : FontStyle
-                                      .normal))[ibCollection!.textStyleIndex],
+                top: 8,
+                right: 8,
+                child: CircleAvatar(
+                  backgroundColor:
+                      Theme.of(context).backgroundColor.withOpacity(0.8),
+                  child: IconButton(
+                      onPressed: () async {
+                        final list = await Get.to(() => const ChatPickerPage());
+                        if (list == null) {
+                          return;
+                        }
+                        final items = (list as List<dynamic>)
+                            .map((e) => e as ChatTabItem)
+                            .toList();
+                        if (items.isNotEmpty) {
+                          Get.dialog(
+                              const IbLoadingDialog(messageTrKey: 'Sharing...'),
+                              barrierDismissible: false);
+                          try {
+                            for (final item in items) {
+                              final message = IbMessage(
+                                  messageId: IbUtils.getUniqueId(),
+                                  content: icebreaker.id,
+                                  extra: [icebreaker.collectionId],
+                                  senderUid: IbUtils.getCurrentUid()!,
+                                  messageType: IbMessage.kMessageTypeIcebreaker,
+                                  chatRoomId: item.ibChat.chatId,
+                                  readUids: [IbUtils.getCurrentUid()!]);
+                              await IbChatDbService().uploadMessage(message);
+                            }
+                            Get.back();
+                            IbUtils.showSimpleSnackBar(
+                                msg: 'Icebreaker shared successfully',
+                                backgroundColor: IbColors.accentColor);
+                          } catch (e) {
+                            Get.back();
+                            Get.dialog(IbDialog(
+                              title: 'Error',
+                              subtitle: e.toString(),
+                              showNegativeBtn: false,
+                            ));
+                          }
+                        }
+                      },
+                      icon: Icon(
+                        FontAwesomeIcons.share,
+                        color: Theme.of(context).indicatorColor,
+                        size: 16,
+                      )),
+                ),
+              ),
+              if (showCollectionName && ibCollection != null)
+                Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: InkWell(
+                      onTap: () {
+                        Get.to(() => IbCoverPage(ibCollection!));
+                      },
+                      child: LimitedBox(
+                        maxWidth: 250,
+                        child: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Text(
+                            ibCollection!.name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: IbUtils.getIbFonts(TextStyle(
+                                fontSize: IbConfig.kDescriptionTextSize,
+                                color: Color(ibCollection!.textColor),
+                                fontWeight: FontWeight.bold,
+                                fontStyle: ibCollection!.isItalic
+                                    ? FontStyle.italic
+                                    : FontStyle
+                                        .normal))[ibCollection!.textStyleIndex],
+                          ),
                         ),
                       ),
-                    ),
-                  ))
-          ],
-        ));
+                    ))
+            ],
+          )),
+    );
   }
 }

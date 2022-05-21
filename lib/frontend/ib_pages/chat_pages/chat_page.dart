@@ -474,27 +474,6 @@ class ChatPage extends StatelessWidget {
     );
   }
 
-/*  void showMediaBtmSheet() {
-    IbUtils.hideKeyboard();
-    final options = IbCard(
-        child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ListTile(
-          onTap: () async {},
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(16))),
-          title: const Text('Choose GIF from Tenor'),
-          leading: const Icon(
-            Icons.gif,
-            color: IbColors.accentColor,
-          ),
-        ),
-      ],
-    ));
-    Get.bottomSheet(SafeArea(child: options), ignoreSafeArea: false);
-  }*/
-
   Widget _newMessageAlert(BuildContext context) {
     return Obx(() {
       return Wrap(

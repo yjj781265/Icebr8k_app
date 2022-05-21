@@ -172,7 +172,9 @@ class ReplyPage extends StatelessWidget {
                                             ),
                                             IbRichText(
                                               string: item.ibComment.content,
-                                              defaultTextStyle: const TextStyle(
+                                              defaultTextStyle: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .indicatorColor,
                                                   fontSize:
                                                       IbConfig.kNormalTextSize),
                                             ),

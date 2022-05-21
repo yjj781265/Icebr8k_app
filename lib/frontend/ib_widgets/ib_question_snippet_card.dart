@@ -16,10 +16,10 @@ class IbQuestionSnippetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IbCard(
-        radius: 8,
-        child: SizedBox(
-          height: 200,
+    return AspectRatio(
+      aspectRatio: 0.618,
+      child: IbCard(
+          radius: 8,
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -58,8 +58,8 @@ class IbQuestionSnippetCard extends StatelessWidget {
                 ),
               ))
             ],
-          ),
-        ));
+          )),
+    );
   }
 
   Icon _getQuestionIcon() {
