@@ -16,11 +16,11 @@ class IbTenorService extends GetConnect {
     final List<IbGif> ibGifs = [];
     if (next != null) {
       response = await post(
-          'https://g.tenor.com/v1/search?q=$searchText&key=$kApiKey&media_filter=minimal&pos=$next',
+          'https://g.tenor.com/v1/search?q=$searchText&key=$kApiKey&contentfilter=low&media_filter=minimal&pos=$next',
           '');
     } else {
       response = await post(
-          'https://g.tenor.com/v1/search?q=$searchText&key=$kApiKey&media_filter=minimal',
+          'https://g.tenor.com/v1/search?q=$searchText&key=$kApiKey&contentfilter=low&media_filter=minimal',
           '');
     }
 
