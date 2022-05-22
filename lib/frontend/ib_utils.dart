@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -74,36 +73,35 @@ class IbUtils {
     return age;
   }
 
-  static Future<File?> showImageCropper(String filePath,
+  static Future<CroppedFile?> showImageCropper(String filePath,
       {CropStyle cropStyle = CropStyle.circle,
       List<CropAspectRatioPreset> ratios = const [
         CropAspectRatioPreset.original,
       ],
-      bool resetAspectRatioEnabled = true,
-      double? width,
       double? height,
+      double? width,
+      bool resetAspectRatioEnabled = true,
       CropAspectRatioPreset initAspectRatio = CropAspectRatioPreset.original,
       bool lockAspectRatio = false,
-      double? minimumAspectRatio}) async {
+      double minimumAspectRatio = 1.0}) async {
     return ImageCropper().cropImage(
-        sourcePath: filePath,
-        cropStyle: cropStyle,
-        aspectRatioPresets: ratios,
-        androidUiSettings: AndroidUiSettings(
+      compressFormat: ImageCompressFormat.png,
+      sourcePath: filePath,
+      cropStyle: cropStyle,
+      aspectRatioPresets: ratios,
+      uiSettings: [
+        AndroidUiSettings(
             toolbarColor: IbColors.darkPrimaryColor,
             toolbarTitle: 'Image Cropper',
             initAspectRatio: initAspectRatio,
             lockAspectRatio: lockAspectRatio),
-        iosUiSettings: IOSUiSettings(
-          rectHeight: height ?? 900,
-          rectWidth: width ?? 1600,
-          rectX: width ?? 1600,
-          rectY: height ?? 900,
-          resetAspectRatioEnabled: resetAspectRatioEnabled,
-          resetButtonHidden: !resetAspectRatioEnabled,
-          minimumAspectRatio: minimumAspectRatio,
+        IOSUiSettings(
+          rectHeight: height,
+          rectWidth: width,
           title: 'Image Cropper',
-        ));
+        )
+      ],
+    );
   }
 
   static String getUniqueId() {

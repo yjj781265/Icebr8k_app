@@ -52,8 +52,8 @@ dependencies:
   get: ^4.6.1
   get_storage: ^2.0.3
   google_fonts: ^2.1.0
-  image_cropper: ^1.5.1
-  image_picker: ^0.8.4+8
+  image_cropper: ^2.0.3
+  image_picker: ^0.8.5+3
   intl: ^0.17.0
   json_annotation: ^4.5.0
   lottie: ^1.2.2

@@ -94,6 +94,7 @@ class _MainPageViewState extends State<MainPageView>
         containerHeight: _mainPageController.isNavBarVisible.isTrue ? 80 : 0,
         selectedIndex: _mainPageController.currentIndex.value,
         onItemSelected: (index) async {
+          _mainPageController.currentIndex.value = index;
           if (index == 2) {
             Get.to(
                 () => CreateQuestionPage(
@@ -104,7 +105,12 @@ class _MainPageViewState extends State<MainPageView>
                 transition: Transition.zoom);
             return;
           }
-          _mainPageController.currentIndex.value = index;
+
+          if (index == 4) {
+            final NotificationController controller = Get.find();
+            await controller.initPushNotification();
+            return;
+          }
         },
         items: <BottomNavyBarItem>[
           BottomNavyBarItem(

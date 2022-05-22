@@ -392,7 +392,7 @@ class EditProfilePage extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final File? file = await IbUtils.showImageCropper(pickedFile.path,
+              final file = await IbUtils.showImageCropper(pickedFile.path,
                   lockAspectRatio: true,
                   minimumAspectRatio: 16 / 9,
                   resetAspectRatioEnabled: false,
@@ -440,7 +440,7 @@ class EditProfilePage extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final File? file = await IbUtils.showImageCropper(pickedFile.path,
+              final file = await IbUtils.showImageCropper(pickedFile.path,
                   lockAspectRatio: true,
                   minimumAspectRatio: 16 / 9,
                   resetAspectRatioEnabled: false,
@@ -502,7 +502,7 @@ class EditProfilePage extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final File? croppedFile = await IbUtils.showImageCropper(
+              final croppedFile = await IbUtils.showImageCropper(
                   pickedFile.path,
                   width: 1600,
                   height: 1600);
@@ -530,7 +530,7 @@ class EditProfilePage extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final File? croppedFile = await IbUtils.showImageCropper(
+              final croppedFile = await IbUtils.showImageCropper(
                 pickedFile.path,
                 width: 1600,
                 height: 1600,

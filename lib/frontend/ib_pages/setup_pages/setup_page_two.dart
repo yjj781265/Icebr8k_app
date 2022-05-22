@@ -203,8 +203,7 @@ class SetupPageTwo extends StatelessWidget {
         InkWell(
           onTap: () async {
             Get.back();
-            final _picker = ImagePicker();
-            final XFile? pickedFile = await _picker.pickImage(
+            final XFile? pickedFile = await _controller.picker.pickImage(
               source: ImageSource.camera,
               preferredCameraDevice: CameraDevice.front,
               imageQuality: IbConfig.kImageQuality,
@@ -240,13 +239,14 @@ class SetupPageTwo extends StatelessWidget {
         InkWell(
           onTap: () async {
             Get.back();
-            final _picker = ImagePicker();
-            final XFile? pickedFile = await _picker.pickImage(
+            final XFile? pickedFile = await _controller.picker.pickImage(
               source: ImageSource.gallery,
+              preferredCameraDevice: CameraDevice.front,
               imageQuality: IbConfig.kImageQuality,
             );
-
+            print(pickedFile);
             if (pickedFile != null) {
+              print(pickedFile.path);
               emoPic.url = pickedFile.path;
               _controller.updateEmoPic(emoPic);
             }

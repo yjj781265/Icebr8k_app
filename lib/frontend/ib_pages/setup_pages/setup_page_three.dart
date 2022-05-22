@@ -223,7 +223,7 @@ class SetupPageThree extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final File? croppedFile = await IbUtils.showImageCropper(
+              final croppedFile = await IbUtils.showImageCropper(
                   pickedFile.path,
                   height: 1600,
                   width: 1600);
@@ -256,14 +256,13 @@ class SetupPageThree extends StatelessWidget {
         InkWell(
           onTap: () async {
             Get.back();
-            final _picker = ImagePicker();
-            final XFile? pickedFile = await _picker.pickImage(
+            final XFile? pickedFile = await _controller.picker.pickImage(
               source: ImageSource.gallery,
               imageQuality: IbConfig.kImageQuality,
             );
 
             if (pickedFile != null) {
-              final File? croppedFile = await IbUtils.showImageCropper(
+              final croppedFile = await IbUtils.showImageCropper(
                   pickedFile.path,
                   height: 1600,
                   width: 1600);

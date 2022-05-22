@@ -33,6 +33,7 @@ class AlertTab extends StatelessWidget {
                 child: Text('Alert'),
               ),
               bottom: TabBar(
+                isScrollable: true,
                 indicatorSize: TabBarIndicatorSize.tab,
                 tabs: [
                   Obx(() {
@@ -41,34 +42,28 @@ class AlertTab extends StatelessWidget {
                         .length;
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Stack(
-                        clipBehavior: Clip.none,
+                      child: Row(
                         children: [
-                          Row(
-                            children: const [
-                              Icon(Icons.notifications),
-                              SizedBox(
-                                width: 8,
-                              ),
-                              Text('Notification(s)')
-                            ],
+                          const Icon(Icons.notifications),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          const Text('Notification(s)'),
+                          const SizedBox(
+                            width: 4,
                           ),
                           if (count != 0)
-                            Positioned(
-                              right: -16,
-                              top: -4,
-                              child: CircleAvatar(
-                                backgroundColor: IbColors.errorRed,
-                                radius: 10,
-                                child: Text(
-                                  count >= 99 ? '99+' : count.toString(),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10,
-                                  ),
+                            CircleAvatar(
+                              backgroundColor: IbColors.errorRed,
+                              radius: 10,
+                              child: Text(
+                                count >= 99 ? '99+' : count.toString(),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
                                 ),
                               ),
                             ),
@@ -82,34 +77,28 @@ class AlertTab extends StatelessWidget {
                         .length;
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Stack(
-                        clipBehavior: Clip.none,
+                      child: Row(
                         children: [
-                          Row(
-                            children: const [
-                              Icon(Icons.group_add_outlined),
-                              SizedBox(
-                                width: 8,
-                              ),
-                              Text('Request(s)'),
-                            ],
+                          const Icon(Icons.group_add),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          const Text('Request(s)'),
+                          const SizedBox(
+                            width: 4,
                           ),
                           if (count != 0)
-                            Positioned(
-                              right: -16,
-                              top: -4,
-                              child: CircleAvatar(
-                                backgroundColor: IbColors.errorRed,
-                                radius: 10,
-                                child: Text(
-                                  count >= 99 ? '99+' : count.toString(),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10,
-                                  ),
+                            CircleAvatar(
+                              backgroundColor: IbColors.errorRed,
+                              radius: 10,
+                              child: Text(
+                                count >= 99 ? '99+' : count.toString(),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
                                 ),
                               ),
                             ),

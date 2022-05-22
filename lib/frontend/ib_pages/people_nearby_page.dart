@@ -89,23 +89,26 @@ class PeopleNearbyPage extends StatelessWidget {
 
         return Column(
           children: [
-            CarouselSlider.builder(
-              itemBuilder: (BuildContext context, int index, int num) {
-                return PeopleNearbyCard(_controller.items[index]);
-              },
-              carouselController: _controller.carouselController,
-              options: CarouselOptions(
-                  aspectRatio: 0.65,
-                  viewportFraction: 1,
-                  enlargeCenterPage: true,
-                  enableInfiniteScroll: false,
-                  onPageChanged: (index, reason) async {
-                    _controller.currentIndex.value = index;
-                    if (index == _controller.items.length - 1) {
-                      await _controller.loadMore();
-                    }
-                  }),
-              itemCount: _controller.items.length,
+            Expanded(
+              flex: 6,
+              child: CarouselSlider.builder(
+                itemBuilder: (BuildContext context, int index, int num) {
+                  return PeopleNearbyCard(_controller.items[index]);
+                },
+                carouselController: _controller.carouselController,
+                options: CarouselOptions(
+                    padEnds: false,
+                    height: Get.height * 0.8,
+                    viewportFraction: 1.0,
+                    enableInfiniteScroll: false,
+                    onPageChanged: (index, reason) async {
+                      _controller.currentIndex.value = index;
+                      if (index == _controller.items.length - 1) {
+                        await _controller.loadMore();
+                      }
+                    }),
+                itemCount: _controller.items.length,
+              ),
             ),
             Flexible(
               child: Align(

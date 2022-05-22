@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/circle_settings_controller.dart';
@@ -372,7 +370,7 @@ class CircleSettings extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final File? croppedFile =
+              final croppedFile =
                   await IbUtils.showImageCropper(pickedFile.path);
               if (croppedFile != null) {
                 _controller.photoUrl.value = croppedFile.path;
@@ -396,7 +394,7 @@ class CircleSettings extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final File? croppedFile =
+              final croppedFile =
                   await IbUtils.showImageCropper(pickedFile.path);
               if (croppedFile != null) {
                 _controller.photoUrl.value = croppedFile.path;

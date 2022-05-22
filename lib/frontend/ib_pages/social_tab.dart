@@ -55,6 +55,7 @@ class _SocialTabState extends State<SocialTab>
         ),
         bottom: TabBar(
           indicatorSize: TabBarIndicatorSize.tab,
+          isScrollable: true,
           controller: _tabController,
           tabs: [
             Obx(() {
@@ -65,34 +66,29 @@ class _SocialTabState extends State<SocialTab>
 
               return Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Stack(
-                  clipBehavior: Clip.none,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Row(
-                      children: const [
-                        Icon(Icons.people),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Text('Circles')
-                      ],
+                    const Icon(Icons.people),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    const Text('Circles'),
+                    const SizedBox(
+                      width: 4,
                     ),
                     if (total > 0)
-                      Positioned(
-                        right: -16,
-                        top: -4,
-                        child: CircleAvatar(
-                          backgroundColor: IbColors.errorRed,
-                          radius: 10,
-                          child: Text(
-                            total >= 99 ? '99+' : total.toString(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                            ),
+                      CircleAvatar(
+                        backgroundColor: IbColors.errorRed,
+                        radius: 10,
+                        child: Text(
+                          total >= 99 ? '99+' : total.toString(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
                           ),
                         ),
                       ),
@@ -108,34 +104,29 @@ class _SocialTabState extends State<SocialTab>
 
               return Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Stack(
-                  clipBehavior: Clip.none,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Row(
-                      children: const [
-                        Icon(Icons.chat_rounded),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Text('Chats'),
-                      ],
+                    const Icon(Icons.chat_rounded),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    const Text('Chats'),
+                    const SizedBox(
+                      width: 4,
                     ),
                     if (total > 0)
-                      Positioned(
-                        right: -16,
-                        top: -4,
-                        child: CircleAvatar(
-                          backgroundColor: IbColors.errorRed,
-                          radius: 10,
-                          child: Text(
-                            total >= 99 ? '99+' : total.toString(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                            ),
+                      CircleAvatar(
+                        backgroundColor: IbColors.errorRed,
+                        radius: 10,
+                        child: Text(
+                          total >= 99 ? '99+' : total.toString(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
                           ),
                         ),
                       ),

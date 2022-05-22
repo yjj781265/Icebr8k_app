@@ -12,6 +12,7 @@ import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_two.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../frontend/ib_pages/setup_pages/review_page.dart';
 
@@ -21,6 +22,7 @@ class SetupController extends GetxController {
   final TextEditingController lNameTeController = TextEditingController();
   final TextEditingController usernameTeController = TextEditingController();
   final TextEditingController bioTeController = TextEditingController();
+  final picker = ImagePicker();
   final gender = ''.obs;
   final genderSelections = [false, false, false].obs;
   final birthdateInMs = DateTime.now().millisecondsSinceEpoch.obs;

@@ -36,11 +36,6 @@ class NotificationController extends GetxController {
   }
 
   @override
-  Future<void> onReady() async {
-    await initPushNotification();
-  }
-
-  @override
   Future<void> onClose() async {
     print('NotificationController onClose');
     await ibNotificationsStream.cancel();
@@ -83,9 +78,10 @@ class NotificationController extends GetxController {
   Future<void> initPushNotification() async {
     final NotificationSettings settings = await fcm.requestPermission();
     if (settings.authorizationStatus != AuthorizationStatus.authorized) {
+      print('Notification not authrized');
       return;
     }
-
+    print('Notification not authrized2' );
     final fcmToken = await fcm.getToken();
     if (fcmToken == null) {
       print('fcm token return null value!!');
