@@ -1,13 +1,17 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
+import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/admin/edit_ib_collection_main_page.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
 import 'package:icebr8k/frontend/ib_pages/search_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../../backend/controllers/user_controllers/home_tab_controller.dart';
 
@@ -17,107 +21,175 @@ class HomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: DropdownButtonHideUnderline(
-          child: Obx(
-            () => DropdownButton2(
-              buttonPadding: EdgeInsets.zero,
-              buttonWidth: 120,
-              value: _controller.selectedCategory.value,
-              onChanged: (value) {
-                if (value != null &&
-                    value == _controller.selectedCategory.value) {
-                  return;
-                }
+    return ShowCaseWidget(
+      onComplete: (index, key) {
+        if (key == IbShowCaseKeys.kPollExpandKey) {
+          IbLocalDataService().updateBoolValue(
+              key: StorageKey.pollExpandShowCaseBool, value: true);
+        }
 
-                if (value != null) {
-                  _controller.selectedCategory.value = value as String;
-                } else {
-                  _controller.selectedCategory.value =
-                      _controller.categories[1];
-                }
-                _controller.onRefresh(refreshStats: true);
-              },
-              items: _controller.categories
-                  .map((e) => DropdownMenuItem<String>(
-                        value: e,
-                        child: Text(
-                          e,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: IbConfig.kPageTitleSize),
-                        ),
-                      ))
-                  .toList(),
-            ),
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Text(
-              '🧊',
-              style: TextStyle(fontSize: 24),
-            ),
-            onPressed: () {
-              Get.to(() => EditIbCollectionMainPage());
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () async {
-              Get.to(() => SearchPage());
-            },
-          ),
-        ],
-        leading: Builder(
-            builder: (context) => IconButton(
-                onPressed: () {
-                  Scaffold.of(context).openDrawer();
-                },
-                icon: const Icon(Icons.menu))),
-      ),
-      drawer: const MenuPage(),
-      body: SafeArea(
-        child: Obx(
-          () => _controller.isLoading.isTrue
-              ? const Center(
-                  child: IbProgressIndicator(),
-                )
-              : SmartRefresher(
-                  enablePullUp: _handlePullUp(),
-                  onRefresh: () async {
-                    await _controller.onRefresh(refreshStats: true);
-                  },
-                  onLoading: () async {
-                    await _controller.loadMore();
-                  },
-                  controller: _controller.refreshController,
-                  child: ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.only(bottom: 16),
-                    controller: _controller.scrollController,
-                    itemBuilder: (context, index) {
-                      if (_controller.selectedCategory.value ==
-                          _controller.categories[1]) {
-                        return IbUtils.handleQuestionType(
-                            _controller.forYourList[index],
-                            expanded: IbUtils.getCurrentUserSettings()
-                                .pollExpandedByDefault);
-                      }
-                      return IbUtils.handleQuestionType(
-                          _controller.trendingList[index],
-                          expanded: IbUtils.getCurrentUserSettings()
-                              .pollExpandedByDefault);
-                    },
-                    itemCount: _controller.selectedCategory.value ==
-                            _controller.categories[1]
-                        ? _controller.forYourList.length
-                        : _controller.trendingList.length,
+        if (key == IbShowCaseKeys.kVoteOptionsKey) {
+          IbLocalDataService().updateBoolValue(
+              key: StorageKey.voteOptionsShowCaseBool, value: true);
+        }
+
+        if (key == IbShowCaseKeys.kIcebreakerKey) {
+          IbLocalDataService().updateBoolValue(
+              key: StorageKey.icebreakerShowCaseBool, value: true);
+        }
+      },
+      builder: Builder(
+          builder: (context) => Scaffold(
+                appBar: AppBar(
+                  title: DropdownButtonHideUnderline(
+                    child: Obx(
+                      () => DropdownButton2(
+                        buttonPadding: EdgeInsets.zero,
+                        buttonWidth: 120,
+                        value: _controller.selectedCategory.value,
+                        onChanged: (value) {
+                          if (value != null &&
+                              value == _controller.selectedCategory.value) {
+                            return;
+                          }
+
+                          if (value != null) {
+                            _controller.selectedCategory.value =
+                                value as String;
+                          } else {
+                            _controller.selectedCategory.value =
+                                _controller.categories[1];
+                          }
+                          if (_controller.isLocked.isFalse) {
+                            _controller.onRefresh(refreshStats: true);
+                          }
+                        },
+                        items: _controller.categories
+                            .map((e) => DropdownMenuItem<String>(
+                                  value: e,
+                                  child: Text(
+                                    e,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: IbConfig.kPageTitleSize),
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                    ),
                   ),
+                  actions: [
+                    Showcase(
+                      key: IbShowCaseKeys.kIcebreakerKey,
+                      overlayOpacity: 0.3,
+                      description: 'Click to view our awesome Icebreakers',
+                      shapeBorder: const CircleBorder(),
+                      child: IconButton(
+                        icon: const Text(
+                          '🧊',
+                          style: TextStyle(fontSize: 24),
+                        ),
+                        onPressed: () {
+                          if (IbUtils.checkFeatureIsLocked()) {
+                            return;
+                          }
+                          Get.to(() => EditIbCollectionMainPage());
+                        },
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () async {
+                        Get.to(() => SearchPage());
+                      },
+                    ),
+                  ],
+                  leading: Builder(
+                      builder: (context) => IconButton(
+                          onPressed: () {
+                            Scaffold.of(context).openDrawer();
+                          },
+                          icon: const Icon(Icons.menu))),
                 ),
-        ),
-      ),
+                drawer: const MenuPage(),
+                body: SafeArea(
+                  child: Obx(() {
+                    if (_controller.isLoading.isTrue) {
+                      return const Center(
+                        child: IbProgressIndicator(),
+                      );
+                    }
+                    if (_controller.isLocked.isTrue &&
+                        _controller.selectedCategory.value == 'Trending') {
+                      return Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                                height: 200,
+                                width: 200,
+                                child: Lottie.asset('assets/images/lock.json')),
+                            const Text.rich(
+                              TextSpan(
+                                  text:
+                                      "Please answer the first eight polls from Icebr8k in ",
+                                  children: [
+                                    TextSpan(
+                                        text: 'For You',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    TextSpan(
+                                        text:
+                                            ' page in order to unlock other features')
+                                  ]),
+                              textAlign: TextAlign.center,
+                            )
+                          ],
+                        ),
+                      );
+                    }
+                    return SmartRefresher(
+                      enablePullUp: _handlePullUp(),
+                      enablePullDown: _controller.isLocked.isFalse,
+                      onRefresh: () async {
+                        await _controller.onRefresh(refreshStats: true);
+                      },
+                      onLoading: () async {
+                        await _controller.loadMore();
+                      },
+                      controller: _controller.refreshController,
+                      child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.only(bottom: 16),
+                        controller: _controller.scrollController,
+                        itemBuilder: (context, index) {
+                          if (_controller.selectedCategory.value ==
+                              _controller.categories[1]) {
+                            return IbUtils.handleQuestionType(
+                                _controller.forYourList[index],
+                                isShowcase: index == 0 &&
+                                    !IbLocalDataService().retrieveBoolValue(
+                                        StorageKey.pollExpandShowCaseBool),
+                                expanded: IbUtils.getCurrentUserSettings()
+                                    .pollExpandedByDefault);
+                          }
+                          return IbUtils.handleQuestionType(
+                              _controller.trendingList[index],
+                              isShowcase: index == 0 &&
+                                  !IbLocalDataService().retrieveBoolValue(
+                                      StorageKey.pollExpandShowCaseBool),
+                              expanded: IbUtils.getCurrentUserSettings()
+                                  .pollExpandedByDefault);
+                        },
+                        itemCount: _controller.selectedCategory.value ==
+                                _controller.categories[1]
+                            ? _controller.forYourList.length
+                            : _controller.trendingList.length,
+                      ),
+                    );
+                  }),
+                ),
+              )),
     );
   }
 

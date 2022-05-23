@@ -6,7 +6,9 @@ import 'package:icebr8k/backend/controllers/user_controllers/circle_settings_con
 import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
+import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_settings.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/friends_picker.dart';
@@ -18,6 +20,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../ib_colors.dart';
 import 'chat_pages/chat_page.dart';
@@ -46,180 +49,197 @@ class _SocialTabState extends State<SocialTab>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text('Social'),
-        ),
-        bottom: TabBar(
-          indicatorSize: TabBarIndicatorSize.tab,
-          isScrollable: true,
-          controller: _tabController,
-          tabs: [
-            Obx(() {
-              int total = 0;
-              for (final item in _controller.circles) {
-                total += item.unReadCount;
-              }
+    return ShowCaseWidget(
+      onComplete: (index, key) {
+        if (key == IbShowCaseKeys.kPeopleNearbyKey) {
+          IbLocalDataService().updateBoolValue(
+              key: StorageKey.peopleNearbyShowCaseBool, value: true);
+        }
+      },
+      builder: Builder(builder: (context) {
+        return Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text('Social'),
+            ),
+            bottom: TabBar(
+              indicatorSize: TabBarIndicatorSize.tab,
+              isScrollable: true,
+              controller: _tabController,
+              tabs: [
+                Obx(() {
+                  int total = 0;
+                  for (final item in _controller.circles) {
+                    total += item.unReadCount;
+                  }
 
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.people),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    const Text('Circles'),
-                    const SizedBox(
-                      width: 4,
-                    ),
-                    if (total > 0)
-                      CircleAvatar(
-                        backgroundColor: IbColors.errorRed,
-                        radius: 10,
-                        child: Text(
-                          total >= 99 ? '99+' : total.toString(),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10,
-                          ),
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.people),
+                        const SizedBox(
+                          width: 8,
                         ),
-                      ),
-                  ],
-                ),
-              );
-            }),
-            Obx(() {
-              int total = 0;
-              for (final item in _controller.oneToOneChats) {
-                total += item.unReadCount;
-              }
+                        const Text('Circles'),
+                        const SizedBox(
+                          width: 4,
+                        ),
+                        if (total > 0)
+                          CircleAvatar(
+                            backgroundColor: IbColors.errorRed,
+                            radius: 10,
+                            child: Text(
+                              total >= 99 ? '99+' : total.toString(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                }),
+                Obx(() {
+                  int total = 0;
+                  for (final item in _controller.oneToOneChats) {
+                    total += item.unReadCount;
+                  }
 
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.chat_rounded),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    const Text('Chats'),
-                    const SizedBox(
-                      width: 4,
-                    ),
-                    if (total > 0)
-                      CircleAvatar(
-                        backgroundColor: IbColors.errorRed,
-                        radius: 10,
-                        child: Text(
-                          total >= 99 ? '99+' : total.toString(),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10,
-                          ),
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.chat_rounded),
+                        const SizedBox(
+                          width: 8,
                         ),
+                        const Text('Chats'),
+                        const SizedBox(
+                          width: 4,
+                        ),
+                        if (total > 0)
+                          CircleAvatar(
+                            backgroundColor: IbColors.errorRed,
+                            radius: 10,
+                            child: Text(
+                              total >= 99 ? '99+' : total.toString(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                }),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.contacts),
+                      SizedBox(
+                        width: 8,
                       ),
-                  ],
-                ),
-              );
-            }),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(Icons.contacts),
-                  SizedBox(
-                    width: 8,
+                      Text('Friends'),
+                    ],
                   ),
-                  Text('Friends'),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            tooltip: 'People Nearby',
-            icon: const Icon(
-              Icons.person_pin_circle_rounded,
-              color: IbColors.errorRed,
-            ),
-            onPressed: () {
-              Get.to(() => PeopleNearbyPage());
-            },
-          ),
-          IconButton(
-            tooltip: 'Search all',
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              Get.to(() => SearchPage());
-            },
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 2),
-        child: TabBarView(
-          controller: _tabController,
-          children: [
-            buildCircle(),
-            buildOneToOneList(),
-            buildFriendList(),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Obx(() {
-          if (_controller.currentIndex.value == 0) {
-            return const Icon(Icons.group_add_outlined);
-          }
-          if (_controller.currentIndex.value == 1) {
-            return const Icon(Icons.message);
-          }
-
-          if (_controller.currentIndex.value == 2) {
-            return const Icon(Icons.person_search);
-          }
-          return const SizedBox();
-        }),
-        onPressed: () async {
-          if (_controller.currentIndex.value == 0) {
-            Get.to(() => CircleSettings(Get.put(CircleSettingsController())),
-                fullscreenDialog: true);
-          } else if (_controller.currentIndex.value == 1) {
-            final users = await Get.to(
-              () => FriendsPicker(
-                Get.put(
-                  IbFriendsPickerController(IbUtils.getCurrentUid()!),
                 ),
-                limit: 1,
-                buttonTxt: 'Add',
+              ],
+            ),
+            actions: [
+              Showcase(
+                overlayOpacity: 0.3,
+                shapeBorder: const CircleBorder(),
+                key: IbShowCaseKeys.kPeopleNearbyKey,
+                description: 'Click here to see people nearby',
+                child: IconButton(
+                  tooltip: 'People Nearby',
+                  icon: const Icon(
+                    Icons.person_pin_circle_rounded,
+                    color: IbColors.errorRed,
+                  ),
+                  onPressed: () {
+                    Get.to(() => PeopleNearbyPage());
+                  },
+                ),
               ),
-            );
-            if (users != null) {
-              final IbUser user = (users as List<IbUser>).first;
-              Get.to(() =>
-                  ChatPage(Get.put(ChatPageController(recipientId: (user.id))
-                    ..title.value = user.username
-                    ..avatarUrl.value = user.avatarUrl)));
-            }
-          } else {
-            Get.to(() => SearchPage());
-          }
-        },
-      ),
+              IconButton(
+                tooltip: 'Search all',
+                icon: const Icon(Icons.search),
+                onPressed: () {
+                  Get.to(() => SearchPage());
+                },
+              ),
+            ],
+          ),
+          body: Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                buildCircle(),
+                buildOneToOneList(),
+                buildFriendList(),
+              ],
+            ),
+          ),
+          floatingActionButton: FloatingActionButton(
+            child: Obx(() {
+              if (_controller.currentIndex.value == 0) {
+                return const Icon(Icons.group_add_outlined);
+              }
+              if (_controller.currentIndex.value == 1) {
+                return const Icon(Icons.message);
+              }
+
+              if (_controller.currentIndex.value == 2) {
+                return const Icon(Icons.person_search);
+              }
+              return const SizedBox();
+            }),
+            onPressed: () async {
+              if (_controller.currentIndex.value == 0) {
+                Get.to(
+                    () => CircleSettings(Get.put(CircleSettingsController())),
+                    fullscreenDialog: true);
+              } else if (_controller.currentIndex.value == 1) {
+                final users = await Get.to(
+                  () => FriendsPicker(
+                    Get.put(
+                      IbFriendsPickerController(IbUtils.getCurrentUid()!),
+                    ),
+                    limit: 1,
+                    buttonTxt: 'Add',
+                  ),
+                );
+                if (users != null) {
+                  final IbUser user = (users as List<IbUser>).first;
+                  Get.to(() => ChatPage(
+                      Get.put(ChatPageController(recipientId: (user.id))
+                        ..title.value = user.username
+                        ..avatarUrl.value = user.avatarUrl)));
+                }
+              } else {
+                Get.to(() => SearchPage());
+              }
+            },
+          ),
+        );
+      }),
     );
   }
 

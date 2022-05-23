@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_stats_controller.dart';
+import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_buttons.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_stats.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_tags.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
 import '../ib_colors.dart';
@@ -42,6 +45,14 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
   @override
   void initState() {
     _prepareAnimations();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget._controller.isShowCase &&
+          !IbLocalDataService()
+              .retrieveBoolValue(StorageKey.pollExpandShowCaseBool)) {
+        ShowCaseWidget.of(IbShowCaseKeys.kPollExpandKey.currentContext!)!
+            .startShowCase([IbShowCaseKeys.kPollExpandKey]);
+      }
+    });
     super.initState();
   }
 
@@ -120,50 +131,71 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
         ),
       ),
     );
-    return IbCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          IbQuestionHeader(widget._controller),
-          const SizedBox(
-            height: 8,
-          ),
-          IbQuestionMediaSlide(widget._controller),
-          IbQuestionInfo(widget._controller),
-          const SizedBox(
-            height: 8,
-          ),
-          SizeTransition(
-            sizeFactor: animation,
-            child: expandableInfo,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return ShowCaseWidget(
+      onComplete: (index, key) {
+        if (key == IbShowCaseKeys.kPollExpandKey) {
+          IbLocalDataService().updateBoolValue(
+              key: StorageKey.pollExpandShowCaseBool, value: true);
+        }
+      },
+      builder: Builder(builder: (context) {
+        return IbCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              IbQuestionStatsBar(widget._controller),
-              IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  widget._controller.rxIsExpanded.value =
-                      !widget._controller.rxIsExpanded.value;
-                },
-                icon: Obx(() {
-                  _runExpandCheck();
-                  return widget._controller.rxIsExpanded.isTrue
-                      ? const Icon(
-                          Icons.expand_less_rounded,
-                          color: IbColors.primaryColor,
-                        )
-                      : const Icon(
-                          Icons.expand_more_outlined,
-                          color: IbColors.primaryColor,
-                        );
-                }),
+              IbQuestionHeader(widget._controller),
+              const SizedBox(
+                height: 8,
+              ),
+              IbQuestionMediaSlide(widget._controller),
+              IbQuestionInfo(widget._controller),
+              const SizedBox(
+                height: 8,
+              ),
+              SizeTransition(
+                sizeFactor: animation,
+                child: expandableInfo,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IbQuestionStatsBar(widget._controller),
+                  Showcase(
+                    key: widget._controller.isShowCase
+                        ? IbShowCaseKeys.kPollExpandKey
+                        : GlobalKey(),
+                    shapeBorder: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8))),
+                    overlayOpacity: 0.3,
+                    description: widget._controller.rxIsExpanded.isTrue
+                        ? 'Click here to minimize'
+                        : 'Click here to see vote options',
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        widget._controller.rxIsExpanded.value =
+                            !widget._controller.rxIsExpanded.value;
+                      },
+                      icon: Obx(() {
+                        _runExpandCheck();
+                        return widget._controller.rxIsExpanded.isTrue
+                            ? const Icon(
+                                Icons.expand_less_rounded,
+                                color: IbColors.primaryColor,
+                              )
+                            : const Icon(
+                                Icons.expand_more_outlined,
+                                color: IbColors.primaryColor,
+                              );
+                      }),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        );
+      }),
     );
   }
 

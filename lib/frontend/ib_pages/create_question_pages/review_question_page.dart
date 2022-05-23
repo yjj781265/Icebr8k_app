@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
-import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
+import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -24,8 +24,9 @@ import '../chat_picker_page.dart';
 class ReviewQuestionPage extends StatelessWidget {
   final CreateQuestionController createQuestionController;
   final IbQuestionItemController itemController;
+  final ScrollController scrollController = ScrollController();
 
-  const ReviewQuestionPage(
+  ReviewQuestionPage(
       {Key? key,
       required this.createQuestionController,
       required this.itemController})
@@ -51,12 +52,14 @@ class ReviewQuestionPage extends StatelessWidget {
         child: ShowCaseWidget(
           onFinish: () {
             IbLocalDataService().updateBoolValue(
-                key: StorageKey.pickAnswerForQuizBool, value: true);
+                key: StorageKey.pickAnswerForQuizShowCaseBool, value: true);
           },
           builder: Builder(
             builder: (context) => Scrollbar(
+              controller: scrollController,
               thumbVisibility: true,
               child: SingleChildScrollView(
+                controller: scrollController,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -151,12 +154,17 @@ class ReviewQuestionPage extends StatelessWidget {
                           value: itemController.rxIbQuestion.value.isQuiz,
                           onChanged: (value) {
                             if (value) {
+                              scrollController.animateTo(0.0,
+                                  curve: Curves.linear,
+                                  duration: const Duration(
+                                      milliseconds:
+                                          IbConfig.kEventTriggerDelayInMillis));
                               itemController.rxIsExpanded.value = true;
                               //give time to animate
                               Future.delayed(const Duration(seconds: 1))
                                   .then((value) {
                                 ShowCaseWidget.of(context)!.startShowCase(
-                                    [IbShowCaseManager.kPickAnswerForQuizKey]);
+                                    [IbShowCaseKeys.kPickAnswerForQuizKey]);
                               });
                             } else {
                               itemController

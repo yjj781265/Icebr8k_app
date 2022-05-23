@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../services/user_services/ib_question_db_service.dart';
 
@@ -11,7 +10,6 @@ class AskedQuestionsController extends GetxController {
   final String uid;
   final isLoading = true.obs;
   final createdQuestions = <IbQuestion>[].obs;
-  final refreshController = RefreshController();
   final bool showPublicOnly;
   DocumentSnapshot? lastDoc;
 
@@ -30,11 +28,6 @@ class AskedQuestionsController extends GetxController {
   }
 
   Future<void> loadMore() async {
-    if (lastDoc == null) {
-      refreshController.loadNoData();
-      return;
-    }
-
     final snapshot = await IbQuestionDbService().queryAskedQuestions(
         uid: uid, lastDoc: lastDoc, publicOnly: showPublicOnly);
     lastDoc = snapshot.size == 0 ? null : snapshot.docs.last;
@@ -43,11 +36,5 @@ class AskedQuestionsController extends GetxController {
       createdQuestions.addIf(
           !createdQuestions.contains(ibQuestion), ibQuestion);
     }
-
-    if (lastDoc == null) {
-      refreshController.loadNoData();
-      return;
-    }
-    refreshController.loadComplete();
   }
 }

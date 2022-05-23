@@ -9,6 +9,7 @@ import '../../ib_utils.dart';
 class AnsweredPage extends StatelessWidget {
   final AnsweredQuestionController _controller;
   final ScrollController _scrollController = ScrollController();
+  final RefreshController _refreshController = RefreshController();
 
   AnsweredPage(this._controller);
 
@@ -27,12 +28,16 @@ class AnsweredPage extends StatelessWidget {
           }
 
           return SmartRefresher(
-            controller: _controller.refreshController,
+            controller: _refreshController,
             scrollController: _scrollController,
             enablePullDown: false,
             enablePullUp: true,
             onLoading: () async {
+              if (_controller.lastDoc == null) {
+                _refreshController.loadNoData();
+              }
               await _controller.loadMore();
+              _refreshController.loadComplete();
             },
             child: ListView.builder(
               controller: _scrollController,

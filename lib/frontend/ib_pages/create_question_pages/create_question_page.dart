@@ -55,7 +55,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
     return ShowCaseWidget(
       onFinish: () {
         IbLocalDataService().updateBoolValue(
-            key: StorageKey.pickTagForQuestionBool, value: true);
+            key: StorageKey.pickTagForQuestionShowCaseBool, value: true);
       },
       builder: Builder(
         builder: (context) => Scaffold(

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
+import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -14,12 +15,16 @@ import 'main_page_controller.dart';
 /// controller for Question tab in Homepage
 class HomeTabController extends GetxController {
   double _lastOffset = 0;
+  late StreamSubscription first8Sub;
   final double hideShowNavBarSensitivity = 10;
   bool canHideNavBar = true;
   final trendingList = <IbQuestion>[].obs;
   final forYourList = <IbQuestion>[].obs;
+  final first8List = <IbQuestion>[].obs;
+  final first8Map = <String, bool>{};
   final categories = ['Trending', 'For You'];
-  final selectedCategory = 'Trending'.obs;
+  final selectedCategory = 'For You'.obs;
+  final isLocked = true.obs;
   final isLoading = true.obs;
 
   DocumentSnapshot<Map<String, dynamic>>? lastFriendQuestionDoc;
@@ -27,7 +32,7 @@ class HomeTabController extends GetxController {
   DocumentSnapshot<Map<String, dynamic>>? lastTrendingDoc;
   RefreshController refreshController = RefreshController();
 
-  late StreamSubscription ibUserSub;
+  StreamSubscription? ibUserSub;
   ScrollController scrollController = ScrollController();
 
   @override
@@ -47,17 +52,59 @@ class HomeTabController extends GetxController {
       _lastOffset = scrollController.offset;
     });
 
-    await onRefresh();
-    isLoading.value = false;
+    determineFeatureIsLocked().then((value) async => {await onRefresh()});
   }
 
   Future<void> onRefresh({bool refreshStats = false}) async {
     Get.find<MainPageController>().showNavBar();
+    if (isLocked.isTrue) {
+      return;
+    }
+
     if (selectedCategory.value == categories[0]) {
       await _loadTrending(refreshStats: refreshStats);
     } else {
       await _loadForYou(refreshStats: refreshStats);
     }
+  }
+
+  Future<void> determineFeatureIsLocked() async {
+    Get.find<MainPageController>().showNavBar();
+    forYourList.clear();
+    first8List.value = await IbQuestionDbService().queryFirst8();
+    for (final q in first8List) {
+      final flag = await IbQuestionDbService()
+          .isQuestionAnswered(uid: IbUtils.getCurrentUid()!, questionId: q.id);
+      first8Map[q.id] = flag;
+      if (!flag) {
+        forYourList.add(q);
+      }
+    }
+    isLocked.value = first8Map.length == 8 && first8Map.values.contains(false);
+    if (isLocked.isTrue) {
+      first8Sub = IbQuestionDbService()
+          .listenToUseAnsweredQuestionsChange(IbUtils.getCurrentUid()!)
+          .listen((event) async {
+        for (final docChange in event.docChanges) {
+          if (docChange.type == DocumentChangeType.added) {
+            if (docChange.doc.data() != null) {
+              final IbAnswer answer = IbAnswer.fromJson(docChange.doc.data()!);
+              if (first8Map.containsKey(answer.questionId)) {
+                first8Map[answer.questionId] = true;
+              }
+            }
+          }
+        }
+
+        isLocked.value =
+            first8Map.length == 8 && first8Map.values.contains(false);
+        print('determineFeatureIsLocked stream $isLocked');
+        if (isLocked.isFalse) {
+          await first8Sub.cancel();
+        }
+      });
+    }
+    isLoading.value = false;
   }
 
   Future<void> _loadTrending({bool refreshStats = false}) async {

@@ -56,6 +56,11 @@ enum StorageKey {
   isLocSharingOnBool,
   loginEmailString,
   recentSearchStringArr,
-  pickAnswerForQuizBool,
-  pickTagForQuestionBool,
+  pickAnswerForQuizShowCaseBool,
+  pickTagForQuestionShowCaseBool,
+  pollExpandShowCaseBool,
+  voteOptionsShowCaseBool,
+  icebreakerShowCaseBool,
+  peopleNearbyShowCaseBool,
+  peopleNearbyIntro,
 }

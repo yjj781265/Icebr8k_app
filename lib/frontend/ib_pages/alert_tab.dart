@@ -33,7 +33,6 @@ class AlertTab extends StatelessWidget {
                 child: Text('Alert'),
               ),
               bottom: TabBar(
-                isScrollable: true,
                 indicatorSize: TabBarIndicatorSize.tab,
                 tabs: [
                   Obx(() {
@@ -43,6 +42,7 @@ class AlertTab extends StatelessWidget {
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Icon(Icons.notifications),
                           const SizedBox(
@@ -78,6 +78,7 @@ class AlertTab extends StatelessWidget {
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Icon(Icons.group_add),
                           const SizedBox(

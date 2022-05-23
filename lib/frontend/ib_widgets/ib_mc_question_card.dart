@@ -6,7 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_stats_controller.dart';
-import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
+import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
@@ -44,6 +44,15 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   @override
   void initState() {
     _prepareAnimations();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget._controller.isShowCase &&
+          !IbLocalDataService()
+              .retrieveBoolValue(StorageKey.pollExpandShowCaseBool)) {
+        print('hello');
+        ShowCaseWidget.of(IbShowCaseKeys.kPollExpandKey.currentContext!)!
+            .startShowCase([IbShowCaseKeys.kPollExpandKey]);
+      }
+    });
     super.initState();
   }
 
@@ -143,48 +152,69 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
         ),
       ),
     );
-    return IbCard(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          IbQuestionHeader(widget._controller),
-          const SizedBox(
-            height: 8,
-          ),
-          IbQuestionMediaSlide(widget._controller),
-          IbQuestionInfo(widget._controller),
-          SizeTransition(
-            sizeFactor: animation,
-            child: expandableInfo,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return ShowCaseWidget(
+      onComplete: (index, key) {
+        if (key == IbShowCaseKeys.kPollExpandKey) {
+          IbLocalDataService().updateBoolValue(
+              key: StorageKey.pollExpandShowCaseBool, value: true);
+        }
+      },
+      builder: Builder(builder: (context) {
+        return IbCard(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              IbQuestionStatsBar(widget._controller),
-              IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  widget._controller.rxIsExpanded.value =
-                      !widget._controller.rxIsExpanded.value;
-                },
-                icon: Obx(() {
-                  _runExpandCheck();
-                  return widget._controller.rxIsExpanded.isTrue
-                      ? const Icon(
-                          Icons.expand_less_rounded,
-                          color: IbColors.primaryColor,
-                        )
-                      : const Icon(
-                          Icons.expand_more_outlined,
-                          color: IbColors.primaryColor,
-                        );
-                }),
+              IbQuestionHeader(widget._controller),
+              const SizedBox(
+                height: 8,
+              ),
+              IbQuestionMediaSlide(widget._controller),
+              IbQuestionInfo(widget._controller),
+              SizeTransition(
+                sizeFactor: animation,
+                child: expandableInfo,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IbQuestionStatsBar(widget._controller),
+                  Showcase(
+                    key: widget._controller.isShowCase
+                        ? IbShowCaseKeys.kPollExpandKey
+                        : GlobalKey(),
+                    shapeBorder: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8))),
+                    overlayOpacity: 0.3,
+                    description: widget._controller.rxIsExpanded.isTrue
+                        ? 'Click here to minimize'
+                        : 'Click here to see vote options',
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        widget._controller.rxIsExpanded.value =
+                            !widget._controller.rxIsExpanded.value;
+                      },
+                      icon: Obx(() {
+                        _runExpandCheck();
+                        return widget._controller.rxIsExpanded.isTrue
+                            ? const Icon(
+                                Icons.expand_less_rounded,
+                                color: IbColors.primaryColor,
+                              )
+                            : const Icon(
+                                Icons.expand_more_outlined,
+                                color: IbColors.primaryColor,
+                              );
+                      }),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        );
+      }),
     );
   }
 
@@ -464,13 +494,13 @@ class IbQuestionMcItem extends StatelessWidget {
     );
     if (_controller.rxIbQuestion.value.choices.indexOf(choice) == 0 &&
         !IbLocalDataService()
-            .retrieveBoolValue(StorageKey.pickAnswerForQuizBool)) {
+            .retrieveBoolValue(StorageKey.pickAnswerForQuizShowCaseBool)) {
       //show showcase widget
       return Expanded(
         child: Showcase(
           overlayColor: Colors.transparent,
           shapeBorder: const CircleBorder(),
-          key: IbShowCaseManager.kPickAnswerForQuizKey,
+          key: IbShowCaseKeys.kPickAnswerForQuizKey,
           description: 'show_case_quiz'.tr,
           child: radio,
         ),
@@ -481,23 +511,19 @@ class IbQuestionMcItem extends StatelessWidget {
   }
 
   void onItemTap() {
-    print('onItemTap');
     if (_controller.rxIbQuestion.value.isQuiz && _controller.voted.isTrue) {
-      print('onItemTap2');
       return;
     }
 
     if (DateTime.now().millisecondsSinceEpoch >
             _controller.rxIbQuestion.value.endTimeInMs &&
         _controller.rxIbQuestion.value.endTimeInMs > 0) {
-      print('onItemTap3');
       return;
     }
 
     if (_controller.rxIsSample.isTrue ||
         (_controller.myAnswer != null &&
             _controller.myAnswer!.uid != IbUtils.getCurrentUid())) {
-      print('onItemTap4');
       return;
     }
 
@@ -506,6 +532,5 @@ class IbQuestionMcItem extends StatelessWidget {
     } else {
       _controller.selectedChoiceId.value = choice.choiceId;
     }
-    print('onItemTap5');
   }
 }

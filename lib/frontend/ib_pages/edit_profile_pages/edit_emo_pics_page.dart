@@ -35,36 +35,42 @@ class EditEmoPicsPage extends StatelessWidget {
                   child: ReorderableWrap(
                     footer: _controller.rxEmoPics.length >= IbConfig.kMaxEmoPic
                         ? null
-                        : IbEmoPicCard(
-                            emoPic: IbEmoPic(
-                              url: '',
-                              id: '',
-                              emoji: '',
+                        : SizedBox(
+                            width: Get.width / 2 - 8,
+                            child: IbEmoPicCard(
+                              emoPic: IbEmoPic(
+                                url: '',
+                                id: '',
+                                emoji: '',
+                              ),
+                              ignoreOnDoubleTap: true,
+                              onTap: () {
+                                Get.to(
+                                  () => EditEmoPicDetailPage(
+                                      IbEmoPic(
+                                        url: '',
+                                        id: IbUtils.getUniqueId(),
+                                        emoji: '',
+                                      ),
+                                      _controller),
+                                );
+                              },
                             ),
-                            ignoreOnDoubleTap: true,
-                            onTap: () {
-                              Get.to(
-                                () => EditEmoPicDetailPage(
-                                    IbEmoPic(
-                                      url: '',
-                                      id: IbUtils.getUniqueId(),
-                                      emoji: '',
-                                    ),
-                                    _controller),
-                              );
-                            },
                           ),
                     runAlignment: WrapAlignment.center,
                     children: _controller.rxEmoPics
                         .map((e) => Stack(
                               clipBehavior: Clip.none,
                               children: [
-                                IbEmoPicCard(
-                                  emoPic: e,
-                                  onTap: () {
-                                    Get.to(() =>
-                                        EditEmoPicDetailPage(e, _controller));
-                                  },
+                                SizedBox(
+                                  width: Get.width / 2 - 8,
+                                  child: IbEmoPicCard(
+                                    emoPic: e,
+                                    onTap: () {
+                                      Get.to(() =>
+                                          EditEmoPicDetailPage(e, _controller));
+                                    },
+                                  ),
                                 ),
                                 Positioned(
                                     top: 0,

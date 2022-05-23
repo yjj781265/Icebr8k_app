@@ -178,6 +178,9 @@ class _MenuPageState extends State<MenuPage> {
                               fontWeight: FontWeight.bold),
                         ),
                         onTap: () {
+                          if (IbUtils.checkFeatureIsLocked()) {
+                            return;
+                          }
                           Get.to(() => PeopleNearbyPage());
                         },
                       ),

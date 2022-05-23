@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/managers/ib_show_case_manager.dart';
+import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_tag_picker.dart';
@@ -27,7 +27,7 @@ class IbMediaBar extends StatelessWidget {
         children: [
           Obx(() {
             return Showcase(
-              key: IbShowCaseManager.kPickTagForQuestionKey,
+              key: IbShowCaseKeys.kPickTagForQuestionKey,
               shapeBorder: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(8))),
               description: 'show_case_tag'.tr,

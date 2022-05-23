@@ -5,12 +5,15 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
+import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
+import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_pages/alert_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/my_profile_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:move_to_background/move_to_background.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../../backend/controllers/user_controllers/social_tab_controller.dart';
 import '../ib_colors.dart';
@@ -94,7 +97,10 @@ class _MainPageViewState extends State<MainPageView>
         containerHeight: _mainPageController.isNavBarVisible.isTrue ? 80 : 0,
         selectedIndex: _mainPageController.currentIndex.value,
         onItemSelected: (index) async {
-          _mainPageController.currentIndex.value = index;
+          if (index != 0 && index != 4 && IbUtils.checkFeatureIsLocked()) {
+            return;
+          }
+
           if (index == 2) {
             Get.to(
                 () => CreateQuestionPage(
@@ -105,6 +111,23 @@ class _MainPageViewState extends State<MainPageView>
                 transition: Transition.zoom);
             return;
           }
+
+          if (index == 0 &&
+              !IbLocalDataService()
+                  .retrieveBoolValue(StorageKey.icebreakerShowCaseBool) &&
+              IbShowCaseKeys.kIcebreakerKey.currentContext != null) {
+            ShowCaseWidget.of(IbShowCaseKeys.kIcebreakerKey.currentContext!)!
+                .startShowCase([IbShowCaseKeys.kIcebreakerKey]);
+          }
+          if (index == 1 &&
+              !IbLocalDataService()
+                  .retrieveBoolValue(StorageKey.peopleNearbyShowCaseBool) &&
+              IbShowCaseKeys.kPeopleNearbyKey.currentContext != null) {
+            ShowCaseWidget.of(IbShowCaseKeys.kPeopleNearbyKey.currentContext!)!
+                .startShowCase([IbShowCaseKeys.kPeopleNearbyKey]);
+          }
+
+          _mainPageController.currentIndex.value = index;
 
           if (index == 4) {
             final NotificationController controller = Get.find();

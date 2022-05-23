@@ -41,6 +41,19 @@ class IbQuestionDbService {
     await _collectionRef.doc(question.id).delete();
   }
 
+  Future<List<IbQuestion>> queryFirst8() async {
+    final snapshot = await _collectionRef
+        .where('creatorId', isEqualTo: 'y79vjfa5yUTN5kFRNf9uSWS7ZOs1')
+        .limit(8)
+        .orderBy('askedTimeInMs', descending: false)
+        .get();
+    if (snapshot.size == 0) {
+      return [];
+    }
+
+    return snapshot.docs.map((e) => IbQuestion.fromJson(e.data())).toList();
+  }
+
   /// retrieve single IbQuestion and cache locally via IbCacheManager
   Future<IbQuestion?> querySingleQuestion(String questionId) async {
     print('querySingleQuestion $questionId');
@@ -133,6 +146,24 @@ class IbQuestionDbService {
           .collectionGroup(_kAnswerCollectionGroup)
           .where('uid', isEqualTo: uid)
           .where('isAnonymous', isEqualTo: false)
+          .startAfterDocument(lastDoc);
+    }
+
+    return query.snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>>
+      listenToUseAnsweredQuestionsChange(String uid,
+          {DocumentSnapshot? lastDoc}) {
+    late Query<Map<String, dynamic>> query;
+    if (lastDoc == null) {
+      query = _db
+          .collectionGroup(_kAnswerCollectionGroup)
+          .where('uid', isEqualTo: uid);
+    } else {
+      query = _db
+          .collectionGroup(_kAnswerCollectionGroup)
+          .where('uid', isEqualTo: uid)
           .startAfterDocument(lastDoc);
     }
 
@@ -373,7 +404,7 @@ class IbQuestionDbService {
         .doc(questionId)
         .collection(_kAnswerCollectionGroup)
         .doc(uid)
-        .get();
+        .get(const GetOptions(source: Source.server));
     return _snapshot.exists;
   }
 

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
+import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../../backend/controllers/user_controllers/comment_controller.dart';
 import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
@@ -15,49 +18,90 @@ class IbQuestionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      return Row(
-        children: [
-          // don't show answer button once user is answered the quiz or poll is closed
-          if (_controller.rxIbQuestion.value.isQuiz &&
-                  _controller.voted.isTrue ||
-              (DateTime.now().millisecondsSinceEpoch >
-                      _controller.rxIbQuestion.value.endTimeInMs &&
-                  _controller.rxIbQuestion.value.endTimeInMs > 0))
-            const SizedBox()
-          else
-            Expanded(
-              child: IbElevatedButton(
-                disabled: _handleVoteButtonDisableState(),
-                onPressed: () async {
-                  await _controller.onVote(
-                      isAnonymous: IbUtils.getCurrentUserSettings()
-                          .voteAnonymousByDefault);
-                },
-                onLongPressed: () async {
-                  await _controller.onVote(
-                      isAnonymous: !IbUtils.getCurrentUserSettings()
-                          .voteAnonymousByDefault);
-                },
-                textTrKey: _handleVoteButtonText(),
-                color: IbColors.primaryColor,
+    return ShowCaseWidget(onComplete: (index, key) {
+      if (key == IbShowCaseKeys.kPollExpandKey) {
+        IbLocalDataService().updateBoolValue(
+            key: StorageKey.pollExpandShowCaseBool, value: true);
+      }
+
+      if (key == IbShowCaseKeys.kVoteOptionsKey) {
+        IbLocalDataService().updateBoolValue(
+            key: StorageKey.voteOptionsShowCaseBool, value: true);
+      }
+
+      if (key == IbShowCaseKeys.kIcebreakerKey) {
+        IbLocalDataService().updateBoolValue(
+            key: StorageKey.icebreakerShowCaseBool, value: true);
+      }
+    }, builder: Builder(builder: (context) {
+      return Obx(() {
+        return Row(
+          children: [
+            // don't show answer button once user is answered the quiz or poll is closed
+            if (_controller.rxIbQuestion.value.isQuiz &&
+                    _controller.voted.isTrue ||
+                (DateTime.now().millisecondsSinceEpoch >
+                        _controller.rxIbQuestion.value.endTimeInMs &&
+                    _controller.rxIbQuestion.value.endTimeInMs > 0))
+              const SizedBox()
+            else
+              Expanded(
+                child: Showcase(
+                  key: _controller.isShowCase
+                      ? IbShowCaseKeys.kVoteOptionsKey
+                      : GlobalKey(),
+                  overlayOpacity: 0.3,
+                  shapeBorder: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8))),
+                  description:
+                      IbUtils.getCurrentUserSettings().voteAnonymousByDefault
+                          ? 'Long press to vote Publicly 📢'
+                          : 'Long press to vote Anonymously 🤫',
+                  child: IbElevatedButton(
+                    disabled: _handleVoteButtonDisableState(),
+                    onPressed: () async {
+                      await _controller.onVote(
+                          isAnonymous: IbUtils.getCurrentUserSettings()
+                              .voteAnonymousByDefault);
+                      if (!IbLocalDataService().retrieveBoolValue(
+                          StorageKey.voteOptionsShowCaseBool)) {
+                        // ignore: use_build_context_synchronously
+                        ShowCaseWidget.of(context)!
+                            .startShowCase([IbShowCaseKeys.kVoteOptionsKey]);
+                      }
+                    },
+                    onLongPressed: () async {
+                      await _controller.onVote(
+                          isAnonymous: !IbUtils.getCurrentUserSettings()
+                              .voteAnonymousByDefault);
+                      if (!IbLocalDataService().retrieveBoolValue(
+                          StorageKey.voteOptionsShowCaseBool)) {
+                        // ignore: use_build_context_synchronously
+                        ShowCaseWidget.of(context)!
+                            .startShowCase([IbShowCaseKeys.kVoteOptionsKey]);
+                      }
+                    },
+                    textTrKey: _handleVoteButtonText(),
+                    color: IbColors.primaryColor,
+                  ),
+                ),
               ),
-            ),
-          if (_controller.rxIbQuestion.value.isCommentEnabled)
-            Expanded(
-              child: IbElevatedButton(
-                disabled: _controller.rxIsSample.isTrue,
-                onPressed: () {
-                  Get.to(() => CommentPage(Get.put(
-                        CommentController(itemController: _controller),
-                      )));
-                },
-                textTrKey: 'comment',
-              ),
-            )
-        ],
-      );
-    });
+            if (_controller.rxIbQuestion.value.isCommentEnabled)
+              Expanded(
+                child: IbElevatedButton(
+                  disabled: _controller.rxIsSample.isTrue,
+                  onPressed: () {
+                    Get.to(() => CommentPage(Get.put(
+                          CommentController(itemController: _controller),
+                        )));
+                  },
+                  textTrKey: 'comment',
+                ),
+              )
+          ],
+        );
+      });
+    }));
   }
 
   String _handleVoteButtonText() {

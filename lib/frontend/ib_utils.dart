@@ -16,6 +16,7 @@ import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_settings.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -729,12 +730,14 @@ class IbUtils {
       List<IbAnswer> ibAnswers = const [],
       bool expanded = false,
       bool isSample = false,
+      bool isShowcase = false,
       IbQuestionItemController? itemController}) {
     if (itemController == null) {
       final tag = uniqueTag ? getUniqueId() : question.id;
       final IbQuestionItemController controller = Get.put(
           IbQuestionItemController(
               ibAnswers: ibAnswers,
+              isShowCase: isShowcase,
               rxIbQuestion: question.obs,
               rxIsExpanded: expanded.obs,
               rxIsSample: isSample.obs),
@@ -784,5 +787,31 @@ class IbUtils {
             .removeWhere((element) => element.id == ibQuestion.id);
       }
     }
+  }
+
+  static bool checkFeatureIsLocked() {
+    final bool isLocked = Get.find<HomeTabController>().isLocked.value;
+    print(isLocked);
+    if (isLocked) {
+      Get.dialog(
+          const IbDialog(
+            title: 'Feature Locked',
+            content: Text.rich(
+              TextSpan(
+                  text: "Please answer all polls from Icebr8k in ",
+                  children: [
+                    TextSpan(
+                        text: 'For You',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(text: ' page in order to unlock other features')
+                  ]),
+              textAlign: TextAlign.start,
+            ),
+            subtitle: '',
+            showNegativeBtn: false,
+          ),
+          barrierDismissible: false);
+    }
+    return isLocked;
   }
 }

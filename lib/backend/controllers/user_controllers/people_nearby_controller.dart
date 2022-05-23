@@ -318,7 +318,16 @@ class PeopleNearbyController extends GetxController {
           .intentions
           .contains(IbUser.kUserIntentionFriendship)
     ];
-    await _determinePosition();
+    Get.dialog(IbDialog(
+      title: 'Welcome',
+      subtitle:
+          'Your people nearby profile only visible to others for 7 days, unless you revisit this page to reset the timer ⌛.',
+      showNegativeBtn: false,
+      onPositiveTap: () async {
+        Get.back();
+        await _determinePosition();
+      },
+    ));
   }
 }
 

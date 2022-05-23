@@ -5,12 +5,10 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../services/user_services/ib_question_db_service.dart';
 
 class AnsweredQuestionController extends GetxController {
-  final refreshController = RefreshController();
   final answeredQs = <IbQuestion>[].obs;
   final isLoading = true.obs;
   DocumentSnapshot? lastDoc;
@@ -37,11 +35,6 @@ class AnsweredQuestionController extends GetxController {
   }
 
   Future<void> loadMore() async {
-    if (lastDoc == null) {
-      refreshController.loadNoData();
-      return;
-    }
-
     final snapshot = await IbQuestionDbService()
         .queryAnsweredQuestions(uid, lastDoc: lastDoc);
     lastDoc = snapshot.size == 0 ? null : snapshot.docs.last;
@@ -55,12 +48,5 @@ class AnsweredQuestionController extends GetxController {
         answeredQs.add(question);
       }
     }
-
-    if (lastDoc == null) {
-      refreshController.loadNoData();
-      return;
-    }
-
-    refreshController.loadComplete();
   }
 }
