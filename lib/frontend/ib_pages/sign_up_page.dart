@@ -198,11 +198,11 @@ class SignUpPage extends GetView<SignUpController> {
               text: 'I have read and agree to the ',
               style: TextStyle(color: Theme.of(context).indicatorColor)),
           TextSpan(
-              text: 'Terms of Service',
+              text: 'Terms & Conditions',
               style: linkStyle,
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
-                  print('Terms of Service"');
+                  Get.to(() => TermAndConditionPage());
                 }),
           TextSpan(
               text: ' and ',

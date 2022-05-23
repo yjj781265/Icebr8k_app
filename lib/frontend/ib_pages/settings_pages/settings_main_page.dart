@@ -88,6 +88,22 @@ class SettingsMainPage extends StatelessWidget {
                 Get.to(() => PrivacyPolicyPage());
               },
             ),
+            ListTile(
+              leading: const Icon(
+                Icons.description,
+                color: IbColors.accentColor,
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              title: const Text(
+                "Terms & Conditions",
+                style: TextStyle(
+                    fontSize: IbConfig.kNormalTextSize,
+                    fontWeight: FontWeight.bold),
+              ),
+              onTap: () {
+                Get.to(() => TermAndConditionPage());
+              },
+            )
           ],
         ));
   }
