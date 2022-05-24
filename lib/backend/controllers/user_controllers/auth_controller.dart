@@ -256,6 +256,8 @@ class AuthController extends GetxService {
             backgroundColor: IbColors.primaryColor,
             isPersistent: true);
         return;
+      } else {
+        Get.closeAllSnackbars();
       }
 
       if (firebaseUser != null && firebaseUser!.emailVerified) {
