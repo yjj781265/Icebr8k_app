@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -258,6 +259,14 @@ class AuthController extends GetxService {
         return;
       } else {
         Get.closeAllSnackbars();
+      }
+
+      final result = await Connectivity().checkConnectivity();
+      if (result == ConnectivityResult.none) {
+        IbUtils.showSimpleSnackBar(
+            msg: 'No Internet Connection',
+            backgroundColor: IbColors.errorRed,
+            isPersistent: true);
       }
 
       if (firebaseUser != null && firebaseUser!.emailVerified) {
