@@ -12,4 +12,8 @@ class IbDbStatusService {
   Stream<DocumentSnapshot<Map<String, dynamic>>> listenToStatus() {
     return _db.collection(_kCollection).doc(DbConfig.dbSuffix).snapshots();
   }
+
+  Future<DocumentSnapshot<Map<String, dynamic>>> queryStatus() {
+    return _db.collection(_kCollection).doc(DbConfig.dbSuffix).get();
+  }
 }

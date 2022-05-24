@@ -101,6 +101,7 @@ class HomeTabController extends GetxController {
         print('determineFeatureIsLocked stream $isLocked');
         if (isLocked.isFalse) {
           await first8Sub.cancel();
+          onRefresh();
         }
       });
     }

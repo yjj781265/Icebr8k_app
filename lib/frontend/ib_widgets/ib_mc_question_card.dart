@@ -107,7 +107,6 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                     : 400,
                 child: Scrollbar(
                   thickness: 3,
-                  thumbVisibility: true,
                   radius: const Radius.circular(8),
                   controller: _scrollController,
                   child: Padding(

@@ -25,9 +25,6 @@ import '../../bindings/home_binding.dart';
 
 class AuthController extends GetxService {
   final isInitializing = true.obs;
-  final isRunning = false.obs;
-  final isOutdated = true.obs;
-  final serverNote = ''.obs;
   late StreamSubscription _fbAuthSub;
   late StreamSubscription _dbStatusSub;
   final isSigningIn = false.obs;
@@ -39,12 +36,12 @@ class AuthController extends GetxService {
   void onInit() {
     super.onInit();
     _dbStatusSub = IbDbStatusService().listenToStatus().listen((event) {
-      isRunning.value = event.data()!['isRunning'] as bool;
-      serverNote.value = event.data()!['note'] as String;
-      final double minV = event.data()!['min_v'] as double;
-      isOutdated.value = IbConfig.kVersion < minV;
-      if (isOutdated.isTrue) {
-        Get.offAll(() => WelcomePage());
+      final isRunning = event.data()!['isRunning'] as bool;
+      final note = event.data()!['note'] as String;
+      final minV = event.data()!['min_v'] as double;
+      final isOutdated = IbConfig.kVersion < minV;
+      if (isOutdated) {
+        Get.offAll(() => WelcomePage(), transition: Transition.noTransition);
         Get.dialog(
             const IbDialog(
               title: 'App Outdated',
@@ -55,13 +52,15 @@ class AuthController extends GetxService {
         return;
       }
 
-      if (isRunning.isFalse) {
+      if (!isRunning) {
         Get.offAll(() => WelcomePage());
         IbUtils.showSimpleSnackBar(
-            msg: serverNote.value,
+            msg: note,
             backgroundColor: IbColors.primaryColor,
             isPersistent: true);
         return;
+      } else {
+        Get.closeAllSnackbars();
       }
     });
 
@@ -89,6 +88,7 @@ class AuthController extends GetxService {
   void onClose() {
     super.onClose();
     _fbAuthSub.cancel();
+    _dbStatusSub.cancel();
     print('auth controller onClose');
   }
 
@@ -231,8 +231,14 @@ class AuthController extends GetxService {
 
   Future<void> _navigateToCorrectPage() async {
     try {
-      if (isOutdated.isTrue) {
-        Get.offAll(() => WelcomePage());
+      final statusSnap = await IbDbStatusService().queryStatus();
+      final isRunning = statusSnap.data()!['isRunning'] as bool;
+      final note = statusSnap.data()!['note'] as String;
+      final minV = statusSnap.data()!['min_v'] as double;
+      final isOutdated = IbConfig.kVersion < minV;
+
+      if (isOutdated) {
+        Get.offAll(() => WelcomePage(), transition: Transition.noTransition);
         Get.dialog(
             const IbDialog(
               title: 'App Outdated',
@@ -243,10 +249,10 @@ class AuthController extends GetxService {
         return;
       }
 
-      if (isRunning.isFalse) {
+      if (!isRunning) {
         Get.offAll(() => WelcomePage());
         IbUtils.showSimpleSnackBar(
-            msg: serverNote.value,
+            msg: note,
             backgroundColor: IbColors.primaryColor,
             isPersistent: true);
         return;
