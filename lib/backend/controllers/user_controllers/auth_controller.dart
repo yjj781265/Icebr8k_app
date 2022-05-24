@@ -6,13 +6,16 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/setup_controller.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_auth_service.dart';
+import 'package:icebr8k/backend/services/user_services/ib_db_status_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/admin/admin_main_page.dart';
 import 'package:icebr8k/frontend/admin/role_select_page.dart';
+import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_one.dart';
 import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
@@ -22,7 +25,11 @@ import '../../bindings/home_binding.dart';
 
 class AuthController extends GetxService {
   final isInitializing = true.obs;
+  final isRunning = false.obs;
+  final isOutdated = true.obs;
+  final serverNote = ''.obs;
   late StreamSubscription _fbAuthSub;
+  late StreamSubscription _dbStatusSub;
   final isSigningIn = false.obs;
   final isSigningUp = false.obs;
   User? firebaseUser;
@@ -31,6 +38,33 @@ class AuthController extends GetxService {
   @override
   void onInit() {
     super.onInit();
+    _dbStatusSub = IbDbStatusService().listenToStatus().listen((event) {
+      isRunning.value = event.data()!['isRunning'] as bool;
+      serverNote.value = event.data()!['note'] as String;
+      final double minV = event.data()!['min_v'] as double;
+      isOutdated.value = IbConfig.kVersion < minV;
+      if (isOutdated.isTrue) {
+        Get.offAll(() => WelcomePage());
+        Get.dialog(
+            const IbDialog(
+              title: 'App Outdated',
+              subtitle: 'Please update your app to the latest version',
+              showNegativeBtn: false,
+            ),
+            barrierDismissible: false);
+        return;
+      }
+
+      if (isRunning.isFalse) {
+        Get.offAll(() => WelcomePage());
+        IbUtils.showSimpleSnackBar(
+            msg: serverNote.value,
+            backgroundColor: IbColors.primaryColor,
+            isPersistent: true);
+        return;
+      }
+    });
+
     _fbAuthSub = _ibAuthService.listenToAuthStateChanges().listen((user) async {
       if (user == null) {
         firebaseUser = null;
@@ -197,6 +231,27 @@ class AuthController extends GetxService {
 
   Future<void> _navigateToCorrectPage() async {
     try {
+      if (isOutdated.isTrue) {
+        Get.offAll(() => WelcomePage());
+        Get.dialog(
+            const IbDialog(
+              title: 'App Outdated',
+              subtitle: 'Please update your app to the latest version',
+              showNegativeBtn: false,
+            ),
+            barrierDismissible: false);
+        return;
+      }
+
+      if (isRunning.isFalse) {
+        Get.offAll(() => WelcomePage());
+        IbUtils.showSimpleSnackBar(
+            msg: serverNote.value,
+            backgroundColor: IbColors.primaryColor,
+            isPersistent: true);
+        return;
+      }
+
       if (firebaseUser != null && firebaseUser!.emailVerified) {
         final IbUser? ibUser =
             await IbUserDbService().queryIbUser(firebaseUser!.uid);

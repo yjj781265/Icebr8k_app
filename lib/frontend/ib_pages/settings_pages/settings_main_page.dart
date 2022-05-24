@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/db_config.dart';
 import 'package:icebr8k/frontend/ib_pages/settings_pages/settings_notification_page.dart';
 import 'package:icebr8k/frontend/ib_pages/settings_pages/settings_poll_page.dart';
 
@@ -65,7 +66,8 @@ class SettingsMainPage extends StatelessWidget {
                 showAboutDialog(
                     context: context,
                     applicationName: 'Icebr8k',
-                    applicationVersion: IbConfig.kVersion,
+                    applicationVersion:
+                        '${IbConfig.kVersion.toString()} ${DbConfig.dbSuffix}',
                     applicationIcon: SizedBox(
                         height: 80,
                         width: 80,

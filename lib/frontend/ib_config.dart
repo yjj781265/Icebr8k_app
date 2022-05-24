@@ -1,5 +1,3 @@
-import 'package:icebr8k/backend/db_config.dart';
-
 class IbConfig {
   static const double kLoadingIndicatorSize = 40;
   static const double kAppLogoSize = 96;
@@ -46,7 +44,7 @@ class IbConfig {
   static const int kCircleMaxMembers = 88;
   static const String kDefaultCoverPhotoUrl =
       'https://firebasestorage.googleapis.com/v0/b/icebr8k-flutter.appspot.com/o/images%2Fheader_img.jpg?alt=media&token=070dea5e-269a-467c-acb8-35ba7a5fde39';
-  static const String kVersion = '0.1.1${DbConfig.dbSuffix}';
+  static const double kVersion = 0.1;
 
   IbConfig._();
 }

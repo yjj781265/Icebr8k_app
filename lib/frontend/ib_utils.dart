@@ -325,8 +325,12 @@ class IbUtils {
     return Get.find<AuthController>().firebaseUser;
   }
 
+  static void showPersistentSnackBar() {}
+
   static void showSimpleSnackBar(
-      {required String msg, required Color backgroundColor}) {
+      {required String msg,
+      required Color backgroundColor,
+      bool isPersistent = false}) {
     Widget icon = const SizedBox();
     if (backgroundColor == IbColors.primaryColor) {
       icon = Icon(
@@ -352,7 +356,8 @@ class IbUtils {
       snackPosition: SnackPosition.TOP,
       borderRadius: IbConfig.kCardCornerRadius,
       margin: const EdgeInsets.only(left: 8, right: 8, top: 16),
-      duration: const Duration(seconds: 2),
+      duration:
+          isPersistent ? const Duration(days: 999) : const Duration(seconds: 2),
       backgroundColor: Theme.of(Get.context!).backgroundColor,
       messageText: Text(
         msg,
