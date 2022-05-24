@@ -19,7 +19,7 @@ class AskedPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Questions Asked'),
+        title: const Text('My Poll(s)'),
       ),
       body: SafeArea(
         child: Obx(() {

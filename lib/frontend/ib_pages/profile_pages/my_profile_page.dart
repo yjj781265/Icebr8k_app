@@ -21,6 +21,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_persistent_header.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_profile_stats.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_snippet_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../../backend/controllers/user_controllers/answered_question_controller.dart';
@@ -39,12 +40,9 @@ import 'friend_list.dart';
 class MyProfilePage extends StatelessWidget {
   final bool showBackButton;
   final MainPageController _controller = Get.find();
-  final RefreshController _askedRefreshController = RefreshController();
+
   final MyProfileController _myProfileController =
       Get.put(MyProfileController());
-  final AskedQuestionsController _askedQuestionsController = Get.put(
-      AskedQuestionsController(IbUtils.getCurrentUid()!, showPublicOnly: false),
-      tag: IbUtils.getCurrentUid());
   MyProfilePage({this.showBackButton = true});
 
   @override
@@ -265,22 +263,33 @@ class MyProfilePage extends StatelessWidget {
             () => IbProfileStats(
               number: _controller.rxCurrentIbUser.value.answeredCount,
               onTap: () {
+                if (_controller.rxCurrentIbUser.value.answeredCount == 0) {
+                  return;
+                }
                 Get.to(() => AnsweredPage(Get.put(AnsweredQuestionController(
                     _controller.rxCurrentIbUser.value.id))));
               },
-              subText: '✅ Vote(s)',
+              subText: '✅ VOTE(S)',
             ),
           ),
           Obx(() => IbProfileStats(
-              number: _askedQuestionsController.createdQuestions.length,
+              number: _myProfileController.asks.length,
               onTap: () {
-                Get.to(() => AskedPage(_askedQuestionsController));
+                if (_myProfileController.asks.isEmpty) {
+                  return;
+                }
+                Get.to(() => AskedPage(Get.put(AskedQuestionsController(
+                    IbUtils.getCurrentUid()!,
+                    showPublicOnly: false))));
               },
-              subText: "✋ ASKED")),
+              subText: "✋ POLL(S)")),
           Obx(
             () => IbProfileStats(
                 number: _controller.rxCurrentIbUser.value.friendUids.length,
                 onTap: () {
+                  if (_controller.rxCurrentIbUser.value.friendUids.isEmpty) {
+                    return;
+                  }
                   Get.to(() => FriendList(Get.put(
                       FriendListController(_controller.rxCurrentIbUser.value),
                       tag: _controller.rxCurrentIbUser.value.id)));
@@ -291,6 +300,9 @@ class MyProfilePage extends StatelessWidget {
             () => IbProfileStats(
                 number: _controller.rxCurrentIbUser.value.tags.length,
                 onTap: () {
+                  if (_controller.rxCurrentIbUser.value.tags.isEmpty) {
+                    return;
+                  }
                   Get.to(() => FollowedTagsPage(
                       _controller.rxCurrentIbUser.value.tags,
                       _controller.rxCurrentIbUser.value.username));
@@ -301,6 +313,9 @@ class MyProfilePage extends StatelessWidget {
             () => IbProfileStats(
                 number: _myProfileController.circles.length,
                 onTap: () {
+                  if (_myProfileController.circles.isEmpty) {
+                    return;
+                  }
                   Get.to(() => CirclesPage(_myProfileController.circles));
                 },
                 subText: "⭕ CIRCLE(S)"),
@@ -419,30 +434,46 @@ class MyProfilePage extends StatelessWidget {
   }
 
   Widget _askedTab() {
-    return Obx(
-      () => SmartRefresher(
-        controller: _askedRefreshController,
+    return Obx(() {
+      if (_myProfileController.asks.isEmpty) {
+        return SingleChildScrollView(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: Lottie.asset('assets/images/koala.json')),
+              ),
+            ),
+            const Text(
+              "I don't have any polls yet",
+              textAlign: TextAlign.center,
+            )
+          ]),
+        );
+      }
+
+      return SmartRefresher(
+        controller: _myProfileController.askedRefreshController,
         enablePullDown: false,
-        enablePullUp: _askedQuestionsController.createdQuestions.length >=
-            IbConfig.kPerPage,
+        enablePullUp: _myProfileController.asks.length >= IbConfig.kPerPage,
         onLoading: () async {
-          if (_askedQuestionsController.lastDoc == null) {
-            _askedRefreshController.loadNoData();
-            return;
-          }
-          await _askedQuestionsController.loadMore();
-          _askedRefreshController.loadComplete();
+          await _myProfileController.onLoadMore();
         },
         child: SingleChildScrollView(
-          child: StaggeredGrid.count(
-            crossAxisCount: 3,
-            children: _askedQuestionsController.createdQuestions
-                .map((element) => IbQuestionSnippetCard(element))
-                .toList(),
+          child: Obx(
+            () => StaggeredGrid.count(
+              crossAxisCount: 3,
+              children: _myProfileController.asks
+                  .map((element) => IbQuestionSnippetCard(element))
+                  .toList(),
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _userInfo() {

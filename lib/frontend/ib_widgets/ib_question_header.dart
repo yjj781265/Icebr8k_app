@@ -165,29 +165,20 @@ class IbQuestionHeader extends StatelessWidget {
                 IbUtils.getCurrentUid() &&
             _itemController.showComparison.isFalse)
           ListTile(
-            onTap: () async {
-              Get.back();
-              await _itemController.deleteQuestion();
+            onTap: () {
+              IbUtils.showSimpleSnackBar(
+                  msg: 'Report system is will be available in the next release',
+                  backgroundColor: IbColors.primaryColor);
             },
             leading: const Icon(
-              Icons.delete,
+              Icons.report,
               color: IbColors.errorRed,
             ),
             title: const Text(
-              "Delete",
+              "Report",
               style: TextStyle(color: IbColors.errorRed),
             ),
           ),
-        const ListTile(
-          leading: Icon(
-            Icons.report,
-            color: IbColors.errorRed,
-          ),
-          title: Text(
-            "Report",
-            style: TextStyle(color: IbColors.errorRed),
-          ),
-        ),
         const Spacer(),
         SizedBox(
             width: double.infinity,

@@ -170,6 +170,25 @@ class IbQuestionDbService {
     return query.snapshots();
   }
 
+  Stream<QuerySnapshot<Map<String, dynamic>>> listenToAskedQuestions(String uid,
+      {DocumentSnapshot? lastDoc}) {
+    late Query<Map<String, dynamic>> query;
+    if (lastDoc == null) {
+      query = _collectionRef
+          .where('creatorId', isEqualTo: uid)
+          .orderBy('askedTimeInMs')
+          .limit(IbConfig.kPerPage);
+    } else {
+      query = _collectionRef
+          .where('creatorId', isEqualTo: uid)
+          .orderBy('askedTimeInMs')
+          .limit(IbConfig.kPerPage)
+          .startAfterDocument(lastDoc);
+    }
+
+    return query.snapshots();
+  }
+
   Stream<QuerySnapshot<Map<String, dynamic>>> listenToComments(
       String questionId,
       {DocumentSnapshot? lastDoc}) {

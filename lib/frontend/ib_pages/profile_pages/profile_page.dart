@@ -32,6 +32,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_profile_stats.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../../backend/controllers/user_controllers/word_cloud_controller.dart';
@@ -471,7 +472,7 @@ class ProfilePage extends StatelessWidget {
               ),
             );
           },
-          subText: '✋ ASKED')),
+          subText: '✋ POLL(S)')),
       Obx(() => IbProfileStats(
           number: _controller.rxIbUser.value.friendUids.length,
           onTap: () {
@@ -598,8 +599,28 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _askedTab() {
-    return Obx(
-      () => SmartRefresher(
+    return Obx(() {
+      if (_controller.askedQuestionsController.createdQuestions.isEmpty) {
+        return SingleChildScrollView(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: Lottie.asset('assets/images/koala.json')),
+              ),
+            ),
+            const Text(
+              "I don't have any polls yet",
+              textAlign: TextAlign.center,
+            )
+          ]),
+        );
+      }
+
+      return SmartRefresher(
         controller: _askedRefreshController,
         enablePullDown: false,
         enablePullUp:
@@ -621,8 +642,8 @@ class ProfilePage extends StatelessWidget {
                 .toList(),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _actions() {

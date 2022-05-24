@@ -17,7 +17,7 @@ class AnsweredPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Questions Answered'),
+        title: const Text('My Vote(s)'),
       ),
       body: SafeArea(
         child: Obx(() {
