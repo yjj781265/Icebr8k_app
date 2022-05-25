@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 
 import '../ib_colors.dart';
 import '../ib_config.dart';
@@ -20,9 +21,9 @@ class IbLinearIndicator extends StatelessWidget {
               borderRadius: const BorderRadius.all(
                   Radius.circular(IbConfig.kScrollbarCornerRadius)),
               child: LinearProgressIndicator(
-                color: _handleIndicatorColor(endValue),
+                color: IbUtils.handleIndicatorColor(endValue),
                 backgroundColor: IbColors.lightGrey,
-                minHeight: 5,
+                minHeight: 8,
                 value: endValue,
               ),
             ),
@@ -33,7 +34,8 @@ class IbLinearIndicator extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Text(
                   '${(endValue * 100).toInt()}%',
-                  style: TextStyle(color: _handleIndicatorColor(endValue)),
+                  style:
+                      TextStyle(color: IbUtils.handleIndicatorColor(endValue)),
                 )),
           )
         ],
@@ -54,9 +56,9 @@ class IbLinearIndicator extends StatelessWidget {
                   borderRadius: const BorderRadius.all(
                       Radius.circular(IbConfig.kScrollbarCornerRadius)),
                   child: LinearProgressIndicator(
-                    color: _handleIndicatorColor(value),
+                    color: IbUtils.handleIndicatorColor(value),
                     backgroundColor: IbColors.lightGrey,
-                    minHeight: 5,
+                    minHeight: 8,
                     value: value,
                   ),
                 ),
@@ -67,39 +69,13 @@ class IbLinearIndicator extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Text(
                     '${(value * 100).toInt()}%',
-                    style: TextStyle(color: _handleIndicatorColor(value)),
+                    style:
+                        TextStyle(color: IbUtils.handleIndicatorColor(value)),
                   ),
                 ),
               )
             ],
           );
         });
-  }
-
-  Color _handleIndicatorColor(double value) {
-    if (value > 0 && value <= 0.2) {
-      return const Color(0xFFFF0000);
-    }
-
-    if (value > 0.2 && value <= 0.4) {
-      return const Color(0xFFFF6600);
-    }
-
-    if (value > 0.4 && value <= 0.6) {
-      return const Color(0xFFFFB700);
-    }
-
-    if (value > 0.6 && value <= 0.7) {
-      return const Color(0xFFB1E423);
-    }
-
-    if (value >= 0.7 && value <= 0.9) {
-      return const Color(0xFF23E480);
-    }
-
-    if (value > 0.9 && value <= 1.0) {
-      return IbColors.accentColor;
-    }
-    return IbColors.errorRed;
   }
 }

@@ -1,32 +1,36 @@
 import 'dart:async';
 
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/main_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_pages/main_page.dart';
+import 'package:icebr8k/frontend/ib_themes.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:lottie/lottie.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import 'backend/controllers/user_controllers/init_controller.dart';
+import 'backend/services/user_services/ib_local_data_service.dart';
 import 'frontend/ib_config.dart';
 import 'frontend/ib_pages/splash_page.dart';
 import 'frontend/ib_strings.dart';
-import 'frontend/ib_themes.dart';
-import 'frontend/ib_widgets/ib_progress_indicator.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  /// prevent blinking for cached images
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 1000 << 20; //1GB
+  IbUtils.changeStatusBarColor();
+  debugRepaintRainbowEnabled = false;
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(statusBarColor: IbColors.lightBlue),
-  );
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
   runApp(MainApp());
 }
@@ -36,13 +40,11 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // make sure you call `initializeApp` before using other Firebase services.
   await Firebase.initializeApp();
 
-  print("Handling a background message: ${message.data}");
+  print("Handling a background message: ${message.messageId}");
 }
 
 class MainApp extends StatelessWidget {
-  final MainController _controller = Get.put(MainController());
-  final FirebaseAnalytics analytics = FirebaseAnalytics();
-
+  final InitController _controller = Get.put(InitController());
   @override
   Widget build(BuildContext context) {
     return Obx(() {
@@ -54,24 +56,34 @@ class MainApp extends StatelessWidget {
         return _loading();
       }
 
-      return GetMaterialApp(
-        navigatorObservers: [
-          FirebaseAnalyticsObserver(analytics: analytics),
-        ],
-        defaultTransition: Transition.cupertino,
-        enableLog: true,
-        debugShowCheckedModeBanner: false,
-        home: SplashPage(),
-        translations: IbStrings(),
-        locale: const Locale('en', 'US'),
-        theme: IbThemes.lightTheme,
+      return RefreshConfiguration(
+        headerBuilder: () => const ClassicHeader(),
+        child: GetMaterialApp(
+          defaultTransition: Transition.cupertino,
+          debugShowCheckedModeBanner: false,
+          initialRoute: './',
+          routes: {
+            './': (context) => SplashPage(),
+            './home': (context) => MainPage()
+          },
+          enableLog: false,
+          translations: IbStrings(),
+          locale: const Locale('en', 'US'),
+          themeMode: ThemeMode.light,
+          theme:
+              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
+                  ? IbThemes(context).buildDarkTheme()
+                  : IbThemes(context).buildLightTheme(),
+        ),
       );
     });
   }
 
   Widget _loading() {
     return Container(
-      color: IbColors.lightBlue,
+      color: IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
+          ? Colors.black
+          : IbColors.lightBlue,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -81,7 +93,6 @@ class MainApp extends StatelessWidget {
               width: IbConfig.kAppLogoSize,
               height: IbConfig.kAppLogoSize,
             ),
-            const IbProgressIndicator(),
           ],
         ),
       ),

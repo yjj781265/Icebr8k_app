@@ -1,502 +1,638 @@
-import 'package:flutter/cupertino.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/auth_controller.dart';
-import 'package:icebr8k/backend/controllers/chat_page_controller.dart';
-import 'package:icebr8k/backend/controllers/friend_list_controller.dart';
-import 'package:icebr8k/backend/controllers/friend_request_controller.dart';
-import 'package:icebr8k/backend/controllers/people_nearby_controller.dart';
-import 'package:icebr8k/backend/controllers/social_tab_controller.dart';
-import 'package:icebr8k/backend/services/ib_local_storage_service.dart';
-import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/circle_settings_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
+import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
+import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/chat_page.dart';
-import 'package:icebr8k/frontend/ib_pages/profile_page.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_settings.dart';
+import 'package:icebr8k/frontend/ib_pages/chat_pages/friends_picker.dart';
+import 'package:icebr8k/frontend/ib_pages/people_nearby_page.dart';
+import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
+import 'package:icebr8k/frontend/ib_pages/search_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:showcaseview/showcaseview.dart';
+
+import '../ib_colors.dart';
+import 'chat_pages/chat_page.dart';
 
 class SocialTab extends StatefulWidget {
   const SocialTab({Key? key}) : super(key: key);
 
   @override
-  _SocialTabState createState() => _SocialTabState();
+  State<SocialTab> createState() => _SocialTabState();
 }
 
 class _SocialTabState extends State<SocialTab>
     with SingleTickerProviderStateMixin {
+  final SocialTabController _controller = Get.find();
+  String title = 'circles'.tr;
   late TabController _tabController;
-  final _friendListController = Get.find<FriendListController>();
-  final _friendRequestController = Get.find<FriendRequestController>();
-  final _peopleNearbyController = Get.find<PeopleNearbyController>();
 
   @override
   void initState() {
-    super.initState();
-    _tabController = TabController(vsync: this, length: 3);
-    Get.find<SocialTabController>().tabController = _tabController;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: IbColors.lightBlue,
-      child: Column(
-        children: [
-          TabBar(
-            isScrollable: true,
-            controller: _tabController,
-            tabs: [
-              Obx(
-                () => Tab(
-                  text:
-                      '${'score_page_tab_3_title'.tr}${_peopleNearbyController.items.isEmpty ? '' : '(${_peopleNearbyController.items.length})'}',
-                ),
-              ),
-              Obx(
-                () => Tab(
-                    text:
-                        '${'score_page_tab_1_title'.tr}${_friendListController.friendItems.isEmpty ? '' : '(${_friendListController.friendItems.length})'}'),
-              ),
-              Obx(
-                () => Tab(
-                  text:
-                      '${'score_page_tab_2_title'.tr}${_friendRequestController.requests.isEmpty ? '' : '(${_friendRequestController.requests.length})'}',
-                ),
-              ),
-            ],
-            labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-            labelColor: Colors.black,
-            unselectedLabelColor: IbColors.lightGrey,
-            indicatorColor: IbColors.primaryColor,
-          ),
-          Expanded(
-              child: TabBarView(
-            controller: _tabController,
-            children: [
-              PeopleNearByTab(),
-              const MyFriendsTab(),
-              const FriendRequestTab(),
-            ],
-          ))
-        ],
-      ),
-    );
-  }
-}
-
-class MyFriendsTab extends StatefulWidget {
-  const MyFriendsTab({Key? key}) : super(key: key);
-
-  @override
-  _MyFriendsTabState createState() => _MyFriendsTabState();
-}
-
-class _MyFriendsTabState extends State<MyFriendsTab>
-    with AutomaticKeepAliveClientMixin {
-  final _controller = Get.find<FriendListController>();
-  final RefreshController _refreshController = RefreshController();
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return Obx(() {
-      if (_controller.friendItems.isEmpty) {
-        return Material(
-            color: IbColors.lightBlue,
-            child: Center(
-                child: Lottie.asset('assets/images/friendship.json',
-                    width: 230, height: 230)));
-      }
-
-      return SmartRefresher(
-        physics: const BouncingScrollPhysics(),
-        controller: _refreshController,
-        header: const ClassicHeader(
-          textStyle: TextStyle(color: IbColors.primaryColor),
-          failedIcon: Icon(
-            Icons.error_outline,
-            color: IbColors.errorRed,
-          ),
-          completeIcon: Icon(
-            Icons.check_circle_outline,
-            color: IbColors.accentColor,
-          ),
-          refreshingIcon: IbProgressIndicator(
-            width: 24,
-            height: 24,
-            padding: 0,
-          ),
-        ),
-        cacheExtent: Get.height * 2,
-        onLoading: () {
-          print('onLoading');
-        },
-        onRefresh: () async {
-          await _controller.refreshEverything();
-          _refreshController.refreshCompleted();
-        },
-        child: ListView.builder(
-          physics: const BouncingScrollPhysics(),
-          itemBuilder: (context, index) {
-            final FriendListItem _item = _controller.friendItems[index];
-            return FriendItemView(friendListItem: _item);
-          },
-          itemCount: _controller.friendItems.length,
-        ),
-      );
+    _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      _controller.currentIndex.value = _tabController.index;
     });
+    super.initState();
   }
 
   @override
-  bool get wantKeepAlive => true;
-}
-
-class FriendItemView extends StatelessWidget {
-  final FriendListItem friendListItem;
-  const FriendItemView({Key? key, required this.friendListItem})
-      : super(key: key);
-  @override
   Widget build(BuildContext context) {
-    return Material(
-      color: IbColors.white,
-      child: ListTile(
-        onTap: () => Get.to(
-            () => ProfilePage(
-                  friendListItem.uid,
-                  showAppBar: true,
-                ),
-            preventDuplicates: false),
-        tileColor: IbColors.white,
-        leading: IbUserAvatar(
-          uid: friendListItem.uid,
-          avatarUrl: friendListItem.avatarUrl,
-        ),
-        title: Text(
-          friendListItem.username,
-          style: const TextStyle(
-              fontSize: IbConfig.kNormalTextSize, fontWeight: FontWeight.bold),
-        ),
-        subtitle: IbLinearIndicator(endValue: friendListItem.score),
-        trailing: IconButton(
-          icon: const Icon(
-            Icons.message_outlined,
-            color: IbColors.primaryColor,
-          ),
-          onPressed: () {
-            final String mUid = Get.find<AuthController>().firebaseUser!.uid;
-            final List<String> memberUids = [mUid, friendListItem.uid];
-            Get.to(() => ChatPage(Get.put(ChatPageController(memberUids),
-                tag: memberUids.toString())));
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class PeopleNearByTab extends StatefulWidget {
-  @override
-  _PeopleNearByTabState createState() => _PeopleNearByTabState();
-}
-
-class _PeopleNearByTabState extends State<PeopleNearByTab>
-    with AutomaticKeepAliveClientMixin {
-  final PeopleNearbyController _controller = Get.find();
-  final _refreshController = RefreshController();
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return NestedScrollView(
-      physics: const NeverScrollableScrollPhysics(),
-      headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-        return [
-          SliverToBoxAdapter(
-            child: Obx(
-              () => SwitchListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                value: _controller.shareLoc.value,
-                onChanged: (value) async {
-                  print(value);
-                  _controller.shareLoc.value = value;
-                  IbLocalStorageService().updateLocSharingFlag(value);
-                  if (value) {
-                    _controller.isSearching.value = true;
-                    await _controller.searchPeopleNearby();
-                  } else {
-                    _controller.isSearching.value = false;
-                    await _controller.removeMyLoc();
-                    _controller.items.clear();
-                  }
-                },
-                title: const Padding(
-                  padding: EdgeInsets.only(left: 16.0),
-                  child: Text('Share my location'),
-                ),
-              ),
-            ),
-          ),
-        ];
+    return ShowCaseWidget(
+      onComplete: (index, key) {
+        if (key == IbShowCaseKeys.kPeopleNearbyKey) {
+          IbLocalDataService().updateBoolValue(
+              key: StorageKey.peopleNearbyShowCaseBool, value: true);
+        }
       },
-      body: Obx(() {
-        if (_controller.isGranted.isFalse || _controller.shareLoc.isFalse) {
-          return Center(
-              child: SizedBox(
-            height: 230,
-            width: 230,
-            child: Lottie.asset('assets/images/location.json'),
-          ));
-        }
+      builder: Builder(builder: (context) {
+        return Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text('Social'),
+            ),
+            bottom: TabBar(
+              indicatorSize: TabBarIndicatorSize.tab,
+              isScrollable: true,
+              controller: _tabController,
+              tabs: [
+                Obx(() {
+                  int total = 0;
+                  for (final item in _controller.circles) {
+                    total += item.unReadCount;
+                  }
 
-        if (_controller.isGranted.isTrue && _controller.isSearching.isTrue) {
-          return const Center(
-            child: IbProgressIndicator(),
-          );
-        }
-
-        return SmartRefresher(
-          physics: const BouncingScrollPhysics(),
-          controller: _refreshController,
-          onRefresh: () async {
-            await _controller.searchPeopleNearby();
-            _refreshController.refreshCompleted();
-          },
-          header: ClassicHeader(
-            height: 88,
-            idleText:
-                'Pull down to refresh\nLast update ${IbUtils.readableDateTime(_controller.lastRefreshTime.value, showTime: true)}',
-            refreshingText: 'Searching people nearby...',
-            releaseText: 'Release to search people nearby',
-            completeText: 'Search completed',
-            textStyle: const TextStyle(color: IbColors.primaryColor),
-            failedIcon: const Icon(
-              Icons.error_outline,
-              color: IbColors.errorRed,
-            ),
-            completeIcon: const Icon(
-              Icons.check_circle_outline,
-              color: IbColors.accentColor,
-            ),
-            refreshingIcon: const IbProgressIndicator(
-              width: 24,
-              height: 24,
-              padding: 0,
-            ),
-          ),
-          child: _controller.isGranted.isTrue &&
-                  _controller.isSearching.isFalse &&
-                  _controller.items.isEmpty
-              ? Center(
-                  child: Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: const [
-                      Icon(
-                        Icons.not_listed_location,
-                        size: 36,
-                        color: IbColors.errorRed,
-                      ),
-                      Text(
-                        'There is no people nearby',
-                        style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                      )
-                    ],
-                  ),
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        'Users within 30 miles',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        final PeopleNearbyItem item = _controller.items[index];
-                        return Material(
-                          child: ListTile(
-                            onTap: () {
-                              Get.to(() => ProfilePage(
-                                    item.ibUser.id,
-                                    showAppBar: true,
-                                  ));
-                            },
-                            tileColor: IbColors.white,
-                            leading: IbUserAvatar(
-                              uid: item.ibUser.id,
-                              avatarUrl: item.ibUser.avatarUrl,
-                            ),
-                            title: Text(item.ibUser.username),
-                            subtitle: IbLinearIndicator(
-                              endValue: item.compScore,
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.people),
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        const Text('Circles'),
+                        const SizedBox(
+                          width: 4,
+                        ),
+                        if (total > 0)
+                          CircleAvatar(
+                            backgroundColor: IbColors.errorRed,
+                            radius: 10,
+                            child: Text(
+                              total >= 99 ? '99+' : total.toString(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                              ),
                             ),
                           ),
-                        );
-                      },
-                      itemCount: _controller.items.length,
+                      ],
                     ),
-                  ],
+                  );
+                }),
+                Obx(() {
+                  int total = 0;
+                  for (final item in _controller.oneToOneChats) {
+                    total += item.unReadCount;
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.chat_rounded),
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        const Text('Chats'),
+                        const SizedBox(
+                          width: 4,
+                        ),
+                        if (total > 0)
+                          CircleAvatar(
+                            backgroundColor: IbColors.errorRed,
+                            radius: 10,
+                            child: Text(
+                              total >= 99 ? '99+' : total.toString(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                }),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.contacts),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text('Friends'),
+                    ],
+                  ),
                 ),
+              ],
+            ),
+            actions: [
+              Showcase(
+                overlayOpacity: 0.3,
+                shapeBorder: const CircleBorder(),
+                key: IbShowCaseKeys.kPeopleNearbyKey,
+                description: 'Click here to see people nearby',
+                child: IconButton(
+                  tooltip: 'People Nearby',
+                  icon: const Icon(
+                    Icons.person_pin_circle_rounded,
+                    color: IbColors.errorRed,
+                  ),
+                  onPressed: () {
+                    Get.to(() => PeopleNearbyPage());
+                  },
+                ),
+              ),
+              IconButton(
+                tooltip: 'Search all',
+                icon: const Icon(Icons.search),
+                onPressed: () {
+                  Get.to(() => SearchPage());
+                },
+              ),
+            ],
+          ),
+          body: Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                buildCircle(),
+                buildOneToOneList(),
+                buildFriendList(),
+              ],
+            ),
+          ),
+          floatingActionButton: FloatingActionButton(
+            child: Obx(() {
+              if (_controller.currentIndex.value == 0) {
+                return const Icon(Icons.group_add_outlined);
+              }
+              if (_controller.currentIndex.value == 1) {
+                return const Icon(Icons.message);
+              }
+
+              if (_controller.currentIndex.value == 2) {
+                return const Icon(Icons.person_search);
+              }
+              return const SizedBox();
+            }),
+            onPressed: () async {
+              if (_controller.currentIndex.value == 0) {
+                Get.to(
+                    () => CircleSettings(Get.put(CircleSettingsController())),
+                    fullscreenDialog: true);
+              } else if (_controller.currentIndex.value == 1) {
+                final users = await Get.to(
+                  () => FriendsPicker(
+                    Get.put(
+                      IbFriendsPickerController(IbUtils.getCurrentUid()!),
+                    ),
+                    limit: 1,
+                    buttonTxt: 'Add',
+                  ),
+                );
+                if (users != null) {
+                  final IbUser user = (users as List<IbUser>).first;
+                  Get.to(() => ChatPage(
+                      Get.put(ChatPageController(recipientId: (user.id))
+                        ..title.value = user.username
+                        ..avatarUrl.value = user.avatarUrl)));
+                }
+              } else {
+                Get.to(() => SearchPage());
+              }
+            },
+          ),
         );
       }),
     );
   }
 
-  @override
-  bool get wantKeepAlive => true;
-}
-
-class FriendRequestTab extends StatefulWidget {
-  const FriendRequestTab({Key? key}) : super(key: key);
-
-  @override
-  _FriendRequestTabState createState() => _FriendRequestTabState();
-}
-
-class _FriendRequestTabState extends State<FriendRequestTab>
-    with AutomaticKeepAliveClientMixin {
-  final _controller = Get.find<FriendRequestController>();
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return _getBody();
-  }
-
-  Widget _getBody() {
+  Widget buildOneToOneList() {
     return Obx(() {
-      if (_controller.requests.isEmpty) {
-        return Material(
-            color: IbColors.lightBlue,
-            child: Center(
-                child: Lottie.asset('assets/images/ice_cream_cup.json',
-                    width: 230, height: 230)));
+      if (_controller.isLoadingChat.value) {
+        return const Center(
+          child: IbProgressIndicator(),
+        );
       }
-      return AnimatedList(
-        key: _controller.animatedListKey,
-        itemBuilder: (context, index, animation) {
-          final FriendRequestItem item = _controller.requests[index];
-          return _buildItem(item, index, animation);
+
+      if (_controller.oneToOneChats.isEmpty) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+                height: 200,
+                width: 200,
+                child: Lottie.asset('assets/images/chat.json')),
+          ],
+        );
+      }
+      return ListView.separated(
+        itemBuilder: (context, index) {
+          final ChatTabItem item = _controller.oneToOneChats[index];
+          return ListTile(
+            tileColor: Theme.of(context).backgroundColor,
+            leading: Stack(
+              children: [
+                if (item.ibChat.photoUrl.isEmpty)
+                  _buildAvatar(item.avatars)
+                else
+                  IbUserAvatar(avatarUrl: item.ibChat.photoUrl),
+                if (item.isMuted)
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).backgroundColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.notifications_off,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+                if (item.isBlocked)
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).backgroundColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.block,
+                        color: IbColors.errorRed,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            onTap: () {
+              item.unReadCount = 0;
+              _controller.oneToOneChats.refresh();
+              _controller.calculateTotalUnread();
+              Get.to(
+                () => ChatPage(
+                  Get.put(
+                    ChatPageController(
+                      ibChat: item.ibChat,
+                    ),
+                    tag: item.ibChat.chatId,
+                  ),
+                ),
+              );
+            },
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 6,
+                  child: Text(
+                    item.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: IbConfig.kNormalTextSize),
+                  ),
+                ),
+                if (item.ibChat.lastMessage != null)
+                  Text(
+                    IbUtils.readableDateTime(
+                        DateTime.fromMillisecondsSinceEpoch(
+                            (item.ibChat.lastMessage!.timestamp as Timestamp)
+                                .millisecondsSinceEpoch),
+                        showTime: true),
+                    style: const TextStyle(
+                        color: IbColors.lightGrey,
+                        fontWeight: FontWeight.normal,
+                        fontSize: IbConfig.kDescriptionTextSize),
+                  ),
+              ],
+            ),
+            subtitle: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 9,
+                  child: _controller.buildSubtitle(item),
+                ),
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                        color: IbColors.errorRed, shape: BoxShape.circle),
+                    child: item.unReadCount != 0
+                        ? Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Text(
+                              item.unReadCount > 99
+                                  ? '99+'
+                                  : item.unReadCount.toString(),
+                              maxLines: 1,
+                              overflow: TextOverflow.fade,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                                fontSize: IbConfig.kDescriptionTextSize,
+                              ),
+                            ),
+                          )
+                        : const SizedBox(),
+                  ),
+                ),
+              ],
+            ),
+          );
         },
-        initialItemCount: _controller.requests.length,
-        shrinkWrap: true,
+        itemCount: _controller.oneToOneChats.length,
+        separatorBuilder: (BuildContext context, int index) {
+          return const Divider(
+            color: IbColors.lightGrey,
+            thickness: 0.5,
+            height: 1,
+          );
+        },
       );
     });
   }
 
-  void _removeItem(int index, FriendRequestItem item) {
-    _controller.requests.removeAt(index);
-    _controller.animatedListKey.currentState!.removeItem(index,
-        (context, animation) {
-      return _buildItem(item, index, animation);
+  Widget buildCircle() {
+    return Obx(() {
+      if (_controller.isLoadingCircles.value) {
+        return const Center(
+          child: IbProgressIndicator(),
+        );
+      }
+
+      if (_controller.circles.isEmpty) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+                height: 200,
+                width: 200,
+                child: Lottie.asset('assets/images/friendship.json')),
+            TextButton(
+                onPressed: () {
+                  Get.to(() => SearchPage());
+                },
+                child: const Text('Search Circles'))
+          ],
+        );
+      }
+
+      return ListView.separated(
+        itemBuilder: (context, index) {
+          final ChatTabItem item = _controller.circles[index];
+          return ListTile(
+            tileColor: Theme.of(context).backgroundColor,
+            leading: Stack(
+              children: [
+                _controller.buildCircleAvatar(item),
+                if (item.isMuted)
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).backgroundColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.notifications_off,
+                        size: 16,
+                      ),
+                    ),
+                  )
+              ],
+            ),
+            onTap: () {
+              item.unReadCount = 0;
+              _controller.circles.refresh();
+              _controller.calculateTotalUnread();
+              Get.to(
+                () => ChatPage(
+                  Get.put(ChatPageController(ibChat: item.ibChat),
+                      tag: item.ibChat.chatId),
+                ),
+              );
+            },
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 6,
+                  child: Text(
+                    item.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: IbConfig.kNormalTextSize),
+                  ),
+                ),
+                if (item.ibChat.lastMessage != null)
+                  Text(
+                    IbUtils.readableDateTime(
+                        DateTime.fromMillisecondsSinceEpoch(
+                            (item.ibChat.lastMessage!.timestamp as Timestamp)
+                                .millisecondsSinceEpoch),
+                        showTime: true),
+                    style: const TextStyle(
+                        color: IbColors.lightGrey,
+                        fontWeight: FontWeight.normal,
+                        fontSize: IbConfig.kDescriptionTextSize),
+                  ),
+              ],
+            ),
+            subtitle: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 9,
+                  child: _controller.buildSubtitle(item),
+                ),
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                        color: IbColors.errorRed, shape: BoxShape.circle),
+                    child: item.unReadCount != 0
+                        ? Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Text(
+                              item.unReadCount > 99
+                                  ? '99+'
+                                  : item.unReadCount.toString(),
+                              maxLines: 1,
+                              overflow: TextOverflow.fade,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: IbConfig.kDescriptionTextSize,
+                              ),
+                            ),
+                          )
+                        : const SizedBox(),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+        itemCount: _controller.circles.length,
+        separatorBuilder: (BuildContext context, int index) {
+          return const Divider(
+            color: IbColors.lightGrey,
+            thickness: 0.5,
+            height: 1,
+          );
+        },
+      );
     });
   }
 
-  Widget _buildItem(
-      FriendRequestItem item, int index, Animation<double> animation) {
-    final _controller = Get.find<FriendRequestController>();
-    return SizeTransition(
-      sizeFactor: animation,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 0.5),
-        child: IbCard(
-            child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              IbUserAvatar(
-                avatarUrl: item.avatarUrl,
-                uid: item.friendUid,
-              ),
-              Expanded(
-                flex: 5,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            item.username,
-                            style: const TextStyle(
-                                fontSize: IbConfig.kNormalTextSize,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                          Text(
-                            ' · ${IbUtils.getAgoDateTimeString(DateTime.fromMillisecondsSinceEpoch(item.timeStampInMs))}',
-                            style: const TextStyle(
-                                color: IbColors.lightGrey,
-                                fontSize: IbConfig.kDescriptionTextSize),
-                          ),
-                        ],
-                      ),
-                      IbLinearIndicator(
-                        endValue: item.score,
-                        disableAnimation: true,
-                      ),
-                      if (item.requestMsg.isNotEmpty)
-                        Text(item.requestMsg,
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: IbConfig.kSecondaryTextSize)),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 3,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    /// add friend icon button
-                    Expanded(
-                        child: IconButton(
-                      icon: const Icon(
-                        Icons.person_add_alt_1_outlined,
-                        color: IbColors.accentColor,
-                      ),
-                      onPressed: () {
-                        _removeItem(index, item);
-                        _controller.acceptFriendRequest(item.friendUid);
-                      },
-                    )),
+  Widget buildFriendList() {
+    return Obx(() {
+      if (_controller.isFriendListLoading.isTrue) {
+        return const Center(
+          child: IbProgressIndicator(),
+        );
+      }
 
-                    /// decline friend request icon button
-                    Expanded(
-                        child: IconButton(
-                      icon: const Icon(
-                        Icons.person_remove_alt_1_outlined,
-                        color: IbColors.errorRed,
-                      ),
-                      onPressed: () {
-                        _removeItem(index, item);
-                        _controller.rejectFriendRequest(item.friendUid);
-                      },
-                    ))
-                  ],
+      if (_controller.friends.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: Lottie.asset('assets/images/monkey_zen.json')),
+              const Text(
+                'Looks like you do not have any friends yet',
+                style: TextStyle(
+                  color: IbColors.lightGrey,
+                  fontSize: IbConfig.kNormalTextSize,
                 ),
-              )
+              ),
+              TextButton(
+                  onPressed: () {
+                    Get.back();
+                    Get.to(() => PeopleNearbyPage());
+                  },
+                  child: const Text('See People Nearby 📍')),
+              TextButton(
+                  onPressed: () {
+                    Get.back();
+                    Get.to(() => SearchPage());
+                  },
+                  child: const Text('Search User'))
             ],
           ),
-        )),
+        );
+      }
+      return SmartRefresher(
+        scrollDirection: Axis.vertical,
+        controller: _controller.friendListRefreshController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        onRefresh: () async {
+          await _controller.onFriendListRefresh();
+        },
+        child: ListView.builder(
+          controller: _controller.scrollController,
+          itemBuilder: (context, index) {
+            final item = _controller.friends.toSet().toList()[index];
+            return FriendListItem(item);
+          },
+          itemCount: _controller.friends.toSet().length,
+        ),
+      );
+    });
+  }
+
+  Widget _buildAvatar(List<IbUser> avatarUsers) {
+    final double radius = avatarUsers.length > 1 ? 10 : 24;
+    return CircleAvatar(
+      backgroundColor: Theme.of(context).backgroundColor,
+      radius: 26,
+      child: Wrap(
+        spacing: 1,
+        runSpacing: 1,
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        runAlignment: WrapAlignment.center,
+        children: avatarUsers
+            .map((e) => IbUserAvatar(
+                  avatarUrl: e.avatarUrl,
+                  radius: radius,
+                ))
+            .toList(),
       ),
     );
   }
+}
+
+class FriendListItem extends StatelessWidget {
+  final FriendItem item;
+
+  const FriendListItem(this.item);
 
   @override
-  bool get wantKeepAlive => true;
+  Widget build(BuildContext context) {
+    return ListTile(
+      onTap: () {
+        Get.to(() => ProfilePage(Get.put(ProfileController(item.user.id))));
+      },
+      leading: IbUserAvatar(
+        avatarUrl: item.user.avatarUrl,
+      ),
+      title: Text(
+        item.user.username,
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      subtitle: IbLinearIndicator(endValue: item.compScore),
+    );
+  }
 }
