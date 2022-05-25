@@ -14,6 +14,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../backend/controllers/user_controllers/home_tab_controller.dart';
+import '../ib_colors.dart';
 
 class HomeTab extends StatelessWidget {
   HomeTab({Key? key}) : super(key: key);
@@ -148,6 +149,38 @@ class HomeTab extends StatelessWidget {
                         ),
                       );
                     }
+
+                    if (_controller.forYourList.isEmpty &&
+                        _controller.selectedCategory.value ==
+                            _controller.categories[1]) {
+                      return Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                                width: 200,
+                                height: 200,
+                                child: Lottie.asset(
+                                    'assets/images/monkey_zen.json')),
+                            const Text(
+                              'This page will show polls from your friends, and tags you followed',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: IbColors.lightGrey,
+                                fontSize: IbConfig.kNormalTextSize,
+                              ),
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  Get.back();
+                                  Get.to(() => SearchPage());
+                                },
+                                child: const Text('Search Users and Tags'))
+                          ],
+                        ),
+                      );
+                    }
+
                     return SmartRefresher(
                       enablePullUp: _handlePullUp(),
                       enablePullDown: _controller.isLocked.isFalse,
