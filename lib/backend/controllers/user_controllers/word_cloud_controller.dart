@@ -2,7 +2,9 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 
 import '../../models/ib_question.dart';
 
@@ -48,6 +50,22 @@ class WordCloudController extends GetxController {
     } else {
       isLoading.value = false;
     }
+
+    showIntroDialog();
     super.onReady();
+  }
+
+  void showIntroDialog() {
+    if (IbLocalDataService().retrieveBoolValue(StorageKey.wordCloudIntro)) {
+      return;
+    }
+    Get.dialog(const IbDialog(
+      title: 'Welcome to your word cloud ☁',
+      subtitle:
+          'Your word cloud shows your past top 16 tags based on your voting history',
+      showNegativeBtn: false,
+    ));
+    IbLocalDataService()
+        .updateBoolValue(key: StorageKey.wordCloudIntro, value: true);
   }
 }
