@@ -129,10 +129,18 @@ class _MainPageViewState extends State<MainPageView>
 
           _mainPageController.currentIndex.value = index;
 
-          if (index == 4) {
+          if (index == 3) {
             final NotificationController controller = Get.find();
             await controller.initPushNotification();
             return;
+          }
+
+          if (index == 4 &&
+              !IbLocalDataService()
+                  .retrieveBoolValue(StorageKey.wordCloudShowCaseBool) &&
+              IbShowCaseKeys.kWordCloudKey.currentContext != null) {
+            ShowCaseWidget.of(IbShowCaseKeys.kWordCloudKey.currentContext!)!
+                .startShowCase([IbShowCaseKeys.kWordCloudKey]);
           }
         },
         items: <BottomNavyBarItem>[

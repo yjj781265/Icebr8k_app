@@ -7,5 +7,6 @@ class IbShowCaseKeys {
   static final GlobalKey kVoteOptionsKey = GlobalKey();
   static final GlobalKey kPeopleNearbyKey = GlobalKey();
   static final GlobalKey kIcebreakerKey = GlobalKey();
+  static final GlobalKey kWordCloudKey = GlobalKey();
   IbShowCaseKeys._();
 }

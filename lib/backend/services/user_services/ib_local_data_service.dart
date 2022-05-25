@@ -63,4 +63,6 @@ enum StorageKey {
   icebreakerShowCaseBool,
   peopleNearbyShowCaseBool,
   peopleNearbyIntro,
+  wordCloudShowCaseBool,
+  wordCloudIntro,
 }

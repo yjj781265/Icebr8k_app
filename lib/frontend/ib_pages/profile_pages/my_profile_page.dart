@@ -10,6 +10,8 @@ import 'package:icebr8k/backend/controllers/user_controllers/asked_questions_con
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/my_profile_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/word_cloud_controller.dart';
+import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
+import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_pages/edit_profile_pages/edit_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/word_cloud_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
@@ -23,6 +25,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_question_snippet_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../../../backend/controllers/user_controllers/answered_question_controller.dart';
 import '../../../backend/controllers/user_controllers/edit_emo_pic_controller.dart';
@@ -48,58 +51,67 @@ class MyProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: DefaultTabController(
-          length: 2,
-          child: ExtendedNestedScrollView(
-            onlyOneScrollInBody: true,
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return [
-                SliverToBoxAdapter(
-                  child: Column(
-                    children: [
-                      _profileHeader(context),
-                      _stats(),
-                      _actions(),
-                      _userInfo(),
-                    ],
-                  ),
+      body: ShowCaseWidget(
+        onComplete: (index, key) {
+          if (key == IbShowCaseKeys.kWordCloudKey) {
+            IbLocalDataService().updateBoolValue(
+                key: StorageKey.wordCloudShowCaseBool, value: true);
+          }
+        },
+        builder: Builder(builder: (context) {
+          return SafeArea(
+            child: DefaultTabController(
+              length: 2,
+              child: ExtendedNestedScrollView(
+                onlyOneScrollInBody: true,
+                headerSliverBuilder:
+                    (BuildContext context, bool innerBoxIsScrolled) {
+                  return [
+                    SliverToBoxAdapter(
+                      child: Column(
+                        children: [
+                          _profileHeader(context),
+                          _stats(),
+                          _actions(),
+                          _userInfo(),
+                        ],
+                      ),
+                    ),
+                    SliverOverlapAbsorber(
+                      handle: ExtendedNestedScrollView
+                          .sliverOverlapAbsorberHandleFor(context),
+                      sliver: SliverPersistentHeader(
+                        pinned: true,
+                        delegate: IbPersistentHeader(
+                            height: 40,
+                            widget: const IbCard(
+                              elevation: 0,
+                              margin: EdgeInsets.zero,
+                              child: TabBar(
+                                padding: EdgeInsets.all(2),
+                                indicatorSize: TabBarIndicatorSize.tab,
+                                tabs: [
+                                  Icon(Icons.face_retouching_natural),
+                                  Icon(FontAwesomeIcons.hand),
+                                  //Text('Friends'),
+                                ],
+                              ),
+                            )),
+                      ),
+                    )
+                  ];
+                },
+                body: Padding(
+                  padding: const EdgeInsets.only(top: 40),
+                  child: TabBarView(children: [
+                    _emoPicsTab(),
+                    _askedTab(),
+                  ]),
                 ),
-                SliverOverlapAbsorber(
-                  handle:
-                      ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
-                          context),
-                  sliver: SliverPersistentHeader(
-                    pinned: true,
-                    delegate: IbPersistentHeader(
-                        height: 40,
-                        widget: const IbCard(
-                          elevation: 0,
-                          margin: EdgeInsets.zero,
-                          child: TabBar(
-                            padding: EdgeInsets.all(2),
-                            indicatorSize: TabBarIndicatorSize.tab,
-                            tabs: [
-                              Icon(Icons.face_retouching_natural),
-                              Icon(FontAwesomeIcons.hand),
-                              //Text('Friends'),
-                            ],
-                          ),
-                        )),
-                  ),
-                )
-              ];
-            },
-            body: Padding(
-              padding: const EdgeInsets.only(top: 40),
-              child: TabBarView(children: [
-                _emoPicsTab(),
-                _askedTab(),
-              ]),
+              ),
             ),
-          ),
-        ),
+          );
+        }),
       ),
     );
   }
@@ -167,19 +179,24 @@ class MyProfilePage extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      CircleAvatar(
-                          backgroundColor: Theme.of(context)
-                              .backgroundColor
-                              .withOpacity(0.8),
-                          child: IconButton(
-                              onPressed: () {
-                                Get.to(() => WordCloudPage(Get.put(
-                                    WordCloudController(
-                                        _controller.rxCurrentIbUser.value))));
-                              },
-                              hoverColor: IbColors.primaryColor,
-                              icon: Icon(Icons.cloud,
-                                  color: Theme.of(context).indicatorColor))),
+                      Showcase(
+                        description: 'Click here to see your word cloud',
+                        key: IbShowCaseKeys.kWordCloudKey,
+                        overlayOpacity: 0.3,
+                        child: CircleAvatar(
+                            backgroundColor: Theme.of(context)
+                                .backgroundColor
+                                .withOpacity(0.8),
+                            child: IconButton(
+                                onPressed: () {
+                                  Get.to(() => WordCloudPage(Get.put(
+                                      WordCloudController(
+                                          _controller.rxCurrentIbUser.value))));
+                                },
+                                hoverColor: IbColors.primaryColor,
+                                icon: Icon(Icons.cloud,
+                                    color: Theme.of(context).indicatorColor))),
+                      ),
                     ],
                   )
                 ],
