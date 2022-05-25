@@ -39,14 +39,15 @@ class AuthController extends GetxService {
     _dbStatusSub = IbDbStatusService().listenToStatus().listen((event) {
       final isRunning = event.data()!['isRunning'] as bool;
       final note = event.data()!['note'] as String;
+      final outDatedMsg = event.data()!['outdatedMsg'] as String;
       final minV = event.data()!['min_v'] as double;
       final isOutdated = IbConfig.kVersion < minV;
       if (isOutdated) {
         Get.offAll(() => WelcomePage(), transition: Transition.noTransition);
         Get.dialog(
-            const IbDialog(
+            IbDialog(
               title: 'App Outdated',
-              subtitle: 'Please update your app to the latest version',
+              subtitle: outDatedMsg,
               showNegativeBtn: false,
             ),
             barrierDismissible: false);
@@ -236,14 +237,15 @@ class AuthController extends GetxService {
       final isRunning = statusSnap.data()!['isRunning'] as bool;
       final note = statusSnap.data()!['note'] as String;
       final minV = statusSnap.data()!['min_v'] as double;
+      final outDatedMsg = statusSnap.data()!['outdatedMsg'] as String;
       final isOutdated = IbConfig.kVersion < minV;
 
       if (isOutdated) {
         Get.offAll(() => WelcomePage(), transition: Transition.noTransition);
         Get.dialog(
-            const IbDialog(
+            IbDialog(
               title: 'App Outdated',
-              subtitle: 'Please update your app to the latest version',
+              subtitle: outDatedMsg,
               showNegativeBtn: false,
             ),
             barrierDismissible: false);
