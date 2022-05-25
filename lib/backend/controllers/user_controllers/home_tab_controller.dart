@@ -7,6 +7,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_co
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
+import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -100,7 +101,9 @@ class HomeTabController extends GetxController {
             first8Map.length == 8 && first8Map.values.contains(false);
         print('determineFeatureIsLocked stream $isLocked');
         if (isLocked.isFalse) {
-          await first8Sub.cancel();
+          IbUtils.showSimpleSnackBar(
+              msg: 'Features unlocked', backgroundColor: IbColors.accentColor);
+          selectedCategory.value = categories.first;
           onRefresh();
         }
       });

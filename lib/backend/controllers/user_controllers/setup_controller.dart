@@ -148,7 +148,7 @@ class SetupController extends GetxController {
         Get.dialog(IbDialog(
           title: 'Missing Info',
           subtitle:
-              "You forgot to take a pic for your ${emoPic.description} face",
+              "You forgot to take a picture for your ${emoPic.description}",
           showNegativeBtn: false,
           positiveTextKey: 'ok',
         ));

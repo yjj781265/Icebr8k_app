@@ -251,6 +251,18 @@ class _SocialTabState extends State<SocialTab>
           child: IbProgressIndicator(),
         );
       }
+
+      if (_controller.oneToOneChats.isEmpty) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+                height: 200,
+                width: 200,
+                child: Lottie.asset('assets/images/chat.json')),
+          ],
+        );
+      }
       return ListView.separated(
         itemBuilder: (context, index) {
           final ChatTabItem item = _controller.oneToOneChats[index];
@@ -392,6 +404,24 @@ class _SocialTabState extends State<SocialTab>
           child: IbProgressIndicator(),
         );
       }
+
+      if (_controller.circles.isEmpty) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+                height: 200,
+                width: 200,
+                child: Lottie.asset('assets/images/friendship.json')),
+            TextButton(
+                onPressed: () {
+                  Get.to(() => SearchPage());
+                },
+                child: const Text('Search Circles'))
+          ],
+        );
+      }
+
       return ListView.separated(
         itemBuilder: (context, index) {
           final ChatTabItem item = _controller.circles[index];
@@ -532,7 +562,13 @@ class _SocialTabState extends State<SocialTab>
                     Get.back();
                     Get.to(() => PeopleNearbyPage());
                   },
-                  child: const Text('See People Nearby 📍'))
+                  child: const Text('See People Nearby 📍')),
+              TextButton(
+                  onPressed: () {
+                    Get.back();
+                    Get.to(() => SearchPage());
+                  },
+                  child: const Text('Search User'))
             ],
           ),
         );
