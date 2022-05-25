@@ -5,6 +5,7 @@ import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
@@ -612,8 +613,13 @@ class IbQuestionDbService {
     for (final doc in snapshot3.docs) {
       await doc.reference.delete();
     }
-    // delete the top node
-    await _collectionRef.doc(questionId).delete();
+    // delete the top node and medias
+    final snapshot4 = await _collectionRef.doc(questionId).get();
+    final q = IbQuestion.fromJson(snapshot4.data()!);
+    for (final media in q.medias) {
+      await IbStorageService().deleteFile(media.url);
+    }
+    await snapshot4.reference.delete();
   }
 
   Future<void> copyCollection(String collection1, String collection2) async {
