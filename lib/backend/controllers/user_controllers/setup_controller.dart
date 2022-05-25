@@ -43,7 +43,7 @@ class SetupController extends GetxController {
     emoPics.add(
       IbEmoPic(
           url: '',
-          emoji: "☹",
+          emoji: "😟",
           id: IbUtils.getUniqueId(),
           description: "Sad face"),
     );

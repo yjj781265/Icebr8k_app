@@ -67,9 +67,13 @@ class PendingAppDetailPage extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children:
-                      user.emoPics.map((e) => IbEmoPicCard(emoPic: e)).toList(),
+                child: SizedBox(
+                  height: 250,
+                  child: Row(
+                    children: user.emoPics
+                        .map((e) => IbEmoPicCard(emoPic: e))
+                        .toList(),
+                  ),
                 ),
               ),
             ),

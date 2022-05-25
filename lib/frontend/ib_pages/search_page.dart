@@ -232,44 +232,43 @@ class SearchPage extends StatelessWidget {
                     fontWeight: FontWeight.bold),
               ),
             ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: _controller.icebreakers
-                    .map(
-                      (element) => SizedBox(
-                        width: 200,
-                        height: 288,
-                        child: InkWell(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(16)),
-                            onTap: () {
-                              final collection = IbCacheManager()
-                                  .retrieveIbCollection(element.collectionId);
-                              if (collection == null) {
-                                return;
-                              }
-                              final controller = Get.put(
-                                  IcebreakerController(collection,
-                                      isEdit: false),
-                                  tag: element.collectionId);
-                              controller.currentIndex.value = controller
-                                  .icebreakers
-                                  .indexWhere((e) => element.id == e.id);
-                              if (controller.currentIndex.value == -1) {
-                                return;
-                              }
+            SizedBox(
+              height: 288,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (context, index) {
+                  final item = _controller.icebreakers[index];
+                  return SizedBox(
+                    width: 200,
+                    height: 288,
+                    child: InkWell(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(16)),
+                        onTap: () {
+                          final collection = IbCacheManager()
+                              .retrieveIbCollection(item.collectionId);
+                          if (collection == null) {
+                            return;
+                          }
+                          final controller = Get.put(
+                              IcebreakerController(collection, isEdit: false),
+                              tag: item.collectionId);
+                          controller.currentIndex.value = controller.icebreakers
+                              .indexWhere((e) => item.id == e.id);
+                          if (controller.currentIndex.value == -1) {
+                            return;
+                          }
 
-                              Get.to(() => IcebreakerMainPage(controller));
-                            },
-                            child: IcebreakerCard(
-                              icebreaker: element,
-                              minSize: IbConfig.kDescriptionTextSize,
-                              maxSize: IbConfig.kSecondaryTextSize,
-                            )),
-                      ),
-                    )
-                    .toList(),
+                          Get.to(() => IcebreakerMainPage(controller));
+                        },
+                        child: IcebreakerCard(
+                          icebreaker: item,
+                          minSize: IbConfig.kDescriptionTextSize,
+                          maxSize: IbConfig.kSecondaryTextSize,
+                        )),
+                  );
+                },
+                itemCount: _controller.icebreakers.length,
               ),
             ),
             const Divider(

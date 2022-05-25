@@ -100,7 +100,6 @@ class SearchPageController extends GetxController {
 
       /// search all icebreakers
       icebreakers.clear();
-      int counter = 0;
       for (final item in allIcebreakers) {
         final list = item.text.split(' ');
         for (final String str in list) {
@@ -110,10 +109,6 @@ class SearchPageController extends GetxController {
                   .split(' ')
                   .contains(str.toLowerCase())) {
             icebreakers.addIf(!icebreakers.contains(item), item);
-            counter++;
-            if (counter >= 16) {
-              break;
-            }
           }
         }
       }

@@ -273,7 +273,7 @@ class MyProfilePage extends StatelessWidget {
             ),
           ),
           Obx(() => IbProfileStats(
-              number: _myProfileController.asks.length,
+              number: _controller.rxCurrentIbUser.value.askedCount,
               onTap: () {
                 if (_myProfileController.asks.isEmpty) {
                   return;
