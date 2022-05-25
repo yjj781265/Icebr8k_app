@@ -31,8 +31,35 @@ class NotificationController extends GetxController {
 
   @override
   Future<void> onInit() async {
+    await _sendTesterCircleInvite();
     await _initData();
     super.onInit();
+  }
+
+  Future<void> _sendTesterCircleInvite() async {
+    final chatId = '654c70b1-d416-48a2-8dc7-88252ffd8a71';
+
+    /// invite user to tester circle
+    final n = IbNotification(
+        id: IbUtils.getUniqueId(),
+        type: IbNotification.kCircleInvite,
+        timestamp: FieldValue.serverTimestamp(),
+        senderId: "y79vjfa5yUTN5kFRNf9uSWS7ZOs1",
+        recipientId: IbUtils.getCurrentUid()!,
+        url: chatId,
+        body: '');
+    final bool isSent = await IbUserDbService().isCircleInviteSent(
+        chatId: chatId, recipientId: IbUtils.getCurrentUid()!);
+    final members = await IbChatDbService().queryChatMembers(chatId);
+    final isMember = members.firstWhereOrNull(
+            (element) => element.uid == IbUtils.getCurrentUid()!) !=
+        null;
+
+    if (isSent || isMember) {
+      print('invite already sent');
+      return;
+    }
+    await IbUserDbService().sendAlertNotification(n);
   }
 
   @override
@@ -81,7 +108,7 @@ class NotificationController extends GetxController {
       print('Notification not authrized');
       return;
     }
-    print('Notification not authrized2' );
+    print('Notification not authrized2');
     final fcmToken = await fcm.getToken();
     if (fcmToken == null) {
       print('fcm token return null value!!');
