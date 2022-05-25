@@ -19,6 +19,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:showcaseview/showcaseview.dart';
 
@@ -507,6 +508,33 @@ class _SocialTabState extends State<SocialTab>
       if (_controller.isFriendListLoading.isTrue) {
         return const Center(
           child: IbProgressIndicator(),
+        );
+      }
+
+      if (_controller.friends.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: Lottie.asset('assets/images/monkey_zen.json')),
+              const Text(
+                'Looks like you do not have any friends yet',
+                style: TextStyle(
+                  color: IbColors.lightGrey,
+                  fontSize: IbConfig.kNormalTextSize,
+                ),
+              ),
+              TextButton(
+                  onPressed: () {
+                    Get.back();
+                    Get.to(() => PeopleNearbyPage());
+                  },
+                  child: const Text('See People Nearby 📍'))
+            ],
+          ),
         );
       }
       return SmartRefresher(

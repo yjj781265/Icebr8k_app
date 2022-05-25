@@ -200,19 +200,6 @@ class _MenuPageState extends State<MenuPage> {
                           Get.to(() => SettingsMainPage());
                         },
                       ),
-                      ListTile(
-                        leading: const Icon(
-                          Icons.feedback_outlined,
-                          color: IbColors.darkPrimaryColor,
-                        ),
-                        title: const Text(
-                          "Send Feedback",
-                          style: TextStyle(
-                              fontSize: IbConfig.kNormalTextSize,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        onTap: () async {},
-                      ),
                     ],
                   ),
                 ),
