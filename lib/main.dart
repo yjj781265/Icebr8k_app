@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -27,6 +28,7 @@ Future<void> main() async {
   /// prevent blinking for cached images
   PaintingBinding.instance.imageCache.maximumSizeBytes = 1000 << 20; //1GB
   IbUtils.changeStatusBarColor();
+  debugRepaintRainbowEnabled = true;
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;

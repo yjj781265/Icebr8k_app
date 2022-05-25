@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/edit_emo_pic_controller.dart';
@@ -85,23 +84,21 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
                       const Divider(
                         thickness: 2,
                       ),
-                      InkWell(
-                        onTap: () => _showEmojiKeyBoard(context),
-                        child: SizedBox(
-                          width: 100,
-                          child: IbTextField(
-                            enabled: false,
-                            textAlign: TextAlign.center,
-                            textStyle:
-                                const TextStyle(fontSize: IbConfig.kSloganSize),
-                            controller: emojiTeController,
-                            titleIcon: const Icon(
-                              Icons.emoji_emotions,
-                              color: Colors.orangeAccent,
-                            ),
-                            titleTrKey: 'emoji',
-                            hintTrKey: '',
+                      SizedBox(
+                        width: 100,
+                        child: IbTextField(
+                          charLimit: 1,
+                          hideCounterText: true,
+                          textAlign: TextAlign.center,
+                          textStyle:
+                              const TextStyle(fontSize: IbConfig.kSloganSize),
+                          controller: emojiTeController,
+                          titleIcon: const Icon(
+                            Icons.emoji_emotions,
+                            color: Colors.orangeAccent,
                           ),
+                          titleTrKey: 'emoji',
+                          hintTrKey: '',
                         ),
                       ),
                       IbTextField(
@@ -290,30 +287,6 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
 
   void _showEmojiKeyBoard(BuildContext context) {
     IbUtils.hideKeyboard();
-    Get.bottomSheet(
-        EmojiPicker(
-            onEmojiSelected: (Category category, Emoji emoji) {
-              Get.back();
-              emojiTeController.text = emoji.emoji;
-              widget.ibEmoPic.emoji = emojiTeController.text;
-            },
-            customWidget: (config, state) => IbEmojiKeyboard(config, state),
-            config: Config(
-                columns: 8,
-                // Issue: https://github.com/flutter/flutter/issues/28894
-                emojiSizeMax: 24 * (Platform.isIOS ? 1.30 : 1.0),
-                bgColor: Theme.of(context).backgroundColor,
-                indicatorColor: IbColors.primaryColor,
-                iconColor: IbColors.lightGrey,
-                skinToneIndicatorColor: Theme.of(context).indicatorColor,
-                iconColorSelected: Theme.of(context).indicatorColor,
-                progressIndicatorColor: IbColors.primaryColor,
-                recentsLimit: 32,
-                tabIndicatorAnimDuration: const Duration(milliseconds: 100),
-                noRecentsStyle: TextStyle(
-                    fontSize: IbConfig.kNormalTextSize,
-                    color: Theme.of(context).indicatorColor),
-                buttonMode: ButtonMode.CUPERTINO)),
-        ignoreSafeArea: false);
+    Get.bottomSheet(IbEmojiKeyboard(), ignoreSafeArea: false);
   }
 }
