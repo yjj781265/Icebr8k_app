@@ -28,7 +28,7 @@ Future<void> main() async {
   /// prevent blinking for cached images
   PaintingBinding.instance.imageCache.maximumSizeBytes = 1000 << 20; //1GB
   IbUtils.changeStatusBarColor();
-  debugRepaintRainbowEnabled = true;
+  debugRepaintRainbowEnabled = false;
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
