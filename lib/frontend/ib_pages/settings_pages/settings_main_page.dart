@@ -67,7 +67,7 @@ class SettingsMainPage extends StatelessWidget {
                     context: context,
                     applicationName: 'Icebr8k',
                     applicationVersion:
-                        '${IbConfig.kVersion.toString()} ${DbConfig.dbSuffix}',
+                        '${IbConfig.kVersion.toString()}${DbConfig.dbSuffix}',
                     applicationIcon: SizedBox(
                         height: 80,
                         width: 80,
