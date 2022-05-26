@@ -179,7 +179,9 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                 children: [
                   IbQuestionStatsBar(widget._controller),
                   Showcase(
-                    key: widget._controller.isShowCase
+                    key: widget._controller.isShowCase &&
+                            !IbLocalDataService().retrieveBoolValue(
+                                StorageKey.pollExpandShowCaseBool)
                         ? IbShowCaseKeys.kPollExpandKey
                         : GlobalKey(),
                     shapeBorder: const RoundedRectangleBorder(
