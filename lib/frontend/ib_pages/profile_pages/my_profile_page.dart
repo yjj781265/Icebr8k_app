@@ -181,7 +181,9 @@ class MyProfilePage extends StatelessWidget {
                     children: [
                       Showcase(
                         description: 'Click here to see your word cloud',
-                        key: IbShowCaseKeys.kWordCloudKey,
+                        key: showBackButton
+                            ? GlobalKey()
+                            : IbShowCaseKeys.kWordCloudKey,
                         overlayOpacity: 0.3,
                         child: CircleAvatar(
                             backgroundColor: Theme.of(context)
