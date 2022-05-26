@@ -20,6 +20,7 @@ class CircleInfoController extends GetxController {
   final Rx<IbChat> rxIbChat;
   final hasInvite = false.obs;
   final requests = <IbNotification>[].obs;
+  final isMember = false.obs;
   final memberScoreMap = <IbUser, double>{}.obs;
   final isLoading = true.obs;
   final TextEditingController editingController = TextEditingController();
@@ -39,6 +40,8 @@ class CircleInfoController extends GetxController {
         chatId: ibChat.chatId, recipientId: IbUtils.getCurrentUid() ?? '');
     requests.value =
         await IbUserDbService().isCircleRequestSent(chatId: ibChat.chatId);
+    isMember.value =
+        rxIbChat.value.memberUids.contains(IbUtils.getCurrentUid());
     isLoading.value = false;
   }
 
