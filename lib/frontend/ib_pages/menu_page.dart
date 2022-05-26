@@ -152,22 +152,6 @@ class _MenuPageState extends State<MenuPage> {
                         ),
                       ListTile(
                         leading: const Icon(
-                          Icons.person,
-                          color: IbColors.primaryColor,
-                        ),
-                        title: Text(
-                          "my_profile".tr,
-                          style: const TextStyle(
-                              fontSize: IbConfig.kNormalTextSize,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        onTap: () {
-                          Get.back();
-                          Get.to(() => MyProfilePage());
-                        },
-                      ),
-                      ListTile(
-                        leading: const Icon(
                           Icons.person_pin_circle_rounded,
                           color: IbColors.errorRed,
                         ),
