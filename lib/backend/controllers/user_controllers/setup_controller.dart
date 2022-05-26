@@ -5,8 +5,8 @@ import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
-import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/setup_pages/review_page.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_three.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_two.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -14,7 +14,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../frontend/ib_pages/setup_pages/review_page.dart';
+import '../../../frontend/ib_colors.dart';
 
 class SetupController extends GetxController {
   final TextEditingController birthdateTeController = TextEditingController();
@@ -28,6 +28,7 @@ class SetupController extends GetxController {
   final birthdateInMs = DateTime.now().millisecondsSinceEpoch.obs;
   final emoPics = <IbEmoPic>[].obs;
   final avatarUrl = ''.obs;
+  final uploadPercentage = 0.obs;
   final String status;
 
   SetupController({this.status = ''});
@@ -211,11 +212,8 @@ class SetupController extends GetxController {
       return;
     }
 
-    Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'),
-        barrierDismissible: false);
     if (await IbUserDbService()
         .isUsernameTaken(usernameTeController.text.trim())) {
-      Get.back();
       Get.dialog(const IbDialog(
         title: 'Error',
         subtitle: "Username is taken, try a different username",
@@ -225,10 +223,16 @@ class SetupController extends GetxController {
       return;
     } else {
       print('Setup Page Three is valid!');
+      uploadPercentage.value = 0;
+      final dialog = Obx(() => IbLoadingDialog(
+          messageTrKey:
+              'Creating your unique profile(${uploadPercentage.value}%)'));
       try {
+        Get.dialog(dialog, barrierDismissible: false);
         final String? url = await IbStorageService()
             .uploadAndRetrieveImgUrl(filePath: avatarUrl.value);
         if (url == null) {
+          Get.back();
           IbUtils.showSimpleSnackBar(
               msg: 'Failed to upload avatar image',
               backgroundColor: IbColors.errorRed);
@@ -240,6 +244,7 @@ class SetupController extends GetxController {
               .uploadAndRetrieveImgUrl(filePath: emoPic.url);
 
           if (emoPicUrl == null) {
+            Get.back();
             IbUtils.showSimpleSnackBar(
                 msg: 'Failed to upload avatar image',
                 backgroundColor: IbColors.errorRed);
@@ -247,6 +252,7 @@ class SetupController extends GetxController {
           }
           emoPic.url = emoPicUrl;
         }
+        uploadPercentage.value = 50;
         final IbUser user = IbUser(
             id: IbUtils.getCurrentUid()!,
             avatarUrl: url,
@@ -260,10 +266,12 @@ class SetupController extends GetxController {
             bio: bioTeController.text.trim(),
             emoPics: emoPics);
         await IbUserDbService().registerNewUser(user);
+        uploadPercentage.value = 80;
         await IbAdminDbService().sendStatusEmail(
             email: user.email,
             fName: user.fName,
             status: IbUser.kUserStatusPending);
+        uploadPercentage.value = 100;
         Get.back();
         Get.offAll(() => ReviewPage());
       } catch (e) {

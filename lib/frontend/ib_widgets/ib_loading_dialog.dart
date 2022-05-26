@@ -13,15 +13,21 @@ class IbLoadingDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 300,
-        height: 100,
+        height: 120,
         child: IbCard(
+          margin: const EdgeInsets.all(16),
           child: Row(
             children: [
               const IbProgressIndicator(),
-              Text(
-                messageTrKey.tr,
-                style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    messageTrKey.tr,
+                    style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                    maxLines: 3,
+                  ),
+                ),
               ),
             ],
           ),
