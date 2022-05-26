@@ -32,6 +32,7 @@ class NotificationController extends GetxController {
   @override
   Future<void> onInit() async {
     await _sendTesterCircleInvite();
+    await _initPushNotification();
     await _initData();
     super.onInit();
   }
@@ -102,13 +103,7 @@ class NotificationController extends GetxController {
     });
   }
 
-  Future<void> initPushNotification() async {
-    final NotificationSettings settings = await fcm.requestPermission();
-    if (settings.authorizationStatus != AuthorizationStatus.authorized) {
-      print('Notification not authrized');
-      return;
-    }
-    print('Notification not authrized2');
+  Future<void> _initPushNotification() async {
     final fcmToken = await fcm.getToken();
     if (fcmToken == null) {
       print('fcm token return null value!!');
