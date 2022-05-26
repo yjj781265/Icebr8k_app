@@ -131,7 +131,7 @@ class _MainPageViewState extends State<MainPageView>
 
           if (index == 3) {
             final NotificationController controller = Get.find();
-            await controller.initPushNotification();
+            await controller.fcm.requestPermission();
             return;
           }
 
