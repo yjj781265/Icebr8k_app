@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
@@ -48,6 +49,13 @@ class IbFriendsPickerController extends GetxController {
     });
 
     super.onInit();
+  }
+
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager().logScreenView(
+        className: 'IbFriendsPickerController', screenName: 'IbFriendsPicker');
   }
 
   void selectAll() {

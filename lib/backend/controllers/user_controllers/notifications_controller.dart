@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
@@ -37,8 +38,15 @@ class NotificationController extends GetxController {
     super.onInit();
   }
 
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager().logScreenView(
+        className: 'NotificationController', screenName: 'AlertTab');
+  }
+
   Future<void> _sendTesterCircleInvite() async {
-    final chatId = '654c70b1-d416-48a2-8dc7-88252ffd8a71';
+    const chatId = '654c70b1-d416-48a2-8dc7-88252ffd8a71';
 
     /// invite user to tester circle
     final n = IbNotification(

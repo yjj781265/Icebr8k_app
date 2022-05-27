@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
@@ -46,6 +47,13 @@ class CircleInfoController extends GetxController {
   }
 
   @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager().logScreenView(
+        className: 'CircleInfoController', screenName: 'CircleInfo');
+  }
+
+  @override
   void onClose() {
     super.onClose();
     editingController.dispose();
@@ -73,6 +81,7 @@ class CircleInfoController extends GetxController {
 
     try {
       final chat = await IbChatDbService().queryChat(rxIbChat.value.chatId);
+
       if (chat != null &&
           chat.memberUids.contains(
             IbUtils.getCurrentUid(),
@@ -94,10 +103,12 @@ class CircleInfoController extends GetxController {
             readUids: [IbUtils.getCurrentUid()!],
             messageType: IbMessage.kMessageTypeAnnouncement,
             chatRoomId: chat!.chatId));
+
         Get.back(closeOverlays: true);
         Get.to(() =>
             ChatPage(Get.put(ChatPageController(ibChat: rxIbChat.value))));
       }
+      await IbAnalyticsManager().logJoinGroup(chat.chatId);
     } catch (e) {
       Get.back();
       Get.dialog(IbDialog(title: "Error", subtitle: e.toString()));

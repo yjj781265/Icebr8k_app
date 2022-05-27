@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
@@ -51,6 +52,13 @@ class EditProfileController extends GetxController {
     } else {
       selectedPrivacy.value = privacyItems[2];
     }
+  }
+
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager().logScreenView(
+        className: 'EditProfileController', screenName: 'EditProfilePage');
   }
 
   @override

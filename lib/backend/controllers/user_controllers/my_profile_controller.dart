@@ -8,6 +8,7 @@ import 'package:icebr8k/backend/services/user_services/ib_question_db_service.da
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import '../../managers/Ib_analytics_manager.dart';
 import '../../models/ib_chat_models/ib_chat.dart';
 
 class MyProfileController extends GetxController {
@@ -17,7 +18,12 @@ class MyProfileController extends GetxController {
   late StreamSubscription asksSub;
   DocumentSnapshot? lastAskDoc;
 
-  MyProfileController();
+  @override
+  Future<void> onReady() async {
+    await IbAnalyticsManager().logScreenView(
+        className: 'MyProfileController', screenName: 'MyProfilePage');
+    super.onReady();
+  }
 
   @override
   Future<void> onInit() async {

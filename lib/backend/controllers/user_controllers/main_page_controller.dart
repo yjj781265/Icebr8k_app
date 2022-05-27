@@ -12,7 +12,6 @@ class MainPageController extends GetxController {
   late StreamSubscription ibUserSub;
   final isNavBarVisible = true.obs;
   Rx<IbUser> rxCurrentIbUser;
-  late String kGooglePlacesApiKey;
 
   MainPageController(this.rxCurrentIbUser);
 

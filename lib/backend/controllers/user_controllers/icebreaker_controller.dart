@@ -4,13 +4,11 @@ import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/ib_collection.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/icebreaker.dart';
 import 'package:icebr8k/backend/services/user_services/icebreaker_db_service.dart';
-import 'package:lottie/lottie.dart';
 import 'package:shake/shake.dart';
-
-import '../../../frontend/ib_widgets/ib_dialog.dart';
 
 class IcebreakerController extends GetxController {
   IbCollection ibCollection;
@@ -28,6 +26,13 @@ class IcebreakerController extends GetxController {
   CarouselController carouselController = CarouselController();
 
   IcebreakerController(this.ibCollection, {required this.isEdit});
+
+  @override
+  Future<void> onReady() async {
+    await IbAnalyticsManager().logScreenView(
+        className: 'IcebreakerController', screenName: 'IcebreakerMainPage');
+    super.onReady();
+  }
 
   @override
   Future<void> onInit() async {
@@ -70,7 +75,7 @@ class IcebreakerController extends GetxController {
     await HapticFeedback.selectionClick();
   }
 
-  void showShakePopup() {
+/*  void showShakePopup() {
     if (isEdit) {
       return;
     }
@@ -88,7 +93,7 @@ class IcebreakerController extends GetxController {
         showNegativeBtn: false,
       ),
     ));
-  }
+  }*/
 
   @override
   Future<void> onClose() async {

@@ -26,6 +26,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../../frontend/ib_widgets/ib_card.dart';
 import '../../../frontend/ib_widgets/ib_user_avatar.dart';
+import '../../managers/Ib_analytics_manager.dart';
 import '../../models/ib_question.dart';
 import '../../models/icebreaker_models/icebreaker.dart';
 
@@ -84,6 +85,8 @@ class ChatPageController extends GetxController {
 
   @override
   Future<void> onReady() async {
+    await IbAnalyticsManager()
+        .logScreenView(className: 'ChatPageController', screenName: 'ChatPage');
     await initData();
 
     /// reset unread count
@@ -136,7 +139,7 @@ class ChatPageController extends GetxController {
       if (txtController.text.length > text.value.length) {
         final str = list[list.length - 1];
         if (str.startsWith('@')) {
-          showMentionList();
+          _showMentionList();
         }
       } else {
         // new text value length has decreased
@@ -164,7 +167,7 @@ class ChatPageController extends GetxController {
       }
     });
 
-    showWelcomeMsg();
+    _showWelcomeMsg();
   }
 
   List<String> _generateMentionIds() {
@@ -208,7 +211,7 @@ class ChatPageController extends GetxController {
     return uids.toSet().toList();
   }
 
-  void showMentionList() {
+  void _showMentionList() {
     if (isCircle.isFalse) {
       return;
     }
@@ -272,13 +275,13 @@ class ChatPageController extends GetxController {
       print('ChatPageController looking for IbChat');
       ibChat = await IbChatDbService().queryOneToOneIbChat(recipientId);
     }
-    setUpStreams();
+    _setUpStreams();
     setUpInfo();
     loadPastPolls();
     loadPastIcebreakers();
   }
 
-  void showWelcomeMsg() {
+  void _showWelcomeMsg() {
     final leader = ibChatMembers.firstWhereOrNull(
         (element) => element.member.role == IbChatMember.kRoleLeader);
 
@@ -384,7 +387,7 @@ class ChatPageController extends GetxController {
     }
   }
 
-  void setUpStreams() {
+  void _setUpStreams() {
     if (ibChat == null) {
       isLoading.value = false;
       return;
@@ -508,7 +511,7 @@ class ChatPageController extends GetxController {
         return a.user.username.compareTo(b.user.username);
       });
       ibChatMembers.refresh();
-      showWelcomeMsg();
+      _showWelcomeMsg();
       setUpTypingUsers();
     });
 
@@ -695,6 +698,7 @@ class ChatPageController extends GetxController {
     if (txtController.text.trim().isEmpty && urls.isEmpty) {
       return;
     }
+
     isSending.value = true;
     if (ibChat == null) {
       if (recipientId.isNotEmpty) {
@@ -703,11 +707,10 @@ class ChatPageController extends GetxController {
       }
 
       if (ibChat != null) {
-        setUpStreams();
+        _setUpStreams();
         setUpInfo();
       } else {
         try {
-          print('ChatPageController creating new IbChat');
           final List<String> sortedArr = [
             IbUtils.getCurrentUid()!,
             recipientId
@@ -725,8 +728,10 @@ class ChatPageController extends GetxController {
                   chatId: ibChat!.chatId,
                   uid: recipientId,
                   role: IbChatMember.kRoleMember));
-          setUpStreams();
+          _setUpStreams();
           setUpInfo();
+          await IbAnalyticsManager()
+              .logCustomEvent(name: 'create_new_chat', data: {});
         } catch (e) {
           IbUtils.showSimpleSnackBar(
               msg: 'Failed to create chat room $e',
@@ -765,6 +770,13 @@ class ChatPageController extends GetxController {
       if (txtController.text.trim().isNotEmpty) {
         await IbChatDbService().uploadMessage(buildTxtMessage());
         txtController.clear();
+        if (ibChat!.isCircle) {
+          await IbAnalyticsManager()
+              .logCustomEvent(name: 'circle_message', data: {});
+        } else {
+          await IbAnalyticsManager()
+              .logCustomEvent(name: '1_1_message', data: {});
+        }
       }
     } catch (e) {
       IbUtils.showSimpleSnackBar(

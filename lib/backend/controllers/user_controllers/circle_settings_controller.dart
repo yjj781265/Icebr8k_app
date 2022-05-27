@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
@@ -47,6 +48,13 @@ class CircleSettingsController extends GetxController {
       welcomeMsgController.text = ibChat!.welcomeMsg;
       isPublicCircle.value = ibChat!.isPublicCircle;
     }
+  }
+
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager().logScreenView(
+        className: 'CircleSettingsController', screenName: 'CircleSettings');
   }
 
   Future<void> onCreateCircle() async {

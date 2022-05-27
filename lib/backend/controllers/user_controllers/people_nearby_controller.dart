@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_typesense_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
@@ -310,6 +311,8 @@ class PeopleNearbyController extends GetxController {
 
   @override
   Future<void> onReady() async {
+    await IbAnalyticsManager().logScreenView(
+        className: 'PeopleNearbyController', screenName: 'PeopleNearby');
     intentionSelection.value = [
       IbUtils.getCurrentIbUser()!
           .intentions

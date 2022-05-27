@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_pages/alert_tab.dart';
@@ -56,6 +57,8 @@ class _MainPageViewState extends State<MainPageView>
 
   @override
   Widget build(BuildContext context) {
+    IbAnalyticsManager()
+        .logScreenView(className: "MainPage", screenName: "MainPage");
     IbUtils.changeStatusBarColor();
     return WillPopScope(
       onWillPop: () async {

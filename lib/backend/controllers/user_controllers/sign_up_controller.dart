@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
@@ -46,6 +47,13 @@ class SignUpController extends GetxController {
       },
       time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
     );
+  }
+
+  @override
+  Future<void> onReady() async {
+    await IbAnalyticsManager()
+        .logScreenView(className: 'SignUpController', screenName: 'SignUpPage');
+    super.onReady();
   }
 
   int calculateAge(DateTime birthDate) {

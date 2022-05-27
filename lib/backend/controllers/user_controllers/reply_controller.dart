@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/comment_controller.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
@@ -79,6 +80,13 @@ class ReplyController extends GetxController {
       isQuestionAnonymous.value = q.isAnonymous;
     }
     isLoading.value = false;
+  }
+
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager()
+        .logScreenView(className: 'ReplyController', screenName: 'ReplyPage');
   }
 
   Future<void> loadMore() async {

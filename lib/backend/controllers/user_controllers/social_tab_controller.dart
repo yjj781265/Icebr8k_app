@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -40,8 +41,14 @@ class SocialTabController extends GetxController {
   @override
   Future<void> onInit() async {
     await setUpStreams();
-
     super.onInit();
+  }
+
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager().logScreenView(
+        className: 'SocialTabController', screenName: 'SocialTab');
   }
 
   Future<void> setUpStreams() async {

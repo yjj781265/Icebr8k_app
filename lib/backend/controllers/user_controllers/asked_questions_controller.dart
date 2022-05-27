@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 
+import '../../managers/Ib_analytics_manager.dart';
 import '../../services/user_services/ib_question_db_service.dart';
 
 class AskedQuestionsController extends GetxController {
@@ -25,6 +26,12 @@ class AskedQuestionsController extends GetxController {
     }
     isLoading.value = false;
     super.onInit();
+  }
+
+  @override
+  Future<void> onReady() async {
+    await IbAnalyticsManager().logScreenView(
+        className: 'AskedQuestionsController', screenName: 'AskedPage $uid ');
   }
 
   Future<void> loadMore() async {

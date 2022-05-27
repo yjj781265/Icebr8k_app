@@ -9,6 +9,7 @@ import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
+import '../../managers/Ib_analytics_manager.dart';
 import 'create_question_controller.dart';
 
 class CreateQuestionTagPickerController extends GetxController {
@@ -44,6 +45,14 @@ class CreateQuestionTagPickerController extends GetxController {
     }
 
     super.onInit();
+  }
+
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager().logScreenView(
+        className: 'CreateQuestionTagPickerController',
+        screenName: 'CreateQuestionTagPicker');
   }
 
   Future<void> addNewTag(String text) async {

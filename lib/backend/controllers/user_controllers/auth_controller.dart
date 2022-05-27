@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/setup_controller.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_auth_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_db_status_service.dart';
@@ -30,19 +31,24 @@ class AuthController extends GetxService {
   late StreamSubscription _dbStatusSub;
   final isSigningIn = false.obs;
   final isSigningUp = false.obs;
+  bool isAnalyticsEnabled = false;
   User? firebaseUser;
   final _ibAuthService = IbAuthService();
 
   @override
   void onInit() {
     super.onInit();
-    _dbStatusSub = IbDbStatusService().listenToStatus().listen((event) {
+    _dbStatusSub = IbDbStatusService().listenToStatus().listen((event) async {
       final isRunning = event.data()!['isRunning'] as bool;
       final note = event.data()!['note'] as String;
       final outDatedMsg = event.data()!['outdatedMsg'] as String;
       final minV = event.data()!['min_v'] as double;
       final isOutdated = IbConfig.kVersion < minV;
+      isAnalyticsEnabled = event.data()!['isAnalyticsEnabled'] as bool;
       if (isOutdated) {
+        await IbAnalyticsManager().logCustomEvent(
+            name: 'app_outdated',
+            data: {'note': 'app terminated due to lower version'});
         Get.offAll(() => WelcomePage(), transition: Transition.noTransition);
         Get.dialog(
             IbDialog(
@@ -55,6 +61,9 @@ class AuthController extends GetxService {
       }
 
       if (!isRunning) {
+        await IbAnalyticsManager().logCustomEvent(
+            name: 'server_down',
+            data: {'note': 'server is down, user got kicked out'});
         Get.offAll(() => WelcomePage());
         IbUtils.showSimpleSnackBar(
             msg: note,
@@ -69,6 +78,8 @@ class AuthController extends GetxService {
     _fbAuthSub = _ibAuthService.listenToAuthStateChanges().listen((user) async {
       if (user == null) {
         firebaseUser = null;
+        await IbAnalyticsManager()
+            .logCustomEvent(name: 'user_log_out', data: {});
         print('User is signed out!');
         isInitializing.value = true;
         Get.offAll(() => WelcomePage(),
@@ -79,6 +90,8 @@ class AuthController extends GetxService {
       } else {
         firebaseUser = user;
         print('User is signed in!');
+        await IbAnalyticsManager()
+            .logCustomEvent(name: 'user_log_in', data: {});
         if (isInitializing.isTrue) {
           _navigateToCorrectPage();
         }
@@ -104,6 +117,7 @@ class AuthController extends GetxService {
     );
     try {
       isSigningIn.value = true;
+      await IbAnalyticsManager().logSignIn('signInViaEmail');
 
       if (rememberEmail) {
         IbLocalDataService()
@@ -187,6 +201,7 @@ class AuthController extends GetxService {
         barrierDismissible: false);
     try {
       isSigningUp.value = true;
+      await IbAnalyticsManager().logSignUp('signUpViaEmail');
       final UserCredential userCredential =
           await _ibAuthService.signUpViaEmail(email.trim(), password);
       final user = userCredential.user;
@@ -241,7 +256,12 @@ class AuthController extends GetxService {
       final isOutdated = IbConfig.kVersion < minV;
 
       if (isOutdated) {
+        await IbAnalyticsManager().logCustomEvent(
+            name: 'app_outdated',
+            data: {'note': 'app terminated due to lower version'});
         Get.offAll(() => WelcomePage(), transition: Transition.noTransition);
+        await IbAnalyticsManager().logScreenView(
+            className: "AuthController", screenName: "WelcomePage");
         Get.dialog(
             IbDialog(
               title: 'App Outdated',
@@ -253,7 +273,12 @@ class AuthController extends GetxService {
       }
 
       if (!isRunning) {
+        await IbAnalyticsManager().logCustomEvent(
+            name: 'server_down',
+            data: {'note': 'server is down, user got kicked out'});
         Get.offAll(() => WelcomePage());
+        await IbAnalyticsManager().logScreenView(
+            className: "AuthController", screenName: "WelcomePage");
         IbUtils.showSimpleSnackBar(
             msg: note,
             backgroundColor: IbColors.primaryColor,
@@ -279,9 +304,14 @@ class AuthController extends GetxService {
         if (ibUser != null &&
             ibUser.roles.contains(IbUser.kAdminRole) &&
             ibUser.roles.contains(IbUser.kUserRole)) {
+          await IbAnalyticsManager().logScreenView(
+              className: "AuthController", screenName: "RoleSelectPage");
           Get.offAll(() => RoleSelectPage());
+
           return;
         } else if (ibUser != null && ibUser.roles.contains(IbUser.kAdminRole)) {
+          await IbAnalyticsManager().logScreenView(
+              className: "AuthController", screenName: "AdminMainPage");
           Get.offAll(() => AdminMainPage());
         }
 
@@ -294,6 +324,8 @@ class AuthController extends GetxService {
 
         switch (status) {
           case IbUser.kUserStatusApproved:
+            await IbAnalyticsManager().logScreenView(
+                className: "AuthController", screenName: "MainPage");
             Get.off(() => MainPage(),
                 binding: HomeBinding(ibUser!),
                 transition: Transition.circularReveal);
@@ -306,12 +338,16 @@ class AuthController extends GetxService {
 
           case IbUser.kUserStatusPending:
             print('Go to InReview Page');
+            await IbAnalyticsManager().logScreenView(
+                className: "AuthController", screenName: "ReviewPage");
             Get.offAll(() => ReviewPage(),
                 transition: Transition.circularReveal);
             break;
 
           case IbUser.kUserStatusRejected:
             print('Go to Setup Page with note dialog');
+            await IbAnalyticsManager().logScreenView(
+                className: "AuthController", screenName: "SetupPageOne");
             Get.offAll(
                 () => SetupPageOne(Get.put(
                     SetupController(status: IbUser.kUserStatusRejected))),
@@ -320,12 +356,16 @@ class AuthController extends GetxService {
 
           case null:
             print('Go to Setup page');
+            await IbAnalyticsManager().logScreenView(
+                className: "AuthController", screenName: "SetupPageOne");
             Get.offAll(() => SetupPageOne(Get.put(SetupController())),
                 transition: Transition.circularReveal);
             break;
 
           default:
             print('default Go to Setup page');
+            await IbAnalyticsManager().logScreenView(
+                className: "AuthController", screenName: "SetupPageOne");
             Get.offAll(() => SetupPageOne(Get.put(SetupController())),
                 transition: Transition.circularReveal);
             break;
@@ -357,6 +397,7 @@ class AuthController extends GetxService {
   Future<void> resetPassword(String email) async {
     Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));
     try {
+      await IbAnalyticsManager().logCustomEvent(name: "reset_pwd", data: {});
       await _ibAuthService.resetPassword(email);
       Get.back();
       final String msg = 'reset_email_msg'.trParams({'email': email});
