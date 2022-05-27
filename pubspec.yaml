@@ -34,10 +34,10 @@ dependencies:
   extended_nested_scroll_view: ^5.1.0
   firebase_analytics: ^9.1.9
   firebase_auth: ^3.3.12
-  firebase_core: ^1.14.0
-  firebase_crashlytics: ^2.6.0
+  firebase_core: ^1.17.1
+  firebase_crashlytics: ^2.8.1
   firebase_messaging: ^11.4.0
-  firebase_performance: ^0.8.0+8
+  firebase_performance: ^0.8.0+13
   firebase_storage: ^10.2.10
   flutter:
     sdk: flutter
