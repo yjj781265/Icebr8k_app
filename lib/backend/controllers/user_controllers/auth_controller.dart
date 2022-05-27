@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/setup_controller.dart';
@@ -45,6 +47,9 @@ class AuthController extends GetxService {
       final minV = event.data()!['min_v'] as double;
       final isOutdated = IbConfig.kVersion < minV;
       isAnalyticsEnabled = event.data()!['isAnalyticsEnabled'] as bool;
+
+      setUpAnalytics();
+
       if (isOutdated) {
         await IbAnalyticsManager().logCustomEvent(
             name: 'app_outdated',
@@ -105,6 +110,13 @@ class AuthController extends GetxService {
     _fbAuthSub.cancel();
     _dbStatusSub.cancel();
     print('auth controller onClose');
+  }
+
+  Future<void> setUpAnalytics() async {
+    final FirebasePerformance performance = FirebasePerformance.instance;
+    final FirebaseCrashlytics crashlytics = FirebaseCrashlytics.instance;
+    await performance.setPerformanceCollectionEnabled(isAnalyticsEnabled);
+    await crashlytics.setCrashlyticsCollectionEnabled(isAnalyticsEnabled);
   }
 
   Future signInViaEmail(
