@@ -44,7 +44,7 @@ class IbConfig {
   static const int kCircleMaxMembers = 88;
   static const String kDefaultCoverPhotoUrl =
       'https://firebasestorage.googleapis.com/v0/b/icebr8k-flutter.appspot.com/o/images%2Fheader_img.jpg?alt=media&token=070dea5e-269a-467c-acb8-35ba7a5fde39';
-  static const double kVersion = 0.1;
+  static const double kVersion = 0.2;
 
   IbConfig._();
 }
