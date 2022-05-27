@@ -19,11 +19,12 @@ class HomeTabController extends GetxController {
   late StreamSubscription first8Sub;
   final double hideShowNavBarSensitivity = 10;
   bool canHideNavBar = true;
+  final newestList = <IbQuestion>[].obs;
   final trendingList = <IbQuestion>[].obs;
   final forYourList = <IbQuestion>[].obs;
   final first8List = <IbQuestion>[].obs;
   final first8Map = <String, bool>{};
-  final categories = ['Trending', 'For You'];
+  final categories = ['Trending', 'For You', 'Newest'];
   final selectedCategory = 'For You'.obs;
   final isLocked = true.obs;
   final isLoading = true.obs;
@@ -31,6 +32,7 @@ class HomeTabController extends GetxController {
   DocumentSnapshot<Map<String, dynamic>>? lastFriendQuestionDoc;
   DocumentSnapshot<Map<String, dynamic>>? lastTagDoc;
   DocumentSnapshot<Map<String, dynamic>>? lastTrendingDoc;
+  DocumentSnapshot<Map<String, dynamic>>? lastNewestDoc;
   RefreshController refreshController = RefreshController();
 
   StreamSubscription? ibUserSub;
@@ -64,8 +66,10 @@ class HomeTabController extends GetxController {
 
     if (selectedCategory.value == categories[0]) {
       await _loadTrending(refreshStats: refreshStats);
-    } else {
+    } else if (selectedCategory.value == categories[1]) {
       await _loadForYou(refreshStats: refreshStats);
+    } else {
+      await _loadNewest(refreshStats: refreshStats);
     }
   }
 
@@ -193,6 +197,32 @@ class HomeTabController extends GetxController {
     }
   }
 
+  Future<void> _loadNewest({bool refreshStats = false}) async {
+    refreshController.resetNoData();
+    newestList.clear();
+    isLoading.value = true;
+    try {
+      final snap = await IbQuestionDbService().queryIbQuestions(
+          askedTimeInMs: Timestamp.now().millisecondsSinceEpoch);
+      for (final doc in snap.docs) {
+        newestList.addIf(
+            newestList.indexWhere((element) => element.id == doc.id) == -1,
+            IbQuestion.fromJson(doc.data()));
+        lastNewestDoc = doc;
+      }
+      refreshController.refreshCompleted();
+      isLoading.value = false;
+      if (refreshStats) {
+        await _refreshQuestionItemControllers();
+      }
+      canHideNavBar = trendingList.length > 6;
+    } catch (e) {
+      refreshController.loadFailed();
+      print(e);
+      isLoading.value = false;
+    }
+  }
+
   Future<void> _refreshQuestionItemControllers() async {
     if (selectedCategory.value == categories[0]) {
       for (final q in trendingList) {
@@ -203,7 +233,16 @@ class HomeTabController extends GetxController {
       return;
     }
 
-    for (final q in forYourList) {
+    if (selectedCategory.value == categories[1]) {
+      for (final q in forYourList) {
+        if (Get.isRegistered<IbQuestionItemController>(tag: q.id)) {
+          await Get.find<IbQuestionItemController>(tag: q.id).refreshStats();
+        }
+      }
+      return;
+    }
+
+    for (final q in newestList) {
       if (Get.isRegistered<IbQuestionItemController>(tag: q.id)) {
         await Get.find<IbQuestionItemController>(tag: q.id).refreshStats();
       }
@@ -280,6 +319,37 @@ class HomeTabController extends GetxController {
         tempList.shuffle();
         forYourList.addAll(tempList);
 
+        refreshController.loadComplete();
+      } catch (e) {
+        refreshController.loadFailed();
+      }
+    }
+
+    if (selectedCategory.value == categories[2]) {
+      if (lastNewestDoc == null) {
+        refreshController.loadNoData();
+        return;
+      }
+
+      final lastQuestion = newestList
+          .firstWhereOrNull((element) => element.id == lastNewestDoc!.id);
+      if (lastQuestion == null) {
+        refreshController.loadNoData();
+        return;
+      }
+
+      try {
+        final snap = await IbQuestionDbService()
+            .queryIbQuestions(askedTimeInMs: lastQuestion.askedTimeInMs);
+        if (snap.docs.isEmpty) {
+          refreshController.loadNoData();
+          return;
+        }
+
+        for (final doc in snap.docs) {
+          newestList.add(IbQuestion.fromJson(doc.data()));
+          lastNewestDoc = doc;
+        }
         refreshController.loadComplete();
       } catch (e) {
         refreshController.loadFailed();

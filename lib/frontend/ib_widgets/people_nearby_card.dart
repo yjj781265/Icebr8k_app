@@ -31,73 +31,70 @@ class PeopleNearbyCard extends StatelessWidget {
       child: IbCard(
         margin: EdgeInsets.zero,
         elevation: 0,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Scrollbar(
-            radius: const Radius.circular(16),
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Column(
-                  children: [
-                    IbUserAvatar(
-                      avatarUrl: item.user.avatarUrl,
-                      compScore: item.compScore,
-                      radius: 48,
-                      uid: item.user.id,
+        child: Scrollbar(
+          radius: const Radius.circular(16),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  IbUserAvatar(
+                    avatarUrl: item.user.avatarUrl,
+                    compScore: item.compScore,
+                    radius: 48,
+                    uid: item.user.id,
+                  ),
+                  AutoSizeText(
+                    item.user.username,
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    maxFontSize: IbConfig.kSloganSize,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: IbConfig.kSloganSize),
+                  ),
+                  AutoSizeText(
+                    '${item.user.fName} • ${item.user.gender} • ${IbUtils.calculateAge(item.user.birthdateInMs ?? -1)}',
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    maxFontSize: IbConfig.kNormalTextSize,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: IbConfig.kNormalTextSize),
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  Text(
+                    '🔍 ${item.user.intentions.join(' • ')}',
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.location_on_outlined,
+                          color: IbColors.primaryColor,
+                          size: 16,
+                        ),
+                        Text(
+                          '${IbUtils.getDistanceString(item.distanceInMeter.toDouble())} away',
+                          style: const TextStyle(color: IbColors.lightGrey),
+                        ),
+                      ],
                     ),
-                    AutoSizeText(
-                      item.user.username,
-                      maxLines: 1,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      maxFontSize: IbConfig.kPageTitleSize,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: IbConfig.kPageTitleSize),
-                    ),
-                    AutoSizeText(
-                      '${item.user.fName} • ${item.user.gender} • ${IbUtils.calculateAge(item.user.birthdateInMs ?? -1)}',
-                      maxLines: 1,
-                      textAlign: TextAlign.center,
-                      maxFontSize: IbConfig.kNormalTextSize,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: IbConfig.kNormalTextSize),
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    Text(
-                      '🔍 ${item.user.intentions.join(' • ')}',
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.location_on_outlined,
-                            color: IbColors.primaryColor,
-                            size: 16,
-                          ),
-                          Text(
-                            '${IbUtils.getDistanceString(item.distanceInMeter.toDouble())} away',
-                            style: const TextStyle(color: IbColors.lightGrey),
-                          ),
-                        ],
-                      ),
-                    ),
-                    IbDescriptionText(
-                      text: item.user.bio,
-                      textAlign: TextAlign.center,
-                    ),
-                    _actions(),
-                    _commonTagsWidget(context),
-                    _emoPics(context),
-                  ],
-                ),
+                  ),
+                  IbDescriptionText(
+                    text: item.user.bio,
+                    textAlign: TextAlign.center,
+                  ),
+                  _actions(),
+                  _commonTagsWidget(context),
+                  _emoPics(context),
+                ],
               ),
             ),
           ),
