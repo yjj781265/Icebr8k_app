@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
@@ -47,8 +48,17 @@ class SearchPageController extends GetxController {
     super.onInit();
   }
 
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager().logScreenView(
+        className: 'SearchPageController', screenName: 'SearchPage');
+  }
+
   Future<void> search() async {
     if (searchText.trim().isNotEmpty) {
+      await IbAnalyticsManager().logSearch(searchText.trim());
+
       /// search IbUsers first
       final ids =
           await IbTypeSenseService().searchIbUsers(searchText.value.trim());

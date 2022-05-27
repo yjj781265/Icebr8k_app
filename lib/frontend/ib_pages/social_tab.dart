@@ -23,6 +23,7 @@ import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:showcaseview/showcaseview.dart';
 
+import '../../backend/managers/Ib_analytics_manager.dart';
 import '../ib_colors.dart';
 import 'chat_pages/chat_page.dart';
 
@@ -50,6 +51,8 @@ class _SocialTabState extends State<SocialTab>
 
   @override
   Widget build(BuildContext context) {
+    IbAnalyticsManager()
+        .logScreenView(className: "SocialTab", screenName: "SocialTab");
     return ShowCaseWidget(
       onComplete: (index, key) {
         if (key == IbShowCaseKeys.kPeopleNearbyKey) {

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
@@ -55,7 +56,14 @@ class HomeTabController extends GetxController {
       _lastOffset = scrollController.offset;
     });
 
-    determineFeatureIsLocked().then((value) async => {await onRefresh()});
+    _determineFeatureIsLocked().then((value) async => {await onRefresh()});
+  }
+
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager()
+        .logScreenView(className: 'HomeTabController', screenName: 'HomeTab');
   }
 
   Future<void> onRefresh({bool refreshStats = false}) async {
@@ -71,9 +79,11 @@ class HomeTabController extends GetxController {
     } else {
       await _loadNewest(refreshStats: refreshStats);
     }
+    await IbAnalyticsManager().logCustomEvent(
+        name: 'refresh_home_tab', data: {'category': selectedCategory.value});
   }
 
-  Future<void> determineFeatureIsLocked() async {
+  Future<void> _determineFeatureIsLocked() async {
     Get.find<MainPageController>().showNavBar();
     forYourList.clear();
     first8List.value = await IbQuestionDbService().queryFirst8();

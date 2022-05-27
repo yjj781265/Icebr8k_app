@@ -1,6 +1,7 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/admin/edit_ib_collection_main_page.dart';
@@ -22,6 +23,8 @@ class HomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    IbAnalyticsManager()
+        .logScreenView(className: "HomeTab", screenName: "HomeTab");
     return ShowCaseWidget(
       onComplete: (index, key) {
         if (key == IbShowCaseKeys.kPollExpandKey) {

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
@@ -34,6 +35,13 @@ class NotificationController extends GetxController {
     await _initPushNotification();
     await _initData();
     super.onInit();
+  }
+
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager().logScreenView(
+        className: 'NotificationController', screenName: 'AlertTab');
   }
 
   @override

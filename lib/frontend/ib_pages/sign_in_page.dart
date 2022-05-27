@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/reset_pwd_controller.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -21,6 +22,8 @@ class SignInPage extends StatelessWidget {
   final ResetPwdController _resetPwdController = Get.put(ResetPwdController());
   @override
   Widget build(BuildContext context) {
+    IbAnalyticsManager()
+        .logScreenView(className: 'SignInPage', screenName: 'SignInPage');
     IbUtils.changeStatusBarColor();
     return Scaffold(
       body: SafeArea(

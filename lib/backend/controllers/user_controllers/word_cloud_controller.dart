@@ -6,6 +6,7 @@ import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dar
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 
+import '../../managers/Ib_analytics_manager.dart';
 import '../../models/ib_question.dart';
 
 class WordCloudController extends GetxController {
@@ -51,11 +52,13 @@ class WordCloudController extends GetxController {
       isLoading.value = false;
     }
 
-    showIntroDialog();
+    await IbAnalyticsManager().logScreenView(
+        className: 'WordCloudController', screenName: 'WordCloudPage');
+    _showIntroDialog();
     super.onReady();
   }
 
-  void showIntroDialog() {
+  void _showIntroDialog() {
     if (IbLocalDataService().retrieveBoolValue(StorageKey.wordCloudIntro)) {
       return;
     }

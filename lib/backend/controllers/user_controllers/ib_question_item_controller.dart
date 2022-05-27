@@ -13,6 +13,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
+import '../../managers/Ib_analytics_manager.dart';
 import '../../services/user_services/ib_question_db_service.dart';
 import '../../services/user_services/ib_user_db_service.dart';
 
@@ -247,9 +248,13 @@ class IbQuestionItemController extends GetxController {
       await IbQuestionDbService().answerQuestion(ibAnswer);
 
       if (!isAnonymous) {
+        await IbAnalyticsManager()
+            .logCustomEvent(name: 'vote', data: {'type': 'public'});
         IbUtils.showSimpleSnackBar(
             msg: 'Voted Publicly 📢', backgroundColor: IbColors.primaryColor);
       } else {
+        await IbAnalyticsManager()
+            .logCustomEvent(name: 'vote', data: {'type': 'anonymous'});
         IbUtils.showSimpleSnackBar(
             msg: 'Voted Anonymously 🤫', backgroundColor: Colors.black);
       }
@@ -295,6 +300,9 @@ class IbQuestionItemController extends GetxController {
       rxIbQuestion.value.likes--;
       await IbQuestionDbService().removeLikes(rxIbQuestion.value.id);
     }
+
+    await IbAnalyticsManager()
+        .logCustomEvent(name: 'liked_poll', data: {'value': liked.value});
   }
 
   Future<IbUser?> retrieveUser(String uid) async {

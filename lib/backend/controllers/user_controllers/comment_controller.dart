@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -34,6 +35,13 @@ class CommentController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
     await loadComments();
+  }
+
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager().logScreenView(
+        className: 'CommentController', screenName: 'CommentPage');
   }
 
   @override
@@ -221,6 +229,7 @@ class CommentController extends GetxController {
               ibAnswer: ibAnswer));
       _updateParentQuestionCommentCount();
       editingController.clear();
+      await IbAnalyticsManager().logCustomEvent(name: 'new_comment', data: {});
       IbUtils.showSimpleSnackBar(
           msg: 'Comment added!', backgroundColor: IbColors.accentColor);
     } catch (e) {

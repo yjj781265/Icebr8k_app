@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
@@ -11,6 +12,13 @@ class EditEmoPicController extends GetxController {
   final RxList<IbEmoPic> rxEmoPics;
 
   EditEmoPicController(this.rxEmoPics);
+
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager().logScreenView(
+        className: 'EditEmoPicController', screenName: 'EditEmoPic');
+  }
 
   Future<void> onRemoveCard(IbEmoPic e) async {
     rxEmoPics.remove(e);

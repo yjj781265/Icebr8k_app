@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/models/ib_gif.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -47,6 +48,13 @@ class IbTenorController extends GetxController {
     });
   }
 
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager().logScreenView(
+        className: 'IbTenorController', screenName: 'IbTenorPage');
+  }
+
   Future<void> loadMore() async {
     try {
       if (trendingGifs.isNotEmpty && showSearchResult.isFalse) {
@@ -69,6 +77,7 @@ class IbTenorController extends GetxController {
     if (editingController.text.isEmpty) {
       return;
     }
+    await IbAnalyticsManager().logSearch(editingController.text);
     isSearching.value = true;
     IbUtils.hideKeyboard();
     showSearchResult.value = true;

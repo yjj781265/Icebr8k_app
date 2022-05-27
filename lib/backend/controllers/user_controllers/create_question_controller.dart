@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
@@ -52,6 +53,9 @@ class CreateQuestionController extends GetxController {
 
   @override
   Future<void> onReady() async {
+    await IbAnalyticsManager().logScreenView(
+        className: 'CreateQuestionController',
+        screenName: 'CreateQuestionPage');
     await preFillInfo();
     super.onReady();
   }
@@ -387,6 +391,9 @@ class CreateQuestionController extends GetxController {
           messageType: IbMessage.kMessageTypePoll,
           chatRoomId: item));
     }
+
+    await IbAnalyticsManager()
+        .logCustomEvent(name: 'create_question', data: {});
 
     Get.close(3);
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
@@ -41,6 +42,13 @@ class SignInController extends GetxController {
       (_) => validateEmail(),
       time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
     );
+  }
+
+  @override
+  Future<void> onReady() async {
+    await IbAnalyticsManager()
+        .logScreenView(className: 'SignInController', screenName: 'SignInPage');
+    super.onReady();
   }
 
   void validatePassword() {

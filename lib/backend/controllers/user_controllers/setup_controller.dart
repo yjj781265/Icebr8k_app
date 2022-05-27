@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart';
@@ -71,6 +72,11 @@ class SetupController extends GetxController {
           showNegativeBtn: false,
         ));
       }
+      await IbAnalyticsManager().logScreenView(
+          className: 'SetupController', screenName: 'SetUpPagesRejected');
+    } else {
+      await IbAnalyticsManager().logScreenView(
+          className: 'SetupController', screenName: 'SetUpPageOne');
     }
   }
 
@@ -140,7 +146,9 @@ class SetupController extends GetxController {
     }
 
     print('Setup Page One is valid!');
-    Get.to(() => SetupPageTwo(this));
+    IbAnalyticsManager()
+        .logScreenView(className: 'SetupController', screenName: 'SetUpPageTwo')
+        .then((value) => Get.to(() => SetupPageTwo(this)));
   }
 
   Future<void> validatePageTwo() async {
@@ -157,7 +165,10 @@ class SetupController extends GetxController {
       }
     }
     print('Setup Page Two is valid!');
-    Get.to(() => SetupPageThree(this));
+    IbAnalyticsManager()
+        .logScreenView(
+            className: 'SetupController', screenName: 'SetUpPageThree')
+        .then((value) => Get.to(() => SetupPageThree(this)));
   }
 
   Future<void> validatePageThree() async {

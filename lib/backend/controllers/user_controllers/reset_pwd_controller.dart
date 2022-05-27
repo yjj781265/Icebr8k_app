@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 
+import '../../managers/Ib_analytics_manager.dart';
+
 class ResetPwdController extends GetxController {
   final email = ''.obs;
   final isEmailValid = false.obs;
@@ -15,6 +17,13 @@ class ResetPwdController extends GetxController {
       (_) => validateEmail(),
       time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
     );
+  }
+
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager().logScreenView(
+        className: 'ResetPwdController', screenName: 'ResetPwdPage');
   }
 
   void validateEmail() {

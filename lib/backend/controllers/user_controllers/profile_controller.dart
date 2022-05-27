@@ -13,6 +13,7 @@ import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import '../../managers/Ib_analytics_manager.dart';
 import '../../services/user_services/ib_chat_db_service.dart';
 
 class ProfileController extends GetxController {
@@ -62,6 +63,13 @@ class ProfileController extends GetxController {
     }
 
     super.onInit();
+  }
+
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager().logScreenView(
+        className: 'ProfileController', screenName: 'ProfilePage');
   }
 
   @override

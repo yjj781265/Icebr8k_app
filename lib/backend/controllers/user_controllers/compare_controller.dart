@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
@@ -47,6 +48,13 @@ class CompareController extends GetxController {
       items[ibQuestion] = ibAnswers;
     }
     isLoading.value = false;
+  }
+
+  @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager().logScreenView(
+        className: 'CompareController', screenName: 'ComparePage');
   }
 
   Future<void> loadMore() async {
