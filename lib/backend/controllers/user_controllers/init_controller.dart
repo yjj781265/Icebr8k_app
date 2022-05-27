@@ -15,6 +15,7 @@ class InitController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
     await GetStorage.init();
+    isLoading.value = false;
   }
 
   @override
