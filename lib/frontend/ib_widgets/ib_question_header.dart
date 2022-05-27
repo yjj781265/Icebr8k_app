@@ -161,24 +161,21 @@ class IbQuestionHeader extends StatelessWidget {
             style: const TextStyle(color: IbColors.lightGrey),
           ),
         ),
-        if (_itemController.rxIbQuestion.value.creatorId ==
-                IbUtils.getCurrentUid() &&
-            _itemController.showComparison.isFalse)
-          ListTile(
-            onTap: () {
-              IbUtils.showSimpleSnackBar(
-                  msg: 'Report system is will be available in the next release',
-                  backgroundColor: IbColors.primaryColor);
-            },
-            leading: const Icon(
-              Icons.report,
-              color: IbColors.errorRed,
-            ),
-            title: const Text(
-              "Report",
-              style: TextStyle(color: IbColors.errorRed),
-            ),
+        ListTile(
+          onTap: () {
+            IbUtils.showSimpleSnackBar(
+                msg: 'Report system is will be available in the next release',
+                backgroundColor: IbColors.primaryColor);
+          },
+          leading: const Icon(
+            Icons.report,
+            color: IbColors.errorRed,
           ),
+          title: const Text(
+            "Report",
+            style: TextStyle(color: IbColors.errorRed),
+          ),
+        ),
         const Spacer(),
         SizedBox(
             width: double.infinity,

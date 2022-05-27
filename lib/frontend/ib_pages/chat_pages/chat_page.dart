@@ -684,7 +684,7 @@ class ChatPage extends StatelessWidget {
               },
               child: Image.network(
                 message.content,
-                height: 120,
+                height: 150,
                 fit: BoxFit.fitHeight,
                 loadingBuilder: (context, child, event) {
                   if (event == null) return child;
@@ -695,8 +695,8 @@ class ChatPage extends StatelessWidget {
                 },
                 errorBuilder: (context, obj, trace) {
                   return Container(
-                    height: 120,
-                    width: 120,
+                    height: 150,
+                    width: 150,
                     color: IbColors.lightGrey,
                     child: const Text('Failed to load image'),
                   );
@@ -764,12 +764,12 @@ class ChatPage extends StatelessWidget {
                         },
                         child: Image.network(
                           message.content,
-                          height: 120,
+                          height: 150,
                           fit: BoxFit.fitHeight,
                           errorBuilder: (context, obj, trace) {
                             return Container(
-                              height: 120,
-                              width: 120,
+                              height: 150,
+                              width: 150,
                               color: IbColors.lightGrey,
                               child: const Text('Failed to load image'),
                             );
@@ -777,7 +777,7 @@ class ChatPage extends StatelessWidget {
                           loadingBuilder: (context, child, event) {
                             if (event == null) return child;
                             return const SizedBox(
-                              height: 120,
+                              height: 150,
                               child: IbProgressIndicator(),
                             );
                           },
@@ -1033,7 +1033,7 @@ class ChatPage extends StatelessWidget {
                 Get.to(() => IcebreakerMainPage(controller));
               },
               child: SizedBox(
-                height: 300,
+                height: 500,
                 child: IcebreakerCard(
                   minSize: IbConfig.kDescriptionTextSize,
                   maxSize: IbConfig.kPageTitleSize,

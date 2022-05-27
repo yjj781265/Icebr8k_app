@@ -192,33 +192,40 @@ class HomeTab extends StatelessWidget {
                       },
                       controller: _controller.refreshController,
                       child: ListView.builder(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.only(bottom: 16),
-                        controller: _controller.scrollController,
-                        itemBuilder: (context, index) {
-                          if (_controller.selectedCategory.value ==
-                              _controller.categories[1]) {
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.only(bottom: 16),
+                          controller: _controller.scrollController,
+                          itemBuilder: (context, index) {
+                            if (_controller.selectedCategory.value ==
+                                _controller.categories[1]) {
+                              return IbUtils.handleQuestionType(
+                                  _controller.forYourList[index],
+                                  isShowcase: index == 0 &&
+                                      !IbLocalDataService().retrieveBoolValue(
+                                          StorageKey.pollExpandShowCaseBool),
+                                  expanded: IbUtils.getCurrentUserSettings()
+                                      .pollExpandedByDefault);
+                            }
+
+                            if (_controller.selectedCategory.value ==
+                                _controller.categories[2]) {
+                              return IbUtils.handleQuestionType(
+                                  _controller.newestList[index],
+                                  isShowcase: index == 0 &&
+                                      !IbLocalDataService().retrieveBoolValue(
+                                          StorageKey.pollExpandShowCaseBool),
+                                  expanded: IbUtils.getCurrentUserSettings()
+                                      .pollExpandedByDefault);
+                            }
                             return IbUtils.handleQuestionType(
-                                _controller.forYourList[index],
+                                _controller.trendingList[index],
                                 isShowcase: index == 0 &&
                                     !IbLocalDataService().retrieveBoolValue(
                                         StorageKey.pollExpandShowCaseBool),
                                 expanded: IbUtils.getCurrentUserSettings()
                                     .pollExpandedByDefault);
-                          }
-                          return IbUtils.handleQuestionType(
-                              _controller.trendingList[index],
-                              isShowcase: index == 0 &&
-                                  !IbLocalDataService().retrieveBoolValue(
-                                      StorageKey.pollExpandShowCaseBool),
-                              expanded: IbUtils.getCurrentUserSettings()
-                                  .pollExpandedByDefault);
-                        },
-                        itemCount: _controller.selectedCategory.value ==
-                                _controller.categories[1]
-                            ? _controller.forYourList.length
-                            : _controller.trendingList.length,
-                      ),
+                          },
+                          itemCount: _handleItemCount()),
                     );
                   }),
                 ),
@@ -226,9 +233,25 @@ class HomeTab extends StatelessWidget {
     );
   }
 
+  int _handleItemCount() {
+    if (_controller.selectedCategory.value == _controller.categories[1]) {
+      return _controller.forYourList.length;
+    }
+
+    if (_controller.selectedCategory.value == _controller.categories[0]) {
+      return _controller.trendingList.length;
+    }
+
+    return _controller.newestList.length;
+  }
+
   bool _handlePullUp() {
     if (_controller.selectedCategory.value == _controller.categories[1]) {
       return _controller.forYourList.length >= IbConfig.kPerPage;
+    }
+
+    if (_controller.selectedCategory.value == _controller.categories[2]) {
+      return _controller.newestList.length >= IbConfig.kPerPage;
     }
     return _controller.trendingList.length >= IbConfig.kPerPage;
   }
