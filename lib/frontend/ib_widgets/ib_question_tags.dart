@@ -85,9 +85,9 @@ class IbQuestionTags extends StatelessWidget {
                         }
 
                         Get.to(
-                          () => TagPage(Get.put(TagPageController(element),
-                              tag: element)),
-                        );
+                            () => TagPage(Get.put(TagPageController(element),
+                                tag: element)),
+                            preventDuplicates: false);
                       },
                     ),
                   ))
