@@ -181,7 +181,7 @@ class SetupPageOne extends StatelessWidget {
                           onPressed: (index) {
                             _controller.onGenderSelect(index);
                           },
-                          isSelected: _controller.genderSelections,
+                          isSelected: _controller.genderSelections.toList(),
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(8.0),
