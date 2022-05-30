@@ -17,6 +17,7 @@ import 'package:icebr8k/frontend/admin/admin_main_page.dart';
 import 'package:icebr8k/frontend/admin/role_select_page.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/banned_count_down_page.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_one.dart';
 import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -317,7 +318,6 @@ class AuthController extends GetxService {
           await IbAnalyticsManager().logScreenView(
               className: "AuthController", screenName: "RoleSelectPage");
           Get.offAll(() => RoleSelectPage());
-
           return;
         } else if (ibUser != null && ibUser.roles.contains(IbUser.kAdminRole)) {
           await IbAnalyticsManager().logScreenView(
@@ -342,8 +342,9 @@ class AuthController extends GetxService {
             break;
 
           case IbUser.kUserStatusBanned:
-            //Todo Go to CounterDown Page
             print('Go to CounterDown Page');
+            Get.off(() => BannedCountDownPage(ibUser!),
+                transition: Transition.circularReveal);
             break;
 
           case IbUser.kUserStatusPending:

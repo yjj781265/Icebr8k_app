@@ -23,6 +23,7 @@ IbUser _$IbUserFromJson(Map<String, dynamic> json) => IbUser(
           const [],
       notificationCount: json['notificationCount'] as int? ?? 0,
       isOnline: json['isOnline'] as bool? ?? false,
+      note: json['note'] as String? ?? '',
       geoPoint: json['geoPoint'] ?? const GeoPoint(0, 0),
       lastLocationTimestampInMs:
           json['lastLocationTimestampInMs'] as int? ?? -1,
@@ -68,6 +69,7 @@ Map<String, dynamic> _$IbUserToJson(IbUser instance) => <String, dynamic>{
       'avatarUrl': instance.avatarUrl,
       'gender': instance.gender,
       'status': instance.status,
+      'note': instance.note,
       'settings': instance.settings?.toJson(),
       'banedEndTimeInMs': instance.banedEndTimeInMs,
       'geoPoint': instance.geoPoint,

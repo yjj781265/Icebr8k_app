@@ -16,6 +16,7 @@ class IbUser {
   String avatarUrl;
   String gender;
   String status;
+  String note;
   IbSettings? settings;
   int banedEndTimeInMs;
   dynamic geoPoint;
@@ -67,6 +68,7 @@ class IbUser {
     this.blockedFriendUids = const [],
     this.notificationCount = 0,
     this.isOnline = false,
+    this.note = '',
     this.geoPoint = const GeoPoint(0, 0),
     this.lastLocationTimestampInMs = -1,
     this.gender = '',

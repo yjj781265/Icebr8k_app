@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/ib_report_controller.dart';
+import 'package:icebr8k/backend/models/ib_report.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_report_card.dart';
 
 import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
 import '../ib_config.dart';
@@ -163,9 +166,15 @@ class IbQuestionHeader extends StatelessWidget {
         ),
         ListTile(
           onTap: () {
-            IbUtils.showSimpleSnackBar(
-                msg: 'Report system is will be available in the next release',
-                backgroundColor: IbColors.primaryColor);
+            Get.back();
+            Get.bottomSheet(IbReportCard(
+                ibReportController: Get.put(
+                    IbReportController(
+                        type: ReportType.poll,
+                        reporteeId:
+                            _itemController.rxIbQuestion.value.creatorId,
+                        url: _itemController.rxIbQuestion.value.id),
+                    tag: _itemController.rxIbQuestion.value.id)));
           },
           leading: const Icon(
             Icons.report,
