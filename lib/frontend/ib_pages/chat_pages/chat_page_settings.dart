@@ -98,65 +98,65 @@ class ChatPageSettings extends StatelessWidget {
   }
 
   Widget membersList(BuildContext context) {
-    return Obx(() => Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
+    return Obx(() => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
                 'Members(${_controller.ibChatMembers.length})',
                 style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: IbConfig.kNormalTextSize),
               ),
-              const SizedBox(
-                height: 8,
-              ),
-              StaggeredGrid.count(
-                crossAxisCount: 5,
-                crossAxisSpacing: 4,
-                mainAxisSpacing: 4,
-                children: _controller.ibChatMembers.map((element) {
-                  return InkWell(
-                    onTap: () {
-                      _showMemberBtmSheet(element);
-                    },
-                    child: SizedBox(
-                      width: 72,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IbUserAvatar(
-                            avatarUrl: element.user.avatarUrl,
-                            compScore: element.compScore,
-                            uid: element.user.id,
-                          ),
-                          Text(
-                            element.user.username,
-                            style: const TextStyle(
-                                fontSize: IbConfig.kNormalTextSize),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            element.member.role,
-                            style: TextStyle(
-                                color: element.member.role ==
-                                        IbChatMember.kRoleLeader
-                                    ? Theme.of(context).indicatorColor
-                                    : IbColors.lightGrey,
-                                fontSize: IbConfig.kDescriptionTextSize),
-                          ),
-                        ],
-                      ),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            StaggeredGrid.count(
+              crossAxisCount: 5,
+              crossAxisSpacing: 4,
+              mainAxisSpacing: 4,
+              children: _controller.ibChatMembers.map((element) {
+                return InkWell(
+                  onTap: () {
+                    _showMemberBtmSheet(element);
+                  },
+                  child: SizedBox(
+                    width: 72,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IbUserAvatar(
+                          avatarUrl: element.user.avatarUrl,
+                          compScore: element.compScore,
+                          uid: element.user.id,
+                        ),
+                        Text(
+                          element.user.username,
+                          style: const TextStyle(
+                              fontSize: IbConfig.kNormalTextSize),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          element.member.role,
+                          style: TextStyle(
+                              color: element.member.role ==
+                                      IbChatMember.kRoleLeader
+                                  ? Theme.of(context).indicatorColor
+                                  : IbColors.lightGrey,
+                              fontSize: IbConfig.kDescriptionTextSize),
+                        ),
+                      ],
                     ),
-                  );
-                }).toList(),
-              ),
-              const Divider(
-                thickness: 2,
-              ),
-            ],
-          ),
+                  ),
+                );
+              }).toList(),
+            ),
+            const Divider(
+              thickness: 2,
+            ),
+          ],
         ));
   }
 
@@ -247,9 +247,12 @@ class ChatPageSettings extends StatelessWidget {
                 Get.to(() => PastIcebreakers(_controller));
               },
               title: const Text('View All Past Icebreakers'),
-              trailing: const Text(
-                '🧊',
-                style: TextStyle(fontSize: 21),
+              trailing: const Padding(
+                padding: EdgeInsets.only(left: 10.0),
+                child: Text(
+                  '🧊',
+                  style: TextStyle(fontSize: 20),
+                ),
               ),
             ),
           if (_controller.pastPolls.isNotEmpty ||
@@ -278,6 +281,7 @@ class ChatPageSettings extends StatelessWidget {
         Obx(
           () => SwitchListTile.adaptive(
             value: _controller.isMuted.value,
+            contentPadding: EdgeInsets.zero,
             onChanged: (value) async {
               if (value) {
                 await _controller.muteNotification();
@@ -285,7 +289,10 @@ class ChatPageSettings extends StatelessWidget {
                 await _controller.unMuteNotification();
               }
             },
-            title: const Text('Mute Notifications'),
+            title: const Padding(
+              padding: EdgeInsets.only(left: 16.0),
+              child: Text('Mute Notifications'),
+            ),
           ),
         ),
         Obx(() {

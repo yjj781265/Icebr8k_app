@@ -37,8 +37,12 @@ class _MenuPageState extends State<MenuPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: SizedBox(
-        width: 300,
+        width: Get.width * 0.7,
         child: IbCard(
+          margin: const EdgeInsets.only(
+            top: 4,
+            bottom: 4,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[

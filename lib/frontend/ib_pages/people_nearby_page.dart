@@ -171,116 +171,145 @@ class PeopleNearbyPage extends StatelessWidget {
       () => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('distance'.tr, style: headerStyle),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Slider(
-                value: _controller.rangeInMi.value,
-                onChanged: (value) {
-                  _controller.rangeInMi.value = value;
-                },
-                min: 1,
-                max: IbConfig.kMaxRangeInMi,
-              ),
-              Text(
-                '${_controller.rangeInMi.value.toInt()}mi',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              )
-            ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text('distance'.tr, style: headerStyle),
           ),
-          Text('age'.tr, style: headerStyle),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RangeSlider(
-                onChanged: (value) {
-                  _controller.rangeValue.value = value;
-                  _controller.rangeValue.refresh();
-                },
-                min: 13,
-                max: 120,
-                values: _controller.rangeValue.value,
-              ),
-              Text(
-                '${_controller.rangeValue.value.start.toInt()}-${_controller.rangeValue.value.end.toInt()}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              )
-            ],
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Slider(
+                  value: _controller.rangeInMi.value,
+                  onChanged: (value) {
+                    _controller.rangeInMi.value = value;
+                  },
+                  min: 1,
+                  max: IbConfig.kMaxRangeInMi,
+                ),
+                Text(
+                  '${_controller.rangeInMi.value.toInt()}mi',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
           ),
-          Text('gender'.tr, style: headerStyle),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text('age'.tr, style: headerStyle),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RangeSlider(
+                  onChanged: (value) {
+                    _controller.rangeValue.value = value;
+                    _controller.rangeValue.refresh();
+                  },
+                  min: 13,
+                  max: 120,
+                  values: _controller.rangeValue.value,
+                ),
+                Text(
+                  '${_controller.rangeValue.value.start.toInt()}-${_controller.rangeValue.value.end.toInt()}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text('gender'.tr, style: headerStyle),
+          ),
           Obx(
-            () => ToggleButtons(
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
-                borderColor: IbColors.lightGrey,
-                selectedColor: IbColors.primaryColor,
-                selectedBorderColor: IbColors.accentColor,
-                borderWidth: 2,
-                onPressed: (index) {
-                  _controller.genderSelections[index] =
-                      !_controller.genderSelections[index];
-                  _controller.genderSelections.refresh();
-                },
-                isSelected: _controller.genderSelections.toList(),
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      IbUser.kGenders[0],
-                      style: TextStyle(color: Theme.of(context).indicatorColor),
+            () => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ToggleButtons(
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  borderColor: IbColors.lightGrey,
+                  selectedColor: IbColors.primaryColor,
+                  selectedBorderColor: IbColors.accentColor,
+                  borderWidth: 2,
+                  onPressed: (index) {
+                    _controller.genderSelections[index] =
+                        !_controller.genderSelections[index];
+                    _controller.genderSelections.refresh();
+                  },
+                  isSelected: _controller.genderSelections.toList(),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        IbUser.kGenders[0],
+                        style:
+                            TextStyle(color: Theme.of(context).indicatorColor),
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      IbUser.kGenders[1],
-                      style: TextStyle(color: Theme.of(context).indicatorColor),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        IbUser.kGenders[1],
+                        style:
+                            TextStyle(color: Theme.of(context).indicatorColor),
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      IbUser.kGenders[2],
-                      style: TextStyle(color: Theme.of(context).indicatorColor),
-                    ),
-                  )
-                ]),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        IbUser.kGenders[2],
+                        style:
+                            TextStyle(color: Theme.of(context).indicatorColor),
+                      ),
+                    )
+                  ]),
+            ),
           ),
           const SizedBox(
             height: 4,
           ),
-          const Text('Intention', style: headerStyle),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text('Intention', style: headerStyle),
+          ),
           Obx(
-            () => ToggleButtons(
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
-                borderColor: IbColors.lightGrey,
-                selectedColor: IbColors.primaryColor,
-                selectedBorderColor: IbColors.accentColor,
-                borderWidth: 2,
-                onPressed: (index) {
-                  _controller.intentionSelection[index] =
-                      !_controller.intentionSelection[index];
-                  _controller.intentionSelection.refresh();
-                },
-                isSelected: _controller.intentionSelection.toList(),
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      IbUser.kIntentions[0],
-                      style: TextStyle(color: Theme.of(context).indicatorColor),
+            () => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ToggleButtons(
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  borderColor: IbColors.lightGrey,
+                  selectedColor: IbColors.primaryColor,
+                  selectedBorderColor: IbColors.accentColor,
+                  borderWidth: 2,
+                  onPressed: (index) {
+                    _controller.intentionSelection[index] =
+                        !_controller.intentionSelection[index];
+                    _controller.intentionSelection.refresh();
+                  },
+                  isSelected: _controller.intentionSelection.toList(),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        IbUser.kIntentions[0],
+                        style:
+                            TextStyle(color: Theme.of(context).indicatorColor),
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      IbUser.kIntentions[1],
-                      style: TextStyle(color: Theme.of(context).indicatorColor),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        IbUser.kIntentions[1],
+                        style:
+                            TextStyle(color: Theme.of(context).indicatorColor),
+                      ),
                     ),
-                  ),
-                ]),
+                  ]),
+            ),
           ),
         ],
       ),

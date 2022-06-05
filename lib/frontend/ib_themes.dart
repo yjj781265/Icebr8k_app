@@ -41,14 +41,14 @@ class IbThemes {
           titleSpacing: 0,
           centerTitle: false,
           iconTheme: const IconThemeData(color: Colors.white),
-          titleTextStyle: GoogleFonts.sourceSansPro(
+          titleTextStyle: GoogleFonts.oxygen(
               fontSize: IbConfig.kPageTitleSize,
               color: Colors.white,
               fontWeight: FontWeight.bold),
         ),
         scaffoldBackgroundColor: Colors.black,
         brightness: Brightness.dark,
-        textTheme: GoogleFonts.sourceSansProTextTheme(
+        textTheme: GoogleFonts.oxygenTextTheme(
           Theme.of(context).textTheme,
         ).apply(bodyColor: Colors.white, displayColor: Colors.white),
         colorScheme: ColorScheme.fromSwatch()
@@ -76,7 +76,7 @@ class IbThemes {
             backgroundColor: IbColors.lightBlue,
             elevation: 0,
             titleSpacing: 0,
-            titleTextStyle: GoogleFonts.sourceSansPro(
+            titleTextStyle: GoogleFonts.oxygen(
                 fontSize: IbConfig.kPageTitleSize,
                 color: Colors.black,
                 fontWeight: FontWeight.bold)),
@@ -95,7 +95,7 @@ class IbThemes {
         brightness: Brightness.light,
         colorScheme:
             ColorScheme.fromSwatch().copyWith(secondary: IbColors.primaryColor),
-        textTheme: GoogleFonts.sourceSansProTextTheme(
+        textTheme: GoogleFonts.oxygenTextTheme(
           Theme.of(context).textTheme,
         ).apply(bodyColor: Colors.black, displayColor: Colors.black));
     return light;

@@ -58,16 +58,21 @@ class IbQuestionDbService {
   /// retrieve single IbQuestion and cache locally via IbCacheManager
   Future<IbQuestion?> querySingleQuestion(String questionId) async {
     print('querySingleQuestion $questionId');
-    if (questionId.isEmpty) {
+    try {
+      if (questionId.isEmpty) {
+        return null;
+      }
+      final snapshot = await _collectionRef.doc(questionId).get();
+      if (!snapshot.exists || snapshot.data() == null) {
+        return null;
+      }
+      final q = IbQuestion.fromJson(snapshot.data()!);
+      IbCacheManager().cacheSingleIbQuestion(q);
+      return q;
+    } catch (e) {
+      print(e.toString());
       return null;
     }
-    final snapshot = await _collectionRef.doc(questionId).get();
-    if (!snapshot.exists || snapshot.data() == null) {
-      return null;
-    }
-    final q = IbQuestion.fromJson(snapshot.data()!);
-    IbCacheManager().cacheSingleIbQuestion(q);
-    return q;
   }
 
   /// query all question this uid asked, public question (no Anonymous question) by default
@@ -347,16 +352,21 @@ class IbQuestionDbService {
   }
 
   Future<IbAnswer?> querySingleIbAnswer(String uid, String questionId) async {
-    final _snapshot = await _collectionRef
-        .doc(questionId)
-        .collection(_kAnswerCollectionGroup)
-        .doc(uid)
-        .get();
-    if (!_snapshot.exists) {
+    try {
+      final _snapshot = await _collectionRef
+          .doc(questionId)
+          .collection(_kAnswerCollectionGroup)
+          .doc(uid)
+          .get();
+      if (!_snapshot.exists) {
+        return null;
+      }
+
+      return IbAnswer.fromJson(_snapshot.data()!);
+    } catch (e) {
+      print(e);
       return null;
     }
-
-    return IbAnswer.fromJson(_snapshot.data()!);
   }
 
   /// get list of PUBLIC ibAnswers with the same choice id but different user id
@@ -568,14 +578,19 @@ class IbQuestionDbService {
 
   Future<IbComment?> queryComment(String commentId) async {
     print('queryComment');
-    final snapshot = await _db
-        .collectionGroup(_kCommentCollectionGroup)
-        .where('commentId', isEqualTo: commentId)
-        .get();
-    if (snapshot.size == 0) {
+    try {
+      final snapshot = await _db
+          .collectionGroup(_kCommentCollectionGroup)
+          .where('commentId', isEqualTo: commentId)
+          .get();
+      if (snapshot.size == 0) {
+        return null;
+      }
+      return IbComment.fromJson(snapshot.docs.first.data());
+    } catch (e) {
+      print(e);
       return null;
     }
-    return IbComment.fromJson(snapshot.docs.first.data());
   }
 
   Future<void> deleteQuestion(String questionId) async {

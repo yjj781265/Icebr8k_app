@@ -98,8 +98,6 @@ class IbQuestionItemController extends GetxController {
 
   /// refresh poll result, comments, likes,
   Future<void> refreshStats() async {
-    countMap.clear();
-    resultMap.clear();
     final q =
         await IbQuestionDbService().querySingleQuestion(rxIbQuestion.value.id);
     if (q != null) {
@@ -172,6 +170,7 @@ class IbQuestionItemController extends GetxController {
   }
 
   Future<void> generatePollStats() async {
+    countMap.clear();
     if (rxIbQuestion.value.pollSize == 0) {
       return;
     }
@@ -181,10 +180,8 @@ class IbQuestionItemController extends GetxController {
     }
 
     for (final IbChoice ibChoice in rxIbQuestion.value.choices) {
-      resultMap[ibChoice] = double.parse(
-          ((countMap[ibChoice.choiceId] ?? 0).toDouble() /
-                  rxIbQuestion.value.pollSize)
-              .toStringAsFixed(1));
+      resultMap[ibChoice] = (countMap[ibChoice.choiceId] ?? 0).toDouble() /
+          rxIbQuestion.value.pollSize.toDouble();
     }
   }
 

@@ -26,211 +26,208 @@ class SignInPage extends StatelessWidget {
         .logScreenView(className: 'SignInPage', screenName: 'SignInPage');
     IbUtils.changeStatusBarColor();
     return Scaffold(
-      body: SafeArea(
-        child: GestureDetector(
-          onTap: () => IbUtils.hideKeyboard(),
-          child: Center(
-            child: Scrollbar(
-              radius: const Radius.circular(IbConfig.kScrollbarCornerRadius),
-              child: SingleChildScrollView(
-                child: AutofillGroup(
-                  child: IbCard(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
+      body: GestureDetector(
+        onTap: () => IbUtils.hideKeyboard(),
+        child: Center(
+          child: Scrollbar(
+            radius: const Radius.circular(IbConfig.kScrollbarCornerRadius),
+            child: SingleChildScrollView(
+              child: AutofillGroup(
+                child: IbCard(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
                         children: [
-                          Row(
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  //hide keyboard
-                                  IbUtils.hideKeyboard();
-                                  Get.back();
-                                },
-                                icon: const Icon(Icons.arrow_back_outlined),
-                              ),
-                              Text(
-                                'login'.tr,
-                                style: const TextStyle(
-                                    fontSize: IbConfig.kPageTitleSize,
-                                    fontWeight: FontWeight.bold),
-                              )
-                            ],
+                          IconButton(
+                            onPressed: () {
+                              //hide keyboard
+                              IbUtils.hideKeyboard();
+                              Get.back();
+                            },
+                            icon: const Icon(Icons.arrow_back_outlined),
                           ),
-                          const SizedBox(
-                            height: 32,
-                          ),
+                          Text(
+                            'login'.tr,
+                            style: const TextStyle(
+                                fontSize: IbConfig.kPageTitleSize,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 32,
+                      ),
 
-                          /*********** Email text field *********/
-                          Obx(() => IbTextField(
-                              textInputType: TextInputType.emailAddress,
-                              titleIcon: const Icon(
-                                Icons.email_outlined,
-                                color: IbColors.primaryColor,
-                              ),
-                              autofillHints: const [
-                                AutofillHints.email,
-                                AutofillHints.username
-                              ],
-                              controller: _controller.emailTxtC,
-                              onChanged: (text) {
-                                _controller.email.value = text;
-                              },
-                              borderColor: _controller.isEmailFirstTime.value
-                                  ? IbColors.lightGrey
-                                  : (_controller.isEmailValid.value
-                                      ? IbColors.accentColor
-                                      : IbColors.errorRed),
-                              titleTrKey: 'email_address',
-                              hintTrKey: 'email_address_hint',
-                              errorTrKey: _controller.emailErrorTrKey.value)),
-
-                          /********* password textInputBox **********/
-                          Obx(
-                            () => IbTextField(
+                      /*********** Email text field *********/
+                      Obx(() => Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: IbTextField(
+                                textInputType: TextInputType.emailAddress,
                                 titleIcon: const Icon(
-                                  Icons.lock_outline,
+                                  Icons.email_outlined,
                                   color: IbColors.primaryColor,
                                 ),
-                                controller: _controller.passwordTxtC,
-                                autofillHints: const [AutofillHints.password],
-                                obscureText: _controller.isPwdObscured.value,
+                                autofillHints: const [
+                                  AutofillHints.email,
+                                  AutofillHints.username
+                                ],
+                                controller: _controller.emailTxtC,
                                 onChanged: (text) {
-                                  _controller.password.value = text;
+                                  _controller.email.value = text;
                                 },
-                                borderColor:
-                                    _controller.isPasswordFirstTime.value
-                                        ? IbColors.lightGrey
-                                        : (_controller.isPasswordValid.value
-                                            ? IbColors.accentColor
-                                            : IbColors.errorRed),
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    final bool isObscured =
-                                        _controller.isPwdObscured.value;
-                                    _controller.isPwdObscured.value =
-                                        !isObscured;
-                                  },
-                                  icon: Icon(_controller.isPwdObscured.value
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined),
-                                ),
-                                titleTrKey: 'password',
-                                hintTrKey: 'password_hint',
-                                errorTrKey:
-                                    _controller.passwordErrorTrKey.value),
-                          ),
-                          Obx(
-                            () => CheckboxListTile(
-                              value: _controller.rememberLoginEmail.value,
-                              controlAffinity: ListTileControlAffinity.leading,
-                              onChanged: (value) {
-                                _controller.rememberLoginEmail.value =
-                                    value ?? false;
-                                IbLocalDataService().updateBoolValue(
-                                    key: StorageKey.rememberLoginEmailBool,
-                                    value: value ?? false);
-                              },
-                              title: const Text('Remember my login email'),
-                            ),
-                          ),
+                                borderColor: _controller.isEmailFirstTime.value
+                                    ? IbColors.lightGrey
+                                    : (_controller.isEmailValid.value
+                                        ? IbColors.accentColor
+                                        : IbColors.errorRed),
+                                titleTrKey: 'email_address',
+                                hintTrKey: 'email_address_hint',
+                                errorTrKey: _controller.emailErrorTrKey.value),
+                          )),
 
-                          /**** forgot password ****/
-                          Padding(
-                            padding: const EdgeInsets.only(left: 24),
-                            child: Row(
-                              children: [
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                      padding: EdgeInsets.zero),
-                                  onPressed: () {
-                                    IbUtils.hideKeyboard();
-                                    _resetPwdController.reset();
-                                    Get.bottomSheet(
-                                      Obx(
-                                        () => IbTextFieldDialog(
-                                          textInputType:
-                                              TextInputType.emailAddress,
-                                          buttons: [
-                                            TextButton(
-                                                onPressed: () {
-                                                  Get.back();
-                                                },
-                                                child: Text(
-                                                  'cancel'.tr,
-                                                  style: const TextStyle(
-                                                      color: IbColors.errorRed),
-                                                )),
-                                            TextButton(
-                                                onPressed: _resetPassword,
-                                                child: Text('reset_pwd'.tr)),
-                                          ],
-                                          borderColor: _resetPwdController
-                                                  .isFirstTime.value
+                      /********* password textInputBox **********/
+                      Obx(
+                        () => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: IbTextField(
+                              titleIcon: const Icon(
+                                Icons.lock_outline,
+                                color: IbColors.primaryColor,
+                              ),
+                              controller: _controller.passwordTxtC,
+                              autofillHints: const [AutofillHints.password],
+                              obscureText: _controller.isPwdObscured.value,
+                              onChanged: (text) {
+                                _controller.password.value = text;
+                              },
+                              borderColor: _controller.isPasswordFirstTime.value
+                                  ? IbColors.lightGrey
+                                  : (_controller.isPasswordValid.value
+                                      ? IbColors.accentColor
+                                      : IbColors.errorRed),
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  final bool isObscured =
+                                      _controller.isPwdObscured.value;
+                                  _controller.isPwdObscured.value = !isObscured;
+                                },
+                                icon: Icon(_controller.isPwdObscured.value
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined),
+                              ),
+                              titleTrKey: 'password',
+                              hintTrKey: 'password_hint',
+                              errorTrKey: _controller.passwordErrorTrKey.value),
+                        ),
+                      ),
+                      Obx(
+                        () => CheckboxListTile(
+                          value: _controller.rememberLoginEmail.value,
+                          controlAffinity: ListTileControlAffinity.leading,
+                          onChanged: (value) {
+                            _controller.rememberLoginEmail.value =
+                                value ?? false;
+                            IbLocalDataService().updateBoolValue(
+                                key: StorageKey.rememberLoginEmailBool,
+                                value: value ?? false);
+                          },
+                          title: const Text('Remember my login email'),
+                        ),
+                      ),
+
+                      /**** forgot password ****/
+                      Padding(
+                        padding: const EdgeInsets.only(left: 24),
+                        child: Row(
+                          children: [
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero),
+                              onPressed: () {
+                                IbUtils.hideKeyboard();
+                                _resetPwdController.reset();
+                                Get.bottomSheet(
+                                  Obx(
+                                    () => IbTextFieldDialog(
+                                      textInputType: TextInputType.emailAddress,
+                                      buttons: [
+                                        TextButton(
+                                            onPressed: () {
+                                              Get.back();
+                                            },
+                                            child: Text(
+                                              'cancel'.tr,
+                                              style: const TextStyle(
+                                                  color: IbColors.errorRed),
+                                            )),
+                                        TextButton(
+                                            onPressed: _resetPassword,
+                                            child: Text('reset_pwd'.tr)),
+                                      ],
+                                      borderColor:
+                                          _resetPwdController.isFirstTime.value
                                               ? IbColors.lightGrey
                                               : (_resetPwdController
                                                       .isEmailValid.value
                                                   ? IbColors.accentColor
                                                   : IbColors.errorRed),
-                                          introTrKey: 'reset_email_intro',
-                                          titleIcon: const Icon(
-                                            Icons.email_outlined,
-                                            color: IbColors.primaryColor,
-                                          ),
-                                          errorTrKey: _resetPwdController
-                                              .emailErrorTrKey.value,
-                                          titleTrKey: 'email_address',
-                                          hintTrKey: 'email_address_hint',
-                                          onChanged: (text) {
-                                            _resetPwdController.email.value =
-                                                text.trim();
-                                          },
-                                        ),
+                                      introTrKey: 'reset_email_intro',
+                                      titleIcon: const Icon(
+                                        Icons.email_outlined,
+                                        color: IbColors.primaryColor,
                                       ),
-                                    );
-                                  },
-                                  child: Text(
-                                    'forget_pwd'.tr,
-                                    style: const TextStyle(
-                                        color: IbColors.lightGrey,
-                                        fontSize: IbConfig.kSecondaryTextSize),
+                                      errorTrKey: _resetPwdController
+                                          .emailErrorTrKey.value,
+                                      titleTrKey: 'email_address',
+                                      hintTrKey: 'email_address_hint',
+                                      onChanged: (text) {
+                                        _resetPwdController.email.value =
+                                            text.trim();
+                                      },
+                                    ),
                                   ),
-                                ),
-                              ],
+                                );
+                              },
+                              child: Text(
+                                'forget_pwd'.tr,
+                                style: const TextStyle(
+                                    color: IbColors.lightGrey,
+                                    fontSize: IbConfig.kSecondaryTextSize),
+                              ),
                             ),
-                          ),
-                          /**** Login Button ****/
-                          Obx(
-                            () => Hero(
-                              transitionOnUserGestures: true,
-                              tag: 'login',
-                              child: GestureDetector(
-                                child: Container(
-                                  height: 80,
-                                  width: Get.width,
-                                  padding: const EdgeInsets.only(
-                                      left: 8, right: 8, bottom: 16, top: 8),
-                                  child: IbElevatedButton(
-                                    icon: const Icon(
-                                        FontAwesomeIcons.rightToBracket),
-                                    color: IbColors.primaryColor,
-                                    textTrKey:
-                                        _authController.isSigningIn.isTrue
-                                            ? 'signing_in'
-                                            : 'login',
-                                    onPressed: () async {
-                                      IbUtils.hideKeyboard();
-                                      await _controller.signInViaEmail();
-                                    },
-                                  ),
-                                ),
+                          ],
+                        ),
+                      ),
+                      /**** Login Button ****/
+                      Obx(
+                        () => Hero(
+                          transitionOnUserGestures: true,
+                          tag: 'login',
+                          child: GestureDetector(
+                            child: Container(
+                              height: 80,
+                              width: Get.width,
+                              padding: const EdgeInsets.only(
+                                  left: 8, right: 8, bottom: 16, top: 8),
+                              child: IbElevatedButton(
+                                icon:
+                                    const Icon(FontAwesomeIcons.rightToBracket),
+                                color: IbColors.primaryColor,
+                                textTrKey: _authController.isSigningIn.isTrue
+                                    ? 'signing_in'
+                                    : 'login',
+                                onPressed: () async {
+                                  IbUtils.hideKeyboard();
+                                  await _controller.signInViaEmail();
+                                },
                               ),
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),

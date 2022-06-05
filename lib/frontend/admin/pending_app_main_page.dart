@@ -10,8 +10,7 @@ class PendingAppMainPage extends StatelessWidget {
   final AdminMainController _controller = Get.find();
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
+    return Scaffold(
       appBar: AppBar(
         title: const Text("Pending Applications"),
       ),
@@ -39,6 +38,6 @@ class PendingAppMainPage extends StatelessWidget {
           itemCount: _controller.pendingUsers.length,
         ),
       ),
-    ));
+    );
   }
 }

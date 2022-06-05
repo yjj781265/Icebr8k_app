@@ -69,7 +69,7 @@ class IbTextFieldDialog extends StatelessWidget {
                     introTrKey.tr,
                     style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: IbConfig.kDescriptionTextSize),
+                        fontSize: IbConfig.kNormalTextSize),
                   ),
                 ),
                 Padding(

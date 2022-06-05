@@ -71,9 +71,9 @@ class MyProfilePage extends StatelessWidget {
                       child: Column(
                         children: [
                           _profileHeader(context),
+                          _userInfo(),
                           _stats(),
                           _actions(),
-                          _userInfo(),
                         ],
                       ),
                     ),
@@ -119,6 +119,11 @@ class MyProfilePage extends StatelessWidget {
   Widget _profileHeader(BuildContext context) {
     return Stack(
       children: [
+        Container(
+          height: Get.width / 2 + 49,
+          width: Get.width,
+          color: Colors.transparent,
+        ),
         Obx(
           () => GestureDetector(
             onTap: () {
@@ -135,7 +140,7 @@ class MyProfilePage extends StatelessWidget {
             },
             child: SizedBox(
               width: Get.width,
-              height: Get.width / 1.78,
+              height: Get.width / 2.0,
               child: CachedNetworkImage(
                 imageUrl:
                     _controller.rxCurrentIbUser.value.coverPhotoUrl.isEmpty
@@ -208,49 +213,26 @@ class MyProfilePage extends StatelessWidget {
         ),
         Positioned(
           bottom: 0,
-          left: 8,
-          right: 0,
-          child: LimitedBox(
-            maxWidth: 300,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                GestureDetector(
-                  child: Obx(
-                    () => IbUserAvatar(
-                        radius: 49,
-                        avatarUrl: _controller.rxCurrentIbUser.value.avatarUrl),
-                  ),
-                  onTap: () {
-                    Get.to(
-                        () => IbMediaViewer(
-                            urls: [_controller.rxCurrentIbUser.value.avatarUrl],
-                            currentIndex: 0),
-                        transition: Transition.zoom,
-                        fullscreenDialog: true);
-                  },
-                ),
-                IbCard(
-                  radius: 8,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Obx(
-                      () => Text(
-                        _controller.rxCurrentIbUser.value.username,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: IbConfig.kPageTitleSize),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+          left: 16,
+          child: InkWell(
+            child: Obx(
+              () => IbUserAvatar(
+                  showBorder: true,
+                  radius: 49,
+                  avatarUrl: _controller.rxCurrentIbUser.value.avatarUrl),
             ),
+            onTap: () {
+              Get.to(
+                  () => IbMediaViewer(
+                      urls: [_controller.rxCurrentIbUser.value.avatarUrl],
+                      currentIndex: 0),
+                  transition: Transition.zoom,
+                  fullscreenDialog: true);
+            },
           ),
         ),
         Positioned(
-            bottom: 8,
+            bottom: 57,
             right: 8,
             child: Container(
               decoration: BoxDecoration(
@@ -272,7 +254,7 @@ class MyProfilePage extends StatelessWidget {
 
   Widget _stats() {
     return Padding(
-      padding: const EdgeInsets.only(top: 4, left: 4, right: 4),
+      padding: const EdgeInsets.only(top: 4, left: 8, right: 8),
       child: StaggeredGrid.count(
         crossAxisCount: 4,
         mainAxisSpacing: 4,
@@ -496,17 +478,32 @@ class MyProfilePage extends StatelessWidget {
   }
 
   Widget _userInfo() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Obx(
-        () => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
+    return Obx(
+      () => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              _controller.rxCurrentIbUser.value.username,
+              style: const TextStyle(
+                  fontSize: IbConfig.kPageTitleSize,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
               '${_controller.rxCurrentIbUser.value.fName} ${_controller.rxCurrentIbUser.value.lName} ',
               style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
             ),
-            Row(
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
               children: [
                 Text(
                   _controller.rxCurrentIbUser.value.gender,
@@ -523,15 +520,19 @@ class MyProfilePage extends StatelessWidget {
                   ),
               ],
             ),
-            const SizedBox(
-              height: 4,
-            ),
-            IbDescriptionText(text: _controller.rxCurrentIbUser.value.bio),
-            const Divider(
-              thickness: 2,
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(
+            height: 4,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child:
+                IbDescriptionText(text: _controller.rxCurrentIbUser.value.bio),
+          ),
+          const Divider(
+            thickness: 2,
+          ),
+        ],
       ),
     );
   }

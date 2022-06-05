@@ -10,8 +10,10 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/compare_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/friend_list_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/ib_report_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
+import 'package:icebr8k/backend/models/ib_report.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -28,9 +30,11 @@ import 'package:icebr8k/frontend/ib_widgets/ib_description_text.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_emo_pic_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_linear_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_profile_stats.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_report_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -68,9 +72,9 @@ class ProfilePage extends StatelessWidget {
                       () => Column(
                         children: [
                           _profileHeader(context),
+                          _userInfo(context),
                           _stats(),
                           _actions(),
-                          _userInfo(context),
                         ],
                       ),
                     ),
@@ -262,9 +266,15 @@ class ProfilePage extends StatelessWidget {
 
   Widget _profileHeader(BuildContext context) {
     return Stack(
+      alignment: Alignment.topCenter,
       children: [
+        Container(
+          height: Get.width / 2 + 49,
+          width: Get.width,
+          color: Colors.transparent,
+        ),
         Obx(
-          () => GestureDetector(
+          () => InkWell(
             onTap: () {
               Get.to(
                   () => IbMediaViewer(urls: [
@@ -278,7 +288,7 @@ class ProfilePage extends StatelessWidget {
             },
             child: SizedBox(
               width: Get.width,
-              height: Get.width / 1.78,
+              height: Get.width / 2.0,
               child: CachedNetworkImage(
                 imageUrl: _controller.rxIbUser.value.coverPhotoUrl.isEmpty
                     ? IbConfig.kDefaultCoverPhotoUrl
@@ -338,9 +348,17 @@ class ProfilePage extends StatelessWidget {
                             Theme.of(context).backgroundColor.withOpacity(0.8),
                         child: IconButton(
                           padding: EdgeInsets.zero,
-                          onPressed: () {},
-                          icon: Icon(Icons.more_vert,
-                              color: Theme.of(context).indicatorColor),
+                          onPressed: () {
+                            Get.bottomSheet(IbReportCard(
+                                ibReportController: Get.put(IbReportController(
+                                    type: ReportType.user,
+                                    reporteeId: _controller.uid,
+                                    url: ''))));
+                          },
+                          icon: const Icon(
+                            Icons.report,
+                            color: IbColors.errorRed,
+                          ),
                         ),
                       )
                     ],
@@ -352,47 +370,25 @@ class ProfilePage extends StatelessWidget {
         ),
         Positioned(
           bottom: 0,
-          left: 0,
-          right: 0,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              GestureDetector(
-                child: Obx(
-                  () => IbUserAvatar(
-                      radius: 49,
-                      compScore: _controller.compScore.value,
-                      avatarUrl: _controller.rxIbUser.value.avatarUrl),
-                ),
-                onTap: () {
-                  Get.to(
-                      () => IbMediaViewer(
-                          urls: [_controller.rxIbUser.value.avatarUrl],
-                          currentIndex: 0),
-                      transition: Transition.zoom,
-                      fullscreenDialog: true);
-                },
-              ),
-              IbCard(
-                radius: 8,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Obx(
-                    () => Text(
-                      _controller.rxIbUser.value.username,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: IbConfig.kPageTitleSize),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          left: 16,
+          child: Obx(
+            () => GestureDetector(
+              onTap: () {
+                Get.to(
+                    () => IbMediaViewer(
+                        urls: [_controller.rxIbUser.value.avatarUrl],
+                        currentIndex: 0),
+                    transition: Transition.zoom);
+              },
+              child: IbUserAvatar(
+                  showBorder: true,
+                  radius: 49,
+                  avatarUrl: _controller.rxIbUser.value.avatarUrl),
+            ),
           ),
         ),
         Positioned(
-            bottom: 8,
+            bottom: 57,
             right: 8,
             child: Container(
               decoration: BoxDecoration(
@@ -407,123 +403,155 @@ class ProfilePage extends StatelessWidget {
                       const TextStyle(fontSize: IbConfig.kDescriptionTextSize),
                 ),
               ),
-            ))
+            )),
       ],
     );
   }
 
   Widget _stats() {
-    return StaggeredGrid.count(crossAxisCount: 4, children: [
-      Obx(
-        () => IbProfileStats(
-          number: _controller.commonAnswers.length,
-          onTap: () {
-            if (_controller.isProfileVisible.isFalse ||
-                _controller.commonAnswers.isEmpty) {
-              return;
-            }
-            Get.to(
-              () => ComparePage(
-                Get.put(
-                  CompareController(
-                    title: '👍 AGREE',
-                    questionIds: _controller.commonAnswers,
-                    uids: [_controller.uid, IbUtils.getCurrentUid() ?? ''],
-                  ),
-                ),
-              ),
-            );
-          },
-          subText: '👍 AGREE',
-        ),
-      ),
-      Obx(
-        () => IbProfileStats(
-            number: _controller.uncommonAnswers.length,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: StaggeredGrid.count(crossAxisCount: 4, children: [
+        Obx(
+          () => IbProfileStats(
+            number: _controller.commonAnswers.length,
             onTap: () {
               if (_controller.isProfileVisible.isFalse ||
-                  _controller.uncommonAnswers.isEmpty) {
+                  _controller.commonAnswers.isEmpty) {
                 return;
               }
               Get.to(
                 () => ComparePage(
                   Get.put(
                     CompareController(
-                      title: '👎 DISAGREE',
-                      questionIds: _controller.uncommonAnswers,
+                      title: '👍 AGREE',
+                      questionIds: _controller.commonAnswers,
                       uids: [_controller.uid, IbUtils.getCurrentUid() ?? ''],
                     ),
                   ),
                 ),
               );
             },
-            subText: '👎 DISAGREE'),
-      ),
-      Obx(() => IbProfileStats(
-          number: _controller.rxIbUser.value.askedCount,
-          onTap: () {
-            if (_controller.isProfileVisible.isFalse ||
-                _controller.rxIbUser.value.askedCount == 0) {
-              return;
-            }
-            Get.to(
-              () => AskedPage(
-                _controller.askedQuestionsController,
-              ),
-            );
-          },
-          subText: '✋ POLL(S)')),
-      Obx(() => IbProfileStats(
-          number: _controller.rxIbUser.value.friendUids.length,
-          onTap: () {
-            if (_controller.isProfileVisible.isFalse ||
-                _controller.rxIbUser.value.friendUids.isEmpty) {
-              return;
-            }
-            Get.to(() => FriendList(Get.put(
-                FriendListController(_controller.rxIbUser.value),
-                tag: _controller.rxIbUser.value.id)));
-          },
-          subText: '👥 FRIEND(S)')),
-      Obx(() => IbProfileStats(
-          number: _controller.rxIbUser.value.tags.length,
-          onTap: () {
-            if (_controller.isProfileVisible.isFalse ||
-                _controller.rxIbUser.value.tags.isEmpty) {
-              return;
-            }
-            Get.to(() => FollowedTagsPage(_controller.rxIbUser.value.tags,
-                _controller.rxIbUser.value.username));
-          },
-          subText: '🏷️ TAG(S)')),
-      Obx(
-        () => IbProfileStats(
-            number: _controller.circles.length,
+            subText: '👍 AGREE',
+          ),
+        ),
+        Obx(
+          () => IbProfileStats(
+              number: _controller.uncommonAnswers.length,
+              onTap: () {
+                if (_controller.isProfileVisible.isFalse ||
+                    _controller.uncommonAnswers.isEmpty) {
+                  return;
+                }
+                Get.to(
+                  () => ComparePage(
+                    Get.put(
+                      CompareController(
+                        title: '👎 DISAGREE',
+                        questionIds: _controller.uncommonAnswers,
+                        uids: [_controller.uid, IbUtils.getCurrentUid() ?? ''],
+                      ),
+                    ),
+                  ),
+                );
+              },
+              subText: '👎 DISAGREE'),
+        ),
+        Obx(() => IbProfileStats(
+            number: _controller.rxIbUser.value.askedCount,
             onTap: () {
               if (_controller.isProfileVisible.isFalse ||
-                  _controller.circles.isEmpty) {
+                  _controller.rxIbUser.value.askedCount == 0) {
                 return;
               }
-              Get.to(() => CirclesPage(_controller.circles));
+              Get.to(
+                () => AskedPage(
+                  _controller.askedQuestionsController,
+                ),
+              );
             },
-            subText: "⭕ CIRCLE(S)"),
-      ),
-    ]);
+            subText: '✋ POLL(S)')),
+        Obx(() => IbProfileStats(
+            number: _controller.rxIbUser.value.friendUids.length,
+            onTap: () {
+              if (_controller.isProfileVisible.isFalse ||
+                  _controller.rxIbUser.value.friendUids.isEmpty) {
+                return;
+              }
+              Get.to(() => FriendList(Get.put(
+                  FriendListController(_controller.rxIbUser.value),
+                  tag: _controller.rxIbUser.value.id)));
+            },
+            subText: '👥 FRIEND(S)')),
+        Obx(() => IbProfileStats(
+            number: _controller.rxIbUser.value.tags.length,
+            onTap: () {
+              if (_controller.isProfileVisible.isFalse ||
+                  _controller.rxIbUser.value.tags.isEmpty) {
+                return;
+              }
+              Get.to(() => FollowedTagsPage(_controller.rxIbUser.value.tags,
+                  _controller.rxIbUser.value.username));
+            },
+            subText: '🏷️ TAG(S)')),
+        Obx(
+          () => IbProfileStats(
+              number: _controller.circles.length,
+              onTap: () {
+                if (_controller.isProfileVisible.isFalse ||
+                    _controller.circles.isEmpty) {
+                  return;
+                }
+                Get.to(() => CirclesPage(_controller.circles));
+              },
+              subText: "⭕ CIRCLE(S)"),
+        ),
+      ]),
+    );
   }
 
   Widget _userInfo(BuildContext context) {
     return Obx(() {
       if (_controller.isProfileVisible.isTrue) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                _controller.rxIbUser.value.username,
+                style: const TextStyle(
+                    fontSize: IbConfig.kPageTitleSize,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                'Match Interest',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: IbLinearIndicator(endValue: _controller.compScore.value),
+            ),
+            const SizedBox(
+              height: 4,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
                 '${_controller.rxIbUser.value.fName} ${_controller.rxIbUser.value.lName} ',
                 style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
               ),
-              Row(
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
                 children: [
                   Text(
                     _controller.rxIbUser.value.gender,
@@ -540,15 +568,18 @@ class ProfilePage extends StatelessWidget {
                     ),
                 ],
               ),
-              const SizedBox(
-                height: 4,
-              ),
-              IbDescriptionText(text: _controller.rxIbUser.value.bio),
-              const Divider(
-                thickness: 2,
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(
+              height: 4,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: IbDescriptionText(text: _controller.rxIbUser.value.bio),
+            ),
+            const Divider(
+              thickness: 2,
+            ),
+          ],
         );
       }
       return const SizedBox();

@@ -18,11 +18,13 @@ class IbUserAvatar extends StatelessWidget {
   final double? compScore;
   final bool showOnlineStatus;
   final bool disableOnTap;
+  final bool showBorder;
   final double radius;
   const IbUserAvatar(
       {Key? key,
       required this.avatarUrl,
       this.compScore,
+      this.showBorder = false,
       this.uid,
       this.disableOnTap = false,
       this.showOnlineStatus = false,
@@ -33,8 +35,12 @@ class IbUserAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     if (avatarUrl.isEmpty) {
       return Container(
-        decoration: const BoxDecoration(
-            shape: BoxShape.circle, color: IbColors.lightGrey),
+        decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: IbColors.lightGrey,
+            border: showBorder
+                ? Border.all(color: Theme.of(context).indicatorColor, width: 2)
+                : null),
         height: radius * 2,
         width: radius * 2,
       );
@@ -43,9 +49,10 @@ class IbUserAvatar extends StatelessWidget {
       alignment: Alignment.center,
       clipBehavior: Clip.none,
       children: [
-        if (compScore != null && uid != IbUtils.getCurrentUid())
+        if (compScore != null)
           TweenAnimationBuilder(
-            tween: Tween<double>(begin: 0, end: compScore),
+            tween: Tween<double>(
+                begin: 0, end: uid == IbUtils.getCurrentUid() ? 0 : compScore),
             duration: const Duration(milliseconds: 888),
             builder: (BuildContext context, double value, Widget? child) {
               return SizedBox(
@@ -81,6 +88,11 @@ class IbUserAvatar extends StatelessWidget {
                         shape: BoxShape.circle,
                         image: DecorationImage(
                             image: imageProvider, fit: BoxFit.cover),
+                        border: showBorder
+                            ? Border.all(
+                                width: 2,
+                                color: Theme.of(context).indicatorColor)
+                            : null,
                       ),
                     ),
                     placeholder: (context, url) => CircleAvatar(
@@ -118,7 +130,7 @@ class IbUserAvatar extends StatelessWidget {
                 },
               ),
             ),
-          )
+          ),
       ],
     );
   }
