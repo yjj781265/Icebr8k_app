@@ -9,25 +9,37 @@ import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/tag_page.dart';
 import 'package:lottie/lottie.dart';
 
-class WordCloudPage extends StatelessWidget {
+class WordCloudPage extends StatefulWidget {
   final WordCloudController _controller;
   const WordCloudPage(this._controller, {Key? key}) : super(key: key);
 
+  @override
+  State<WordCloudPage> createState() => _WordCloudPageState();
+}
+
+class _WordCloudPageState extends State<WordCloudPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
-          title: Text("${_controller.user.username}'s Word Cloud"),
+          title: Text("${widget._controller.user.username}'s Word Cloud"),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  setState(() {});
+                },
+                icon: const Icon(Icons.refresh))
+          ],
         ),
         body: Obx(() {
-          if (_controller.isLoading.isTrue) {
+          if (widget._controller.isLoading.isTrue) {
             return const Center(
               child: IbProgressIndicator(),
             );
           }
 
-          if (_controller.userIbTagMap.isEmpty) {
+          if (widget._controller.userIbTagMap.isEmpty) {
             return Center(
               child: SizedBox(
                 width: 300,
@@ -36,41 +48,38 @@ class WordCloudPage extends StatelessWidget {
                   children: [
                     Lottie.asset('assets/images/sloth_zen.json'),
                     Text(
-                        '${_controller.user.username} has not answered any questions yet')
+                        '${widget._controller.user.username} has not answered any questions yet')
                   ],
                 ),
               ),
             );
           }
 
-          final List<String> tags = _controller.userIbTagMap.keys.toList();
-          tags.sort((a, b) => (_controller.userIbTagMap[b] ?? 0)
-              .compareTo(_controller.userIbTagMap[a] ?? 0));
+          final List<String> tags =
+              widget._controller.userIbTagMap.keys.toList();
+          tags.sort((a, b) => (widget._controller.userIbTagMap[b] ?? 0)
+              .compareTo(widget._controller.userIbTagMap[a] ?? 0));
           return Center(
             child: FittedBox(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: InteractiveViewer(
-                  clipBehavior: Clip.none,
-                  child: Scatter(
-                    fillGaps: true,
-                    clipBehavior: Clip.none,
-                    delegate: ArchimedeanSpiralScatterDelegate(),
-                    children: tags
-                        .take(16)
-                        .toList()
-                        .map((e) => TextButton(
-                              child: Text(
-                                e,
-                                style: randomFont(e),
-                              ),
-                              onPressed: () {
-                                Get.to(() => TagPage(
-                                    Get.put(TagPageController(e), tag: e)));
-                              },
-                            ))
-                        .toList(),
-                  ),
+              child: InteractiveViewer(
+                child: Scatter(
+                  fillGaps: true,
+                  clipBehavior: Clip.hardEdge,
+                  delegate: ArchimedeanSpiralScatterDelegate(),
+                  children: tags
+                      .take(16)
+                      .toList()
+                      .map((e) => TextButton(
+                            child: Text(
+                              e,
+                              style: randomFont(e),
+                            ),
+                            onPressed: () {
+                              Get.to(() => TagPage(
+                                  Get.put(TagPageController(e), tag: e)));
+                            },
+                          ))
+                      .toList(),
                 ),
               ),
             ),
@@ -79,12 +88,12 @@ class WordCloudPage extends StatelessWidget {
   }
 
   TextStyle randomFont(String tag) {
-    final List<String> tags = _controller.userIbTagMap.keys.toList();
-    tags.sort((a, b) => (_controller.userIbTagMap[b] ?? 0)
-        .compareTo(_controller.userIbTagMap[a] ?? 0));
+    final List<String> tags = widget._controller.userIbTagMap.keys.toList();
+    tags.sort((a, b) => (widget._controller.userIbTagMap[b] ?? 0)
+        .compareTo(widget._controller.userIbTagMap[a] ?? 0));
 
-    final int max = _controller.userIbTagMap[tags.first] ?? 1;
-    final int count = _controller.userIbTagMap[tag] ?? 0;
+    final int max = widget._controller.userIbTagMap[tags.first] ?? 1;
+    final int count = widget._controller.userIbTagMap[tag] ?? 0;
     final fontStyles = [FontStyle.italic, FontStyle.normal];
     final fontWeights = [FontWeight.bold, FontWeight.normal];
     final fontSize =

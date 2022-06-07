@@ -160,7 +160,7 @@ class IbUtils {
       {bool isMetric = false}) {
     final double foot = 3.28084 * distanceInMeter;
     if (foot < 528) {
-      return '${foot.toPrecision(1)} ft';
+      return '1.0 mi';
     }
     return '${(foot / 5280).toPrecision(1)} mi';
   }
@@ -570,18 +570,13 @@ class IbUtils {
     final List<Color> _colors = [
       IbColors.primaryColor,
       IbColors.accentColor,
-      IbColors.darkPrimaryColor,
+      Colors.black,
+      Colors.redAccent,
+      Colors.yellowAccent,
+      Colors.cyanAccent,
+      Colors.lightBlueAccent,
+      Colors.purpleAccent,
     ];
-    _colors.addAll(Colors.accents);
-    _colors.addAll(Colors.primaries);
-    _colors.remove(Colors.greenAccent);
-    _colors.remove(Colors.green);
-    _colors.remove(Colors.lightGreen);
-    _colors.remove(Colors.lightGreenAccent);
-    _colors.remove(Colors.yellowAccent);
-    _colors.remove(Colors.yellow);
-    _colors.remove(Colors.amberAccent);
-    _colors.remove(Colors.amber);
     return _colors[random.nextInt(_colors.length)];
   }
 

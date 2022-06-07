@@ -58,6 +58,10 @@ class WordCloudController extends GetxController {
     super.onReady();
   }
 
+  void refreshWordCloud() {
+    refresh();
+  }
+
   void _showIntroDialog() {
     if (IbLocalDataService().retrieveBoolValue(StorageKey.wordCloudIntro)) {
       return;

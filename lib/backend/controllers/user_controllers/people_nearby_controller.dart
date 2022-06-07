@@ -1,4 +1,3 @@
-import 'package:carousel_slider/carousel_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -7,16 +6,17 @@ import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_typesense_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
-import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_pages/edit_profile_pages/edit_profile_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class PeopleNearbyController extends GetxController {
-  CarouselController carouselController = CarouselController();
+  RefreshController refreshController = RefreshController();
   final rangeInMi = 50.0.obs;
   final genderSelections = [true, true, true].obs;
   final intentionSelection = [true, true].obs;
+  final isExpanded = true.obs;
   final currentIndex = 0.obs;
   final rangeValue = const RangeValues(13, 60).obs;
   final int perPage = 16;
@@ -124,6 +124,8 @@ class PeopleNearbyController extends GetxController {
   Future<void> loadItem() async {
     final currentUser = IbUtils.getCurrentIbUser();
     loadedCount = 0;
+    page = 1;
+    refreshController.resetNoData();
     if (currentUser == null) {
       return;
     }
@@ -220,8 +222,7 @@ class PeopleNearbyController extends GetxController {
         items.add(nearbyItem);
       }
       hasMore = found > loadedCount;
-      items.sort((a, b) => b.compScore.compareTo(a.compScore));
-      print(hasMore);
+      items.sort((a, b) => a.distanceInMeter.compareTo(b.distanceInMeter));
       isLoading.value = false;
     } catch (e) {
       print(e);
@@ -240,9 +241,6 @@ class PeopleNearbyController extends GetxController {
   Future<void> loadMore() async {
     if (hasMore) {
       page++;
-      IbUtils.showSimpleSnackBar(
-          msg: 'Looking for more people nearby...',
-          backgroundColor: IbColors.primaryColor);
       final List<String> genders = [];
 
       for (int i = 0; i < genderSelections.length; i++) {
@@ -300,8 +298,11 @@ class PeopleNearbyController extends GetxController {
         tempList.add(nearbyItem);
       }
       hasMore = found > loadedCount;
-      tempList.sort((a, b) => b.compScore.compareTo(a.compScore));
+      tempList.sort((a, b) => a.distanceInMeter.compareTo(b.distanceInMeter));
       items.addAll(tempList);
+      refreshController.loadComplete();
+    } else {
+      refreshController.loadNoData();
     }
   }
 
@@ -344,7 +345,13 @@ class NearbyItem {
       {required this.user,
       required this.distanceInMeter,
       required this.compScore,
-      this.commonTags = const []});
+      this.commonTags = const [
+        '1231312',
+        '123',
+        '132131313',
+        '132131313132131313213',
+        '1321313'
+      ]});
 
   @override
   String toString() {
