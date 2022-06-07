@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../backend/controllers/user_controllers/profile_controller.dart';
@@ -23,7 +24,7 @@ class IbRichText extends StatelessWidget {
   HighLightComponent getHighlightComponent(String word) {
     if (checkIfUserName(word)) {
       return HighLightComponent.username;
-    } else if (GetUtils.isURL(word)) {
+    } else if (GetUtils.isURL(word) && word.contains('http')) {
       return HighLightComponent.url;
     } else if (GetUtils.isPhoneNumber(word)) {
       return HighLightComponent.phoneNumber;
@@ -103,8 +104,10 @@ class IbRichText extends StatelessWidget {
                           ProfilePage(Get.put(ProfileController(userId))));
                     }
                   } else if (HighLightComponent.url == highLightComponent) {
-                    if (await canLaunchUrlString("https:$aWord")) {
-                      await launchUrlString("https:$aWord");
+                    final Uri _url = Uri.parse(aWord);
+                    if (await canLaunchUrl(_url)) {
+                      await launchUrl(_url,
+                          mode: LaunchMode.externalApplication);
                     }
                   } else if (HighLightComponent.phoneNumber ==
                       highLightComponent) {
@@ -115,7 +118,7 @@ class IbRichText extends StatelessWidget {
                     if (await canLaunchUrlString("mailto:$aWord")) {
                       await launchUrlString("mailto:$aWord");
                     } else {
-                      print('cant laucnhc emial');
+                      print('cant launch email');
                     }
                   }
                 }));
