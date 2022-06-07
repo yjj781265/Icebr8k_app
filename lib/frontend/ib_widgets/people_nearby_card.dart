@@ -30,6 +30,7 @@ class PeopleNearbyCard extends StatefulWidget {
 class _PeopleNearbyCardState extends State<PeopleNearbyCard> {
   int currentIndex = 0;
   final CarouselController _controller = CarouselController();
+  final PeopleNearbyController _peopleNearbyController = Get.find();
   @override
   Widget build(BuildContext context) {
     return IbCard(
@@ -61,12 +62,16 @@ class _PeopleNearbyCardState extends State<PeopleNearbyCard> {
           ),
           FloatingActionButton(
             heroTag: null,
-            onPressed: () {
-              print('ontap');
+            onPressed: () async {
+              if (!widget.item.liked) {
+                await _peopleNearbyController.likeProfile(widget.item);
+              } else {
+                await _peopleNearbyController.dislikeProfile(widget.item);
+              }
             },
             backgroundColor: Colors.white,
-            child: const Icon(
-              Icons.favorite_border,
+            child: Icon(
+              widget.item.liked ? Icons.favorite : Icons.favorite_border,
               color: IbColors.errorRed,
             ),
           ),
@@ -186,6 +191,9 @@ class _PeopleNearbyCardState extends State<PeopleNearbyCard> {
                           style: const TextStyle(
                               fontSize: IbConfig.kNormalTextSize),
                         )),
+                  ),
+                  const Divider(
+                    thickness: 2,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),

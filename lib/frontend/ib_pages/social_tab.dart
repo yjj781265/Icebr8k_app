@@ -12,7 +12,7 @@ import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dar
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/circle_settings.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/friends_picker.dart';
-import 'package:icebr8k/frontend/ib_pages/people_nearby_page.dart';
+import 'package:icebr8k/frontend/ib_pages/people_nearby_pages/people_nearby_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/search_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';

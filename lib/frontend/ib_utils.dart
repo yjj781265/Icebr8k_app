@@ -160,7 +160,7 @@ class IbUtils {
       {bool isMetric = false}) {
     final double foot = 3.28084 * distanceInMeter;
     if (foot < 528) {
-      return '1.0 mi';
+      return '0.1 mi';
     }
     return '${(foot / 5280).toPrecision(1)} mi';
   }

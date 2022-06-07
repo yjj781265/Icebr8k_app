@@ -185,7 +185,8 @@ class NotificationController extends GetxController {
         item.ibComment = reply;
         items.add(item);
       }
-    } else if (notification.type == IbNotification.kFriendAccepted) {
+    } else if (notification.type == IbNotification.kFriendAccepted ||
+        notification.type == IbNotification.kProfileLiked) {
       items.add(item);
     }
   }

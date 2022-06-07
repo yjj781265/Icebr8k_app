@@ -22,8 +22,18 @@ class IbLocalDataService {
     return value;
   }
 
+  int retrieveIntValue(StorageKey key) {
+    final int value = _box.read(key.toString()) ?? 0;
+    return value;
+  }
+
   List<String> retrieveStringArrValue(StorageKey key) {
     final List<String> value = _box.read(key.toString()) ?? [];
+    return value;
+  }
+
+  List<bool> retrieveBoolArrValue(StorageKey key) {
+    final List<bool> value = _box.read(key.toString()) ?? [];
     return value;
   }
 
@@ -39,10 +49,22 @@ class IbLocalDataService {
     _box.write(key.toString(), value);
   }
 
+  void updateIntValue({required StorageKey key, required int value}) {
+    _box.write(key.toString(), value);
+  }
+
   void updateStringArrValue({required StorageKey key, required String value}) {
     final List<String> list = _box.read(key.toString()) ?? [];
     list.add(value);
     _box.write(key.toString(), list.toSet().toList());
+  }
+
+  void updateBoolArrValue(
+      {required StorageKey key, required List<bool> value}) {
+    final List<bool> list = _box.read(key.toString()) ?? [];
+    list.clear();
+    list.addAll(value);
+    _box.write(key.toString(), list);
   }
 
   void removeKey(StorageKey key) {
@@ -65,4 +87,8 @@ enum StorageKey {
   peopleNearbyIntro,
   wordCloudShowCaseBool,
   wordCloudIntro,
+  peopleNearbyRangInMiInt,
+  peopleNearbyGenderSelectionBoolArr,
+  peopleNearbyMaxAgeInt,
+  peopleNearbyMinAgeInt,
 }

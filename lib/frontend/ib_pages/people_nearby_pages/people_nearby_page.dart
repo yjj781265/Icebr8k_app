@@ -11,11 +11,10 @@ import 'package:icebr8k/frontend/ib_widgets/people_nearby_snip_card.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import '../../backend/models/ib_user.dart';
+import '../../../backend/models/ib_user.dart';
 
 class PeopleNearbyPage extends StatelessWidget {
-  final PeopleNearbyController _controller =
-      Get.put(PeopleNearbyController(), tag: IbUtils.getUniqueId());
+  final PeopleNearbyController _controller = Get.put(PeopleNearbyController());
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +96,7 @@ class PeopleNearbyPage extends StatelessWidget {
           }
           return SmartRefresher(
             controller: _controller.refreshController,
-            enablePullUp: true,
+            enablePullUp: _controller.items.length >= _controller.perPage,
             enablePullDown: false,
             onLoading: () async {
               await _controller.loadMore();
@@ -292,17 +291,25 @@ class PeopleNearbyPage extends StatelessWidget {
           _controller.intentionSelection.value = oldIntentionSelection.toList();
           _controller.intentionSelection.refresh();
           _controller.genderSelections.refresh();
+          Get.closeAllSnackbars();
           Get.back();
         },
         onPositiveTap: () {
-          if (_controller.genderSelections.contains(true)) {
-            Get.back();
-            _controller.loadItem();
-          } else {
+          if (!_controller.intentionSelection.contains(true)) {
+            IbUtils.showSimpleSnackBar(
+                msg: 'Pick at least one intention',
+                backgroundColor: IbColors.errorRed);
+            return;
+          }
+
+          if (!_controller.genderSelections.contains(true)) {
             IbUtils.showSimpleSnackBar(
                 msg: 'Pick at least one gender',
                 backgroundColor: IbColors.errorRed);
+            return;
           }
+          Get.back();
+          _controller.loadItem();
         },
       ),
     ));

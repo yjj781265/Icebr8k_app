@@ -1003,6 +1003,50 @@ class AlertTab extends StatelessWidget {
         ),
       );
     }
+    if (item.notification.type == IbNotification.kProfileLiked) {
+      return IbCard(
+        radius: 0,
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        color: item.notification.isRead ? Theme.of(context).primaryColor : null,
+        child: ListTile(
+          onTap: () async {
+            if (!item.notification.isRead) {
+              item.notification.isRead = true;
+              await IbUserDbService().sendAlertNotification(item.notification);
+            }
+            Get.to(() => ProfilePage(
+                  Get.put(ProfileController(item.senderUser.id),
+                      tag: item.senderUser.id),
+                ));
+          },
+          leading: IbUserAvatar(
+            radius: 21,
+            avatarUrl: item.avatarUrl,
+          ),
+          title: Text.rich(
+            TextSpan(text: item.senderUser.username, children: const [
+              TextSpan(
+                  text: ' liked your profile in people nearby',
+                  style: TextStyle(fontWeight: FontWeight.normal))
+            ]),
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text(
+            IbUtils.getAgoDateTimeString(DateTime.fromMillisecondsSinceEpoch(
+                (item.notification.timestamp as Timestamp)
+                    .millisecondsSinceEpoch)),
+            style: const TextStyle(
+                fontSize: IbConfig.kDescriptionTextSize,
+                color: IbColors.lightGrey),
+          ),
+          trailing: const Icon(
+            Icons.person_pin_circle_sharp,
+            color: IbColors.errorRed,
+          ),
+        ),
+      );
+    }
     return const SizedBox();
   }
 }

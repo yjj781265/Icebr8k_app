@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 import 'package:icebr8k/backend/db_config.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
@@ -12,6 +13,8 @@ class IbUserDbService {
   static final _ibUserService = IbUserDbService._();
   static final _db = FirebaseFirestore.instance;
   static const _kUserCollection = 'IbUsers${DbConfig.dbSuffix}';
+  static const _kProfileLikesSubCollection =
+      'IbProfileLikes${DbConfig.dbSuffix}';
   static const _kNotificationSubCollection =
       'IbNotifications${DbConfig.dbSuffix}';
   late CollectionReference<Map<String, dynamic>> _collectionRef;
@@ -291,5 +294,111 @@ class IbUserDbService {
   Future<void> clearLocation() async {
     return _collectionRef.doc(IbUtils.getCurrentUid()).update(
         {'geoPoint': const GeoPoint(0, 0), 'lastLocationTimestampInMs': -1});
+  }
+
+  Future<void> likeProfile(String userId) async {
+    if (userId == IbUtils.getCurrentUid()) {
+      return;
+    }
+
+    await _collectionRef
+        .doc(IbUtils.getCurrentUid())
+        .collection(_kProfileLikesSubCollection)
+        .doc(userId)
+        .set({
+      'isLiked': true,
+      'likedUid': userId,
+      'timestamp': FieldValue.serverTimestamp()
+    }, SetOptions(merge: true));
+  }
+
+  /// return -1 if timestamp is null or not found
+  Future<int> lastLikedTimestampInMs(String userId) async {
+    if (userId == IbUtils.getCurrentUid()) {
+      return -1;
+    }
+    try {
+      final snapshot = await _collectionRef
+          .doc(IbUtils.getCurrentUid())
+          .collection(_kProfileLikesSubCollection)
+          .doc(userId)
+          .get();
+      return (snapshot.data()!['timestamp'] as Timestamp)
+          .millisecondsSinceEpoch;
+    } catch (e) {
+      print(e);
+      return -1;
+    }
+  }
+
+  Future<void> dislikeProfile(String userId) async {
+    if (userId == IbUtils.getCurrentUid()) {
+      return;
+    }
+
+    await _collectionRef
+        .doc(IbUtils.getCurrentUid())
+        .collection(_kProfileLikesSubCollection)
+        .doc(userId)
+        .set({
+      'isLiked': false,
+      'likedUid': userId,
+      'timestamp': FieldValue.serverTimestamp()
+    }, SetOptions(merge: true));
+  }
+
+  Future<bool> isProfileLiked(
+      {required String user1Id, required String user2Id}) async {
+    try {
+      final snapshot = await _collectionRef
+          .doc(user1Id)
+          .collection(_kProfileLikesSubCollection)
+          .doc(user2Id)
+          .get();
+
+      if (snapshot.data() == null || !snapshot.exists) {
+        return false;
+      }
+
+      return snapshot.data()!['isLiked'] as bool;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  Future<bool> isProfileLikedNotificationSent(
+      {required String recipientId}) async {
+    try {
+      final snapshot = await _collectionRef
+          .doc(recipientId)
+          .collection(_kNotificationSubCollection)
+          .where('type', isEqualTo: IbNotification.kProfileLiked)
+          .where('senderId', isEqualTo: IbUtils.getCurrentUid())
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      printError(info: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> isProfileBingo(
+      {required String user1Id, required String user2Id}) async {
+    try {
+      final user1Liked =
+          await isProfileLiked(user1Id: user1Id, user2Id: user2Id);
+      final user2Liked =
+          await isProfileLiked(user1Id: user2Id, user2Id: user1Id);
+      return user2Liked && user1Liked;
+    } catch (e) {
+      printError(info: e.toString());
+      return false;
+    }
   }
 }

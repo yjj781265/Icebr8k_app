@@ -7,7 +7,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/main_page_controlle
 import 'package:icebr8k/frontend/admin/admin_main_page.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/people_nearby_page.dart';
+import 'package:icebr8k/frontend/ib_pages/people_nearby_pages/people_nearby_page.dart';
 import 'package:icebr8k/frontend/ib_pages/settings_pages/settings_main_page.dart';
 import 'package:icebr8k/frontend/ib_themes.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';

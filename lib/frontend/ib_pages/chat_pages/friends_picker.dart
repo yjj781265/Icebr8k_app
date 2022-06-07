@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/people_nearby_page.dart';
+import 'package:icebr8k/frontend/ib_pages/people_nearby_pages/people_nearby_page.dart';
 import 'package:icebr8k/frontend/ib_pages/search_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';

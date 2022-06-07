@@ -264,13 +264,8 @@ class ChatPage extends StatelessWidget {
                           minLines: 1,
                           maxLines: 8,
                           maxLength: 2000,
-                          onSubmitted: (value) async {
-                            if (value.isNotEmpty) {
-                              _controller.sendMessage();
-                            }
-                          },
-                          textInputAction: TextInputAction.send,
                           controller: _controller.txtController,
+                          keyboardType: TextInputType.multiline,
                           decoration: const InputDecoration(
                             contentPadding:
                                 EdgeInsets.symmetric(horizontal: 4.0),

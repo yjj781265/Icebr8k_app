@@ -14,7 +14,8 @@ import 'ib_linear_indicator.dart';
 
 class PeopleNearbySnipCard extends StatelessWidget {
   final NearbyItem item;
-  const PeopleNearbySnipCard(this.item, {Key? key}) : super(key: key);
+  final PeopleNearbyController _peopleNearbyController = Get.find();
+  PeopleNearbySnipCard(this.item, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -112,11 +113,15 @@ class PeopleNearbySnipCard extends StatelessWidget {
             top: 0,
             right: 0,
             child: IconButton(
-                onPressed: () {
-                  print('onTap');
+                onPressed: () async {
+                  if (!item.liked) {
+                    await _peopleNearbyController.likeProfile(item);
+                  } else {
+                    await _peopleNearbyController.dislikeProfile(item);
+                  }
                 },
-                icon: const Icon(
-                  Icons.favorite_border,
+                icon: Icon(
+                  item.liked ? Icons.favorite : Icons.favorite_border,
                   color: IbColors.errorRed,
                 )),
           )

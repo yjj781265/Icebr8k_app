@@ -18,6 +18,7 @@ class IbNotification {
   static const String kFriendRequest = 'friend_request';
   static const String kFriendAccepted = 'friend_accepted';
   static const String kChat = 'chat';
+  static const String kProfileLiked = 'profile_liked';
   static const String kCircleInvite = 'circle_invite';
   static const String kCircleRequest = 'circle_request';
   static const String kPollComment = 'poll_comment';

@@ -404,7 +404,7 @@ class SocialTabController extends GetxController {
               fontSize: IbConfig.kSecondaryTextSize,
               fontWeight:
                   item.unReadCount <= 0 ? FontWeight.normal : FontWeight.bold),
-          maxLines: 3,
+          maxLines: 1,
           overflow: TextOverflow.ellipsis,
         );
       case IbMessage.kMessageTypePic:
@@ -414,7 +414,7 @@ class SocialTabController extends GetxController {
               fontSize: IbConfig.kSecondaryTextSize,
               fontWeight:
                   item.unReadCount <= 0 ? FontWeight.normal : FontWeight.bold),
-          maxLines: 3,
+          maxLines: 1,
           overflow: TextOverflow.ellipsis,
         );
       case IbMessage.kMessageTypePoll:
@@ -424,7 +424,7 @@ class SocialTabController extends GetxController {
               fontSize: IbConfig.kSecondaryTextSize,
               fontWeight:
                   item.unReadCount <= 0 ? FontWeight.normal : FontWeight.bold),
-          maxLines: 3,
+          maxLines: 1,
           overflow: TextOverflow.ellipsis,
         );
       case IbMessage.kMessageTypeIcebreaker:
@@ -434,7 +434,7 @@ class SocialTabController extends GetxController {
               fontSize: IbConfig.kSecondaryTextSize,
               fontWeight:
                   item.unReadCount <= 0 ? FontWeight.normal : FontWeight.bold),
-          maxLines: 3,
+          maxLines: 1,
           overflow: TextOverflow.ellipsis,
         );
       default:
