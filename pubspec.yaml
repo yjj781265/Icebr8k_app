@@ -22,6 +22,7 @@ environment:
 
 dependencies:
   animations: ^2.0.2
+  any_link_preview: ^2.0.8
   auto_size_text: ^3.0.0
   cached_network_image: ^3.2.0
   carousel_slider: ^4.1.1

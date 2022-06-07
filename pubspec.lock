@@ -22,6 +22,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.2"
+  any_link_preview:
+    dependency: "direct main"
+    description:
+      name: any_link_preview
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.8"
   archive:
     dependency: transitive
     description:
@@ -1281,6 +1288,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.1"
+  string_validator:
+    dependency: transitive
+    description:
+      name: string_validator
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
   synchronized:
     dependency: transitive
     description:

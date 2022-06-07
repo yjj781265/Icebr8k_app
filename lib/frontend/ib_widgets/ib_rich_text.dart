@@ -1,3 +1,4 @@
+import 'package:any_link_preview/any_link_preview.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,6 +16,8 @@ class IbRichText extends StatelessWidget {
   final String string;
   final Color highlightColor;
   final TextStyle defaultTextStyle;
+  final String errorImageUrl =
+      'https://firebasestorage.googleapis.com/v0/b/icebr8k-flutter.appspot.com/o/admin_files%2Ferror.PNG?alt=media&token=04a4d688-7b4d-4c5a-8d8c-1fdbe4a28db1';
 
   const IbRichText(
       {required this.string,
@@ -78,8 +81,36 @@ class IbRichText extends StatelessWidget {
             stringBuffer.write(" ");
           }
           break;
-        case HighLightComponent.username:
         case HighLightComponent.url:
+          return AnyLinkPreview(
+            key: ValueKey(aWord),
+            link: aWord,
+            displayDirection: UIDirection.uiDirectionHorizontal,
+            bodyMaxLines: 5,
+            titleStyle: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+            ),
+            bodyStyle: const TextStyle(color: Colors.grey, fontSize: 12),
+            errorBody: "Can't parse this url",
+            errorTitle: 'Url',
+            errorWidget: Container(
+              color: Colors.grey[300],
+              child: const Text("Can't parse this url"),
+            ),
+            errorImage: errorImageUrl,
+            backgroundColor: Colors.grey[300],
+            borderRadius: 12,
+            boxShadow: const [BoxShadow(blurRadius: 3, color: Colors.grey)],
+            onTap: () async {
+              final Uri _url = Uri.parse(aWord);
+              if (await canLaunchUrl(_url)) {
+                await launchUrl(_url);
+              }
+            }, // This disables tap event
+          );
+        case HighLightComponent.username:
         case HighLightComponent.phoneNumber:
         case HighLightComponent.email:
           addNonHighlightedTextFromStringBufferToTextSpanList(
@@ -102,12 +133,6 @@ class IbRichText extends StatelessWidget {
                     } else {
                       Get.to(() =>
                           ProfilePage(Get.put(ProfileController(userId))));
-                    }
-                  } else if (HighLightComponent.url == highLightComponent) {
-                    final Uri _url = Uri.parse(aWord);
-                    if (await canLaunchUrl(_url)) {
-                      await launchUrl(_url,
-                          mode: LaunchMode.externalApplication);
                     }
                   } else if (HighLightComponent.phoneNumber ==
                       highLightComponent) {
