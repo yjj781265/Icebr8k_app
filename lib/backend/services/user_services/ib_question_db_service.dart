@@ -119,7 +119,7 @@ class IbQuestionDbService {
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> queryAnsweredQuestions(String uid,
-      {DocumentSnapshot? lastDoc, int limit = 8}) async {
+      {DocumentSnapshot? lastDoc, int limit = IbConfig.kPerPage}) async {
     late Query<Map<String, dynamic>> query;
     if (lastDoc != null) {
       query = _db

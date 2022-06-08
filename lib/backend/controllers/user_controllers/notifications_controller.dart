@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
@@ -14,6 +15,7 @@ import 'package:icebr8k/backend/services/user_services/ib_question_db_service.da
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/chat_page.dart';
+import 'package:icebr8k/frontend/ib_pages/question_pages/question_main_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
@@ -93,31 +95,45 @@ class NotificationController extends GetxController {
       await fcm.subscribeToTopic('Users${DbConfig.dbSuffix}');
       await IbUserDbService().saveTokenToDatabase(fcmToken);
       await handleRemoteMessageFromTerminatedState();
-      FirebaseMessaging.onMessageOpenedApp.listen((event) async {
-        print(event.data);
-        if (event.data['type'] == IbNotification.kChat) {
-          final chatId = event.data['url'] as String;
-          final ibChat = await IbChatDbService().queryChat(chatId);
-          if (ibChat != null) {
-            Get.to(() => ChatPage(Get.put(ChatPageController(ibChat: ibChat),
-                tag: ibChat.chatId)));
-          }
-        }
+      FirebaseMessaging.onMessageOpenedApp.listen((message) async {
+        _handleRemoteMessage(message);
       });
+    }
+  }
+
+  Future<void> _handleRemoteMessage(RemoteMessage message) async {
+    if (message.data['type'] == IbNotification.kChat) {
+      final chatId = message.data['url'] as String;
+      final ibChat = await IbChatDbService().queryChat(chatId);
+      if (ibChat != null) {
+        Get.to(
+            () => ChatPage(Get.put(ChatPageController(ibChat: ibChat),
+                tag: ibChat.chatId)),
+            preventDuplicates: true);
+      }
+    }
+
+    if (message.data['type'] == IbNotification.kPoll) {
+      final questionId = message.data['url'] as String;
+      final question =
+          await IbQuestionDbService().querySingleQuestion(questionId);
+      if (question != null) {
+        final IbQuestionItemController itemController = Get.put(
+            IbQuestionItemController(
+                rxIbQuestion: question.obs,
+                rxIsExpanded: true.obs,
+                rxIsSample: false.obs),
+            tag: questionId);
+        Get.to(() => QuestionMainPage(itemController),
+            preventDuplicates: false);
+      }
     }
   }
 
   Future<void> handleRemoteMessageFromTerminatedState() async {
     final message = await fcm.getInitialMessage();
     if (message != null) {
-      if (message.data['type'] == IbNotification.kChat) {
-        final chatId = message.data['url'] as String;
-        final ibChat = await IbChatDbService().queryChat(chatId);
-        if (ibChat != null) {
-          Get.to(() => ChatPage(
-              Get.put(ChatPageController(ibChat: ibChat), tag: ibChat.chatId)));
-        }
-      }
+      _handleRemoteMessage(message);
     }
   }
 

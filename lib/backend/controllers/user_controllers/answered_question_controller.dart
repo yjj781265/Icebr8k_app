@@ -6,11 +6,13 @@ import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../services/user_services/ib_question_db_service.dart';
 
 class AnsweredQuestionController extends GetxController {
   final answeredQs = <IbQuestion>[].obs;
+  final RefreshController refreshController = RefreshController();
   final isLoading = true.obs;
   DocumentSnapshot? lastDoc;
   final String uid;
@@ -44,18 +46,29 @@ class AnsweredQuestionController extends GetxController {
   }
 
   Future<void> loadMore() async {
-    final snapshot = await IbQuestionDbService()
-        .queryAnsweredQuestions(uid, lastDoc: lastDoc);
-    lastDoc = snapshot.size == 0 ? null : snapshot.docs.last;
-    for (final doc in snapshot.docs) {
-      final IbAnswer ibAnswer = IbAnswer.fromJson(doc.data());
-      IbCacheManager()
-          .cacheSingleIbAnswer(uid: ibAnswer.uid, ibAnswer: ibAnswer);
-      final IbQuestion? question =
-          await IbQuestionDbService().querySingleQuestion(ibAnswer.questionId);
-      if (question != null) {
-        answeredQs.add(question);
+    if (lastDoc == null) {
+      refreshController.loadNoData();
+      return;
+    }
+
+    try {
+      final snapshot = await IbQuestionDbService()
+          .queryAnsweredQuestions(uid, lastDoc: lastDoc);
+      lastDoc = snapshot.size == 0 ? null : snapshot.docs.last;
+      for (final doc in snapshot.docs) {
+        final IbAnswer ibAnswer = IbAnswer.fromJson(doc.data());
+        IbCacheManager()
+            .cacheSingleIbAnswer(uid: ibAnswer.uid, ibAnswer: ibAnswer);
+        final IbQuestion? question = await IbQuestionDbService()
+            .querySingleQuestion(ibAnswer.questionId);
+        if (question != null) {
+          answeredQs.add(question);
+        }
       }
+      refreshController.loadComplete();
+    } catch (e) {
+      refreshController.loadFailed();
+      print('AnsweredQuestionController loadMore $e');
     }
   }
 }

@@ -51,9 +51,9 @@ class ChatPageController extends GetxController {
   final avatarUrl = ''.obs;
   final title = ''.obs;
   final subtitle = ''.obs;
-  StreamSubscription? _messageSub;
-  StreamSubscription? _memberSub;
-  StreamSubscription? _chatSub;
+  StreamSubscription? messageSub;
+  StreamSubscription? memberSub;
+  StreamSubscription? chatSub;
   final isSending = false.obs;
   final isMuted = false.obs;
   DocumentSnapshot<Map<String, dynamic>>? lastSnap;
@@ -170,6 +170,26 @@ class ChatPageController extends GetxController {
     _showWelcomeMsg();
   }
 
+  @override
+  Future<void> onClose() async {
+    if (messageSub != null) {
+      await messageSub!.cancel();
+    }
+
+    if (memberSub != null) {
+      await memberSub!.cancel();
+    }
+
+    if (chatSub != null) {
+      await chatSub!.cancel();
+    }
+    if (ibChat != null) {
+      await IbChatDbService().removeTypingUid(chatId: ibChat!.chatId);
+    }
+
+    super.onClose();
+  }
+
   List<String> _generateMentionIds() {
     final list = <String>[];
     final uids = <String>[];
@@ -244,26 +264,6 @@ class ChatPageController extends GetxController {
     Get.dialog(Center(
       child: LimitedBox(maxHeight: 300, child: options),
     ));
-  }
-
-  @override
-  Future<void> onClose() async {
-    if (_messageSub != null) {
-      await _messageSub!.cancel();
-    }
-
-    if (_memberSub != null) {
-      await _memberSub!.cancel();
-    }
-
-    if (_chatSub != null) {
-      await _chatSub!.cancel();
-    }
-    if (ibChat != null) {
-      await IbChatDbService().removeTypingUid(chatId: ibChat!.chatId);
-    }
-
-    super.onClose();
   }
 
   Future<void> initData() async {
@@ -394,7 +394,7 @@ class ChatPageController extends GetxController {
     }
 
     ///loading messages from stream
-    _messageSub = IbChatDbService()
+    messageSub = IbChatDbService()
         .listenToMessageChanges(ibChat!.chatId)
         .listen((event) async {
       for (final docChange in event.docChanges) {
@@ -446,7 +446,7 @@ class ChatPageController extends GetxController {
       isLoading.value = false;
     });
 
-    _memberSub = IbChatDbService()
+    memberSub = IbChatDbService()
         .listenToIbMemberChanges(ibChat!.chatId)
         .listen((event) async {
       for (final docChange in event.docChanges) {
@@ -515,7 +515,7 @@ class ChatPageController extends GetxController {
       setUpTypingUsers();
     });
 
-    _chatSub =
+    chatSub =
         IbChatDbService().listenToIbChatChanges(ibChat!.chatId).listen((event) {
       if (event.data() != null) {
         ibChat = IbChat.fromJson(event.data()!);

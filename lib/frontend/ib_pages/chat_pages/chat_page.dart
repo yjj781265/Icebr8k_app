@@ -10,6 +10,7 @@ import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/chat_page_settings.dart';
@@ -36,9 +37,67 @@ import '../../../backend/controllers/user_controllers/icebreaker_controller.dart
 import '../../../backend/models/ib_question.dart';
 import '../ib_tenor_page.dart';
 
-class ChatPage extends StatelessWidget {
+class ChatPage extends StatefulWidget {
   const ChatPage(this._controller, {Key? key}) : super(key: key);
   final ChatPageController _controller;
+
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    print(state);
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (widget._controller.messageSub != null) {
+          widget._controller.messageSub!.resume();
+        }
+
+        if (widget._controller.memberSub != null) {
+          widget._controller.memberSub!.resume();
+        }
+
+        if (widget._controller.chatSub != null) {
+          widget._controller.chatSub!.resume();
+        }
+        break;
+      case AppLifecycleState.inactive:
+        break;
+      case AppLifecycleState.paused:
+        if (widget._controller.messageSub != null) {
+          widget._controller.messageSub!.pause();
+        }
+
+        if (widget._controller.memberSub != null) {
+          widget._controller.memberSub!.pause();
+        }
+
+        if (widget._controller.chatSub != null) {
+          widget._controller.chatSub!.pause();
+        }
+        if (widget._controller.ibChat != null) {
+          await IbChatDbService()
+              .removeTypingUid(chatId: widget._controller.ibChat!.chatId);
+        }
+        break;
+      case AppLifecycleState.detached:
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,20 +111,20 @@ class ChatPage extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (_controller.avatarUrl.isEmpty &&
-                    _controller.isCircle.isFalse)
+                if (widget._controller.avatarUrl.isEmpty &&
+                    widget._controller.isCircle.isFalse)
                   _buildAvatar(
                       context: context,
-                      avatarUsers: _controller.ibChatMembers
+                      avatarUsers: widget._controller.ibChatMembers
                           .map((element) => element.user)
                           .toList())
-                else if (_controller.ibChat != null &&
-                    _controller.isCircle.isTrue)
+                else if (widget._controller.ibChat != null &&
+                    widget._controller.isCircle.isTrue)
                   _buildCircleAvatar(
-                      context: context, ibChat: _controller.ibChat!)
+                      context: context, ibChat: widget._controller.ibChat!)
                 else
                   IbUserAvatar(
-                    avatarUrl: _controller.avatarUrl.value,
+                    avatarUrl: widget._controller.avatarUrl.value,
                     radius: 16,
                   ),
                 const SizedBox(
@@ -74,9 +133,10 @@ class ChatPage extends StatelessWidget {
                 Expanded(
                     child: InkWell(
                         onTap: () {
-                          if (_controller.isCircle.isTrue &&
-                              _controller.ibChat != null) {
-                            final currentMember = _controller.ibChatMembers
+                          if (widget._controller.isCircle.isTrue &&
+                              widget._controller.ibChat != null) {
+                            final currentMember = widget
+                                ._controller.ibChatMembers
                                 .firstWhereOrNull((element) =>
                                     element.user.id == IbUtils.getCurrentUid());
                             final isAbleToEdit = currentMember != null &&
@@ -84,7 +144,7 @@ class ChatPage extends StatelessWidget {
                                     IbChatMember.kRoleMember;
                             Get.to(() => CircleSettings(Get.put(
                                 CircleSettingsController(
-                                    ibChat: _controller.ibChat,
+                                    ibChat: widget._controller.ibChat,
                                     isAbleToEdit: isAbleToEdit))));
                           }
                         },
@@ -95,24 +155,24 @@ class ChatPage extends StatelessWidget {
         ),
         actions: [
           Obx(
-            () => _controller.showSettings.isTrue
+            () => widget._controller.showSettings.isTrue
                 ? IconButton(
                     onPressed: () async {
-                      if (_controller.isMuted.isTrue) {
-                        await _controller.unMuteNotification();
+                      if (widget._controller.isMuted.isTrue) {
+                        await widget._controller.unMuteNotification();
                       } else {
-                        await _controller.muteNotification();
+                        await widget._controller.muteNotification();
                       }
                     },
-                    icon: Icon(_controller.isMuted.isTrue
+                    icon: Icon(widget._controller.isMuted.isTrue
                         ? Icons.notifications_off
                         : Icons.notifications_on))
                 : const SizedBox(),
           ),
-          Obx(() => _controller.showSettings.isTrue
+          Obx(() => widget._controller.showSettings.isTrue
               ? IconButton(
                   onPressed: () {
-                    Get.to(() => ChatPageSettings(_controller));
+                    Get.to(() => ChatPageSettings(widget._controller));
                   },
                   icon: const Icon(Icons.more_vert))
               : const SizedBox()),
@@ -120,7 +180,7 @@ class ChatPage extends StatelessWidget {
       ),
       body: Obx(
         () {
-          if (_controller.isLoading.isTrue) {
+          if (widget._controller.isLoading.isTrue) {
             return const Center(
               child: IbProgressIndicator(),
             );
@@ -140,21 +200,21 @@ class ChatPage extends StatelessWidget {
                             physics: const BouncingScrollPhysics(),
                             reverse: true,
                             itemScrollController:
-                                _controller.itemScrollController,
+                                widget._controller.itemScrollController,
                             itemPositionsListener:
-                                _controller.itemPositionsListener,
+                                widget._controller.itemPositionsListener,
                             itemBuilder: (context, index) {
                               return _handleMessageType(
-                                  model: _controller.messages[index],
+                                  model: widget._controller.messages[index],
                                   context: context);
                             },
-                            itemCount: _controller.messages.length,
+                            itemCount: widget._controller.messages.length,
                           ),
                           onNotification: (info) {
                             if (info.metrics.pixels -
                                     info.metrics.maxScrollExtent >
                                 32) {
-                              _controller.loadMore();
+                              widget._controller.loadMore();
                             }
                             return true;
                           },
@@ -167,7 +227,7 @@ class ChatPage extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (_controller.isTypingUsers.isNotEmpty)
+                if (widget._controller.isTypingUsers.isNotEmpty)
                   Align(
                       alignment: Alignment.bottomLeft,
                       child: _buildTypingIndicator(context)),
@@ -237,11 +297,11 @@ class ChatPage extends StatelessWidget {
                           child: IconButton(
                             padding: EdgeInsets.zero,
                             onPressed: () {
-                              _controller.showMsgOptions.value =
-                                  !_controller.showMsgOptions.value;
+                              widget._controller.showMsgOptions.value =
+                                  !widget._controller.showMsgOptions.value;
                             },
                             icon: Icon(
-                                _controller.showMsgOptions.isTrue
+                                widget._controller.showMsgOptions.isTrue
                                     ? Icons.remove
                                     : Icons.add,
                                 color: Theme.of(context).indicatorColor),
@@ -264,7 +324,7 @@ class ChatPage extends StatelessWidget {
                           minLines: 1,
                           maxLines: 8,
                           maxLength: 2000,
-                          controller: _controller.txtController,
+                          controller: widget._controller.txtController,
                           keyboardType: TextInputType.multiline,
                           decoration: const InputDecoration(
                             contentPadding:
@@ -280,7 +340,7 @@ class ChatPage extends StatelessWidget {
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 10.0),
-                        child: _controller.isSending.isTrue
+                        child: widget._controller.isSending.isTrue
                             ? const CircularProgressIndicator(
                                 color: IbColors.primaryColor,
                               )
@@ -288,7 +348,7 @@ class ChatPage extends StatelessWidget {
                                 backgroundColor: IbColors.primaryColor,
                                 child: IconButton(
                                   onPressed: () async {
-                                    await _controller.sendMessage();
+                                    await widget._controller.sendMessage();
                                   },
                                   icon: Icon(Icons.send,
                                       color: Theme.of(context).indicatorColor),
@@ -299,23 +359,23 @@ class ChatPage extends StatelessWidget {
                   ],
                 ),
               ),
-              if (_controller.showMsgOptions.isTrue)
+              if (widget._controller.showMsgOptions.isTrue)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      if (_controller.ibChat != null)
+                      if (widget._controller.ibChat != null)
                         IbActionButton(
                             color: IbColors.primaryColor,
                             iconData: Icons.poll,
                             onPressed: () {
-                              _controller.showMsgOptions.value = false;
+                              widget._controller.showMsgOptions.value = false;
 
                               final chatTabItem = IbUtils.getAllChatTabItems()
                                   .firstWhereOrNull((element) =>
                                       element.ibChat.chatId ==
-                                      _controller.ibChat!.chatId);
+                                      widget._controller.ibChat!.chatId);
                               final createQuestionController =
                                   Get.put(CreateQuestionController());
 
@@ -333,14 +393,14 @@ class ChatPage extends StatelessWidget {
                           color: IbColors.accentColor,
                           iconData: Icons.gif,
                           onPressed: () async {
-                            _controller.showMsgOptions.value = false;
+                            widget._controller.showMsgOptions.value = false;
                             IbUtils.hideKeyboard();
                             final gifUrl = await Get.to(
                               () => IbTenorPage(),
                             );
                             if (gifUrl != null &&
                                 gifUrl.toString().isNotEmpty) {
-                              _controller.urls.add(gifUrl!.toString());
+                              widget._controller.urls.add(gifUrl!.toString());
                             }
                           },
                           text: 'GIF'),
@@ -366,7 +426,7 @@ class ChatPage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Wrap(
-              children: _controller.isTypingUsers
+              children: widget._controller.isTypingUsers
                   .map((element) => element)
                   .toList()
                   .map((element) => Padding(
@@ -391,8 +451,8 @@ class ChatPage extends StatelessWidget {
       padding: const EdgeInsets.only(left: 56, right: 16),
       child: ReorderableRow(
         onReorder: (int oldIndex, int newIndex) {
-          final url = _controller.urls.removeAt(oldIndex);
-          _controller.urls.insert(newIndex, url);
+          final url = widget._controller.urls.removeAt(oldIndex);
+          widget._controller.urls.insert(newIndex, url);
         },
         buildDraggableFeedback: (context, _, child) {
           return Material(
@@ -400,7 +460,7 @@ class ChatPage extends StatelessWidget {
             child: child,
           );
         },
-        children: _controller.urls.toSet().map((element) {
+        children: widget._controller.urls.toSet().map((element) {
           final image = element.contains('http')
               ? Image.network(element, height: 100, fit: BoxFit.fitHeight,
                   errorBuilder: (context, obj, trace) {
@@ -438,8 +498,9 @@ class ChatPage extends StatelessWidget {
                     onTap: () {
                       Get.to(
                           () => IbMediaViewer(
-                              urls: _controller.urls,
-                              currentIndex: _controller.urls.indexOf(element)),
+                              urls: widget._controller.urls,
+                              currentIndex:
+                                  widget._controller.urls.indexOf(element)),
                           transition: Transition.zoom,
                           fullscreenDialog: true);
                     },
@@ -458,7 +519,7 @@ class ChatPage extends StatelessWidget {
                           size: 20,
                         ),
                         onPressed: () {
-                          _controller.urls.remove(element);
+                          widget._controller.urls.remove(element);
                         },
                       ),
                     ))
@@ -480,8 +541,8 @@ class ChatPage extends StatelessWidget {
                 color: Theme.of(context).backgroundColor,
                 borderRadius: const BorderRadius.all(Radius.circular(8))),
             duration: const Duration(milliseconds: 300),
-            height: _controller.showNewMsgAlert.isTrue ? 49 : 0,
-            width: _controller.showNewMsgAlert.isTrue ? 123 : 0,
+            height: widget._controller.showNewMsgAlert.isTrue ? 49 : 0,
+            width: widget._controller.showNewMsgAlert.isTrue ? 123 : 0,
             child: TextButton(
               child: Text(
                 'New Message(s) ↓',
@@ -490,7 +551,7 @@ class ChatPage extends StatelessWidget {
                     color: Theme.of(context).indicatorColor),
               ),
               onPressed: () {
-                _controller.itemScrollController.jumpTo(index: 0);
+                widget._controller.itemScrollController.jumpTo(index: 0);
               },
             ),
           ),
@@ -569,7 +630,7 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget _textMsgItem(IbMessage message) {
-    final IbUser? senderUser = _controller.ibChatMembers
+    final IbUser? senderUser = widget._controller.ibChatMembers
         .firstWhereOrNull((element) => element.user.id == message.senderUid)
         ?.user;
     return Padding(
@@ -591,7 +652,8 @@ class ChatPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (senderUser != null && _controller.isCircle.isTrue)
+                    if (senderUser != null &&
+                        widget._controller.isCircle.isTrue)
                       Text(senderUser.username),
                     if (message.mentionUids.isNotEmpty)
                       Text(
@@ -720,7 +782,7 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget _imgMsgItem(IbMessage message) {
-    final IbUser? senderUser = _controller.ibChatMembers
+    final IbUser? senderUser = widget._controller.ibChatMembers
         .firstWhereOrNull((element) => element.user.id == message.senderUid)
         ?.user;
     return Padding(
@@ -744,7 +806,8 @@ class ChatPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (senderUser != null && _controller.isCircle.isTrue)
+                    if (senderUser != null &&
+                        widget._controller.isCircle.isTrue)
                       Text(senderUser.username),
                     ClipRRect(
                       borderRadius: const BorderRadius.only(
@@ -817,7 +880,7 @@ class ChatPage extends StatelessWidget {
     if (model.ibMessage.messageType == IbMessage.kMessageTypePoll) {
       final IbQuestion? question = model.ibQuestion;
       final IbMessage message = model.ibMessage;
-      final member = _controller.ibChatMembers
+      final member = widget._controller.ibChatMembers
           .firstWhereOrNull((p0) => p0.user.id == message.senderUid);
       final avatarUrl = member == null ? '' : member.user.avatarUrl;
       final username = member == null ? '' : member.user.username;
@@ -933,7 +996,7 @@ class ChatPage extends StatelessWidget {
     if (model.ibMessage.messageType == IbMessage.kMessageTypeIcebreaker) {
       final icebreaker = model.icebreaker;
       final message = model.ibMessage;
-      final member = _controller.ibChatMembers
+      final member = widget._controller.ibChatMembers
           .firstWhereOrNull((p0) => p0.user.id == message.senderUid);
       final avatarUrl = member == null ? '' : member.user.avatarUrl;
       final username = member == null ? '' : member.user.username;
@@ -1083,7 +1146,7 @@ class ChatPage extends StatelessWidget {
 
   ///won't show sender and current User's avatar
   Widget _buildReadIndicator(IbMessage message) {
-    if (_controller.messages.indexWhere(
+    if (widget._controller.messages.indexWhere(
             (element) => element.ibMessage.messageId == message.messageId) ==
         0) {
       return SingleChildScrollView(
@@ -1096,7 +1159,7 @@ class ChatPage extends StatelessWidget {
                     element != message.senderUid &&
                     element != IbUtils.getCurrentUid())
                 .map((e) {
-              final IbChatMemberModel? model = _controller.ibChatMembers
+              final IbChatMemberModel? model = widget._controller.ibChatMembers
                   .firstWhereOrNull((item) => item.user.id == e);
               if (model != null) {
                 return Padding(
@@ -1115,24 +1178,27 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget _buildTitle() {
-    if (_controller.ibChat != null && _controller.ibChat!.name.isNotEmpty) {
+    if (widget._controller.ibChat != null &&
+        widget._controller.ibChat!.name.isNotEmpty) {
       return Text(
-        _controller.title.value,
+        widget._controller.title.value,
         overflow: TextOverflow.ellipsis,
       );
     }
 
-    if (_controller.title.isEmpty) {
-      final avatarUsers =
-          _controller.ibChatMembers.map((element) => element.user).toList();
+    if (widget._controller.title.isEmpty) {
+      final avatarUsers = widget._controller.ibChatMembers
+          .map((element) => element.user)
+          .toList();
       avatarUsers
           .removeWhere((element) => element.id == IbUtils.getCurrentUid());
       for (final user in avatarUsers) {
-        _controller.title.value = '${_controller.title.value}${user.username} ';
+        widget._controller.title.value =
+            '${widget._controller.title.value}${user.username} ';
       }
     }
     return Text(
-      _controller.title.value,
+      widget._controller.title.value,
       overflow: TextOverflow.ellipsis,
     );
   }

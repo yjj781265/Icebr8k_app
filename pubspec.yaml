@@ -21,25 +21,25 @@ environment:
   sdk: ">=2.17.0 <3.0.0"
 
 dependencies:
-  animations: ^2.0.2
+  animations: ^2.0.3
   any_link_preview: ^2.0.8
   auto_size_text: ^3.0.0
   cached_network_image: ^3.2.0
   carousel_slider: ^4.1.1
-  cloud_firestore: ^3.1.11
-  cloud_functions: ^3.2.11
-  connectivity_plus: ^2.3.0
+  cloud_firestore: ^3.1.17
+  cloud_functions: ^3.2.16
+  connectivity_plus: ^2.3.3
   cupertino_icons: ^1.0.2
   dropdown_button2: ^1.2.0
   emoji_picker_flutter: ^1.2.1
   extended_nested_scroll_view: ^5.1.0
   firebase_analytics: ^9.1.9
-  firebase_auth: ^3.3.12
+  firebase_auth: ^3.3.19
   firebase_core: ^1.17.1
   firebase_crashlytics: ^2.8.1
-  firebase_messaging: ^11.4.0
+  firebase_messaging: ^11.4.1
   firebase_performance: ^0.8.0+13
-  firebase_storage: ^10.2.10
+  firebase_storage: ^10.2.17
   flutter:
     sdk: flutter
   flutter_colorpicker: ^1.0.3
@@ -61,8 +61,8 @@ dependencies:
   lottie: ^1.2.2
   move_to_background: ^1.0.2
   pull_to_refresh: ^2.0.0
-  reorderables: ^0.4.3
-  scrollable_positioned_list: ^0.2.3
+  reorderables: ^0.5.0
+  scrollable_positioned_list: ^0.3.2
   shake: ^2.1.0
   showcaseview: ^1.1.5
   url_launcher: 6.1.2

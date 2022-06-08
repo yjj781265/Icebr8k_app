@@ -4,12 +4,12 @@ import 'package:icebr8k/backend/controllers/user_controllers/answered_question_c
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import '../../ib_config.dart';
 import '../../ib_utils.dart';
 
 class AnsweredPage extends StatelessWidget {
   final AnsweredQuestionController _controller;
   final ScrollController _scrollController = ScrollController();
-  final RefreshController _refreshController = RefreshController();
 
   AnsweredPage(this._controller);
 
@@ -28,16 +28,12 @@ class AnsweredPage extends StatelessWidget {
           }
 
           return SmartRefresher(
-            controller: _refreshController,
+            controller: _controller.refreshController,
             scrollController: _scrollController,
             enablePullDown: false,
-            enablePullUp: true,
+            enablePullUp: _controller.answeredQs.length >= IbConfig.kPerPage,
             onLoading: () async {
-              if (_controller.lastDoc == null) {
-                _refreshController.loadNoData();
-              }
               await _controller.loadMore();
-              _refreshController.loadComplete();
             },
             child: ListView.builder(
               controller: _scrollController,
