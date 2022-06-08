@@ -118,7 +118,8 @@ class HomeTabController extends GetxController {
           IbUtils.showSimpleSnackBar(
               msg: 'Features unlocked', backgroundColor: IbColors.accentColor);
           selectedCategory.value = categories.first;
-          onRefresh();
+          Future.delayed(const Duration(seconds: 2), () => onRefresh());
+          await first8Sub.cancel();
         }
       });
     }

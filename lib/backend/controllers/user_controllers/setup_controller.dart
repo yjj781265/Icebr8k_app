@@ -135,6 +135,17 @@ class SetupController extends GetxController {
       return;
     }
 
+    if (!IbUtils.isOver13(
+        DateTime.fromMillisecondsSinceEpoch(birthdateInMs.value))) {
+      Get.dialog(const IbDialog(
+        title: 'Error',
+        subtitle: "Age is not over 13",
+        showNegativeBtn: false,
+        positiveTextKey: 'ok',
+      ));
+      return;
+    }
+
     if (gender.value.isEmpty) {
       Get.dialog(const IbDialog(
         title: 'Missing Info',
@@ -195,8 +206,9 @@ class SetupController extends GetxController {
     if (!GetUtils.isUsername(usernameTeController.text.trim()) ||
         usernameTeController.text.trim().toLowerCase() == 'anonymous') {
       Get.dialog(const IbDialog(
-        title: 'Error',
-        subtitle: "Username is not valid",
+        title: 'Username is not valid',
+        subtitle:
+            "username needs to start with a letter or a number, and end with a letter or a number",
         showNegativeBtn: false,
         positiveTextKey: 'ok',
       ));

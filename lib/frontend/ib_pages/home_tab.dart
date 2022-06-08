@@ -124,7 +124,10 @@ class HomeTab extends StatelessWidget {
                     );
                   }
                   if (_controller.isLocked.isTrue &&
-                      _controller.selectedCategory.value == 'Trending') {
+                      (_controller.selectedCategory.value ==
+                              _controller.categories[0] ||
+                          _controller.selectedCategory.value ==
+                              _controller.categories[2])) {
                     return Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -136,7 +139,7 @@ class HomeTab extends StatelessWidget {
                           const Text.rich(
                             TextSpan(
                                 text:
-                                    "Please answer the first eight polls from Icebr8k in ",
+                                    "Please answer all polls from Icebr8k in ",
                                 children: [
                                   TextSpan(
                                       text: 'For You',

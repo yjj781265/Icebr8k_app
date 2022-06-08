@@ -270,7 +270,11 @@ class IbQuestionItemController extends GetxController {
       final int incrementedCount = (countMap[ibAnswer.choiceId] ?? 0) + 1;
       countMap[ibAnswer.choiceId] = incrementedCount;
 
-      await generatePollStats();
+      /// update result
+      for (final IbChoice ibChoice in rxIbQuestion.value.choices) {
+        resultMap[ibChoice] = (countMap[ibChoice.choiceId] ?? 0).toDouble() /
+            rxIbQuestion.value.pollSize.toDouble();
+      }
       await _generateChoiceUserMap();
       voted.value = true;
     } catch (e) {

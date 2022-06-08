@@ -383,6 +383,9 @@ class AuthController extends GetxService {
         }
       } else {
         print('AuthController firebase user email is not verified ');
+        Get.offAll(() => WelcomePage());
+        await IbAnalyticsManager().logScreenView(
+            className: "AuthController", screenName: "WelcomePage");
       }
     } on FirebaseAuthException catch (e) {
       Get.dialog(IbDialog(
