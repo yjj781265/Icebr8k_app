@@ -93,8 +93,6 @@ class _PeopleNearbyCardState extends State<PeopleNearbyCard> {
   Widget _userinfo() {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: const BorderRadius.only(
-            bottomLeft: Radius.circular(16), bottomRight: Radius.circular(16)),
         color: Colors.black.withOpacity(0.7),
       ),
       child: Padding(

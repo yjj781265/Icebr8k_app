@@ -35,7 +35,7 @@ class SettingsNotificationPage extends StatelessWidget {
                 await IbUserDbService()
                     .updateIbUser(_controller.rxCurrentIbUser.value);
               },
-              title: const Text('New Likes on Polls'),
+              title: const Text('New Likes on My Polls'),
             ),
             SwitchListTile.adaptive(
               value: _controller.rxCurrentIbUser.value.settings!.pollVoteN,
@@ -44,7 +44,7 @@ class SettingsNotificationPage extends StatelessWidget {
                 await IbUserDbService()
                     .updateIbUser(_controller.rxCurrentIbUser.value);
               },
-              title: const Text('New Votes on Polls'),
+              title: const Text('New Votes on My Polls'),
             ),
             SwitchListTile.adaptive(
               value: _controller.rxCurrentIbUser.value.settings!.pollCommentN,
@@ -54,7 +54,7 @@ class SettingsNotificationPage extends StatelessWidget {
                 await IbUserDbService()
                     .updateIbUser(_controller.rxCurrentIbUser.value);
               },
-              title: const Text('New Comments on Polls'),
+              title: const Text('New Comments on My Polls'),
             ),
             SwitchListTile.adaptive(
               value:
@@ -65,7 +65,17 @@ class SettingsNotificationPage extends StatelessWidget {
                 await IbUserDbService()
                     .updateIbUser(_controller.rxCurrentIbUser.value);
               },
-              title: const Text("New Likes on Comments"),
+              title: const Text("New Likes on My Comments"),
+            ),
+            SwitchListTile.adaptive(
+              value: _controller.rxCurrentIbUser.value.settings!.profileLikesN,
+              onChanged: (value) async {
+                _controller.rxCurrentIbUser.value.settings!.profileLikesN =
+                    value;
+                await IbUserDbService()
+                    .updateIbUser(_controller.rxCurrentIbUser.value);
+              },
+              title: const Text("New Likes on People Nearby"),
             ),
             SwitchListTile.adaptive(
               value:
@@ -76,7 +86,7 @@ class SettingsNotificationPage extends StatelessWidget {
                 await IbUserDbService()
                     .updateIbUser(_controller.rxCurrentIbUser.value);
               },
-              title: const Text('New Replies on Comments'),
+              title: const Text('New Replies on My Comments'),
             ),
             SwitchListTile.adaptive(
               value: _controller.rxCurrentIbUser.value.settings!.circleInviteN,

@@ -8,6 +8,7 @@ class IbSettings {
   bool pollLikesN;
   bool pollCommentLikesN;
   bool pollVoteN;
+  bool profileLikesN;
   bool circleInviteN;
   bool circleRequestN;
   bool friendRequestN;
@@ -24,6 +25,7 @@ class IbSettings {
     this.pollVoteN = true,
     this.friendRequestN = true,
     this.circleRequestN = true,
+    this.profileLikesN = true,
     this.circleInviteN = true,
     this.pollCommentReplyN = true,
     this.pollExpandedByDefault = false,

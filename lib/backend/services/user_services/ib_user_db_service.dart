@@ -7,6 +7,7 @@ import 'package:icebr8k/backend/models/ib_settings.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
+import '../../../frontend/ib_config.dart';
 import '../../managers/ib_cache_manager.dart';
 
 class IbUserDbService {
@@ -307,7 +308,8 @@ class IbUserDbService {
         .doc(userId)
         .set({
       'isLiked': true,
-      'likedUid': userId,
+      'likerId': IbUtils.getCurrentUid(),
+      'likeId': userId,
       'timestamp': FieldValue.serverTimestamp()
     }, SetOptions(merge: true));
   }
@@ -323,10 +325,13 @@ class IbUserDbService {
           .collection(_kProfileLikesSubCollection)
           .doc(userId)
           .get();
+      if (snapshot.data() == null || !snapshot.exists) {
+        return -1;
+      }
       return (snapshot.data()!['timestamp'] as Timestamp)
           .millisecondsSinceEpoch;
     } catch (e) {
-      print(e);
+      print('lastLikedTimestampInMs: $e');
       return -1;
     }
   }
@@ -342,7 +347,8 @@ class IbUserDbService {
         .doc(userId)
         .set({
       'isLiked': false,
-      'likedUid': userId,
+      'likerId': IbUtils.getCurrentUid(),
+      'likeId': userId,
       'timestamp': FieldValue.serverTimestamp()
     }, SetOptions(merge: true));
   }
@@ -362,7 +368,7 @@ class IbUserDbService {
 
       return snapshot.data()!['isLiked'] as bool;
     } catch (e) {
-      print(e);
+      print('isProfileLiked $e');
       return false;
     }
   }
@@ -383,7 +389,7 @@ class IbUserDbService {
 
       return true;
     } catch (e) {
-      printError(info: e.toString());
+      print('isProfileLikedNotificationSent $e');
       return false;
     }
   }
@@ -400,5 +406,16 @@ class IbUserDbService {
       printError(info: e.toString());
       return false;
     }
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> queryProfileLikedUsers(
+      {DocumentSnapshot? lastDoc}) async {
+    return _db
+        .collectionGroup(_kProfileLikesSubCollection)
+        .where('likeId', isEqualTo: IbUtils.getCurrentUid())
+        .where('isLiked', isEqualTo: true)
+        .orderBy('timestamp', descending: true)
+        .limit(IbConfig.kPerPage)
+        .get();
   }
 }

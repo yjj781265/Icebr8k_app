@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/people_nearby_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/people_nearby_pages/profile_liked_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/people_nearby_card.dart';
@@ -30,7 +31,10 @@ class PeopleNearbyPage extends StatelessWidget {
                     ? const Icon(Icons.list)
                     : const Icon(Icons.grid_view))),
             IconButton(
-                onPressed: () {},
+                onPressed: () async {
+                  _controller.loadLikedItems();
+                  Get.to(() => ProfileLikedPage());
+                },
                 icon: const Icon(
                   Icons.favorite,
                   color: IbColors.errorRed,

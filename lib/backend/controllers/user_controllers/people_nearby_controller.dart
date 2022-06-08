@@ -18,6 +18,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class PeopleNearbyController extends GetxController {
   RefreshController refreshController = RefreshController();
+  RefreshController likeRefreshController = RefreshController();
   final rangeInMi = 50.0.obs;
   final genderSelections = [true, true, true].obs;
   final intentionSelection = [true, true].obs;
@@ -28,9 +29,11 @@ class PeopleNearbyController extends GetxController {
   int page = 1;
   bool hasMore = false;
   Position? currentPosition;
+  final likeItems = <LikedItem>[].obs;
   final items = <NearbyItem>[].obs;
   int loadedCount = 0;
   final isLoading = false.obs;
+  DocumentSnapshot? lastLikedDoc;
 
   @override
   Future<void> onReady() async {
@@ -45,6 +48,7 @@ class PeopleNearbyController extends GetxController {
           .contains(IbUser.kUserIntentionFriendship)
     ];
     _loadLocalSearchCriteria();
+
     Get.dialog(IbDialog(
       title: 'Welcome',
       subtitle: 'Your people nearby profile only visible to others for 7 days, '
@@ -77,14 +81,6 @@ class PeopleNearbyController extends GetxController {
       maxAge = 60;
     }
     rangeValue.value = RangeValues(minAge.toDouble(), maxAge.toDouble());
-    List<bool> genderSelection = IbLocalDataService()
-        .retrieveBoolArrValue(StorageKey.peopleNearbyGenderSelectionBoolArr);
-    print(genderSelection);
-
-    if (genderSelection.isEmpty) {
-      genderSelection = [true, true, true];
-    }
-    genderSelections.value = genderSelection.toList();
   }
 
   void _cacheLocalSearchCriteria() {
@@ -97,28 +93,6 @@ class PeopleNearbyController extends GetxController {
     IbLocalDataService().updateIntValue(
         key: StorageKey.peopleNearbyMaxAgeInt,
         value: rangeValue.value.end.toInt());
-    IbLocalDataService().updateBoolArrValue(
-        key: StorageKey.peopleNearbyGenderSelectionBoolArr,
-        value: genderSelections);
-
-    int minAge =
-        IbLocalDataService().retrieveIntValue(StorageKey.peopleNearbyMinAgeInt);
-    if (minAge == 0) {
-      minAge = 13;
-    }
-
-    int maxAge =
-        IbLocalDataService().retrieveIntValue(StorageKey.peopleNearbyMaxAgeInt);
-    if (maxAge == 0) {
-      maxAge = 60;
-    }
-    rangeValue.value = RangeValues(minAge.toDouble(), maxAge.toDouble());
-    final genderSelection = IbLocalDataService()
-        .retrieveBoolArrValue(StorageKey.peopleNearbyGenderSelectionBoolArr);
-
-    if (genderSelection.isEmpty) {
-      genderSelections.value = [true, true, true];
-    }
   }
 
   /// Determine the current position of the device.
@@ -466,6 +440,112 @@ class PeopleNearbyController extends GetxController {
     item.liked = false;
     items.refresh();
   }
+
+  Future<void> loadLikedItems() async {
+    likeItems.clear();
+    final snapshot = await IbUserDbService().queryProfileLikedUsers();
+    for (final doc in snapshot.docs) {
+      final likerId = doc.data()['likerId'];
+      if (likerId == null) {
+        continue;
+      }
+
+      final user = await IbUserDbService().queryIbUser(likerId.toString());
+      if (user == null) {
+        continue;
+      }
+
+      final timestamp = doc.data()['timestamp'];
+      if (timestamp == null) {
+        continue;
+      }
+
+      final likedTimestampInMs =
+          (timestamp as Timestamp).millisecondsSinceEpoch;
+      final isBingo = await IbUserDbService()
+          .isProfileBingo(user1Id: IbUtils.getCurrentUid()!, user2Id: user.id);
+      final geoPoint = user.geoPoint;
+
+      int? distanceInMeter;
+      if (geoPoint != null &&
+          currentPosition != null &&
+          (geoPoint as GeoPoint).latitude != 0 &&
+          geoPoint.longitude != 0) {
+        distanceInMeter = Geolocator.distanceBetween(
+                currentPosition!.latitude,
+                currentPosition!.longitude,
+                geoPoint.latitude,
+                geoPoint.longitude)
+            .toInt();
+      }
+
+      likeItems.add(LikedItem(
+          user: user,
+          distanceInMeters: distanceInMeter,
+          isBingo: isBingo,
+          likedTimestampInMs: likedTimestampInMs));
+
+      lastLikedDoc = doc;
+    }
+  }
+
+  Future<void> loadMoreLikedItems() async {
+    if (lastLikedDoc == null) {
+      likeRefreshController.loadNoData();
+      return;
+    }
+
+    final snapshot =
+        await IbUserDbService().queryProfileLikedUsers(lastDoc: lastLikedDoc);
+    for (final doc in snapshot.docs) {
+      final likerId = doc.data()['likerId'];
+      if (likerId == null) {
+        continue;
+      }
+
+      final user = await IbUserDbService().queryIbUser(likerId.toString());
+      if (user == null) {
+        continue;
+      }
+
+      final timestamp = doc.data()['timestamp'];
+      if (timestamp == null) {
+        continue;
+      }
+
+      final likedTimestampInMs =
+          (timestamp as Timestamp).millisecondsSinceEpoch;
+      final isBingo = await IbUserDbService()
+          .isProfileBingo(user1Id: IbUtils.getCurrentUid()!, user2Id: user.id);
+      final geoPoint = user.geoPoint;
+      int? distanceInMeter;
+      if (geoPoint != null &&
+          currentPosition != null &&
+          (geoPoint as GeoPoint).latitude != 0 &&
+          geoPoint.longitude != 0) {
+        distanceInMeter = Geolocator.distanceBetween(
+                currentPosition!.latitude,
+                currentPosition!.longitude,
+                geoPoint.longitude,
+                geoPoint.longitude)
+            .toInt();
+      }
+
+      likeItems.add(LikedItem(
+          distanceInMeters: distanceInMeter,
+          user: user,
+          isBingo: isBingo,
+          likedTimestampInMs: likedTimestampInMs));
+
+      lastLikedDoc = doc;
+    }
+    if (snapshot.docs.isEmpty) {
+      likeRefreshController.loadNoData();
+      lastLikedDoc = null;
+      return;
+    }
+    likeRefreshController.loadComplete();
+  }
 }
 
 class NearbyItem {
@@ -510,4 +590,30 @@ class NearbyItem {
       lastLikedTimestampInMs.hashCode ^
       compScore.hashCode ^
       commonTags.hashCode;
+}
+
+class LikedItem {
+  final IbUser user;
+  final bool isBingo;
+  final int likedTimestampInMs;
+  final int? distanceInMeters;
+
+  LikedItem(
+      {required this.user,
+      required this.isBingo,
+      this.distanceInMeters,
+      required this.likedTimestampInMs});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LikedItem &&
+          runtimeType == other.runtimeType &&
+          user == other.user &&
+          isBingo == other.isBingo &&
+          likedTimestampInMs == other.likedTimestampInMs;
+
+  @override
+  int get hashCode =>
+      user.hashCode ^ isBingo.hashCode ^ likedTimestampInMs.hashCode;
 }

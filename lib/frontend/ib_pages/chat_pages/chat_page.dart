@@ -305,28 +305,30 @@ class ChatPage extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      IbActionButton(
-                          color: IbColors.primaryColor,
-                          iconData: Icons.poll,
-                          onPressed: () {
-                            _controller.showMsgOptions.value = false;
-                            final chatTabItem = IbUtils.getAllChatTabItems()
-                                .firstWhereOrNull((element) =>
-                                    element.ibChat.chatId ==
-                                    _controller.ibChat!.chatId);
-                            final createQuestionController =
-                                Get.put(CreateQuestionController());
+                      if (_controller.ibChat != null)
+                        IbActionButton(
+                            color: IbColors.primaryColor,
+                            iconData: Icons.poll,
+                            onPressed: () {
+                              _controller.showMsgOptions.value = false;
 
-                            if (chatTabItem != null) {
-                              createQuestionController.pickedChats
-                                  .add(chatTabItem);
-                            }
+                              final chatTabItem = IbUtils.getAllChatTabItems()
+                                  .firstWhereOrNull((element) =>
+                                      element.ibChat.chatId ==
+                                      _controller.ibChat!.chatId);
+                              final createQuestionController =
+                                  Get.put(CreateQuestionController());
 
-                            Get.to(() => CreateQuestionPage(
-                                  controller: createQuestionController,
-                                ));
-                          },
-                          text: 'Poll'),
+                              if (chatTabItem != null) {
+                                createQuestionController.pickedChats
+                                    .add(chatTabItem);
+                              }
+
+                              Get.to(() => CreateQuestionPage(
+                                    controller: createQuestionController,
+                                  ));
+                            },
+                            text: 'Poll'),
                       IbActionButton(
                           color: IbColors.accentColor,
                           iconData: Icons.gif,
