@@ -526,7 +526,7 @@ class PeopleNearbyController extends GetxController {
         distanceInMeter = Geolocator.distanceBetween(
                 currentPosition!.latitude,
                 currentPosition!.longitude,
-                geoPoint.longitude,
+                geoPoint.latitude,
                 geoPoint.longitude)
             .toInt();
       }
