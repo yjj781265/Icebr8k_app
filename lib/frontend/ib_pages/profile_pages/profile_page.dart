@@ -512,76 +512,74 @@ class ProfilePage extends StatelessWidget {
 
   Widget _userInfo(BuildContext context) {
     return Obx(() {
-      if (_controller.isProfileVisible.isTrue) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                _controller.rxIbUser.value.username,
-                style: const TextStyle(
-                    fontSize: IbConfig.kPageTitleSize,
-                    fontWeight: FontWeight.bold),
-              ),
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              _controller.rxIbUser.value.username,
+              style: const TextStyle(
+                  fontSize: IbConfig.kPageTitleSize,
+                  fontWeight: FontWeight.bold),
             ),
-            const SizedBox(
-              height: 8,
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              'Match Interest',
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                'Match Interest',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: IbLinearIndicator(endValue: _controller.compScore.value),
+          ),
+          const SizedBox(
+            height: 4,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              '${_controller.rxIbUser.value.fName} ${_controller.rxIbUser.value.lName} ',
+              style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: IbLinearIndicator(endValue: _controller.compScore.value),
-            ),
-            const SizedBox(
-              height: 4,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                '${_controller.rxIbUser.value.fName} ${_controller.rxIbUser.value.lName} ',
-                style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                children: [
-                  Text(
-                    _controller.rxIbUser.value.gender,
-                    style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
-                  ),
-                  if (_controller.rxIbUser.value.birthdateInMs != null)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Text(
-                        'Age: ${IbUtils.calculateAge(_controller.rxIbUser.value.birthdateInMs!).toString()}',
-                        style:
-                            const TextStyle(fontSize: IbConfig.kNormalTextSize),
-                      ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              children: [
+                Text(
+                  _controller.rxIbUser.value.gender,
+                  style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                ),
+                if (_controller.rxIbUser.value.birthdateInMs != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text(
+                      'Age: ${IbUtils.calculateAge(_controller.rxIbUser.value.birthdateInMs!).toString()}',
+                      style:
+                          const TextStyle(fontSize: IbConfig.kNormalTextSize),
                     ),
-                ],
-              ),
+                  ),
+              ],
             ),
-            const SizedBox(
-              height: 4,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: IbDescriptionText(text: _controller.rxIbUser.value.bio),
-            ),
-            const Divider(
-              thickness: 2,
-            ),
-          ],
-        );
-      }
+          ),
+          const SizedBox(
+            height: 4,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: IbDescriptionText(text: _controller.rxIbUser.value.bio),
+          ),
+          const Divider(
+            thickness: 2,
+          ),
+        ],
+      );
       return const SizedBox();
     });
   }

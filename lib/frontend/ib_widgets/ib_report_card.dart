@@ -69,9 +69,19 @@ class IbReportCard extends StatelessWidget {
                             ? 'Reporting...'
                             : 'Report',
                         textColor: IbColors.creamYellow,
-                        color: IbColors.lightGrey,
+                        color: IbColors.errorRed,
                         onPressed: () async {
                           try {
+                            if (!ibReportController.selectionMap.values
+                                    .contains(true) &&
+                                ibReportController.editingController.text
+                                    .trim()
+                                    .isEmpty) {
+                              IbUtils.showSimpleSnackBar(
+                                  msg: 'Pick at least one report category.',
+                                  backgroundColor: IbColors.errorRed);
+                              return;
+                            }
                             await ibReportController.report();
                             Get.back();
                             showReceivedDialog();
