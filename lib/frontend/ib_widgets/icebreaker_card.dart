@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/ib_collection.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/icebreaker.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
+import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/icebreaker_pages/ib_cover_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -18,7 +19,7 @@ import '../ib_pages/chat_picker_page.dart';
 import 'ib_dialog.dart';
 import 'ib_loading_dialog.dart';
 
-class IcebreakerCard extends StatelessWidget {
+class IcebreakerCard extends StatefulWidget {
   final Icebreaker icebreaker;
   final IbCollection? ibCollection;
   final bool showCollectionName;
@@ -34,18 +35,58 @@ class IcebreakerCard extends StatelessWidget {
       : super(key: key);
 
   @override
+  State<IcebreakerCard> createState() => _IcebreakerCardState();
+}
+
+class _IcebreakerCardState extends State<IcebreakerCard> {
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!IbLocalDataService()
+          .retrieveBoolValue(StorageKey.icebreakerProTipBool)) {
+        Get.dialog(Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: IbDialog(
+            title: 'Pro Tip',
+            subtitle: '',
+            content: Wrap(
+              children: const [
+                Text('Click'),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Icon(
+                    FontAwesomeIcons.share,
+                    size: 16,
+                  ),
+                ),
+                Text(
+                    'at the top right corner to share this icebreaker to chats')
+              ],
+            ),
+            showNegativeBtn: false,
+          ),
+        ));
+      }
+      IbLocalDataService()
+          .updateBoolValue(key: StorageKey.icebreakerProTipBool, value: true);
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AspectRatio(
       aspectRatio: 0.618,
       child: IbCard(
-          color: Color(icebreaker.bgColor),
+          color: Color(widget.icebreaker.bgColor),
           child: Stack(
             children: [
               Center(
                 child: GestureDetector(
                   onLongPress: () {
                     HapticFeedback.heavyImpact();
-                    Clipboard.setData(ClipboardData(text: icebreaker.text));
+                    Clipboard.setData(
+                        ClipboardData(text: widget.icebreaker.text));
                     IbUtils.showSimpleSnackBar(
                         msg: "Text copied to clipboard",
                         backgroundColor: IbColors.primaryColor);
@@ -53,20 +94,20 @@ class IcebreakerCard extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8),
                     child: AutoSizeText(
-                      icebreaker.text,
+                      widget.icebreaker.text,
                       textAlign: TextAlign.center,
-                      minFontSize: minSize,
-                      maxFontSize: maxSize,
+                      minFontSize: widget.minSize,
+                      maxFontSize: widget.maxSize,
                       maxLines: IbConfig.kIbCardMaxLine,
                       overflow: TextOverflow.ellipsis,
                       style: IbUtils.getIbFonts(TextStyle(
-                          fontSize: maxSize,
-                          color: Color(icebreaker.textColor),
-                          fontStyle: icebreaker.isItalic
+                          fontSize: widget.maxSize,
+                          color: Color(widget.icebreaker.textColor),
+                          fontStyle: widget.icebreaker.isItalic
                               ? FontStyle.italic
                               : FontStyle.normal,
-                          fontWeight:
-                              FontWeight.bold))[icebreaker.textStyleIndex],
+                          fontWeight: FontWeight
+                              .bold))[widget.icebreaker.textStyleIndex],
                     ),
                   ),
                 ),
@@ -94,8 +135,8 @@ class IcebreakerCard extends StatelessWidget {
                             for (final item in items) {
                               final message = IbMessage(
                                   messageId: IbUtils.getUniqueId(),
-                                  content: icebreaker.id,
-                                  extra: [icebreaker.collectionId],
+                                  content: widget.icebreaker.id,
+                                  extra: [widget.icebreaker.collectionId],
                                   senderUid: IbUtils.getCurrentUid()!,
                                   messageType: IbMessage.kMessageTypeIcebreaker,
                                   chatRoomId: item.ibChat.chatId,
@@ -123,34 +164,34 @@ class IcebreakerCard extends StatelessWidget {
                       )),
                 ),
               ),
-              if (showCollectionName && ibCollection != null)
+              if (widget.showCollectionName && widget.ibCollection != null)
                 Positioned(
                     bottom: 0,
                     right: 0,
                     child: InkWell(
                       onTap: () {
-                        Get.to(() => IbCoverPage(ibCollection!));
+                        Get.to(() => IbCoverPage(widget.ibCollection!));
                       },
                       child: LimitedBox(
                         maxWidth: 250,
                         child: Padding(
                           padding: const EdgeInsets.all(4.0),
                           child: Text(
-                            ibCollection!.name,
+                            widget.ibCollection!.name,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: IbUtils.getIbFonts(TextStyle(
                                 fontSize: IbConfig.kDescriptionTextSize,
-                                color: Color(ibCollection!.textColor),
+                                color: Color(widget.ibCollection!.textColor),
                                 fontWeight: FontWeight.bold,
-                                fontStyle: ibCollection!.isItalic
+                                fontStyle: widget.ibCollection!.isItalic
                                     ? FontStyle.italic
-                                    : FontStyle
-                                        .normal))[ibCollection!.textStyleIndex],
+                                    : FontStyle.normal))[widget
+                                .ibCollection!.textStyleIndex],
                           ),
                         ),
                       ),
-                    ))
+                    )),
             ],
           )),
     );

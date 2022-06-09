@@ -90,7 +90,7 @@ class IbQuestionItemController extends GetxController {
           await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
       liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
       await _getMyAnswerAndDeterminedPollCloseStatus();
-      await generatePollStats();
+      await _generatePollStats();
       await _generateChoiceUserMap();
       _setUpCountDownTimer();
     }
@@ -107,7 +107,8 @@ class IbQuestionItemController extends GetxController {
     commented.value =
         await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
     liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
-    await generatePollStats();
+    await _generatePollStats();
+    await _generateChoiceUserMap();
     await _getMyAnswerAndDeterminedPollCloseStatus();
   }
 
@@ -169,8 +170,14 @@ class IbQuestionItemController extends GetxController {
     voted.refresh();
   }
 
-  Future<void> generatePollStats() async {
+  Future<void> _generatePollStats() async {
     countMap.clear();
+    final newQ =
+        await IbQuestionDbService().querySingleQuestion(rxIbQuestion.value.id);
+    if (newQ == null) {
+      return;
+    }
+    rxIbQuestion.value = newQ;
     if (rxIbQuestion.value.pollSize == 0) {
       return;
     }

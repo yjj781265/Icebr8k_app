@@ -11,6 +11,7 @@ import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_chat_db_service.dart';
+import 'package:icebr8k/frontend/admin/edit_ib_collection_main_page.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/chat_pages/chat_page_settings.dart';
@@ -404,6 +405,17 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                             }
                           },
                           text: 'GIF'),
+                      IbActionButton(
+                          color: IbColors.primaryColor,
+                          iconData: null,
+                          content: const Text(
+                            '🧊',
+                            style: TextStyle(fontSize: 21),
+                          ),
+                          onPressed: () {
+                            Get.to(() => EditIbCollectionMainPage());
+                          },
+                          text: 'Icebreaker')
                     ],
                   ),
                 ),

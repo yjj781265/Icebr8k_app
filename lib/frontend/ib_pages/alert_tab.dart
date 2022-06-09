@@ -381,7 +381,10 @@ class AlertTab extends StatelessWidget {
                 ));
           },
           leading: IbUserAvatar(
-              avatarUrl: item.senderUser.avatarUrl, uid: item.senderUser.id),
+            avatarUrl: item.senderUser.avatarUrl,
+            uid: item.senderUser.id,
+            radius: 21,
+          ),
           title: Text(item.senderUser.username,
               style: const TextStyle(
                   fontWeight: FontWeight.bold,

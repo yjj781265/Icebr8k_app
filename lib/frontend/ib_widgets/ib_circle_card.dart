@@ -17,9 +17,9 @@ class IbCircleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LimitedBox(
-      maxHeight: 200,
-      maxWidth: 200,
+    return SizedBox(
+      height: 150,
+      width: 250,
       child: InkWell(
         borderRadius: const BorderRadius.all(Radius.circular(16)),
         onTap: () {
@@ -29,7 +29,7 @@ class IbCircleCard extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 if (ibChat.photoUrl.isEmpty)
                   CircleAvatar(
@@ -37,7 +37,7 @@ class IbCircleCard extends StatelessWidget {
                     radius: 24,
                     child: AutoSizeText(
                       ibChat.name[0],
-                      maxLines: 3,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -53,7 +53,7 @@ class IbCircleCard extends StatelessWidget {
                 AutoSizeText(
                   ibChat.name,
                   textAlign: TextAlign.center,
-                  maxLines: 3,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                       fontWeight: FontWeight.bold,

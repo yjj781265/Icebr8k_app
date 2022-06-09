@@ -44,9 +44,13 @@ class IbMediaBar extends StatelessWidget {
                         iconData: FontAwesomeIcons.tag,
                         onPressed: () {
                           Get.to(
-                              () => CreateQuestionTagPicker(Get.put(
-                                  CreateQuestionTagPickerController(
-                                      _controller))),
+                              () => ShowCaseWidget(
+                                    builder: Builder(builder: (context) {
+                                      return CreateQuestionTagPicker(Get.put(
+                                          CreateQuestionTagPickerController(
+                                              _controller)));
+                                    }),
+                                  ),
                               transition: Transition.zoom);
                         },
                         text: 'Add Tags'),

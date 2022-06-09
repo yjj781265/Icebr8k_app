@@ -165,6 +165,17 @@ class IbQuestionHeader extends StatelessWidget {
           ),
         ),
         ListTile(
+          onTap: () async {
+            Get.back();
+            await _itemController.refreshStats();
+          },
+          leading: const Icon(
+            Icons.refresh,
+            color: IbColors.accentColor,
+          ),
+          title: const Text("Refresh"),
+        ),
+        ListTile(
           onTap: () {
             Get.back();
             Get.bottomSheet(IbReportCard(
@@ -186,14 +197,17 @@ class IbQuestionHeader extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        SizedBox(
-            width: double.infinity,
-            child: IbElevatedButton(
-                textTrKey: 'cancel',
-                color: IbColors.primaryColor,
-                onPressed: () {
-                  Get.back();
-                }))
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SizedBox(
+              width: double.infinity,
+              child: IbElevatedButton(
+                  textTrKey: 'cancel',
+                  color: IbColors.primaryColor,
+                  onPressed: () {
+                    Get.back();
+                  })),
+        )
       ],
     );
     Get.bottomSheet(Center(child: IbCard(child: options)));

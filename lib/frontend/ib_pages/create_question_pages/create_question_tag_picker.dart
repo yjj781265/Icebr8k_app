@@ -1,17 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:reorderables/reorderables.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../../../backend/controllers/user_controllers/create_question_tag_picker_controller.dart';
 
-class CreateQuestionTagPicker extends StatelessWidget {
+class CreateQuestionTagPicker extends StatefulWidget {
   final CreateQuestionTagPickerController _controller;
 
   const CreateQuestionTagPicker(this._controller);
+
+  @override
+  State<CreateQuestionTagPicker> createState() =>
+      _CreateQuestionTagPickerState();
+}
+
+class _CreateQuestionTagPickerState extends State<CreateQuestionTagPicker> {
+  final GlobalKey showcaseKey = GlobalKey();
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        if (!IbLocalDataService()
+            .retrieveBoolValue(StorageKey.pickTagForQuestionShowCaseBool)) {
+          ShowCaseWidget.of(context)!.startShowCase([showcaseKey]);
+          IbLocalDataService().updateBoolValue(
+              key: StorageKey.pickTagForQuestionShowCaseBool, value: true);
+        }
+      },
+    );
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,16 +51,16 @@ class CreateQuestionTagPicker extends StatelessWidget {
           ),
           child: TextField(
             textInputAction: TextInputAction.search,
-            controller: _controller.textEditingController,
+            controller: widget._controller.textEditingController,
             decoration: InputDecoration(
               border: InputBorder.none,
               prefixIcon: const Icon(Icons.search),
               suffixIcon: Obx(
-                () => _controller.searchText.isEmpty
+                () => widget._controller.searchText.isEmpty
                     ? const SizedBox()
                     : IconButton(
                         onPressed: () {
-                          _controller.textEditingController.clear();
+                          widget._controller.textEditingController.clear();
                         },
                         icon: const Icon(
                           Icons.cancel,
@@ -77,7 +101,7 @@ class CreateQuestionTagPicker extends StatelessWidget {
 
   Widget searchResultTags(BuildContext context) {
     return Obx(() {
-      if (_controller.searchResults.isNotEmpty) {
+      if (widget._controller.searchResults.isNotEmpty) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -93,25 +117,25 @@ class CreateQuestionTagPicker extends StatelessWidget {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: _controller.searchResults
+                children: widget._controller.searchResults
                     .map((element) => Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4.0),
                           child: FilterChip(
                             pressElevation: 0,
                             backgroundColor: Theme.of(context).backgroundColor,
-                            avatar: _controller
-                                    .createQuestionController.pickedTags
+                            avatar: widget._controller.createQuestionController
+                                    .pickedTags
                                     .contains(element)
                                 ? const SizedBox()
                                 : const Icon(Icons.add),
                             label: Text(element.text),
                             selectedColor: IbColors.accentColor,
-                            selected: _controller
-                                .createQuestionController.pickedTags
+                            selected: widget
+                                ._controller.createQuestionController.pickedTags
                                 .contains(element),
                             onSelected: (bool value) {
                               if (value) {
-                                if (_controller.createQuestionController
+                                if (widget._controller.createQuestionController
                                         .pickedTags.length >=
                                     IbConfig.kMaxTag) {
                                   IbUtils.showSimpleSnackBar(
@@ -119,10 +143,12 @@ class CreateQuestionTagPicker extends StatelessWidget {
                                       backgroundColor: IbColors.primaryColor);
                                   return;
                                 }
-                                _controller.createQuestionController.pickedTags
+                                widget._controller.createQuestionController
+                                    .pickedTags
                                     .add(element);
                               } else {
-                                _controller.createQuestionController.pickedTags
+                                widget._controller.createQuestionController
+                                    .pickedTags
                                     .remove(element);
                               }
                             },
@@ -152,7 +178,7 @@ class CreateQuestionTagPicker extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Text(
               '${'picked_tags'.tr} '
-              '(${_controller.createQuestionController.pickedTags.length}'
+              '(${widget._controller.createQuestionController.pickedTags.length}'
               '/${IbConfig.kMaxTag})',
               style: const TextStyle(
                   fontSize: IbConfig.kPageTitleSize,
@@ -162,39 +188,46 @@ class CreateQuestionTagPicker extends StatelessWidget {
           ReorderableWrap(
             spacing: 4,
             onReorder: (oldIndex, newIndex) {
-              final pickedTag = _controller.createQuestionController.pickedTags
+              final pickedTag = widget
+                  ._controller.createQuestionController.pickedTags
                   .removeAt(oldIndex);
-              _controller.createQuestionController.pickedTags
+              widget._controller.createQuestionController.pickedTags
                   .insert(newIndex, pickedTag);
             },
             buildDraggableFeedback: (context, axis, item) {
               return Material(color: Colors.transparent, child: item);
             },
-            footer: _controller.createQuestionController.pickedTags.length <
-                    IbConfig.kMaxTag
-                ? InkWell(
-                    onTap: () {
-                      showAddTagBtmSheet();
-                    },
-                    child: Chip(
-                      label: Text(
-                        'add_tag'.tr,
-                      ),
-                      onDeleted: () {
-                        showAddTagBtmSheet();
-                      },
-                      deleteIcon: const Icon(
-                        Icons.add,
-                      ),
-                    ),
-                  )
-                : null,
-            children: _controller.createQuestionController.pickedTags
+            footer:
+                widget._controller.createQuestionController.pickedTags.length <
+                        IbConfig.kMaxTag
+                    ? Showcase(
+                        key: showcaseKey,
+                        shapeBorder: const CircleBorder(),
+                        description: 'Click here to create a new tag',
+                        child: InkWell(
+                          onTap: () {
+                            showAddTagBtmSheet();
+                          },
+                          child: Chip(
+                            label: Text(
+                              'add_tag'.tr,
+                            ),
+                            onDeleted: () {
+                              showAddTagBtmSheet();
+                            },
+                            deleteIcon: const Icon(
+                              Icons.add,
+                            ),
+                          ),
+                        ),
+                      )
+                    : null,
+            children: widget._controller.createQuestionController.pickedTags
                 .map((element) => Chip(
                       backgroundColor: Theme.of(context).backgroundColor,
                       label: Text(element.text),
                       onDeleted: () {
-                        _controller.createQuestionController.pickedTags
+                        widget._controller.createQuestionController.pickedTags
                             .remove(element);
                       },
                       deleteIcon: const Icon(
@@ -226,33 +259,36 @@ class CreateQuestionTagPicker extends StatelessWidget {
           ),
           Wrap(
               spacing: 4,
-              children: _controller.trendingTags
+              children: widget._controller.trendingTags
                   .map((element) => FilterChip(
                         pressElevation: 0,
                         backgroundColor: Theme.of(context).backgroundColor,
-                        avatar: _controller.createQuestionController.pickedTags
+                        avatar: widget
+                                ._controller.createQuestionController.pickedTags
                                 .contains(element)
                             ? const SizedBox()
                             : const Icon(Icons.add),
                         label: Text(element.text),
                         selectedColor: IbColors.accentColor,
-                        selected: _controller
-                            .createQuestionController.pickedTags
+                        selected: widget
+                            ._controller.createQuestionController.pickedTags
                             .contains(element),
                         onSelected: (bool value) {
                           if (value) {
-                            if (_controller.createQuestionController.pickedTags
-                                    .length >=
+                            if (widget._controller.createQuestionController
+                                    .pickedTags.length >=
                                 IbConfig.kMaxTag) {
                               IbUtils.showSimpleSnackBar(
                                   msg: 'max_tag_info'.tr,
                                   backgroundColor: IbColors.primaryColor);
                               return;
                             }
-                            _controller.createQuestionController.pickedTags
+                            widget
+                                ._controller.createQuestionController.pickedTags
                                 .add(element);
                           } else {
-                            _controller.createQuestionController.pickedTags
+                            widget
+                                ._controller.createQuestionController.pickedTags
                                 .remove(element);
                           }
                         },
@@ -262,9 +298,9 @@ class CreateQuestionTagPicker extends StatelessWidget {
             width: double.infinity,
             child: TextButton(
               onPressed: () async {
-                await _controller.loadMore();
+                await widget._controller.loadMore();
               },
-              child: Text(_controller.footerText.value),
+              child: Text(widget._controller.footerText.value),
             ),
           )
         ],
@@ -286,7 +322,7 @@ class CreateQuestionTagPicker extends StatelessWidget {
       subtitle: '',
       onPositiveTap: () {
         Get.back();
-        _controller.addNewTag(controller.text);
+        widget._controller.addNewTag(controller.text);
       },
       content: textField,
     );

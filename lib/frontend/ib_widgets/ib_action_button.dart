@@ -8,6 +8,7 @@ class IbActionButton extends StatelessWidget {
   final bool showCircle;
   final double size;
   final double fontSize;
+  final Widget? content;
   final IconData? iconData;
   final String text;
   final Function onPressed;
@@ -18,6 +19,7 @@ class IbActionButton extends StatelessWidget {
       this.size = 24,
       this.fontSize = IbConfig.kSecondaryTextSize,
       this.showCircle = true,
+      this.content,
       required this.iconData,
       required this.onPressed,
       required this.text});
@@ -39,11 +41,13 @@ class IbActionButton extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(width: 2, color: color))
                 : null,
-            child: Icon(
-              iconData,
-              size: size,
-              color: color,
-            ),
+            child: content == null
+                ? Icon(
+                    iconData,
+                    size: size,
+                    color: color,
+                  )
+                : content!,
           ),
         ),
         if (text.isNotEmpty)

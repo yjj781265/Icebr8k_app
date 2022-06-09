@@ -70,6 +70,8 @@ enum StorageKey {
   pollExpandShowCaseBool,
   voteOptionsShowCaseBool,
   icebreakerShowCaseBool,
+  createNewTagShowCaseBool,
+  icebreakerProTipBool,
   peopleNearbyShowCaseBool,
   peopleNearbyIntro,
   wordCloudShowCaseBool,

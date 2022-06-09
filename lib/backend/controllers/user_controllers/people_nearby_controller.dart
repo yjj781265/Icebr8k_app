@@ -409,8 +409,9 @@ class PeopleNearbyController extends GetxController {
 
     item.liked = true;
     item.lastLikedTimestampInMs = Timestamp.now().millisecondsSinceEpoch;
-    items.refresh();
 
+    items.refresh();
+    await HapticFeedback.vibrate();
     await IbUserDbService().likeProfile(item.user.id);
     if (!await IbUserDbService()
         .isProfileLikedNotificationSent(recipientId: item.user.id)) {
