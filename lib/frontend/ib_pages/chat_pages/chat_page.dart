@@ -928,6 +928,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
       final IbQuestionItemController itemController = Get.put(
           IbQuestionItemController(
               rxIsSample: false.obs,
+              isShowCase: false.obs,
               rxIbQuestion: question.obs,
               rxIsExpanded: false.obs),
           tag: question.id);

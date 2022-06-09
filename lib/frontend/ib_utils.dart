@@ -730,21 +730,23 @@ class IbUtils {
       List<IbAnswer> ibAnswers = const [],
       bool expanded = false,
       bool isSample = false,
-      bool isShowcase = false,
+      bool isShowCase = false,
       IbQuestionItemController? itemController}) {
     if (itemController == null) {
       final tag = uniqueTag ? getUniqueId() : question.id;
       final IbQuestionItemController controller = Get.put(
           IbQuestionItemController(
               ibAnswers: ibAnswers,
-              isShowCase: isShowcase,
+              isShowCase: isShowCase.obs,
               rxIbQuestion: question.obs,
               rxIsExpanded: expanded.obs,
               rxIsSample: isSample.obs),
           tag: tag);
       if (question.questionType == QuestionType.multipleChoice ||
           question.questionType == QuestionType.multipleChoicePic) {
-        return IbMcQuestionCard(controller);
+        return IbMcQuestionCard(
+          controller,
+        );
       }
 
       return IbScQuestionCard(controller);

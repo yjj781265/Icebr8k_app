@@ -27,6 +27,7 @@ class IbQuestionButtons extends StatelessWidget {
       if (key == IbShowCaseKeys.kVoteOptionsKey) {
         IbLocalDataService().updateBoolValue(
             key: StorageKey.voteOptionsShowCaseBool, value: true);
+        _controller.isShowCase.value = true;
       }
 
       if (key == IbShowCaseKeys.kIcebreakerKey) {
@@ -47,7 +48,9 @@ class IbQuestionButtons extends StatelessWidget {
             else
               Expanded(
                 child: Showcase(
-                  key: _controller.isShowCase
+                  key: _controller.isShowCase.isTrue &&
+                          !IbLocalDataService().retrieveBoolValue(
+                              StorageKey.voteOptionsShowCaseBool)
                       ? IbShowCaseKeys.kVoteOptionsKey
                       : GlobalKey(),
                   overlayOpacity: 0.3,

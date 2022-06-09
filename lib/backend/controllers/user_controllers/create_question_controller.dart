@@ -217,10 +217,13 @@ class CreateQuestionController extends GetxController {
       itemController!.rxIbQuestion.value = q;
     } else {
       itemController = Get.put(IbQuestionItemController(
-          rxIsSample: true.obs, rxIbQuestion: q.obs, rxIsExpanded: true.obs));
+          isShowCase: false.obs,
+          rxIsSample: true.obs,
+          rxIbQuestion: q.obs,
+          rxIsExpanded: true.obs));
     }
 
-    ///IMPORTANT
+    ///IMPORTANT DO NOT CHANGE CODE BELOW UNTILL YOU UNDERSTAND
     itemController!.rxIsExpanded.value = true;
     itemController!.selectedChoiceId.value = '';
     itemController!.rxIsSample.value = true;

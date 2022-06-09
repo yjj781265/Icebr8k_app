@@ -52,6 +52,7 @@ class IbQuestionSnippetCard extends StatelessWidget {
                         IbQuestionItemController(
                             rxIbQuestion: question.obs,
                             rxIsExpanded: true.obs,
+                            isShowCase: false.obs,
                             rxIsSample: false.obs),
                         tag: question.id)));
                   },

@@ -14,7 +14,6 @@ import 'package:icebr8k/frontend/ib_widgets/ib_question_tags.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
-import '../ib_colors.dart';
 import '../ib_config.dart';
 import 'ib_media_slide.dart';
 import 'ib_question_header.dart';
@@ -23,7 +22,7 @@ import 'ib_question_stats_bar.dart';
 
 class IbScQuestionCard extends StatefulWidget {
   final IbQuestionItemController _controller;
-  const IbScQuestionCard(this._controller, {Key? key}) : super(key: key);
+  const IbScQuestionCard(this._controller);
 
   @override
   _IbScQuestionCardState createState() => _IbScQuestionCardState();
@@ -46,11 +45,14 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
   void initState() {
     _prepareAnimations();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget._controller.isShowCase &&
+      if (widget._controller.isShowCase.isTrue &&
           !IbLocalDataService()
               .retrieveBoolValue(StorageKey.pollExpandShowCaseBool)) {
+        widget._controller.rxIsExpanded.value = true;
         ShowCaseWidget.of(IbShowCaseKeys.kPollExpandKey.currentContext!)!
-            .startShowCase([IbShowCaseKeys.kPollExpandKey]);
+            .startShowCase([
+          IbShowCaseKeys.kPollExpandKey,
+        ]);
       }
     });
     super.initState();
@@ -160,38 +162,38 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IbQuestionStatsBar(widget._controller),
-                  Showcase(
-                    key: widget._controller.isShowCase &&
-                            !IbLocalDataService().retrieveBoolValue(
-                                StorageKey.pollExpandShowCaseBool)
-                        ? IbShowCaseKeys.kPollExpandKey
-                        : GlobalKey(),
-                    shapeBorder: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8))),
-                    overlayOpacity: 0.3,
-                    description: widget._controller.rxIsExpanded.isTrue
-                        ? 'Click here to minimize'
-                        : 'Click here to see vote options',
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        widget._controller.rxIsExpanded.value =
-                            !widget._controller.rxIsExpanded.value;
-                      },
-                      icon: Obx(() {
-                        _runExpandCheck();
-                        return widget._controller.rxIsExpanded.isTrue
-                            ? const Icon(
-                                Icons.expand_less_rounded,
-                                color: IbColors.primaryColor,
-                              )
-                            : const Icon(
-                                Icons.expand_more_outlined,
-                                color: IbColors.primaryColor,
-                              );
-                      }),
-                    ),
-                  ),
+                  Obx(() => Showcase(
+                        key: !IbLocalDataService().retrieveBoolValue(
+                                    StorageKey.pollExpandShowCaseBool) &&
+                                widget._controller.isShowCase.isTrue
+                            ? IbShowCaseKeys.kPollExpandKey
+                            : GlobalKey(),
+                        shapeBorder: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8))),
+                        overlayOpacity: 0.3,
+                        description: widget._controller.rxIsExpanded.isTrue
+                            ? 'Click here to minimize'
+                            : 'Click here to see vote options',
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            widget._controller.rxIsExpanded.value =
+                                !widget._controller.rxIsExpanded.value;
+                          },
+                          icon: Obx(() {
+                            _runExpandCheck();
+                            return widget._controller.rxIsExpanded.isTrue
+                                ? const Icon(
+                                    Icons.expand_less_rounded,
+                                    color: IbColors.primaryColor,
+                                  )
+                                : const Icon(
+                                    Icons.expand_more_outlined,
+                                    color: IbColors.primaryColor,
+                                  );
+                          }),
+                        ),
+                      )),
                 ],
               ),
             ],

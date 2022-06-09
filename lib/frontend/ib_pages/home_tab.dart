@@ -206,7 +206,7 @@ class HomeTab extends StatelessWidget {
                               _controller.categories[1]) {
                             return IbUtils.handleQuestionType(
                                 _controller.forYourList[index],
-                                isShowcase: index == 0 &&
+                                isShowCase: index == 0 &&
                                     !IbLocalDataService().retrieveBoolValue(
                                         StorageKey.pollExpandShowCaseBool),
                                 expanded: IbUtils.getCurrentUserSettings()
@@ -217,7 +217,7 @@ class HomeTab extends StatelessWidget {
                               _controller.categories[2]) {
                             return IbUtils.handleQuestionType(
                                 _controller.newestList[index],
-                                isShowcase: index == 0 &&
+                                isShowCase: index == 0 &&
                                     !IbLocalDataService().retrieveBoolValue(
                                         StorageKey.pollExpandShowCaseBool),
                                 expanded: IbUtils.getCurrentUserSettings()
@@ -225,7 +225,7 @@ class HomeTab extends StatelessWidget {
                           }
                           return IbUtils.handleQuestionType(
                               _controller.trendingList[index],
-                              isShowcase: index == 0 &&
+                              isShowCase: index == 0 &&
                                   !IbLocalDataService().retrieveBoolValue(
                                       StorageKey.pollExpandShowCaseBool),
                               expanded: IbUtils.getCurrentUserSettings()

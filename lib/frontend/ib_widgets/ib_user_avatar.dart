@@ -68,6 +68,9 @@ class IbUserAvatar extends StatelessWidget {
             onTap: (disableOnTap || uid == null || uid!.isEmpty)
                 ? null
                 : () {
+                    if (IbUtils.checkFeatureIsLocked()) {
+                      return;
+                    }
                     if (uid == IbUtils.getCurrentUid()!) {
                       Get.to(() => MyProfilePage());
                     } else {

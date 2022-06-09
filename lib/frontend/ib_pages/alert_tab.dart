@@ -713,6 +713,7 @@ class AlertTab extends StatelessWidget {
             Get.to(() => QuestionMainPage(
                   Get.put(
                       IbQuestionItemController(
+                          isShowCase: false.obs,
                           rxIsSample: false.obs,
                           rxIbQuestion: item.ibQuestion!.obs,
                           rxIsExpanded: true.obs),
@@ -774,6 +775,7 @@ class AlertTab extends StatelessWidget {
             Get.to(() => QuestionMainPage(
                   Get.put(
                       IbQuestionItemController(
+                          isShowCase: false.obs,
                           rxIsSample: false.obs,
                           rxIbQuestion: item.ibQuestion!.obs,
                           rxIsExpanded: true.obs),
@@ -835,6 +837,7 @@ class AlertTab extends StatelessWidget {
             Get.to(() => QuestionMainPage(
                   Get.put(
                       IbQuestionItemController(
+                          isShowCase: false.obs,
                           rxIsSample: false.obs,
                           rxIbQuestion: item.ibQuestion!.obs,
                           rxIsExpanded: true.obs),
@@ -897,6 +900,7 @@ class AlertTab extends StatelessWidget {
             Get.to(() => QuestionMainPage(
                   Get.put(
                       IbQuestionItemController(
+                          isShowCase: false.obs,
                           rxIsSample: false.obs,
                           rxIbQuestion: item.ibQuestion!.obs,
                           rxIsExpanded: true.obs),
@@ -961,6 +965,7 @@ class AlertTab extends StatelessWidget {
                   Get.put(
                       IbQuestionItemController(
                           rxIsSample: false.obs,
+                          isShowCase: false.obs,
                           rxIbQuestion: item.ibQuestion!.obs,
                           rxIsExpanded: true.obs),
                       tag: item.ibQuestion!.id),

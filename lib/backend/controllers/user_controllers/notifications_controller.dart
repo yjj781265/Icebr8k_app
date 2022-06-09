@@ -120,6 +120,7 @@ class NotificationController extends GetxController {
       if (question != null) {
         final IbQuestionItemController itemController = Get.put(
             IbQuestionItemController(
+                isShowCase: false.obs,
                 rxIbQuestion: question.obs,
                 rxIsExpanded: true.obs,
                 rxIsSample: false.obs),

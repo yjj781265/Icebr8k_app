@@ -80,6 +80,10 @@ class IbQuestionTags extends StatelessWidget {
                       customBorder: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16)),
                       onTap: () {
+                        if (IbUtils.checkFeatureIsLocked()) {
+                          return;
+                        }
+
                         if (Get.isRegistered<TagPageController>(tag: element)) {
                           return;
                         }

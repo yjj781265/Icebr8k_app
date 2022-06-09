@@ -40,7 +40,7 @@ class IbQuestionItemController extends GetxController {
   final compScore = 0.0.obs;
   final resultMap = <IbChoice, double>{}.obs;
   final sharedCircles = <ChatTabItem>[].obs;
-  final bool isShowCase;
+  final RxBool isShowCase;
 
   //start
   // variables for poll stat main page
@@ -60,7 +60,7 @@ class IbQuestionItemController extends GetxController {
     required this.rxIbQuestion,
     required this.rxIsExpanded,
     required this.rxIsSample,
-    this.isShowCase = false,
+    required this.isShowCase,
     this.ibAnswers = const [],
   });
 

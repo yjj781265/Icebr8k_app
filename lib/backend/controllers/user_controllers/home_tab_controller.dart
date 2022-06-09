@@ -116,9 +116,12 @@ class HomeTabController extends GetxController {
         print('determineFeatureIsLocked stream $isLocked');
         if (isLocked.isFalse) {
           IbUtils.showSimpleSnackBar(
-              msg: 'Features unlocked', backgroundColor: IbColors.accentColor);
-          selectedCategory.value = categories.first;
-          Future.delayed(const Duration(seconds: 2), () => onRefresh());
+              msg: 'Features unlocked, now you are officially an Icebr8ker',
+              backgroundColor: IbColors.accentColor);
+          await Future.delayed(const Duration(seconds: 2), () {
+            selectedCategory.value = categories.first;
+            onRefresh();
+          });
           await first8Sub.cancel();
         }
       });
