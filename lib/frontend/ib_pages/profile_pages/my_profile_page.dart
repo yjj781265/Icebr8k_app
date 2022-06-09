@@ -240,11 +240,13 @@ class MyProfilePage extends StatelessWidget {
                   borderRadius: const BorderRadius.all(Radius.circular(8))),
               child: Padding(
                 padding: const EdgeInsets.all(3.0),
-                child: Text(
-                  beautifyProfilePrivacy(
-                      _controller.rxCurrentIbUser.value.profilePrivacy),
-                  style:
-                      const TextStyle(fontSize: IbConfig.kDescriptionTextSize),
+                child: Obx(
+                  () => Text(
+                    beautifyProfilePrivacy(
+                        _controller.rxCurrentIbUser.value.profilePrivacy),
+                    style: const TextStyle(
+                        fontSize: IbConfig.kDescriptionTextSize),
+                  ),
                 ),
               ),
             ))
