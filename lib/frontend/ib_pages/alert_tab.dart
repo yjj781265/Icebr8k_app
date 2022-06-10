@@ -33,6 +33,7 @@ class AlertTab extends StatelessWidget {
                 child: Text('Alert'),
               ),
               bottom: TabBar(
+                isScrollable: true,
                 indicatorSize: TabBarIndicatorSize.tab,
                 tabs: [
                   Obx(() {

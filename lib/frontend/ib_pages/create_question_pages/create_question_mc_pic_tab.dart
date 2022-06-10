@@ -417,6 +417,6 @@ class CreateQuestionMcPicTab extends StatelessWidget {
       ],
     );
 
-    Get.bottomSheet(SafeArea(child: IbCard(child: options)));
+    Get.bottomSheet(IbCard(child: options), ignoreSafeArea: false);
   }
 }

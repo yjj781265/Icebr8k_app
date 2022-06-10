@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
@@ -102,6 +103,13 @@ class NotificationController extends GetxController {
   }
 
   Future<void> _handleRemoteMessage(RemoteMessage message) async {
+    /// clear app badge
+    FlutterAppBadger.updateBadgeCount(0);
+    if (IbUtils.getCurrentIbUser() != null &&
+        IbUtils.getCurrentIbUser()!.notificationCount != 0) {
+      await IbUserDbService().updateIbUserNotificationCount(0);
+    }
+
     if (message.data['type'] == IbNotification.kChat) {
       final chatId = message.data['url'] as String;
       final ibChat = await IbChatDbService().queryChat(chatId);

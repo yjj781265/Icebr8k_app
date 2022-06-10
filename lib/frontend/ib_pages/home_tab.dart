@@ -104,6 +104,9 @@ class HomeTab extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.search),
                       onPressed: () async {
+                        if (IbUtils.checkFeatureIsLocked()) {
+                          return;
+                        }
                         Get.to(() => SearchPage());
                       },
                     ),

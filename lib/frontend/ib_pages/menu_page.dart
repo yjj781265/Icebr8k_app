@@ -119,10 +119,10 @@ class _MenuPageState extends State<MenuPage> {
                 value: isDarkMode,
                 onChanged: (value) {
                   print('dark mode to $value');
-                  IbLocalDataService().updateBoolValue(
-                      key: StorageKey.isDarkModeBool, value: value);
                   setState(() {
                     isDarkMode = value;
+                    IbLocalDataService().updateBoolValue(
+                        key: StorageKey.isDarkModeBool, value: value);
                     Get.changeTheme(value
                         ? IbThemes(context).buildDarkTheme()
                         : IbThemes(context).buildLightTheme());

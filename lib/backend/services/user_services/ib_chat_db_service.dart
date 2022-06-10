@@ -68,6 +68,13 @@ class IbChatDbService {
         .get();
   }
 
+  Stream<QuerySnapshot<Map<String, dynamic>>> listenToUserCircles(String uid) {
+    return _collectionRef
+        .where('isCircle', isEqualTo: true)
+        .where('memberUids', arrayContains: uid)
+        .snapshots();
+  }
+
   Future<List<IbChat>> queryUserCircles(String uid) async {
     final list = <IbChat>[];
     final snapshot = await _collectionRef

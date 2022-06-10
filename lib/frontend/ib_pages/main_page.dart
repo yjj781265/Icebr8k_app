@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
@@ -17,6 +18,7 @@ import 'package:move_to_background/move_to_background.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../backend/controllers/user_controllers/social_tab_controller.dart';
+import '../../backend/services/user_services/ib_user_db_service.dart';
 import '../ib_colors.dart';
 import 'create_question_pages/create_question_page.dart';
 import 'home_tab.dart';
@@ -53,7 +55,16 @@ class _MainPageViewState extends State<MainPageView>
   }
 
   @override
-  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {}
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed) {
+      /// clear app badge
+      FlutterAppBadger.updateBadgeCount(0);
+      if (IbUtils.getCurrentIbUser() != null &&
+          IbUtils.getCurrentIbUser()!.notificationCount != 0) {
+        await IbUserDbService().updateIbUserNotificationCount(0);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

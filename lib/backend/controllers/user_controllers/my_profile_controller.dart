@@ -16,6 +16,7 @@ class MyProfileController extends GetxController {
   final asks = <IbQuestion>[].obs;
   final RefreshController askedRefreshController = RefreshController();
   late StreamSubscription asksSub;
+  late StreamSubscription circleSub;
   DocumentSnapshot? lastAskDoc;
 
   @override
@@ -28,8 +29,34 @@ class MyProfileController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
-    circles.value =
-        await IbChatDbService().queryUserCircles(IbUtils.getCurrentUid()!);
+    circleSub = IbChatDbService().listenToCircles().listen((event) {
+      for (final docChange in event.docChanges) {
+        if (docChange.doc.data() == null) {
+          continue;
+        }
+        final ibChat = IbChat.fromJson(docChange.doc.data()!);
+
+        switch (docChange.type) {
+          case DocumentChangeType.added:
+            circles.add(ibChat);
+            break;
+          case DocumentChangeType.modified:
+            final int index = circles
+                .indexWhere((element) => element.chatId == ibChat.chatId);
+            if (index != -1) {
+              circles[index] = ibChat;
+            }
+            break;
+          case DocumentChangeType.removed:
+            final int index = circles
+                .indexWhere((element) => element.chatId == ibChat.chatId);
+            if (index != -1) {
+              circles.removeAt(index);
+            }
+            break;
+        }
+      }
+    });
     asksSub = IbQuestionDbService()
         .listenToAskedQuestions(IbUtils.getCurrentUid()!)
         .listen((event) {
@@ -87,5 +114,6 @@ class MyProfileController extends GetxController {
   @override
   Future<void> onClose() async {
     await asksSub.cancel();
+    await circleSub.cancel();
   }
 }

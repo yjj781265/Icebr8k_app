@@ -46,8 +46,12 @@ class IbUtils {
       SystemUiOverlayStyle(
           statusBarIconBrightness:
               IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
-                  ? Brightness.light
-                  : Brightness.dark,
+                  ? Brightness.dark
+                  : Brightness.light,
+          statusBarBrightness:
+              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
+                  ? Brightness.dark
+                  : Brightness.light,
           statusBarColor:
               IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
                   ? Colors.black
