@@ -336,14 +336,14 @@ class AuthController extends GetxService {
           case IbUser.kUserStatusApproved:
             await IbAnalyticsManager().logScreenView(
                 className: "AuthController", screenName: "MainPage");
-            Get.off(() => MainPage(),
+            Get.offAll(() => MainPage(),
                 binding: HomeBinding(ibUser!),
                 transition: Transition.circularReveal);
             break;
 
           case IbUser.kUserStatusBanned:
             print('Go to CounterDown Page');
-            Get.off(() => BannedCountDownPage(ibUser!),
+            Get.offAll(() => BannedCountDownPage(ibUser!),
                 transition: Transition.circularReveal);
             break;
 

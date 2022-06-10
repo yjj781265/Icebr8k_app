@@ -16,10 +16,10 @@ class HomeBinding implements Bindings {
   @override
   void dependencies() {
     Get.lazyPut(() => MainPageController(currentIbUser.obs), fenix: true);
-    Get.put(() => AdminMainController());
     Get.lazyPut(() => HomeTabController(), fenix: true);
     Get.lazyPut(() => SocialTabController(), fenix: true);
     Get.lazyPut(() => NotificationController(), fenix: true);
     Get.lazyPut(() => PeopleNearbyController(), fenix: true);
+    Get.put(AdminMainController());
   }
 }

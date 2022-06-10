@@ -373,7 +373,7 @@ class IbQuestionDbService {
   Future<QuerySnapshot<Map<String, dynamic>>> queryIbAnswers(
       {required String choiceId,
       required String questionId,
-      int limit = 8,
+      int limit = IbConfig.kPerPage,
       DocumentSnapshot<Map<String, dynamic>>? lastSnap}) async {
     if (lastSnap != null) {
       return _collectionRef

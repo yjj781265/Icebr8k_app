@@ -309,7 +309,9 @@ class CommentItemWidget extends StatelessWidget {
                                       }
                                     },
                                     icon: Icon(
-                                      FontAwesomeIcons.heart,
+                                      item.isLiked
+                                          ? Icons.favorite
+                                          : Icons.favorite_border,
                                       color: item.isLiked
                                           ? IbColors.errorRed
                                           : IbColors.lightGrey,

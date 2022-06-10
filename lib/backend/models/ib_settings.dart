@@ -8,6 +8,7 @@ class IbSettings {
   bool pollLikesN;
   bool pollCommentLikesN;
   bool pollVoteN;
+  bool pollNewN;
   bool profileLikesN;
   bool circleInviteN;
   bool circleRequestN;
@@ -23,6 +24,7 @@ class IbSettings {
     this.pollLikesN = true,
     this.pollCommentLikesN = true,
     this.pollVoteN = true,
+    this.pollNewN = true,
     this.friendRequestN = true,
     this.circleRequestN = true,
     this.profileLikesN = true,
@@ -45,10 +47,14 @@ class IbSettings {
           pollLikesN == other.pollLikesN &&
           pollCommentLikesN == other.pollCommentLikesN &&
           pollVoteN == other.pollVoteN &&
+          pollNewN == other.pollNewN &&
+          profileLikesN == other.profileLikesN &&
           circleInviteN == other.circleInviteN &&
           circleRequestN == other.circleRequestN &&
           friendRequestN == other.friendRequestN &&
-          pollCommentReplyN == other.pollCommentReplyN;
+          pollCommentReplyN == other.pollCommentReplyN &&
+          pollExpandedByDefault == other.pollExpandedByDefault &&
+          voteAnonymousByDefault == other.voteAnonymousByDefault;
 
   @override
   int get hashCode =>
@@ -56,8 +62,12 @@ class IbSettings {
       pollLikesN.hashCode ^
       pollCommentLikesN.hashCode ^
       pollVoteN.hashCode ^
+      pollNewN.hashCode ^
+      profileLikesN.hashCode ^
       circleInviteN.hashCode ^
       circleRequestN.hashCode ^
       friendRequestN.hashCode ^
-      pollCommentReplyN.hashCode;
+      pollCommentReplyN.hashCode ^
+      pollExpandedByDefault.hashCode ^
+      voteAnonymousByDefault.hashCode;
 }

@@ -40,7 +40,7 @@ class QuestionResultDetailPage extends StatelessWidget {
 
           return SmartRefresher(
             enablePullDown: false,
-            enablePullUp: true,
+            enablePullUp: _controller.results.length >= IbConfig.kPerPage,
             onLoading: () async {
               await _controller.loadMore();
             },

@@ -38,6 +38,15 @@ class SettingsNotificationPage extends StatelessWidget {
               title: const Text('New Likes on My Polls'),
             ),
             SwitchListTile.adaptive(
+              value: _controller.rxCurrentIbUser.value.settings!.pollNewN,
+              onChanged: (value) async {
+                _controller.rxCurrentIbUser.value.settings!.pollNewN = value;
+                await IbUserDbService()
+                    .updateIbUser(_controller.rxCurrentIbUser.value);
+              },
+              title: const Text('New Polls From Friends'),
+            ),
+            SwitchListTile.adaptive(
               value: _controller.rxCurrentIbUser.value.settings!.pollVoteN,
               onChanged: (value) async {
                 _controller.rxCurrentIbUser.value.settings!.pollVoteN = value;

@@ -79,6 +79,10 @@ class QuestionResultDetailPageController extends GetxController {
   }
 
   Future<void> loadMore() async {
+    if (lastSnap == null) {
+      refreshController.loadNoData();
+      return;
+    }
     if (lastSnap != null) {
       try {
         final snapshot = await IbQuestionDbService().queryIbAnswers(

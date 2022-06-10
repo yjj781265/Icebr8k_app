@@ -175,6 +175,7 @@ class CircleInfoController extends GetxController {
         for (final request in requests) {
           await IbUserDbService().removeNotification(request);
         }
+        requests.clear();
       }
       IbUtils.showSimpleSnackBar(
           msg: 'Request Canceled', backgroundColor: IbColors.primaryColor);
