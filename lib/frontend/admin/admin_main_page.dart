@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/admin_controllers/admin_main_controller.dart';
+import 'package:icebr8k/frontend/admin/feedback_chat_list.dart';
 import 'package:icebr8k/frontend/admin/pending_app_main_page.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -71,6 +72,19 @@ class AdminMainPage extends StatelessWidget {
                     Get.to(() => EditIbCollectionMainPage(
                           isEdit: true,
                         ));
+                  },
+                  color: IbColors.primaryColor,
+                )),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+                height: 56,
+                width: double.infinity,
+                child: IbElevatedButton(
+                  textTrKey: 'Feedbacks',
+                  onPressed: () {
+                    Get.to(() => FeedBackChatList());
                   },
                   color: IbColors.primaryColor,
                 )),

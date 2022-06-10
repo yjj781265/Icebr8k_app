@@ -6,10 +6,13 @@ import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/ib_collection.dart';
 import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 
+import '../../models/ib_chat_models/ib_message.dart';
+
 class IbAdminDbService {
   static final _ibAdminDbService = IbAdminDbService._();
   static final _db = FirebaseFirestore.instance;
   static const _kUsersCollection = 'IbUsers${DbConfig.dbSuffix}';
+  static const _kFeedbackCollection = 'Feedbacks${DbConfig.dbSuffix}';
   static const _kIcebreakerCollection = 'Icebreakers';
 
   factory IbAdminDbService() => _ibAdminDbService;
@@ -69,6 +72,22 @@ class IbAdminDbService {
 
   Future<void> deleteAvatarUrl(IbUser user) async {
     await IbStorageService().deleteFile(user.avatarUrl);
+  }
+
+  Future<void> addFeedback(IbMessage message) async {
+    message.timestamp = Timestamp.now();
+    await _db.collection(_kFeedbackCollection).doc(message.chatRoomId).set({
+      'feedbacks': FieldValue.arrayUnion([message.toJson()])
+    }, SetOptions(merge: true));
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> listenToSingleFeedbacks(
+      String chatId) {
+    return _db.collection(_kFeedbackCollection).doc(chatId).snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> listenToAllFeedbacks() {
+    return _db.collection(_kFeedbackCollection).snapshots();
   }
 
   Future<void> sendStatusEmail(

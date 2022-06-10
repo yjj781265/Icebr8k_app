@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/frontend/admin/admin_main_page.dart';
+import 'package:icebr8k/frontend/admin/feedback_chat_page.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/people_nearby_pages/people_nearby_page.dart';
@@ -14,6 +15,7 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
+import '../../backend/controllers/admin_controllers/feedback_chat_controller.dart';
 import '../../backend/controllers/user_controllers/auth_controller.dart';
 import '../../backend/models/ib_user.dart';
 import '../../backend/services/user_services/ib_local_data_service.dart';
@@ -170,6 +172,26 @@ class _MenuPageState extends State<MenuPage> {
                             return;
                           }
                           Get.to(() => PeopleNearbyPage());
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(
+                          Icons.support_agent,
+                          color: IbColors.accentColor,
+                        ),
+                        title: const Text(
+                          "Support/Feedback",
+                          style: TextStyle(
+                              fontSize: IbConfig.kNormalTextSize,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        onTap: () {
+                          if (IbUtils.checkFeatureIsLocked()) {
+                            return;
+                          }
+                          Get.to(() => FeedBackChatPage(Get.put(
+                              FeedbackChatController(
+                                  IbUtils.getCurrentUid()!))));
                         },
                       ),
                       ListTile(

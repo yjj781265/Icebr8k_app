@@ -22,11 +22,14 @@ import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
 import '../../../frontend/ib_pages/setup_pages/review_page.dart';
+import '../../models/ib_chat_models/ib_message.dart';
 
 class AdminMainController extends GetxController {
   late StreamSubscription applicationSub;
   late StreamSubscription ibCollectionsSub;
+  late StreamSubscription feedbacksSub;
   final pendingUsers = <IbUser>[].obs;
+  final pendingFeedbacks = <_FeedbackItem>[].obs;
   final ibCollections = <IbCollection>[].obs;
   final totalMessages = 0.obs;
 
@@ -40,6 +43,10 @@ class AdminMainController extends GetxController {
     ibCollectionsSub = IbAdminDbService()
         .listenToIcebreakerCollection()
         .listen((event) => _handleIbCollectionSnapshot(event));
+
+    feedbacksSub = IbAdminDbService().listenToAllFeedbacks().listen((event) {
+      _handleAllFeedbacksSnapshot(event);
+    });
   }
 
   @override
@@ -82,6 +89,58 @@ class AdminMainController extends GetxController {
         pendingUsers.refresh();
         totalMessages.value--;
       }
+    }
+  }
+
+  Future<void> _handleAllFeedbacksSnapshot(
+      QuerySnapshot<Map<String, dynamic>> snapshot) async {
+    for (final docChange in snapshot.docChanges) {
+      switch (docChange.type) {
+        case DocumentChangeType.added:
+          final IbUser? user =
+              await IbUserDbService().queryIbUser(docChange.doc.id);
+          if (user != null && docChange.doc.data() != null) {
+            final items = docChange.doc.data()!['feedbacks'] as List;
+            final messages = items
+                .map((e) => IbMessage.fromJson(e as Map<String, dynamic>))
+                .toList();
+            messages.sort((a, b) =>
+                (b.timestamp as Timestamp).compareTo(a.timestamp as Timestamp));
+            final lastMessage = messages.first;
+            pendingFeedbacks
+                .add(_FeedbackItem(user: user, lastMessage: lastMessage));
+          }
+          break;
+        case DocumentChangeType.modified:
+          final IbUser? user =
+              await IbUserDbService().queryIbUser(docChange.doc.id);
+          if (user != null && docChange.doc.data() != null) {
+            final items = docChange.doc.data()!['feedbacks'] as List;
+            final messages = items
+                .map((e) => IbMessage.fromJson(e as Map<String, dynamic>))
+                .toList();
+            messages.sort((a, b) =>
+                (b.timestamp as Timestamp).compareTo(a.timestamp as Timestamp));
+            final lastMessage = messages.first;
+            final item = _FeedbackItem(user: user, lastMessage: lastMessage);
+            final int index = pendingFeedbacks
+                .indexWhere((element) => element.user.id == user.id);
+            if (index != -1) {
+              pendingFeedbacks[index] = item;
+            }
+          }
+          break;
+        case DocumentChangeType.removed:
+          final int index = pendingFeedbacks
+              .indexWhere((element) => element.user.id == docChange.doc.id);
+          if (index != -1) {
+            pendingFeedbacks.removeAt(index);
+          }
+          break;
+      }
+      pendingFeedbacks.sort((a, b) => (b.lastMessage.timestamp as Timestamp)
+          .compareTo(a.lastMessage.timestamp as Timestamp));
+      pendingFeedbacks.refresh();
     }
   }
 
@@ -263,4 +322,11 @@ class AdminMainController extends GetxController {
       ));
     }
   }
+}
+
+class _FeedbackItem {
+  final IbUser user;
+  final IbMessage lastMessage;
+
+  _FeedbackItem({required this.user, required this.lastMessage});
 }
