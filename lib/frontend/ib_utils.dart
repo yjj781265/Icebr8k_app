@@ -44,10 +44,14 @@ class IbUtils {
   static void changeStatusBarColor() {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
+
+          ///for android
           statusBarIconBrightness:
               IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
-                  ? Brightness.dark
-                  : Brightness.light,
+                  ? Brightness.light
+                  : Brightness.dark,
+
+          ///for IOS
           statusBarBrightness:
               IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
                   ? Brightness.dark
