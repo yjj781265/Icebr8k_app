@@ -44,7 +44,7 @@ class SettingsNotificationPage extends StatelessWidget {
                 await IbUserDbService()
                     .updateIbUser(_controller.rxCurrentIbUser.value);
               },
-              title: const Text('New Polls From Friends'),
+              title: const Text('New Polls from Friends'),
             ),
             SwitchListTile.adaptive(
               value: _controller.rxCurrentIbUser.value.settings!.pollVoteN,

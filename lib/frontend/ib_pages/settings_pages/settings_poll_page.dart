@@ -45,7 +45,7 @@ class SettingsPollPage extends StatelessWidget {
                 await IbUserDbService()
                     .updateIbUser(_controller.rxCurrentIbUser.value);
               },
-              title: const Text('Vote Anonymously By Default'),
+              title: const Text('Vote Anonymously by Default'),
             ),
           ],
         ),

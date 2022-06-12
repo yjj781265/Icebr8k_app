@@ -135,7 +135,7 @@ class IbPremiumPage extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: const [
-                  Text('• Create Unlimited Polls Per day',
+                  Text('• Create Unlimited Polls per Day',
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: IbConfig.kPageTitleSize,
@@ -225,7 +225,7 @@ class IbPremiumPage extends StatelessWidget {
                           element.availablePackages.first.product.title,
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: IbConfig.kPageTitleSize),
+                              fontSize: IbConfig.kNormalTextSize),
                         ),
                         subtitle: Text(element.availablePackages.first.product
                                 .description.capitalizeFirst ??
