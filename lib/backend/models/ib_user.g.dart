@@ -50,6 +50,7 @@ IbUser _$IbUserFromJson(Map<String, dynamic> json) => IbUser(
       roles:
           (json['roles'] as List<dynamic>?)?.map((e) => e as String).toList() ??
               const ['user'],
+      isPremium: json['isPremium'] as bool? ?? false,
       bio: json['bio'] as String? ?? '',
       fName: json['fName'] as String? ?? '',
       lName: json['lName'] as String? ?? '',
@@ -86,6 +87,7 @@ Map<String, dynamic> _$IbUserToJson(IbUser instance) => <String, dynamic>{
       'profilePrivacy': instance.profilePrivacy,
       'fcmToken': instance.fcmToken,
       'isOnline': instance.isOnline,
+      'isPremium': instance.isPremium,
       'coverPhotoUrl': instance.coverPhotoUrl,
       'bio': instance.bio,
       'voiceMemoUrl': instance.voiceMemoUrl,

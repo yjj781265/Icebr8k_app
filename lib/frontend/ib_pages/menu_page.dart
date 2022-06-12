@@ -8,6 +8,7 @@ import 'package:icebr8k/frontend/admin/admin_main_page.dart';
 import 'package:icebr8k/frontend/admin/feedback_chat_page.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/ib_premium_page.dart';
 import 'package:icebr8k/frontend/ib_pages/people_nearby_pages/people_nearby_page.dart';
 import 'package:icebr8k/frontend/ib_pages/settings_pages/settings_main_page.dart';
 import 'package:icebr8k/frontend/ib_themes.dart';
@@ -29,8 +30,6 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
-  final kBetaSurveyLink = 'https://forms.gle/xuYbYcsWGC6WtT7h7';
-
   bool isDarkMode =
       IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool);
   final MainPageController _mainPageController = Get.find();
@@ -113,6 +112,18 @@ class _MenuPageState extends State<MenuPage> {
                           ],
                         ),
                       ),
+                      if (_mainPageController.rxCurrentIbUser.value.isPremium)
+                        const Positioned(
+                          top: 8,
+                          right: 8,
+                          child: IbCard(
+                            child: Icon(
+                              Icons.workspace_premium,
+                              color: IbColors.primaryColor,
+                              size: 24,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -158,6 +169,26 @@ class _MenuPageState extends State<MenuPage> {
                         ),
                       ListTile(
                         leading: const Icon(
+                          Icons.workspace_premium,
+                          color: IbColors.primaryColor,
+                        ),
+                        title: const Text(
+                          "Go Premium",
+                          style: TextStyle(
+                              fontSize: IbConfig.kNormalTextSize,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: const Text('Remove Ads and More'),
+                        onTap: () {
+                          if (IbUtils.checkFeatureIsLocked()) {
+                            return;
+                          }
+
+                          Get.to(() => IbPremiumPage());
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(
                           Icons.person_pin_circle_rounded,
                           color: IbColors.errorRed,
                         ),
@@ -165,7 +196,7 @@ class _MenuPageState extends State<MenuPage> {
                           "People Nearby",
                           style: TextStyle(
                               fontSize: IbConfig.kNormalTextSize,
-                              fontWeight: FontWeight.bold),
+                              fontWeight: FontWeight.normal),
                         ),
                         onTap: () {
                           if (IbUtils.checkFeatureIsLocked()) {
@@ -183,7 +214,7 @@ class _MenuPageState extends State<MenuPage> {
                           "Support/Feedback",
                           style: TextStyle(
                               fontSize: IbConfig.kNormalTextSize,
-                              fontWeight: FontWeight.bold),
+                              fontWeight: FontWeight.normal),
                         ),
                         onTap: () {
                           if (IbUtils.checkFeatureIsLocked()) {
@@ -203,7 +234,7 @@ class _MenuPageState extends State<MenuPage> {
                           "Settings",
                           style: TextStyle(
                               fontSize: IbConfig.kNormalTextSize,
-                              fontWeight: FontWeight.bold),
+                              fontWeight: FontWeight.normal),
                         ),
                         onTap: () {
                           Get.back();

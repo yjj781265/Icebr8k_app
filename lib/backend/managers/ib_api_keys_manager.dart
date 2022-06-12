@@ -7,11 +7,16 @@ class IbApiKeysManager {
   static String kGooglePlacesApiKey = '';
   static String kTypeSenseSearchApiKey = '';
   static String kTypeSenseNode = '';
+  static String kRevenueCatAndroidKey = '';
+  static String kRevenueCatIosKey = '';
 
   Future<void> init() async {
     kGooglePlacesApiKey = await IbApiKeysService().queryGooglePlacesApiKey();
     kTypeSenseSearchApiKey =
         await IbApiKeysService().queryTypeSenseSearchApiKey();
     kTypeSenseNode = await IbApiKeysService().queryTypeSenseNodeAddress();
+    kRevenueCatAndroidKey =
+        await IbApiKeysService().queryRevenueCatAndroidApiKey();
+    kRevenueCatIosKey = await IbApiKeysService().queryRevenueCatIosApiKey();
   }
 }

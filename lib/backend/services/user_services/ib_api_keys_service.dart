@@ -38,6 +38,36 @@ class IbApiKeysService {
   }
 
   /// will return empty string on error
+  Future<String> queryRevenueCatAndroidApiKey() async {
+    try {
+      final snapshot =
+          await _db.collection(kCollection).doc('revenue-cat-keys').get();
+      if (!snapshot.exists) {
+        return '';
+      }
+      return snapshot.data()!['android'].toString();
+    } catch (e) {
+      print(e);
+      return '';
+    }
+  }
+
+  /// will return empty string on error
+  Future<String> queryRevenueCatIosApiKey() async {
+    try {
+      final snapshot =
+          await _db.collection(kCollection).doc('revenue-cat-keys').get();
+      if (!snapshot.exists) {
+        return '';
+      }
+      return snapshot.data()!['ios'].toString();
+    } catch (e) {
+      print(e);
+      return '';
+    }
+  }
+
+  /// will return empty string on error
   Future<String> queryTypeSenseNodeAddress() async {
     try {
       final snapshot =

@@ -47,6 +47,12 @@ class IbUserDbService {
         .set(_ibUser.toJson(), SetOptions(merge: true));
   }
 
+  Future<void> updateCurrentIbUserPremium(bool isActive) {
+    return _collectionRef
+        .doc(IbUtils.getCurrentUid())
+        .update({'isPremium': isActive});
+  }
+
   Future<void> updateIbUserNotificationCount(int count) async {
     return _collectionRef
         .doc(IbUtils.getCurrentUid())

@@ -35,6 +35,7 @@ class IbUser {
   String profilePrivacy;
   String fcmToken;
   bool isOnline;
+  bool isPremium;
   String coverPhotoUrl;
   String bio;
   String voiceMemoUrl;
@@ -82,6 +83,7 @@ class IbUser {
     this.tags = const [],
     this.emoPics = const [],
     this.roles = const ['user'],
+    this.isPremium = false,
     this.bio = '',
     this.fName = '',
     this.lName = '',
