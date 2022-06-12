@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/managers/ib_api_keys_manager.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:purchases_flutter/models/purchaser_info_wrapper.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
@@ -29,16 +31,36 @@ class MainPageController extends GetxController {
     });
 
     await IbApiKeysManager().init();
-
-    ///query purchase Info
-    final PurchaserInfo purchaserInfo = await Purchases.getPurchaserInfo();
-    await _handlePurchaseInfo(purchaserInfo);
+    await _queryPurchaseInfo();
   }
 
   @override
   Future<void> onClose() async {
     super.onClose();
     await ibUserSub.cancel();
+  }
+
+  Future<void> _queryPurchaseInfo() async {
+    ///query purchase Info
+    try {
+      final String androidKey = IbApiKeysManager.kRevenueCatAndroidKey;
+      final String iosKey = IbApiKeysManager.kRevenueCatIosKey;
+      print(androidKey);
+      if (Platform.isAndroid && androidKey.isNotEmpty) {
+        await Purchases.setup(androidKey, appUserId: IbUtils.getCurrentUid());
+      } else if (Platform.isIOS && iosKey.isNotEmpty) {
+        await Purchases.setup(iosKey, appUserId: IbUtils.getCurrentUid());
+      }
+      if (Platform.isAndroid && androidKey.isNotEmpty) {
+        await Purchases.setup(androidKey, appUserId: IbUtils.getCurrentUid());
+      } else if (Platform.isIOS && iosKey.isNotEmpty) {
+        await Purchases.setup(iosKey, appUserId: IbUtils.getCurrentUid());
+      }
+      final PurchaserInfo purchaserInfo = await Purchases.getPurchaserInfo();
+      await _handlePurchaseInfo(purchaserInfo);
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> _handlePurchaseInfo(PurchaserInfo purchaserInfo) async {

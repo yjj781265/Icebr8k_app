@@ -441,6 +441,14 @@ class ChatPageController extends GetxController {
         await IbChatDbService().updateReadUidArray(
             chatRoomId: ibChat!.chatId, messageId: lastMessage.messageId);
       }
+      messages.sort((a, b) {
+        /// timestamp take times update on the server so it might be null
+        if (b.ibMessage.timestamp != null && a.ibMessage.timestamp != null) {
+          return (b.ibMessage.timestamp as Timestamp)
+              .compareTo(a.ibMessage.timestamp as Timestamp);
+        }
+        return 0;
+      });
       messages.refresh();
 
       isLoading.value = false;

@@ -30,7 +30,7 @@ class SettingsPollPage extends StatelessWidget {
               },
               title: const Text('Expand Poll by Default'),
               subtitle: const Text(
-                'Take effect after restarting the app',
+                'Take effects after restarted the app',
                 style: TextStyle(
                     fontSize: IbConfig.kSecondaryTextSize,
                     color: IbColors.lightGrey),

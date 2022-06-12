@@ -35,6 +35,8 @@ class FeedBackChatPage extends StatelessWidget {
           Expanded(
             child: Obx(
               () => ListView.builder(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 reverse: true,
                 itemBuilder: (context, index) {
                   final item = _controller.feedbacks[index];

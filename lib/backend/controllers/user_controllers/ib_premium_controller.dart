@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/managers/ib_api_keys_manager.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -34,14 +32,6 @@ class IbPremiumController extends GetxController {
 
   Future<void> _initPlatformState() async {
     await Purchases.setDebugLogsEnabled(true);
-    final String androidKey = IbApiKeysManager.kRevenueCatAndroidKey;
-    final String iosKey = IbApiKeysManager.kRevenueCatIosKey;
-    if (Platform.isAndroid && androidKey.isNotEmpty) {
-      await Purchases.setup(androidKey, appUserId: IbUtils.getCurrentUid());
-    } else if (Platform.isIOS && iosKey.isNotEmpty) {
-      await Purchases.setup(iosKey, appUserId: IbUtils.getCurrentUid());
-    }
-
     try {
       if (await Purchases.isConfigured) {
         /// load products
@@ -69,8 +59,9 @@ class IbPremiumController extends GetxController {
         _handlePurchaseInfo(info);
       });
     } on PlatformException catch (e) {
+      final errorCode = PurchasesErrorHelper.getErrorCode(e);
       Get.dialog(IbDialog(
-        title: 'Error',
+        title: 'Error(${errorCode.name})',
         subtitle: e.message ?? 'Oops, something went wrong',
         showNegativeBtn: false,
       ));
@@ -110,8 +101,9 @@ class IbPremiumController extends GetxController {
         await IbUserDbService().updateCurrentIbUserPremium(isActive);
       }
     } on PlatformException catch (e) {
+      final errorCode = PurchasesErrorHelper.getErrorCode(e);
       Get.dialog(IbDialog(
-        title: 'Error',
+        title: 'Error(${errorCode.name})',
         subtitle: e.message ?? 'Oops, something went wrong',
         showNegativeBtn: false,
       ));
@@ -123,8 +115,9 @@ class IbPremiumController extends GetxController {
       final PurchaserInfo restoredInfo = await Purchases.restoreTransactions();
       await _handlePurchaseInfo(restoredInfo);
     } on PlatformException catch (e) {
+      final errorCode = PurchasesErrorHelper.getErrorCode(e);
       Get.dialog(IbDialog(
-        title: 'Error',
+        title: 'Error(${errorCode.name})',
         subtitle: e.message ?? 'Oops, something went wrong',
         showNegativeBtn: false,
       ));

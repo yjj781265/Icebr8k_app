@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/admin_controllers/feedback_chat_controller.dart';
+import 'package:icebr8k/frontend/admin/feedback_chat_page.dart';
 import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
 import 'package:lottie/lottie.dart';
 
@@ -30,13 +32,24 @@ class BannedCountDownPage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('You account will be unbanned after ${banedString()}'),
+            child: Text.rich(
+                TextSpan(text: 'You account will be unbanned after', children: [
+              TextSpan(
+                  text: ' ${banedString()}',
+                  style: const TextStyle(fontWeight: FontWeight.bold))
+            ])),
           ),
           ElevatedButton(
               onPressed: () {
                 Get.offAll(() => WelcomePage());
               },
-              child: const Text('To Home Page 🏠'))
+              child: const Text('To Home Page 🏠')),
+          ElevatedButton(
+              onPressed: () {
+                Get.to(() =>
+                    FeedBackChatPage(Get.put(FeedbackChatController(user.id))));
+              },
+              child: const Text('To Support/Feedback Page'))
         ],
       ),
     );
@@ -57,13 +70,15 @@ class BannedCountDownPage extends StatelessWidget {
     }
 
     if (duration.inHours >= 0) {
-      return '${duration.inDays} hr(s)';
+      return '${duration.inHours} hr(s)';
     }
 
     if (duration.inMinutes >= 0) {
-      return '${duration.inDays} min(s)';
+      return '${duration.inMinutes} min(s)';
     }
-    print('here');
+    if (duration.inSeconds >= 0) {
+      return '${duration.inSeconds} sec(s)';
+    }
 
     return '';
   }
