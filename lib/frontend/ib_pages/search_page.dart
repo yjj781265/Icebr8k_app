@@ -29,45 +29,59 @@ class SearchPage extends StatelessWidget {
         appBar: AppBar(
           title: searchWidget(context),
         ),
-        body: Obx(() {
-          if (_controller.isSearching.isTrue) {
-            return const Center(
-              child: IbProgressIndicator(),
-            );
-          }
-          if (_controller.questions.isEmpty &&
-              _controller.users.isEmpty &&
-              _controller.tags.isEmpty &&
-              _controller.circles.isEmpty &&
-              _controller.icebreakers.isEmpty &&
-              _controller.isSearching.isFalse &&
-              _controller.searchText.isNotEmpty) {
-            return Center(
-              child: SizedBox(
-                width: 300,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Lottie.asset('assets/images/sloth_zen.json'),
-                    const Text('I could not find anything')
-                  ],
-                ),
-              ),
-            );
-          }
+        body: Column(
+          children: [
+            Expanded(
+              child: Obx(() {
+                if (_controller.isSearching.isTrue) {
+                  return const Center(
+                    child: IbProgressIndicator(),
+                  );
+                }
+                if (_controller.questions.isEmpty &&
+                    _controller.users.isEmpty &&
+                    _controller.tags.isEmpty &&
+                    _controller.circles.isEmpty &&
+                    _controller.icebreakers.isEmpty &&
+                    _controller.isSearching.isFalse &&
+                    _controller.searchText.isNotEmpty) {
+                  return Center(
+                    child: SizedBox(
+                      width: 300,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Lottie.asset('assets/images/sloth_zen.json'),
+                          const Text('I could not find anything')
+                        ],
+                      ),
+                    ),
+                  );
+                }
 
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                userWidget(context),
-                questionWidget(context),
-                icebreakerWidget(context),
-                circleWidget(context),
-                tagWidget(context),
-              ],
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      userWidget(context),
+                      questionWidget(context),
+                      icebreakerWidget(context),
+                      circleWidget(context),
+                      tagWidget(context),
+                    ],
+                  ),
+                );
+              }),
             ),
-          );
-        }));
+            if (IbUtils.getCurrentIbUser() != null &&
+                !IbUtils.getCurrentIbUser()!.isPremium)
+
+              /// ADD BANNER AD HERE
+              const SizedBox(
+                height: 56,
+                child: Placeholder(),
+              ),
+          ],
+        ));
   }
 
   Widget searchWidget(BuildContext context) {

@@ -37,9 +37,19 @@ class IbQuestionDbService {
         .set(question.toJson(), SetOptions(merge: true));
   }
 
-  Future<void> removeQuestion(IbQuestion question) async {
-    print('removeQuestion $question');
-    await _collectionRef.doc(question.id).delete();
+  Future<int> queryDailyCurrentUserPollsCount() async {
+    final int timestamp24HrAgoInMs = Timestamp.now().millisecondsSinceEpoch -
+        const Duration(hours: 24).inMilliseconds;
+    final snapshot = await _collectionRef
+        .where('creatorId', isEqualTo: IbUtils.getCurrentUid())
+        .where(
+          'askedTimeInMs',
+          isGreaterThanOrEqualTo: timestamp24HrAgoInMs,
+        )
+        .limit(4)
+        .orderBy('askedTimeInMs', descending: true)
+        .get();
+    return snapshot.docs.length;
   }
 
   Future<List<IbQuestion>> queryFirst8() async {

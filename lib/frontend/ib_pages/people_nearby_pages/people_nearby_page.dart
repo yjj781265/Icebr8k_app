@@ -59,64 +59,83 @@ class PeopleNearbyPage extends StatelessWidget {
                 icon: const Icon(Icons.location_off))
           ],
         ),
-        body: Obx(() {
-          if (_controller.isLoading.isTrue) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                      height: 300,
-                      width: 300,
-                      child: Lottie.asset('assets/images/location.json')),
-                  Text.rich(TextSpan(text: 'Searching people in ', children: [
-                    TextSpan(
-                        text: '${_controller.rangeInMi.toInt()} mi ',
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    const TextSpan(
-                      text: 'radius...',
-                    )
-                  ]))
-                ],
-              ),
-            );
-          }
-
-          if (_controller.items.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                      height: 300,
-                      child: Lottie.asset('assets/images/location.json')),
-                  const Text(
-                    'No one is nearby, try different search criteria',
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
-          }
-          return SmartRefresher(
-            controller: _controller.refreshController,
-            enablePullUp: _controller.items.length >= _controller.perPage,
-            enablePullDown: false,
-            onLoading: () async {
-              await _controller.loadMore();
-            },
-            child: _controller.isExpanded.isTrue
-                ? _expandedList()
-                : SingleChildScrollView(
-                    child: StaggeredGrid.count(
-                      crossAxisCount: 2,
-                      children: _controller.items
-                          .map((element) => PeopleNearbySnipCard(element))
-                          .toList(),
+        body: Column(
+          children: [
+            Expanded(
+              child: Obx(() {
+                if (_controller.isLoading.isTrue) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                            height: 300,
+                            width: 300,
+                            child: Lottie.asset('assets/images/location.json')),
+                        Text.rich(
+                            TextSpan(text: 'Searching people in ', children: [
+                          TextSpan(
+                              text: '${_controller.rangeInMi.toInt()} mi ',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
+                          const TextSpan(
+                            text: 'radius...',
+                          )
+                        ]))
+                      ],
                     ),
-                  ),
-          );
-        }));
+                  );
+                }
+
+                if (_controller.items.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                            height: 300,
+                            child: Lottie.asset('assets/images/location.json')),
+                        const Text(
+                          'No one is nearby, try different search criteria',
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return SmartRefresher(
+                  controller: _controller.refreshController,
+                  enablePullUp: _controller.items.length >= _controller.perPage,
+                  enablePullDown: false,
+                  onLoading: () async {
+                    await _controller.loadMore();
+                  },
+                  child: _controller.isExpanded.isTrue
+                      ? _expandedList()
+                      : SingleChildScrollView(
+                          child: StaggeredGrid.count(
+                            crossAxisCount: 2,
+                            children: _controller.items
+                                .map((element) => PeopleNearbySnipCard(element))
+                                .toList(),
+                          ),
+                        ),
+                );
+              }),
+            ),
+            if (IbUtils.getCurrentIbUser() != null &&
+                !IbUtils.getCurrentIbUser()!.isPremium)
+
+              /// TODO BANNER ADS HERE
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: const SizedBox(
+                  height: 56,
+                  child: Placeholder(),
+                ),
+              ),
+          ],
+        ));
   }
 
   Widget _expandedList() {

@@ -215,6 +215,16 @@ class IbUtils {
     }
   }
 
+  static Future<bool> isOverDailyPollLimit() async {
+    if (getCurrentIbUser()!.isPremium) {
+      return false;
+    }
+
+    final int count =
+        await IbQuestionDbService().queryDailyCurrentUserPollsCount();
+    return count >= IbConfig.kDailyPollLimit;
+  }
+
   static String getChatTabDateString(DateTime _dateTime) {
     final Duration diffDt = DateTime.now().difference(_dateTime);
     if (diffDt.inSeconds == 0) {

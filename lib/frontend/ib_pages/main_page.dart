@@ -10,9 +10,11 @@ import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_pages/alert_tab.dart';
+import 'package:icebr8k/frontend/ib_pages/ib_premium_page.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/my_profile_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:move_to_background/move_to_background.dart';
 import 'package:showcaseview/showcaseview.dart';
@@ -20,6 +22,7 @@ import 'package:showcaseview/showcaseview.dart';
 import '../../backend/controllers/user_controllers/social_tab_controller.dart';
 import '../../backend/services/user_services/ib_user_db_service.dart';
 import '../ib_colors.dart';
+import '../ib_config.dart';
 import 'create_question_pages/create_question_page.dart';
 import 'home_tab.dart';
 import 'social_tab.dart';
@@ -116,6 +119,35 @@ class _MainPageViewState extends State<MainPageView>
           }
 
           if (index == 2) {
+            if (await IbUtils.isOverDailyPollLimit()) {
+              Get.dialog(IbDialog(
+                title:
+                    'You can only create maximum ${IbConfig.kDailyPollLimit} polls per day',
+                subtitle:
+                    'Go Icebr8k Premium or Watch an Ad to create more polls',
+                showNegativeBtn: false,
+                actionButtons: Wrap(
+                  children: [
+                    TextButton(
+                        onPressed: () {
+                          Get.back();
+                          Get.to(() => IbPremiumPage());
+                        },
+                        child: const Text(
+                          'Go Premium',
+                          style: TextStyle(color: IbColors.errorRed),
+                        )),
+                    TextButton(
+                        onPressed: () {
+                          // TODO ADD ADMOB HERE
+                        },
+                        child: const Text('Watch an Ad')),
+                  ],
+                ),
+              ));
+              return;
+            }
+
             Get.to(
                 () => CreateQuestionPage(
                       controller: Get.put(CreateQuestionController()),

@@ -371,7 +371,9 @@ class SocialTabController extends GetxController {
     if (item.ibChat.lastMessage == null) {
       return const SizedBox();
     }
-    if (item.ibChat.isTypingUids.isNotEmpty) {
+    if (item.ibChat.isTypingUids.isNotEmpty &&
+        IbUtils.getCurrentIbUser() != null &&
+        IbUtils.getCurrentIbUser()!.isPremium) {
       return const Text(
         'someone is typing...',
         maxLines: 1,

@@ -23,68 +23,86 @@ class EditIbCollectionMainPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Icebreaker Collections'),
       ),
-      body: Obx(
-        () => SingleChildScrollView(
-          child: StaggeredGrid.count(
-            crossAxisCount: 2,
-            children: _controller.ibCollections
-                .map((e) => Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Hero(
-                          tag: e.id,
-                          child: Material(
-                            color: Colors.transparent,
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              width: Get.width / 2,
-                              height: (Get.width / 2) * 1.44,
-                              child: InkWell(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(8)),
-                                onTap: () => Get.to(() => IbCoverPage(
-                                      e,
-                                      isEdit: isEdit,
-                                    )),
-                                child: IbCard(
-                                  color: Color(e.bgColor),
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(4.0),
-                                      child: AutoSizeText(
-                                        e.name,
-                                        textAlign: TextAlign.center,
-                                        overflow: TextOverflow.ellipsis,
-                                        minFontSize: IbConfig.kNormalTextSize,
-                                        maxFontSize: IbConfig.kSloganSize,
-                                        maxLines: 4,
-                                        style: IbUtils.getIbFonts(TextStyle(
-                                            fontSize: IbConfig.kNormalTextSize,
-                                            fontStyle: e.isItalic
-                                                ? FontStyle.italic
-                                                : FontStyle.normal,
-                                            color: Color(e.textColor),
-                                            fontWeight: FontWeight
-                                                .bold))[e.textStyleIndex],
+      body: Column(
+        children: [
+          Expanded(
+            child: Obx(
+              () => SingleChildScrollView(
+                child: StaggeredGrid.count(
+                  crossAxisCount: 2,
+                  children: _controller.ibCollections
+                      .map((e) => Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Hero(
+                                tag: e.id,
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    width: Get.width / 2,
+                                    height: (Get.width / 2) * 1.44,
+                                    child: InkWell(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(8)),
+                                      onTap: () => Get.to(() => IbCoverPage(
+                                            e,
+                                            isEdit: isEdit,
+                                          )),
+                                      child: IbCard(
+                                        color: Color(e.bgColor),
+                                        child: Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(4.0),
+                                            child: AutoSizeText(
+                                              e.name,
+                                              textAlign: TextAlign.center,
+                                              overflow: TextOverflow.ellipsis,
+                                              minFontSize:
+                                                  IbConfig.kNormalTextSize,
+                                              maxFontSize: IbConfig.kSloganSize,
+                                              maxLines: 4,
+                                              style: IbUtils.getIbFonts(
+                                                  TextStyle(
+                                                      fontSize: IbConfig
+                                                          .kNormalTextSize,
+                                                      fontStyle: e.isItalic
+                                                          ? FontStyle.italic
+                                                          : FontStyle.normal,
+                                                      color: Color(e.textColor),
+                                                      fontWeight:
+                                                          FontWeight.bold))[e
+                                                  .textStyleIndex],
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ),
-                        ),
-                        if (isEdit)
-                          TextButton(
-                              onPressed: () {
-                                Get.to(() => EditIbCoverPage(e));
-                              },
-                              child: const Text('^ Edit Cover'))
-                      ],
-                    ))
-                .toList(),
+                              if (isEdit)
+                                TextButton(
+                                    onPressed: () {
+                                      Get.to(() => EditIbCoverPage(e));
+                                    },
+                                    child: const Text('^ Edit Cover'))
+                            ],
+                          ))
+                      .toList(),
+                ),
+              ),
+            ),
           ),
-        ),
+          if (IbUtils.getCurrentIbUser() != null &&
+              !IbUtils.getCurrentIbUser()!.isPremium)
+
+            /// ADD BANNER AD HERE
+            const SizedBox(
+              height: 56,
+              child: Placeholder(),
+            ),
+        ],
       ),
       floatingActionButton: isEdit
           ? FloatingActionButton(

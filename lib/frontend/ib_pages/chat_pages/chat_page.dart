@@ -21,6 +21,7 @@ import 'package:icebr8k/frontend/ib_pages/icebreaker_pages/icebreaker_main_page.
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
@@ -36,6 +37,7 @@ import '../../../backend/controllers/user_controllers/chat_page_controller.dart'
 import '../../../backend/controllers/user_controllers/ib_question_item_controller.dart';
 import '../../../backend/controllers/user_controllers/icebreaker_controller.dart';
 import '../../../backend/models/ib_question.dart';
+import '../ib_premium_page.dart';
 import '../ib_tenor_page.dart';
 
 class ChatPage extends StatefulWidget {
@@ -228,7 +230,9 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                     ],
                   ),
                 ),
-                if (widget._controller.isTypingUsers.isNotEmpty)
+                if (widget._controller.isTypingUsers.isNotEmpty &&
+                    IbUtils.getCurrentIbUser() != null &&
+                    IbUtils.getCurrentIbUser()!.isPremium)
                   Align(
                       alignment: Alignment.bottomLeft,
                       child: _buildTypingIndicator(context)),
@@ -370,8 +374,37 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                         IbActionButton(
                             color: IbColors.primaryColor,
                             iconData: Icons.poll,
-                            onPressed: () {
+                            onPressed: () async {
                               widget._controller.showMsgOptions.value = false;
+                              if (await IbUtils.isOverDailyPollLimit()) {
+                                Get.dialog(IbDialog(
+                                  title:
+                                      'You can only create maximum ${IbConfig.kDailyPollLimit} polls per day',
+                                  subtitle:
+                                      'Go Icebr8k Premium or Watch an Ad to create more polls',
+                                  showNegativeBtn: false,
+                                  actionButtons: Wrap(
+                                    children: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Get.back();
+                                            Get.to(() => IbPremiumPage());
+                                          },
+                                          child: const Text(
+                                            'Go Premium',
+                                            style: TextStyle(
+                                                color: IbColors.errorRed),
+                                          )),
+                                      TextButton(
+                                          onPressed: () {
+                                            // TODO ADD ADMOB HERE
+                                          },
+                                          child: const Text('Watch an Ad')),
+                                    ],
+                                  ),
+                                ));
+                                return;
+                              }
 
                               final chatTabItem = IbUtils.getAllChatTabItems()
                                   .firstWhereOrNull((element) =>
@@ -1159,6 +1192,10 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
 
   ///won't show sender and current User's avatar
   Widget _buildReadIndicator(IbMessage message) {
+    if (IbUtils.getCurrentIbUser() != null &&
+        !IbUtils.getCurrentIbUser()!.isPremium) {
+      return const SizedBox();
+    }
     if (widget._controller.messages.indexWhere(
             (element) => element.ibMessage.messageId == message.messageId) ==
         0) {

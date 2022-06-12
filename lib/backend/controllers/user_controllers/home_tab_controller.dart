@@ -72,6 +72,7 @@ class HomeTabController extends GetxController {
       return;
     }
 
+    //TODO ADD BANNER AD HERE
     if (selectedCategory.value == categories[0]) {
       await _loadTrending(refreshStats: refreshStats);
     } else if (selectedCategory.value == categories[1]) {
