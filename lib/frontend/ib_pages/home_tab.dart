@@ -1,7 +1,7 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
@@ -10,13 +10,14 @@ import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
 import 'package:icebr8k/frontend/ib_pages/search_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_ad_widget.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../backend/controllers/user_controllers/home_tab_controller.dart';
+import '../../backend/controllers/user_controllers/ib_ad_controller.dart';
 import '../ib_colors.dart';
 
 class HomeTab extends StatelessWidget {
@@ -90,9 +91,9 @@ class HomeTab extends StatelessWidget {
                   description: 'Click to view our awesome Icebreakers',
                   shapeBorder: const CircleBorder(),
                   child: IconButton(
-                    icon: const Text(
-                      '🧊',
-                      style: TextStyle(fontSize: 24),
+                    icon: const Icon(
+                      FontAwesomeIcons.eight,
+                      color: IbColors.primaryColor,
                     ),
                     onPressed: () {
                       if (IbUtils.checkFeatureIsLocked()) {
@@ -210,9 +211,10 @@ class HomeTab extends StatelessWidget {
 
                         if (item.question.isEmpty &&
                             item.id == 'AD' &&
-                            _controller.isBelowAndroid9.isFalse &&
                             !IbUtils.getCurrentIbUser()!.isPremium) {
-                          return const _IbBanner();
+                          return IbAdWidget(Get.put(
+                              IbAdController(_controller.myBanner),
+                              tag: IbUtils.getUniqueId()));
                         }
 
                         return IbUtils.handleQuestionType(
@@ -230,9 +232,10 @@ class HomeTab extends StatelessWidget {
 
                         if (item.question.isEmpty &&
                             item.id == 'AD' &&
-                            _controller.isBelowAndroid9.isFalse &&
                             !IbUtils.getCurrentIbUser()!.isPremium) {
-                          return const _IbBanner();
+                          return IbAdWidget(Get.put(
+                              IbAdController(_controller.myBanner),
+                              tag: IbUtils.getUniqueId()));
                         }
 
                         return IbUtils.handleQuestionType(
@@ -248,9 +251,10 @@ class HomeTab extends StatelessWidget {
 
                       if (item.question.isEmpty &&
                           item.id == 'AD' &&
-                          _controller.isBelowAndroid9.isFalse &&
                           !IbUtils.getCurrentIbUser()!.isPremium) {
-                        return const _IbBanner();
+                        return IbAdWidget(Get.put(
+                            IbAdController(_controller.myBanner),
+                            tag: IbUtils.getUniqueId()));
                       }
 
                       return IbUtils.handleQuestionType(
@@ -289,41 +293,5 @@ class HomeTab extends StatelessWidget {
       return _controller.newestList.length >= IbConfig.kPerPage;
     }
     return _controller.trendingList.length >= IbConfig.kPerPage;
-  }
-}
-
-class _IbBanner extends StatefulWidget {
-  const _IbBanner({Key? key}) : super(key: key);
-
-  @override
-  State<_IbBanner> createState() => _IbBannerState();
-}
-
-class _IbBannerState extends State<_IbBanner> {
-  final HomeTabController _controller = Get.put(HomeTabController());
-
-  @override
-  void initState() {
-    _controller.myBanner.dispose();
-    _controller.myBanner.load();
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _bannerAd();
-  }
-
-  Widget _bannerAd() {
-    return StatefulBuilder(builder: (context, setState) {
-      return IbCard(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: SizedBox(
-              height: _controller.myBanner.size.height.toDouble(),
-              child: AdWidget(key: UniqueKey(), ad: _controller.myBanner)),
-        ),
-      );
-    });
   }
 }

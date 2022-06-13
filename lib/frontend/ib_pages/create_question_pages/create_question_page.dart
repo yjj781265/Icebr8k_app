@@ -5,17 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/ib_ad_manager.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_mc_pic_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_mc_tab.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/create_question_sc_tab.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_ad_widget.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_persistent_header.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../../backend/controllers/user_controllers/create_question_controller.dart';
+import '../../../backend/controllers/user_controllers/ib_ad_controller.dart';
 import '../../ib_config.dart';
 import 'ib_media_bar.dart';
 
@@ -125,6 +129,11 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                     ),
                   ),
                 ),
+                if (!IbUtils.getCurrentIbUser()!.isPremium)
+                  SliverToBoxAdapter(
+                    child: IbAdWidget(
+                        Get.put(IbAdController(IbAdManager().getBanner1()))),
+                  ),
                 SliverToBoxAdapter(
                   child: IbCard(
                     child: Padding(

@@ -13,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../ib_colors.dart';
 import '../../ib_config.dart';
 import '../../ib_utils.dart';
+import '../ib_premium_page.dart';
 import '../ib_tenor_page.dart';
 
 class CreateQuestionMcPicTab extends StatelessWidget {
@@ -315,6 +316,45 @@ class CreateQuestionMcPicTab extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(16))),
           onTap: () async {
             Get.back();
+            final url = await Get.to(
+              () => IbTenorPage(),
+            );
+            if (url != null && url.toString().isNotEmpty) {
+              if (ibChoice != null) {
+                // ignore: parameter_assignments
+                ibChoice!.url = url.toString();
+              } else {
+                // ignore: parameter_assignments
+                ibChoice = IbChoice(
+                  choiceId: IbUtils.getUniqueId(),
+                  url: url.toString(),
+                );
+                // ignore: parameter_assignments
+                list.add(ibChoice!);
+              }
+
+              list.refresh();
+            }
+          },
+          leading: const Icon(
+            Icons.gif,
+            color: IbColors.accentColor,
+            size: 24,
+          ),
+          title: const Text(
+            'Choose GIF from Tenor',
+            style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+          ),
+        ),
+        ListTile(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
+          onTap: () async {
+            if (!IbUtils.getCurrentIbUser()!.isPremium) {
+              _showPremiumDialog();
+              return;
+            }
+            Get.back();
             final _picker = ImagePicker();
             final XFile? pickedFile = await _picker.pickImage(
               source: ImageSource.camera,
@@ -347,6 +387,10 @@ class CreateQuestionMcPicTab extends StatelessWidget {
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(16))),
           onTap: () async {
+            if (!IbUtils.getCurrentIbUser()!.isPremium) {
+              _showPremiumDialog();
+              return;
+            }
             Get.back();
             final _picker = ImagePicker();
             final XFile? pickedFile = await _picker.pickImage(
@@ -379,44 +423,23 @@ class CreateQuestionMcPicTab extends StatelessWidget {
             style: TextStyle(fontSize: IbConfig.kNormalTextSize),
           ),
         ),
-        ListTile(
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(16))),
-          onTap: () async {
-            Get.back();
-            final url = await Get.to(
-              () => IbTenorPage(),
-            );
-            if (url != null && url.toString().isNotEmpty) {
-              if (ibChoice != null) {
-                // ignore: parameter_assignments
-                ibChoice!.url = url.toString();
-              } else {
-                // ignore: parameter_assignments
-                ibChoice = IbChoice(
-                  choiceId: IbUtils.getUniqueId(),
-                  url: url.toString(),
-                );
-                // ignore: parameter_assignments
-                list.add(ibChoice!);
-              }
-
-              list.refresh();
-            }
-          },
-          leading: const Icon(
-            Icons.gif,
-            color: IbColors.accentColor,
-            size: 24,
-          ),
-          title: const Text(
-            'Choose GIF from Tenor',
-            style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-          ),
-        ),
       ],
     );
 
     Get.bottomSheet(IbCard(child: options), ignoreSafeArea: false);
+  }
+
+  void _showPremiumDialog() {
+    if (!IbUtils.getCurrentIbUser()!.isPremium) {
+      Get.dialog(IbDialog(
+        title: 'Premium Only Feature',
+        subtitle: 'Go premium to enjoy poll with your own pic',
+        positiveTextKey: 'Go Premium',
+        onPositiveTap: () {
+          Get.back();
+          Get.to(() => IbPremiumPage());
+        },
+      ));
+    }
   }
 }

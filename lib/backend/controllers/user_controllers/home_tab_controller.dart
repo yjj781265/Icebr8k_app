@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -21,10 +20,12 @@ import 'main_page_controller.dart';
 /// controller for Question tab in Homepage
 class HomeTabController extends GetxController {
   double _lastOffset = 0;
+  final int adFrequency = 7;
+
+  /// show an ad every 7 polls
   late StreamSubscription first8Sub;
   final double hideShowNavBarSensitivity = 10;
   bool canHideNavBar = true;
-  final isBelowAndroid9 = false.obs;
   final adPlaceHolder = IbQuestion(
       question: '',
       id: 'AD',
@@ -69,15 +70,6 @@ class HomeTabController extends GetxController {
       }
       _lastOffset = scrollController.offset;
     });
-
-    /// AdMob Scrolling limitation on Android 9 and below
-    /// see https://github.com/flutter/flutter/wiki/Hybrid-Composition#performance
-    if (GetPlatform.isAndroid) {
-      final androidInfo = await DeviceInfoPlugin().androidInfo;
-      final sdkInt = androidInfo.version.sdkInt ?? 0;
-      isBelowAndroid9.value = sdkInt < 29;
-      // Android 9 (SDK 28)
-    }
 
     /// load ad;
     await myBanner.load();
@@ -412,20 +404,19 @@ class HomeTabController extends GetxController {
   }
 
   void _addAds(List<IbQuestion> list) {
-    if (isBelowAndroid9.isTrue ||
-        !IbLocalDataService()
+    if (!IbLocalDataService()
             .retrieveBoolValue(StorageKey.pollExpandShowCaseBool) ||
         IbUtils.getCurrentIbUser()!.isPremium ||
         isLocked.isTrue) {
       return;
     }
-    if (list.length <= 4) {
+    if (list.length <= adFrequency) {
       list.add(adPlaceHolder);
       return;
     }
 
     for (int i = 0; i < list.length; i++) {
-      if (i != 0 && i % 4 == 0) {
+      if (i != 0 && i % adFrequency == 0) {
         list.insert(i, adPlaceHolder);
       }
     }

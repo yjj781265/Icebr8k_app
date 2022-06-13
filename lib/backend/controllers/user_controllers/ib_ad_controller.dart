@@ -1,0 +1,28 @@
+import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
+
+/// use this controller if you want to show inline ad in a list
+class IbAdController extends GetxController {
+  final BannerAd bannerAd;
+  final isLoading = true.obs;
+
+  IbAdController(this.bannerAd);
+
+  @override
+  Future<void> onInit() async {
+    super.onInit();
+    isLoading.value = true;
+    await bannerAd.dispose();
+    await bannerAd.load();
+    await Future.delayed(
+        const Duration(microseconds: IbConfig.kEventTriggerDelayInMillis));
+    isLoading.value = false;
+  }
+
+  @override
+  Future<void> onClose() async {
+    super.onClose();
+    await bannerAd.dispose();
+  }
+}

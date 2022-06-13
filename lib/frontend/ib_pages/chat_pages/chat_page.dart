@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/circle_settings_controller.dart';
@@ -381,7 +382,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                               if (await IbUtils.isOverDailyPollLimit()) {
                                 Get.dialog(IbDialog(
                                   title:
-                                      'You can only create maximum ${IbConfig.kDailyPollLimit} polls per day',
+                                      'You can only create maximum ${IbConfig.kDailyPollLimit} polls in 24 hrs',
                                   subtitle:
                                       'Go Icebr8k Premium or Watch an Ad to create more polls',
                                   showNegativeBtn: false,
@@ -477,11 +478,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                           text: 'GIF'),
                       IbActionButton(
                           color: IbColors.primaryColor,
-                          iconData: null,
-                          content: const Text(
-                            '🧊',
-                            style: TextStyle(fontSize: 21),
-                          ),
+                          iconData: FontAwesomeIcons.eight,
                           onPressed: () {
                             Get.to(() => EditIbCollectionMainPage());
                           },

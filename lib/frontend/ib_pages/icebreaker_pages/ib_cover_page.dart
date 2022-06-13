@@ -120,7 +120,7 @@ class IbCoverPage extends StatelessWidget {
               height: 56,
               width: Get.width,
               child: IbElevatedButton(
-                textTrKey: isEdit ? 'Edit ✏️' : "Let's 🧊🔨",
+                textTrKey: isEdit ? 'Edit ✏' : "Let's break the ice",
                 onPressed: () async {
                   Get.off(() => IcebreakerMainPage(Get.put(
                       IcebreakerController(ibCollection, isEdit: isEdit),

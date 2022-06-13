@@ -14,6 +14,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:reorderables/reorderables.dart';
 
 import '../../../backend/controllers/user_controllers/create_question_controller.dart';
+import '../../ib_widgets/ib_dialog.dart';
+import '../ib_premium_page.dart';
 
 class CreateQuestionImagePicker extends StatelessWidget {
   final CreateQuestionController _controller;
@@ -190,6 +192,43 @@ class CreateQuestionImagePicker extends StatelessWidget {
           ListTile(
             onTap: () async {
               Get.back();
+              final gifUrl = await Get.to(
+                () => IbTenorPage(),
+              );
+              if (gifUrl != null && gifUrl.toString().isNotEmpty) {
+                if (index != null) {
+                  // ignore: parameter_assignments
+                  list[index] = IbMedia(
+                      url: gifUrl.toString(),
+                      id: IbUtils.getUniqueId(),
+                      type: IbMedia.kPicType);
+                } else {
+                  list.add(IbMedia(
+                      url: gifUrl.toString(),
+                      id: IbUtils.getUniqueId(),
+                      type: IbMedia.kPicType));
+                }
+
+                list.refresh();
+              }
+            },
+            leading: const Icon(
+              Icons.gif,
+              color: IbColors.accentColor,
+              size: 24,
+            ),
+            title: const Text(
+              'Choose GIF from Tenor',
+              style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+            ),
+          ),
+          ListTile(
+            onTap: () async {
+              if (!IbUtils.getCurrentIbUser()!.isPremium) {
+                _showPremiumDialog();
+                return;
+              }
+              Get.back();
               final _picker = ImagePicker();
               final XFile? pickedFile = await _picker.pickImage(
                 source: ImageSource.camera,
@@ -223,6 +262,11 @@ class CreateQuestionImagePicker extends StatelessWidget {
           ),
           ListTile(
             onTap: () async {
+              if (!IbUtils.getCurrentIbUser()!.isPremium) {
+                _showPremiumDialog();
+                return;
+              }
+
               Get.back();
               final _picker = ImagePicker();
               if (index == null) {
@@ -272,43 +316,24 @@ class CreateQuestionImagePicker extends StatelessWidget {
               style: TextStyle(fontSize: IbConfig.kNormalTextSize),
             ),
           ),
-          ListTile(
-            onTap: () async {
-              Get.back();
-              final gifUrl = await Get.to(
-                () => IbTenorPage(),
-              );
-              if (gifUrl != null && gifUrl.toString().isNotEmpty) {
-                if (index != null) {
-                  // ignore: parameter_assignments
-                  list[index] = IbMedia(
-                      url: gifUrl.toString(),
-                      id: IbUtils.getUniqueId(),
-                      type: IbMedia.kPicType);
-                } else {
-                  list.add(IbMedia(
-                      url: gifUrl.toString(),
-                      id: IbUtils.getUniqueId(),
-                      type: IbMedia.kPicType));
-                }
-
-                list.refresh();
-              }
-            },
-            leading: const Icon(
-              Icons.gif,
-              color: IbColors.accentColor,
-              size: 24,
-            ),
-            title: const Text(
-              'Choose GIF from Tenor',
-              style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-            ),
-          ),
         ],
       ),
     );
 
     Get.bottomSheet(options, ignoreSafeArea: false);
+  }
+
+  void _showPremiumDialog() {
+    if (!IbUtils.getCurrentIbUser()!.isPremium) {
+      Get.dialog(IbDialog(
+        title: 'Premium Only Feature',
+        subtitle: 'Go premium to enjoy poll with your own pic',
+        positiveTextKey: 'Go Premium',
+        onPositiveTap: () {
+          Get.back();
+          Get.to(() => IbPremiumPage());
+        },
+      ));
+    }
   }
 }

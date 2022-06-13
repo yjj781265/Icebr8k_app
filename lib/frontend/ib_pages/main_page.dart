@@ -124,7 +124,7 @@ class _MainPageViewState extends State<MainPageView>
             if (await IbUtils.isOverDailyPollLimit()) {
               Get.dialog(IbDialog(
                 title:
-                    'You can only create maximum ${IbConfig.kDailyPollLimit} polls per day',
+                    'You can only create maximum ${IbConfig.kDailyPollLimit} polls 24 hrs',
                 subtitle:
                     'Go Icebr8k Premium or Watch an Ad to create more polls',
                 showNegativeBtn: false,
