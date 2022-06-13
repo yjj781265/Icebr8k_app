@@ -5,8 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:icebr8k/backend/bindings/home_binding.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/setup_controller.dart';
+import 'package:icebr8k/backend/managers/ib_ad_manager.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/ib_collection.dart';
@@ -14,6 +16,7 @@ import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/banned_count_down_page.dart';
 import 'package:icebr8k/frontend/ib_pages/main_page.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_one.dart';
 import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
@@ -32,10 +35,14 @@ class AdminMainController extends GetxController {
   final pendingFeedbacks = <_FeedbackItem>[].obs;
   final ibCollections = <IbCollection>[].obs;
   final totalMessages = 0.obs;
+  final isLoadingAd = true.obs;
+  BannerAd ad = IbAdManager().getBanner2();
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
+    await ad.load();
+    isLoadingAd.value = false;
     applicationSub = IbAdminDbService()
         .listenToPendingApplications()
         .listen((event) => _handlePendingApplicationSnapshot(event));
@@ -51,6 +58,8 @@ class AdminMainController extends GetxController {
 
   @override
   Future<void> dispose() async {
+    await ad.dispose();
+
     await applicationSub.cancel();
     await ibCollectionsSub.cancel();
     super.dispose();
@@ -196,7 +205,7 @@ class AdminMainController extends GetxController {
             break;
 
           case IbUser.kUserStatusBanned:
-            //Todo Go to CounterDown Page
+            Get.offAll(() => BannedCountDownPage(ibUser!));
             print('Go to CounterDown Page');
             break;
 

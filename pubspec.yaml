@@ -30,6 +30,7 @@ dependencies:
   cloud_functions: ^3.2.16
   connectivity_plus: ^2.3.3
   cupertino_icons: ^1.0.2
+  device_info_plus: ^3.2.4
   dropdown_button2: ^1.2.0
   emoji_picker_flutter: ^1.2.1
   extended_nested_scroll_view: ^5.1.0
@@ -55,6 +56,7 @@ dependencies:
   get: ^4.6.1
   get_storage: ^2.0.3
   google_fonts: ^2.1.0
+  google_mobile_ads: ^1.2.0
   image_cropper: ^2.0.3
   image_picker: ^0.8.5+3
   intl: ^0.17.0

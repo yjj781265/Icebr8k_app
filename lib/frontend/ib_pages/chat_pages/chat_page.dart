@@ -4,8 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/circle_settings_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
+import 'package:icebr8k/backend/managers/ib_ad_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat_member.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_message.dart';
@@ -396,8 +398,43 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                                 color: IbColors.errorRed),
                                           )),
                                       TextButton(
-                                          onPressed: () {
-                                            // TODO ADD ADMOB HERE
+                                          onPressed: () async {
+                                            Get.back();
+                                            await IbAdManager().showRewardAd(
+                                                FullScreenContentCallback(
+                                                    onAdFailedToShowFullScreenContent:
+                                                        (RewardedAd ad,
+                                                            AdError error) {
+                                              print(
+                                                  '$ad onAdFailedToShowFullScreenContent: $error');
+                                              ad.dispose();
+                                            }, onAdDismissedFullScreenContent:
+                                                        (ad) {
+                                              ad.dispose();
+                                              final chatTabItem =
+                                                  IbUtils.getAllChatTabItems()
+                                                      .firstWhereOrNull(
+                                                          (element) =>
+                                                              element.ibChat
+                                                                  .chatId ==
+                                                              widget
+                                                                  ._controller
+                                                                  .ibChat!
+                                                                  .chatId);
+                                              final createQuestionController =
+                                                  Get.put(
+                                                      CreateQuestionController());
+
+                                              if (chatTabItem != null) {
+                                                createQuestionController
+                                                    .pickedChats
+                                                    .add(chatTabItem);
+                                              }
+                                              Get.to(() => CreateQuestionPage(
+                                                    controller:
+                                                        createQuestionController,
+                                                  ));
+                                            }));
                                           },
                                           child: const Text('Watch an Ad')),
                                     ],

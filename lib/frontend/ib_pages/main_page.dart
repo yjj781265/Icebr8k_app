@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
@@ -20,6 +21,7 @@ import 'package:move_to_background/move_to_background.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../backend/controllers/user_controllers/social_tab_controller.dart';
+import '../../backend/managers/ib_ad_manager.dart';
 import '../../backend/services/user_services/ib_user_db_service.dart';
 import '../ib_colors.dart';
 import '../ib_config.dart';
@@ -138,8 +140,24 @@ class _MainPageViewState extends State<MainPageView>
                           style: TextStyle(color: IbColors.errorRed),
                         )),
                     TextButton(
-                        onPressed: () {
-                          // TODO ADD ADMOB HERE
+                        onPressed: () async {
+                          Get.back();
+                          await IbAdManager().showRewardAd(
+                              FullScreenContentCallback(
+                                  onAdFailedToShowFullScreenContent:
+                                      (RewardedAd ad, AdError error) {
+                            print(
+                                '$ad onAdFailedToShowFullScreenContent: $error');
+                            ad.dispose();
+                          }, onAdDismissedFullScreenContent: (ad) {
+                            ad.dispose();
+                            final createQuestionController =
+                                Get.put(CreateQuestionController());
+
+                            Get.to(() => CreateQuestionPage(
+                                  controller: createQuestionController,
+                                ));
+                          }));
                         },
                         child: const Text('Watch an Ad')),
                   ],

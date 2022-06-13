@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
+import 'package:icebr8k/backend/managers/ib_ad_manager.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
@@ -34,6 +36,13 @@ class PeopleNearbyController extends GetxController {
   int loadedCount = 0;
   final isLoading = false.obs;
   DocumentSnapshot? lastLikedDoc;
+  BannerAd ad = IbAdManager().getBanner1();
+
+  @override
+  Future<void> onInit() async {
+    await ad.load();
+    super.onInit();
+  }
 
   @override
   Future<void> onReady() async {
@@ -59,6 +68,12 @@ class PeopleNearbyController extends GetxController {
         await _determinePosition();
       },
     ));
+  }
+
+  @override
+  Future<void> onClose() async {
+    super.onClose();
+    await ad.dispose();
   }
 
   void _loadLocalSearchCriteria() {

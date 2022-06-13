@@ -1,12 +1,16 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
+import 'package:icebr8k/backend/managers/ib_ad_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -20,6 +24,16 @@ class HomeTabController extends GetxController {
   late StreamSubscription first8Sub;
   final double hideShowNavBarSensitivity = 10;
   bool canHideNavBar = true;
+  final isBelowAndroid9 = false.obs;
+  final adPlaceHolder = IbQuestion(
+      question: '',
+      id: 'AD',
+      creatorId: '',
+      choices: [],
+      questionType: QuestionType.multipleChoice,
+      askedTimeInMs: -1);
+  final BannerAd myBanner = IbAdManager().getBanner3();
+
   final newestList = <IbQuestion>[].obs;
   final trendingList = <IbQuestion>[].obs;
   final forYourList = <IbQuestion>[].obs;
@@ -56,6 +70,17 @@ class HomeTabController extends GetxController {
       _lastOffset = scrollController.offset;
     });
 
+    /// AdMob Scrolling limitation on Android 9 and below
+    /// see https://github.com/flutter/flutter/wiki/Hybrid-Composition#performance
+    if (GetPlatform.isAndroid) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      final sdkInt = androidInfo.version.sdkInt ?? 0;
+      isBelowAndroid9.value = sdkInt < 29;
+      // Android 9 (SDK 28)
+    }
+
+    /// load ad;
+    await myBanner.load();
     _determineFeatureIsLocked().then((value) async => {await onRefresh()});
   }
 
@@ -66,13 +91,17 @@ class HomeTabController extends GetxController {
         .logScreenView(className: 'HomeTabController', screenName: 'HomeTab');
   }
 
+  @override
+  Future<void> onClose() async {
+    await myBanner.dispose();
+  }
+
   Future<void> onRefresh({bool refreshStats = false}) async {
     Get.find<MainPageController>().showNavBar();
     if (isLocked.isTrue) {
       return;
     }
 
-    //TODO ADD BANNER AD HERE
     if (selectedCategory.value == categories[0]) {
       await _loadTrending(refreshStats: refreshStats);
     } else if (selectedCategory.value == categories[1]) {
@@ -159,7 +188,7 @@ class HomeTabController extends GetxController {
       tempList.sort((a, b) => b.points.compareTo(a.points));
 
       trendingList.addAll(tempList);
-
+      _addAds(trendingList);
       refreshController.refreshCompleted();
       isLoading.value = false;
 
@@ -198,6 +227,7 @@ class HomeTabController extends GetxController {
       }
 
       forYourList.shuffle();
+      _addAds(forYourList);
       refreshController.refreshCompleted();
       isLoading.value = false;
 
@@ -225,6 +255,7 @@ class HomeTabController extends GetxController {
             IbQuestion.fromJson(doc.data()));
         lastNewestDoc = doc;
       }
+      _addAds(newestList);
       refreshController.refreshCompleted();
       isLoading.value = false;
       if (refreshStats) {
@@ -281,20 +312,24 @@ class HomeTabController extends GetxController {
       try {
         final snap = await IbQuestionDbService()
             .queryIbQuestions(askedTimeInMs: lastQuestion.askedTimeInMs);
+        final tempList = <IbQuestion>[];
         if (snap.docs.isEmpty) {
           refreshController.loadNoData();
           return;
         }
 
         for (final doc in snap.docs) {
-          trendingList.add(IbQuestion.fromJson(doc.data()));
+          tempList.add(IbQuestion.fromJson(doc.data()));
           lastTrendingDoc = doc;
         }
+        _addAds(tempList);
+        trendingList.addAll(tempList);
         refreshController.loadComplete();
       } catch (e) {
         refreshController.loadFailed();
       }
     }
+
     if (selectedCategory.value == categories[1]) {
       if (lastTagDoc == null && lastFriendQuestionDoc == null) {
         refreshController.loadNoData();
@@ -332,6 +367,7 @@ class HomeTabController extends GetxController {
         }
 
         tempList.shuffle();
+        _addAds(tempList);
         forYourList.addAll(tempList);
 
         refreshController.loadComplete();
@@ -356,18 +392,41 @@ class HomeTabController extends GetxController {
       try {
         final snap = await IbQuestionDbService()
             .queryIbQuestions(askedTimeInMs: lastQuestion.askedTimeInMs);
+        final tempList = <IbQuestion>[];
         if (snap.docs.isEmpty) {
           refreshController.loadNoData();
           return;
         }
 
         for (final doc in snap.docs) {
-          newestList.add(IbQuestion.fromJson(doc.data()));
+          tempList.add(IbQuestion.fromJson(doc.data()));
           lastNewestDoc = doc;
         }
+        _addAds(tempList);
+        newestList.addAll(tempList);
         refreshController.loadComplete();
       } catch (e) {
         refreshController.loadFailed();
+      }
+    }
+  }
+
+  void _addAds(List<IbQuestion> list) {
+    if (isBelowAndroid9.isTrue ||
+        !IbLocalDataService()
+            .retrieveBoolValue(StorageKey.pollExpandShowCaseBool) ||
+        IbUtils.getCurrentIbUser()!.isPremium ||
+        isLocked.isTrue) {
+      return;
+    }
+    if (list.length <= 4) {
+      list.add(adPlaceHolder);
+      return;
+    }
+
+    for (int i = 0; i < list.length; i++) {
+      if (i != 0 && i % 4 == 0) {
+        list.insert(i, adPlaceHolder);
       }
     }
   }

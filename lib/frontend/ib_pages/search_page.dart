@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/icebreaker_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/search_page_controller.dart';
@@ -29,58 +30,61 @@ class SearchPage extends StatelessWidget {
         appBar: AppBar(
           title: searchWidget(context),
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: Obx(() {
-                if (_controller.isSearching.isTrue) {
-                  return const Center(
-                    child: IbProgressIndicator(),
-                  );
-                }
-                if (_controller.questions.isEmpty &&
-                    _controller.users.isEmpty &&
-                    _controller.tags.isEmpty &&
-                    _controller.circles.isEmpty &&
-                    _controller.icebreakers.isEmpty &&
-                    _controller.isSearching.isFalse &&
-                    _controller.searchText.isNotEmpty) {
-                  return Center(
-                    child: SizedBox(
-                      width: 300,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Lottie.asset('assets/images/sloth_zen.json'),
-                          const Text('I could not find anything')
-                        ],
+        body: Obx(
+          () => Column(
+            children: [
+              Expanded(
+                child: Obx(() {
+                  if (_controller.isSearching.isTrue) {
+                    return const Center(
+                      child: IbProgressIndicator(),
+                    );
+                  }
+                  if (_controller.questions.isEmpty &&
+                      _controller.users.isEmpty &&
+                      _controller.tags.isEmpty &&
+                      _controller.circles.isEmpty &&
+                      _controller.icebreakers.isEmpty &&
+                      _controller.isSearching.isFalse &&
+                      _controller.searchText.isNotEmpty) {
+                    return Center(
+                      child: SizedBox(
+                        width: 300,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Lottie.asset('assets/images/sloth_zen.json'),
+                            const Text('I could not find anything')
+                          ],
+                        ),
                       ),
+                    );
+                  }
+
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        userWidget(context),
+                        questionWidget(context),
+                        icebreakerWidget(context),
+                        circleWidget(context),
+                        tagWidget(context),
+                      ],
                     ),
                   );
-                }
-
-                return SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      userWidget(context),
-                      questionWidget(context),
-                      icebreakerWidget(context),
-                      circleWidget(context),
-                      tagWidget(context),
-                    ],
-                  ),
-                );
-              }),
-            ),
-            if (IbUtils.getCurrentIbUser() != null &&
-                !IbUtils.getCurrentIbUser()!.isPremium)
-
-              /// ADD BANNER AD HERE
-              const SizedBox(
-                height: 56,
-                child: Placeholder(),
+                }),
               ),
-          ],
+              if (IbUtils.getCurrentIbUser() != null &&
+                  !IbUtils.getCurrentIbUser()!.isPremium &&
+                  _controller.isLoadingAd.isFalse)
+                SizedBox(
+                  height: 56,
+                  child: _controller.ad == null
+                      ? const SizedBox()
+                      : AdWidget(ad: _controller.ad),
+                ),
+            ],
+          ),
         ));
   }
 

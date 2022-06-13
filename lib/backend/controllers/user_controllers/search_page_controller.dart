@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
+import 'package:icebr8k/backend/managers/ib_ad_manager.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
@@ -25,9 +27,13 @@ class SearchPageController extends GetxController {
   final textEtController = TextEditingController();
   final searchText = ''.obs;
   final isSearching = false.obs;
+  final isLoadingAd = true.obs;
+  BannerAd ad = IbAdManager().getBanner2();
 
   @override
   Future<void> onInit() async {
+    await ad.load();
+    isLoadingAd.value = false;
     textEtController.addListener(() {
       if (searchText.value == textEtController.text) {
         return;
@@ -46,6 +52,13 @@ class SearchPageController extends GetxController {
       await search();
     }, time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis));
     super.onInit();
+  }
+
+  @override
+  Future<void> onClose() async {
+    super.onClose();
+    ad.dispose();
+    textEtController.dispose();
   }
 
   @override
