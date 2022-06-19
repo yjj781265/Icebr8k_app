@@ -5,6 +5,7 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:showcaseview/showcaseview.dart';
 
@@ -28,7 +29,9 @@ class _CreateQuestionTagPickerState extends State<CreateQuestionTagPicker> {
       (_) {
         if (!IbLocalDataService()
             .retrieveBoolValue(StorageKey.pickTagForQuestionShowCaseBool)) {
-          ShowCaseWidget.of(context)!.startShowCase([showcaseKey]);
+          Future.delayed(const Duration(seconds: 2)).then((value) =>
+              ShowCaseWidget.of(context)!.startShowCase([showcaseKey]));
+
           IbLocalDataService().updateBoolValue(
               key: StorageKey.pickTagForQuestionShowCaseBool, value: true);
         }
@@ -79,22 +82,28 @@ class _CreateQuestionTagPickerState extends State<CreateQuestionTagPicker> {
               child: Text('confirm'.tr))
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              searchResultTags(context),
-              pickedTags(context),
-              const Divider(
-                height: 1,
-                thickness: 1,
+      body: Obx(
+        () => widget._controller.isLoading.isTrue
+            ? const Center(
+                child: IbProgressIndicator(),
+              )
+            : Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      searchResultTags(context),
+                      pickedTags(context),
+                      const Divider(
+                        height: 1,
+                        thickness: 1,
+                      ),
+                      trendingTags(context),
+                    ],
+                  ),
+                ),
               ),
-              trendingTags(context),
-            ],
-          ),
-        ),
       ),
     );
   }

@@ -36,7 +36,7 @@ class ReviewQuestionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Review your question'),
+        title: const Text('Review Your Poll'),
         actions: [
           TextButton(
             onPressed: () async {

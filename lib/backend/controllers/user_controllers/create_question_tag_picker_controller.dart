@@ -17,6 +17,7 @@ class CreateQuestionTagPickerController extends GetxController {
   TextEditingController textEditingController = TextEditingController();
   CreateQuestionTagPickerController(this.createQuestionController);
   final searchText = ''.obs;
+  final isLoading = true.obs;
   final trendingTags = <IbTag>[].obs;
   final searchResults = <IbTag>[].obs;
   final footerText = 'Click to Load More'.obs;
@@ -43,6 +44,8 @@ class CreateQuestionTagPickerController extends GetxController {
     for (final doc in snapshot.docs) {
       trendingTags.add(IbTag.fromJson(doc.data()));
     }
+
+    isLoading.value = false;
 
     super.onInit();
   }
