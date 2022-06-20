@@ -16,6 +16,7 @@ class FeedBackChatPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: false,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: const [

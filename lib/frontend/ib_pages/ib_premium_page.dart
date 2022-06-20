@@ -20,6 +20,7 @@ class IbPremiumPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
+        centerTitle: false,
         title: const Text('Go Premium'),
         actions: [
           Obx(() {
@@ -290,6 +291,10 @@ class IbPremiumPage extends StatelessWidget {
                   const SizedBox(
                     height: 16,
                   ),
+                  Text(
+                      'Will Renew: ${_controller.entitlementInfo!.willRenew.toString()}'),
+                  Text(
+                      'Product ID: ${_controller.entitlementInfo!.productIdentifier} '),
                   Text(
                     'Manage subscription from ${GetPlatform.isAndroid ? 'Google Play Store' : 'iOS App Store'}',
                     style: const TextStyle(

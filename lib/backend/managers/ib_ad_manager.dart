@@ -1,11 +1,18 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
 class IbAdManager {
-  static const String kTestBannerId = 'ca-app-pub-3940256099942544/6300978111';
-  static const String kTestRewardId = 'ca-app-pub-3940256099942544/5224354917';
+  static const String kTestBannerIdAndroid =
+      'ca-app-pub-3940256099942544/6300978111';
+  static const String kTestRewardIdAndroid =
+      'ca-app-pub-3940256099942544/5224354917';
+  static const String kTestBannerIdIos =
+      'ca-app-pub-3940256099942544/6300978111';
+  static const String kTestRewardIdIos =
+      'ca-app-pub-3940256099942544/1712485313';
   static const String kBanner1IdAndroid =
       'ca-app-pub-5061564569223287/1263768520';
   static const String kBanner2IdAndroid =
@@ -27,7 +34,13 @@ class IbAdManager {
     IbUtils.showSimpleSnackBar(
         msg: 'Loading Ad...', backgroundColor: IbColors.primaryColor);
     await RewardedAd.load(
-        adUnitId: GetPlatform.isAndroid ? kRewardIdAndroid : kRewardIdiOS,
+        adUnitId: kDebugMode
+            ? GetPlatform.isAndroid
+                ? kTestRewardIdAndroid
+                : kTestRewardIdIos
+            : GetPlatform.isAndroid
+                ? kRewardIdAndroid
+                : kRewardIdiOS,
         request: const AdRequest(),
         rewardedAdLoadCallback: RewardedAdLoadCallback(
           onAdLoaded: (RewardedAd ad) {
@@ -62,7 +75,13 @@ class IbAdManager {
       onAdImpression: (Ad ad) => print('Ad impression.'),
     );
     final BannerAd myBanner = BannerAd(
-      adUnitId: GetPlatform.isAndroid ? kBanner1IdAndroid : kBanner1IdiOS,
+      adUnitId: kDebugMode
+          ? GetPlatform.isAndroid
+              ? kTestBannerIdAndroid
+              : kTestBannerIdIos
+          : GetPlatform.isAndroid
+              ? kBanner1IdAndroid
+              : kBanner1IdiOS,
       size: AdSize(height: 50, width: Get.width.toInt()),
       request: const AdRequest(),
       listener: listener,
@@ -89,7 +108,13 @@ class IbAdManager {
       onAdImpression: (Ad ad) => print('Ad impression.'),
     );
     final BannerAd myBanner = BannerAd(
-      adUnitId: GetPlatform.isAndroid ? kBanner2IdAndroid : kBanner2IdiOS,
+      adUnitId: kDebugMode
+          ? GetPlatform.isAndroid
+              ? kTestBannerIdAndroid
+              : kTestBannerIdIos
+          : GetPlatform.isAndroid
+              ? kBanner2IdAndroid
+              : kBanner2IdiOS,
       size: AdSize(height: 50, width: Get.width.toInt()),
       request: const AdRequest(),
       listener: listener,
@@ -116,7 +141,13 @@ class IbAdManager {
       onAdImpression: (Ad ad) => print('Ad impression.'),
     );
     final BannerAd myBanner = BannerAd(
-      adUnitId: GetPlatform.isAndroid ? kBanner3IdAndroid : kBanner3IdiOS,
+      adUnitId: kDebugMode
+          ? GetPlatform.isAndroid
+              ? kTestBannerIdAndroid
+              : kTestBannerIdIos
+          : GetPlatform.isAndroid
+              ? kBanner3IdAndroid
+              : kBanner3IdiOS,
       size: AdSize.mediumRectangle,
       request: const AdRequest(),
       listener: listener,

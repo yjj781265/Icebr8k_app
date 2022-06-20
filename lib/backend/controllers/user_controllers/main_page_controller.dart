@@ -45,17 +45,13 @@ class MainPageController extends GetxController {
     try {
       final String androidKey = IbApiKeysManager.kRevenueCatAndroidKey;
       final String iosKey = IbApiKeysManager.kRevenueCatIosKey;
-      print(androidKey);
+
       if (Platform.isAndroid && androidKey.isNotEmpty) {
         await Purchases.setup(androidKey, appUserId: IbUtils.getCurrentUid());
       } else if (Platform.isIOS && iosKey.isNotEmpty) {
         await Purchases.setup(iosKey, appUserId: IbUtils.getCurrentUid());
       }
-      if (Platform.isAndroid && androidKey.isNotEmpty) {
-        await Purchases.setup(androidKey, appUserId: IbUtils.getCurrentUid());
-      } else if (Platform.isIOS && iosKey.isNotEmpty) {
-        await Purchases.setup(iosKey, appUserId: IbUtils.getCurrentUid());
-      }
+
       final PurchaserInfo purchaserInfo = await Purchases.getPurchaserInfo();
       await _handlePurchaseInfo(purchaserInfo);
     } catch (e) {

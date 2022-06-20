@@ -55,7 +55,6 @@ class IbPremiumController extends GetxController {
       }
 
       ///query purchase Info
-      await Purchases.syncPurchases();
       final PurchaserInfo purchaserInfo = await Purchases.getPurchaserInfo();
       await _handlePurchaseInfo(purchaserInfo);
       isLoading.value = false;
@@ -67,10 +66,11 @@ class IbPremiumController extends GetxController {
     } on PlatformException catch (e) {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);
       Get.dialog(IbDialog(
-        title: 'Error(${errorCode.name})',
+        title: 'Error (${errorCode.name})',
         subtitle: e.message ?? 'Oops, something went wrong',
         showNegativeBtn: false,
       ));
+      isLoading.value = false;
     }
   }
 
@@ -90,7 +90,7 @@ class IbPremiumController extends GetxController {
       isPremium.value = entitlementInfo!.isActive;
     }
     print('User has premium $isPremium');
-
+    await Purchases.syncPurchases();
     await IbUserDbService().updateCurrentIbUserPremium(isPremium.value);
   }
 

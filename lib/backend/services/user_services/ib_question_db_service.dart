@@ -192,12 +192,12 @@ class IbQuestionDbService {
     if (lastDoc == null) {
       query = _collectionRef
           .where('creatorId', isEqualTo: uid)
-          .orderBy('askedTimeInMs')
+          .orderBy('askedTimeInMs', descending: true)
           .limit(IbConfig.kPerPage);
     } else {
       query = _collectionRef
           .where('creatorId', isEqualTo: uid)
-          .orderBy('askedTimeInMs')
+          .orderBy('askedTimeInMs', descending: true)
           .limit(IbConfig.kPerPage)
           .startAfterDocument(lastDoc);
     }

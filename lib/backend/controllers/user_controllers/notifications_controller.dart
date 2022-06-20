@@ -257,11 +257,10 @@ class NotificationController extends GetxController {
           senderId: IbUtils.getCurrentUid()!,
           recipientId: ibNotification.senderId));
       IbUtils.showSimpleSnackBar(
-          msg: 'Friend request accepted',
-          backgroundColor: IbColors.accentColor);
+          msg: 'Request accepted', backgroundColor: IbColors.accentColor);
     } catch (e) {
       IbUtils.showSimpleSnackBar(
-          msg: 'Failed to accept friend request $e',
+          msg: 'Failed to accept request $e',
           backgroundColor: IbColors.errorRed);
     }
   }
@@ -270,8 +269,7 @@ class NotificationController extends GetxController {
     try {
       await IbUserDbService().removeNotification(ibNotification);
       IbUtils.showSimpleSnackBar(
-          msg: 'Friend request declined',
-          backgroundColor: IbColors.accentColor);
+          msg: 'Request declined', backgroundColor: IbColors.accentColor);
     } catch (e) {
       IbUtils.showSimpleSnackBar(
           msg: 'Failed to decline request $e',
