@@ -102,9 +102,11 @@ class EditIbCollectionMainPage extends StatelessWidget {
             ),
             if (IbUtils.getCurrentIbUser() != null &&
                 !IbUtils.getCurrentIbUser()!.isPremium)
-              SizedBox(
-                height: 56,
-                child: AdWidget(ad: _controller.ad),
+              SafeArea(
+                child: SizedBox(
+                  height: 56,
+                  child: AdWidget(ad: _controller.ad),
+                ),
               ),
           ],
         ),

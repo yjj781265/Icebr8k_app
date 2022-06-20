@@ -47,7 +47,6 @@
 	<string>Allow access to photo library</string>
 	<key>UIBackgroundModes</key>
 	<array>
-		<string>fetch</string>
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
@@ -71,9 +70,7 @@
 	<true/>
 	<key>FirebaseAutomaticScreenReportingEnabled</key>
 	<false/>
-	<key>UIBackgroundModes</key>
-        <array>
-            <string>remote-notification</string>
-        </array>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-5061564569223287~8248232861</string>
 </dict>
 </plist>

@@ -5,8 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_premium_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:lottie/lottie.dart';
 
 class IbPremiumPage extends StatelessWidget {
@@ -33,6 +35,12 @@ class IbPremiumPage extends StatelessWidget {
         ],
       ),
       body: Obx(() {
+        if (_controller.isLoading.isTrue) {
+          return const Center(
+            child: IbProgressIndicator(),
+          );
+        }
+
         if (_controller.isPremium.isTrue &&
             _controller.entitlementInfo != null) {
           return _premiumBody();
@@ -84,14 +92,16 @@ class IbPremiumPage extends StatelessWidget {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: IbElevatedButton(
-                      color: IbColors.primaryColor,
-                      textTrKey: 'I am IN',
-                      onPressed: () async {
-                        showPayWall();
-                      },
+                  child: SafeArea(
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: IbElevatedButton(
+                        color: IbColors.primaryColor,
+                        textTrKey: 'I am In',
+                        onPressed: () async {
+                          showPayWall();
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -117,7 +127,7 @@ class IbPremiumPage extends StatelessWidget {
                     '• No Ads',
                     style: TextStyle(
                         color: Colors.black,
-                        fontSize: IbConfig.kPageTitleSize,
+                        fontSize: IbConfig.kNormalTextSize,
                         fontWeight: FontWeight.bold),
                   ),
                   SizedBox(
@@ -138,7 +148,7 @@ class IbPremiumPage extends StatelessWidget {
                   Text('• Create Unlimited Polls per Day',
                       style: TextStyle(
                           color: Colors.black,
-                          fontSize: IbConfig.kPageTitleSize,
+                          fontSize: IbConfig.kNormalTextSize,
                           fontWeight: FontWeight.bold)),
                   SizedBox(
                     width: 4,
@@ -155,10 +165,10 @@ class IbPremiumPage extends StatelessWidget {
               children: const [
                 Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Text('• Create Polls with You Own Images',
+                  child: AutoSizeText('• Image Polls',
                       style: TextStyle(
                           color: Colors.black,
-                          fontSize: IbConfig.kPageTitleSize,
+                          fontSize: IbConfig.kNormalTextSize,
                           fontWeight: FontWeight.bold)),
                 ),
                 SizedBox(
@@ -178,7 +188,7 @@ class IbPremiumPage extends StatelessWidget {
                   child: Text('• Seen and Typing Indicator in Chat',
                       style: TextStyle(
                           color: Colors.black,
-                          fontSize: IbConfig.kPageTitleSize,
+                          fontSize: IbConfig.kNormalTextSize,
                           fontWeight: FontWeight.bold)),
                 ),
                 SizedBox(
@@ -254,20 +264,27 @@ class IbPremiumPage extends StatelessWidget {
               child: SizedBox(
                   width: 300,
                   height: 300,
-                  child: Lottie.asset('images/premium.json'))),
+                  child: Lottie.asset('assets/images/premium.json'))),
           Flexible(
               flex: 2,
               child: Column(
                 children: [
                   Text(
-                    'Member since ${_controller.entitlementInfo!.originalPurchaseDate}',
+                    'Member since ${IbUtils.readableDateTime(DateTime.parse(_controller.entitlementInfo!.originalPurchaseDate), showTime: true)}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(
                     height: 8,
                   ),
                   Text(
-                    'Expires at ${_controller.entitlementInfo!.expirationDate}',
+                    'Last purchase at ${IbUtils.readableDateTime(DateTime.parse(_controller.entitlementInfo!.latestPurchaseDate), showTime: true)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  Text(
+                    'Expires at ${IbUtils.readableDateTime(DateTime.parse(_controller.entitlementInfo!.expirationDate ?? ''), showTime: true)}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(

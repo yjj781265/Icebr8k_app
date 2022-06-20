@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
@@ -17,6 +18,7 @@ class IbPremiumController extends GetxController {
   final entitlement = 'premium';
   final offerings = <Offering>[].obs;
   final isPremium = false.obs;
+  final isLoading = true.obs;
   EntitlementInfo? entitlementInfo;
 
   @override
@@ -31,7 +33,8 @@ class IbPremiumController extends GetxController {
   }
 
   Future<void> _initPlatformState() async {
-    await Purchases.setDebugLogsEnabled(true);
+    isLoading.value = true;
+    await Purchases.setDebugLogsEnabled(kDebugMode);
     try {
       if (await Purchases.isConfigured) {
         /// load products
@@ -47,12 +50,15 @@ class IbPremiumController extends GetxController {
       } else {
         IbUtils.showSimpleSnackBar(
             msg: 'Failed to load products', backgroundColor: IbColors.errorRed);
+        isLoading.value = false;
         return;
       }
 
       ///query purchase Info
+      await Purchases.syncPurchases();
       final PurchaserInfo purchaserInfo = await Purchases.getPurchaserInfo();
       await _handlePurchaseInfo(purchaserInfo);
+      isLoading.value = false;
 
       ///listen to  purchase Info changes
       Purchases.addPurchaserInfoUpdateListener((info) {
@@ -69,10 +75,11 @@ class IbPremiumController extends GetxController {
   }
 
   Future<void> _handlePurchaseInfo(PurchaserInfo purchaserInfo) async {
-    if (purchaserInfo.activeSubscriptions.isNotEmpty) {
+    if (purchaserInfo.activeSubscriptions.isEmpty) {
       IbUtils.showSimpleSnackBar(
           msg: 'No Active Subscription Found',
           backgroundColor: IbColors.primaryColor);
+      return;
     }
 
     if (purchaserInfo.entitlements.all[entitlement] == null) {
@@ -82,6 +89,7 @@ class IbPremiumController extends GetxController {
       entitlementInfo = purchaserInfo.entitlements.all[entitlement];
       isPremium.value = entitlementInfo!.isActive;
     }
+    print('User has premium $isPremium');
 
     await IbUserDbService().updateCurrentIbUserPremium(isPremium.value);
   }
@@ -95,10 +103,12 @@ class IbPremiumController extends GetxController {
         isActive = false;
       } else {
         isActive = info.entitlements.all[entitlement]!.isActive;
+        await Purchases.syncPurchases();
       }
 
       if (isActive) {
         await IbUserDbService().updateCurrentIbUserPremium(isActive);
+        await Purchases.syncPurchases();
       }
     } on PlatformException catch (e) {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);
@@ -113,6 +123,12 @@ class IbPremiumController extends GetxController {
   Future<void> restorePurchase() async {
     try {
       final PurchaserInfo restoredInfo = await Purchases.restoreTransactions();
+      if (restoredInfo.activeSubscriptions.isEmpty) {
+        IbUtils.showSimpleSnackBar(
+            msg: 'No active subscriptions found',
+            backgroundColor: IbColors.primaryColor);
+        return;
+      }
       await _handlePurchaseInfo(restoredInfo);
     } on PlatformException catch (e) {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);

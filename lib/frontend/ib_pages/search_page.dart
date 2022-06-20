@@ -62,6 +62,8 @@ class SearchPage extends StatelessWidget {
                   }
 
                   return SingleChildScrollView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
                     child: Column(
                       children: [
                         userWidget(context),
@@ -77,11 +79,11 @@ class SearchPage extends StatelessWidget {
               if (IbUtils.getCurrentIbUser() != null &&
                   !IbUtils.getCurrentIbUser()!.isPremium &&
                   _controller.isLoadingAd.isFalse)
-                SizedBox(
-                  height: 56,
-                  child: _controller.ad == null
-                      ? const SizedBox()
-                      : AdWidget(ad: _controller.ad),
+                SafeArea(
+                  child: SizedBox(
+                    height: 56,
+                    child: AdWidget(ad: _controller.ad),
+                  ),
                 ),
             ],
           ),

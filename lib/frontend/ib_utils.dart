@@ -119,10 +119,10 @@ class IbUtils {
 
   static String readableDateTime(DateTime _dateTime, {bool showTime = false}) {
     if (showTime) {
-      return '${DateFormat('hh:mm aa').format(_dateTime)} ${getSuffixDateTimeString(_dateTime)}';
+      return '${DateFormat('hh:mm aa').format(_dateTime.toLocal())} ${getSuffixDateTimeString(_dateTime)}';
     }
     final f = DateFormat('MM/dd/yyyy');
-    return f.format(_dateTime);
+    return f.format(_dateTime.toLocal());
   }
 
   static String getAgoDateTimeString(DateTime _dateTime) {
@@ -376,7 +376,9 @@ class IbUtils {
       margin: const EdgeInsets.only(left: 8, right: 8, top: 16),
       duration:
           isPersistent ? const Duration(days: 999) : const Duration(seconds: 2),
-      backgroundColor: Theme.of(Get.context!).backgroundColor,
+      backgroundColor: Get.context == null
+          ? IbColors.lightBlue
+          : Theme.of(Get.context!).backgroundColor,
       messageText: Text(
         msg,
         style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
