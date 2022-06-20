@@ -17,6 +17,11 @@ class IbAdController extends GetxController {
     await bannerAd.load();
     await Future.delayed(
         const Duration(microseconds: IbConfig.kEventTriggerDelayInMillis));
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
     isLoading.value = false;
   }
 
