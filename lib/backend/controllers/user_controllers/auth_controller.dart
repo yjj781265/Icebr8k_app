@@ -44,7 +44,7 @@ class AuthController extends GetxService {
     _dbStatusSub = IbDbStatusService().listenToStatus().listen((event) async {
       final isRunning = event.data()!['isRunning'] as bool;
       final note = event.data()!['note'] as String;
-      final minV = event.data()!['min_v'] as double;
+      final minV = double.parse(event.data()!['min_v'].toString());
       final isOutdated = IbConfig.kVersion < minV;
       isAnalyticsEnabled = event.data()!['isAnalyticsEnabled'] as bool;
 
@@ -263,7 +263,7 @@ class AuthController extends GetxService {
       final statusSnap = await IbDbStatusService().queryStatus();
       final isRunning = statusSnap.data()!['isRunning'] as bool;
       final note = statusSnap.data()!['note'] as String;
-      final minV = statusSnap.data()!['min_v'] as double;
+      final minV = double.parse(statusSnap.data()!['min_v'].toString());
       final isOutdated = IbConfig.kVersion < minV;
 
       if (isOutdated) {
