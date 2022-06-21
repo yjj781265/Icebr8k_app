@@ -1,4 +1,5 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/auth_controller.dart';
 
@@ -25,7 +26,7 @@ class IbAnalyticsManager {
     required String className,
     required String screenName,
   }) async {
-    if (!Get.find<AuthController>().isAnalyticsEnabled) {
+    if (!Get.find<AuthController>().isAnalyticsEnabled || kDebugMode) {
       return;
     }
     await analytics.logScreenView(
@@ -33,21 +34,21 @@ class IbAnalyticsManager {
   }
 
   Future<void> logSignIn(String methodName) async {
-    if (!Get.find<AuthController>().isAnalyticsEnabled) {
+    if (!Get.find<AuthController>().isAnalyticsEnabled || kDebugMode) {
       return;
     }
     await analytics.logLogin(loginMethod: methodName);
   }
 
   Future<void> logSignUp(String methodName) async {
-    if (!Get.find<AuthController>().isAnalyticsEnabled) {
+    if (!Get.find<AuthController>().isAnalyticsEnabled || kDebugMode) {
       return;
     }
     await analytics.logSignUp(signUpMethod: methodName);
   }
 
   Future<void> logJoinGroup(String groupId) async {
-    if (!Get.find<AuthController>().isAnalyticsEnabled) {
+    if (!Get.find<AuthController>().isAnalyticsEnabled || kDebugMode) {
       return;
     }
 
@@ -55,7 +56,7 @@ class IbAnalyticsManager {
   }
 
   Future<void> logSearch(String text) async {
-    if (!Get.find<AuthController>().isAnalyticsEnabled) {
+    if (!Get.find<AuthController>().isAnalyticsEnabled || kDebugMode) {
       return;
     }
     await analytics.logSearch(searchTerm: text);
@@ -65,7 +66,7 @@ class IbAnalyticsManager {
       {required String contentType,
       required String itemId,
       required String methodName}) async {
-    if (!Get.find<AuthController>().isAnalyticsEnabled) {
+    if (!Get.find<AuthController>().isAnalyticsEnabled || kDebugMode) {
       return;
     }
     await analytics.logShare(
