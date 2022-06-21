@@ -752,6 +752,10 @@ class IbUtils {
       bool isSample = false,
       bool isShowCase = false,
       IbQuestionItemController? itemController}) {
+    if (question.question.isEmpty) {
+      return const SizedBox();
+    }
+
     if (itemController == null) {
       final tag = uniqueTag ? getUniqueId() : question.id;
       final IbQuestionItemController controller = Get.put(
