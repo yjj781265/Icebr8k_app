@@ -272,6 +272,13 @@ class PeopleNearbyController extends GetxController {
           genders: genders,
           minAge: rangeValue.value.start.toInt(),
           maxAge: rangeValue.value.end.toInt());
+      if (data.isEmpty ||
+          data['found'] == null ||
+          data['page'] == null ||
+          data['hits'] == null) {
+        isLoading.value = false;
+        return;
+      }
       final found = data['found'] as int;
       page = data['page'] as int;
       final docList = data['hits'] as List<dynamic>;
@@ -354,6 +361,14 @@ class PeopleNearbyController extends GetxController {
           genders: genders,
           minAge: rangeValue.value.start.toInt(),
           maxAge: rangeValue.value.end.toInt());
+      if (data.isEmpty ||
+          data['found'] == null ||
+          data['page'] == null ||
+          data['hits'] == null) {
+        refreshController.loadNoData();
+        isLoading.value = false;
+        return;
+      }
       final found = data['found'] as int;
       page = data['page'] as int;
       final docList = data['hits'] as List<dynamic>;

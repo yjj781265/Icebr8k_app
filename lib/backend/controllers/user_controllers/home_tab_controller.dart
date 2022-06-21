@@ -410,7 +410,7 @@ class HomeTabController extends GetxController {
         isLocked.isTrue) {
       return;
     }
-    if (list.length <= adFrequency) {
+    if (list.length <= adFrequency && list.isNotEmpty) {
       list.add(adPlaceHolder);
       return;
     }

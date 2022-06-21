@@ -176,9 +176,7 @@ class IbUtils {
   /// Returns the difference (in full days) between the provided date and today.
   static int _calculateDifference(DateTime date) {
     final DateTime now = DateTime.now();
-    return DateTime(date.year, date.month, date.day)
-        .difference(DateTime(now.year, now.month, now.day))
-        .inDays;
+    return date.difference(now).inDays;
   }
 
   static String getStatsString(int num) {
@@ -191,26 +189,27 @@ class IbUtils {
   }
 
   static String getSuffixDateTimeString(DateTime _dateTime) {
-    if (_calculateDifference(_dateTime) == 0) {
+    if (_calculateDifference(_dateTime.toLocal()) == 0) {
       return '';
     }
 
-    if (_calculateDifference(_dateTime) == 1) {
+    if (_calculateDifference(_dateTime.toLocal()) == 1) {
       return 'tomorrow';
     }
 
-    if (_calculateDifference(_dateTime) == -1) {
+    if (_calculateDifference(_dateTime.toLocal()) == -1) {
       return 'yesterday';
     }
 
-    final Duration diffDt = DateTime.now().difference(_dateTime);
+    final Duration diffDt =
+        DateTime.now().toLocal().difference(_dateTime.toLocal());
     if (diffDt.inDays < 365) {
       final DateFormat formatter = DateFormat('MM/dd');
-      final String formatted = formatter.format(_dateTime);
+      final String formatted = formatter.format(_dateTime.toLocal());
       return formatted;
     } else {
       final DateFormat formatter = DateFormat('MM/dd/yyyy');
-      final String formatted = formatter.format(_dateTime);
+      final String formatted = formatter.format(_dateTime.toLocal());
       return formatted;
     }
   }
