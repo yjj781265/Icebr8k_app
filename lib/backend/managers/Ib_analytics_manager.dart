@@ -13,7 +13,7 @@ class IbAnalyticsManager {
 
   Future<void> logCustomEvent(
       {required String name, required Map<String, dynamic> data}) async {
-    if (!Get.find<AuthController>().isAnalyticsEnabled) {
+    if (!Get.find<AuthController>().isAnalyticsEnabled || kDebugMode) {
       return;
     }
     await analytics.logEvent(
