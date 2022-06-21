@@ -1,62 +1,116 @@
-import 'dart:io';
 import 'dart:math';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/auth_controller.dart';
-import 'package:icebr8k/backend/controllers/home_controller.dart';
-import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/answered_question_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/home_tab_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/tag_page_controller.dart';
+import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
-import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/backend/models/ib_settings.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/backend/services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+import '../backend/controllers/user_controllers/asked_questions_controller.dart';
+import '../backend/controllers/user_controllers/auth_controller.dart';
+import '../backend/models/ib_question.dart';
+import '../backend/services/user_services/ib_local_data_service.dart';
+import '../backend/services/user_services/ib_question_db_service.dart';
 import 'ib_config.dart';
 
 class IbUtils {
   IbUtils._();
+
   static void hideKeyboard() => FocusManager.instance.primaryFocus?.unfocus();
+
   static bool isOver13(DateTime dateTime) {
     final bool isOver13 =
         DateTime.now().difference(dateTime).inDays > IbConfig.kAgeLimitInDays;
     return isOver13;
   }
 
-  static Future<File?> showImageCropper(String filePath,
+  static void changeStatusBarColor() {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+
+          ///for android
+          statusBarIconBrightness:
+              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
+                  ? Brightness.light
+                  : Brightness.dark,
+
+          ///for IOS
+          statusBarBrightness:
+              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
+                  ? Brightness.dark
+                  : Brightness.light,
+          statusBarColor:
+              IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
+                  ? Colors.black
+                  : IbColors.lightBlue),
+    );
+  }
+
+  static int calculateAge(int timestampInMs) {
+    final DateTime currentDate = DateTime.now();
+    final DateTime birthDate =
+        DateTime.fromMillisecondsSinceEpoch(timestampInMs);
+    int age = currentDate.year - birthDate.year;
+    final int month1 = currentDate.month;
+    final int month2 = birthDate.month;
+    if (month2 > month1) {
+      age--;
+    } else if (month1 == month2) {
+      final int day1 = currentDate.day;
+      final int day2 = birthDate.day;
+      if (day2 > day1) {
+        age--;
+      }
+    }
+    return age;
+  }
+
+  static Future<CroppedFile?> showImageCropper(String filePath,
       {CropStyle cropStyle = CropStyle.circle,
-      List<CropAspectRatioPreset> ratios = const [],
+      List<CropAspectRatioPreset> ratios = const [
+        CropAspectRatioPreset.original,
+      ],
       double? height,
       double? width,
       bool resetAspectRatioEnabled = true,
       CropAspectRatioPreset initAspectRatio = CropAspectRatioPreset.original,
       bool lockAspectRatio = false,
-      double? minimumAspectRatio}) async {
-    return ImageCropper.cropImage(
-        sourcePath: filePath,
-        cropStyle: cropStyle,
-        aspectRatioPresets: ratios,
-        androidUiSettings: AndroidUiSettings(
-            statusBarColor: IbColors.lightBlue,
+      double minimumAspectRatio = 1.0}) async {
+    return ImageCropper().cropImage(
+      compressFormat: ImageCompressFormat.png,
+      sourcePath: filePath,
+      cropStyle: cropStyle,
+      aspectRatioPresets: ratios,
+      uiSettings: [
+        AndroidUiSettings(
+            toolbarColor: IbColors.darkPrimaryColor,
             toolbarTitle: 'Image Cropper',
-            toolbarColor: IbColors.lightBlue,
             initAspectRatio: initAspectRatio,
             lockAspectRatio: lockAspectRatio),
-        iosUiSettings: IOSUiSettings(
-          rectHeight: cropStyle == CropStyle.circle ? null : 900,
-          rectWidth: cropStyle == CropStyle.circle ? null : 1600,
-          rectX: cropStyle == CropStyle.circle ? null : 1600,
-          rectY: cropStyle == CropStyle.circle ? null : 900,
-          aspectRatioLockEnabled: true,
-          aspectRatioLockDimensionSwapEnabled: true,
-          resetAspectRatioEnabled: resetAspectRatioEnabled,
-          resetButtonHidden: !resetAspectRatioEnabled,
-          minimumAspectRatio: minimumAspectRatio,
+        IOSUiSettings(
+          rectHeight: height,
+          rectWidth: width,
           title: 'Image Cropper',
-        ));
+        )
+      ],
+    );
   }
 
   static String getUniqueId() {
@@ -65,15 +119,15 @@ class IbUtils {
 
   static String readableDateTime(DateTime _dateTime, {bool showTime = false}) {
     if (showTime) {
-      return '${DateFormat('hh:mm aa').format(_dateTime)} ${getSuffixDateTimeString(_dateTime)}';
+      return '${DateFormat('hh:mm aa').format(_dateTime.toLocal())} ${getSuffixDateTimeString(_dateTime)}';
     }
     final f = DateFormat('MM/dd/yyyy');
-    return f.format(_dateTime);
+    return f.format(_dateTime.toLocal());
   }
 
   static String getAgoDateTimeString(DateTime _dateTime) {
     final Duration diffDt = DateTime.now().difference(_dateTime);
-    if (diffDt.inSeconds == 0) {
+    if (diffDt.inSeconds <= 0) {
       return 'now';
     }
 
@@ -105,16 +159,16 @@ class IbUtils {
     }
 
     if (diffDt.inDays > 365) {
-      return '${diffDt.inDays ~/ 365} yr ago';
+      return '${diffDt.inDays / 365} yr ago';
     }
     return '${diffDt.inDays} days ago';
   }
 
-  static String getDistanceString(double distanceInKm,
+  static String getDistanceString(double distanceInMeter,
       {bool isMetric = false}) {
-    final double foot = 3.28084 * distanceInKm * 1000;
+    final double foot = 3.28084 * distanceInMeter;
     if (foot < 528) {
-      return '${foot.toPrecision(1)} ft';
+      return '0.1 mi';
     }
     return '${(foot / 5280).toPrecision(1)} mi';
   }
@@ -138,7 +192,7 @@ class IbUtils {
 
   static String getSuffixDateTimeString(DateTime _dateTime) {
     if (_calculateDifference(_dateTime) == 0) {
-      return 'today';
+      return '';
     }
 
     if (_calculateDifference(_dateTime) == 1) {
@@ -150,37 +204,47 @@ class IbUtils {
     }
 
     final Duration diffDt = DateTime.now().difference(_dateTime);
-    if (diffDt.inDays >= 30 && diffDt.inDays < 365) {
+    if (diffDt.inDays < 365) {
       final DateFormat formatter = DateFormat('MM/dd');
       final String formatted = formatter.format(_dateTime);
-      return 'on $formatted';
+      return formatted;
     } else {
       final DateFormat formatter = DateFormat('MM/dd/yyyy');
       final String formatted = formatter.format(_dateTime);
-      return 'on $formatted';
+      return formatted;
     }
   }
 
-  static String getChatDateTimeString(DateTime _dateTime) {
+  static Future<bool> isOverDailyPollLimit() async {
+    if (getCurrentIbUser()!.isPremium) {
+      return false;
+    }
+
+    final int count =
+        await IbQuestionDbService().queryDailyCurrentUserPollsCount();
+    return count >= IbConfig.kDailyPollLimit;
+  }
+
+  static String getChatTabDateString(DateTime _dateTime) {
     final Duration diffDt = DateTime.now().difference(_dateTime);
     if (diffDt.inSeconds == 0) {
       return 'now';
     }
 
     if (diffDt.inSeconds < 60) {
-      return '${diffDt.inSeconds} s';
+      return '${diffDt.inSeconds} s ago';
     }
 
     if (diffDt.inMinutes >= 1 && diffDt.inMinutes < 60) {
-      return '${diffDt.inMinutes} min';
+      return '${diffDt.inMinutes} min ago';
     }
 
     if (diffDt.inHours >= 1 && diffDt.inHours < 24) {
-      return '${diffDt.inHours} hr';
+      return '${diffDt.inHours} hr ago';
     }
 
     if (diffDt.inDays >= 1 && diffDt.inDays < 30) {
-      return '${diffDt.inDays} d';
+      return '${diffDt.inDays} d ago';
     }
 
     if (diffDt.inDays >= 30 && diffDt.inDays < 365) {
@@ -213,115 +277,312 @@ class IbUtils {
   }
 
   static IbUser? getCurrentIbUser() {
-    if (!Get.isRegistered<HomeController>()) {
+    if (!Get.isRegistered<MainPageController>()) {
       return null;
     }
-    return Get.find<HomeController>().currentIbUser;
+    return Get.find<MainPageController>().rxCurrentIbUser.value;
   }
 
+  /// return current IbUser friend ids what are not in block list
+  static List<String> getCurrentIbUserUnblockedFriendsId() {
+    if (getCurrentIbUser() == null) {
+      return [];
+    }
+    return getCurrentIbUser()!
+        .friendUids
+        .where((element) =>
+            !getCurrentIbUser()!.blockedFriendUids.contains(element))
+        .toList();
+  }
+
+  /// return current IbUser circle chat items
+  static List<ChatTabItem> getCircleItems() {
+    if (!Get.isRegistered<SocialTabController>()) {
+      return [];
+    }
+    final circleItems =
+        List<ChatTabItem>.from(Get.find<SocialTabController>().circles);
+    return circleItems;
+  }
+
+  /// return current IbUser all chat items
+  static List<ChatTabItem> getAllChatTabItems() {
+    if (!Get.isRegistered<SocialTabController>()) {
+      return [];
+    }
+    final circleItems =
+        List<ChatTabItem>.from(Get.find<SocialTabController>().circles);
+    final oneToOneItems =
+        List<ChatTabItem>.from(Get.find<SocialTabController>().oneToOneChats);
+    oneToOneItems.addAll(circleItems);
+    final allItems = oneToOneItems.toSet().toList();
+    allItems.sort((a, b) => (a.title).compareTo(b.title));
+    return allItems;
+  }
+
+  /// return current ib google fonts
+  static List<TextStyle> getIbFonts(TextStyle style) {
+    return [
+      GoogleFonts.openSans(textStyle: style),
+      GoogleFonts.robotoSlab(textStyle: style),
+      GoogleFonts.breeSerif(textStyle: style),
+      GoogleFonts.comicNeue(textStyle: style),
+      GoogleFonts.nothingYouCouldDo(textStyle: style),
+      GoogleFonts.shadowsIntoLight(textStyle: style),
+      GoogleFonts.abrilFatface(textStyle: style),
+      GoogleFonts.caveat(textStyle: style),
+      GoogleFonts.cormorantGaramond(textStyle: style),
+      GoogleFonts.theGirlNextDoor(textStyle: style),
+    ];
+  }
+
+  static User? getCurrentFbUser() {
+    if (Get.find<AuthController>().firebaseUser == null) {
+      return null;
+    }
+    return Get.find<AuthController>().firebaseUser;
+  }
+
+  static void showPersistentSnackBar() {}
+
   static void showSimpleSnackBar(
-      {required String msg, required Color backgroundColor}) {
-    hideKeyboard();
-    Get.showSnackbar(GetBar(
+      {required String msg,
+      required Color backgroundColor,
+      bool isPersistent = false}) {
+    Widget icon = const SizedBox();
+    if (backgroundColor == IbColors.primaryColor) {
+      icon = Icon(
+        Icons.info_rounded,
+        color: backgroundColor,
+      );
+    } else if (backgroundColor == IbColors.accentColor) {
+      icon = Icon(
+        Icons.check_circle_rounded,
+        color: backgroundColor,
+      );
+    } else if (backgroundColor == IbColors.errorRed) {
+      icon = Icon(Icons.error_rounded, color: backgroundColor);
+    } else {
+      icon = Icon(
+        Icons.info_rounded,
+        color: backgroundColor,
+      );
+    }
+
+    Get.showSnackbar(GetSnackBar(
+      icon: icon,
+      snackPosition: SnackPosition.TOP,
       borderRadius: IbConfig.kCardCornerRadius,
-      margin: const EdgeInsets.only(left: 8, right: 8, bottom: 64),
-      duration: const Duration(seconds: 3),
-      backgroundColor: backgroundColor,
-      messageText: Text(msg),
+      margin: const EdgeInsets.only(left: 8, right: 8, top: 16),
+      duration:
+          isPersistent ? const Duration(days: 999) : const Duration(seconds: 2),
+      backgroundColor: Get.context == null
+          ? IbColors.lightBlue
+          : Theme.of(Get.context!).backgroundColor,
+      messageText: Text(
+        msg,
+        style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+      ),
     ));
   }
 
-  static Future<double> getCompScore(String uid) async {
+  static Future<double> getCompScore(
+      {required String uid, bool isRefresh = false}) async {
     final List<IbAnswer> uid1QuestionAnswers = [];
-    uid1QuestionAnswers
-        .addAll(Get.find<MyAnsweredQuestionsController>().ibAnswers);
-    final List<IbAnswer> uid2QuestionAnswers =
-        await IbQuestionDbService().queryUserAnswers(uid);
+    final List<IbAnswer> uid2QuestionAnswers = [];
+    if (IbCacheManager().getIbAnswers(getCurrentUid()!) == null || isRefresh) {
+      final tempList =
+          await IbQuestionDbService().queryUserAnswers(getCurrentUid()!);
+      IbCacheManager()
+          .cacheIbAnswers(uid: getCurrentUid()!, ibAnswers: tempList);
+      uid1QuestionAnswers.addAll(tempList);
+      print('refresh list1');
+    } else {
+      uid1QuestionAnswers
+          .addAll(IbCacheManager().getIbAnswers(getCurrentUid()!)!);
+    }
+
+    if (IbCacheManager().getIbAnswers(uid) == null || isRefresh) {
+      final tempList = await IbQuestionDbService().queryUserAnswers(uid);
+      IbCacheManager().cacheIbAnswers(uid: uid, ibAnswers: tempList);
+      uid2QuestionAnswers.addAll(tempList);
+      print('refresh list2');
+    } else {
+      uid2QuestionAnswers.addAll(IbCacheManager().getIbAnswers(uid)!);
+    }
 
     if (uid1QuestionAnswers.isEmpty || uid2QuestionAnswers.isEmpty) {
       return 0;
     }
 
-    final List<String> uid1QuestionIds = [];
-    final List<String> uid2QuestionIds = [];
-
-    for (final IbAnswer answer in uid1QuestionAnswers) {
-      uid1QuestionIds.add(answer.questionId);
-    }
-
-    for (final IbAnswer answer in uid2QuestionAnswers) {
-      uid2QuestionIds.add(answer.questionId);
-    }
-
-    final int commonQuestionSize =
-        uid1QuestionIds.toSet().intersection(uid2QuestionIds.toSet()).length;
-    final int commonAnswerSize = uid1QuestionAnswers
+    final int commonQuestionSize = uid1QuestionAnswers
+        .map((e) => e.questionId)
         .toSet()
-        .intersection(uid2QuestionAnswers.toSet())
+        .intersection(uid2QuestionAnswers.map((e) => e.questionId).toSet())
         .length;
 
     if (commonQuestionSize == 0) {
       return 0;
     }
 
-    final _score = commonAnswerSize / commonQuestionSize.toDouble();
+    final List<IbAnswer> commonAnswers = [];
+    final List<String> questionIds = uid1QuestionAnswers
+        .map((e) => e.questionId)
+        .toSet()
+        .intersection(uid2QuestionAnswers.map((e) => e.questionId).toSet())
+        .toList();
+
+    for (final String id in questionIds) {
+      final IbAnswer? uid1Answer = uid1QuestionAnswers
+          .firstWhereOrNull((element) => element.questionId == id);
+      final IbAnswer? uid2Answer = uid2QuestionAnswers
+          .firstWhereOrNull((element) => element.questionId == id);
+      if (uid1Answer == null || uid2Answer == null) {
+        continue;
+      } else if (uid1Answer.choiceId == uid2Answer.choiceId) {
+        commonAnswers.add(uid1Answer);
+      }
+    }
+    commonAnswers
+        .sort((a, b) => b.answeredTimeInMs.compareTo(a.answeredTimeInMs));
+
+    final _score =
+        commonAnswers.length.toDouble() / commonQuestionSize.toDouble();
     print('score is $_score');
 
     return _score;
   }
 
-  static Future<List<IbAnswer>> getCommonAnswersQ(String uid) async {
+  static Future<List<String>> getCommonAnswerQuestionIds(
+      {required String uid, bool isRefresh = false}) async {
     /// query each user answered questions then intersect
     final List<IbAnswer> uid1QuestionAnswers = [];
-    uid1QuestionAnswers
-        .addAll(Get.find<MyAnsweredQuestionsController>().ibAnswers);
-    final List<IbAnswer> uid2QuestionAnswers =
-        await IbQuestionDbService().queryUserAnswers(uid);
+    final List<IbAnswer> uid2QuestionAnswers = [];
+    if (IbCacheManager().getIbAnswers(getCurrentUid()!) == null || isRefresh) {
+      final tempList =
+          await IbQuestionDbService().queryUserAnswers(getCurrentUid()!);
+      IbCacheManager()
+          .cacheIbAnswers(uid: getCurrentUid()!, ibAnswers: tempList);
+      uid1QuestionAnswers.addAll(tempList);
+    } else {
+      uid1QuestionAnswers
+          .addAll(IbCacheManager().getIbAnswers(getCurrentUid()!)!);
+    }
 
-    return uid2QuestionAnswers
+    if (IbCacheManager().getIbAnswers(uid) == null || isRefresh) {
+      final tempList = await IbQuestionDbService().queryUserAnswers(uid);
+      IbCacheManager().cacheIbAnswers(uid: uid, ibAnswers: tempList);
+      uid2QuestionAnswers.addAll(tempList);
+    } else {
+      uid2QuestionAnswers.addAll(IbCacheManager().getIbAnswers(uid)!);
+    }
+
+    final List<IbAnswer> commonAnswers = [];
+    final List<String> questionIds = uid1QuestionAnswers
+        .map((e) => e.questionId)
         .toSet()
-        .intersection(uid1QuestionAnswers.toSet())
+        .intersection(uid2QuestionAnswers.map((e) => e.questionId).toSet())
         .toList();
-  }
 
-  static Future<List<IbAnswer>> getUncommonAnswersQ(String uid) async {
-    /// query each user answered questions then find the difference
-    final List<IbAnswer> uid1QuestionAnswers = [];
-    uid1QuestionAnswers
-        .addAll(Get.find<MyAnsweredQuestionsController>().ibAnswers);
-    final List<IbAnswer> uid2QuestionAnswers =
-        await IbQuestionDbService().queryUserAnswers(uid);
-
-    final List<String> uid1QuestionIds = [];
-    final List<String> uid2QuestionIds = [];
-
-    for (final IbAnswer answer in uid1QuestionAnswers) {
-      uid1QuestionIds.add(answer.questionId);
-    }
-
-    for (final IbAnswer answer in uid2QuestionAnswers) {
-      uid2QuestionIds.add(answer.questionId);
-    }
-
-    final List<String> commonQ =
-        uid1QuestionIds.toSet().intersection(uid2QuestionIds.toSet()).toList();
-    final List<IbAnswer> uncommonAnswers = [];
-
-    for (final id in commonQ) {
-      if (uid1QuestionAnswers
-              .firstWhere((element) => element.questionId == id)
-              .answer !=
-          uid2QuestionAnswers
-              .firstWhere((element) => element.questionId == id)
-              .answer) {
-        print(
-            'add uncommon answer ${uid2QuestionAnswers.firstWhere((element) => element.questionId == id)}');
-        uncommonAnswers.add(uid2QuestionAnswers
-            .firstWhere((element) => element.questionId == id));
+    for (final String id in questionIds) {
+      final IbAnswer? uid1Answer = uid1QuestionAnswers
+          .firstWhereOrNull((element) => element.questionId == id);
+      final IbAnswer? uid2Answer = uid2QuestionAnswers
+          .firstWhereOrNull((element) => element.questionId == id);
+      if (uid1Answer == null || uid2Answer == null) {
+        continue;
+      } else if (uid1Answer.choiceId == uid2Answer.choiceId) {
+        commonAnswers.add(uid1Answer);
       }
     }
+    commonAnswers
+        .sort((a, b) => b.answeredTimeInMs.compareTo(a.answeredTimeInMs));
+    return commonAnswers.map((e) => e.questionId).toList();
+  }
 
-    return uncommonAnswers;
+  static Future<List<String>> getUncommonAnswerQuestionIds(
+      {required String uid, bool isRefresh = false}) async {
+    /// query each user answered questions then find the difference
+    final List<IbAnswer> uid1QuestionAnswers = [];
+    final List<IbAnswer> uid2QuestionAnswers = [];
+    if (IbCacheManager().getIbAnswers(getCurrentUid()!) == null || isRefresh) {
+      final tempList =
+          await IbQuestionDbService().queryUserAnswers(getCurrentUid()!);
+      IbCacheManager()
+          .cacheIbAnswers(uid: getCurrentUid()!, ibAnswers: tempList);
+      uid1QuestionAnswers.addAll(tempList);
+    } else {
+      uid1QuestionAnswers
+          .addAll(IbCacheManager().getIbAnswers(getCurrentUid()!)!);
+    }
+
+    if (IbCacheManager().getIbAnswers(uid) == null || isRefresh) {
+      final tempList = await IbQuestionDbService().queryUserAnswers(uid);
+      IbCacheManager().cacheIbAnswers(uid: uid, ibAnswers: tempList);
+      uid2QuestionAnswers.addAll(tempList);
+    } else {
+      uid2QuestionAnswers.addAll(IbCacheManager().getIbAnswers(uid)!);
+    }
+
+    final List<String> commonQuestionIds = uid1QuestionAnswers
+        .map((e) => e.questionId)
+        .toSet()
+        .intersection(uid2QuestionAnswers.map((e) => e.questionId).toSet())
+        .toList();
+
+    final List<IbAnswer> uncommonAnswers = [];
+
+    for (final String id in commonQuestionIds) {
+      final IbAnswer? uid1Answer = uid1QuestionAnswers
+          .firstWhereOrNull((element) => element.questionId == id);
+      final IbAnswer? uid2Answer = uid2QuestionAnswers
+          .firstWhereOrNull((element) => element.questionId == id);
+      if (uid1Answer == null || uid2Answer == null) {
+        continue;
+      } else if (uid1Answer.choiceId != uid2Answer.choiceId) {
+        uncommonAnswers.add(uid1Answer);
+      }
+    }
+    uncommonAnswers
+        .sort((a, b) => b.answeredTimeInMs.compareTo(a.answeredTimeInMs));
+    return uncommonAnswers.map((e) => e.questionId).toList();
+  }
+
+  static Future<List<IbAnswer>> getIbAnswersForDifferentUsers(
+      {required List<String> uids,
+      required String questionId,
+      bool isRefresh = false}) async {
+    final List<IbAnswer> theAnswers = [];
+
+    /// look for ibAnswer in cache first
+
+    for (final String uid in uids.toSet()) {
+      if (IbCacheManager().getIbAnswers(uid) == null || isRefresh) {
+        final answer =
+            await IbQuestionDbService().querySingleIbAnswer(uid, questionId);
+        if (answer == null) {
+          continue;
+        }
+        IbCacheManager().cacheSingleIbAnswer(uid: uid, ibAnswer: answer);
+        theAnswers.add(answer);
+      } else {
+        final List<IbAnswer> answers = IbCacheManager().getIbAnswers(uid)!;
+        final IbAnswer? ibAnswer = answers
+            .firstWhereOrNull((element) => element.questionId == questionId);
+        if (ibAnswer != null) {
+          theAnswers.add(ibAnswer);
+        } else {
+          final answer =
+              await IbQuestionDbService().querySingleIbAnswer(uid, questionId);
+          if (answer == null) {
+            continue;
+          }
+          theAnswers.add(answer);
+          IbCacheManager().cacheSingleIbAnswer(uid: uid, ibAnswer: answer);
+        }
+      }
+    }
+    return theAnswers;
   }
 
   static Color getRandomColor() {
@@ -329,26 +590,250 @@ class IbUtils {
     final List<Color> _colors = [
       IbColors.primaryColor,
       IbColors.accentColor,
-      IbColors.darkPrimaryColor,
+      Colors.black,
+      Colors.redAccent,
+      Colors.yellowAccent,
+      Colors.cyanAccent,
+      Colors.lightBlueAccent,
+      Colors.purpleAccent,
     ];
-    _colors.addAll(Colors.accents);
-    _colors.addAll(Colors.primaries);
-    _colors.remove(Colors.yellowAccent);
-    _colors.remove(Colors.yellow);
-    _colors.remove(Colors.amberAccent);
-    _colors.remove(Colors.amber);
     return _colors[random.nextInt(_colors.length)];
   }
 
-  static Map<String, int> populateStatMap(List<String> choices, String type) {
-    if (IbQuestion.kScale == type) {
-      return {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0};
-    } else {
-      final map = <String, int>{};
-      for (final choice in choices) {
-        map[choice] = 0;
-      }
-      return map;
+  static Widget leftTimeText(int millsSinceEpoch) {
+    final futureDateTime = DateTime.fromMillisecondsSinceEpoch(millsSinceEpoch);
+    final diff = futureDateTime.difference(DateTime.now());
+
+    if (diff.isNegative) {
+      return const Text(
+        'Closed',
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+            fontSize: IbConfig.kDescriptionTextSize, color: IbColors.errorRed),
+      );
     }
+
+    if (diff.inSeconds < 60) {
+      return Text(
+        '${diff.inSeconds} sec left',
+        style: const TextStyle(
+            fontSize: IbConfig.kDescriptionTextSize, color: Colors.deepOrange),
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+
+    if (diff.inMinutes < 60) {
+      return Text(
+        '${diff.inMinutes} min left',
+        style: const TextStyle(
+            fontSize: IbConfig.kDescriptionTextSize, color: Colors.orange),
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+
+    if (diff.inHours < 24) {
+      return Text(
+        '${diff.inHours} hr left',
+        style: const TextStyle(
+            fontSize: IbConfig.kDescriptionTextSize,
+            color: Colors.orangeAccent),
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+
+    return Text(
+      '${diff.inDays} d left',
+      style: const TextStyle(
+          fontSize: IbConfig.kDescriptionTextSize, color: IbColors.accentColor),
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+
+  static Color handleIndicatorColor(double percentageInDecimal) {
+    if (percentageInDecimal > 0 && percentageInDecimal <= 0.2) {
+      return const Color(0xFFFF0000);
+    }
+
+    if (percentageInDecimal > 0.2 && percentageInDecimal <= 0.4) {
+      return const Color(0xFFFF6600);
+    }
+
+    if (percentageInDecimal > 0.4 && percentageInDecimal <= 0.6) {
+      return const Color(0xFFFFB700);
+    }
+
+    if (percentageInDecimal > 0.6 && percentageInDecimal <= 0.7) {
+      return const Color(0xFFB1E423);
+    }
+
+    if (percentageInDecimal >= 0.7 && percentageInDecimal <= 0.9) {
+      return const Color(0xFF23E480);
+    }
+
+    if (percentageInDecimal > 0.9 && percentageInDecimal <= 1.0) {
+      return IbColors.accentColor;
+    }
+    return IbColors.errorRed;
+  }
+
+  static void showInteractiveViewer(
+      List<String> urls, Widget widget, BuildContext context) {
+    /// show image preview
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        barrierColor: Colors.black.withOpacity(0.8),
+        barrierDismissible: true,
+        pageBuilder: (BuildContext context, _, __) => Stack(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Get.back();
+              },
+              child: InteractiveViewer(
+                  boundaryMargin: const EdgeInsets.all(8), child: widget),
+            ),
+            Positioned(
+              right: 8,
+              top: 64,
+              child: Material(
+                color: Colors.transparent,
+                child: IconButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    icon: const Icon(
+                      Icons.cancel,
+                      color: IbColors.errorRed,
+                    )),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static IbSettings getCurrentUserSettings() {
+    if (getCurrentIbUser() == null || getCurrentIbUser()!.settings == null) {
+      return IbSettings();
+    } else {
+      return getCurrentIbUser()!.settings!;
+    }
+  }
+
+  static String statsShortString(int number) {
+    if (number < 1000) {
+      return number.toString();
+    }
+
+    if (number >= 1000 && number < 999999) {
+      final double num = number.toDouble() / 1000;
+      return '${num.toStringAsFixed(1)}K';
+    }
+
+    if (number >= 999999 && number < 9999999) {
+      final double num = number.toDouble() / 1000000;
+      return '${num.toStringAsFixed(1)}M';
+    }
+
+    if (number >= 9999999 && number < 9999999999) {
+      final double num = number.toDouble() / 10000000;
+      return '${num.toStringAsFixed(1)}B';
+    }
+
+    return '10B+';
+  }
+
+  static Widget handleQuestionType(IbQuestion question,
+      {bool uniqueTag = false,
+      List<IbAnswer> ibAnswers = const [],
+      bool expanded = false,
+      bool isSample = false,
+      bool isShowCase = false,
+      IbQuestionItemController? itemController}) {
+    if (itemController == null) {
+      final tag = uniqueTag ? getUniqueId() : question.id;
+      final IbQuestionItemController controller = Get.put(
+          IbQuestionItemController(
+              ibAnswers: ibAnswers,
+              isShowCase: isShowCase.obs,
+              rxIbQuestion: question.obs,
+              rxIsExpanded: expanded.obs,
+              rxIsSample: isSample.obs),
+          tag: tag);
+      if (question.questionType == QuestionType.multipleChoice ||
+          question.questionType == QuestionType.multipleChoicePic) {
+        return IbMcQuestionCard(
+          controller,
+        );
+      }
+
+      return IbScQuestionCard(controller);
+    }
+
+    if (question.questionType == QuestionType.multipleChoice ||
+        question.questionType == QuestionType.multipleChoicePic) {
+      return IbMcQuestionCard(itemController);
+    }
+
+    return IbScQuestionCard(itemController);
+  }
+
+  static void masterDeleteSingleQuestion(IbQuestion ibQuestion) {
+    if (Get.isRegistered<HomeTabController>()) {
+      Get.find<HomeTabController>()
+          .forYourList
+          .removeWhere((element) => element.id == ibQuestion.id);
+      Get.find<HomeTabController>()
+          .trendingList
+          .removeWhere((element) => element.id == ibQuestion.id);
+    }
+
+    if (Get.isRegistered<AnsweredQuestionController>()) {
+      Get.find<AnsweredQuestionController>()
+          .answeredQs
+          .removeWhere((element) => element.id == ibQuestion.id);
+    }
+
+    if (Get.isRegistered<AskedQuestionsController>(tag: getCurrentUid())) {
+      Get.find<AskedQuestionsController>(tag: getCurrentUid())
+          .createdQuestions
+          .removeWhere((element) => element.id == ibQuestion.id);
+    }
+
+    for (final tag in ibQuestion.tags) {
+      if (Get.isRegistered<TagPageController>(tag: tag)) {
+        Get.find<TagPageController>(tag: tag)
+            .ibQuestions
+            .removeWhere((element) => element.id == ibQuestion.id);
+      }
+    }
+  }
+
+  static bool checkFeatureIsLocked() {
+    final bool isLocked = Get.find<HomeTabController>().isLocked.value;
+    print(isLocked);
+    if (isLocked) {
+      Get.dialog(
+          const IbDialog(
+            title: 'Feature Locked',
+            content: Text.rich(
+              TextSpan(
+                  text: "Please answer all polls from Icebr8k in ",
+                  children: [
+                    TextSpan(
+                        text: 'For You',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(text: ' page in order to unlock other features')
+                  ]),
+              textAlign: TextAlign.start,
+            ),
+            subtitle: '',
+            showNegativeBtn: false,
+          ),
+          barrierDismissible: false);
+    }
+    return isLocked;
   }
 }

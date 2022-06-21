@@ -4,7 +4,11 @@ import 'package:icebr8k/frontend/ib_config.dart';
 class IbActionButton extends StatelessWidget {
   final Color color;
   final Color bgColor;
+
+  final bool showCircle;
   final double size;
+  final double fontSize;
+  final Widget? content;
   final IconData? iconData;
   final String text;
   final Function onPressed;
@@ -13,6 +17,9 @@ class IbActionButton extends StatelessWidget {
       {required this.color,
       this.bgColor = Colors.transparent,
       this.size = 24,
+      this.fontSize = IbConfig.kSecondaryTextSize,
+      this.showCircle = true,
+      this.content,
       required this.iconData,
       required this.onPressed,
       required this.text});
@@ -27,24 +34,27 @@ class IbActionButton extends StatelessWidget {
             onPressed();
           },
           child: Container(
-            decoration: BoxDecoration(
-                color: bgColor,
-                shape: BoxShape.circle,
-                border: Border.all(width: 2, color: color)),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Icon(
-                iconData,
-                size: size,
-                color: color,
-              ),
-            ),
+            padding: showCircle ? const EdgeInsets.all(8) : null,
+            decoration: showCircle
+                ? BoxDecoration(
+                    color: bgColor,
+                    shape: BoxShape.circle,
+                    border: Border.all(width: 2, color: color))
+                : null,
+            child: content == null
+                ? Icon(
+                    iconData,
+                    size: size,
+                    color: color,
+                  )
+                : content!,
           ),
         ),
-        Text(
-          text,
-          style: const TextStyle(fontSize: IbConfig.kDescriptionTextSize),
-        )
+        if (text.isNotEmpty)
+          Text(
+            text,
+            style: TextStyle(fontSize: fontSize),
+          )
       ],
     );
   }

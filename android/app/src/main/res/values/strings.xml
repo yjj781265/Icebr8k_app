@@ -1,4 +1,7 @@
 <resources>
-    <string name="default_notification_channel_id" translatable="false">icebr8k_channel</string>_
+    <string name="default_notification_channel_id" translatable="false">icebr8k_channel</string>
+    <string name="custom_notification_channel_id" translatable="false">icebr8k_custom_channel</string>
+    <string name="default_notification_channel_name" translatable="false">icebr8k_channel_name</string>
+    <string name="default_notification_channel_description" translatable="false">icebr8k_channel_description</string>
 
 </resources>

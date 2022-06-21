@@ -4,15 +4,32 @@ import '../ib_config.dart';
 
 class IbCard extends StatelessWidget {
   final Widget child;
-  const IbCard({Key? key, required this.child}) : super(key: key);
+  final Color? color;
+  final EdgeInsetsGeometry? margin;
+  final double radius;
+  final double elevation;
+  const IbCard(
+      {Key? key,
+      required this.child,
+      this.margin,
+      this.color,
+      this.radius = IbConfig.kCardCornerRadius,
+      this.elevation = 1})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(IbConfig.kCardCornerRadius),
+    return Material(
+      color: Colors.transparent,
+      child: Card(
+        margin: margin,
+        elevation: elevation,
+        color: color,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radius),
+        ),
+        child: child,
       ),
-      child: child,
     );
   }
 }

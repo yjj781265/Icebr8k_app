@@ -23,11 +23,27 @@
           }
         },
         {
+          "client_id": "768747685028-ba68c5q6rghu24hc0m3mgp7shgi2hrel.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.icebr8k.android",
+            "certificate_hash": "6aa1ef338fd406e8bda962292c6fbd871f41f31c"
+          }
+        },
+        {
           "client_id": "768747685028-ktcncbpjd4kldtouc2btebl253nve817.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.icebr8k.android",
             "certificate_hash": "3f670e6911cfc0ac982a686aff08e4cb7a5e7c31"
+          }
+        },
+        {
+          "client_id": "768747685028-mj96ralgnr5brkvp7ubv0q3f82hpku19.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.icebr8k.android",
+            "certificate_hash": "da60b2b36abb4d21238c9df506b5263eb0123853"
           }
         },
         {

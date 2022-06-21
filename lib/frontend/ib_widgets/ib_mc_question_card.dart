@@ -1,20 +1,35 @@
+import 'dart:io';
+
+import 'package:animations/animations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/ib_question_item_controller.dart';
-import 'package:icebr8k/backend/controllers/my_answered_questions_controller.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/ib_question_stats_controller.dart';
+import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
+import 'package:icebr8k/backend/models/ib_choice.dart';
+import 'package:icebr8k/backend/models/ib_question.dart';
+import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_media_slide.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_question_buttons.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_question_header.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_question_info.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_question_stats_bar.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_question_tags.dart';
+import 'package:showcaseview/showcaseview.dart';
 
+import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
 import '../ib_colors.dart';
 import '../ib_config.dart';
 import '../ib_utils.dart';
 import 'ib_card.dart';
-import 'ib_elevated_button.dart';
-import 'ib_user_avatar.dart';
+import 'ib_media_viewer.dart';
+import 'ib_question_stats.dart';
 
 class IbMcQuestionCard extends StatefulWidget {
   final IbQuestionItemController _controller;
 
-  const IbMcQuestionCard(this._controller, {Key? key}) : super(key: key);
+  const IbMcQuestionCard(this._controller);
 
   @override
   _IbMcQuestionCardState createState() => _IbMcQuestionCardState();
@@ -29,6 +44,16 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   @override
   void initState() {
     _prepareAnimations();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget._controller.isShowCase.isTrue &&
+          !IbLocalDataService()
+              .retrieveBoolValue(StorageKey.pollExpandShowCaseBool)) {
+        ShowCaseWidget.of(IbShowCaseKeys.kPollExpandKey.currentContext!)!
+            .startShowCase([
+          IbShowCaseKeys.kPollExpandKey,
+        ]);
+      }
+    });
     super.initState();
   }
 
@@ -45,11 +70,9 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   }
 
   void _runExpandCheck() {
-    if (widget._controller.isExpanded.isTrue &&
-        widget._controller.isExpandable) {
+    if (widget._controller.rxIsExpanded.isTrue) {
       expandController.forward();
-    } else if (widget._controller.isExpanded.isFalse &&
-        widget._controller.isExpandable) {
+    } else {
       expandController.reverse();
     }
   }
@@ -63,244 +86,147 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    _runExpandCheck();
-    final Widget expandableInfo = Column(
-      children: [
-        Scrollbar(
-          controller: _scrollController,
-          child: LimitedBox(
-            maxHeight: 300,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: ListView.builder(
-                controller: _scrollController,
-                itemBuilder: (context, index) {
-                  final String _choice =
-                      widget._controller.ibQuestion.choices[index];
-                  return IbQuestionMcItem(_choice, widget._controller);
-                },
-                shrinkWrap: true,
-                itemCount: widget._controller.ibQuestion.choices.length,
-              ),
-            ),
-          ),
-        ),
-        Center(child: _handleButtons()),
-      ],
-    );
-    return SingleChildScrollView(
-      child: InkWell(
-        child: Ink(
-          child: Center(
-            child: LimitedBox(
-              maxWidth: Get.width * 0.95,
-              child: IbCard(
-                  child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 16, right: 8, top: 16, bottom: 8),
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: Obx(
-                    () => Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            _handleAvatarImage(),
-                            const SizedBox(
-                              width: 8,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width: 200,
-                                  child: Text(
-                                    widget._controller.title.value,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: const TextStyle(
-                                        fontSize: IbConfig.kSecondaryTextSize,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                ),
-                                Text(
-                                  IbUtils.getAgoDateTimeString(
-                                      DateTime.fromMillisecondsSinceEpoch(widget
-                                          ._controller
-                                          .ibQuestion
-                                          .askedTimeInMs)),
-                                  style: const TextStyle(
-                                      fontSize: IbConfig.kDescriptionTextSize,
-                                      color: IbColors.lightGrey),
-                                )
-                              ],
-                            ),
-                          ],
+    try {
+      _runExpandCheck();
+      final Widget expandableInfo = Padding(
+        padding: const EdgeInsets.only(left: 14, right: 14, top: 8),
+        child: Obx(
+          () => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (widget._controller.showComparison.isTrue)
+                IbQuestionStats(Get.put(
+                    IbQuestionStatsController(
+                        ibAnswers: widget._controller.ibAnswers,
+                        ibQuestion: widget._controller.rxIbQuestion.value),
+                    tag: widget._controller.rxIbQuestion.value.id))
+              else
+                LimitedBox(
+                  maxHeight:
+                      widget._controller.rxIbQuestion.value.questionType ==
+                              QuestionType.multipleChoice
+                          ? 200
+                          : 400,
+                  child: Scrollbar(
+                    thickness: 3,
+                    radius: const Radius.circular(8),
+                    controller: _scrollController,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 4.0),
+                      child: SingleChildScrollView(
+                        controller: _scrollController,
+                        child: Column(
+                          children: widget
+                              ._controller.rxIbQuestion.value.choices
+                              .map((e) =>
+                                  IbQuestionMcItem(e, widget._controller))
+                              .toList(),
                         ),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        Text(
-                          widget._controller.ibQuestion.question,
-                          style: const TextStyle(
-                              fontSize: IbConfig.kPageTitleSize,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        if (widget._controller.ibQuestion.description
-                            .trim()
-                            .isNotEmpty)
-                          Text(
-                            widget._controller.ibQuestion.description.trim(),
-                            style: const TextStyle(
-                                fontSize: IbConfig.kSecondaryTextSize,
-                                color: Colors.black),
-                          ),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        if (widget._controller.isExpandable)
-                          SizeTransition(
-                            sizeFactor: animation,
-                            child: expandableInfo,
-                          )
-                        else
-                          widget._controller.isExpanded.isTrue
-                              ? expandableInfo
-                              : const SizedBox(),
-
-                        /// show current user answer is available
-                        if (Get.find<MyAnsweredQuestionsController>()
-                                    .retrieveAnswer(
-                                        widget._controller.ibQuestion.id) !=
-                                null &&
-                            widget._controller.showMyAnswer)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Row(
-                              children: [
-                                IbUserAvatar(
-                                  avatarUrl:
-                                      IbUtils.getCurrentIbUser()!.avatarUrl,
-                                  radius: 8,
-                                ),
-                                Text(
-                                    ': ${Get.find<MyAnsweredQuestionsController>().retrieveAnswer(widget._controller.ibQuestion.id)!.answer}')
-                              ],
-                            ),
-                          ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '${widget._controller.totalPolled.value} polled',
-                              style: const TextStyle(
-                                  fontSize: IbConfig.kDescriptionTextSize,
-                                  color: IbColors.lightGrey),
-                            ),
-                            if (widget._controller.isExpandable)
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                onPressed: () {
-                                  widget._controller.isExpanded.value =
-                                      !widget._controller.isExpanded.value;
-                                  _runExpandCheck();
-                                },
-                                icon: Obx(
-                                  () => widget._controller.isExpanded.isTrue
-                                      ? const Icon(
-                                          Icons.expand_less_outlined,
-                                          color: IbColors.primaryColor,
-                                        )
-                                      : const Icon(
-                                          Icons.expand_more_outlined,
-                                          color: IbColors.primaryColor,
-                                        ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              )),
-            ),
+              if (QuestionType.multipleChoicePic ==
+                      widget._controller.rxIbQuestion.value.questionType &&
+                  widget._controller.showComparison.isFalse)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    'double_tap_pic'.tr,
+                    style: const TextStyle(
+                        color: IbColors.lightGrey,
+                        fontSize: IbConfig.kDescriptionTextSize),
+                  ),
+                ),
+              const SizedBox(
+                height: 8,
+              ),
+              IbQuestionTags(widget._controller),
+              const SizedBox(
+                height: 8,
+              ),
+              const Divider(
+                height: 1,
+                thickness: 1,
+              ),
+              if (!widget._controller.showComparison.value)
+                Center(child: IbQuestionButtons(widget._controller))
+            ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _handleButtons() {
-    if (!widget._controller.showActionButtons) {
-      return const SizedBox();
-    }
-    return SizedBox(
-      height: 56,
-      child: Obx(() {
-        if (widget._controller.isAnswering.isTrue) {
-          return const IbProgressIndicator(
-            width: 20,
-            height: 20,
-          );
-        }
-
-        if (widget._controller.showResult.isTrue) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.check_circle_outline,
-                color: IbColors.accentColor,
-                size: 16,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                    '${widget._controller.answeredUsername.value} voted ${IbUtils.getSuffixDateTimeString(widget._controller.votedDateTime.value)}'),
-              )
-            ],
-          );
-        }
-
-        if (!widget._controller.isSample) {
-          return Center(
-            child: IbElevatedButton(
-                textTrKey: 'vote',
-                color: IbColors.primaryColor,
-                onPressed: widget._controller.selectedChoice.isEmpty
-                    ? null
-                    : () {
-                        widget._controller.onVote();
-                      }),
-          );
-        } else {
-          return Center(
-            child: IbElevatedButton(
-                textTrKey: 'submit',
-                color: IbColors.primaryColor,
-                onPressed: () async {
-                  await widget._controller.onSubmit();
-                }),
-          );
-        }
-      }),
-    );
-  }
-
-  Widget _handleAvatarImage() {
-    return Obx(() {
-      return IbUserAvatar(
-        disableOnTap: widget._controller.disableAvatarOnTouch,
-        avatarUrl: widget._controller.avatarUrl.value,
-        uid: widget._controller.ibUser == null
-            ? ''
-            : widget._controller.ibUser!.id,
-        radius: 16,
       );
-    });
+      return ShowCaseWidget(
+        onComplete: (index, key) {
+          if (key == IbShowCaseKeys.kPollExpandKey) {
+            IbLocalDataService().updateBoolValue(
+                key: StorageKey.pollExpandShowCaseBool, value: true);
+          }
+        },
+        builder: Builder(builder: (context) {
+          return IbCard(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                IbQuestionHeader(widget._controller),
+                const SizedBox(
+                  height: 8,
+                ),
+                IbQuestionMediaSlide(widget._controller),
+                IbQuestionInfo(widget._controller),
+                SizeTransition(
+                  sizeFactor: animation,
+                  child: expandableInfo,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IbQuestionStatsBar(widget._controller),
+                    Obx(() => Showcase(
+                          key: !IbLocalDataService().retrieveBoolValue(
+                                      StorageKey.pollExpandShowCaseBool) &&
+                                  widget._controller.isShowCase.isTrue
+                              ? IbShowCaseKeys.kPollExpandKey
+                              : GlobalKey(),
+                          shapeBorder: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8))),
+                          overlayOpacity: 0.3,
+                          description: widget._controller.rxIsExpanded.isTrue
+                              ? 'Click here to minimize'
+                              : 'Click here to see vote options',
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              widget._controller.rxIsExpanded.value =
+                                  !widget._controller.rxIsExpanded.value;
+                            },
+                            icon: Obx(() {
+                              _runExpandCheck();
+                              return widget._controller.rxIsExpanded.isTrue
+                                  ? const Icon(
+                                      Icons.expand_less_rounded,
+                                      color: IbColors.primaryColor,
+                                    )
+                                  : const Icon(
+                                      Icons.expand_more_outlined,
+                                      color: IbColors.primaryColor,
+                                    );
+                            }),
+                          ),
+                        )),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }),
+      );
+    } catch (e) {
+      print('_IbMcQuestionCard $e');
+    }
+    return const SizedBox();
   }
 
   @override
@@ -308,120 +234,314 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
 }
 
 class IbQuestionMcItem extends StatelessWidget {
-  final String choice;
+  final IbChoice choice;
   final IbQuestionItemController _controller;
 
   const IbQuestionMcItem(this.choice, this._controller, {Key? key})
       : super(key: key);
 
+  Color getItemColor() {
+    if (_controller.voted.isFalse) {
+      if (choice.choiceId == _controller.selectedChoiceId.value) {
+        return IbColors.primaryColor;
+      } else {
+        return IbColors.lightBlue;
+      }
+    } else {
+      if (_controller.rxIbQuestion.value.isQuiz &&
+          choice.choiceId == _controller.rxIbQuestion.value.correctChoiceId &&
+          (_controller.resultMap[choice] ?? 0) != 0) {
+        return IbColors.accentColor;
+      } else if (_controller.rxIbQuestion.value.isQuiz &&
+          choice.choiceId != _controller.rxIbQuestion.value.correctChoiceId &&
+          _controller.myAnswer != null &&
+          choice.choiceId == _controller.myAnswer!.choiceId) {
+        return IbColors.errorRed;
+      } else if (_controller.rxIbQuestion.value.isQuiz &&
+          (_controller.resultMap[choice] ?? 0) == 0) {
+        return IbColors.lightBlue;
+      } else if (_controller.rxIbQuestion.value.isQuiz &&
+          (_controller.resultMap[choice] ?? 0) != 0) {
+        return IbColors.lightGrey;
+      }
+
+      if (choice.choiceId == _controller.selectedChoiceId.value &&
+          !_controller.rxIbQuestion.value.isQuiz) {
+        return IbColors.primaryColor;
+      } else if ((_controller.resultMap[choice] ?? 0) == 0) {
+        return IbColors.lightBlue;
+      } else {
+        return IbColors.lightGrey;
+      }
+    }
+  }
+
+  double getItemWidth() {
+    if (_controller.voted.isFalse) {
+      return Get.width;
+    }
+
+    return (Get.width * (_controller.resultMap[choice] ?? 0)) == 0
+        ? Get.width
+        : Get.width * (_controller.resultMap[choice] ?? 0);
+  }
+
+  Widget getItemIcon() {
+    if (!_controller.rxIbQuestion.value.isQuiz &&
+        _controller.voted.isTrue &&
+        _controller.myAnswer != null &&
+        choice.choiceId == _controller.myAnswer!.choiceId) {
+      return const CircleAvatar(
+        radius: 8,
+        backgroundColor: IbColors.white,
+        child: Icon(
+          Icons.check_circle_rounded,
+          color: IbColors.accentColor,
+          size: 16,
+        ),
+      );
+    }
+
+    if (_controller.rxIbQuestion.value.isQuiz &&
+        _controller.voted.isTrue &&
+        choice.choiceId == _controller.rxIbQuestion.value.correctChoiceId) {
+      return const CircleAvatar(
+        radius: 8,
+        backgroundColor: IbColors.white,
+        child: Icon(
+          Icons.check_circle_rounded,
+          color: IbColors.accentColor,
+          size: 16,
+        ),
+      );
+    }
+    if (_controller.rxIbQuestion.value.isQuiz &&
+        _controller.voted.isTrue &&
+        _controller.myAnswer != null &&
+        choice.choiceId == _controller.myAnswer!.choiceId &&
+        choice.choiceId != _controller.rxIbQuestion.value.correctChoiceId) {
+      return const CircleAvatar(
+        radius: 8,
+        backgroundColor: IbColors.white,
+        child: Icon(
+          Icons.cancel,
+          color: IbColors.errorRed,
+          size: 16,
+        ),
+      );
+    }
+
+    return const SizedBox();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => GestureDetector(
-        onTap: () {
-          if (_controller.isSample ||
-              _controller.showResult.isTrue ||
-              _controller.disableChoiceOnTouch) {
-            return;
-          }
-
-          if (_controller.selectedChoice.value == choice) {
-            _controller.selectedChoice.value = '';
-          } else {
-            _controller.selectedChoice.value = choice;
-          }
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Stack(
-            alignment: Alignment.centerLeft,
+    return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4.0),
+        child: Obx(
+          () => Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: Get.width * 0.9,
-                height: 46,
-                decoration: BoxDecoration(
-                    color: IbColors.lightBlue,
-                    borderRadius: BorderRadius.circular(8)),
-              ),
-              AnimatedContainer(
-                height: 46,
-                decoration: BoxDecoration(
-                    color: _determineColor(
-                        result: _controller.resultMap[choice] ?? 0,
-                        isSelected: _controller.selectedChoice.value == choice,
-                        isVoted: _controller.showResult.value),
-                    borderRadius: BorderRadius.circular(8)),
-                width: _determineWidth(
-                    isSelected: _controller.selectedChoice.value == choice,
-                    result: _controller.resultMap[choice] ?? 0,
-                    isVoted: _controller.showResult.value),
-                duration: Duration(
-                    milliseconds: _controller.showResult.value
-                        ? IbConfig.kEventTriggerDelayInMillis
-                        : 0),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  choice,
-                  maxLines: 1,
-                  style: const TextStyle(
-                      fontSize: IbConfig.kNormalTextSize, color: Colors.black),
+              Expanded(
+                flex: 8,
+                child: InkWell(
+                  radius: IbConfig.kMcItemCornerRadius,
+                  borderRadius:
+                      BorderRadius.circular(IbConfig.kMcItemCornerRadius),
+                  onTap: onItemTap,
+                  child: Stack(
+                    alignment: Alignment.centerLeft,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        width: Get.width,
+                        height: _controller.rxIbQuestion.value.questionType ==
+                                QuestionType.multipleChoice
+                            ? IbConfig.kMcTxtItemSize
+                            : IbConfig.kMcPicItemSize,
+                        decoration: BoxDecoration(
+                            color: IbColors.lightBlue,
+                            borderRadius: BorderRadius.circular(
+                                IbConfig.kMcItemCornerRadius)),
+                      ),
+                      AnimatedContainer(
+                        height: _controller.rxIbQuestion.value.questionType ==
+                                QuestionType.multipleChoice
+                            ? IbConfig.kMcTxtItemSize
+                            : IbConfig.kMcPicItemSize,
+                        decoration: BoxDecoration(
+                            color: getItemColor(),
+                            borderRadius: BorderRadius.circular(8)),
+                        width: getItemWidth(),
+                        duration: Duration(
+                            milliseconds: _controller.voted.value
+                                ? IbConfig.kEventTriggerDelayInMillis
+                                : 0),
+                      ),
+                      SizedBox(
+                        width: Get.width,
+                        height: _controller.rxIbQuestion.value.questionType ==
+                                QuestionType.multipleChoice
+                            ? IbConfig.kMcTxtItemSize
+                            : IbConfig.kMcPicItemSize,
+                        child: Row(
+                          children: [
+                            if (choice.url != null && choice.url!.isNotEmpty)
+                              OpenContainer(
+                                openElevation: 0,
+                                closedElevation: 0,
+                                closedShape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      IbConfig.kMcItemCornerRadius),
+                                ),
+                                openColor: Colors.black,
+                                middleColor: Colors.black,
+                                closedColor: Colors.transparent,
+                                transitionType:
+                                    ContainerTransitionType.fadeThrough,
+                                openBuilder: (BuildContext context,
+                                    void Function({Object? returnValue})
+                                        action) {
+                                  return IbMediaViewer(
+                                    urls: _controller.rxIbQuestion.value.choices
+                                        .map((e) => e.url!)
+                                        .toList(),
+                                    currentIndex: _controller
+                                        .rxIbQuestion.value.choices
+                                        .map((e) => e.url!)
+                                        .toList()
+                                        .indexWhere((element) =>
+                                            choice.url! == element),
+                                  );
+                                },
+                                closedBuilder: (_, openContainer) => Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: InkWell(
+                                    onDoubleTap: openContainer,
+                                    onTap: onItemTap,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                          IbConfig.kMcItemCornerRadius),
+                                      child: !choice.url!.contains('http')
+                                          ? Image.file(
+                                              File(choice.url!),
+                                              fit: BoxFit.fill,
+                                              width: IbConfig.kMcPicSize,
+                                              height: IbConfig.kMcPicSize,
+                                            )
+                                          : CachedNetworkImage(
+                                              fit: BoxFit.fill,
+                                              fadeInDuration: const Duration(
+                                                  milliseconds: 300),
+                                              width: IbConfig.kMcPicSize,
+                                              height: IbConfig.kMcPicSize,
+                                              imageUrl: choice.url!,
+                                            ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: AutoSizeText(
+                                choice.content.toString(),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                maxFontSize: IbConfig.kNormalTextSize,
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      Positioned(
+                        bottom: 0,
+                        right: 2,
+                        child: getItemIcon(),
+                      ),
+
+                      /// show percentage animation
+                      if (_controller.voted.value)
+                        TweenAnimationBuilder(
+                            tween: Tween<double>(
+                                begin: 0,
+                                end: _controller.resultMap[choice] ?? 0),
+                            duration: const Duration(
+                                milliseconds:
+                                    IbConfig.kEventTriggerDelayInMillis),
+                            builder: (context, double value, child) {
+                              return Positioned(
+                                right: 8,
+                                child: Text(
+                                  '${(value * 100).toStringAsFixed(1)}%',
+                                  style: const TextStyle(color: Colors.black),
+                                ),
+                              );
+                            })
+                    ],
+                  ),
                 ),
               ),
-              if (_controller.showResult.value)
-                TweenAnimationBuilder(
-                  builder:
-                      (BuildContext context, Object? value, Widget? child) {
-                    return Positioned(
-                      right: 8,
-                      child: Text(
-                          '${((_controller.resultMap[choice] ?? 0) * 100).toStringAsFixed(1)}%'),
-                    );
-                  },
-                  duration: const Duration(
-                      milliseconds: IbConfig.kEventTriggerDelayInMillis),
-                  tween: Tween<double>(
-                      begin: 0, end: _controller.resultMap[choice] ?? 0),
-                ),
+
+              /// show radios if is sample and quiz option is on
+              if (_controller.rxIbQuestion.value.isQuiz &&
+                  _controller.rxIsSample.isTrue)
+                _handleShowCaseQuizWidget()
             ],
           ),
-        ),
-      ),
+        ));
+  }
+
+  Widget _handleShowCaseQuizWidget() {
+    final radio = Radio(
+      activeColor: IbColors.accentColor,
+      value: choice.choiceId,
+      groupValue: _controller.rxIbQuestion.value.correctChoiceId,
+      onChanged: (id) {
+        _controller.rxIbQuestion.value.correctChoiceId = id.toString();
+        _controller.rxIbQuestion.refresh();
+      },
     );
+    if (_controller.rxIbQuestion.value.choices.indexOf(choice) == 0 &&
+        !IbLocalDataService()
+            .retrieveBoolValue(StorageKey.pickAnswerForQuizShowCaseBool)) {
+      //show showcase widget
+      return Expanded(
+        child: Showcase(
+          overlayColor: Colors.transparent,
+          shapeBorder: const CircleBorder(),
+          key: IbShowCaseKeys.kPickAnswerForQuizKey,
+          description: 'show_case_quiz'.tr,
+          child: radio,
+        ),
+      );
+    }
+
+    return Expanded(child: radio);
   }
 
-  double _determineWidth(
-      {required bool isSelected,
-      required bool isVoted,
-      required double result}) {
-    if (isVoted) {
-      return Get.width * 0.9 * result;
+  void onItemTap() {
+    if (_controller.rxIbQuestion.value.isQuiz && _controller.voted.isTrue) {
+      return;
     }
 
-    if (isSelected) {
-      return Get.width * 0.9;
+    if (DateTime.now().millisecondsSinceEpoch >
+            _controller.rxIbQuestion.value.endTimeInMs &&
+        _controller.rxIbQuestion.value.endTimeInMs > 0) {
+      return;
     }
 
-    return 0;
-  }
-
-  Color _determineColor(
-      {required bool isSelected,
-      required bool isVoted,
-      required double result}) {
-    if (isSelected) {
-      return IbColors.primaryColor;
+    if (_controller.rxIsSample.isTrue ||
+        (_controller.myAnswer != null &&
+            _controller.myAnswer!.uid != IbUtils.getCurrentUid())) {
+      return;
     }
 
-    if (isVoted && !isSelected) {
-      return IbColors.lightGrey.withOpacity(0.3);
+    if (_controller.selectedChoiceId.value == choice.choiceId) {
+      _controller.selectedChoiceId.value = '';
+    } else {
+      _controller.selectedChoiceId.value = choice.choiceId;
     }
-
-    if (!isVoted && !isSelected) {
-      return Colors.transparent;
-    }
-
-    return Colors.transparent;
   }
 }

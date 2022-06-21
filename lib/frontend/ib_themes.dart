@@ -1,35 +1,106 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 
 import 'ib_config.dart';
 
 class IbThemes {
-  static final ThemeData lightTheme = ThemeData(
-      brightness: Brightness.light,
-      toggleableActiveColor: IbColors.accentColor,
-      backgroundColor: IbColors.lightBlue,
-      primaryColor: IbColors.primaryColor,
-      primaryColorDark: IbColors.darkPrimaryColor,
-      fontFamily: 'OpenSans',
-      appBarTheme: const AppBarTheme(
-        elevation: 0,
-        titleSpacing: 0,
-        titleTextStyle: TextStyle(
-            color: Colors.black,
-            fontSize: IbConfig.kPageTitleSize,
-            fontWeight: FontWeight.bold),
-      ),
-      colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.lightBlue)
-          .copyWith(secondary: IbColors.accentColor));
+  BuildContext context;
 
-  static final ThemeData darkTheme = ThemeData(
-      brightness: Brightness.dark,
-      backgroundColor: IbColors.lightBlue,
-      primaryColor: IbColors.primaryColor,
-      primaryColorDark: IbColors.darkPrimaryColor,
-      fontFamily: 'OpenSans',
-      colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.lightBlue)
-          .copyWith(secondary: IbColors.accentColor));
+  IbThemes(this.context);
 
-  IbThemes._();
+  ThemeData buildDarkTheme() {
+    final dark = ThemeData.dark().copyWith(
+        cupertinoOverrideTheme: const CupertinoThemeData(
+          textTheme: CupertinoTextThemeData(
+            dateTimePickerTextStyle: TextStyle(
+              color: Colors.white,
+              fontSize: IbConfig.kNormalTextSize,
+            ),
+          ),
+        ),
+        primaryColor: Colors.black,
+        indicatorColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.white),
+        toggleableActiveColor: IbColors.primaryColor,
+        tabBarTheme: const TabBarTheme(
+          indicatorSize: TabBarIndicatorSize.tab,
+          indicator: BoxDecoration(
+              color: IbColors.primaryColor,
+              borderRadius: BorderRadius.all(
+                  Radius.circular(IbConfig.kCardCornerRadius))),
+          labelStyle: TextStyle(fontWeight: FontWeight.bold),
+          unselectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+          labelColor: Colors.white,
+          unselectedLabelColor: IbColors.lightGrey,
+        ),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.black,
+          elevation: 0,
+          titleSpacing: 0,
+          centerTitle: false,
+          systemOverlayStyle: SystemUiOverlayStyle.light,
+          iconTheme: const IconThemeData(color: Colors.white),
+          titleTextStyle: GoogleFonts.oxygen(
+              fontSize: IbConfig.kPageTitleSize,
+              color: Colors.white,
+              fontWeight: FontWeight.bold),
+        ),
+        scaffoldBackgroundColor: Colors.black,
+        brightness: Brightness.dark,
+        textTheme: GoogleFonts.oxygenTextTheme(
+          Theme.of(context).textTheme,
+        ).apply(bodyColor: Colors.white, displayColor: Colors.white),
+        colorScheme: ColorScheme.fromSwatch()
+            .copyWith(secondary: IbColors.primaryColor));
+    return dark;
+  }
+
+  ThemeData buildLightTheme() {
+    final light = ThemeData.light().copyWith(
+        cupertinoOverrideTheme: const CupertinoThemeData(
+          textTheme: CupertinoTextThemeData(
+            dateTimePickerTextStyle: TextStyle(
+              color: Colors.black,
+              fontSize: IbConfig.kNormalTextSize,
+            ),
+          ),
+        ),
+        toggleableActiveColor: IbColors.primaryColor,
+        primaryColor: IbColors.lightBlue,
+        indicatorColor: Colors.black,
+        backgroundColor: IbColors.creamYellow,
+        iconTheme: const IconThemeData(color: Colors.black),
+        appBarTheme: AppBarTheme(
+            iconTheme: const IconThemeData(color: Colors.black),
+            backgroundColor: IbColors.lightBlue,
+            elevation: 0,
+            systemOverlayStyle: SystemUiOverlayStyle.dark,
+            titleSpacing: 0,
+            titleTextStyle: GoogleFonts.oxygen(
+                fontSize: IbConfig.kPageTitleSize,
+                color: Colors.black,
+                fontWeight: FontWeight.bold)),
+        tabBarTheme: const TabBarTheme(
+          indicatorSize: TabBarIndicatorSize.tab,
+          indicator: BoxDecoration(
+              color: IbColors.primaryColor,
+              borderRadius: BorderRadius.all(
+                  Radius.circular(IbConfig.kCardCornerRadius))),
+          labelStyle: TextStyle(fontWeight: FontWeight.bold),
+          unselectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+          labelColor: Colors.white,
+          unselectedLabelColor: IbColors.lightGrey,
+        ),
+        scaffoldBackgroundColor: IbColors.lightBlue,
+        brightness: Brightness.light,
+        colorScheme:
+            ColorScheme.fromSwatch().copyWith(secondary: IbColors.primaryColor),
+        textTheme: GoogleFonts.oxygenTextTheme(
+          Theme.of(context).textTheme,
+        ).apply(bodyColor: Colors.black, displayColor: Colors.black));
+    return light;
+  }
 }

@@ -4,6 +4,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 
 import '../ib_config.dart';
 
+/// show stats such as how many question asked in the profile page
 class IbStats extends StatelessWidget {
   final String title;
   final int num;

@@ -10,6 +10,7 @@ class IbColors {
   static const Color lightGreen = Color(0xffcbf7c7);
   static const Color white = Colors.white;
   static const Color lightGrey = Color(0xFFB3B0B0);
+  static const Color creamYellow = Color(0xfffffff4);
 
   IbColors._();
 }
