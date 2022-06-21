@@ -752,7 +752,7 @@ class IbUtils {
       bool isSample = false,
       bool isShowCase = false,
       IbQuestionItemController? itemController}) {
-    if (question.question.isEmpty) {
+    if (question.question.trim().isEmpty) {
       return const SizedBox();
     }
 
