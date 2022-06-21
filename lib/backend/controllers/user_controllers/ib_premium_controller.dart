@@ -75,13 +75,6 @@ class IbPremiumController extends GetxController {
   }
 
   Future<void> _handlePurchaseInfo(PurchaserInfo purchaserInfo) async {
-    if (purchaserInfo.activeSubscriptions.isEmpty) {
-      IbUtils.showSimpleSnackBar(
-          msg: 'No Active Subscription Found',
-          backgroundColor: IbColors.primaryColor);
-      return;
-    }
-
     if (purchaserInfo.entitlements.all[entitlement] == null) {
       entitlementInfo = null;
       isPremium.value = false;

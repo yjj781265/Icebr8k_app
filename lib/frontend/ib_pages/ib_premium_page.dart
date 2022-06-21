@@ -13,7 +13,7 @@ import 'package:lottie/lottie.dart';
 
 class IbPremiumPage extends StatelessWidget {
   IbPremiumPage({Key? key}) : super(key: key);
-  final IbPremiumController _controller = Get.put(IbPremiumController());
+  final IbPremiumController _controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
