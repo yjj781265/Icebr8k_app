@@ -101,7 +101,7 @@ class EditIbCollectionMainPage extends StatelessWidget {
               ),
             ),
             if (IbUtils.getCurrentIbUser() != null &&
-                !IbUtils.getCurrentIbUser()!.isPremium)
+                !IbUtils.isPremiumMember())
               SafeArea(
                 child: SizedBox(
                   height: 56,

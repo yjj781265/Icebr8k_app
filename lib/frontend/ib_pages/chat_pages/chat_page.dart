@@ -448,8 +448,9 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                   .firstWhereOrNull((element) =>
                                       element.ibChat.chatId ==
                                       widget._controller.ibChat!.chatId);
-                              final createQuestionController =
-                                  Get.put(CreateQuestionController());
+                              final createQuestionController = Get.put(
+                                  CreateQuestionController(),
+                                  tag: IbUtils.getUniqueId());
 
                               if (chatTabItem != null) {
                                 createQuestionController.pickedChats

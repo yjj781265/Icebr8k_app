@@ -10,9 +10,11 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/compare_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/friend_list_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/ib_ad_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_report_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
+import 'package:icebr8k/backend/managers/ib_ad_manager.dart';
 import 'package:icebr8k/backend/models/ib_report.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -25,6 +27,7 @@ import 'package:icebr8k/frontend/ib_pages/profile_pages/followed_tags_page.dart'
 import 'package:icebr8k/frontend/ib_pages/profile_pages/friend_list.dart';
 import 'package:icebr8k/frontend/ib_pages/profile_pages/word_cloud_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_ad_widget.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_description_text.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
@@ -75,6 +78,21 @@ class ProfilePage extends StatelessWidget {
                           _userInfo(context),
                           _stats(),
                           _actions(),
+                          if (IbUtils.getCurrentIbUser() != null &&
+                              !IbUtils.isPremiumMember())
+                            SafeArea(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: SizedBox(
+                                  height: 64,
+                                  child: IbAdWidget(Get.put(
+                                      IbAdController(
+                                          IbAdManager().getBanner1()),
+                                      tag: _controller.uid)),
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                     ),
@@ -580,7 +598,6 @@ class ProfilePage extends StatelessWidget {
           ),
         ],
       );
-      return const SizedBox();
     });
   }
 

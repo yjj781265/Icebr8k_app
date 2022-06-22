@@ -147,6 +147,8 @@ class HomeTabController extends GetxController {
           await first8Sub.cancel();
         }
       });
+    } else {
+      selectedCategory.value = categories.first;
     }
     isLoading.value = false;
   }
@@ -406,7 +408,7 @@ class HomeTabController extends GetxController {
   void _addAds(List<IbQuestion> list) {
     if (!IbLocalDataService()
             .retrieveBoolValue(StorageKey.pollExpandShowCaseBool) ||
-        IbUtils.getCurrentIbUser()!.isPremium ||
+        IbUtils.isPremiumMember() ||
         isLocked.isTrue) {
       return;
     }

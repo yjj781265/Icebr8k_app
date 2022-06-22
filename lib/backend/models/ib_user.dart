@@ -36,6 +36,7 @@ class IbUser {
   String fcmToken;
   bool isOnline;
   bool isPremium;
+  bool isMasterPremium;
   String coverPhotoUrl;
   String bio;
   String voiceMemoUrl;
@@ -74,6 +75,7 @@ class IbUser {
     this.lastLocationTimestampInMs = -1,
     this.gender = '',
     this.status = '',
+    this.isMasterPremium = false,
     this.voiceMemoUrl = '',
     this.joinTime,
     IbSettings? settings,

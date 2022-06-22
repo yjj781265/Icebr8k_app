@@ -224,7 +224,7 @@ class CreateQuestionImagePicker extends StatelessWidget {
           ),
           ListTile(
             onTap: () async {
-              if (!IbUtils.getCurrentIbUser()!.isPremium) {
+              if (!IbUtils.isPremiumMember()) {
                 _showPremiumDialog();
                 return;
               }
@@ -262,7 +262,7 @@ class CreateQuestionImagePicker extends StatelessWidget {
           ),
           ListTile(
             onTap: () async {
-              if (!IbUtils.getCurrentIbUser()!.isPremium) {
+              if (!IbUtils.isPremiumMember()) {
                 _showPremiumDialog();
                 return;
               }
@@ -324,7 +324,7 @@ class CreateQuestionImagePicker extends StatelessWidget {
   }
 
   void _showPremiumDialog() {
-    if (!IbUtils.getCurrentIbUser()!.isPremium) {
+    if (!IbUtils.isPremiumMember()) {
       Get.dialog(IbDialog(
         title: 'Premium Only Feature',
         subtitle: 'Go premium to enjoy poll with your own pic',

@@ -130,7 +130,7 @@ class PeopleNearbyPage extends StatelessWidget {
                 }),
               ),
               if (IbUtils.getCurrentIbUser() != null &&
-                  !IbUtils.getCurrentIbUser()!.isPremium &&
+                  !IbUtils.isPremiumMember() &&
                   _controller.isLoading.isFalse)
                 SafeArea(
                   child: SizedBox(

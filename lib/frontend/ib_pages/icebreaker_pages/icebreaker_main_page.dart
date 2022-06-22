@@ -67,7 +67,7 @@ class IcebreakerMainPage extends StatelessWidget {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  if (!IbUtils.getCurrentIbUser()!.isPremium)
+                  if (!IbUtils.isPremiumMember())
                     IbAdWidget(
                         Get.put(IbAdController(IbAdManager().getBanner1()))),
                   if (controller.isShuffling.isTrue)

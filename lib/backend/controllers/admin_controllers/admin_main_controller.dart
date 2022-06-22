@@ -267,13 +267,14 @@ class AdminMainController extends GetxController {
 
   Future<void> approveApplication(IbUser user) async {
     try {
+      Get.dialog(const IbLoadingDialog(messageTrKey: 'Processing...'));
       await IbAdminDbService()
           .updateUserStatus(status: IbUser.kUserStatusApproved, uid: user.id);
       await IbAdminDbService().sendStatusEmail(
           email: user.email,
           fName: user.fName,
           status: IbUser.kUserStatusApproved);
-      Get.back();
+      Get.back(closeOverlays: true);
       IbUtils.showSimpleSnackBar(
           msg: 'Profile Approved!', backgroundColor: IbColors.accentColor);
     } catch (e) {
@@ -304,7 +305,7 @@ class AdminMainController extends GetxController {
               return;
             }
             Get.back();
-            Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));
+            Get.dialog(const IbLoadingDialog(messageTrKey: 'Processing...'));
             await IbAdminDbService().updateUserStatus(
                 status: IbUser.kUserStatusRejected,
                 uid: user.id,

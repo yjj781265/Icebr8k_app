@@ -124,7 +124,7 @@ class _MainPageViewState extends State<MainPageView>
             if (await IbUtils.isOverDailyPollLimit()) {
               Get.dialog(IbDialog(
                 title:
-                    'You can only create maximum ${IbConfig.kDailyPollLimit} polls 24 hrs',
+                    'You can only create maximum ${IbConfig.kDailyPollLimit} polls in 24 hrs',
                 subtitle:
                     'Go Icebr8k Premium or Watch an Ad to create more polls',
                 showNegativeBtn: false,
@@ -151,8 +151,9 @@ class _MainPageViewState extends State<MainPageView>
                             ad.dispose();
                           }, onAdDismissedFullScreenContent: (ad) {
                             ad.dispose();
-                            final createQuestionController =
-                                Get.put(CreateQuestionController());
+                            final createQuestionController = Get.put(
+                                CreateQuestionController(),
+                                tag: IbUtils.getUniqueId());
 
                             Get.to(() => CreateQuestionPage(
                                   controller: createQuestionController,
@@ -168,7 +169,8 @@ class _MainPageViewState extends State<MainPageView>
 
             Get.to(
                 () => CreateQuestionPage(
-                      controller: Get.put(CreateQuestionController()),
+                      controller: Get.put(CreateQuestionController(),
+                          tag: IbUtils.getUniqueId()),
                     ),
                 fullscreenDialog: true,
                 popGesture: false,
