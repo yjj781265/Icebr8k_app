@@ -58,18 +58,14 @@ class WordCloudController extends GetxController {
     super.onReady();
   }
 
-  void refreshWordCloud() {
-    refresh();
-  }
-
   void _showIntroDialog() {
     if (IbLocalDataService().retrieveBoolValue(StorageKey.wordCloudIntro)) {
       return;
     }
     Get.dialog(const IbDialog(
-      title: 'Welcome to your word cloud ☁',
+      title: 'Welcome to word cloud ☁',
       subtitle:
-          'Your word cloud shows your past top 16 tags based on your voting history',
+          'Word cloud shows user past top voted 16 tags based on voting history',
       showNegativeBtn: false,
     ));
     IbLocalDataService()

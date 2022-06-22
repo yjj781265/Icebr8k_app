@@ -215,7 +215,7 @@ class IbUtils {
   }
 
   static Future<bool> isOverDailyPollLimit() async {
-    if (getCurrentIbUser()!.isPremium) {
+    if (isPremiumMember()) {
       return false;
     }
 
@@ -589,7 +589,6 @@ class IbUtils {
     final List<Color> _colors = [
       IbColors.primaryColor,
       IbColors.accentColor,
-      Colors.black,
       Colors.redAccent,
       Colors.yellowAccent,
       Colors.cyanAccent,
@@ -834,5 +833,12 @@ class IbUtils {
           barrierDismissible: false);
     }
     return isLocked;
+  }
+
+  static bool isPremiumMember() {
+    if (getCurrentIbUser() == null) {
+      return false;
+    }
+    return getCurrentIbUser()!.isPremium || getCurrentIbUser()!.isMasterPremium;
   }
 }

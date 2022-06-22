@@ -34,11 +34,12 @@ class CreateQuestionPage extends StatefulWidget {
 
 class _CreateQuestionPageState extends State<CreateQuestionPage>
     with SingleTickerProviderStateMixin {
-  final CreateQuestionController _controller = Get.find();
+  late CreateQuestionController _controller;
 
   @override
   void initState() {
     super.initState();
+    _controller = widget.controller;
     _controller.tabController = TabController(vsync: this, length: 3);
     _controller.tabController.addListener(() {
       if (_controller.tabController.index == 0) {
@@ -129,7 +130,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                     ),
                   ),
                 ),
-                if (!IbUtils.getCurrentIbUser()!.isPremium)
+                if (!IbUtils.isPremiumMember())
                   SliverToBoxAdapter(
                     child: IbAdWidget(
                         Get.put(IbAdController(IbAdManager().getBanner1()))),

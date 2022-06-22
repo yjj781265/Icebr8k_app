@@ -66,8 +66,10 @@ class SetupController extends GetxController {
         Get.dialog(IbDialog(
           title: 'Your profile was rejected',
           subtitle: 'Reasons:\n$note',
-          content:
-              const Text('You can try it again by resubmitting your profile'),
+          content: const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: Text('You can try it again by resubmitting your profile'),
+          ),
           positiveTextKey: 'ok',
           showNegativeBtn: false,
         ));

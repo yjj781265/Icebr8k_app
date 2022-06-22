@@ -350,7 +350,7 @@ class CreateQuestionMcPicTab extends StatelessWidget {
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(16))),
           onTap: () async {
-            if (!IbUtils.getCurrentIbUser()!.isPremium) {
+            if (!IbUtils.isPremiumMember()) {
               _showPremiumDialog();
               return;
             }
@@ -387,7 +387,7 @@ class CreateQuestionMcPicTab extends StatelessWidget {
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(16))),
           onTap: () async {
-            if (!IbUtils.getCurrentIbUser()!.isPremium) {
+            if (!IbUtils.isPremiumMember()) {
               _showPremiumDialog();
               return;
             }
@@ -430,7 +430,7 @@ class CreateQuestionMcPicTab extends StatelessWidget {
   }
 
   void _showPremiumDialog() {
-    if (!IbUtils.getCurrentIbUser()!.isPremium) {
+    if (!IbUtils.isPremiumMember()) {
       Get.dialog(IbDialog(
         title: 'Premium Only Feature',
         subtitle: 'Go premium to enjoy poll with your own pic',

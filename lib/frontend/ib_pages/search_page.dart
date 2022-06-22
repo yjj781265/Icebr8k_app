@@ -77,7 +77,7 @@ class SearchPage extends StatelessWidget {
                 }),
               ),
               if (IbUtils.getCurrentIbUser() != null &&
-                  !IbUtils.getCurrentIbUser()!.isPremium &&
+                  !IbUtils.isPremiumMember() &&
                   _controller.isLoadingAd.isFalse)
                 SafeArea(
                   child: SizedBox(
