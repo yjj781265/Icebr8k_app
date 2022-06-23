@@ -114,21 +114,23 @@ class IbCoverPage extends StatelessWidget {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SizedBox(
-              height: 56,
-              width: Get.width,
-              child: IbElevatedButton(
-                textTrKey: isEdit ? 'Edit ✏' : "Let's break the ice",
-                onPressed: () async {
-                  Get.off(() => IcebreakerMainPage(Get.put(
-                      IcebreakerController(ibCollection, isEdit: isEdit),
-                      tag: ibCollection.id)));
-                },
-                textSize: IbConfig.kPageTitleSize,
-                textColor: Color(ibCollection.textColor),
-                color: Color(ibCollection.bgColor).withOpacity(0.8),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SizedBox(
+                height: 56,
+                width: Get.width,
+                child: IbElevatedButton(
+                  textTrKey: isEdit ? 'Edit ✏' : "Let's break the ice",
+                  onPressed: () async {
+                    Get.off(() => IcebreakerMainPage(Get.put(
+                        IcebreakerController(ibCollection, isEdit: isEdit),
+                        tag: ibCollection.id)));
+                  },
+                  textSize: IbConfig.kPageTitleSize,
+                  textColor: Color(ibCollection.textColor),
+                  color: Color(ibCollection.bgColor).withOpacity(0.8),
+                ),
               ),
             ),
           )

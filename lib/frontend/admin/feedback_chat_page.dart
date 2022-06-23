@@ -116,36 +116,38 @@ class FeedBackChatPage extends StatelessWidget {
               ),
             ),
           ),
-          Container(
-            height: 56,
-            alignment: Alignment.centerLeft,
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: IbColors.lightGrey.withOpacity(0.3),
-              borderRadius: const BorderRadius.all(
-                Radius.circular(8),
-              ),
-            ),
-            child: TextField(
-              scrollPadding: EdgeInsets.zero,
-              minLines: 1,
-              maxLines: 8,
-              maxLength: 2000,
-              controller: _controller.textEditingController,
-              keyboardType: TextInputType.multiline,
-              decoration: InputDecoration(
-                suffixIcon: SizedBox(
-                  child: IconButton(
-                      onPressed: () async {
-                        await _controller.addFeedback();
-                      },
-                      icon: const Icon(Icons.send)),
+          SafeArea(
+            child: Container(
+              height: 56,
+              alignment: Alignment.centerLeft,
+              margin: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: IbColors.lightGrey.withOpacity(0.3),
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(8),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-                counterText: '',
-                fillColor: IbColors.lightGrey,
-                border: InputBorder.none,
-                hintText: 'Questions, Feedbacks, Comments',
+              ),
+              child: TextField(
+                scrollPadding: EdgeInsets.zero,
+                minLines: 1,
+                maxLines: 8,
+                maxLength: 2000,
+                controller: _controller.textEditingController,
+                keyboardType: TextInputType.multiline,
+                decoration: InputDecoration(
+                  suffixIcon: SizedBox(
+                    child: IconButton(
+                        onPressed: () async {
+                          await _controller.addFeedback();
+                        },
+                        icon: const Icon(Icons.send)),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  counterText: '',
+                  fillColor: IbColors.lightGrey,
+                  border: InputBorder.none,
+                  hintText: 'Questions, Feedbacks, Comments',
+                ),
               ),
             ),
           ),

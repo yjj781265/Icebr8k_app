@@ -50,12 +50,14 @@ class SearchPage extends StatelessWidget {
                     return Center(
                       child: SizedBox(
                         width: 300,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Lottie.asset('assets/images/sloth_zen.json'),
-                            const Text('I could not find anything')
-                          ],
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Lottie.asset('assets/images/sloth_zen.json'),
+                              const Text('I could not find anything')
+                            ],
+                          ),
                         ),
                       ),
                     );
