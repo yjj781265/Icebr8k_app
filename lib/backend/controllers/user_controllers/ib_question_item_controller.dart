@@ -12,8 +12,10 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../../managers/Ib_analytics_manager.dart';
+import '../../services/user_services/ib_local_data_service.dart';
 import '../../services/user_services/ib_question_db_service.dart';
 import '../../services/user_services/ib_user_db_service.dart';
 
@@ -56,6 +58,11 @@ class IbQuestionItemController extends GetxController {
 
   IbUser? creatorUser;
 
+  /// Global keys for showcase
+  final GlobalKey expandShowCaseKey = GlobalKey();
+  final GlobalKey voteOptionsShowCaseKey = GlobalKey();
+  final GlobalKey quizShowCaseKey = GlobalKey();
+
   IbQuestionItemController({
     required this.rxIbQuestion,
     required this.rxIsExpanded,
@@ -67,6 +74,12 @@ class IbQuestionItemController extends GetxController {
   @override
   Future<void> onReady() async {
     await initData();
+    if (isShowCase.isTrue &&
+        !IbLocalDataService()
+            .retrieveBoolValue(StorageKey.pollExpandShowCaseBool)) {
+      ShowCaseWidget.of(expandShowCaseKey.currentContext!)
+          .startShowCase([expandShowCaseKey]);
+    }
     super.onReady();
   }
 
