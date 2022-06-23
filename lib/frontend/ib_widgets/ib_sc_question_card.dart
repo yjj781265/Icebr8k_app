@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_stats_controller.dart';
-import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
@@ -44,17 +43,6 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
   @override
   void initState() {
     _prepareAnimations();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget._controller.isShowCase.isTrue &&
-          !IbLocalDataService()
-              .retrieveBoolValue(StorageKey.pollExpandShowCaseBool)) {
-        widget._controller.rxIsExpanded.value = true;
-        ShowCaseWidget.of(IbShowCaseKeys.kPollExpandKey.currentContext!)!
-            .startShowCase([
-          IbShowCaseKeys.kPollExpandKey,
-        ]);
-      }
-    });
     super.initState();
   }
 
@@ -135,7 +123,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
     );
     return ShowCaseWidget(
       onComplete: (index, key) {
-        if (key == IbShowCaseKeys.kPollExpandKey) {
+        if (key == widget._controller.expandShowCaseKey) {
           IbLocalDataService().updateBoolValue(
               key: StorageKey.pollExpandShowCaseBool, value: true);
         }
@@ -163,11 +151,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                 children: [
                   IbQuestionStatsBar(widget._controller),
                   Obx(() => Showcase(
-                        key: !IbLocalDataService().retrieveBoolValue(
-                                    StorageKey.pollExpandShowCaseBool) &&
-                                widget._controller.isShowCase.isTrue
-                            ? IbShowCaseKeys.kPollExpandKey
-                            : GlobalKey(),
+                        key: widget._controller.expandShowCaseKey,
                         shapeBorder: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(Radius.circular(8))),
                         overlayOpacity: 0.3,

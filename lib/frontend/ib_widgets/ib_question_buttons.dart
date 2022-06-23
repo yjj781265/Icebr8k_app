@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:showcaseview/showcaseview.dart';
@@ -19,20 +18,11 @@ class IbQuestionButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ShowCaseWidget(onComplete: (index, key) {
-      if (key == IbShowCaseKeys.kPollExpandKey) {
-        IbLocalDataService().updateBoolValue(
-            key: StorageKey.pollExpandShowCaseBool, value: true);
-      }
-
-      if (key == IbShowCaseKeys.kVoteOptionsKey) {
+      print(key);
+      if (key == _controller.voteOptionsShowCaseKey) {
         IbLocalDataService().updateBoolValue(
             key: StorageKey.voteOptionsShowCaseBool, value: true);
-        _controller.isShowCase.value = true;
-      }
-
-      if (key == IbShowCaseKeys.kIcebreakerKey) {
-        IbLocalDataService().updateBoolValue(
-            key: StorageKey.icebreakerShowCaseBool, value: true);
+        _controller.isShowCase.value = false;
       }
     }, builder: Builder(builder: (context) {
       return Obx(() {
@@ -48,11 +38,7 @@ class IbQuestionButtons extends StatelessWidget {
             else
               Expanded(
                 child: Showcase(
-                  key: _controller.isShowCase.isTrue &&
-                          !IbLocalDataService().retrieveBoolValue(
-                              StorageKey.voteOptionsShowCaseBool)
-                      ? IbShowCaseKeys.kVoteOptionsKey
-                      : GlobalKey(),
+                  key: _controller.voteOptionsShowCaseKey,
                   overlayOpacity: 0.3,
                   shapeBorder: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(8))),
@@ -69,8 +55,10 @@ class IbQuestionButtons extends StatelessWidget {
                       if (!IbLocalDataService().retrieveBoolValue(
                           StorageKey.voteOptionsShowCaseBool)) {
                         // ignore: use_build_context_synchronously
-                        ShowCaseWidget.of(context)!
-                            .startShowCase([IbShowCaseKeys.kVoteOptionsKey]);
+                        ShowCaseWidget.of(_controller
+                                .voteOptionsShowCaseKey.currentContext!)
+                            .startShowCase(
+                                [_controller.voteOptionsShowCaseKey]);
                       }
                     },
                     onLongPressed: () async {
@@ -80,8 +68,10 @@ class IbQuestionButtons extends StatelessWidget {
                       if (!IbLocalDataService().retrieveBoolValue(
                           StorageKey.voteOptionsShowCaseBool)) {
                         // ignore: use_build_context_synchronously
-                        ShowCaseWidget.of(context)!
-                            .startShowCase([IbShowCaseKeys.kVoteOptionsKey]);
+                        ShowCaseWidget.of(_controller
+                                .voteOptionsShowCaseKey.currentContext!)
+                            .startShowCase(
+                                [_controller.voteOptionsShowCaseKey]);
                       }
                     },
                     textTrKey: _handleVoteButtonText(),

@@ -68,7 +68,6 @@ class IbQuestionHeader extends StatelessWidget {
                   const Icon(
                     Icons.question_mark,
                     color: IbColors.accentColor,
-                    size: 16,
                   ),
                 IconButton(
                     onPressed: _itemController.rxIsSample.isTrue
