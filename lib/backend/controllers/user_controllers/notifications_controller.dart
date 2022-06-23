@@ -102,6 +102,14 @@ class NotificationController extends GetxController {
     }
   }
 
+  Future<void> requestPermission() async {
+    final settings = await fcm.requestPermission();
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      final fcmToken = await fcm.getToken();
+      await IbUserDbService().saveTokenToDatabase(fcmToken ?? '');
+    }
+  }
+
   Future<void> _handleRemoteMessage(RemoteMessage message) async {
     /// clear app badge
     FlutterAppBadger.updateBadgeCount(0);
