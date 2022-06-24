@@ -151,7 +151,7 @@ class IbQuestionButtons extends StatelessWidget {
     Get.dialog(IbDialog(
       title: 'Time Limit',
       subtitle:
-          "Sorry, you can't vote on the same poll again until ${IbUtils.readableDateTime(voteAgainDate, showTime: true)}",
+          "Sorry, you can't vote on this poll again until ${IbUtils.readableDateTime(voteAgainDate, showTime: true)}",
       showNegativeBtn: false,
     ));
     return false;
