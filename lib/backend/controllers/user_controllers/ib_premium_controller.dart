@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
+import 'package:icebr8k/backend/managers/ib_api_keys_manager.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -36,6 +38,12 @@ class IbPremiumController extends GetxController {
     isLoading.value = true;
     await Purchases.setDebugLogsEnabled(kDebugMode);
     try {
+      await IbApiKeysManager().init();
+      if (GetPlatform.isAndroid) {
+        await Purchases.setup(IbApiKeysManager.kRevenueCatAndroidKey);
+      } else if (GetPlatform.isIOS) {
+        await Purchases.setup(IbApiKeysManager.kRevenueCatIosKey);
+      }
       if (await Purchases.isConfigured) {
         /// load products
         final offers = await Purchases.getOfferings();
@@ -48,8 +56,7 @@ class IbPremiumController extends GetxController {
         offerings.sort((a, b) => (a.availablePackages.first.product.price)
             .compareTo(b.availablePackages.first.product.price));
       } else {
-        IbUtils.showSimpleSnackBar(
-            msg: 'Failed to load products', backgroundColor: IbColors.errorRed);
+        await IbAnalyticsManager().logCustomEvent(name: 'error_load_products');
         isLoading.value = false;
         return;
       }
@@ -65,11 +72,8 @@ class IbPremiumController extends GetxController {
       });
     } on PlatformException catch (e) {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);
-      Get.dialog(IbDialog(
-        title: 'Error (${errorCode.name})',
-        subtitle: e.message ?? 'Oops, something went wrong',
-        showNegativeBtn: false,
-      ));
+      await IbAnalyticsManager().logCustomEvent(
+          name: 'error_load_products', data: {'errorCode': errorCode});
       isLoading.value = false;
     }
   }
@@ -91,12 +95,13 @@ class IbPremiumController extends GetxController {
     try {
       final PurchaserInfo info =
           await Purchases.purchaseProduct(product.identifier);
+      await IbAnalyticsManager().logCustomEvent(
+          name: 'purchase_premium', data: {'type': product.identifier});
       bool isActive;
       if (info.entitlements.all[entitlement] == null) {
         isActive = false;
       } else {
         isActive = info.entitlements.all[entitlement]!.isActive;
-        await Purchases.syncPurchases();
       }
 
       if (isActive) {
