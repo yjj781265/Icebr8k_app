@@ -140,7 +140,7 @@ class NotificationController extends GetxController {
                 rxIbQuestion: question.obs,
                 rxIsExpanded: true.obs,
                 rxIsSample: false.obs),
-            tag: questionId);
+            tag: IbUtils.getUniqueId());
         Get.to(() => QuestionMainPage(itemController),
             preventDuplicates: false);
       }

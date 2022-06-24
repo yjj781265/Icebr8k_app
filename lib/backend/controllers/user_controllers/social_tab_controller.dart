@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
@@ -284,62 +283,63 @@ class SocialTabController extends GetxController {
 
   void _showChatNotification(
       {required ChatTabItem oldItem, required ChatTabItem item}) {
-    if (item.lastMessageUser == null ||
-        item.ibChat.lastMessage == null ||
-        item.ibChat.lastMessage!.senderUid == IbUtils.getCurrentUid()) {
-      return;
-    }
-
-    if (oldItem.ibChat.lastMessage != null &&
-        oldItem.ibChat.lastMessage!.content ==
-            item.ibChat.lastMessage!.content) {
-      return;
-    }
-    GetSnackBar notification = const GetSnackBar();
-
-    if (!item.ibChat.isCircle) {
-      notification = GetSnackBar(
-        snackPosition: SnackPosition.TOP,
-        duration: const Duration(seconds: 3),
-        margin: const EdgeInsets.only(left: 8, right: 8, top: 16),
-        borderRadius: IbConfig.kCardCornerRadius,
-        icon: IbUserAvatar(
-          avatarUrl: item.lastMessageUser!.avatarUrl,
-          radius: 16,
-        ),
-        titleText: Text(
-          item.ibChat.name.isEmpty
-              ? item.lastMessageUser!.username
-              : item.ibChat.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        messageText: buildSubtitle(item),
-        backgroundColor: Theme.of(Get.context!).backgroundColor,
-      );
-    } else {
-      notification = GetSnackBar(
-        borderRadius: IbConfig.kCardCornerRadius,
-        duration: const Duration(seconds: 3),
-        snackPosition: SnackPosition.TOP,
-        margin: const EdgeInsets.only(left: 8, right: 8, top: 16),
-        icon: buildCircleAvatar(item, size: 16),
-        titleText: Text(
-            item.ibChat.name.isEmpty
-                ? item.lastMessageUser!.username
-                : item.ibChat.name,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
-        messageText: buildSubtitle(item),
-        backgroundColor: Theme.of(Get.context!).backgroundColor,
-      );
-    }
-
-    if (Get.isRegistered<ChatPageController>(tag: item.ibChat.chatId) ||
-        Get.isRegistered<ChatPageController>(tag: item.lastMessageUser!.id) ||
-        item.ibChat.mutedUids.contains(IbUtils.getCurrentUid())) {
-      return;
-    } else {
-      Get.showSnackbar(notification);
-    }
+    /* // if (item.lastMessageUser == null ||
+    //     item.ibChat.lastMessage == null ||
+    //     item.ibChat.lastMessage!.senderUid == IbUtils.getCurrentUid()) {
+    //   return;
+    // }
+    //
+    // if (oldItem.ibChat.lastMessage != null &&
+    //     oldItem.ibChat.lastMessage!.content ==
+    //         item.ibChat.lastMessage!.content) {
+    //   return;
+    // }
+    // GetSnackBar notification = const GetSnackBar();
+    //
+    // if (!item.ibChat.isCircle) {
+    //   notification = GetSnackBar(
+    //     snackPosition: SnackPosition.TOP,
+    //     duration: const Duration(seconds: 3),
+    //     margin: const EdgeInsets.only(left: 8, right: 8, top: 16),
+    //     borderRadius: IbConfig.kCardCornerRadius,
+    //     icon: IbUserAvatar(
+    //       avatarUrl: item.lastMessageUser!.avatarUrl,
+    //       radius: 16,
+    //     ),
+    //     titleText: Text(
+    //       item.ibChat.name.isEmpty
+    //           ? item.lastMessageUser!.username
+    //           : item.ibChat.name,
+    //       style: const TextStyle(fontWeight: FontWeight.bold),
+    //     ),
+    //     messageText: buildSubtitle(item),
+    //     backgroundColor: Theme.of(Get.context!).backgroundColor,
+    //   );
+    // } else {
+    //   notification = GetSnackBar(
+    //     borderRadius: IbConfig.kCardCornerRadius,
+    //     duration: const Duration(seconds: 3),
+    //     snackPosition: SnackPosition.TOP,
+    //     margin: const EdgeInsets.only(left: 8, right: 8, top: 16),
+    //     icon: buildCircleAvatar(item, size: 16),
+    //     titleText: Text(
+    //         item.ibChat.name.isEmpty
+    //             ? item.lastMessageUser!.username
+    //             : item.ibChat.name,
+    //         style: const TextStyle(fontWeight: FontWeight.bold)),
+    //     messageText: buildSubtitle(item),
+    //     backgroundColor: Theme.of(Get.context!).backgroundColor,
+    //   );
+    // }
+    //
+    // if (Get.isRegistered<ChatPageController>(tag: item.ibChat.chatId) ||
+    //     Get.isRegistered<ChatPageController>(tag: item.lastMessageUser!.id) ||
+    //     item.ibChat.mutedUids.contains(IbUtils.getCurrentUid())) {
+    //   return;
+    // } else {
+    //   Get.showSnackbar(notification);
+    // }*/
+    return;
   }
 
   Widget buildCircleAvatar(ChatTabItem item, {double size = 24}) {
