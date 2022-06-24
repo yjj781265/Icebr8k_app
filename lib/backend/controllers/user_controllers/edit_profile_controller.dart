@@ -241,6 +241,11 @@ class EditProfileController extends GetxController {
         rxIbUser.value.coverPhotoUrl = url;
       }
 
+      if (GetUtils.isURL(coverPhotoUrl.value) &&
+          GetUtils.isImage(coverPhotoUrl.value)) {
+        rxIbUser.value.coverPhotoUrl = coverPhotoUrl.value;
+      }
+
       /// update user info
       rxIbUser.value.username = usernameTeController.text.trim().toLowerCase();
       rxIbUser.value.fName = fNameTeController.text.trim();
