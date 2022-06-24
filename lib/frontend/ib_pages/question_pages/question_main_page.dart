@@ -64,7 +64,8 @@ class _QuestionMainPageState extends State<QuestionMainPage> {
         },
         child: SingleChildScrollView(
             child: IbUtils.handleQuestionType(
-                widget._controller.rxIbQuestion.value)),
+                widget._controller.rxIbQuestion.value,
+                uniqueTag: true)),
       ),
     );
   }
