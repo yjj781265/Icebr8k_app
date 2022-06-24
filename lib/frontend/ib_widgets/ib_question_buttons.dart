@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../backend/controllers/user_controllers/comment_controller.dart';
 import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
 import '../ib_colors.dart';
+import '../ib_config.dart';
 import '../ib_pages/comment_pages/comment_page.dart';
 import 'ib_elevated_button.dart';
 
@@ -49,6 +51,9 @@ class IbQuestionButtons extends StatelessWidget {
                   child: IbElevatedButton(
                     disabled: _handleVoteButtonDisableState(),
                     onPressed: () async {
+                      if (!_canVoteAgain()) {
+                        return;
+                      }
                       await _controller.onVote(
                           isAnonymous: IbUtils.getCurrentUserSettings()
                               .voteAnonymousByDefault);
@@ -62,6 +67,10 @@ class IbQuestionButtons extends StatelessWidget {
                       }
                     },
                     onLongPressed: () async {
+                      if (!_canVoteAgain()) {
+                        return;
+                      }
+
                       await _controller.onVote(
                           isAnonymous: !IbUtils.getCurrentUserSettings()
                               .voteAnonymousByDefault);
@@ -116,5 +125,35 @@ class IbQuestionButtons extends StatelessWidget {
             _controller.myAnswer!.uid != IbUtils.getCurrentUid()) ||
         _controller.isAnswering.isTrue ||
         _controller.voted.isTrue && _controller.rxIbQuestion.value.isQuiz;
+  }
+
+  bool _canVoteAgain() {
+    if (_controller.myAnswer == null) {
+      return true;
+    }
+
+    if (DateTime.now().millisecondsSinceEpoch <=
+        _controller.myAnswer!.answeredTimeInMs) {
+      return true;
+    }
+
+    final int diffInMs = DateTime.now().millisecondsSinceEpoch -
+        _controller.myAnswer!.answeredTimeInMs;
+
+    if (Duration(milliseconds: diffInMs).inMinutes <=
+        IbConfig.kVoteAgainGracePeriodInMinutes) {
+      return true;
+    }
+
+    final DateTime voteAgainDate = DateTime.fromMillisecondsSinceEpoch(
+        _controller.myAnswer!.answeredTimeInMs +
+            const Duration(hours: IbConfig.kVoteAgainInHours).inMilliseconds);
+    Get.dialog(IbDialog(
+      title: 'Time Limit',
+      subtitle:
+          "Sorry, you can't vote on this poll again until ${IbUtils.readableDateTime(voteAgainDate, showTime: true)}",
+      showNegativeBtn: false,
+    ));
+    return false;
   }
 }

@@ -10,6 +10,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/edit_profile_contro
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/ib_tenor_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
@@ -391,7 +392,31 @@ class EditProfilePage extends StatelessWidget {
     final Widget options = ListView(
       shrinkWrap: true,
       children: [
-        InkWell(
+        ListTile(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
+          onTap: () async {
+            Get.back();
+            final url = await Get.to(
+              () => IbTenorPage(),
+            );
+            if (url != null && url.toString().isNotEmpty) {
+              _controller.coverPhotoUrl.value = url.toString();
+            }
+          },
+          leading: const Icon(
+            Icons.gif,
+            color: IbColors.accentColor,
+            size: 24,
+          ),
+          title: const Text(
+            'Choose GIF from Tenor',
+            style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+          ),
+        ),
+        ListTile(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
           onTap: () async {
             Get.back();
             final _picker = ImagePicker();
@@ -418,28 +443,16 @@ class EditProfilePage extends StatelessWidget {
               }
             }
           },
-          child: Ink(
-            height: 56,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.camera_alt_outlined,
-                    color: IbColors.primaryColor,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text('Take a photo',
-                      style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
-                ],
-              ),
-            ),
+          leading: const Icon(
+            Icons.camera_alt_outlined,
+            color: IbColors.primaryColor,
           ),
+          title: const Text('Take a photo',
+              style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
         ),
-        InkWell(
+        ListTile(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
           onTap: () async {
             Get.back();
             final _picker = ImagePicker();
@@ -466,27 +479,13 @@ class EditProfilePage extends StatelessWidget {
               }
             }
           },
-          child: Ink(
-            height: 56,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.photo_album_outlined,
-                    color: IbColors.errorRed,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    'Choose from gallery',
-                    style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                  ),
-                ],
-              ),
-            ),
+          leading: const Icon(
+            Icons.photo_album_outlined,
+            color: IbColors.errorRed,
+          ),
+          title: const Text(
+            'Choose from gallery',
+            style: TextStyle(fontSize: IbConfig.kNormalTextSize),
           ),
         ),
       ],
