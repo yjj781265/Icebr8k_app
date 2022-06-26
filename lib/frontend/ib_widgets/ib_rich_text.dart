@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -86,11 +87,11 @@ class IbRichText extends StatelessWidget {
             key: ValueKey(aWord),
             link: aWord,
             displayDirection: UIDirection.uiDirectionHorizontal,
-            bodyMaxLines: 5,
+            bodyMaxLines: 3,
             titleStyle: const TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.bold,
-              fontSize: 15,
+              fontSize: IbConfig.kSecondaryTextSize,
             ),
             bodyStyle: const TextStyle(color: Colors.grey, fontSize: 12),
             errorBody: "Can't parse this url",
@@ -101,7 +102,7 @@ class IbRichText extends StatelessWidget {
             ),
             errorImage: errorImageUrl,
             backgroundColor: Colors.grey[300],
-            borderRadius: 12,
+            borderRadius: 8,
             boxShadow: const [BoxShadow(blurRadius: 3, color: Colors.grey)],
             onTap: () async {
               final Uri _url = Uri.parse(aWord);
