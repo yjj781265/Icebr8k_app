@@ -19,7 +19,7 @@ class IbCircleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 150,
-      width: 250,
+      width: 200,
       child: InkWell(
         borderRadius: const BorderRadius.all(Radius.circular(16)),
         onTap: () {
@@ -42,7 +42,7 @@ class IbCircleCard extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           color: Theme.of(context).indicatorColor,
-                          fontSize: 24,
+                          fontSize: IbConfig.kNormalTextSize,
                           fontWeight: FontWeight.bold),
                     ),
                   )
