@@ -62,7 +62,8 @@ class AskedPage extends StatelessWidget {
                 }
                 index -= 1;
                 return IbUtils.handleQuestionType(
-                    _controller.createdQuestions[index]);
+                    _controller.createdQuestions[index],
+                    uniqueTag: true);
               },
               itemCount: _controller.createdQuestions.length + 1,
             ),
