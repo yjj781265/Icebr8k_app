@@ -232,7 +232,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                 ),
                 if (widget._controller.isTypingUsers.isNotEmpty &&
                     IbUtils.getCurrentIbUser() != null &&
-                    IbUtils.getCurrentIbUser()!.isPremium)
+                    IbUtils.isPremiumMember())
                   Align(
                       alignment: Alignment.bottomLeft,
                       child: _buildTypingIndicator(context)),
@@ -1211,8 +1211,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
 
   ///won't show sender and current User's avatar
   Widget _buildReadIndicator(IbMessage message) {
-    if (IbUtils.getCurrentIbUser() != null &&
-        !IbUtils.getCurrentIbUser()!.isPremium) {
+    if (IbUtils.getCurrentIbUser() != null && !IbUtils.isPremiumMember()) {
       return const SizedBox();
     }
     if (widget._controller.messages.indexWhere(
