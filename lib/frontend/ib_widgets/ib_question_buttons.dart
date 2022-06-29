@@ -30,6 +30,18 @@ class IbQuestionButtons extends StatelessWidget {
       return Obx(() {
         return Row(
           children: [
+            if (_controller.rxIbQuestion.value.isCommentEnabled)
+              Expanded(
+                child: IbElevatedButton(
+                  disabled: _controller.rxIsSample.isTrue,
+                  onPressed: () {
+                    Get.to(() => CommentPage(Get.put(
+                          CommentController(itemController: _controller),
+                        )));
+                  },
+                  textTrKey: 'comment',
+                ),
+              ),
             // don't show answer button once user is answered the quiz or poll is closed
             if (_controller.rxIbQuestion.value.isQuiz &&
                     _controller.voted.isTrue ||
@@ -88,18 +100,6 @@ class IbQuestionButtons extends StatelessWidget {
                   ),
                 ),
               ),
-            if (_controller.rxIbQuestion.value.isCommentEnabled)
-              Expanded(
-                child: IbElevatedButton(
-                  disabled: _controller.rxIsSample.isTrue,
-                  onPressed: () {
-                    Get.to(() => CommentPage(Get.put(
-                          CommentController(itemController: _controller),
-                        )));
-                  },
-                  textTrKey: 'comment',
-                ),
-              )
           ],
         );
       });

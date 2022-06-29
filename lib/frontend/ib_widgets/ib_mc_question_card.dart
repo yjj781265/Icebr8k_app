@@ -169,10 +169,14 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                 sizeFactor: animation,
                 child: expandableInfo,
               ),
+              const SizedBox(
+                height: 8,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IbQuestionStatsBar(widget._controller),
+                  Expanded(
+                      flex: 6, child: IbQuestionStatsBar(widget._controller)),
                   Obx(() => Showcase(
                         key: widget._controller.expandShowCaseKey,
                         shapeBorder: const RoundedRectangleBorder(
@@ -187,18 +191,23 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                             widget._controller.rxIsExpanded.value =
                                 !widget._controller.rxIsExpanded.value;
                           },
-                          icon: Obx(() {
-                            _runExpandCheck();
-                            return widget._controller.rxIsExpanded.isTrue
-                                ? const Icon(
-                                    Icons.expand_less_rounded,
-                                    color: IbColors.primaryColor,
-                                  )
-                                : const Icon(
-                                    Icons.expand_more_outlined,
-                                    color: IbColors.primaryColor,
-                                  );
-                          }),
+                          icon: CircleAvatar(
+                            radius: 18,
+                            backgroundColor:
+                                Theme.of(context).primaryColor.withOpacity(0.6),
+                            child: Obx(() {
+                              _runExpandCheck();
+                              return widget._controller.rxIsExpanded.isTrue
+                                  ? Icon(
+                                      Icons.expand_less_rounded,
+                                      color: Theme.of(context).indicatorColor,
+                                    )
+                                  : Icon(
+                                      Icons.expand_more_outlined,
+                                      color: Theme.of(context).indicatorColor,
+                                    );
+                            }),
+                          ),
                         ),
                       )),
                 ],

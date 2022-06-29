@@ -5,7 +5,6 @@ import 'package:icebr8k/backend/controllers/user_controllers/ib_question_stats_c
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
-import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_buttons.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_stats.dart';
@@ -149,7 +148,8 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IbQuestionStatsBar(widget._controller),
+                  Expanded(
+                      flex: 6, child: IbQuestionStatsBar(widget._controller)),
                   Obx(() => Showcase(
                         key: widget._controller.expandShowCaseKey,
                         shapeBorder: const RoundedRectangleBorder(
@@ -164,18 +164,23 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                             widget._controller.rxIsExpanded.value =
                                 !widget._controller.rxIsExpanded.value;
                           },
-                          icon: Obx(() {
-                            _runExpandCheck();
-                            return widget._controller.rxIsExpanded.isTrue
-                                ? const Icon(
-                                    Icons.expand_less_rounded,
-                                    color: IbColors.primaryColor,
-                                  )
-                                : const Icon(
-                                    Icons.expand_more_outlined,
-                                    color: IbColors.primaryColor,
-                                  );
-                          }),
+                          icon: CircleAvatar(
+                            radius: 18,
+                            backgroundColor:
+                                Theme.of(context).primaryColor.withOpacity(0.5),
+                            child: Obx(() {
+                              _runExpandCheck();
+                              return widget._controller.rxIsExpanded.isTrue
+                                  ? Icon(
+                                      Icons.expand_less_rounded,
+                                      color: Theme.of(context).indicatorColor,
+                                    )
+                                  : Icon(
+                                      Icons.expand_more_outlined,
+                                      color: Theme.of(context).indicatorColor,
+                                    );
+                            }),
+                          ),
                         ),
                       )),
                 ],

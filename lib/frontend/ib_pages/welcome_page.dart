@@ -16,77 +16,80 @@ class WelcomePage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 32),
+            Expanded(
+              flex: 6,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SafeArea(
+                      child: SizedBox(
+                          width: 300,
+                          height: 300,
+                          child: Lottie.asset('assets/images/friends.json')),
+                    ),
+                    RichText(
+                      text: const TextSpan(
+                          text: 'Post Polls',
+                          style: TextStyle(
+                              fontSize: IbConfig.kSloganSize,
+                              fontWeight: FontWeight.bold,
+                              color: IbColors.primaryColor),
+                          children: [
+                            TextSpan(
+                                text: ' & ',
+                                style: TextStyle(color: IbColors.lightGrey)),
+                            TextSpan(
+                                text: 'Make Friends',
+                                style: TextStyle(color: IbColors.accentColor))
+                          ]),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 2,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
-                  SafeArea(
-                    child: Text(
-                      'Welcome to Icebr8k ',
-                      style: TextStyle(
-                          fontSize: IbConfig.kPageTitleSize,
-                          fontWeight: FontWeight.bold),
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Hero(
+                    tag: 'login',
+                    child: Container(
+                      width: Get.width,
+                      height: 80,
+                      padding: const EdgeInsets.all(8),
+                      child: IbElevatedButton(
+                        icon: const Icon(FontAwesomeIcons.rightToBracket),
+                        textTrKey: 'login',
+                        onPressed: () {
+                          Get.to(() => SignInPage());
+                        },
+                        color: IbColors.primaryColor,
+                      ),
                     ),
                   ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  Text(
-                    'The place you can build meaningful connection with people around ',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: IbConfig.kNormalTextSize,
-                        fontWeight: FontWeight.bold),
+                  Hero(
+                    tag: 'sign_up',
+                    child: Container(
+                      width: Get.width,
+                      height: 80,
+                      padding: const EdgeInsets.all(8),
+                      child: IbElevatedButton(
+                        icon: const Icon(Icons.person_add_alt_1),
+                        textTrKey: 'sign_up',
+                        onPressed: () {
+                          Get.to(() => const SignUpPage());
+                        },
+                      ),
+                    ),
                   ),
                 ],
               ),
-            ),
-            SizedBox(
-                width: 250,
-                height: 250,
-                child: Lottie.asset('assets/images/business_chat.json')),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Hero(
-                  tag: 'login',
-                  child: Container(
-                    width: Get.width,
-                    height: 80,
-                    padding: const EdgeInsets.all(8),
-                    child: IbElevatedButton(
-                      icon: const Icon(FontAwesomeIcons.rightToBracket),
-                      textTrKey: 'login',
-                      onPressed: () {
-                        Get.to(() => SignInPage());
-                      },
-                      color: IbColors.primaryColor,
-                    ),
-                  ),
-                ),
-                Hero(
-                  tag: 'sign_up',
-                  child: Container(
-                    width: Get.width,
-                    height: 80,
-                    padding: const EdgeInsets.all(8),
-                    child: IbElevatedButton(
-                      icon: const Icon(Icons.person_add_alt_1),
-                      textTrKey: 'sign_up',
-                      onPressed: () {
-                        Get.to(() => const SignUpPage());
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-              ],
             ),
           ],
         ),
