@@ -373,7 +373,7 @@ class SocialTabController extends GetxController {
     }
     if (item.ibChat.isTypingUids.isNotEmpty &&
         IbUtils.getCurrentIbUser() != null &&
-        IbUtils.getCurrentIbUser()!.isPremium) {
+        IbUtils.isPremiumMember()) {
       return const Text(
         'someone is typing...',
         maxLines: 1,
