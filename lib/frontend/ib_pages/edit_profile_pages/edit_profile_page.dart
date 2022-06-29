@@ -153,80 +153,108 @@ class EditProfilePage extends StatelessWidget {
                       thickness: 2,
                     ),
                     Obx(
-                      () => IbTextField(
-                        text: _controller.fName.value,
-                        controller: _controller.fNameTeController,
-                        titleIcon: const Icon(
-                          Icons.person_rounded,
-                          color: IbColors.primaryColor,
-                        ),
-                        textInputType: TextInputType.name,
-                        titleTrKey: 'fName',
-                        hintTrKey: 'fNameHint',
-                      ),
-                    ),
-                    Obx(
-                      () => IbTextField(
-                        text: _controller.lName.value,
-                        controller: _controller.lNameTeController,
-                        titleIcon: const Icon(
-                          Icons.person_rounded,
-                          color: IbColors.primaryColor,
-                        ),
-                        textInputType: TextInputType.name,
-                        titleTrKey: 'lName',
-                        hintTrKey: 'lNameHint',
-                      ),
-                    ),
-                    Obx(
-                      () => IbTextField(
-                          inputFormatter: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow(
-                                RegExp('[a-z0-9_.]')),
-                            LengthLimitingTextInputFormatter(
-                                IbConfig.kUsernameMaxLength)
-                          ],
-                          text: _controller.username.value,
-                          controller: _controller.usernameTeController,
+                      () => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: IbTextField(
+                          text: _controller.fName.value,
+                          controller: _controller.fNameTeController,
                           titleIcon: const Icon(
                             Icons.person_rounded,
                             color: IbColors.primaryColor,
                           ),
-                          titleTrKey: 'username',
-                          hintTrKey: 'username_hint',
-                          onChanged: (text) {}),
-                    ),
-                    InkWell(
-                      onTap: _showDateTimePicker,
-                      child: IbTextField(
-                        titleIcon: const Icon(
-                          Icons.cake_outlined,
-                          color: IbColors.primaryColor,
+                          textInputType: TextInputType.name,
+                          titleTrKey: 'fName',
+                          hintTrKey: 'fNameHint',
                         ),
-                        controller: _controller.birthdateTeController,
-                        text: IbUtils.readableDateTime(
-                            DateTime.fromMillisecondsSinceEpoch(
-                                _controller.birthdateInMs.value)),
-                        suffixIcon: const Icon(Icons.calendar_today_outlined),
-                        titleTrKey: 'birthdate',
-                        hintTrKey: 'birthdate_hint',
-                        enabled: false,
-                        onChanged: (birthdate) {},
                       ),
                     ),
                     Obx(
-                      () => IbTextField(
-                          text: _controller.bio.value,
-                          maxLines: IbConfig.kBioMaxLines,
-                          charLimit: IbConfig.kBioMaxLength,
-                          controller: _controller.bioTeController,
+                      () => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: IbTextField(
+                          text: _controller.lName.value,
+                          controller: _controller.lNameTeController,
                           titleIcon: const Icon(
-                            Icons.edit,
+                            Icons.person_rounded,
                             color: IbColors.primaryColor,
                           ),
-                          titleTrKey: 'bio',
-                          hintTrKey: 'bio_hint',
-                          onChanged: (text) {}),
+                          textInputType: TextInputType.name,
+                          titleTrKey: 'lName',
+                          hintTrKey: 'lNameHint',
+                        ),
+                      ),
+                    ),
+                    Obx(
+                      () => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: IbTextField(
+                            inputFormatter: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(
+                                  RegExp('[a-z0-9_.]')),
+                              LengthLimitingTextInputFormatter(
+                                  IbConfig.kUsernameMaxLength)
+                            ],
+                            text: _controller.username.value,
+                            controller: _controller.usernameTeController,
+                            titleIcon: const Icon(
+                              Icons.person_rounded,
+                              color: IbColors.primaryColor,
+                            ),
+                            titleTrKey: 'username',
+                            hintTrKey: 'username_hint',
+                            onChanged: (text) {}),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: _showDateTimePicker,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: IbTextField(
+                          titleIcon: const Icon(
+                            Icons.cake_outlined,
+                            color: IbColors.primaryColor,
+                          ),
+                          controller: _controller.birthdateTeController,
+                          text: IbUtils.readableDateTime(
+                              DateTime.fromMillisecondsSinceEpoch(
+                                  _controller.birthdateInMs.value)),
+                          suffixIcon: const Icon(Icons.calendar_today_outlined),
+                          titleTrKey: 'birthdate',
+                          hintTrKey: 'birthdate_hint',
+                          enabled: false,
+                          onChanged: (birthdate) {},
+                        ),
+                      ),
+                    ),
+                    Obx(
+                      () => SwitchListTile.adaptive(
+                        value: _controller.isAgeHidden.value,
+                        onChanged: (value) {
+                          _controller.isAgeHidden.value = value;
+                        },
+                        tileColor: Theme.of(context).backgroundColor,
+                        title: const Text('Hide My Age'),
+                      ),
+                    ),
+                    const Divider(
+                      color: IbColors.lightGrey,
+                    ),
+                    Obx(
+                      () => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: IbTextField(
+                            text: _controller.bio.value,
+                            maxLines: IbConfig.kBioMaxLines,
+                            charLimit: IbConfig.kBioMaxLength,
+                            controller: _controller.bioTeController,
+                            titleIcon: const Icon(
+                              Icons.edit,
+                              color: IbColors.primaryColor,
+                            ),
+                            titleTrKey: 'bio',
+                            hintTrKey: 'bio_hint',
+                            onChanged: (text) {}),
+                      ),
                     ),
                   ],
                 ),

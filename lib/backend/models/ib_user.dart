@@ -37,6 +37,7 @@ class IbUser {
   bool isOnline;
   bool isPremium;
   bool isMasterPremium;
+  bool isAgeHidden;
   String coverPhotoUrl;
   String bio;
   String voiceMemoUrl;
@@ -75,6 +76,7 @@ class IbUser {
     this.lastLocationTimestampInMs = -1,
     this.gender = '',
     this.status = '',
+    this.isAgeHidden = true,
     this.isMasterPremium = false,
     this.voiceMemoUrl = '',
     this.joinTime,

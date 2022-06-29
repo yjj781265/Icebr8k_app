@@ -574,7 +574,8 @@ class ProfilePage extends StatelessWidget {
                   _controller.rxIbUser.value.gender,
                   style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
                 ),
-                if (_controller.rxIbUser.value.birthdateInMs != null)
+                if (_controller.rxIbUser.value.birthdateInMs != null &&
+                    !_controller.rxIbUser.value.isAgeHidden)
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
                     child: Text(

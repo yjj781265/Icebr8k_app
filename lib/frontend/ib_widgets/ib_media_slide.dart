@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_media.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
 import '../ib_colors.dart';
 
@@ -72,6 +73,9 @@ class _IbQuestionMediaSlideState extends State<IbQuestionMediaSlide> {
                 );
               }).toList(),
             ),
+          const SizedBox(
+            height: 8,
+          ),
         ],
       );
     });
@@ -85,6 +89,12 @@ class _IbQuestionMediaSlideState extends State<IbQuestionMediaSlide> {
               media.url,
               height: Get.width * 1.78,
               fit: BoxFit.fitHeight,
+              loadingBuilder: (context, widget, propress) {
+                if (propress == null) return widget;
+                return const Center(
+                  child: IbProgressIndicator(),
+                );
+              },
               errorBuilder: (context, obj, stackTrace) {
                 return Container(
                   color: IbColors.lightGrey,
