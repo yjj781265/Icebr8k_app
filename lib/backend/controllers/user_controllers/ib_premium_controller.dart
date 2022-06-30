@@ -40,9 +40,11 @@ class IbPremiumController extends GetxController {
     try {
       await IbApiKeysManager().init();
       if (GetPlatform.isAndroid) {
-        await Purchases.setup(IbApiKeysManager.kRevenueCatAndroidKey);
+        await Purchases.setup(IbApiKeysManager.kRevenueCatAndroidKey,
+            appUserId: IbUtils.getCurrentUid());
       } else if (GetPlatform.isIOS) {
-        await Purchases.setup(IbApiKeysManager.kRevenueCatIosKey);
+        await Purchases.setup(IbApiKeysManager.kRevenueCatIosKey,
+            appUserId: IbUtils.getCurrentUid());
       }
       if (await Purchases.isConfigured) {
         /// load products
