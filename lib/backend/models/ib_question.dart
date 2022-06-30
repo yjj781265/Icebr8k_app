@@ -16,6 +16,7 @@ class IbQuestion {
   bool isPublic;
   bool isShareable;
   bool isAnonymous;
+  bool isOpenEnded;
   bool isCommentEnabled;
   bool isQuiz;
   int points;
@@ -47,6 +48,7 @@ class IbQuestion {
       this.description = '',
       this.isPublic = true,
       this.isShareable = true,
+      this.isOpenEnded = false,
       this.points = 0,
       this.shares = 0,
       this.likes = 0,

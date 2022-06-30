@@ -148,6 +148,12 @@ class IbQuestionButtons extends StatelessWidget {
     final DateTime voteAgainDate = DateTime.fromMillisecondsSinceEpoch(
         _controller.myAnswer!.answeredTimeInMs +
             const Duration(hours: IbConfig.kVoteAgainInHours).inMilliseconds);
+
+    if (DateTime.now().millisecondsSinceEpoch >
+        voteAgainDate.millisecondsSinceEpoch) {
+      return true;
+    }
+
     Get.dialog(IbDialog(
       title: 'Time Limit',
       subtitle:

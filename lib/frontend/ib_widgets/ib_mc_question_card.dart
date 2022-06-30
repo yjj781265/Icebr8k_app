@@ -9,6 +9,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/ib_question_stats_c
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_slide.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_buttons.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_header.dart';
@@ -91,10 +92,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                   tag: widget._controller.rxIbQuestion.value.id))
             else
               LimitedBox(
-                maxHeight: widget._controller.rxIbQuestion.value.questionType ==
-                        QuestionType.multipleChoice
-                    ? 200
-                    : 400,
+                maxHeight: 400,
                 child: Scrollbar(
                   thickness: 3,
                   radius: const Radius.circular(8),
@@ -104,9 +102,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                     child: SingleChildScrollView(
                       controller: _scrollController,
                       child: Column(
-                        children: widget._controller.rxIbQuestion.value.choices
-                            .map((e) => IbQuestionMcItem(e, widget._controller))
-                            .toList(),
+                        children: _handleChoiceItems(),
                       ),
                     ),
                   ),
@@ -216,6 +212,101 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
           ),
         );
       }),
+    );
+  }
+
+  List<Widget> _handleChoiceItems() {
+    final List<Widget> list = [];
+    list.addAll(widget._controller.rxIbQuestion.value.choices
+        .map((e) => IbQuestionMcItem(e, widget._controller))
+        .toList());
+
+    // todo add support for mc pic in the future
+    if (widget._controller.rxIbQuestion.value.isOpenEnded &&
+        widget._controller.rxIbQuestion.value.questionType ==
+            QuestionType.multipleChoice) {
+      list.add(headerWidget());
+    }
+    return list;
+  }
+
+  void _showBottomSheet({required String strTrKey}) {
+    IbUtils.hideKeyboard();
+    final TextEditingController _txtController = TextEditingController();
+    final Widget _widget = IbDialog(
+      title: strTrKey.tr,
+      content: TextField(
+        textInputAction: TextInputAction.done,
+        maxLength: IbConfig.kAnswerMaxLength,
+        onSubmitted: (value) async {
+          Get.back();
+          final choice =
+              IbChoice(choiceId: IbUtils.getUniqueId(), content: value);
+          await widget._controller.addChoice(choice);
+        },
+        controller: _txtController,
+        autofocus: true,
+        textAlign: TextAlign.center,
+        cursorColor: IbColors.primaryColor,
+      ),
+      subtitle: '',
+      onPositiveTap: () async {
+        Get.back();
+        final choice = IbChoice(
+            choiceId: IbUtils.getUniqueId(), content: _txtController.text);
+        await widget._controller.addChoice(choice);
+      },
+    );
+    Get.bottomSheet(_widget, persistent: true, ignoreSafeArea: false);
+  }
+
+  Widget headerWidget() {
+    return Stack(
+      children: [
+        IbCard(
+          elevation: 0,
+          radius: 8,
+          margin: const EdgeInsets.only(top: 4, bottom: 4),
+          color: IbColors.lightBlue,
+          child: SizedBox(
+            height: IbConfig.kMcTxtItemSize,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'tap_to_add'.tr,
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.add,
+                    color: Colors.black,
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
+              ],
+            ),
+          ),
+        ),
+        Positioned.fill(
+            child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            customBorder: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(8))),
+            onTap: () {
+              if (widget._controller.rxIsSample.isTrue) {
+                return;
+              }
+              _showBottomSheet(strTrKey: 'add_choice');
+            },
+          ),
+        ))
+      ],
     );
   }
 

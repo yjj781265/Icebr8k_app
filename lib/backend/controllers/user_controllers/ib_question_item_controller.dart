@@ -83,6 +83,15 @@ class IbQuestionItemController extends GetxController {
     super.onReady();
   }
 
+  @override
+  void onClose() {
+    super.onClose();
+    if (_timer != null) {
+      _timer!.cancel();
+      _timer = null;
+    }
+  }
+
   Future<void> initData() async {
     countMap.clear();
     resultMap.clear();
@@ -125,13 +134,33 @@ class IbQuestionItemController extends GetxController {
     await _getMyAnswerAndDeterminedPollCloseStatus();
   }
 
-  @override
-  void onClose() {
-    super.onClose();
-    if (_timer != null) {
-      _timer!.cancel();
-      _timer = null;
+  Future<void> addChoice(IbChoice choice) async {
+    final bool isDuplicated = rxIbQuestion.value.choices
+        .where((element) => element.content == choice.content)
+        .isNotEmpty;
+    if (isDuplicated) {
+      IbUtils.showSimpleSnackBar(
+          msg: "This choice already exists.",
+          backgroundColor: IbColors.primaryColor);
+      return;
     }
+
+    IbUtils.showSimpleSnackBar(
+        msg: "Adding a new choice...", backgroundColor: IbColors.primaryColor);
+
+    await IbQuestionDbService()
+        .addChoice(questionId: rxIbQuestion.value.id, ibChoice: choice);
+
+    final newQ =
+        await IbQuestionDbService().querySingleQuestion(rxIbQuestion.value.id);
+
+    if (newQ != null) {
+      rxIbQuestion.value = newQ;
+      rxIbQuestion.refresh();
+    }
+    await _generatePollStats();
+    IbUtils.showSimpleSnackBar(
+        msg: "New choice added", backgroundColor: IbColors.accentColor);
   }
 
   void _setUpCountDownTimer() {
@@ -185,12 +214,6 @@ class IbQuestionItemController extends GetxController {
 
   Future<void> _generatePollStats() async {
     countMap.clear();
-    final newQ =
-        await IbQuestionDbService().querySingleQuestion(rxIbQuestion.value.id);
-    if (newQ == null) {
-      return;
-    }
-    rxIbQuestion.value = newQ;
     if (rxIbQuestion.value.pollSize == 0) {
       return;
     }

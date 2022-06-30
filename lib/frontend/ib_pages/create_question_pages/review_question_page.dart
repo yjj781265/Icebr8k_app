@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_friends_picker_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
+import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -118,7 +119,7 @@ class ReviewQuestionPage extends StatelessWidget {
                       title: const Text('Comment'),
                       secondary: const Icon(
                         FontAwesomeIcons.comment,
-                        color: IbColors.primaryColor,
+                        color: IbColors.accentColor,
                       ),
                     ),
                   ),
@@ -137,6 +138,26 @@ class ReviewQuestionPage extends StatelessWidget {
                       ),
                     ),
                   ),
+                  Obx(() {
+                    if (itemController.rxIbQuestion.value.questionType ==
+                            QuestionType.multipleChoice &&
+                        !itemController.rxIbQuestion.value.isQuiz) {
+                      return SwitchListTile.adaptive(
+                        tileColor: Theme.of(context).primaryColor,
+                        value: itemController.rxIbQuestion.value.isOpenEnded,
+                        onChanged: (value) {
+                          itemController.rxIbQuestion.value.isOpenEnded = value;
+                          itemController.rxIbQuestion.refresh();
+                        },
+                        title: const Text('Allow Others to Add Choices'),
+                        secondary: const Icon(
+                          FontAwesomeIcons.plus,
+                          color: IbColors.primaryColor,
+                        ),
+                      );
+                    }
+                    return const SizedBox();
+                  }),
                   if (!itemController.rxIbQuestion.value.questionType
                       .toString()
                       .contains('sc'))
