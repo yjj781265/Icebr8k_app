@@ -36,7 +36,8 @@ class CommentPage extends StatelessWidget {
             children: [
               Text(
                 _controller.itemController.rxIbQuestion.value.question,
-                maxLines: 2,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
               ),
               Text(
