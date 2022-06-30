@@ -87,9 +87,8 @@ class MyProfileController extends GetxController {
         }
         print("askSub ${docChange.type}");
       }
-
+      asks.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
       asks.refresh();
-      print(asks.map((element) => element.question));
     });
   }
 
@@ -104,6 +103,8 @@ class MyProfileController extends GetxController {
 
     asks.addAll(
         snapshot.docs.map((e) => IbQuestion.fromJson(e.data())).toList());
+    asks.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
+    asks.refresh();
     if (snapshot.docs.isEmpty) {
       askedRefreshController.loadNoData();
       return;
