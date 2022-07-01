@@ -229,6 +229,9 @@ class IbPremiumPage extends StatelessWidget {
                       child: ListTile(
                         onTap: () async {
                           Get.back();
+                          IbUtils.showSimpleSnackBar(
+                              msg: "Loading...",
+                              backgroundColor: IbColors.primaryColor);
                           _controller.purchasePremium(
                               element.availablePackages.first.product);
                         },
@@ -278,7 +281,7 @@ class IbPremiumPage extends StatelessWidget {
                     height: 8,
                   ),
                   Text(
-                    'Last purchase at ${IbUtils.readableDateTime(DateTime.parse(_controller.entitlementInfo!.latestPurchaseDate), showTime: true)}',
+                    'Last purchase at ${IbUtils.readableDateTime(DateTime.parse(_controller.entitlementInfo!.latestPurchaseDate), showTime: true)} from ${_controller.entitlementInfo!.store.name}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(
@@ -296,7 +299,7 @@ class IbPremiumPage extends StatelessWidget {
                   Text(
                       'Product ID: ${_controller.entitlementInfo!.productIdentifier} '),
                   Text(
-                    'Manage subscription from ${GetPlatform.isAndroid ? 'Google Play Store' : 'iOS App Store'}',
+                    'Manage subscription from ${_controller.entitlementInfo!.store.name}',
                     style: const TextStyle(
                         fontStyle: FontStyle.italic, color: IbColors.lightGrey),
                   ),

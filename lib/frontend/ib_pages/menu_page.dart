@@ -15,6 +15,7 @@ import 'package:icebr8k/frontend/ib_themes.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../../backend/controllers/admin_controllers/feedback_chat_controller.dart';
 import '../../backend/controllers/user_controllers/auth_controller.dart';
@@ -179,12 +180,13 @@ class _MenuPageState extends State<MenuPage> {
                               fontWeight: FontWeight.bold),
                         ),
                         subtitle: const Text('Remove Ads and More'),
-                        onTap: () {
+                        onTap: () async {
                           if (IbUtils.checkFeatureIsLocked()) {
                             return;
                           }
 
                           Get.to(() => IbPremiumPage());
+                          await Purchases.syncPurchases();
                         },
                       ),
                       ListTile(

@@ -372,9 +372,9 @@ class CreateQuestionController extends GetxController {
       );
       if (url == null) {
         IbUtils.showSimpleSnackBar(
-            msg: 'Failed to upload images...',
+            msg: 'Failed to upload images, check internet connections',
             backgroundColor: IbColors.errorRed);
-        break;
+        return;
       } else {
         media.url = url;
       }
