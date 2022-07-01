@@ -14,7 +14,7 @@ class IbStorageService {
       {required String filePath, String oldUrl = ''}) async {
     final File file = File(filePath);
     final String fileName = IbUtils.getUniqueId();
-    final String refString = 'images/$fileName.png';
+    final String refString = 'images/$fileName';
 
     try {
       if (oldUrl.isNotEmpty) {
