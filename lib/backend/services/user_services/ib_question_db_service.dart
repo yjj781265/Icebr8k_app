@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
+import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
@@ -35,6 +36,13 @@ class IbQuestionDbService {
     await _collectionRef
         .doc(question.id)
         .set(question.toJson(), SetOptions(merge: true));
+  }
+
+  Future<void> addChoice(
+      {required String questionId, required IbChoice ibChoice}) async {
+    await _collectionRef.doc(questionId).update({
+      'choices': FieldValue.arrayUnion([ibChoice.toJson()])
+    });
   }
 
   Future<int> queryDailyCurrentUserPollsCount() async {

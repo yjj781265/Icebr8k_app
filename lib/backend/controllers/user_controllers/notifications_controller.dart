@@ -102,6 +102,14 @@ class NotificationController extends GetxController {
     }
   }
 
+  Future<void> requestPermission() async {
+    final settings = await fcm.requestPermission();
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      final fcmToken = await fcm.getToken();
+      await IbUserDbService().saveTokenToDatabase(fcmToken ?? '');
+    }
+  }
+
   Future<void> _handleRemoteMessage(RemoteMessage message) async {
     /// clear app badge
     FlutterAppBadger.updateBadgeCount(0);
@@ -132,7 +140,7 @@ class NotificationController extends GetxController {
                 rxIbQuestion: question.obs,
                 rxIsExpanded: true.obs,
                 rxIsSample: false.obs),
-            tag: questionId);
+            tag: IbUtils.getUniqueId());
         Get.to(() => QuestionMainPage(itemController),
             preventDuplicates: false);
       }

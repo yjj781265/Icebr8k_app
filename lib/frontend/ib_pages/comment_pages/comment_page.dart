@@ -36,7 +36,8 @@ class CommentPage extends StatelessWidget {
             children: [
               Text(
                 _controller.itemController.rxIbQuestion.value.question,
-                maxLines: 2,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
               ),
               Text(
@@ -96,6 +97,8 @@ class CommentPage extends StatelessWidget {
                   await _controller.loadMore();
                 },
                 child: ListView.builder(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
                   itemBuilder: (context, index) {
                     return Builder(builder: (context) {
                       return Column(
@@ -197,7 +200,9 @@ class CommentItemWidget extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                /// header row
                 Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -236,115 +241,112 @@ class CommentItemWidget extends StatelessWidget {
                         width: 16,
                       ),
                       Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    item.user.username,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: IbConfig.kNormalTextSize),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                item.ibComment.timestamp == null
-                                    ? 'Posting...'
-                                    : IbUtils.getAgoDateTimeString(
-                                        (item.ibComment.timestamp as Timestamp)
-                                            .toDate()),
-                                style: const TextStyle(
-                                    fontSize: IbConfig.kDescriptionTextSize,
-                                    color: IbColors.lightGrey),
-                              ),
-                              const SizedBox(
-                                height: 8,
-                              ),
-                              IbRichText(
-                                  string: item.ibComment.content,
-                                  defaultTextStyle: TextStyle(
-                                      color: Theme.of(context).indicatorColor,
-                                      fontSize: IbConfig.kNormalTextSize)),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  TextButton.icon(
-                                    onPressed: () {
-                                      Get.to(() => ReplyPage(Get.put(
-                                          ReplyController(
-                                              parentCommentId:
-                                                  item.ibComment.commentId,
-                                              ibQuestion: controller
-                                                  .itemController
-                                                  .rxIbQuestion
-                                                  .value))));
-                                    },
-                                    icon: const Icon(
-                                      FontAwesomeIcons.reply,
-                                      size: 16,
-                                      color: IbColors.lightGrey,
-                                    ),
-                                    label: Text(
-                                      IbUtils.statsShortString(
-                                          item.ibComment.replies.length),
-                                      style: TextStyle(
-                                          fontSize: IbConfig.kSecondaryTextSize,
-                                          color:
-                                              Theme.of(context).indicatorColor),
-                                    ),
-                                  ),
-                                  TextButton.icon(
-                                    onPressed: () async {
-                                      if (item.isLiked) {
-                                        await controller.dislikeComment(item);
-                                      } else {
-                                        await controller.likeComment(item);
-                                      }
-                                    },
-                                    icon: Icon(
-                                      item.isLiked
-                                          ? Icons.favorite
-                                          : Icons.favorite_border,
-                                      color: item.isLiked
-                                          ? IbColors.errorRed
-                                          : IbColors.lightGrey,
-                                      size: 16,
-                                    ),
-                                    label: Text(
-                                        IbUtils.statsShortString(
-                                            item.ibComment.likes),
-                                        style: TextStyle(
-                                            color: Theme.of(context)
-                                                .indicatorColor,
-                                            fontSize:
-                                                IbConfig.kSecondaryTextSize)),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                        flex: 3,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              item.user.username,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: IbConfig.kNormalTextSize),
+                            ),
+                            Text(
+                              item.ibComment.timestamp == null
+                                  ? 'Posting...'
+                                  : IbUtils.getAgoDateTimeString(
+                                      (item.ibComment.timestamp as Timestamp)
+                                          .toDate()),
+                              style: const TextStyle(
+                                  fontSize: IbConfig.kDescriptionTextSize,
+                                  color: IbColors.lightGrey),
+                            ),
+                          ],
                         ),
                       ),
                       if (item.ibAnswer != null && !item.ibAnswer!.isAnonymous)
-                        Wrap(
-                          children: [
-                            const Text(
-                              'Vote: ',
-                              style: TextStyle(
-                                  color: IbColors.lightGrey,
-                                  fontSize: IbConfig.kDescriptionTextSize),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Wrap(
+                              children: [
+                                const Text(
+                                  'Vote: ',
+                                  style: TextStyle(
+                                      color: IbColors.lightGrey,
+                                      fontSize: IbConfig.kDescriptionTextSize),
+                                ),
+                                _handleIbAnswerUI(item),
+                              ],
                             ),
-                            _handleIbAnswerUI(item),
-                          ],
+                          ),
                         ),
                     ]),
+                Padding(
+                  padding: const EdgeInsets.only(left: 48.0, right: 8, top: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IbRichText(
+                          string: item.ibComment.content,
+                          defaultTextStyle: TextStyle(
+                              color: Theme.of(context).indicatorColor,
+                              fontSize: IbConfig.kNormalTextSize)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextButton.icon(
+                            onPressed: () {
+                              Get.to(() => ReplyPage(Get.put(ReplyController(
+                                  parentCommentId: item.ibComment.commentId,
+                                  ibQuestion: controller
+                                      .itemController.rxIbQuestion.value))));
+                            },
+                            icon: const Icon(
+                              FontAwesomeIcons.reply,
+                              size: 16,
+                              color: IbColors.lightGrey,
+                            ),
+                            label: Text(
+                              IbUtils.statsShortString(
+                                  item.ibComment.replies.length),
+                              style: TextStyle(
+                                  fontSize: IbConfig.kSecondaryTextSize,
+                                  color: Theme.of(context).indicatorColor),
+                            ),
+                          ),
+                          TextButton.icon(
+                            onPressed: () async {
+                              if (item.isLiked) {
+                                await controller.dislikeComment(item);
+                              } else {
+                                await controller.likeComment(item);
+                              }
+                            },
+                            icon: Icon(
+                              item.isLiked
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: item.isLiked
+                                  ? IbColors.errorRed
+                                  : IbColors.lightGrey,
+                              size: 16,
+                            ),
+                            label: Text(
+                                IbUtils.statsShortString(item.ibComment.likes),
+                                style: TextStyle(
+                                    color: Theme.of(context).indicatorColor,
+                                    fontSize: IbConfig.kSecondaryTextSize)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),

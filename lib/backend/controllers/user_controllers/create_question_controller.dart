@@ -150,9 +150,11 @@ class CreateQuestionController extends GetxController {
         showNegativeBtn: false,
         onPositiveTap: () {
           Get.back();
+          IbUtils.hideKeyboard();
           if (!IbLocalDataService()
               .retrieveBoolValue(StorageKey.pickTagForQuestionShowCaseBool)) {
-            ShowCaseWidget.of(context)!
+            ShowCaseWidget.of(
+                    IbShowCaseKeys.kPickTagForQuestionKey.currentContext!)
                 .startShowCase([IbShowCaseKeys.kPickTagForQuestionKey]);
           }
         },

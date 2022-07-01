@@ -19,6 +19,7 @@ class EditProfileController extends GetxController {
   final fName = ''.obs;
   final lName = ''.obs;
   final gender = ''.obs;
+  final isAgeHidden = true.obs;
   final genderSelections = [false, false, false].obs;
   final selectedPrivacy = ''.obs;
   final List<String> privacyItems = [
@@ -41,6 +42,7 @@ class EditProfileController extends GetxController {
     gender.value = rxIbUser.value.gender;
     username.value = rxIbUser.value.username;
     birthdateInMs.value = rxIbUser.value.birthdateInMs ?? -1;
+    isAgeHidden.value = rxIbUser.value.isAgeHidden;
     bio.value = rxIbUser.value.bio;
     if (IbUser.kGenders.contains(gender.value)) {
       genderSelections[IbUser.kGenders.indexOf(gender.value)] = true;
@@ -241,6 +243,11 @@ class EditProfileController extends GetxController {
         rxIbUser.value.coverPhotoUrl = url;
       }
 
+      if (GetUtils.isURL(coverPhotoUrl.value) &&
+          GetUtils.isImage(coverPhotoUrl.value)) {
+        rxIbUser.value.coverPhotoUrl = coverPhotoUrl.value;
+      }
+
       /// update user info
       rxIbUser.value.username = usernameTeController.text.trim().toLowerCase();
       rxIbUser.value.fName = fNameTeController.text.trim();
@@ -248,6 +255,7 @@ class EditProfileController extends GetxController {
       rxIbUser.value.bio = bioTeController.text.trim();
       rxIbUser.value.gender = gender.value;
       rxIbUser.value.birthdateInMs = birthdateInMs.value;
+      rxIbUser.value.isAgeHidden = isAgeHidden.value;
       await IbUserDbService().updateIbUser(rxIbUser.value);
       Get.back(closeOverlays: true);
       IbUtils.showSimpleSnackBar(

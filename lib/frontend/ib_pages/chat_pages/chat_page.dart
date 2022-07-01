@@ -25,11 +25,9 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_action_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_mc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_rich_text.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_sc_question_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:icebr8k/frontend/ib_widgets/icebreaker_card.dart';
 import 'package:lottie/lottie.dart';
@@ -37,7 +35,6 @@ import 'package:reorderables/reorderables.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../../backend/controllers/user_controllers/chat_page_controller.dart';
-import '../../../backend/controllers/user_controllers/ib_question_item_controller.dart';
 import '../../../backend/controllers/user_controllers/icebreaker_controller.dart';
 import '../../../backend/models/ib_question.dart';
 import '../ib_premium_page.dart';
@@ -235,7 +232,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                 ),
                 if (widget._controller.isTypingUsers.isNotEmpty &&
                     IbUtils.getCurrentIbUser() != null &&
-                    IbUtils.getCurrentIbUser()!.isPremium)
+                    IbUtils.isPremiumMember())
                   Align(
                       alignment: Alignment.bottomLeft,
                       child: _buildTypingIndicator(context)),
@@ -1004,21 +1001,8 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
         );
       }
 
-      Widget pollWidget = const SizedBox();
-      final IbQuestionItemController itemController = Get.put(
-          IbQuestionItemController(
-              rxIsSample: false.obs,
-              isShowCase: false.obs,
-              rxIbQuestion: question.obs,
-              rxIsExpanded: false.obs),
-          tag: question.id);
-
-      if (question.questionType == QuestionType.multipleChoice ||
-          question.questionType == QuestionType.multipleChoicePic) {
-        pollWidget = IbMcQuestionCard(itemController);
-      } else {
-        pollWidget = IbScQuestionCard(itemController);
-      }
+      final Widget pollWidget =
+          IbUtils.handleQuestionType(question, uniqueTag: true);
 
       return Column(
         mainAxisSize: MainAxisSize.min,
@@ -1227,8 +1211,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
 
   ///won't show sender and current User's avatar
   Widget _buildReadIndicator(IbMessage message) {
-    if (IbUtils.getCurrentIbUser() != null &&
-        !IbUtils.getCurrentIbUser()!.isPremium) {
+    if (IbUtils.getCurrentIbUser() != null && !IbUtils.isPremiumMember()) {
       return const SizedBox();
     }
     if (widget._controller.messages.indexWhere(

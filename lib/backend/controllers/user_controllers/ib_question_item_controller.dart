@@ -12,8 +12,10 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../../managers/Ib_analytics_manager.dart';
+import '../../services/user_services/ib_local_data_service.dart';
 import '../../services/user_services/ib_question_db_service.dart';
 import '../../services/user_services/ib_user_db_service.dart';
 
@@ -56,6 +58,11 @@ class IbQuestionItemController extends GetxController {
 
   IbUser? creatorUser;
 
+  /// Global keys for showcase
+  final GlobalKey expandShowCaseKey = GlobalKey();
+  final GlobalKey voteOptionsShowCaseKey = GlobalKey();
+  final GlobalKey quizShowCaseKey = GlobalKey();
+
   IbQuestionItemController({
     required this.rxIbQuestion,
     required this.rxIsExpanded,
@@ -67,7 +74,22 @@ class IbQuestionItemController extends GetxController {
   @override
   Future<void> onReady() async {
     await initData();
+    if (isShowCase.isTrue &&
+        !IbLocalDataService()
+            .retrieveBoolValue(StorageKey.pollExpandShowCaseBool)) {
+      ShowCaseWidget.of(expandShowCaseKey.currentContext!)
+          .startShowCase([expandShowCaseKey]);
+    }
     super.onReady();
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+    if (_timer != null) {
+      _timer!.cancel();
+      _timer = null;
+    }
   }
 
   Future<void> initData() async {
@@ -112,13 +134,33 @@ class IbQuestionItemController extends GetxController {
     await _getMyAnswerAndDeterminedPollCloseStatus();
   }
 
-  @override
-  void onClose() {
-    super.onClose();
-    if (_timer != null) {
-      _timer!.cancel();
-      _timer = null;
+  Future<void> addChoice(IbChoice choice) async {
+    final bool isDuplicated = rxIbQuestion.value.choices
+        .where((element) => element.content == choice.content)
+        .isNotEmpty;
+    if (isDuplicated) {
+      IbUtils.showSimpleSnackBar(
+          msg: "This choice already exists.",
+          backgroundColor: IbColors.primaryColor);
+      return;
     }
+
+    IbUtils.showSimpleSnackBar(
+        msg: "Adding a new choice...", backgroundColor: IbColors.primaryColor);
+
+    await IbQuestionDbService()
+        .addChoice(questionId: rxIbQuestion.value.id, ibChoice: choice);
+
+    final newQ =
+        await IbQuestionDbService().querySingleQuestion(rxIbQuestion.value.id);
+
+    if (newQ != null) {
+      rxIbQuestion.value = newQ;
+      rxIbQuestion.refresh();
+    }
+    await _generatePollStats();
+    IbUtils.showSimpleSnackBar(
+        msg: "New choice added", backgroundColor: IbColors.accentColor);
   }
 
   void _setUpCountDownTimer() {
@@ -172,12 +214,6 @@ class IbQuestionItemController extends GetxController {
 
   Future<void> _generatePollStats() async {
     countMap.clear();
-    final newQ =
-        await IbQuestionDbService().querySingleQuestion(rxIbQuestion.value.id);
-    if (newQ == null) {
-      return;
-    }
-    rxIbQuestion.value = newQ;
     if (rxIbQuestion.value.pollSize == 0) {
       return;
     }

@@ -219,9 +219,7 @@ class HomeTab extends StatelessWidget {
 
                         return IbUtils.handleQuestionType(
                             _controller.forYourList[index],
-                            isShowCase: index == 0 &&
-                                !IbLocalDataService().retrieveBoolValue(
-                                    StorageKey.pollExpandShowCaseBool),
+                            isShowCase: index == 0,
                             expanded: IbUtils.getCurrentUserSettings()
                                 .pollExpandedByDefault);
                       }
@@ -240,9 +238,7 @@ class HomeTab extends StatelessWidget {
 
                         return IbUtils.handleQuestionType(
                             _controller.newestList[index],
-                            isShowCase: index == 0 &&
-                                !IbLocalDataService().retrieveBoolValue(
-                                    StorageKey.pollExpandShowCaseBool),
+                            isShowCase: index == 0,
                             expanded: IbUtils.getCurrentUserSettings()
                                 .pollExpandedByDefault);
                       }
@@ -259,9 +255,7 @@ class HomeTab extends StatelessWidget {
 
                       return IbUtils.handleQuestionType(
                           _controller.trendingList[index],
-                          isShowCase: index == 0 &&
-                              !IbLocalDataService().retrieveBoolValue(
-                                  StorageKey.pollExpandShowCaseBool),
+                          isShowCase: index == 0,
                           expanded: IbUtils.getCurrentUserSettings()
                               .pollExpandedByDefault);
                     },

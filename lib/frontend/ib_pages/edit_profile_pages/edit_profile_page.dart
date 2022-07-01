@@ -10,6 +10,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/edit_profile_contro
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/ib_tenor_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
@@ -152,80 +153,108 @@ class EditProfilePage extends StatelessWidget {
                       thickness: 2,
                     ),
                     Obx(
-                      () => IbTextField(
-                        text: _controller.fName.value,
-                        controller: _controller.fNameTeController,
-                        titleIcon: const Icon(
-                          Icons.person_rounded,
-                          color: IbColors.primaryColor,
-                        ),
-                        textInputType: TextInputType.name,
-                        titleTrKey: 'fName',
-                        hintTrKey: 'fNameHint',
-                      ),
-                    ),
-                    Obx(
-                      () => IbTextField(
-                        text: _controller.lName.value,
-                        controller: _controller.lNameTeController,
-                        titleIcon: const Icon(
-                          Icons.person_rounded,
-                          color: IbColors.primaryColor,
-                        ),
-                        textInputType: TextInputType.name,
-                        titleTrKey: 'lName',
-                        hintTrKey: 'lNameHint',
-                      ),
-                    ),
-                    Obx(
-                      () => IbTextField(
-                          inputFormatter: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow(
-                                RegExp('[a-z0-9_.]')),
-                            LengthLimitingTextInputFormatter(
-                                IbConfig.kUsernameMaxLength)
-                          ],
-                          text: _controller.username.value,
-                          controller: _controller.usernameTeController,
+                      () => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: IbTextField(
+                          text: _controller.fName.value,
+                          controller: _controller.fNameTeController,
                           titleIcon: const Icon(
                             Icons.person_rounded,
                             color: IbColors.primaryColor,
                           ),
-                          titleTrKey: 'username',
-                          hintTrKey: 'username_hint',
-                          onChanged: (text) {}),
-                    ),
-                    InkWell(
-                      onTap: _showDateTimePicker,
-                      child: IbTextField(
-                        titleIcon: const Icon(
-                          Icons.cake_outlined,
-                          color: IbColors.primaryColor,
+                          textInputType: TextInputType.name,
+                          titleTrKey: 'fName',
+                          hintTrKey: 'fNameHint',
                         ),
-                        controller: _controller.birthdateTeController,
-                        text: IbUtils.readableDateTime(
-                            DateTime.fromMillisecondsSinceEpoch(
-                                _controller.birthdateInMs.value)),
-                        suffixIcon: const Icon(Icons.calendar_today_outlined),
-                        titleTrKey: 'birthdate',
-                        hintTrKey: 'birthdate_hint',
-                        enabled: false,
-                        onChanged: (birthdate) {},
                       ),
                     ),
                     Obx(
-                      () => IbTextField(
-                          text: _controller.bio.value,
-                          maxLines: IbConfig.kBioMaxLines,
-                          charLimit: IbConfig.kBioMaxLength,
-                          controller: _controller.bioTeController,
+                      () => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: IbTextField(
+                          text: _controller.lName.value,
+                          controller: _controller.lNameTeController,
                           titleIcon: const Icon(
-                            Icons.edit,
+                            Icons.person_rounded,
                             color: IbColors.primaryColor,
                           ),
-                          titleTrKey: 'bio',
-                          hintTrKey: 'bio_hint',
-                          onChanged: (text) {}),
+                          textInputType: TextInputType.name,
+                          titleTrKey: 'lName',
+                          hintTrKey: 'lNameHint',
+                        ),
+                      ),
+                    ),
+                    Obx(
+                      () => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: IbTextField(
+                            inputFormatter: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(
+                                  RegExp('[a-z0-9_.]')),
+                              LengthLimitingTextInputFormatter(
+                                  IbConfig.kUsernameMaxLength)
+                            ],
+                            text: _controller.username.value,
+                            controller: _controller.usernameTeController,
+                            titleIcon: const Icon(
+                              Icons.person_rounded,
+                              color: IbColors.primaryColor,
+                            ),
+                            titleTrKey: 'username',
+                            hintTrKey: 'username_hint',
+                            onChanged: (text) {}),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: _showDateTimePicker,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: IbTextField(
+                          titleIcon: const Icon(
+                            Icons.cake_outlined,
+                            color: IbColors.primaryColor,
+                          ),
+                          controller: _controller.birthdateTeController,
+                          text: IbUtils.readableDateTime(
+                              DateTime.fromMillisecondsSinceEpoch(
+                                  _controller.birthdateInMs.value)),
+                          suffixIcon: const Icon(Icons.calendar_today_outlined),
+                          titleTrKey: 'birthdate',
+                          hintTrKey: 'birthdate_hint',
+                          enabled: false,
+                          onChanged: (birthdate) {},
+                        ),
+                      ),
+                    ),
+                    Obx(
+                      () => SwitchListTile.adaptive(
+                        value: _controller.isAgeHidden.value,
+                        onChanged: (value) {
+                          _controller.isAgeHidden.value = value;
+                        },
+                        tileColor: Theme.of(context).backgroundColor,
+                        title: const Text('Hide My Age'),
+                      ),
+                    ),
+                    const Divider(
+                      color: IbColors.lightGrey,
+                    ),
+                    Obx(
+                      () => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: IbTextField(
+                            text: _controller.bio.value,
+                            maxLines: IbConfig.kBioMaxLines,
+                            charLimit: IbConfig.kBioMaxLength,
+                            controller: _controller.bioTeController,
+                            titleIcon: const Icon(
+                              Icons.edit,
+                              color: IbColors.primaryColor,
+                            ),
+                            titleTrKey: 'bio',
+                            hintTrKey: 'bio_hint',
+                            onChanged: (text) {}),
+                      ),
                     ),
                   ],
                 ),
@@ -391,7 +420,31 @@ class EditProfilePage extends StatelessWidget {
     final Widget options = ListView(
       shrinkWrap: true,
       children: [
-        InkWell(
+        ListTile(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
+          onTap: () async {
+            Get.back();
+            final url = await Get.to(
+              () => IbTenorPage(),
+            );
+            if (url != null && url.toString().isNotEmpty) {
+              _controller.coverPhotoUrl.value = url.toString();
+            }
+          },
+          leading: const Icon(
+            Icons.gif,
+            color: IbColors.accentColor,
+            size: 24,
+          ),
+          title: const Text(
+            'Choose GIF from Tenor',
+            style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+          ),
+        ),
+        ListTile(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
           onTap: () async {
             Get.back();
             final _picker = ImagePicker();
@@ -418,28 +471,16 @@ class EditProfilePage extends StatelessWidget {
               }
             }
           },
-          child: Ink(
-            height: 56,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.camera_alt_outlined,
-                    color: IbColors.primaryColor,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text('Take a photo',
-                      style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
-                ],
-              ),
-            ),
+          leading: const Icon(
+            Icons.camera_alt_outlined,
+            color: IbColors.primaryColor,
           ),
+          title: const Text('Take a photo',
+              style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
         ),
-        InkWell(
+        ListTile(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
           onTap: () async {
             Get.back();
             final _picker = ImagePicker();
@@ -466,27 +507,13 @@ class EditProfilePage extends StatelessWidget {
               }
             }
           },
-          child: Ink(
-            height: 56,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.photo_album_outlined,
-                    color: IbColors.errorRed,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    'Choose from gallery',
-                    style: TextStyle(fontSize: IbConfig.kNormalTextSize),
-                  ),
-                ],
-              ),
-            ),
+          leading: const Icon(
+            Icons.photo_album_outlined,
+            color: IbColors.errorRed,
+          ),
+          title: const Text(
+            'Choose from gallery',
+            style: TextStyle(fontSize: IbConfig.kNormalTextSize),
           ),
         ),
       ],

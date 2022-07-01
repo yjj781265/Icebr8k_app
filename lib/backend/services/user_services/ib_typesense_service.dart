@@ -32,9 +32,10 @@ class IbTypeSenseService extends GetConnect {
     if (response.isOk && response.bodyString != null) {
       final myMap = jsonDecode(response.bodyString!);
       final docList = myMap['hits'] as List<dynamic>;
-      ibTags = docList
-          .map((e) => IbTag.fromJson(e['document'] as Map<String, dynamic>))
-          .toList();
+      ibTags = docList.map((e) {
+        print(e['document']);
+        return IbTag.fromJson(e['document'] as Map<String, dynamic>);
+      }).toList();
     }
 
     return ibTags;

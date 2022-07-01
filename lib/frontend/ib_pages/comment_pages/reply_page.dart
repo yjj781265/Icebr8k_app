@@ -79,6 +79,8 @@ class ReplyPage extends StatelessWidget {
                   await _controller.loadMore();
                 },
                 child: ListView.builder(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
                   itemBuilder: (context, index) {
                     final item = _controller.comments[index];
                     return Ink(
@@ -87,11 +89,12 @@ class ReplyPage extends StatelessWidget {
                           : Theme.of(context).primaryColor,
                       child: InkWell(
                         onTap: () async => _onReplyTap(item),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
                                   mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -130,89 +133,91 @@ class ReplyPage extends StatelessWidget {
                                       width: 16,
                                     ),
                                     Expanded(
-                                      child: SingleChildScrollView(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  item.user.username,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: IbConfig
-                                                          .kNormalTextSize),
-                                                ),
-                                              ],
-                                            ),
-                                            Text(
-                                              item.ibComment.timestamp == null
-                                                  ? 'Posting...'
-                                                  : IbUtils
-                                                      .getAgoDateTimeString(
-                                                          (item.ibComment
-                                                                      .timestamp
-                                                                  as Timestamp)
-                                                              .toDate()),
-                                              style: const TextStyle(
-                                                  fontSize: IbConfig
-                                                      .kDescriptionTextSize,
-                                                  color: IbColors.lightGrey),
-                                            ),
-                                            const SizedBox(
-                                              height: 8,
-                                            ),
-                                            IbRichText(
-                                              string: item.ibComment.content,
-                                              defaultTextStyle: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .indicatorColor,
-                                                  fontSize:
-                                                      IbConfig.kNormalTextSize),
-                                            ),
-                                            TextButton(
-                                                onPressed: () async {
-                                                  await _onReplyTap(item);
-                                                },
-                                                child: const Text(
-                                                  'Reply',
-                                                ))
-                                          ],
-                                        ),
+                                      flex: 3,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                item.user.username,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: IbConfig
+                                                        .kNormalTextSize),
+                                              ),
+                                            ],
+                                          ),
+                                          Text(
+                                            item.ibComment.timestamp == null
+                                                ? 'Posting...'
+                                                : IbUtils.getAgoDateTimeString(
+                                                    (item.ibComment.timestamp
+                                                            as Timestamp)
+                                                        .toDate()),
+                                            style: const TextStyle(
+                                                fontSize: IbConfig
+                                                    .kDescriptionTextSize,
+                                                color: IbColors.lightGrey),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     if (item.ibAnswer != null &&
                                         !item.ibAnswer!.isAnonymous)
-                                      Wrap(
-                                        children: [
-                                          const Text(
-                                            'Vote: ',
-                                            style: TextStyle(
-                                                color: IbColors.lightGrey,
-                                                fontSize: IbConfig
-                                                    .kDescriptionTextSize),
-                                          ),
-                                          _handleIbAnswerUI(item),
-                                        ],
+                                      Expanded(
+                                        child: Wrap(
+                                          children: [
+                                            const Text(
+                                              'Vote: ',
+                                              style: TextStyle(
+                                                  color: IbColors.lightGrey,
+                                                  fontSize: IbConfig
+                                                      .kDescriptionTextSize),
+                                            ),
+                                            _handleIbAnswerUI(item),
+                                          ],
+                                        ),
                                       ),
                                   ]),
-                            ),
-                            if (index == 0)
-                              const SizedBox()
-                            else
-                              const Divider(
-                                height: 1,
-                                thickness: 1,
-                              )
-                          ],
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 48, right: 8, top: 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IbRichText(
+                                      string: item.ibComment.content,
+                                      defaultTextStyle: TextStyle(
+                                          color:
+                                              Theme.of(context).indicatorColor,
+                                          fontSize: IbConfig.kNormalTextSize),
+                                    ),
+                                    TextButton(
+                                        onPressed: () async {
+                                          await _onReplyTap(item);
+                                        },
+                                        child: const Text(
+                                          'Reply',
+                                        )),
+                                  ],
+                                ),
+                              ),
+                              if (index == 0)
+                                const SizedBox()
+                              else
+                                const Divider(
+                                  height: 1,
+                                  thickness: 1,
+                                )
+                            ],
+                          ),
                         ),
                       ),
                     );

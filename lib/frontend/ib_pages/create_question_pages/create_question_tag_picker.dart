@@ -28,12 +28,12 @@ class _CreateQuestionTagPickerState extends State<CreateQuestionTagPicker> {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) {
         if (!IbLocalDataService()
-            .retrieveBoolValue(StorageKey.pickTagForQuestionShowCaseBool)) {
+            .retrieveBoolValue(StorageKey.createNewTagShowCaseBool)) {
           Future.delayed(const Duration(seconds: 2)).then((value) =>
               ShowCaseWidget.of(context)!.startShowCase([showcaseKey]));
 
           IbLocalDataService().updateBoolValue(
-              key: StorageKey.pickTagForQuestionShowCaseBool, value: true);
+              key: StorageKey.createNewTagShowCaseBool, value: true);
         }
       },
     );

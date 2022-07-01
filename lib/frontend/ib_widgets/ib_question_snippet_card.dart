@@ -7,6 +7,7 @@ import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/question_pages/question_main_page.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 
 class IbQuestionSnippetCard extends StatelessWidget {
@@ -54,7 +55,7 @@ class IbQuestionSnippetCard extends StatelessWidget {
                             rxIsExpanded: true.obs,
                             isShowCase: false.obs,
                             rxIsSample: false.obs),
-                        tag: question.id)));
+                        tag: IbUtils.getUniqueId())));
                   },
                 ),
               ))

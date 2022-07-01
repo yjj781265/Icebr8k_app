@@ -21,8 +21,9 @@ class IbQuestionInfo extends StatelessWidget {
             padding: const EdgeInsets.only(left: 16, right: 16),
             child: AutoSizeText(
               _controller.rxIbQuestion.value.question,
-              maxLines: 2,
-              minFontSize: IbConfig.kNormalTextSize,
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+              minFontSize: IbConfig.kSecondaryTextSize,
               maxFontSize: IbConfig.kPageTitleSize,
               style: const TextStyle(
                   fontSize: IbConfig.kPageTitleSize,
@@ -31,7 +32,7 @@ class IbQuestionInfo extends StatelessWidget {
           ),
           if (_controller.rxIbQuestion.value.description.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, top: 4),
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
               child: IbDescriptionText(
                 text: _controller.rxIbQuestion.value.description,
               ),

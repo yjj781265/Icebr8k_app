@@ -2,7 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/ib_ad_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/icebreaker_controller.dart';
 import 'package:icebr8k/backend/models/icebreaker_models/icebreaker.dart';
 import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart';
@@ -10,7 +9,6 @@ import 'package:icebr8k/frontend/admin/edit_icebreaker_page.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_ad_widget.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/icebreaker_card.dart';
@@ -18,7 +16,6 @@ import 'package:lottie/lottie.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:showcaseview/showcaseview.dart';
 
-import '../../../backend/managers/ib_ad_manager.dart';
 import '../../ib_widgets/ib_card.dart';
 
 class IcebreakerMainPage extends StatelessWidget {
@@ -67,9 +64,6 @@ class IcebreakerMainPage extends StatelessWidget {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  if (!IbUtils.isPremiumMember())
-                    IbAdWidget(
-                        Get.put(IbAdController(IbAdManager().getBanner1()))),
                   if (controller.isShuffling.isTrue)
                     Expanded(
                       child: Center(

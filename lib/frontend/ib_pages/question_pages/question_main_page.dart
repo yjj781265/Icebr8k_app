@@ -21,12 +21,12 @@ class QuestionMainPage extends StatefulWidget {
 }
 
 class _QuestionMainPageState extends State<QuestionMainPage> {
-  RefreshController refreshController = RefreshController();
+  RefreshController refreshController = RefreshController(initialRefresh: true);
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       switch (widget.toPage) {
         case ToPage.none:
           break;
@@ -57,14 +57,15 @@ class _QuestionMainPageState extends State<QuestionMainPage> {
       ),
       body: SmartRefresher(
         controller: refreshController,
-        onRefresh: () {
-          widget._controller
-              .refreshStats()
-              .then((value) => refreshController.refreshCompleted());
+        onRefresh: () async {
+          await widget._controller.refreshStats();
+          refreshController.refreshCompleted();
         },
         child: SingleChildScrollView(
             child: IbUtils.handleQuestionType(
-                widget._controller.rxIbQuestion.value)),
+                widget._controller.rxIbQuestion.value,
+                uniqueTag: true,
+                itemController: widget._controller)),
       ),
     );
   }
