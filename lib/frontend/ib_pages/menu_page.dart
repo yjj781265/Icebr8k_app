@@ -184,9 +184,12 @@ class _MenuPageState extends State<MenuPage> {
                           if (IbUtils.checkFeatureIsLocked()) {
                             return;
                           }
-
-                          Get.to(() => IbPremiumPage());
+                          IbUtils.showSimpleSnackBar(
+                              msg: 'Loading info...',
+                              backgroundColor: IbColors.primaryColor,
+                              duration: const Duration(milliseconds: 1000));
                           await Purchases.syncPurchases();
+                          Get.to(() => IbPremiumPage());
                         },
                       ),
                       ListTile(

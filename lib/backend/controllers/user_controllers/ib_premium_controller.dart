@@ -95,6 +95,8 @@ class IbPremiumController extends GetxController {
 
   Future<void> purchasePremium(Product product) async {
     try {
+      IbUtils.showSimpleSnackBar(
+          msg: "Loading...", backgroundColor: IbColors.primaryColor);
       final PurchaserInfo info =
           await Purchases.purchaseProduct(product.identifier);
       await IbAnalyticsManager().logCustomEvent(
