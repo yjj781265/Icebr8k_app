@@ -776,6 +776,15 @@ class AlertTab extends StatelessWidget {
               item.notification.isRead = true;
               await IbUserDbService().sendAlertNotification(item.notification);
             }
+            Get.to(() => QuestionMainPage(
+                  Get.put(
+                      IbQuestionItemController(
+                          isShowCase: false.obs,
+                          rxIsSample: false.obs,
+                          rxIbQuestion: item.ibQuestion!.obs,
+                          rxIsExpanded: true.obs),
+                      tag: IbUtils.getUniqueId()),
+                ));
           },
           leading: IbUserAvatar(
             radius: 21,
