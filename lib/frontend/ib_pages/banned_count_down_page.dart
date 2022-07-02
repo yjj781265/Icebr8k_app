@@ -16,41 +16,44 @@ class BannedCountDownPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Column(
-        children: [
-          SizedBox(
-              height: 300,
-              width: 300,
-              child: Lottie.asset('assets/images/hour_glass.json')),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'You account is banned for the following reason: \n${user.note}',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+                height: 300,
+                width: 300,
+                child: Lottie.asset('assets/images/hour_glass.json')),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'You account is banned for the following reason: \n${user.note}',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text.rich(
-                TextSpan(text: 'You account will be unbanned after', children: [
-              TextSpan(
-                  text: ' ${banedString()}',
-                  style: const TextStyle(fontWeight: FontWeight.bold))
-            ])),
-          ),
-          ElevatedButton(
-              onPressed: () {
-                Get.offAll(() => WelcomePage());
-              },
-              child: const Text('To Home Page 🏠')),
-          ElevatedButton(
-              onPressed: () {
-                Get.to(() =>
-                    FeedBackChatPage(Get.put(FeedbackChatController(user.id))));
-              },
-              child: const Text('To Support/Feedback Page'))
-        ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text.rich(TextSpan(
+                  text: 'You account will be unbanned after',
+                  children: [
+                    TextSpan(
+                        text: ' ${banedString()}',
+                        style: const TextStyle(fontWeight: FontWeight.bold))
+                  ])),
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  Get.offAll(() => WelcomePage());
+                },
+                child: const Text('To Home Page 🏠')),
+            ElevatedButton(
+                onPressed: () {
+                  Get.to(() => FeedBackChatPage(
+                      Get.put(FeedbackChatController(user.id))));
+                },
+                child: const Text('To Support/Feedback Page'))
+          ],
+        ),
       ),
     );
   }
