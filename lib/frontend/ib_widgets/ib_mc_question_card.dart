@@ -217,6 +217,11 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
 
   List<Widget> _handleChoiceItems() {
     final List<Widget> list = [];
+
+    // put the popular vote on top
+    widget._controller.rxIbQuestion.value.choices.sort((a, b) =>
+        (widget._controller.countMap[b.choiceId] ?? 0)
+            .compareTo(widget._controller.countMap[a.choiceId] ?? 0));
     list.addAll(widget._controller.rxIbQuestion.value.choices
         .map((e) => IbQuestionMcItem(e, widget._controller))
         .toList());
@@ -302,6 +307,15 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
               if (widget._controller.rxIsSample.isTrue) {
                 return;
               }
+
+              if (widget._controller.rxIbQuestion.value.choices.length >=
+                  IbConfig.kOpenEndedChoiceLimit) {
+                IbUtils.showSimpleSnackBar(
+                    msg: 'Failed to add a choice, poll reaches choice limit',
+                    backgroundColor: IbColors.errorRed);
+                return;
+              }
+
               _showBottomSheet(strTrKey: 'add_choice');
             },
           ),
