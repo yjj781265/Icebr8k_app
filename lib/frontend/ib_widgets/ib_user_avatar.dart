@@ -97,17 +97,10 @@ class IbUserAvatar extends StatelessWidget {
                             : null,
                       ),
                     ),
-                    progressIndicatorBuilder: (context, string, progress) {
-                      return Center(
-                        child: SizedBox(
-                          width: 8,
-                          height: 8,
-                          child: CircularProgressIndicator.adaptive(
-                            value: progress.progress,
-                          ),
-                        ),
-                      );
-                    },
+                    placeholder: (context, str) => CircleAvatar(
+                      radius: radius,
+                      backgroundColor: IbColors.lightGrey,
+                    ),
                   )
                 : CircleAvatar(
                     radius: radius,
