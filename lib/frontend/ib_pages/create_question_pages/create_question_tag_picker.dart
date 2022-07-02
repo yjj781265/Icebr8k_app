@@ -30,7 +30,7 @@ class _CreateQuestionTagPickerState extends State<CreateQuestionTagPicker> {
         if (!IbLocalDataService()
             .retrieveBoolValue(StorageKey.createNewTagShowCaseBool)) {
           Future.delayed(const Duration(seconds: 2)).then((value) =>
-              ShowCaseWidget.of(context)!.startShowCase([showcaseKey]));
+              ShowCaseWidget.of(context).startShowCase([showcaseKey]));
 
           IbLocalDataService().updateBoolValue(
               key: StorageKey.createNewTagShowCaseBool, value: true);
