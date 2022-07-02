@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
 import '../ib_config.dart';
 import '../ib_pages/profile_pages/my_profile_page.dart';
@@ -98,11 +97,17 @@ class IbUserAvatar extends StatelessWidget {
                             : null,
                       ),
                     ),
-                    placeholder: (context, url) => CircleAvatar(
-                      radius: radius,
-                      backgroundColor: IbColors.lightBlue,
-                      child: const IbProgressIndicator(),
-                    ),
+                    progressIndicatorBuilder: (context, string, progress) {
+                      return Center(
+                        child: SizedBox(
+                          width: 8,
+                          height: 8,
+                          child: CircularProgressIndicator.adaptive(
+                            value: progress.progress,
+                          ),
+                        ),
+                      );
+                    },
                   )
                 : CircleAvatar(
                     radius: radius,

@@ -312,6 +312,13 @@ class ProfilePage extends StatelessWidget {
                     ? IbConfig.kDefaultCoverPhotoUrl
                     : _controller.rxIbUser.value.coverPhotoUrl,
                 fit: BoxFit.fill,
+                progressIndicatorBuilder: (context, string, progress) {
+                  return Center(
+                    child: CircularProgressIndicator.adaptive(
+                      value: progress.progress,
+                    ),
+                  );
+                },
               ),
             ),
           ),
