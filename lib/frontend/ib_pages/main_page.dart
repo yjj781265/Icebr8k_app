@@ -182,14 +182,14 @@ class _MainPageViewState extends State<MainPageView>
               !IbLocalDataService()
                   .retrieveBoolValue(StorageKey.icebreakerShowCaseBool) &&
               IbShowCaseKeys.kIcebreakerKey.currentContext != null) {
-            ShowCaseWidget.of(IbShowCaseKeys.kIcebreakerKey.currentContext!)!
+            ShowCaseWidget.of(IbShowCaseKeys.kIcebreakerKey.currentContext!)
                 .startShowCase([IbShowCaseKeys.kIcebreakerKey]);
           }
           if (index == 1 &&
               !IbLocalDataService()
                   .retrieveBoolValue(StorageKey.peopleNearbyShowCaseBool) &&
               IbShowCaseKeys.kPeopleNearbyKey.currentContext != null) {
-            ShowCaseWidget.of(IbShowCaseKeys.kPeopleNearbyKey.currentContext!)!
+            ShowCaseWidget.of(IbShowCaseKeys.kPeopleNearbyKey.currentContext!)
                 .startShowCase([IbShowCaseKeys.kPeopleNearbyKey]);
           }
 
@@ -205,7 +205,7 @@ class _MainPageViewState extends State<MainPageView>
               !IbLocalDataService()
                   .retrieveBoolValue(StorageKey.wordCloudShowCaseBool) &&
               IbShowCaseKeys.kWordCloudKey.currentContext != null) {
-            ShowCaseWidget.of(IbShowCaseKeys.kWordCloudKey.currentContext!)!
+            ShowCaseWidget.of(IbShowCaseKeys.kWordCloudKey.currentContext!)
                 .startShowCase([IbShowCaseKeys.kWordCloudKey]);
           }
         },
