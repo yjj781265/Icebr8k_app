@@ -531,6 +531,29 @@ class IbQuestionMcItem extends StatelessWidget {
                                               width: IbConfig.kMcPicSize,
                                               height: IbConfig.kMcPicSize,
                                               imageUrl: choice.url!,
+                                              progressIndicatorBuilder:
+                                                  (context, string, progress) {
+                                                return Center(
+                                                  child:
+                                                      CircularProgressIndicator
+                                                          .adaptive(
+                                                    value: progress.progress,
+                                                  ),
+                                                );
+                                              },
+                                              errorWidget: (context, str, obj) {
+                                                return Container(
+                                                  width: IbConfig.kMcPicSize,
+                                                  height: IbConfig.kMcPicSize,
+                                                  color: IbColors.lightGrey,
+                                                  child: const Center(
+                                                    child: Icon(
+                                                      Icons.error,
+                                                      color: IbColors.errorRed,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
                                             ),
                                     ),
                                   ),
