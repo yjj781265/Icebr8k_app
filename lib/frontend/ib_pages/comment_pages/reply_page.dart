@@ -171,18 +171,9 @@ class ReplyPage extends StatelessWidget {
                                     if (item.ibAnswer != null &&
                                         !item.ibAnswer!.isAnonymous)
                                       Expanded(
-                                        child: Wrap(
-                                          children: [
-                                            const Text(
-                                              'Vote: ',
-                                              style: TextStyle(
-                                                  color: IbColors.lightGrey,
-                                                  fontSize: IbConfig
-                                                      .kDescriptionTextSize),
-                                            ),
-                                            _handleIbAnswerUI(item),
-                                          ],
-                                        ),
+                                        child: Align(
+                                            alignment: Alignment.centerRight,
+                                            child: _handleIbAnswerUI(item)),
                                       ),
                                   ]),
                               Padding(

@@ -270,17 +270,7 @@ class CommentItemWidget extends StatelessWidget {
                         Expanded(
                           child: Align(
                             alignment: Alignment.centerRight,
-                            child: Wrap(
-                              children: [
-                                const Text(
-                                  'Vote: ',
-                                  style: TextStyle(
-                                      color: IbColors.lightGrey,
-                                      fontSize: IbConfig.kDescriptionTextSize),
-                                ),
-                                _handleIbAnswerUI(item),
-                              ],
-                            ),
+                            child: _handleIbAnswerUI(item),
                           ),
                         ),
                     ]),
