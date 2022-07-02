@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/models/ib_media.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 
 import '../ib_colors.dart';
 
@@ -85,20 +85,25 @@ class _IbQuestionMediaSlideState extends State<IbQuestionMediaSlide> {
     late Widget mediaWidget;
     if (media.type == IbMedia.kPicType) {
       mediaWidget = media.url.contains('http')
-          ? Image.network(
-              media.url,
+          ? CachedNetworkImage(
+              imageUrl: media.url,
               height: Get.width * 1.78,
               fit: BoxFit.fitHeight,
-              loadingBuilder: (context, widget, propress) {
-                if (propress == null) return widget;
-                return const Center(
-                  child: IbProgressIndicator(),
+              progressIndicatorBuilder: (context, string, progress) {
+                return Center(
+                  child: CircularProgressIndicator.adaptive(
+                    value: progress.progress,
+                  ),
                 );
               },
-              errorBuilder: (context, obj, stackTrace) {
+              errorWidget: (context, str, obj) {
                 return Container(
+                  height: 100,
+                  width: 50,
                   color: IbColors.lightGrey,
-                  child: const Center(child: Text('Failed to load image')),
+                  child: const Center(
+                    child: Text('Failed to load image'),
+                  ),
                 );
               },
             )
