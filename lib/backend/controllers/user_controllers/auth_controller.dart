@@ -330,6 +330,9 @@ class AuthController extends GetxService {
           status = null;
         } else {
           status = ibUser.status;
+          if (ibUser.banedEndTimeInMs != -1) {
+            status = IbUser.kUserStatusBanned;
+          }
         }
 
         switch (status) {
