@@ -347,6 +347,7 @@ class IbUtils {
   static void showSimpleSnackBar(
       {required String msg,
       required Color backgroundColor,
+      Duration duration = const Duration(seconds: 2),
       bool isPersistent = false}) {
     Widget icon = const SizedBox();
     if (backgroundColor == IbColors.primaryColor) {
@@ -373,8 +374,7 @@ class IbUtils {
       snackPosition: SnackPosition.TOP,
       borderRadius: IbConfig.kCardCornerRadius,
       margin: const EdgeInsets.only(left: 8, right: 8, top: 16),
-      duration:
-          isPersistent ? const Duration(days: 999) : const Duration(seconds: 2),
+      duration: isPersistent ? const Duration(days: 999) : duration,
       backgroundColor: Get.context == null
           ? IbColors.lightBlue
           : Theme.of(Get.context!).backgroundColor,

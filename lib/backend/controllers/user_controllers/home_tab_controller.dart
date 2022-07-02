@@ -12,6 +12,7 @@ import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_question_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -20,7 +21,6 @@ import 'main_page_controller.dart';
 /// controller for Question tab in Homepage
 class HomeTabController extends GetxController {
   double _lastOffset = 0;
-  final int adFrequency = 7;
 
   /// show an ad every 7 polls
   late StreamSubscription first8Sub;
@@ -412,13 +412,13 @@ class HomeTabController extends GetxController {
         isLocked.isTrue) {
       return;
     }
-    if (list.length <= adFrequency && list.isNotEmpty) {
+    if (list.length <= IbConfig.kAdFrequency && list.isNotEmpty) {
       list.add(adPlaceHolder);
       return;
     }
 
     for (int i = 0; i < list.length; i++) {
-      if (i != 0 && i % adFrequency == 0) {
+      if (i != 0 && i % IbConfig.kAdFrequency == 0) {
         list.insert(i, adPlaceHolder);
       }
     }

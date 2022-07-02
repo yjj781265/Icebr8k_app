@@ -1,15 +1,19 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_premium_controller.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
+import 'package:icebr8k/frontend/ib_pages/menu_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
+import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:lottie/lottie.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 class IbPremiumPage extends StatelessWidget {
   IbPremiumPage({Key? key}) : super(key: key);
@@ -18,7 +22,6 @@ class IbPremiumPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
         centerTitle: false,
         title: const Text('Go Premium'),
@@ -47,76 +50,69 @@ class IbPremiumPage extends StatelessWidget {
           return _premiumBody();
         }
 
-        return Container(
-          padding: const EdgeInsets.all(4),
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/images/default_cover_photo.jpeg"),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: Column(
-            children: [
-              Expanded(
-                flex: 6,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const IbCard(
-                        child: Icon(
-                          Icons.workspace_premium,
-                          color: IbColors.primaryColor,
-                          size: 48,
+        return Column(
+          children: [
+            Expanded(
+              flex: 6,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const IbCard(
+                      child: Icon(
+                        Icons.workspace_premium,
+                        color: IbColors.primaryColor,
+                        size: 48,
+                      ),
+                    ),
+                    IbCard(
+                      elevation: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Icebr8k Premium',
+                          style: GoogleFonts.robotoSlab(
+                              textStyle: const TextStyle(
+                                  fontSize: IbConfig.kSloganSize,
+                                  fontWeight: FontWeight.bold)),
                         ),
                       ),
-                      IbCard(
-                        elevation: 0,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'Icebr8k Premium',
-                            style: GoogleFonts.robotoSlab(
-                                textStyle: const TextStyle(
-                                    fontSize: IbConfig.kSloganSize,
-                                    fontWeight: FontWeight.bold)),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 32,
-                      ),
-                      _benefits(),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(
+                      height: 32,
+                    ),
+                    _benefits(),
+                  ],
                 ),
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SafeArea(
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: IbElevatedButton(
-                        color: IbColors.primaryColor,
-                        textTrKey: 'I am In',
-                        onPressed: () async {
-                          showPayWall();
-                        },
-                      ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SafeArea(
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: IbElevatedButton(
+                      color: IbColors.primaryColor,
+                      textTrKey: 'I am In',
+                      onPressed: () async {
+                        _showPayWall();
+                      },
                     ),
                   ),
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         );
       }),
     );
   }
 
   Widget _benefits() {
-    return IbCard(
-        color: IbColors.lightBlue,
+    return Container(
+        margin: const EdgeInsets.all(8),
+        decoration:
+            BoxDecoration(border: Border.all(color: IbColors.lightGrey)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -127,7 +123,6 @@ class IbPremiumPage extends StatelessWidget {
                   Text(
                     '• No Ads',
                     style: TextStyle(
-                        color: Colors.black,
                         fontSize: IbConfig.kNormalTextSize,
                         fontWeight: FontWeight.bold),
                   ),
@@ -148,7 +143,6 @@ class IbPremiumPage extends StatelessWidget {
                 children: const [
                   Text('• Create Unlimited Polls per Day',
                       style: TextStyle(
-                          color: Colors.black,
                           fontSize: IbConfig.kNormalTextSize,
                           fontWeight: FontWeight.bold)),
                   SizedBox(
@@ -168,7 +162,6 @@ class IbPremiumPage extends StatelessWidget {
                   padding: EdgeInsets.all(8.0),
                   child: AutoSizeText('• Image Polls',
                       style: TextStyle(
-                          color: Colors.black,
                           fontSize: IbConfig.kNormalTextSize,
                           fontWeight: FontWeight.bold)),
                 ),
@@ -188,7 +181,6 @@ class IbPremiumPage extends StatelessWidget {
                   padding: EdgeInsets.all(8.0),
                   child: Text('• Seen and Typing Indicator in Chat',
                       style: TextStyle(
-                          color: Colors.black,
                           fontSize: IbConfig.kNormalTextSize,
                           fontWeight: FontWeight.bold)),
                 ),
@@ -209,14 +201,13 @@ class IbPremiumPage extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: IbConfig.kPageTitleSize,
-                    color: Colors.black,
                   )),
             ),
           ],
         ));
   }
 
-  void showPayWall() {
+  void _showPayWall() {
     final Widget payWall = Obx(
       () => IbCard(
         child: Padding(
@@ -229,10 +220,11 @@ class IbPremiumPage extends StatelessWidget {
                       child: ListTile(
                         onTap: () async {
                           Get.back();
-                          IbUtils.showSimpleSnackBar(
-                              msg: "Loading...",
-                              backgroundColor: IbColors.primaryColor);
-                          _controller.purchasePremium(
+                          if (GetPlatform.isIOS) {
+                            _showDisclosure(element);
+                            return;
+                          }
+                          await _controller.purchasePremium(
                               element.availablePackages.first.product);
                         },
                         title: Text(
@@ -259,6 +251,47 @@ class IbPremiumPage extends StatelessWidget {
     Get.bottomSheet(payWall, ignoreSafeArea: true);
   }
 
+  void _showDisclosure(Offering offering) {
+    Get.dialog(IbDialog(
+      title: 'Info',
+      content: Text.rich(TextSpan(text: 'A ', children: [
+        TextSpan(
+          text: offering.availablePackages.first.product.priceString,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const TextSpan(
+          text:
+              ' purchase will be applied to your apple account. Subscriptions will automatically renew unless canceled within 24-hours before the end of the current period. You can cancel anytime within your AppStore settings. For more information, see our ',
+        ),
+        TextSpan(
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              Get.to(() => TermAndConditionPage());
+            },
+          text: 'Term & Conditions',
+          style: const TextStyle(
+              fontWeight: FontWeight.bold, color: IbColors.darkPrimaryColor),
+        ),
+        const TextSpan(text: ' and '),
+        TextSpan(
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              Get.to(() => PrivacyPolicyPage());
+            },
+          text: 'Privacy Policy',
+          style: const TextStyle(
+              fontWeight: FontWeight.bold, color: IbColors.darkPrimaryColor),
+        ),
+      ])),
+      onPositiveTap: () async {
+        Get.back();
+        await _controller
+            .purchasePremium(offering.availablePackages.first.product);
+      },
+      subtitle: '',
+    ));
+  }
+
   Widget _premiumBody() {
     return SizedBox.expand(
       child: Column(
@@ -281,7 +314,7 @@ class IbPremiumPage extends StatelessWidget {
                     height: 8,
                   ),
                   Text(
-                    'Last purchase at ${IbUtils.readableDateTime(DateTime.parse(_controller.entitlementInfo!.latestPurchaseDate), showTime: true)} from ${_controller.entitlementInfo!.store.name}',
+                    'Last purchase at ${IbUtils.readableDateTime(DateTime.parse(_controller.entitlementInfo!.latestPurchaseDate), showTime: true)} from ${_controller.entitlementInfo!.store.name.capitalize}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(
@@ -295,13 +328,27 @@ class IbPremiumPage extends StatelessWidget {
                     height: 16,
                   ),
                   Text(
-                      'Will Renew: ${_controller.entitlementInfo!.willRenew.toString()}'),
+                      'Will Renew: ${_controller.entitlementInfo!.willRenew.toString()}',
+                      style: const TextStyle(
+                          fontSize: IbConfig.kDescriptionTextSize,
+                          color: IbColors.lightGrey)),
+                  const SizedBox(
+                    height: 4,
+                  ),
                   Text(
-                      'Product ID: ${_controller.entitlementInfo!.productIdentifier} '),
+                      'Product ID: ${_controller.entitlementInfo!.productIdentifier} ',
+                      style: const TextStyle(
+                          fontSize: IbConfig.kDescriptionTextSize,
+                          color: IbColors.lightGrey)),
+                  const SizedBox(
+                    height: 4,
+                  ),
                   Text(
-                    'Manage subscription from ${_controller.entitlementInfo!.store.name}',
+                    'Manage subscription from ${_controller.entitlementInfo!.store.name.capitalize}',
                     style: const TextStyle(
-                        fontStyle: FontStyle.italic, color: IbColors.lightGrey),
+                        fontSize: IbConfig.kDescriptionTextSize,
+                        fontStyle: FontStyle.italic,
+                        color: IbColors.lightGrey),
                   ),
                 ],
               ))
