@@ -196,7 +196,9 @@ class AdminMainController extends GetxController {
           status = null;
         } else {
           status = ibUser.status;
-          if (ibUser.banedEndTimeInMs != -1) {
+          if (ibUser.banedEndTimeInMs != -1 &&
+              Timestamp.now().millisecondsSinceEpoch <
+                  ibUser.banedEndTimeInMs) {
             status = IbUser.kUserStatusBanned;
           }
         }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -330,7 +331,9 @@ class AuthController extends GetxService {
           status = null;
         } else {
           status = ibUser.status;
-          if (ibUser.banedEndTimeInMs != -1) {
+          if (ibUser.banedEndTimeInMs != -1 &&
+              Timestamp.now().millisecondsSinceEpoch <
+                  ibUser.banedEndTimeInMs) {
             status = IbUser.kUserStatusBanned;
           }
         }
