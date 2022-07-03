@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -27,7 +28,7 @@ class IbRichText extends StatelessWidget {
   HighLightComponent getHighlightComponent(String word) {
     if (checkIfUserName(word)) {
       return HighLightComponent.username;
-    } else if (GetUtils.isURL(word) && word.contains('http')) {
+    } else if (GetUtils.isURL(word)) {
       return HighLightComponent.url;
     } else if (GetUtils.isPhoneNumber(word)) {
       return HighLightComponent.phoneNumber;
@@ -51,10 +52,11 @@ class IbRichText extends StatelessWidget {
   }
 
   void addNonHighlightedTextFromStringBufferToTextSpanList(
-      List<TextSpan> textSpanListWithStyle, StringBuffer stringBuffer) {
+      List<Widget> textSpanListWithStyle, StringBuffer stringBuffer) {
     if (stringBuffer.isNotEmpty) {
-      textSpanListWithStyle.add(
-          TextSpan(text: stringBuffer.toString(), style: defaultTextStyle));
+      textSpanListWithStyle.add(RichText(
+          text: TextSpan(
+              text: stringBuffer.toString(), style: defaultTextStyle)));
     }
     stringBuffer.clear();
   }
@@ -62,7 +64,7 @@ class IbRichText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<String> words = string.split(" ");
-    final List<TextSpan> textSpanListWithStyle = <TextSpan>[];
+    final List<Widget> textSpanListWithStyle = [];
     final StringBuffer stringBuffer = StringBuffer();
     for (int i = 0; i < words.length; i++) {
       final String aWord = words[i];
@@ -82,15 +84,14 @@ class IbRichText extends StatelessWidget {
           }
           break;
         case HighLightComponent.url:
-          return AnyLinkPreview(
+          final widget = AnyLinkPreview(
             key: ValueKey(aWord),
-            link: aWord,
+            link: aWord.contains('http') ? aWord : 'https://$aWord',
             displayDirection: UIDirection.uiDirectionHorizontal,
-            bodyMaxLines: 5,
             titleStyle: const TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.bold,
-              fontSize: 15,
+              fontSize: IbConfig.kSecondaryTextSize,
             ),
             bodyStyle: const TextStyle(color: Colors.grey, fontSize: 12),
             errorBody: "Can't parse this url",
@@ -101,52 +102,59 @@ class IbRichText extends StatelessWidget {
             ),
             errorImage: errorImageUrl,
             backgroundColor: Colors.grey[300],
-            borderRadius: 12,
+            borderRadius: 8,
             boxShadow: const [BoxShadow(blurRadius: 3, color: Colors.grey)],
             onTap: () async {
-              final Uri _url = Uri.parse(aWord);
+              final link = aWord.contains('http') ? aWord : 'https://$aWord';
+              final Uri _url = Uri.parse(link);
               if (await canLaunchUrl(_url)) {
                 await launchUrl(_url);
               }
             }, // This disables tap event
           );
+          textSpanListWithStyle.add(widget);
+          break;
         case HighLightComponent.username:
         case HighLightComponent.phoneNumber:
         case HighLightComponent.email:
           addNonHighlightedTextFromStringBufferToTextSpanList(
               textSpanListWithStyle, stringBuffer);
-          textSpanListWithStyle.add(TextSpan(
-              text: aWord,
-              style: highLightedTextStyle,
-              recognizer: TapGestureRecognizer()
-                ..onTap = () async {
-                  if (HighLightComponent.username == highLightComponent) {
-                    final userId = await IbUserDbService()
-                        .queryUserIdFromUserName(aWord.substring(1));
-                    if (userId == null) {
-                      IbUtils.showSimpleSnackBar(
-                          msg: 'Invalid User.',
-                          backgroundColor: IbColors.primaryColor);
-                      return;
-                    } else if (userId == IbUtils.getCurrentUid()) {
-                      Get.to(() => MyProfilePage());
-                    } else {
-                      Get.to(() =>
-                          ProfilePage(Get.put(ProfileController(userId))));
-                    }
-                  } else if (HighLightComponent.phoneNumber ==
-                      highLightComponent) {
-                    if (await canLaunchUrlString("tel:$aWord")) {
-                      await launchUrlString("tel:$aWord");
-                    }
-                  } else if (HighLightComponent.email == highLightComponent) {
-                    if (await canLaunchUrlString("mailto:$aWord")) {
-                      await launchUrlString("mailto:$aWord");
-                    } else {
-                      print('cant launch email');
-                    }
-                  }
-                }));
+          textSpanListWithStyle.add(
+            RichText(
+                text: TextSpan(
+                    text: aWord,
+                    style: highLightedTextStyle,
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () async {
+                        if (HighLightComponent.username == highLightComponent) {
+                          final userId = await IbUserDbService()
+                              .queryUserIdFromUserName(aWord.substring(1));
+                          if (userId == null) {
+                            IbUtils.showSimpleSnackBar(
+                                msg: 'Invalid User.',
+                                backgroundColor: IbColors.primaryColor);
+                            return;
+                          } else if (userId == IbUtils.getCurrentUid()) {
+                            Get.to(() => MyProfilePage());
+                          } else {
+                            Get.to(() => ProfilePage(
+                                Get.put(ProfileController(userId))));
+                          }
+                        } else if (HighLightComponent.phoneNumber ==
+                            highLightComponent) {
+                          if (await canLaunchUrlString("tel:$aWord")) {
+                            await launchUrlString("tel:$aWord");
+                          }
+                        } else if (HighLightComponent.email ==
+                            highLightComponent) {
+                          if (await canLaunchUrlString("mailto:$aWord")) {
+                            await launchUrlString("mailto:$aWord");
+                          } else {
+                            print('cant launch email');
+                          }
+                        }
+                      })),
+          );
           if (i < words.length - 1) {
             //add space if not the last word
             stringBuffer.write(" ");
@@ -157,11 +165,9 @@ class IbRichText extends StatelessWidget {
     addNonHighlightedTextFromStringBufferToTextSpanList(
         textSpanListWithStyle, stringBuffer);
 
-    return RichText(
-      text: TextSpan(
-        text: "",
-        children: textSpanListWithStyle,
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: textSpanListWithStyle,
     );
   }
 }
