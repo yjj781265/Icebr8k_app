@@ -247,12 +247,9 @@ class ChatPageSettings extends StatelessWidget {
                 Get.to(() => PastIcebreakers(_controller));
               },
               title: const Text('View All Past Icebreakers'),
-              trailing: const Padding(
-                padding: EdgeInsets.only(left: 10.0),
-                child: Text(
-                  '🧊',
-                  style: TextStyle(fontSize: 20),
-                ),
+              trailing: const Icon(
+                FontAwesomeIcons.eight,
+                color: IbColors.primaryColor,
               ),
             ),
           if (_controller.pastPolls.isNotEmpty ||
