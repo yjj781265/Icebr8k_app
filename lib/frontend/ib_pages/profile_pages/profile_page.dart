@@ -6,6 +6,7 @@ import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/compare_controller.dart';
@@ -84,12 +85,12 @@ class ProfilePage extends StatelessWidget {
                               child: Padding(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 8.0),
-                                child: SizedBox(
-                                  height: 64,
+                                child: LimitedBox(
+                                  maxHeight: 88,
                                   child: IbAdWidget(Get.put(
                                       IbAdController(
                                           IbAdManager().getBanner1()),
-                                      tag: _controller.uid)),
+                                      tag: IbUtils.getUniqueId())),
                                 ),
                               ),
                             ),
@@ -415,22 +416,73 @@ class ProfilePage extends StatelessWidget {
         Positioned(
             bottom: 57,
             right: 8,
-            child: Container(
-              decoration: BoxDecoration(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _distance(),
+                IbCard(
                   color: IbColors.primaryColor.withOpacity(0.8),
-                  borderRadius: const BorderRadius.all(Radius.circular(8))),
-              child: Padding(
-                padding: const EdgeInsets.all(3.0),
-                child: Text(
-                  beautifyProfilePrivacy(
-                      _controller.rxIbUser.value.profilePrivacy),
-                  style:
-                      const TextStyle(fontSize: IbConfig.kDescriptionTextSize),
+                  radius: 8,
+                  elevation: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.all(3.0),
+                    child: Text(
+                      beautifyProfilePrivacy(
+                          _controller.rxIbUser.value.profilePrivacy),
+                      style: const TextStyle(
+                          fontSize: IbConfig.kDescriptionTextSize),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             )),
       ],
     );
+  }
+
+  Widget _distance() {
+    if (_controller.isProfileVisible.isTrue &&
+        _controller.rxIbUser.value.geoPoint != null &&
+        (_controller.rxIbUser.value.geoPoint as GeoPoint).latitude != 0 &&
+        (_controller.rxIbUser.value.geoPoint as GeoPoint).longitude != 0 &&
+        IbUtils.getCurrentIbUser()!.geoPoint != null &&
+        (Duration(
+                    milliseconds:
+                        IbUtils.getCurrentIbUser()!.lastLocationTimestampInMs -
+                            Timestamp.now().millisecondsSinceEpoch)
+                .inDays <=
+            IbConfig.kValidNearbyLocationDurationInDays) &&
+        (Duration(
+                    milliseconds:
+                        _controller.rxIbUser.value.lastLocationTimestampInMs -
+                            Timestamp.now().millisecondsSinceEpoch)
+                .inDays <=
+            IbConfig.kValidNearbyLocationDurationInDays)) {
+      final myGeoPoint = IbUtils.getCurrentIbUser()!.geoPoint as GeoPoint;
+      final userGeoPoint = _controller.rxIbUser.value.geoPoint as GeoPoint;
+
+      final double distanceInMeters = Geolocator.distanceBetween(
+          myGeoPoint.latitude,
+          myGeoPoint.longitude,
+          userGeoPoint.latitude,
+          userGeoPoint.longitude);
+
+      return Tooltip(
+        message:
+            'This user is ${IbUtils.getDistanceString(distanceInMeters)} away',
+        child: IbCard(
+            elevation: 0,
+            radius: 8,
+            child: Padding(
+              padding: const EdgeInsets.all(3.0),
+              child: Text(
+                IbUtils.getDistanceString(distanceInMeters),
+                style: const TextStyle(fontSize: IbConfig.kDescriptionTextSize),
+              ),
+            )),
+      );
+    }
+    return const SizedBox();
   }
 
   Widget _stats() {
