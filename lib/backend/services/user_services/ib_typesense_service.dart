@@ -7,6 +7,7 @@ import 'package:icebr8k/backend/db_config.dart';
 import 'package:icebr8k/backend/managers/ib_api_keys_manager.dart';
 import 'package:icebr8k/backend/models/ib_tag.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 
 import '../../../frontend/ib_utils.dart';
 import '../../models/ib_chat_models/ib_chat.dart';
@@ -65,7 +66,8 @@ class IbTypeSenseService extends GetConnect {
       double radiusInMi = 30,
       int perPage = 16}) async {
     final sevenDaysAgoTimestamp = Timestamp.now().millisecondsSinceEpoch -
-        (const Duration(days: 7).inMilliseconds);
+        (const Duration(days: IbConfig.kValidNearbyLocationDurationInDays)
+            .inMilliseconds);
     final minAgeInMs = Timestamp.now().millisecondsSinceEpoch -
         (Duration(days: minAge * 365).inMilliseconds);
     final maxAgeInMs = Timestamp.now().millisecondsSinceEpoch -
