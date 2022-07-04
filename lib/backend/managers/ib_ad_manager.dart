@@ -10,7 +10,7 @@ class IbAdManager {
   static const String kTestRewardIdAndroid =
       'ca-app-pub-3940256099942544/5224354917';
   static const String kTestBannerIdIos =
-      'ca-app-pub-3940256099942544/6300978111';
+      'ca-app-pub-3940256099942544/2934735716';
   static const String kTestRewardIdIos =
       'ca-app-pub-3940256099942544/1712485313';
   static const String kBanner1IdAndroid =
@@ -28,11 +28,14 @@ class IbAdManager {
   static const String kBanner3IdiOS = 'ca-app-pub-5061564569223287/3166779657';
   static const String kRewardIdiOS = 'ca-app-pub-5061564569223287/5601371307';
 
-  Future<void> showRewardAd(
-      FullScreenContentCallback<RewardedAd> callback) async {
+  Future<void> showRewardAd(Function func) async {
     RewardedAd myAd;
     IbUtils.showSimpleSnackBar(
         msg: 'Loading Ad...', backgroundColor: IbColors.primaryColor);
+    final adRequest = IbUtils.getCurrentIbUser() == null
+        ? const AdRequest()
+        : AdRequest(keywords: IbUtils.getCurrentIbUser()!.tags);
+
     await RewardedAd.load(
         adUnitId: kDebugMode
             ? GetPlatform.isAndroid
@@ -41,14 +44,35 @@ class IbAdManager {
             : GetPlatform.isAndroid
                 ? kRewardIdAndroid
                 : kRewardIdiOS,
-        request: const AdRequest(),
+        request: adRequest,
         rewardedAdLoadCallback: RewardedAdLoadCallback(
           onAdLoaded: (RewardedAd ad) {
+            bool isRewarded = false;
             myAd = ad;
-            myAd.fullScreenContentCallback = callback;
-            myAd.show(
-                onUserEarnedReward: (view, item) =>
-                    print('I WATCHED THE VIDEO'));
+            myAd.fullScreenContentCallback = FullScreenContentCallback(
+              onAdShowedFullScreenContent: (RewardedAd ad) =>
+                  print('$ad onAdShowedFullScreenContent.'),
+              onAdDismissedFullScreenContent: (RewardedAd ad) {
+                print('$ad onAdDismissedFullScreenContent.');
+                ad.dispose();
+                if (isRewarded) {
+                  func();
+                } else {
+                  print('Reward is not granted yet');
+                }
+              },
+              onAdFailedToShowFullScreenContent:
+                  (RewardedAd ad, AdError error) {
+                print('$ad onAdFailedToShowFullScreenContent: $error');
+                ad.dispose();
+              },
+              onAdImpression: (RewardedAd ad) =>
+                  print('$ad impression occurred.'),
+            );
+            myAd.show(onUserEarnedReward: (view, item) {
+              print('Reward granted');
+              isRewarded = true;
+            });
           },
           onAdFailedToLoad: (LoadAdError error) {
             print('RewardedAd failed to load: $error');
@@ -58,6 +82,9 @@ class IbAdManager {
 
   /// return banner 1
   BannerAd getBanner1() {
+    final adRequest = IbUtils.getCurrentIbUser() == null
+        ? const AdRequest()
+        : AdRequest(keywords: IbUtils.getCurrentIbUser()!.tags);
     final BannerAdListener listener = BannerAdListener(
       // Called when an ad is successfully received.
       onAdLoaded: (Ad ad) => print('Ad loaded.'),
@@ -83,7 +110,7 @@ class IbAdManager {
               ? kBanner1IdAndroid
               : kBanner1IdiOS,
       size: AdSize(height: 50, width: Get.width.toInt()),
-      request: const AdRequest(),
+      request: adRequest,
       listener: listener,
     );
     return myBanner;
@@ -91,6 +118,9 @@ class IbAdManager {
 
   /// return  banner 2
   BannerAd getBanner2() {
+    final adRequest = IbUtils.getCurrentIbUser() == null
+        ? const AdRequest()
+        : AdRequest(keywords: IbUtils.getCurrentIbUser()!.tags);
     final BannerAdListener listener = BannerAdListener(
       // Called when an ad is successfully received.
       onAdLoaded: (Ad ad) => print('Ad loaded.'),
@@ -116,7 +146,7 @@ class IbAdManager {
               ? kBanner2IdAndroid
               : kBanner2IdiOS,
       size: AdSize(height: 50, width: Get.width.toInt()),
-      request: const AdRequest(),
+      request: adRequest,
       listener: listener,
     );
     return myBanner;
@@ -124,6 +154,9 @@ class IbAdManager {
 
   /// return medium size banner, call load before use
   BannerAd getBanner3() {
+    final adRequest = IbUtils.getCurrentIbUser() == null
+        ? const AdRequest()
+        : AdRequest(keywords: IbUtils.getCurrentIbUser()!.tags);
     final BannerAdListener listener = BannerAdListener(
       // Called when an ad is successfully received.
       onAdLoaded: (Ad ad) => print('Ad loaded.'),
@@ -149,7 +182,7 @@ class IbAdManager {
               ? kBanner3IdAndroid
               : kBanner3IdiOS,
       size: AdSize.mediumRectangle,
-      request: const AdRequest(),
+      request: adRequest,
       listener: listener,
     );
     return myBanner;

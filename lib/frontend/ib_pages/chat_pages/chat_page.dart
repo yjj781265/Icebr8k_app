@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/circle_settings_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
 import 'package:icebr8k/backend/managers/ib_ad_manager.dart';
@@ -398,41 +397,21 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                       TextButton(
                                           onPressed: () async {
                                             Get.back();
-                                            await IbAdManager().showRewardAd(
-                                                FullScreenContentCallback(
-                                                    onAdFailedToShowFullScreenContent:
-                                                        (RewardedAd ad,
-                                                            AdError error) {
-                                              print(
-                                                  '$ad onAdFailedToShowFullScreenContent: $error');
-                                              ad.dispose();
-                                            }, onAdDismissedFullScreenContent:
-                                                        (ad) {
-                                              ad.dispose();
-                                              final chatTabItem =
-                                                  IbUtils.getAllChatTabItems()
-                                                      .firstWhereOrNull(
-                                                          (element) =>
-                                                              element.ibChat
-                                                                  .chatId ==
-                                                              widget
-                                                                  ._controller
-                                                                  .ibChat!
-                                                                  .chatId);
-                                              final createQuestionController =
-                                                  Get.put(
-                                                      CreateQuestionController());
+                                            void func() {
+                                              Get.to(
+                                                  () => CreateQuestionPage(
+                                                        controller: Get.put(
+                                                            CreateQuestionController(),
+                                                            tag: IbUtils
+                                                                .getUniqueId()),
+                                                      ),
+                                                  fullscreenDialog: true,
+                                                  popGesture: false,
+                                                  transition: Transition.zoom);
+                                            }
 
-                                              if (chatTabItem != null) {
-                                                createQuestionController
-                                                    .pickedChats
-                                                    .add(chatTabItem);
-                                              }
-                                              Get.to(() => CreateQuestionPage(
-                                                    controller:
-                                                        createQuestionController,
-                                                  ));
-                                            }));
+                                            await IbAdManager()
+                                                .showRewardAd(func);
                                           },
                                           child: const Text('Watch an Ad')),
                                     ],
