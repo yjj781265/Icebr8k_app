@@ -3,7 +3,6 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:get/get.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/create_question_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
@@ -142,23 +141,19 @@ class _MainPageViewState extends State<MainPageView>
                     TextButton(
                         onPressed: () async {
                           Get.back();
-                          await IbAdManager().showRewardAd(
-                              FullScreenContentCallback(
-                                  onAdFailedToShowFullScreenContent:
-                                      (RewardedAd ad, AdError error) {
-                            print(
-                                '$ad onAdFailedToShowFullScreenContent: $error');
-                            ad.dispose();
-                          }, onAdDismissedFullScreenContent: (ad) {
-                            ad.dispose();
-                            final createQuestionController = Get.put(
-                                CreateQuestionController(),
-                                tag: IbUtils.getUniqueId());
+                          void func() {
+                            Get.to(
+                                () => CreateQuestionPage(
+                                      controller: Get.put(
+                                          CreateQuestionController(),
+                                          tag: IbUtils.getUniqueId()),
+                                    ),
+                                fullscreenDialog: true,
+                                popGesture: false,
+                                transition: Transition.zoom);
+                          }
 
-                            Get.to(() => CreateQuestionPage(
-                                  controller: createQuestionController,
-                                ));
-                          }));
+                          await IbAdManager().showRewardAd(func);
                         },
                         child: const Text('Watch an Ad')),
                   ],
