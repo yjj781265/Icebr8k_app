@@ -20,8 +20,14 @@ class IbAdWidget extends StatelessWidget {
             child: SizedBox(
               width: Get.width,
               height: _controller.bannerAd.size.height.toDouble(),
-              child: const Center(
-                child: IbProgressIndicator(),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    IbProgressIndicator(),
+                    Text('Loading Ad...')
+                  ],
+                ),
               ),
             ),
           ),
