@@ -5,8 +5,8 @@ import 'package:icebr8k/frontend/admin/feedback_chat_page.dart';
 import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
 import 'package:lottie/lottie.dart';
 
-import '../../backend/models/ib_user.dart';
-import '../ib_config.dart';
+import '../../../backend/models/ib_user.dart';
+import '../../ib_config.dart';
 
 class BannedCountDownPage extends StatelessWidget {
   final IbUser user;
@@ -28,7 +28,7 @@ class BannedCountDownPage extends StatelessWidget {
               child: Text(
                 'You account is banned for the following reason: \n${user.note}',
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: IbConfig.kPageTitleSize),
+                style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
               ),
             ),
             Padding(
@@ -38,7 +38,9 @@ class BannedCountDownPage extends StatelessWidget {
                   children: [
                     TextSpan(
                         text: ' ${banedString()}',
-                        style: const TextStyle(fontWeight: FontWeight.bold))
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: IbConfig.kNormalTextSize))
                   ])),
             ),
             ElevatedButton(
