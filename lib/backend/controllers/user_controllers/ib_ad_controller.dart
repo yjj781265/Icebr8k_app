@@ -12,15 +12,11 @@ class IbAdController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
     isLoading.value = true;
-    await bannerAd.dispose();
-    await bannerAd.load();
-    await Future.delayed(const Duration(seconds: 1));
-  }
-
-  @override
-  void onReady() {
-    super.onReady();
-    isLoading.value = false;
+    await Future.wait([
+      bannerAd.dispose(),
+      bannerAd.load(),
+      Future.delayed(const Duration(milliseconds: 888))
+    ]).then((value) => isLoading.value = false);
   }
 
   @override
