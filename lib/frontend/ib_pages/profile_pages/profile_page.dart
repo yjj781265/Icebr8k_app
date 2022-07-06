@@ -308,19 +308,22 @@ class ProfilePage extends StatelessWidget {
             child: SizedBox(
               width: Get.width,
               height: Get.width / 2.0,
-              child: CachedNetworkImage(
-                imageUrl: _controller.rxIbUser.value.coverPhotoUrl.isEmpty
-                    ? IbConfig.kDefaultCoverPhotoUrl
-                    : _controller.rxIbUser.value.coverPhotoUrl,
-                fit: BoxFit.fill,
-                progressIndicatorBuilder: (context, string, progress) {
-                  return Center(
-                    child: CircularProgressIndicator.adaptive(
-                      value: progress.progress,
+              child: _controller.rxIbUser.value.coverPhotoUrl.isEmpty
+                  ? Image.asset(
+                      'assets/images.header_img.jpg',
+                      fit: BoxFit.fill,
+                    )
+                  : CachedNetworkImage(
+                      imageUrl: _controller.rxIbUser.value.coverPhotoUrl,
+                      fit: BoxFit.fill,
+                      progressIndicatorBuilder: (context, string, progress) {
+                        return Center(
+                          child: CircularProgressIndicator.adaptive(
+                            value: progress.progress,
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ),
         ),

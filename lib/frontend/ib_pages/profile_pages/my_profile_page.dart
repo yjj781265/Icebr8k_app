@@ -141,13 +141,15 @@ class MyProfilePage extends StatelessWidget {
             child: SizedBox(
               width: Get.width,
               height: Get.width / 2.0,
-              child: CachedNetworkImage(
-                imageUrl:
-                    _controller.rxCurrentIbUser.value.coverPhotoUrl.isEmpty
-                        ? IbConfig.kDefaultCoverPhotoUrl
-                        : _controller.rxCurrentIbUser.value.coverPhotoUrl,
-                fit: BoxFit.fill,
-              ),
+              child: _controller.rxCurrentIbUser.value.coverPhotoUrl.isEmpty
+                  ? Image.asset(
+                      'assets/images/header_img.jpg',
+                      fit: BoxFit.fill,
+                    )
+                  : CachedNetworkImage(
+                      imageUrl: _controller.rxCurrentIbUser.value.coverPhotoUrl,
+                      fit: BoxFit.fill,
+                    ),
             ),
           ),
         ),
