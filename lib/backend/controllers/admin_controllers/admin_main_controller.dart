@@ -16,8 +16,8 @@ import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
-import 'package:icebr8k/frontend/ib_pages/banned_count_down_page.dart';
 import 'package:icebr8k/frontend/ib_pages/main_page.dart';
+import 'package:icebr8k/frontend/ib_pages/setup_pages/banned_count_down_page.dart';
 import 'package:icebr8k/frontend/ib_pages/setup_pages/setup_page_one.dart';
 import 'package:icebr8k/frontend/ib_pages/welcome_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';

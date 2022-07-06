@@ -42,10 +42,10 @@ class ReviewPage extends StatelessWidget {
                     const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Text(
-                        'At Icebr8k we want to create a safe environment for every Icebr8kers'
+                        'At Icebr8k we want to create a safe environment for every Icebr8ker'
                         '\n\nYour profile is currently under review, '
-                        'we will notify you via Email once '
-                        'is done, thank you for your patient😃 \n -Junjie(Founder of Icebr8k)',
+                        'we will notify you via email once '
+                        'is done, thank you for your patience😃 \n -Junjie(Founder of Icebr8k)',
                         style: TextStyle(fontSize: IbConfig.kNormalTextSize),
                         textAlign: TextAlign.center,
                       ),
