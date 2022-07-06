@@ -61,14 +61,17 @@ class _MenuPageState extends State<MenuPage> {
                           borderRadius: const BorderRadius.only(
                               topRight: Radius.circular(16),
                               topLeft: Radius.circular(16)),
-                          child: CachedNetworkImage(
-                            fit: BoxFit.fill,
-                            imageUrl: _mainPageController
-                                    .rxCurrentIbUser.value.coverPhotoUrl.isEmpty
-                                ? IbConfig.kDefaultCoverPhotoUrl
-                                : _mainPageController
-                                    .rxCurrentIbUser.value.coverPhotoUrl,
-                          ),
+                          child: _mainPageController
+                                  .rxCurrentIbUser.value.coverPhotoUrl.isEmpty
+                              ? Image.asset(
+                                  'assets/images/header_img.jpg',
+                                  fit: BoxFit.fill,
+                                )
+                              : CachedNetworkImage(
+                                  fit: BoxFit.fill,
+                                  imageUrl: _mainPageController
+                                      .rxCurrentIbUser.value.coverPhotoUrl,
+                                ),
                         ),
                       ),
                       Positioned.fill(
