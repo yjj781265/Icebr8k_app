@@ -67,7 +67,6 @@ dependencies:
   purchases_flutter: ^3.10.0
   reorderables: ^0.5.0
   scrollable_positioned_list: ^0.3.2
-  shake: ^2.1.0
   showcaseview: ^1.1.6
   url_launcher: 6.1.2
   uuid: ^3.0.6
