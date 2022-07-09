@@ -21,7 +21,7 @@ class IbAdWidget extends StatelessWidget {
               width: Get.width,
               height: _controller.bannerAd.size.height.toDouble(),
               child: Center(
-                child: Column(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: const [
                     IbProgressIndicator(),

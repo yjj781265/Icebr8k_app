@@ -1,4 +1,9 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:icebr8k/backend/services/admin_services/ib_admin_db_service.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
+
+import '../../db_config.dart';
 
 class IbAuthService {
   static final IbAuthService _authService = IbAuthService._();
@@ -30,6 +35,27 @@ class IbAuthService {
 
   Future<void> signOut() async {
     return _firebaseAuth.signOut();
+  }
+
+  Future<bool> deleteAccount() async {
+    if (IbUtils.getCurrentIbUser() == null) {
+      return false;
+    }
+    try {
+      await IbAdminDbService().deleteAllEmoPics(IbUtils.getCurrentIbUser()!);
+      await IbAdminDbService().deleteAvatarUrl(IbUtils.getCurrentIbUser()!);
+      await IbAdminDbService().deleteCoverPhoto(IbUtils.getCurrentIbUser()!);
+      await FirebaseFunctions.instance.httpsCallable('deleteAccount').call({
+        'dbSuffix': DbConfig.dbSuffix,
+        'uid': IbUtils.getCurrentUid() ?? ''
+      });
+      return true;
+    } on FirebaseFunctionsException catch (error) {
+      print(error.code);
+      print(error.details);
+      print(error.message);
+      return false;
+    }
   }
 
   Future<void> resetPassword(String email) async {
