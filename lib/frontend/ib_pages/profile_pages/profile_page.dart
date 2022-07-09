@@ -295,13 +295,13 @@ class ProfilePage extends StatelessWidget {
         Obx(
           () => InkWell(
             onTap: () {
+              if (_controller.rxIbUser.value.coverPhotoUrl.isEmpty) {
+                return;
+              }
               Get.to(
-                  () => IbMediaViewer(urls: [
-                        if (_controller.rxIbUser.value.coverPhotoUrl.isEmpty)
-                          IbConfig.kDefaultCoverPhotoUrl
-                        else
-                          _controller.rxIbUser.value.coverPhotoUrl
-                      ], currentIndex: 0),
+                  () => IbMediaViewer(
+                      urls: [_controller.rxIbUser.value.coverPhotoUrl],
+                      currentIndex: 0),
                   transition: Transition.zoom,
                   fullscreenDialog: true);
             },
@@ -449,16 +449,16 @@ class ProfilePage extends StatelessWidget {
         (_controller.rxIbUser.value.geoPoint as GeoPoint).latitude != 0 &&
         (_controller.rxIbUser.value.geoPoint as GeoPoint).longitude != 0 &&
         IbUtils.getCurrentIbUser()!.geoPoint != null &&
+        (IbUtils.getCurrentIbUser()!.geoPoint as GeoPoint).latitude != 0 &&
+        (IbUtils.getCurrentIbUser()!.geoPoint as GeoPoint).longitude != 0 &&
         (Duration(
-                    milliseconds:
-                        IbUtils.getCurrentIbUser()!.lastLocationTimestampInMs -
-                            Timestamp.now().millisecondsSinceEpoch)
+                    milliseconds: Timestamp.now().millisecondsSinceEpoch -
+                        IbUtils.getCurrentIbUser()!.lastLocationTimestampInMs)
                 .inDays <=
             IbConfig.kValidNearbyLocationDurationInDays) &&
         (Duration(
-                    milliseconds:
-                        _controller.rxIbUser.value.lastLocationTimestampInMs -
-                            Timestamp.now().millisecondsSinceEpoch)
+                    milliseconds: Timestamp.now().millisecondsSinceEpoch -
+                        _controller.rxIbUser.value.lastLocationTimestampInMs)
                 .inDays <=
             IbConfig.kValidNearbyLocationDurationInDays)) {
       final myGeoPoint = IbUtils.getCurrentIbUser()!.geoPoint as GeoPoint;

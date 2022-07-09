@@ -286,15 +286,19 @@ class EditProfilePage extends StatelessWidget {
     return Obx(() => Stack(
           alignment: Alignment.center,
           children: [
-            if (_controller.coverPhotoUrl.value.contains('http') ||
-                _controller.coverPhotoUrl.value.isEmpty)
+            if (_controller.coverPhotoUrl.value.isURL)
               CachedNetworkImage(
                   width: Get.width,
                   height: Get.width / 2,
                   fit: BoxFit.fill,
-                  imageUrl: _controller.coverPhotoUrl.isEmpty
-                      ? IbConfig.kDefaultCoverPhotoUrl
-                      : _controller.coverPhotoUrl.value)
+                  imageUrl: _controller.coverPhotoUrl.value)
+            else if (_controller.coverPhotoUrl.value.isEmpty)
+              Image.asset(
+                'assets/images/default_cover_photo.jpeg',
+                width: Get.width,
+                height: Get.width / 2,
+                fit: BoxFit.fill,
+              )
             else
               Image.file(
                 File(_controller.coverPhotoUrl.value),

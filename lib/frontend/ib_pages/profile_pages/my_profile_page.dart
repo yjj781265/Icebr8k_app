@@ -127,14 +127,13 @@ class MyProfilePage extends StatelessWidget {
         Obx(
           () => GestureDetector(
             onTap: () {
+              if (_controller.rxCurrentIbUser.value.coverPhotoUrl.isEmpty) {
+                return;
+              }
               Get.to(
-                  () => IbMediaViewer(urls: [
-                        if (_controller
-                            .rxCurrentIbUser.value.coverPhotoUrl.isEmpty)
-                          IbConfig.kDefaultCoverPhotoUrl
-                        else
-                          _controller.rxCurrentIbUser.value.coverPhotoUrl
-                      ], currentIndex: 0),
+                  () => IbMediaViewer(
+                      urls: [_controller.rxCurrentIbUser.value.coverPhotoUrl],
+                      currentIndex: 0),
                   transition: Transition.zoom,
                   fullscreenDialog: true);
             },

@@ -236,7 +236,7 @@ class EditProfileController extends GetxController {
               backgroundColor: IbColors.errorRed);
           return;
         }
-        if (rxIbUser.value.coverPhotoUrl != IbConfig.kDefaultCoverPhotoUrl) {
+        if (rxIbUser.value.coverPhotoUrl.isNotEmpty) {
           // rm the old cover photo url
           await IbStorageService().deleteFile(rxIbUser.value.coverPhotoUrl);
         }

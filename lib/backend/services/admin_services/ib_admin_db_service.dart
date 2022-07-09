@@ -74,6 +74,10 @@ class IbAdminDbService {
     await IbStorageService().deleteFile(user.avatarUrl);
   }
 
+  Future<void> deleteCoverPhoto(IbUser user) async {
+    await IbStorageService().deleteFile(user.coverPhotoUrl);
+  }
+
   Future<void> addFeedback(IbMessage message) async {
     message.timestamp = Timestamp.now();
     await _db.collection(_kFeedbackCollection).doc(message.chatRoomId).set({
