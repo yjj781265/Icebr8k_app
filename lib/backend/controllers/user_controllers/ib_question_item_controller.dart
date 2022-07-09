@@ -244,7 +244,9 @@ class IbQuestionItemController extends GetxController {
 
       for (final IbAnswer answer in ibAnswers) {
         final user = await retrieveUser(answer.uid);
-        users.addIf(user != null, user!);
+        if (user != null) {
+          users.add(user);
+        }
       }
       choiceUserMap[choice] = users;
     }
@@ -318,7 +320,11 @@ class IbQuestionItemController extends GetxController {
         resultMap[ibChoice] = (countMap[ibChoice.choiceId] ?? 0).toDouble() /
             rxIbQuestion.value.pollSize.toDouble();
       }
+      // put the popular vote on top
+      rxIbQuestion.value.choices.sort((a, b) =>
+          (countMap[b.choiceId] ?? 0).compareTo(countMap[a.choiceId] ?? 0));
       await _generateChoiceUserMap();
+
       voted.value = true;
     } catch (e) {
       voted.value = false;
