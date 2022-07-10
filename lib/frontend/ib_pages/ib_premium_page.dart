@@ -85,19 +85,18 @@ class IbPremiumPage extends StatelessWidget {
                 ),
               ),
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SafeArea(
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: IbElevatedButton(
-                      color: IbColors.primaryColor,
-                      textTrKey: 'I am In',
-                      onPressed: () async {
-                        _showPayWall();
-                      },
-                    ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SafeArea(
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: IbElevatedButton(
+                    color: IbColors.primaryColor,
+                    textTrKey: 'I am In',
+                    onPressed: () async {
+                      _showPayWall();
+                    },
                   ),
                 ),
               ),

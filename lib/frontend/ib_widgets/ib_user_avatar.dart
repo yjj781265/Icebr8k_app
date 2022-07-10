@@ -42,6 +42,7 @@ class IbUserAvatar extends StatelessWidget {
                 : null),
         height: radius * 2,
         width: radius * 2,
+        child: const Icon(Icons.no_accounts_sharp),
       );
     }
     return Stack(

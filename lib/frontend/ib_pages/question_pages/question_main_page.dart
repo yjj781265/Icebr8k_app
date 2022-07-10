@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/frontend/ib_pages/comment_pages/reply_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../../backend/controllers/user_controllers/comment_controller.dart';
+import '../../../backend/controllers/user_controllers/question_main_controller.dart';
 import '../../../backend/controllers/user_controllers/reply_controller.dart';
 import '../comment_pages/comment_page.dart';
 
 class QuestionMainPage extends StatefulWidget {
-  final IbQuestionItemController _controller;
+  final QuestionMainController _controller;
   final ToPage toPage;
   final String? commentId;
   const QuestionMainPage(this._controller,
@@ -32,7 +32,8 @@ class _QuestionMainPageState extends State<QuestionMainPage> {
           break;
         case ToPage.comment:
           Get.to(CommentPage(Get.put(
-              CommentController(itemController: widget._controller),
+              CommentController(
+                  itemController: widget._controller.itemController),
               tag: IbUtils.getUniqueId())));
           break;
         case ToPage.reply:
@@ -42,7 +43,8 @@ class _QuestionMainPageState extends State<QuestionMainPage> {
           Get.to(ReplyPage(Get.put(
               ReplyController(
                   parentCommentId: widget.commentId!,
-                  ibQuestion: widget._controller.rxIbQuestion.value),
+                  ibQuestion:
+                      widget._controller.itemController.rxIbQuestion.value),
               tag: IbUtils.getUniqueId())));
           break;
       }
@@ -53,19 +55,20 @@ class _QuestionMainPageState extends State<QuestionMainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget._controller.rxIbQuestion.value.question),
+        title:
+            Text(widget._controller.itemController.rxIbQuestion.value.question),
       ),
       body: SmartRefresher(
         controller: refreshController,
         onRefresh: () async {
-          await widget._controller.refreshStats();
+          await widget._controller.itemController.refreshStats();
           refreshController.refreshCompleted();
         },
         child: SingleChildScrollView(
             child: IbUtils.handleQuestionType(
-                widget._controller.rxIbQuestion.value,
-                uniqueTag: true,
-                itemController: widget._controller)),
+          widget._controller.itemController.rxIbQuestion.value,
+          uniqueTag: true,
+        )),
       ),
     );
   }

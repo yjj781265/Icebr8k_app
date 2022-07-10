@@ -786,6 +786,9 @@ class IbUtils {
       Get.find<HomeTabController>()
           .trendingList
           .removeWhere((element) => element.id == ibQuestion.id);
+      Get.find<HomeTabController>()
+          .newestList
+          .removeWhere((element) => element.id == ibQuestion.id);
     }
 
     if (Get.isRegistered<AnsweredQuestionController>()) {

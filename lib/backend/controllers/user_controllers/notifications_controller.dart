@@ -6,6 +6,7 @@ import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/question_main_controller.dart';
 import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
@@ -134,14 +135,14 @@ class NotificationController extends GetxController {
       final question =
           await IbQuestionDbService().querySingleQuestion(questionId);
       if (question != null) {
-        final IbQuestionItemController itemController = Get.put(
-            IbQuestionItemController(
-                isShowCase: false.obs,
-                rxIbQuestion: question.obs,
-                rxIsExpanded: true.obs,
-                rxIsSample: false.obs),
-            tag: IbUtils.getUniqueId());
-        Get.to(() => QuestionMainPage(itemController),
+        Get.to(
+            () => QuestionMainPage(Get.put(
+                QuestionMainController(Get.put(IbQuestionItemController(
+                    rxIbQuestion: question.obs,
+                    rxIsExpanded: true.obs,
+                    rxIsSample: false.obs,
+                    isShowCase: false.obs))),
+                tag: questionId)),
             preventDuplicates: false);
       }
     }

@@ -226,6 +226,10 @@ class IbQuestionItemController extends GetxController {
       resultMap[ibChoice] = (countMap[ibChoice.choiceId] ?? 0).toDouble() /
           rxIbQuestion.value.pollSize.toDouble();
     }
+    // put the popular vote on top
+    rxIbQuestion.value.choices.sort((a, b) =>
+        (countMap[b.choiceId] ?? 0).compareTo(countMap[a.choiceId] ?? 0));
+    rxIbQuestion.refresh();
   }
 
   Future<void> _generateChoiceUserMap() async {
@@ -370,7 +374,6 @@ class IbQuestionItemController extends GetxController {
     if (rxIbQuestion.value.creatorId != IbUtils.getCurrentUid()) {
       return;
     }
-
     try {
       Get.dialog(
         IbDialog(

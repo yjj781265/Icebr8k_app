@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_comment.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
+import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 
@@ -61,8 +63,9 @@ class IbQuestionDbService {
   }
 
   Future<List<IbQuestion>> queryFirst8() async {
+    final uid = await IbUserDbService().queryUserIdFromUserName('icebr8k');
     final snapshot = await _collectionRef
-        .where('creatorId', isEqualTo: 'y79vjfa5yUTN5kFRNf9uSWS7ZOs1')
+        .where('creatorId', isEqualTo: uid)
         .limit(8)
         .orderBy('askedTimeInMs', descending: false)
         .get();
@@ -446,6 +449,11 @@ class IbQuestionDbService {
         .snapshots();
   }
 
+  Stream<DocumentSnapshot<Map<String, dynamic>>> listenToIbQuestionChange(
+      String questionId) {
+    return _collectionRef.doc(questionId).snapshots();
+  }
+
   Future<bool> isQuestionAnswered(
       {required String uid, required String questionId}) async {
     final _snapshot = await _collectionRef
@@ -651,6 +659,12 @@ class IbQuestionDbService {
     final q = IbQuestion.fromJson(snapshot4.data()!);
     for (final media in q.medias) {
       await IbStorageService().deleteFile(media.url);
+    }
+
+    for (final choice in q.choices) {
+      if (choice.url != null && choice.url!.isURL) {
+        await IbStorageService().deleteFile(choice.url!);
+      }
     }
     await snapshot4.reference.delete();
   }

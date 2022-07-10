@@ -10,6 +10,8 @@ import 'package:icebr8k/frontend/ib_pages/question_pages/question_main_page.dart
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 
+import '../../backend/controllers/user_controllers/question_main_controller.dart';
+
 class IbQuestionSnippetCard extends StatelessWidget {
   final IbQuestion question;
 
@@ -49,13 +51,17 @@ class IbQuestionSnippetCard extends StatelessWidget {
                   customBorder: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8)),
                   onTap: () {
-                    Get.to(() => QuestionMainPage(Get.put(
-                        IbQuestionItemController(
-                            rxIbQuestion: question.obs,
-                            rxIsExpanded: true.obs,
-                            isShowCase: false.obs,
-                            rxIsSample: false.obs),
-                        tag: IbUtils.getUniqueId())));
+                    Get.to(() => QuestionMainPage(
+                          Get.put(QuestionMainController(
+                            Get.put(
+                                IbQuestionItemController(
+                                    isShowCase: false.obs,
+                                    rxIsSample: false.obs,
+                                    rxIbQuestion: question.obs,
+                                    rxIsExpanded: true.obs),
+                                tag: IbUtils.getUniqueId()),
+                          )),
+                        ));
                   },
                 ),
               ))
