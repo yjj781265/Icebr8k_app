@@ -98,9 +98,7 @@ class AuthController extends GetxService {
         print('User is signed in!');
         await IbAnalyticsManager()
             .logCustomEvent(name: 'user_log_in', data: {});
-        if (isInitializing.isTrue) {
-          _navigateToCorrectPage();
-        }
+        _navigateToCorrectPage();
       }
     });
   }
@@ -226,15 +224,8 @@ class AuthController extends GetxService {
           title: "Verify your email",
           subtitle: 'sign_up_email_verification'.tr,
           positiveTextKey: 'ok',
-          onPositiveTap: () async {
-            await _ibAuthService.signOut();
-            Get.offAll(() => WelcomePage(),
-                transition: Transition.circularReveal);
-          },
           showNegativeBtn: false,
         ));
-      } else {
-        await _ibAuthService.signOut();
       }
     } on FirebaseAuthException catch (e) {
       Get.back();
@@ -387,11 +378,11 @@ class AuthController extends GetxService {
                 transition: Transition.circularReveal);
             break;
         }
-      } else {
-        print('AuthController firebase user email is not verified ');
+      } else if (firebaseUser != null && !firebaseUser!.emailVerified) {
+        IbUtils.showSimpleSnackBar(
+            msg: 'User email is not verified yet',
+            backgroundColor: IbColors.primaryColor);
         Get.offAll(() => WelcomePage());
-        await IbAnalyticsManager().logScreenView(
-            className: "AuthController", screenName: "WelcomePage");
       }
     } on FirebaseAuthException catch (e) {
       Get.dialog(IbDialog(
