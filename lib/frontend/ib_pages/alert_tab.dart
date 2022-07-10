@@ -20,6 +20,8 @@ import 'package:icebr8k/frontend/ib_widgets/ib_progress_indicator.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../backend/controllers/user_controllers/question_main_controller.dart';
+
 class AlertTab extends StatelessWidget {
   final NotificationController _controller = Get.find();
   @override
@@ -715,13 +717,15 @@ class AlertTab extends StatelessWidget {
               await IbUserDbService().sendAlertNotification(item.notification);
             }
             Get.to(() => QuestionMainPage(
-                  Get.put(
-                      IbQuestionItemController(
-                          isShowCase: false.obs,
-                          rxIsSample: false.obs,
-                          rxIbQuestion: item.ibQuestion!.obs,
-                          rxIsExpanded: true.obs),
-                      tag: IbUtils.getUniqueId()),
+                  Get.put(QuestionMainController(
+                    Get.put(
+                        IbQuestionItemController(
+                            isShowCase: false.obs,
+                            rxIsSample: false.obs,
+                            rxIbQuestion: item.ibQuestion!.obs,
+                            rxIsExpanded: true.obs),
+                        tag: IbUtils.getUniqueId()),
+                  )),
                   toPage: ToPage.comment,
                 ));
           },
@@ -776,6 +780,17 @@ class AlertTab extends StatelessWidget {
               item.notification.isRead = true;
               await IbUserDbService().sendAlertNotification(item.notification);
             }
+            Get.to(() => QuestionMainPage(
+                  Get.put(QuestionMainController(
+                    Get.put(
+                        IbQuestionItemController(
+                            isShowCase: false.obs,
+                            rxIsSample: false.obs,
+                            rxIbQuestion: item.ibQuestion!.obs,
+                            rxIsExpanded: true.obs),
+                        tag: IbUtils.getUniqueId()),
+                  )),
+                ));
           },
           leading: IbUserAvatar(
             radius: 21,
@@ -830,13 +845,15 @@ class AlertTab extends StatelessWidget {
               await IbUserDbService().sendAlertNotification(item.notification);
             }
             Get.to(() => QuestionMainPage(
-                  Get.put(
-                      IbQuestionItemController(
-                          isShowCase: false.obs,
-                          rxIsSample: false.obs,
-                          rxIbQuestion: item.ibQuestion!.obs,
-                          rxIsExpanded: true.obs),
-                      tag: IbUtils.getUniqueId()),
+                  Get.put(QuestionMainController(
+                    Get.put(
+                        IbQuestionItemController(
+                            isShowCase: false.obs,
+                            rxIsSample: false.obs,
+                            rxIbQuestion: item.ibQuestion!.obs,
+                            rxIsExpanded: true.obs),
+                        tag: IbUtils.getUniqueId()),
+                  )),
                   toPage: ToPage.comment,
                 ));
           },
@@ -893,13 +910,15 @@ class AlertTab extends StatelessWidget {
               await IbUserDbService().sendAlertNotification(item.notification);
             }
             Get.to(() => QuestionMainPage(
-                  Get.put(
-                      IbQuestionItemController(
-                          isShowCase: false.obs,
-                          rxIsSample: false.obs,
-                          rxIbQuestion: item.ibQuestion!.obs,
-                          rxIsExpanded: true.obs),
-                      tag: IbUtils.getUniqueId()),
+                  Get.put(QuestionMainController(
+                    Get.put(
+                        IbQuestionItemController(
+                            isShowCase: false.obs,
+                            rxIsSample: false.obs,
+                            rxIbQuestion: item.ibQuestion!.obs,
+                            rxIsExpanded: true.obs),
+                        tag: IbUtils.getUniqueId()),
+                  )),
                   toPage: ToPage.reply,
                   commentId: item.ibComment!.parentId,
                 ));
@@ -956,7 +975,17 @@ class AlertTab extends StatelessWidget {
               item.notification.isRead = true;
               await IbUserDbService().sendAlertNotification(item.notification);
             }
-            _toQuestionMainPage(item);
+            Get.to(() => QuestionMainPage(
+                  Get.put(QuestionMainController(
+                    Get.put(
+                        IbQuestionItemController(
+                            isShowCase: false.obs,
+                            rxIsSample: false.obs,
+                            rxIbQuestion: item.ibQuestion!.obs,
+                            rxIsExpanded: true.obs),
+                        tag: IbUtils.getUniqueId()),
+                  )),
+                ));
           },
           leading: IbUserAvatar(
             radius: 21,
@@ -1040,17 +1069,5 @@ class AlertTab extends StatelessWidget {
       );
     }
     return const SizedBox();
-  }
-
-  void _toQuestionMainPage(NotificationItem item) {
-    Get.to(() => QuestionMainPage(
-          Get.put(
-              IbQuestionItemController(
-                  isShowCase: false.obs,
-                  rxIsSample: false.obs,
-                  rxIbQuestion: item.ibQuestion!.obs,
-                  rxIsExpanded: true.obs),
-              tag: IbUtils.getUniqueId()),
-        ));
   }
 }

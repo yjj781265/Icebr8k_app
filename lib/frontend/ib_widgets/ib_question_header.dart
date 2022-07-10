@@ -151,6 +151,19 @@ class IbQuestionHeader extends StatelessWidget {
             ),
             title: const Text("Edit"),
           ),
+        if (_itemController.rxIbQuestion.value.creatorId ==
+            IbUtils.getCurrentUid())
+          ListTile(
+            onTap: () async {
+              Get.back();
+              _itemController.deleteQuestion();
+            },
+            leading: const Icon(
+              Icons.delete,
+              color: IbColors.errorRed,
+            ),
+            title: const Text("Delete"),
+          ),
         ListTile(
           leading: const Icon(
             Icons.remove_red_eye,
@@ -210,6 +223,6 @@ class IbQuestionHeader extends StatelessWidget {
         )
       ],
     );
-    Get.bottomSheet(Center(child: IbCard(child: options)));
+    Get.bottomSheet(IbCard(child: options));
   }
 }

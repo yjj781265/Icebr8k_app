@@ -129,7 +129,8 @@ class TagPage extends StatelessWidget {
                     }
                     index -= 1;
                     return IbUtils.handleQuestionType(
-                        _controller.ibQuestions[index]);
+                        _controller.ibQuestions[index],
+                        uniqueTag: true);
                   },
                   itemCount: _controller.ibQuestions.isEmpty
                       ? 1

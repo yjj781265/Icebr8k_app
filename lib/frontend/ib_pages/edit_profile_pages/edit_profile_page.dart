@@ -232,8 +232,7 @@ class EditProfilePage extends StatelessWidget {
                         onChanged: (value) {
                           _controller.isAgeHidden.value = value;
                         },
-                        tileColor: Theme.of(context).backgroundColor,
-                        title: const Text('Hide My Age'),
+                        title: const Text("Don't Show My Age"),
                       ),
                     ),
                     const Divider(

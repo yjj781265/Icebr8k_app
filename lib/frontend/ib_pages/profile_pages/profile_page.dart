@@ -310,7 +310,7 @@ class ProfilePage extends StatelessWidget {
               height: Get.width / 2.0,
               child: _controller.rxIbUser.value.coverPhotoUrl.isEmpty
                   ? Image.asset(
-                      'assets/images.header_img.jpg',
+                      'assets/images/header_img.jpg',
                       fit: BoxFit.fill,
                     )
                   : CachedNetworkImage(

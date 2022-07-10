@@ -20,7 +20,6 @@ class IbQuestionButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ShowCaseWidget(onComplete: (index, key) {
-      print(key);
       if (key == _controller.voteOptionsShowCaseKey) {
         IbLocalDataService().updateBoolValue(
             key: StorageKey.voteOptionsShowCaseBool, value: true);

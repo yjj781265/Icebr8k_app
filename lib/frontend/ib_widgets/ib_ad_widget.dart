@@ -15,19 +15,14 @@ class IbAdWidget extends StatelessWidget {
     return Obx(() {
       if (_controller.isLoading.isTrue) {
         return IbCard(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SizedBox(
-              width: Get.width,
-              height: _controller.bannerAd.size.height.toDouble(),
-              child: Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    IbProgressIndicator(),
-                    Text('Loading Ad...')
-                  ],
-                ),
+          child: Container(
+            margin: const EdgeInsets.all(8),
+            width: Get.width,
+            height: _controller.bannerAd.size.height.toDouble(),
+            child: Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [IbProgressIndicator(), Text('Loading Ad...')],
               ),
             ),
           ),
@@ -35,14 +30,12 @@ class IbAdWidget extends StatelessWidget {
       }
 
       return IbCard(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: SizedBox(
-            width: Get.width,
-            height: _controller.bannerAd.size.height.toDouble(),
-            child: AdWidget(
-              ad: _controller.bannerAd,
-            ),
+        child: Container(
+          margin: const EdgeInsets.all(8),
+          width: Get.width,
+          height: _controller.bannerAd.size.height.toDouble(),
+          child: AdWidget(
+            ad: _controller.bannerAd,
           ),
         ),
       );
