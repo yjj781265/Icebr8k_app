@@ -19,55 +19,43 @@ class IbQuestionSnippetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 0.618,
-      child: IbCard(
-          radius: 8,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: AutoSizeText(
-                  question.question,
-                  textAlign: TextAlign.center,
-                  maxLines: 8,
-                  style: const TextStyle(
-                      fontSize: IbConfig.kPageTitleSize,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: _getQuestionIcon(),
-                ),
-              ),
-              Positioned.fill(
-                  child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  customBorder: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                  onTap: () {
-                    Get.to(() => QuestionMainPage(
-                          Get.put(QuestionMainController(
-                            Get.put(
-                                IbQuestionItemController(
-                                    isShowCase: false.obs,
-                                    rxIsSample: false.obs,
-                                    rxIbQuestion: question.obs,
-                                    rxIsExpanded: true.obs),
-                                tag: IbUtils.getUniqueId()),
-                          )),
-                        ));
-                  },
-                ),
-              ))
-            ],
-          )),
-    );
+    return IbCard(
+        child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListTile(
+        onTap: () {
+          Get.to(() => QuestionMainPage(
+                Get.put(QuestionMainController(
+                  Get.put(
+                      IbQuestionItemController(
+                          isShowCase: false.obs,
+                          rxIsSample: false.obs,
+                          rxIbQuestion: question.obs,
+                          rxIsExpanded: true.obs),
+                      tag: IbUtils.getUniqueId()),
+                )),
+              ));
+        },
+        title: AutoSizeText(
+          question.question,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+          minFontSize: IbConfig.kNormalTextSize,
+          style: const TextStyle(
+              fontSize: IbConfig.kPageTitleSize, fontWeight: FontWeight.bold),
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 4.0),
+          child: Text(
+            '${question.pollSize} Vote(s)',
+            style: const TextStyle(
+                color: IbColors.lightGrey,
+                fontSize: IbConfig.kSecondaryTextSize),
+          ),
+        ),
+        trailing: _getQuestionIcon(),
+      ),
+    ));
   }
 
   Icon _getQuestionIcon() {
@@ -75,12 +63,11 @@ class IbQuestionSnippetCard extends StatelessWidget {
       case QuestionType.multipleChoice:
         return const Icon(
           FontAwesomeIcons.bars,
-          size: 16,
           color: IbColors.primaryColor,
         );
       case QuestionType.multipleChoicePic:
         return const Icon(FontAwesomeIcons.listUl,
-            size: 16, color: IbColors.primaryColor);
+            color: IbColors.primaryColor);
       case QuestionType.scaleOne:
       case QuestionType.scaleTwo:
       case QuestionType.scaleThree:

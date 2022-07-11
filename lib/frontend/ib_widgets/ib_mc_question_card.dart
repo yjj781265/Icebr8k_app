@@ -92,7 +92,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                   tag: widget._controller.rxIbQuestion.value.id))
             else
               LimitedBox(
-                maxHeight: 400,
+                maxHeight: 350,
                 child: Scrollbar(
                   thickness: 3,
                   radius: const Radius.circular(8),
