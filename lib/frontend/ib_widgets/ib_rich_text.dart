@@ -96,9 +96,16 @@ class IbRichText extends StatelessWidget {
             bodyStyle: const TextStyle(color: Colors.grey, fontSize: 12),
             errorBody: "Can't parse this url",
             errorTitle: 'Url',
+            placeholderWidget: Text(
+              aWord,
+              style: defaultTextStyle,
+            ),
             errorWidget: Container(
-              color: Colors.grey[300],
-              child: const Text("Can't parse this url"),
+              color: Colors.transparent,
+              child: Text(
+                aWord,
+                style: defaultTextStyle,
+              ),
             ),
             errorImage: errorImageUrl,
             backgroundColor: Colors.grey[300],

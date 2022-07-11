@@ -251,11 +251,12 @@ class SetupController extends GetxController {
       uploadPercentage.value = 0;
       final dialog = Obx(() => IbLoadingDialog(
           messageTrKey:
-              'Creating your unique profile(${uploadPercentage.value}%)'));
+              'Creating your unique profile (${uploadPercentage.value}%)'));
       try {
         Get.dialog(dialog, barrierDismissible: false);
         final String? url = await IbStorageService()
             .uploadAndRetrieveImgUrl(filePath: avatarUrl.value);
+        uploadPercentage.value = 10;
         if (url == null) {
           Get.back();
           IbUtils.showSimpleSnackBar(
@@ -267,6 +268,7 @@ class SetupController extends GetxController {
         for (final emoPic in emoPics) {
           final emoPicUrl = await IbStorageService()
               .uploadAndRetrieveImgUrl(filePath: emoPic.url);
+          uploadPercentage.value = uploadPercentage.value + 10;
 
           if (emoPicUrl == null) {
             Get.back();
@@ -277,7 +279,7 @@ class SetupController extends GetxController {
           }
           emoPic.url = emoPicUrl;
         }
-        uploadPercentage.value = 50;
+        uploadPercentage.value = uploadPercentage.value + 10;
         final IbUser user = IbUser(
             id: IbUtils.getCurrentUid()!,
             avatarUrl: url,
