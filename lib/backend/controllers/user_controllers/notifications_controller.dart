@@ -336,6 +336,7 @@ class NotificationController extends GetxController {
     Get.dialog(const IbLoadingDialog(messageTrKey: 'Clearing...'));
     final tempList = <NotificationItem>[];
     tempList.addAll(items);
+    tempList.addAll(requests);
     for (final item in tempList) {
       await IbUserDbService().removeNotification(item.notification);
     }

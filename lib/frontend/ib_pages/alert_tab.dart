@@ -113,7 +113,8 @@ class AlertTab extends StatelessWidget {
                 ],
               ),
               actions: [
-                if (_controller.items.isNotEmpty)
+                if (_controller.items.isNotEmpty ||
+                    _controller.requests.isNotEmpty)
                   TextButton(
                       onPressed: () async {
                         await _controller.clearAllNotifications();

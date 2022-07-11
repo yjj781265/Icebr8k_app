@@ -36,13 +36,17 @@ class CircleInfoController extends GetxController {
       return;
     }
     rxIbChat.value = ibChat;
+    isMember.value =
+        rxIbChat.value.memberUids.contains(IbUtils.getCurrentUid());
+    if (isMember.isTrue) {
+      Get.off(() => ChatPage(Get.put(ChatPageController(ibChat: ibChat))));
+    }
     await initMemberScoreMap();
     hasInvite.value = await IbUserDbService().isCircleInviteSent(
         chatId: ibChat.chatId, recipientId: IbUtils.getCurrentUid() ?? '');
     requests.value =
         await IbUserDbService().isCircleRequestSent(chatId: ibChat.chatId);
-    isMember.value =
-        rxIbChat.value.memberUids.contains(IbUtils.getCurrentUid());
+
     isLoading.value = false;
   }
 

@@ -489,6 +489,14 @@ class ChatPageController extends GetxController {
           if (index != -1) {
             ibChatMembers.removeAt(index);
           }
+          if (ibChatMembers.length == 1 &&
+              ibChatMembers.first.member.role != IbChatMember.kRoleLeader) {
+            ibChatMembers.first.member.role = IbChatMember.kRoleLeader;
+            await IbChatDbService()
+                .updateChatMember(member: ibChatMembers.first.member);
+            print(
+                'ChatPageController only 1 member left auto promote to leader');
+          }
         }
       }
 
@@ -518,14 +526,6 @@ class ChatPageController extends GetxController {
         return a.user.username.compareTo(b.user.username);
       });
       ibChatMembers.refresh();
-
-      if (ibChatMembers.length == 1 &&
-          ibChatMembers.first.member.role != IbChatMember.kRoleLeader) {
-        ibChatMembers.first.member.role = IbChatMember.kRoleLeader;
-        await IbChatDbService()
-            .updateChatMember(member: ibChatMembers.first.member);
-        print('ChatPageController only 1 member left auto promote to leader');
-      }
 
       _showWelcomeMsg();
       setUpTypingUsers();

@@ -127,18 +127,14 @@ class CircleInfo extends StatelessWidget {
                               color: _controller.requests.isNotEmpty
                                   ? Colors.orange
                                   : IbColors.accentColor,
-                              textTrKey: _controller.hasInvite.isTrue ||
-                                      _controller
-                                          .rxIbChat.value.isPublicCircle ||
-                                      _controller.isMember.isTrue
-                                  ? 'Join Circle'
-                                  : _controller.requests.isNotEmpty
-                                      ? 'Cancel Request'
-                                      : 'Request to Join Circle',
+                              textTrKey:
+                                  _controller.rxIbChat.value.isPublicCircle
+                                      ? 'Join Circle'
+                                      : _controller.requests.isNotEmpty
+                                          ? 'Cancel Request'
+                                          : 'Request to Join Circle',
                               onPressed: () async {
-                                if (_controller.hasInvite.isTrue ||
-                                    _controller.rxIbChat.value.isPublicCircle ||
-                                    _controller.isMember.isTrue) {
+                                if (_controller.rxIbChat.value.isPublicCircle) {
                                   _controller.joinCircle();
                                 } else if (!_controller
                                         .rxIbChat.value.isPublicCircle &&
