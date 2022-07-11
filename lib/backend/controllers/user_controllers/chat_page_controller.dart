@@ -507,7 +507,6 @@ class ChatPageController extends GetxController {
 
         if (a.member.role == IbChatMember.kRoleAssistant &&
             b.member.role == IbChatMember.kRoleMember) {
-          print(3);
           return -1;
         }
 
@@ -519,6 +518,15 @@ class ChatPageController extends GetxController {
         return a.user.username.compareTo(b.user.username);
       });
       ibChatMembers.refresh();
+
+      if (ibChatMembers.length == 1 &&
+          ibChatMembers.first.member.role != IbChatMember.kRoleLeader) {
+        ibChatMembers.first.member.role = IbChatMember.kRoleLeader;
+        await IbChatDbService()
+            .updateChatMember(member: ibChatMembers.first.member);
+        print('ChatPageController only 1 member left auto promote to leader');
+      }
+
       _showWelcomeMsg();
       setUpTypingUsers();
     });
@@ -704,6 +712,15 @@ class ChatPageController extends GetxController {
 
   Future<void> sendMessage() async {
     if (txtController.text.trim().isEmpty && urls.isEmpty) {
+      return;
+    }
+
+    if (ibChatMembers.indexWhere(
+            (element) => element.user.id == IbUtils.getCurrentUid()!) ==
+        -1) {
+      IbUtils.showSimpleSnackBar(
+          msg: 'You are not a member of this circle',
+          backgroundColor: IbColors.errorRed);
       return;
     }
 

@@ -18,6 +18,7 @@ import '../../services/user_services/ib_chat_db_service.dart';
 
 class ProfileController extends GetxController {
   final isLoading = true.obs;
+  final isNotValidUser = false.obs;
   final isFriend = false.obs;
   final isProfileVisible = false.obs;
   final circles = <IbChat>[].obs;
@@ -60,6 +61,8 @@ class ProfileController extends GetxController {
       circles.value = await IbChatDbService().queryUserCircles(user.id);
       isProfileVisible.value = _handleProfileVisibility();
       isLoading.value = false;
+    } else {
+      isNotValidUser.value = true;
     }
 
     super.onInit();
