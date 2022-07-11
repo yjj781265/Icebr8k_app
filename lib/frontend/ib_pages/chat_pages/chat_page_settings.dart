@@ -34,50 +34,59 @@ class ChatPageSettings extends StatelessWidget {
           title: Obx(
             () => Text(_controller.title.value),
           ),
-          actions: [
-            if (_controller.isCircle.isTrue)
-              IconButton(
-                  onPressed: () async {
-                    if (_controller.ibChatMembers.length >=
-                        IbConfig.kCircleMaxMembers) {
-                      IbUtils.showSimpleSnackBar(
-                          msg:
-                              'Circle reached ${IbConfig.kCircleMaxMembers} members limit',
-                          backgroundColor: IbColors.primaryColor);
-                      return;
-                    }
-                    final items = await Get.to(
-                      () => FriendsPicker(
-                        Get.put(
-                          IbFriendsPickerController(
-                            IbUtils.getCurrentUid()!,
-                            pickedUids: _controller.ibChatMembers
-                                .map((element) => element.user.id)
-                                .toList(),
-                          ),
-                        ),
-                      ),
-                    );
-                    if (items == null) {
-                      return;
-                    }
-                    final List<IbUser> invitees = [];
-                    for (final dynamic item in items) {
-                      final user = item as IbUser;
-                      if (_controller.ibChatMembers.indexWhere(
-                              (element) => element.user.id == user.id) ==
-                          -1) {
-                        invitees.add(user);
-                      }
-                    }
-                    await _controller.sendCircleInvites(invitees);
-                  },
-                  icon: const Icon(Icons.person_add_alt_1))
-          ],
+          actions: [_handleMemberAddBtn()],
         ),
         body: getBody(context),
       ),
     );
+  }
+
+  Widget _handleMemberAddBtn() {
+    final IbChatMemberModel? currentUserChatMemberModel =
+        _controller.ibChatMembers.firstWhereOrNull(
+            (element) => element.user.id == IbUtils.getCurrentUid());
+    if (_controller.isCircle.isFalse ||
+        currentUserChatMemberModel == null ||
+        currentUserChatMemberModel.member.role == IbChatMember.kRoleMember &&
+            _controller.isPublicCircle.isFalse) {
+      return const SizedBox();
+    }
+    return IconButton(
+        onPressed: () async {
+          if (_controller.ibChatMembers.length >= IbConfig.kCircleMaxMembers) {
+            IbUtils.showSimpleSnackBar(
+                msg:
+                    'Circle reached ${IbConfig.kCircleMaxMembers} members limit',
+                backgroundColor: IbColors.primaryColor);
+            return;
+          }
+          final items = await Get.to(
+            () => FriendsPicker(
+              Get.put(
+                IbFriendsPickerController(
+                  IbUtils.getCurrentUid()!,
+                  pickedUids: _controller.ibChatMembers
+                      .map((element) => element.user.id)
+                      .toList(),
+                ),
+              ),
+            ),
+          );
+          if (items == null) {
+            return;
+          }
+          final List<IbUser> invitees = [];
+          for (final dynamic item in items) {
+            final user = item as IbUser;
+            if (_controller.ibChatMembers
+                    .indexWhere((element) => element.user.id == user.id) ==
+                -1) {
+              invitees.add(user);
+            }
+          }
+          await _controller.sendCircleInvites(invitees);
+        },
+        icon: const Icon(Icons.person_add_alt_1));
   }
 
   Widget getBody(BuildContext context) {

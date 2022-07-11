@@ -58,11 +58,37 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Obx(() {
+        if (_controller.isNotValidUser.isTrue) {
+          return Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: 200,
+                    width: 200,
+                    child: Lottie.asset('assets/images/cat.json'),
+                  ),
+                  const Text('This user does not exist'),
+                  TextButton.icon(
+                      onPressed: Get.back,
+                      icon: const Icon(Icons.arrow_back_ios_new),
+                      label: const Text(
+                        'Back',
+                        style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+                      ))
+                ],
+              ),
+            ),
+          );
+        }
+
         if (_controller.isLoading.isTrue) {
           return const Center(
             child: IbProgressIndicator(),
           );
         }
+
         return SafeArea(
           child: DefaultTabController(
             length: 2,

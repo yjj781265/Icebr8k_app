@@ -258,6 +258,8 @@ class SocialTabController extends GetxController {
     for (final item in friends) {
       final user = await IbUserDbService().queryIbUser(item.user.id);
       if (user == null) {
+        print('user is null remove from friends');
+        await IbUserDbService().removeFriend(item.user.id);
         continue;
       }
       final compScore =
