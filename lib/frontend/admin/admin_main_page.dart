@@ -53,6 +53,7 @@ class AdminMainPage extends StatelessWidget {
                         child: Text(
                           _controller.pendingUsers.length.toString(),
                           style: const TextStyle(
+                              color: IbColors.white,
                               fontSize: IbConfig.kSecondaryTextSize),
                         ),
                       ),
