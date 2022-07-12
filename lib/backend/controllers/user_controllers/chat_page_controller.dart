@@ -124,6 +124,9 @@ class ChatPageController extends GetxController {
 
     // remove typing after 8s
     debounce(text, (value) async {
+      if (ibChat == null) {
+        return;
+      }
       await IbChatDbService().removeTypingUid(chatId: ibChat!.chatId);
       isTyping.value = false;
     }, time: const Duration(seconds: 8));
@@ -715,9 +718,10 @@ class ChatPageController extends GetxController {
       return;
     }
 
-    if (ibChatMembers.indexWhere(
-            (element) => element.user.id == IbUtils.getCurrentUid()!) ==
-        -1) {
+    if (isCircle.isTrue &&
+        ibChatMembers.indexWhere(
+                (element) => element.user.id == IbUtils.getCurrentUid()!) ==
+            -1) {
       IbUtils.showSimpleSnackBar(
           msg: 'You are not a member of this circle',
           backgroundColor: IbColors.errorRed);
