@@ -15,6 +15,7 @@ import 'package:icebr8k/backend/services/user_services/ib_tag_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/review_question_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../../frontend/ib_colors.dart';
@@ -403,6 +404,7 @@ class CreateQuestionController extends GetxController {
     Get.close(3);
 
     /// DO NOT ERASE THIS LINE BELOW
+    /// update question in home page
     itemController!.rxIsSample.value = false;
     itemController!.rxIbQuestion.value = ibQuestion;
     itemController!.rxIbQuestion.refresh();
@@ -410,6 +412,17 @@ class CreateQuestionController extends GetxController {
     IbUtils.showSimpleSnackBar(
         msg: 'Question submitted successfully',
         backgroundColor: IbColors.accentColor);
+
+    if (IbUtils.getCurrentIbUser()!.askedCount % 7 == 0) {
+      final InAppReview inAppReview = InAppReview.instance;
+      if (await inAppReview.isAvailable()) {
+        inAppReview.requestReview();
+      } else {
+        IbUtils.showSimpleSnackBar(
+            msg: 'inAppReview.isAvailable() is false',
+            backgroundColor: IbColors.errorRed);
+      }
+    }
   }
 }
 

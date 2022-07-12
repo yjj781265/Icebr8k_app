@@ -388,8 +388,7 @@ class SearchPage extends StatelessWidget {
                       final collection = IbCacheManager()
                           .retrieveIbCollection(item.collectionId);
                       if (collection != null) {
-                        final controller = Get.put(
-                            IcebreakerController(collection, isEdit: false),
+                        Get.put(IcebreakerController(collection, isEdit: false),
                             tag: item.collectionId);
                       }
                       return IbCard(
@@ -527,8 +526,7 @@ class SearchPage extends StatelessWidget {
             final collection =
                 IbCacheManager().retrieveIbCollection(item.collectionId);
             if (collection != null) {
-              final controller = Get.put(
-                  IcebreakerController(collection, isEdit: false),
+              Get.put(IcebreakerController(collection, isEdit: false),
                   tag: item.collectionId);
             }
 
