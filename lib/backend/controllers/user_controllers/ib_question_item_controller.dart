@@ -122,12 +122,6 @@ class IbQuestionItemController extends GetxController {
 
   /// refresh poll result, comments, likes,
   Future<void> refreshStats() async {
-    final q =
-        await IbQuestionDbService().querySingleQuestion(rxIbQuestion.value.id);
-    if (q != null) {
-      rxIbQuestion.value = q;
-      rxIbQuestion.refresh();
-    }
     commented.value =
         await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
     liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
@@ -154,14 +148,7 @@ class IbQuestionItemController extends GetxController {
     await IbQuestionDbService()
         .addChoice(questionId: rxIbQuestion.value.id, ibChoice: choice);
 
-    final newQ =
-        await IbQuestionDbService().querySingleQuestion(rxIbQuestion.value.id);
-
-    if (newQ != null) {
-      rxIbQuestion.value = newQ;
-      rxIbQuestion.refresh();
-    }
-    await _generatePollStats();
+    await refreshStats();
     IbUtils.showSimpleSnackBar(
         msg: "New choice added", backgroundColor: IbColors.accentColor);
   }
@@ -217,7 +204,9 @@ class IbQuestionItemController extends GetxController {
 
   Future<void> _generatePollStats() async {
     countMap.clear();
-    if (rxIbQuestion.value.pollSize == 0) {
+    final q =
+        await IbQuestionDbService().querySingleQuestion(rxIbQuestion.value.id);
+    if (q == null) {
       return;
     }
 
@@ -225,13 +214,14 @@ class IbQuestionItemController extends GetxController {
       countMap.value = await _getChoiceCountMap();
     }
 
-    for (final IbChoice ibChoice in rxIbQuestion.value.choices) {
-      resultMap[ibChoice] = (countMap[ibChoice.choiceId] ?? 0).toDouble() /
-          rxIbQuestion.value.pollSize.toDouble();
+    for (final IbChoice ibChoice in q.choices) {
+      resultMap[ibChoice] =
+          (countMap[ibChoice.choiceId] ?? 0).toDouble() / q.pollSize.toDouble();
     }
     // put the popular vote on top
-    rxIbQuestion.value.choices.sort((a, b) =>
+    q.choices.sort((a, b) =>
         (countMap[b.choiceId] ?? 0).compareTo(countMap[a.choiceId] ?? 0));
+    rxIbQuestion.value = q;
     rxIbQuestion.refresh();
   }
 
