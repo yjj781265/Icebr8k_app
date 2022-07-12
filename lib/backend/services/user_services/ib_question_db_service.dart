@@ -101,9 +101,9 @@ class IbQuestionDbService {
     int limit = IbConfig.kPerPage,
     bool publicOnly = true,
     required String uid,
-    DocumentSnapshot? lastDoc,
+    int? lastAskedTimeInMs,
   }) {
-    if (lastDoc == null && publicOnly) {
+    if (lastAskedTimeInMs == null && publicOnly) {
       return _collectionRef
           .orderBy('askedTimeInMs', descending: true)
           .where('isAnonymous', isEqualTo: false)
@@ -112,22 +112,22 @@ class IbQuestionDbService {
           .limit(limit)
           .get();
     }
-    if (lastDoc != null && publicOnly) {
+    if (lastAskedTimeInMs != null && publicOnly) {
       return _collectionRef
           .orderBy('askedTimeInMs', descending: true)
           .where('creatorId', isEqualTo: uid)
           .where('isAnonymous', isEqualTo: false)
           .where('isPublic', isEqualTo: true)
-          .startAfterDocument(lastDoc)
+          .where('askedTimeInMs', isLessThan: lastAskedTimeInMs)
           .limit(limit)
           .get();
     }
 
-    if (lastDoc != null && !publicOnly) {
+    if (lastAskedTimeInMs != null && !publicOnly) {
       return _collectionRef
           .orderBy('askedTimeInMs', descending: true)
           .where('creatorId', isEqualTo: uid)
-          .startAfterDocument(lastDoc)
+          .where('askedTimeInMs', isLessThan: lastAskedTimeInMs)
           .limit(limit)
           .get();
     }
@@ -198,9 +198,9 @@ class IbQuestionDbService {
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> listenToAskedQuestions(String uid,
-      {DocumentSnapshot? lastDoc}) {
+      {int? lastAskedTimeInMs}) {
     late Query<Map<String, dynamic>> query;
-    if (lastDoc == null) {
+    if (lastAskedTimeInMs == null) {
       query = _collectionRef
           .where('creatorId', isEqualTo: uid)
           .orderBy('askedTimeInMs', descending: true)
@@ -208,9 +208,9 @@ class IbQuestionDbService {
     } else {
       query = _collectionRef
           .where('creatorId', isEqualTo: uid)
+          .where('askedTimeInMs', isLessThan: lastAskedTimeInMs)
           .orderBy('askedTimeInMs', descending: true)
-          .limit(IbConfig.kPerPage)
-          .startAfterDocument(lastDoc);
+          .limit(IbConfig.kPerPage);
     }
 
     return query.snapshots();
@@ -260,7 +260,7 @@ class IbQuestionDbService {
   }
 
   /// Icebr8k algorithm for loading trending question
-  /// - loading public questions order by points during last 72 hrs;
+  /// loading public questions order by points during last 72 hrs;
   /// then load the rest order by asc time;
   Future<QuerySnapshot<Map<String, dynamic>>> queryTrendingQuestions(
       {int limit = IbConfig.kPerPage}) async {

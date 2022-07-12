@@ -8,6 +8,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:icebr8k/backend/controllers/user_controllers/asked_questions_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/chat_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/compare_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/friend_list_controller.dart';
@@ -51,8 +52,7 @@ import '../../ib_widgets/ib_question_snippet_card.dart';
 
 class ProfilePage extends StatelessWidget {
   final ProfileController _controller;
-  final RefreshController _askedRefreshController = RefreshController();
-  ProfilePage(this._controller);
+  const ProfilePage(this._controller);
 
   @override
   Widget build(BuildContext context) {
@@ -572,7 +572,8 @@ class ProfilePage extends StatelessWidget {
               }
               Get.to(
                 () => AskedPage(
-                  _controller.askedQuestionsController,
+                  Get.put(AskedQuestionsController(_controller.uid),
+                      tag: IbUtils.getUniqueId()),
                 ),
               );
             },
@@ -734,8 +735,11 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _askedTab() {
+    final AskedQuestionsController askedQuestionsController = Get.put(
+        AskedQuestionsController(_controller.uid),
+        tag: IbUtils.getUniqueId());
     return Obx(() {
-      if (_controller.askedQuestionsController.createdQuestions.isEmpty) {
+      if (askedQuestionsController.createdQuestions.isEmpty) {
         return SingleChildScrollView(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Center(
@@ -756,23 +760,18 @@ class ProfilePage extends StatelessWidget {
       }
 
       return SmartRefresher(
-        controller: _askedRefreshController,
+        controller: askedQuestionsController.askedRefreshController,
         enablePullDown: false,
-        enablePullUp:
-            _controller.askedQuestionsController.createdQuestions.length >=
-                IbConfig.kPerPage,
+        enablePullUp: askedQuestionsController.createdQuestions.length >=
+            IbConfig.kPerPage,
         onLoading: () async {
-          if (_controller.askedQuestionsController.lastDoc == null) {
-            _askedRefreshController.loadNoData();
-            return;
-          }
-          await _controller.askedQuestionsController.loadMore();
-          _askedRefreshController.loadComplete();
+          await askedQuestionsController.loadMore();
         },
-        child: SingleChildScrollView(
-          child: StaggeredGrid.count(
-            crossAxisCount: 3,
-            children: _controller.askedQuestionsController.createdQuestions
+        child: Obx(
+          () => ListView(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: askedQuestionsController.createdQuestions
                 .map((element) => IbQuestionSnippetCard(element))
                 .toList(),
           ),

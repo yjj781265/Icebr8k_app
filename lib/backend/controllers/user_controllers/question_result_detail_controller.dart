@@ -42,6 +42,35 @@ class QuestionResultDetailPageController extends GetxController {
     isLoading.value = true;
     results.clear();
     try {
+      /// add friends answers first if Available
+      final unBlockedUids = IbUtils.getCurrentIbUserUnblockedFriendsId();
+      final temp = <ResultItemUserModel>[];
+      for (final uid in unBlockedUids) {
+        final answers = IbCacheManager().getIbAnswers(uid) ?? [];
+        final answer = answers.firstWhereOrNull(
+            (element) => element.choiceId == ibChoice.choiceId);
+        if (answer == null) {
+          continue;
+        } else {
+          late IbUser? ibUser;
+          if (IbCacheManager().getIbUser(uid) == null) {
+            ibUser = await IbUserDbService().queryIbUser(uid);
+            IbCacheManager().cacheIbUser(ibUser);
+          } else {
+            ibUser = IbCacheManager().getIbUser(uid);
+          }
+
+          if (ibUser == null) {
+            continue;
+          }
+          final double compScore = await IbUtils.getCompScore(uid: uid);
+          temp.add(ResultItemUserModel(
+              user: ibUser,
+              compScore: compScore,
+              answeredTimestampInMs: answer.answeredTimeInMs));
+          temp.sort((a, b) => b.compScore.compareTo(a.compScore));
+        }
+      }
       final snapshot = await IbQuestionDbService().queryIbAnswers(
           choiceId: ibChoice.choiceId,
           questionId: itemController.rxIbQuestion.value.id);
@@ -49,6 +78,11 @@ class QuestionResultDetailPageController extends GetxController {
       for (final doc in snapshot.docs) {
         final IbAnswer ibAnswer = IbAnswer.fromJson(doc.data());
         final double compScore = await IbUtils.getCompScore(uid: ibAnswer.uid);
+        if (temp.indexWhere((element) => element.user.id == ibAnswer.uid) !=
+            -1) {
+          continue;
+        }
+
         late IbUser? ibUser;
         if (IbCacheManager().getIbUser(ibAnswer.uid) == null) {
           ibUser = await IbUserDbService().queryIbUser(ibAnswer.uid);
@@ -60,6 +94,7 @@ class QuestionResultDetailPageController extends GetxController {
         if (ibUser == null) {
           continue;
         }
+
         results.add(ResultItemUserModel(
             user: ibUser,
             compScore: compScore,
@@ -69,11 +104,13 @@ class QuestionResultDetailPageController extends GetxController {
       if (snapshot.docs.isNotEmpty) {
         lastSnap = snapshot.docs.last;
       }
+
+      results.sort((a, b) => b.compScore.compareTo(a.compScore));
+      results.insertAll(0, temp);
     } catch (e) {
       IbUtils.showSimpleSnackBar(
           msg: "Failed to load results $e", backgroundColor: IbColors.errorRed);
     } finally {
-      results.sort((a, b) => b.compScore.compareTo(a.compScore));
       isLoading.value = false;
     }
   }
@@ -92,6 +129,11 @@ class QuestionResultDetailPageController extends GetxController {
 
         for (final doc in snapshot.docs) {
           final IbAnswer ibAnswer = IbAnswer.fromJson(doc.data());
+          if (results
+                  .indexWhere((element) => element.user.id == ibAnswer.uid) !=
+              -1) {
+            continue;
+          }
           final double compScore =
               await IbUtils.getCompScore(uid: ibAnswer.uid);
           late IbUser? ibUser;

@@ -466,14 +466,13 @@ class MyProfilePage extends StatelessWidget {
         onLoading: () async {
           await _myProfileController.onLoadMore();
         },
-        child: SingleChildScrollView(
-          child: Obx(
-            () => StaggeredGrid.count(
-              crossAxisCount: 3,
-              children: _myProfileController.asks
-                  .map((element) => IbQuestionSnippetCard(element))
-                  .toList(),
-            ),
+        child: Obx(
+          () => ListView(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: _myProfileController.asks
+                .map((element) => IbQuestionSnippetCard(element))
+                .toList(),
           ),
         ),
       );

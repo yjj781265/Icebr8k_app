@@ -48,6 +48,7 @@ class IbQuestionItemController extends GetxController {
   // variables for poll stat main page
   final RxMap<IbChoice, Set<IbUser>> choiceUserMap =
       <IbChoice, Set<IbUser>>{}.obs;
+  final RxList<IbUser> friendVotedList = <IbUser>[].obs;
   //end
 
   /// vote count for each choice id
@@ -114,6 +115,7 @@ class IbQuestionItemController extends GetxController {
       await _getMyAnswerAndDeterminedPollCloseStatus();
       await _generatePollStats();
       await _generateChoiceUserMap();
+      await _getFriendVotedList();
       _setUpCountDownTimer();
     }
   }
@@ -132,6 +134,7 @@ class IbQuestionItemController extends GetxController {
     await _generatePollStats();
     await _generateChoiceUserMap();
     await _getMyAnswerAndDeterminedPollCloseStatus();
+    await _getFriendVotedList();
   }
 
   Future<void> addChoice(IbChoice choice) async {
@@ -232,27 +235,66 @@ class IbQuestionItemController extends GetxController {
     rxIbQuestion.refresh();
   }
 
-  Future<void> _generateChoiceUserMap() async {
-    choiceUserMap.clear();
-    for (final IbChoice choice in rxIbQuestion.value.choices) {
-      final snapshot = await IbQuestionDbService().queryIbAnswers(
-          choiceId: choice.choiceId,
-          questionId: rxIbQuestion.value.id,
-          limit: 4);
-      final List<IbAnswer> ibAnswers = [];
-      for (final doc in snapshot.docs) {
-        ibAnswers.add(IbAnswer.fromJson(doc.data()));
-      }
-
-      final Set<IbUser> users = {};
-
-      for (final IbAnswer answer in ibAnswers) {
-        final user = await retrieveUser(answer.uid);
+  Future<void> _getFriendVotedList() async {
+    friendVotedList.clear();
+    final unBlockedUids = IbUtils.getCurrentIbUserUnblockedFriendsId();
+    for (final uid in unBlockedUids) {
+      final answers = IbCacheManager().getIbAnswers(uid) ?? [];
+      if (answers.indexWhere(
+              (element) => element.questionId == rxIbQuestion.value.id) !=
+          -1) {
+        final user = await retrieveUser(uid);
         if (user != null) {
-          users.add(user);
+          friendVotedList.add(user);
         }
       }
-      choiceUserMap[choice] = users;
+    }
+  }
+
+  Future<void> _generateChoiceUserMap() async {
+    choiceUserMap.clear();
+    const int kLimit = 4;
+    final unBlockedUids = IbUtils.getCurrentIbUserUnblockedFriendsId();
+    for (final IbChoice choice in rxIbQuestion.value.choices) {
+      final Set<IbUser> users = {};
+
+      /// add friends answers first if Available
+      for (final uid in unBlockedUids) {
+        final answers = IbCacheManager().getIbAnswers(uid) ?? [];
+        final answer = answers
+            .firstWhereOrNull((element) => element.choiceId == choice.choiceId);
+        if (answer == null) {
+          continue;
+        } else {
+          if (users.length >= kLimit) {
+            break;
+          }
+          final user = await retrieveUser(answer.uid);
+          if (user != null) {
+            users.add(user);
+          }
+        }
+      }
+      if (users.length >= kLimit) {
+        choiceUserMap[choice] = users;
+      } else {
+        final snapshot = await IbQuestionDbService().queryIbAnswers(
+            choiceId: choice.choiceId,
+            questionId: rxIbQuestion.value.id,
+            limit: kLimit - users.length);
+        final List<IbAnswer> ibAnswers = [];
+        for (final doc in snapshot.docs) {
+          ibAnswers.add(IbAnswer.fromJson(doc.data()));
+        }
+
+        for (final IbAnswer answer in ibAnswers) {
+          final user = await retrieveUser(answer.uid);
+          if (user != null) {
+            users.add(user);
+          }
+        }
+        choiceUserMap[choice] = users;
+      }
     }
   }
 

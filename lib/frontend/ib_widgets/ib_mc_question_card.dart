@@ -25,6 +25,7 @@ import '../ib_utils.dart';
 import 'ib_card.dart';
 import 'ib_media_viewer.dart';
 import 'ib_question_stats.dart';
+import 'ib_question_voted_txt.dart';
 
 class IbMcQuestionCard extends StatefulWidget {
   final IbQuestionItemController _controller;
@@ -45,6 +46,12 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   void initState() {
     _prepareAnimations();
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    _runExpandCheck();
+    super.didChangeDependencies();
   }
 
   ///Setting up the animation
@@ -131,6 +138,9 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
               height: 1,
               thickness: 1,
             ),
+            const SizedBox(
+              height: 8,
+            ),
             if (!widget._controller.showComparison.value)
               Center(child: IbQuestionButtons(widget._controller))
           ],
@@ -166,8 +176,9 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                 child: expandableInfo,
               ),
               const SizedBox(
-                height: 8,
+                height: 16,
               ),
+              IbQuestionVotedText(widget._controller),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -186,14 +197,14 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                           onPressed: () {
                             widget._controller.rxIsExpanded.value =
                                 !widget._controller.rxIsExpanded.value;
+                            _runExpandCheck();
                           },
                           icon: CircleAvatar(
-                            radius: 18,
-                            backgroundColor:
-                                Theme.of(context).primaryColor.withOpacity(0.6),
-                            child: Obx(() {
-                              _runExpandCheck();
-                              return widget._controller.rxIsExpanded.isTrue
+                              radius: 18,
+                              backgroundColor: Theme.of(context)
+                                  .primaryColor
+                                  .withOpacity(0.6),
+                              child: widget._controller.rxIsExpanded.isTrue
                                   ? Icon(
                                       Icons.expand_less_rounded,
                                       color: Theme.of(context).indicatorColor,
@@ -201,9 +212,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                                   : Icon(
                                       Icons.expand_more_outlined,
                                       color: Theme.of(context).indicatorColor,
-                                    );
-                            }),
-                          ),
+                                    )),
                         ),
                       )),
                 ],
@@ -477,91 +486,99 @@ class IbQuestionMcItem extends StatelessWidget {
                         child: Row(
                           children: [
                             if (choice.url != null && choice.url!.isNotEmpty)
-                              OpenContainer(
-                                openElevation: 0,
-                                closedElevation: 0,
-                                closedShape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      IbConfig.kMcItemCornerRadius),
-                                ),
-                                openColor: Colors.black,
-                                middleColor: Colors.black,
-                                closedColor: Colors.transparent,
-                                transitionType:
-                                    ContainerTransitionType.fadeThrough,
-                                openBuilder: (BuildContext context,
-                                    void Function({Object? returnValue})
-                                        action) {
-                                  return IbMediaViewer(
-                                    urls: _controller.rxIbQuestion.value.choices
-                                        .map((e) => e.url!)
-                                        .toList(),
-                                    currentIndex: _controller
-                                        .rxIbQuestion.value.choices
-                                        .map((e) => e.url!)
-                                        .toList()
-                                        .indexWhere((element) =>
-                                            choice.url! == element),
-                                  );
-                                },
-                                closedBuilder: (_, openContainer) => Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: InkWell(
-                                    onDoubleTap: openContainer,
-                                    onTap: onItemTap,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(
-                                          IbConfig.kMcItemCornerRadius),
-                                      child: !choice.url!.contains('http')
-                                          ? Image.file(
-                                              File(choice.url!),
-                                              fit: BoxFit.fill,
-                                              width: IbConfig.kMcPicSize,
-                                              height: IbConfig.kMcPicSize,
-                                            )
-                                          : CachedNetworkImage(
-                                              fit: BoxFit.fill,
-                                              fadeInDuration: const Duration(
-                                                  milliseconds: 300),
-                                              width: IbConfig.kMcPicSize,
-                                              height: IbConfig.kMcPicSize,
-                                              imageUrl: choice.url!,
-                                              progressIndicatorBuilder:
-                                                  (context, string, progress) {
-                                                return Center(
-                                                  child:
-                                                      CircularProgressIndicator
-                                                          .adaptive(
-                                                    value: progress.progress,
-                                                  ),
-                                                );
-                                              },
-                                              errorWidget: (context, str, obj) {
-                                                return Container(
-                                                  width: IbConfig.kMcPicSize,
-                                                  height: IbConfig.kMcPicSize,
-                                                  color: IbColors.lightGrey,
-                                                  child: const Center(
-                                                    child: Icon(
-                                                      Icons.error,
-                                                      color: IbColors.errorRed,
+                              Flexible(
+                                child: OpenContainer(
+                                  openElevation: 0,
+                                  closedElevation: 0,
+                                  closedShape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        IbConfig.kMcItemCornerRadius),
+                                  ),
+                                  openColor: Colors.black,
+                                  middleColor: Colors.black,
+                                  closedColor: Colors.transparent,
+                                  transitionType:
+                                      ContainerTransitionType.fadeThrough,
+                                  openBuilder: (BuildContext context,
+                                      void Function({Object? returnValue})
+                                          action) {
+                                    return IbMediaViewer(
+                                      urls: _controller
+                                          .rxIbQuestion.value.choices
+                                          .map((e) => e.url!)
+                                          .toList(),
+                                      currentIndex: _controller
+                                          .rxIbQuestion.value.choices
+                                          .map((e) => e.url!)
+                                          .toList()
+                                          .indexWhere((element) =>
+                                              choice.url! == element),
+                                    );
+                                  },
+                                  closedBuilder: (_, openContainer) => Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: InkWell(
+                                      onDoubleTap: openContainer,
+                                      onTap: onItemTap,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                            IbConfig.kMcItemCornerRadius),
+                                        child: !choice.url!.contains('http')
+                                            ? Image.file(
+                                                File(choice.url!),
+                                                fit: BoxFit.fill,
+                                                width: IbConfig.kMcPicSize,
+                                                height: IbConfig.kMcPicSize,
+                                              )
+                                            : CachedNetworkImage(
+                                                fit: BoxFit.fill,
+                                                fadeInDuration: const Duration(
+                                                    milliseconds: 300),
+                                                width: IbConfig.kMcPicSize,
+                                                height: IbConfig.kMcPicSize,
+                                                imageUrl: choice.url!,
+                                                progressIndicatorBuilder:
+                                                    (context, string,
+                                                        progress) {
+                                                  return Center(
+                                                    child:
+                                                        CircularProgressIndicator
+                                                            .adaptive(
+                                                      value: progress.progress,
                                                     ),
-                                                  ),
-                                                );
-                                              },
-                                            ),
+                                                  );
+                                                },
+                                                errorWidget:
+                                                    (context, str, obj) {
+                                                  return Container(
+                                                    width: IbConfig.kMcPicSize,
+                                                    height: IbConfig.kMcPicSize,
+                                                    color: IbColors.lightGrey,
+                                                    child: const Center(
+                                                      child: Icon(
+                                                        Icons.error,
+                                                        color:
+                                                            IbColors.errorRed,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: AutoSizeText(
-                                choice.content.toString(),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                maxFontSize: IbConfig.kNormalTextSize,
-                                style: const TextStyle(color: Colors.black),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: AutoSizeText(
+                                  choice.content.toString(),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxFontSize: IbConfig.kNormalTextSize,
+                                  style: const TextStyle(color: Colors.black),
+                                ),
                               ),
                             ),
                           ],

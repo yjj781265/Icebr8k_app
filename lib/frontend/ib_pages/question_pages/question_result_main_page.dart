@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -78,13 +79,16 @@ class QuestionResultMainPage extends StatelessWidget {
             Row(
                 children: ibUsers.map((e) {
               if (ibUsers.toList().indexOf(e) == ibUsers.length - 1 &&
-                  ibUsers.length - 1 > votes) {
+                  ibUsers.toList().indexOf(e) != 0) {
                 return Align(
                   widthFactor: 0.8,
                   child: CircleAvatar(
                     backgroundColor: IbColors.lightGrey,
                     radius: 16,
-                    child: Text('+${ibUsers.length - 1 - votes}'),
+                    child: Text(
+                      '+${votes - (ibUsers.length - 1)}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 );
               }
@@ -214,9 +218,17 @@ class QuestionResultMainPage extends StatelessWidget {
             ),
           ),
         if (choice.content != null)
-          Text(
-            choice.content!,
-            style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: AutoSizeText(
+                choice.content!,
+                maxLines: 2,
+                maxFontSize: IbConfig.kSecondaryTextSize,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
+              ),
+            ),
           )
       ],
     );

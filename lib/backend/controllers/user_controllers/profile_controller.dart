@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/asked_questions_controller.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -33,14 +32,11 @@ class ProfileController extends GetxController {
   final compScore = 0.0.obs;
   late Rx<IbUser> rxIbUser;
   final double kAppBarCollapseHeight = 56;
-  late AskedQuestionsController askedQuestionsController;
   final RefreshController refreshController = RefreshController();
   final ScrollController scrollController = ScrollController();
   final commonAnswers = <String>[].obs;
   final uncommonAnswers = <String>[].obs;
-  ProfileController(this.uid) {
-    askedQuestionsController = Get.put(AskedQuestionsController(uid), tag: uid);
-  }
+  ProfileController(this.uid);
 
   @override
   Future<void> onInit() async {

@@ -176,7 +176,6 @@ class HomeTabController extends GetxController {
         tempList.addIf(
             trendingList.indexWhere((element) => element.id == doc.id) == -1,
             IbQuestion.fromJson(doc.data()));
-        lastTrendingDoc = doc;
       }
 
       tempList.sort((a, b) => b.points.compareTo(a.points));
@@ -291,17 +290,10 @@ class HomeTabController extends GetxController {
 
   Future<void> loadMore() async {
     if (selectedCategory.value == categories[0]) {
-      if (lastTrendingDoc == null) {
-        refreshController.loadNoData();
-        return;
-      }
-
-      final lastQuestion = trendingList
-          .firstWhereOrNull((element) => element.id == lastTrendingDoc!.id);
-      if (lastQuestion == null) {
-        refreshController.loadNoData();
-        return;
-      }
+      final tempList = <IbQuestion>[];
+      tempList.addAll(trendingList);
+      tempList.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
+      final lastQuestion = tempList.last;
 
       try {
         final snap = await IbQuestionDbService()
@@ -314,7 +306,6 @@ class HomeTabController extends GetxController {
 
         for (final doc in snap.docs) {
           tempList.add(IbQuestion.fromJson(doc.data()));
-          lastTrendingDoc = doc;
         }
         _addAds(tempList);
         trendingList.addAll(tempList);
