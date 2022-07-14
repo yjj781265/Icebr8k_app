@@ -24,12 +24,12 @@ class FriendListController extends GetxController {
     for (final String id in ibUser.friendUids) {
       IbUser? user = IbCacheManager().getIbUser(id);
       if (user != null) {
-        final compScore = await IbUtils.getCompScore(uid: user.id);
+        final compScore = await IbUtils().getCompScore(uid: user.id);
         items.add(FriendItem(user: user, compScore: compScore));
       } else {
         user = await IbUserDbService().queryIbUser(id);
         if (user != null) {
-          final compScore = await IbUtils.getCompScore(uid: user.id);
+          final compScore = await IbUtils().getCompScore(uid: user.id);
           items.add(FriendItem(user: user, compScore: compScore));
         }
       }

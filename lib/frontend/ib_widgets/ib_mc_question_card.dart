@@ -240,7 +240,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   }
 
   void _showBottomSheet({required String strTrKey}) {
-    IbUtils.hideKeyboard();
+    IbUtils().hideKeyboard();
     final TextEditingController _txtController = TextEditingController();
     final Widget _widget = IbDialog(
       title: strTrKey.tr,
@@ -250,7 +250,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
         onSubmitted: (value) async {
           Get.back();
           final choice =
-              IbChoice(choiceId: IbUtils.getUniqueId(), content: value);
+              IbChoice(choiceId: IbUtils().getUniqueId(), content: value);
           await widget._controller.addChoice(choice);
         },
         controller: _txtController,
@@ -262,7 +262,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
       onPositiveTap: () async {
         Get.back();
         final choice = IbChoice(
-            choiceId: IbUtils.getUniqueId(), content: _txtController.text);
+            choiceId: IbUtils().getUniqueId(), content: _txtController.text);
         await widget._controller.addChoice(choice);
       },
     );
@@ -314,7 +314,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
 
               if (widget._controller.rxIbQuestion.value.choices.length >=
                   IbConfig.kOpenEndedChoiceLimit) {
-                IbUtils.showSimpleSnackBar(
+                IbUtils().showSimpleSnackBar(
                     msg: 'Failed to add a choice, poll reaches choice limit',
                     backgroundColor: IbColors.errorRed);
                 return;
@@ -665,7 +665,7 @@ class IbQuestionMcItem extends StatelessWidget {
 
     if (_controller.rxIsSample.isTrue ||
         (_controller.myAnswer != null &&
-            _controller.myAnswer!.uid != IbUtils.getCurrentUid())) {
+            _controller.myAnswer!.uid != IbUtils().getCurrentUid())) {
       return;
     }
 

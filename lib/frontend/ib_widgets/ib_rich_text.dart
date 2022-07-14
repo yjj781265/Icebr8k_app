@@ -137,11 +137,11 @@ class IbRichText extends StatelessWidget {
                           final userId = await IbUserDbService()
                               .queryUserIdFromUserName(aWord.substring(1));
                           if (userId == null) {
-                            IbUtils.showSimpleSnackBar(
+                            IbUtils().showSimpleSnackBar(
                                 msg: 'Invalid User.',
                                 backgroundColor: IbColors.primaryColor);
                             return;
-                          } else if (userId == IbUtils.getCurrentUid()) {
+                          } else if (userId == IbUtils().getCurrentUid()) {
                             Get.to(() => MyProfilePage());
                           } else {
                             Get.to(() => ProfilePage(

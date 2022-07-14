@@ -87,7 +87,7 @@ class _IcebreakerCardState extends State<IcebreakerCard> {
                     HapticFeedback.heavyImpact();
                     Clipboard.setData(
                         ClipboardData(text: widget.icebreaker.text));
-                    IbUtils.showSimpleSnackBar(
+                    IbUtils().showSimpleSnackBar(
                         msg: "Text copied to clipboard",
                         backgroundColor: IbColors.primaryColor);
                   },
@@ -100,7 +100,7 @@ class _IcebreakerCardState extends State<IcebreakerCard> {
                       maxFontSize: widget.maxSize,
                       maxLines: IbConfig.kIbCardMaxLine,
                       overflow: TextOverflow.ellipsis,
-                      style: IbUtils.getIbFonts(TextStyle(
+                      style: IbUtils().getIbFonts(TextStyle(
                           fontSize: widget.maxSize,
                           color: Color(widget.icebreaker.textColor),
                           fontStyle: widget.icebreaker.isItalic
@@ -134,17 +134,17 @@ class _IcebreakerCardState extends State<IcebreakerCard> {
                           try {
                             for (final item in items) {
                               final message = IbMessage(
-                                  messageId: IbUtils.getUniqueId(),
+                                  messageId: IbUtils().getUniqueId(),
                                   content: widget.icebreaker.id,
                                   extra: [widget.icebreaker.collectionId],
-                                  senderUid: IbUtils.getCurrentUid()!,
+                                  senderUid: IbUtils().getCurrentUid()!,
                                   messageType: IbMessage.kMessageTypeIcebreaker,
                                   chatRoomId: item.ibChat.chatId,
-                                  readUids: [IbUtils.getCurrentUid()!]);
+                                  readUids: [IbUtils().getCurrentUid()!]);
                               await IbChatDbService().uploadMessage(message);
                             }
                             Get.back();
-                            IbUtils.showSimpleSnackBar(
+                            IbUtils().showSimpleSnackBar(
                                 msg: 'Icebreaker shared successfully',
                                 backgroundColor: IbColors.accentColor);
                           } catch (e) {
@@ -180,7 +180,7 @@ class _IcebreakerCardState extends State<IcebreakerCard> {
                             widget.ibCollection!.name,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: IbUtils.getIbFonts(TextStyle(
+                            style: IbUtils().getIbFonts(TextStyle(
                                 fontSize: IbConfig.kDescriptionTextSize,
                                 color: Color(widget.ibCollection!.textColor),
                                 fontWeight: FontWeight.bold,

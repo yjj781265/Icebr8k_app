@@ -24,10 +24,10 @@ class SignInPage extends StatelessWidget {
   Widget build(BuildContext context) {
     IbAnalyticsManager()
         .logScreenView(className: 'SignInPage', screenName: 'SignInPage');
-    IbUtils.changeStatusBarColor();
+    IbUtils().changeStatusBarColor();
     return Scaffold(
       body: GestureDetector(
-        onTap: () => IbUtils.hideKeyboard(),
+        onTap: () => IbUtils().hideKeyboard(),
         child: Center(
           child: Scrollbar(
             radius: const Radius.circular(IbConfig.kScrollbarCornerRadius),
@@ -42,7 +42,7 @@ class SignInPage extends StatelessWidget {
                           IconButton(
                             onPressed: () {
                               //hide keyboard
-                              IbUtils.hideKeyboard();
+                              IbUtils().hideKeyboard();
                               Get.back();
                             },
                             icon: const Icon(Icons.arrow_back_outlined),
@@ -146,7 +146,7 @@ class SignInPage extends StatelessWidget {
                               style: TextButton.styleFrom(
                                   padding: EdgeInsets.zero),
                               onPressed: () {
-                                IbUtils.hideKeyboard();
+                                IbUtils().hideKeyboard();
                                 _resetPwdController.reset();
                                 Get.bottomSheet(
                                   Obx(
@@ -219,7 +219,7 @@ class SignInPage extends StatelessWidget {
                                     ? 'signing_in'
                                     : 'login',
                                 onPressed: () async {
-                                  IbUtils.hideKeyboard();
+                                  IbUtils().hideKeyboard();
                                   await _controller.signInViaEmail();
                                 },
                               ),
@@ -242,7 +242,7 @@ class SignInPage extends StatelessWidget {
     _resetPwdController.validateEmail();
     if (_resetPwdController.isEmailValid.isTrue) {
       Get.back();
-      IbUtils.hideKeyboard();
+      IbUtils().hideKeyboard();
       await _authController
           .resetPassword(_resetPwdController.email.value.trim());
     }

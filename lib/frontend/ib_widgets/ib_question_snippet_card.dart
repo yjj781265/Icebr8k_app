@@ -32,7 +32,7 @@ class IbQuestionSnippetCard extends StatelessWidget {
                           rxIsSample: false.obs,
                           rxIbQuestion: question.obs,
                           rxIsExpanded: true.obs),
-                      tag: IbUtils.getUniqueId()),
+                      tag: IbUtils().getUniqueId()),
                 )),
               ));
         },

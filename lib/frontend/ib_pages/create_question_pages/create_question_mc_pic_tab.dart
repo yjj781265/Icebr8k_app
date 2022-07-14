@@ -269,7 +269,7 @@ class CreateQuestionMcPicTab extends StatelessWidget {
       _controller.picChoiceList[index].content = value.trim();
     } else {
       _controller.picChoiceList.add(IbChoice(
-        choiceId: IbUtils.getUniqueId(),
+        choiceId: IbUtils().getUniqueId(),
         content: value.trim(),
       ));
     }
@@ -278,7 +278,7 @@ class CreateQuestionMcPicTab extends StatelessWidget {
   }
 
   void _showBottomSheet({required String strTrKey, int? index}) {
-    IbUtils.hideKeyboard();
+    IbUtils().hideKeyboard();
     final TextEditingController _txtController = TextEditingController();
     if (index != null) {
       _txtController.text = _controller.picChoiceList[index].content ?? '';
@@ -307,7 +307,7 @@ class CreateQuestionMcPicTab extends StatelessWidget {
       {required BuildContext context,
       IbChoice? ibChoice,
       required RxList<IbChoice> list}) {
-    IbUtils.hideKeyboard();
+    IbUtils().hideKeyboard();
     final Widget options = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -326,7 +326,7 @@ class CreateQuestionMcPicTab extends StatelessWidget {
               } else {
                 // ignore: parameter_assignments
                 ibChoice = IbChoice(
-                  choiceId: IbUtils.getUniqueId(),
+                  choiceId: IbUtils().getUniqueId(),
                   url: url.toString(),
                 );
                 // ignore: parameter_assignments
@@ -350,7 +350,7 @@ class CreateQuestionMcPicTab extends StatelessWidget {
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(16))),
           onTap: () async {
-            if (!IbUtils.isPremiumMember()) {
+            if (!IbUtils().isPremiumMember()) {
               _showPremiumDialog();
               return;
             }
@@ -368,7 +368,7 @@ class CreateQuestionMcPicTab extends StatelessWidget {
               } else {
                 // ignore: parameter_assignments
                 ibChoice = IbChoice(
-                    choiceId: IbUtils.getUniqueId(), url: pickedFile.path);
+                    choiceId: IbUtils().getUniqueId(), url: pickedFile.path);
                 // ignore: parameter_assignments
                 list.add(ibChoice!);
               }
@@ -387,7 +387,7 @@ class CreateQuestionMcPicTab extends StatelessWidget {
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(16))),
           onTap: () async {
-            if (!IbUtils.isPremiumMember()) {
+            if (!IbUtils().isPremiumMember()) {
               _showPremiumDialog();
               return;
             }
@@ -405,7 +405,7 @@ class CreateQuestionMcPicTab extends StatelessWidget {
               } else {
                 // ignore: parameter_assignments
                 ibChoice = IbChoice(
-                  choiceId: IbUtils.getUniqueId(),
+                  choiceId: IbUtils().getUniqueId(),
                   url: pickedFile.path,
                 );
                 // ignore: parameter_assignments
@@ -430,7 +430,7 @@ class CreateQuestionMcPicTab extends StatelessWidget {
   }
 
   void _showPremiumDialog() {
-    if (!IbUtils.isPremiumMember()) {
+    if (!IbUtils().isPremiumMember()) {
       Get.dialog(IbDialog(
         title: 'Premium Only Feature',
         subtitle: 'Go premium to enjoy poll with your own pic',

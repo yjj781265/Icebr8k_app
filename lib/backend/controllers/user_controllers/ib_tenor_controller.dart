@@ -24,7 +24,7 @@ class IbTenorController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
     scrollController.addListener(() {
-      IbUtils.hideKeyboard();
+      IbUtils().hideKeyboard();
     });
 
     /// loading top 20 trending gif from tenor
@@ -79,7 +79,7 @@ class IbTenorController extends GetxController {
     }
     await IbAnalyticsManager().logSearch(editingController.text);
     isSearching.value = true;
-    IbUtils.hideKeyboard();
+    IbUtils().hideKeyboard();
     showSearchResult.value = true;
     resultGifs.clear();
     final tempList = await IbTenorService()

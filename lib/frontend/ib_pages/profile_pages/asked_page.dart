@@ -54,7 +54,7 @@ class AskedPage extends StatelessWidget {
                   return const SizedBox();
                 }
                 index -= 1;
-                return IbUtils.handleQuestionType(
+                return IbUtils().handleQuestionType(
                     _controller.createdQuestions[index],
                     uniqueTag: true);
               },

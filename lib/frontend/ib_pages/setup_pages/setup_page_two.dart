@@ -24,7 +24,7 @@ class SetupPageTwo extends StatelessWidget {
       body: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: IbUtils.hideKeyboard,
+          onTap: IbUtils().hideKeyboard,
           child: SafeArea(
               child: Container(
             color: Theme.of(context).primaryColor,

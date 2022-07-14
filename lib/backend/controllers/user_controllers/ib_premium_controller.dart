@@ -41,10 +41,10 @@ class IbPremiumController extends GetxController {
       await IbApiKeysManager().init();
       if (GetPlatform.isAndroid) {
         await Purchases.setup(IbApiKeysManager.kRevenueCatAndroidKey,
-            appUserId: IbUtils.getCurrentUid());
+            appUserId: IbUtils().getCurrentUid());
       } else if (GetPlatform.isIOS) {
         await Purchases.setup(IbApiKeysManager.kRevenueCatIosKey,
-            appUserId: IbUtils.getCurrentUid());
+            appUserId: IbUtils().getCurrentUid());
       }
       if (await Purchases.isConfigured) {
         /// load products
@@ -95,7 +95,7 @@ class IbPremiumController extends GetxController {
 
   Future<void> purchasePremium(Product product) async {
     try {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: "Loading...", backgroundColor: IbColors.primaryColor);
       final PurchaserInfo info =
           await Purchases.purchaseProduct(product.identifier);
@@ -126,7 +126,7 @@ class IbPremiumController extends GetxController {
     try {
       final PurchaserInfo restoredInfo = await Purchases.restoreTransactions();
       if (restoredInfo.activeSubscriptions.isEmpty) {
-        IbUtils.showSimpleSnackBar(
+        IbUtils().showSimpleSnackBar(
             msg: 'No active subscriptions found',
             backgroundColor: IbColors.primaryColor);
         return;

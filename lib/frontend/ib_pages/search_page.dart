@@ -133,8 +133,8 @@ class SearchPage extends StatelessWidget {
                   );
                 }),
               ),
-              if (IbUtils.getCurrentIbUser() != null &&
-                  !IbUtils.isPremiumMember() &&
+              if (IbUtils().getCurrentIbUser() != null &&
+                  !IbUtils().isPremiumMember() &&
                   _controller.isLoadingAd.isFalse)
                 SafeArea(
                   child: SizedBox(
@@ -208,7 +208,7 @@ class SearchPage extends StatelessWidget {
                                 contentPadding: EdgeInsets.zero,
                                 dense: true,
                                 onTap: () {
-                                  if (element.id == IbUtils.getCurrentUid()) {
+                                  if (element.id == IbUtils().getCurrentUid()) {
                                     Get.to(() => MyProfilePage());
                                   } else {
                                     Get.to(() => ProfilePage(Get.put(
@@ -327,8 +327,10 @@ class SearchPage extends StatelessWidget {
                               child: Text(element.text,
                                   style: TextStyle(
                                       fontWeight:
-                                          IbUtils.getCurrentIbUser() != null &&
-                                                  IbUtils.getCurrentIbUser()!
+                                          IbUtils().getCurrentIbUser() !=
+                                                      null &&
+                                                  IbUtils()
+                                                      .getCurrentIbUser()!
                                                       .tags
                                                       .contains(element.text)
                                               ? FontWeight.bold
@@ -402,7 +404,7 @@ class SearchPage extends StatelessWidget {
                               maxFontSize: IbConfig.kPageTitleSize,
                               maxLines: IbConfig.kIbCardMaxLine,
                               overflow: TextOverflow.ellipsis,
-                              style: IbUtils.getIbFonts(TextStyle(
+                              style: IbUtils().getIbFonts(TextStyle(
                                   fontSize: IbConfig.kPageTitleSize,
                                   color: Color(item.textColor),
                                   fontStyle: item.isItalic
@@ -428,7 +430,7 @@ class SearchPage extends StatelessWidget {
                               if (controller.currentIndex.value == -1) {
                                 return;
                               }
-                              IbUtils.hideKeyboard();
+                              IbUtils().hideKeyboard();
                               Get.to(() => IcebreakerMainPage(controller),
                                   transition: Transition.zoom);
                             },
@@ -463,7 +465,7 @@ class SearchPage extends StatelessWidget {
                       contentPadding: EdgeInsets.zero,
                       dense: true,
                       onTap: () {
-                        if (element.id == IbUtils.getCurrentUid()) {
+                        if (element.id == IbUtils().getCurrentUid()) {
                           Get.to(() => MyProfilePage());
                         } else {
                           Get.to(() => ProfilePage(Get.put(
@@ -541,7 +543,7 @@ class SearchPage extends StatelessWidget {
                     maxFontSize: IbConfig.kPageTitleSize,
                     maxLines: IbConfig.kIbCardMaxLine,
                     overflow: TextOverflow.ellipsis,
-                    style: IbUtils.getIbFonts(TextStyle(
+                    style: IbUtils().getIbFonts(TextStyle(
                         fontSize: IbConfig.kPageTitleSize,
                         color: Color(item.textColor),
                         fontStyle:
@@ -563,7 +565,7 @@ class SearchPage extends StatelessWidget {
                       print('collection is -1');
                       return;
                     }
-                    IbUtils.hideKeyboard();
+                    IbUtils().hideKeyboard();
                     Get.to(() => IcebreakerMainPage(controller),
                         transition: Transition.zoom);
                   },
@@ -610,8 +612,9 @@ class SearchPage extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(element.text,
                         style: TextStyle(
-                            fontWeight: IbUtils.getCurrentIbUser() != null &&
-                                    IbUtils.getCurrentIbUser()!
+                            fontWeight: IbUtils().getCurrentIbUser() != null &&
+                                    IbUtils()
+                                        .getCurrentIbUser()!
                                         .tags
                                         .contains(element.text)
                                 ? FontWeight.bold

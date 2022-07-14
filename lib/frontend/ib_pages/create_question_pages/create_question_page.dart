@@ -131,7 +131,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                     ),
                   ),
                 ),
-                if (!IbUtils.isPremiumMember())
+                if (!IbUtils().isPremiumMember())
                   SliverToBoxAdapter(
                     child: IbAdWidget(
                         Get.put(IbAdController(IbAdManager().getBanner1()))),

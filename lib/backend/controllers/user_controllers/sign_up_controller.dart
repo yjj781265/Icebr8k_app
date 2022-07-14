@@ -171,7 +171,7 @@ class SignUpController extends GetxController {
   }
 
   Future<void> signUp() async {
-    IbUtils.hideKeyboard();
+    IbUtils().hideKeyboard();
     validateAllFields();
     if (isEverythingValid()) {
       await Get.find<AuthController>()

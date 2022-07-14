@@ -58,7 +58,7 @@ class MyProfileController extends GetxController {
       }
     });
     asksSub = IbQuestionDbService()
-        .listenToAskedQuestions(IbUtils.getCurrentUid()!)
+        .listenToAskedQuestions(IbUtils().getCurrentUid()!)
         .listen((event) {
       for (final docChange in event.docChanges) {
         if (docChange.doc.data() == null) {
@@ -97,7 +97,7 @@ class MyProfileController extends GetxController {
       return;
     }
     final snapshot = await IbQuestionDbService().queryAskedQuestions(
-        uid: IbUtils.getCurrentUid()!,
+        uid: IbUtils().getCurrentUid()!,
         lastAskedTimeInMs: asks.last.askedTimeInMs,
         publicOnly: false);
     if (snapshot.docs.isEmpty) {

@@ -143,7 +143,7 @@ class _MenuPageState extends State<MenuPage> {
                     Get.changeTheme(value
                         ? IbThemes(context).buildDarkTheme()
                         : IbThemes(context).buildLightTheme());
-                    IbUtils.changeStatusBarColor();
+                    IbUtils().changeStatusBarColor();
                   });
                 },
                 title: const Text('Dark Mode'),
@@ -154,8 +154,9 @@ class _MenuPageState extends State<MenuPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (IbUtils.getCurrentIbUser() != null &&
-                          IbUtils.getCurrentIbUser()!
+                      if (IbUtils().getCurrentIbUser() != null &&
+                          IbUtils()
+                              .getCurrentIbUser()!
                               .roles
                               .contains(IbUser.kAdminRole))
                         ListTile(
@@ -184,10 +185,10 @@ class _MenuPageState extends State<MenuPage> {
                         ),
                         subtitle: const Text('Remove Ads and More'),
                         onTap: () async {
-                          if (IbUtils.checkFeatureIsLocked()) {
+                          if (IbUtils().checkFeatureIsLocked()) {
                             return;
                           }
-                          IbUtils.showSimpleSnackBar(
+                          IbUtils().showSimpleSnackBar(
                               msg: 'Loading info...',
                               backgroundColor: IbColors.primaryColor,
                               duration: const Duration(milliseconds: 1000));
@@ -207,7 +208,7 @@ class _MenuPageState extends State<MenuPage> {
                               fontWeight: FontWeight.normal),
                         ),
                         onTap: () {
-                          if (IbUtils.checkFeatureIsLocked()) {
+                          if (IbUtils().checkFeatureIsLocked()) {
                             return;
                           }
                           Get.to(() => PeopleNearbyPage());
@@ -225,12 +226,12 @@ class _MenuPageState extends State<MenuPage> {
                               fontWeight: FontWeight.normal),
                         ),
                         onTap: () {
-                          if (IbUtils.checkFeatureIsLocked()) {
+                          if (IbUtils().checkFeatureIsLocked()) {
                             return;
                           }
                           Get.to(() => FeedBackChatPage(Get.put(
                               FeedbackChatController(
-                                  IbUtils.getCurrentUid()!))));
+                                  IbUtils().getCurrentUid()!))));
                         },
                       ),
                       ListTile(

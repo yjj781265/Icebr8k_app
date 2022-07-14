@@ -51,7 +51,7 @@ class IbQuestionDbService {
     final int timestamp24HrAgoInMs = Timestamp.now().millisecondsSinceEpoch -
         const Duration(hours: 24).inMilliseconds;
     final snapshot = await _collectionRef
-        .where('creatorId', isEqualTo: IbUtils.getCurrentUid())
+        .where('creatorId', isEqualTo: IbUtils().getCurrentUid())
         .where(
           'askedTimeInMs',
           isGreaterThanOrEqualTo: timestamp24HrAgoInMs,
@@ -255,7 +255,7 @@ class IbQuestionDbService {
     return _collectionRef
         .doc(questionId)
         .collection(_kCommentCollectionGroup)
-        .where('uid', isEqualTo: IbUtils.getCurrentUid())
+        .where('uid', isEqualTo: IbUtils().getCurrentUid())
         .get();
   }
 
@@ -280,7 +280,7 @@ class IbQuestionDbService {
     if (lastDoc != null) {
       return _collectionRef
           .where('sharedFriendUids',
-              arrayContains: IbUtils.getCurrentUid() ?? '')
+              arrayContains: IbUtils().getCurrentUid() ?? '')
           .orderBy('askedTimeInMs', descending: true)
           .startAfterDocument(lastDoc)
           .limit(limit)
@@ -288,7 +288,8 @@ class IbQuestionDbService {
     }
 
     return _collectionRef
-        .where('sharedFriendUids', arrayContains: IbUtils.getCurrentUid() ?? '')
+        .where('sharedFriendUids',
+            arrayContains: IbUtils().getCurrentUid() ?? '')
         .orderBy('askedTimeInMs', descending: true)
         .limit(limit)
         .get();
@@ -425,8 +426,8 @@ class IbQuestionDbService {
         .doc(ibAnswer.uid)
         .set(ibAnswer.toJson(), SetOptions(merge: true));
 
-    IbCacheManager()
-        .cacheSingleIbAnswer(uid: IbUtils.getCurrentUid()!, ibAnswer: ibAnswer);
+    IbCacheManager().cacheSingleIbAnswer(
+        uid: IbUtils().getCurrentUid()!, ibAnswer: ibAnswer);
   }
 
   Future<int> querySpecificAnswerPollSize(
@@ -468,7 +469,7 @@ class IbQuestionDbService {
     final snapshot = await _collectionRef
         .doc(questionId)
         .collection(_kLikesCollectionGroup)
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .get();
 
     return snapshot.exists;
@@ -481,10 +482,10 @@ class IbQuestionDbService {
     await _collectionRef
         .doc(questionId)
         .collection(_kLikesCollectionGroup)
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .set(
       {
-        'uid': IbUtils.getCurrentUid(),
+        'uid': IbUtils().getCurrentUid(),
         'timestampInMs': DateTime.now().millisecondsSinceEpoch,
         'questionId': questionId,
       },
@@ -499,7 +500,7 @@ class IbQuestionDbService {
     await _collectionRef
         .doc(questionId)
         .collection(_kLikesCollectionGroup)
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .delete();
   }
 
@@ -530,9 +531,9 @@ class IbQuestionDbService {
         .collection(_kCommentCollectionGroup)
         .doc(comment.commentId)
         .collection(_kCommentLikesCollectionGroup)
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .set({
-      'uid': IbUtils.getCurrentUid(),
+      'uid': IbUtils().getCurrentUid(),
       'commentId': comment.commentId,
       'questionId': comment.questionId
     });
@@ -554,7 +555,7 @@ class IbQuestionDbService {
         .collection(_kCommentCollectionGroup)
         .doc(comment.commentId)
         .collection(_kCommentLikesCollectionGroup)
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .delete();
   }
 
@@ -564,7 +565,7 @@ class IbQuestionDbService {
         .collection(_kCommentCollectionGroup)
         .doc(ibComment.commentId)
         .collection(_kCommentLikesCollectionGroup)
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .get();
     return snapshot.exists;
   }
@@ -596,7 +597,7 @@ class IbQuestionDbService {
     final snapshot = await _collectionRef
         .doc(questionId)
         .collection(_kCommentCollectionGroup)
-        .where('uid', isEqualTo: IbUtils.getCurrentUid())
+        .where('uid', isEqualTo: IbUtils().getCurrentUid())
         .get();
 
     return snapshot.size >= 1;

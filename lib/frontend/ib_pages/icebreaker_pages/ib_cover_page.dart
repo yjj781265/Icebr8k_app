@@ -56,7 +56,7 @@ class IbCoverPage extends StatelessWidget {
                               minFontSize: IbConfig.kPageTitleSize,
                               maxFontSize: IbConfig.kSloganSize,
                               maxLines: 4,
-                              style: IbUtils.getIbFonts(TextStyle(
+                              style: IbUtils().getIbFonts(TextStyle(
                                   fontSize: IbConfig.kSloganSize,
                                   fontStyle: ibCollection.isItalic
                                       ? FontStyle.italic

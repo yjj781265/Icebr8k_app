@@ -110,8 +110,8 @@ class HomeTabController extends GetxController {
     forYourList.clear();
     first8List.value = await IbQuestionDbService().queryFirst8();
     for (final q in first8List) {
-      final flag = await IbQuestionDbService()
-          .isQuestionAnswered(uid: IbUtils.getCurrentUid()!, questionId: q.id);
+      final flag = await IbQuestionDbService().isQuestionAnswered(
+          uid: IbUtils().getCurrentUid()!, questionId: q.id);
       first8Map[q.id] = flag;
       if (!flag) {
         forYourList.add(q);
@@ -120,7 +120,7 @@ class HomeTabController extends GetxController {
     isLocked.value = first8Map.length == 8 && first8Map.values.contains(false);
     if (isLocked.isTrue) {
       first8Sub = IbQuestionDbService()
-          .listenToUseAnsweredQuestionsChange(IbUtils.getCurrentUid()!)
+          .listenToUseAnsweredQuestionsChange(IbUtils().getCurrentUid()!)
           .listen((event) async {
         for (final docChange in event.docChanges) {
           if (docChange.type == DocumentChangeType.added) {
@@ -137,7 +137,7 @@ class HomeTabController extends GetxController {
             first8Map.length == 8 && first8Map.values.contains(false);
         print('determineFeatureIsLocked stream $isLocked');
         if (isLocked.isFalse) {
-          IbUtils.showSimpleSnackBar(
+          IbUtils().showSimpleSnackBar(
               msg: 'Features unlocked, now you are officially an Icebr8ker',
               backgroundColor: IbColors.accentColor);
           await Future.delayed(const Duration(seconds: 2), () {
@@ -202,9 +202,9 @@ class HomeTabController extends GetxController {
     lastTagDoc = null;
     isLoading.value = true;
     try {
-      if (IbUtils.getCurrentIbUser()!.tags.isNotEmpty) {
-        final snapshot = await IbQuestionDbService()
-            .queryFollowedTagsQuestions(tags: IbUtils.getCurrentIbUser()!.tags);
+      if (IbUtils().getCurrentIbUser()!.tags.isNotEmpty) {
+        final snapshot = await IbQuestionDbService().queryFollowedTagsQuestions(
+            tags: IbUtils().getCurrentIbUser()!.tags);
         for (final doc in snapshot.docs) {
           forYourList.add(IbQuestion.fromJson(doc.data()));
           lastTagDoc = doc;
@@ -323,9 +323,9 @@ class HomeTabController extends GetxController {
 
       try {
         final tempList = <IbQuestion>[];
-        if (IbUtils.getCurrentIbUser()!.tags.isNotEmpty) {
+        if (IbUtils().getCurrentIbUser()!.tags.isNotEmpty) {
           final snap = await IbQuestionDbService().queryFollowedTagsQuestions(
-              tags: IbUtils.getCurrentIbUser()!.tags);
+              tags: IbUtils().getCurrentIbUser()!.tags);
           for (final doc in snap.docs) {
             tempList.addIf(
                 forYourList.indexWhere((element) => element.id == doc.id) == -1,
@@ -399,7 +399,7 @@ class HomeTabController extends GetxController {
   void _addAds(List<IbQuestion> list) {
     if (!IbLocalDataService()
             .retrieveBoolValue(StorageKey.pollExpandShowCaseBool) ||
-        IbUtils.isPremiumMember() ||
+        IbUtils().isPremiumMember() ||
         isLocked.isTrue) {
       return;
     }

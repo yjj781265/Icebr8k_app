@@ -100,14 +100,16 @@ class _WordCloudPageState extends State<WordCloudPage> {
         ((count.toDouble() / max.toDouble()) * 32) < IbConfig.kNormalTextSize
             ? IbConfig.kNormalTextSize
             : ((count.toDouble() / max.toDouble()) * 32);
-    final fontColor = IbUtils.getRandomColor();
+    final fontColor = IbUtils().getRandomColor();
     fontStyles.shuffle();
     fontWeights.shuffle();
 
-    return IbUtils.getIbFonts(TextStyle(
-      fontSize: fontSize,
-      fontWeight: fontWeights.first,
-      color: fontColor,
-    )).first;
+    return IbUtils()
+        .getIbFonts(TextStyle(
+          fontSize: fontSize,
+          fontWeight: fontWeights.first,
+          color: fontColor,
+        ))
+        .first;
   }
 }

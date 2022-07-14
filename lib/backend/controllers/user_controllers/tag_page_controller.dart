@@ -31,7 +31,7 @@ class TagPageController extends GetxController {
     if (tag != null) {
       ibTag.value = tag;
       total.value = ibTag.value.questionCount;
-      isFollower.value = IbUtils.getCurrentIbUser()!.tags.contains(text);
+      isFollower.value = IbUtils().getCurrentIbUser()!.tags.contains(text);
 
       user = await IbUserDbService().queryIbUser(ibTag.value.creatorId);
       if (user != null) {

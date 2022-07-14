@@ -49,13 +49,13 @@ class IbUserDbService {
 
   Future<void> updateCurrentIbUserPremium(bool isActive) {
     return _collectionRef
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .update({'isPremium': isActive});
   }
 
   Future<void> updateIbUserNotificationCount(int count) async {
     return _collectionRef
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .update({'notificationCount': count});
   }
 
@@ -76,13 +76,13 @@ class IbUserDbService {
   }
 
   Future<void> followTag({required String tag}) {
-    return _collectionRef.doc(IbUtils.getCurrentUid()).set({
+    return _collectionRef.doc(IbUtils().getCurrentUid()).set({
       'tags': FieldValue.arrayUnion([tag])
     }, SetOptions(merge: true));
   }
 
   Future<void> unfollowTag({required String tag}) {
-    return _collectionRef.doc(IbUtils.getCurrentUid()).set({
+    return _collectionRef.doc(IbUtils().getCurrentUid()).set({
       'tags': FieldValue.arrayRemove([tag])
     }, SetOptions(merge: true));
   }
@@ -125,7 +125,7 @@ class IbUserDbService {
         .doc(friendId)
         .collection(_kNotificationSubCollection)
         .where('type', isEqualTo: IbNotification.kFriendRequest)
-        .where('senderId', isEqualTo: IbUtils.getCurrentUid())
+        .where('senderId', isEqualTo: IbUtils().getCurrentUid())
         .where('recipientId', isEqualTo: friendId)
         .get();
     if (snapshot.size == 0) {
@@ -151,7 +151,7 @@ class IbUserDbService {
     final snapshot = await _db
         .collectionGroup(_kNotificationSubCollection)
         .where('type', isEqualTo: IbNotification.kCircleRequest)
-        .where('senderId', isEqualTo: IbUtils.getCurrentUid())
+        .where('senderId', isEqualTo: IbUtils().getCurrentUid())
         .where('url', isEqualTo: chatId)
         .get();
     for (final doc in snapshot.docs) {
@@ -164,11 +164,11 @@ class IbUserDbService {
   Future<IbNotification?> isFriendRequestWaitingForMeForApproval(
       String friendId) async {
     final snapshot = await _collectionRef
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .collection(_kNotificationSubCollection)
         .where('type', isEqualTo: IbNotification.kFriendRequest)
         .where('senderId', isEqualTo: friendId)
-        .where('recipientId', isEqualTo: IbUtils.getCurrentUid())
+        .where('recipientId', isEqualTo: IbUtils().getCurrentUid())
         .get();
     if (snapshot.size == 0) {
       return null;
@@ -177,39 +177,39 @@ class IbUserDbService {
   }
 
   Future<void> addFriend(String friendUid) async {
-    await _collectionRef.doc(IbUtils.getCurrentUid()).update({
+    await _collectionRef.doc(IbUtils().getCurrentUid()).update({
       'friendUids': FieldValue.arrayUnion([friendUid])
     });
 
     await _collectionRef.doc(friendUid).update({
-      'friendUids': FieldValue.arrayUnion([IbUtils.getCurrentUid()])
+      'friendUids': FieldValue.arrayUnion([IbUtils().getCurrentUid()])
     });
   }
 
   Future<void> removeFriend(String friendUid) async {
-    await _collectionRef.doc(IbUtils.getCurrentUid()).update({
+    await _collectionRef.doc(IbUtils().getCurrentUid()).update({
       'friendUids': FieldValue.arrayRemove([friendUid])
     });
-    await _collectionRef.doc(IbUtils.getCurrentUid()).update({
+    await _collectionRef.doc(IbUtils().getCurrentUid()).update({
       'blockedFriendUids': FieldValue.arrayRemove([friendUid])
     });
 
     await _collectionRef.doc(friendUid).update({
-      'friendUids': FieldValue.arrayRemove([IbUtils.getCurrentUid()])
+      'friendUids': FieldValue.arrayRemove([IbUtils().getCurrentUid()])
     });
     await _collectionRef.doc(friendUid).update({
-      'blockedFriendUids': FieldValue.arrayRemove([IbUtils.getCurrentUid()])
+      'blockedFriendUids': FieldValue.arrayRemove([IbUtils().getCurrentUid()])
     });
   }
 
   Future<void> blockFriend(String friendUid) async {
-    await _collectionRef.doc(IbUtils.getCurrentUid()).update({
+    await _collectionRef.doc(IbUtils().getCurrentUid()).update({
       'blockedFriendUids': FieldValue.arrayUnion([friendUid])
     });
   }
 
   Future<void> unblockFriend(String friendUid) async {
-    await _collectionRef.doc(IbUtils.getCurrentUid()).update({
+    await _collectionRef.doc(IbUtils().getCurrentUid()).update({
       'blockedFriendUids': FieldValue.arrayRemove([friendUid])
     });
   }
@@ -225,9 +225,9 @@ class IbUserDbService {
   /// this will only listen to last 64 notifications
   Stream<QuerySnapshot<Map<String, dynamic>>> listenToNewIbNotifications() {
     return _collectionRef
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .collection(_kNotificationSubCollection)
-        .where('recipientId', isEqualTo: IbUtils.getCurrentUid())
+        .where('recipientId', isEqualTo: IbUtils().getCurrentUid())
         .orderBy('timestamp', descending: true)
         .limit(64)
         .snapshots();
@@ -235,7 +235,7 @@ class IbUserDbService {
 
   Future<void> saveTokenToDatabase(String token) async {
     // Assume user is logged in for this example
-    final String? userId = IbUtils.getCurrentUid();
+    final String? userId = IbUtils().getCurrentUid();
     if (userId == null) {
       return;
     }
@@ -246,7 +246,7 @@ class IbUserDbService {
 
   Future<void> removeTokenFromDatabase() async {
     // Assume user is logged in for this example
-    final String? userId = IbUtils.getCurrentUid();
+    final String? userId = IbUtils().getCurrentUid();
     if (userId == null) {
       return;
     }
@@ -272,8 +272,8 @@ class IbUserDbService {
   }
 
   Future<void> updateCurrentUserPosition(GeoPoint geoPoint) async {
-    if (IbUtils.getCurrentUid() != null) {
-      await _collectionRef.doc(IbUtils.getCurrentUid()).update({
+    if (IbUtils().getCurrentUid() != null) {
+      await _collectionRef.doc(IbUtils().getCurrentUid()).update({
         'geoPoint': geoPoint,
         'lastLocationTimestampInMs': Timestamp.now().millisecondsSinceEpoch
       });
@@ -294,27 +294,27 @@ class IbUserDbService {
   static const String intentionIndex = "intentions";
   Future<void> updateUserIntention(List<String> intentions) async {
     return _collectionRef
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .update({intentionIndex: intentions});
   }
 
   Future<void> clearLocation() async {
-    return _collectionRef.doc(IbUtils.getCurrentUid()).update(
+    return _collectionRef.doc(IbUtils().getCurrentUid()).update(
         {'geoPoint': const GeoPoint(0, 0), 'lastLocationTimestampInMs': -1});
   }
 
   Future<void> likeProfile(String userId) async {
-    if (userId == IbUtils.getCurrentUid()) {
+    if (userId == IbUtils().getCurrentUid()) {
       return;
     }
 
     await _collectionRef
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .collection(_kProfileLikesSubCollection)
         .doc(userId)
         .set({
       'isLiked': true,
-      'likerId': IbUtils.getCurrentUid(),
+      'likerId': IbUtils().getCurrentUid(),
       'likeId': userId,
       'timestamp': FieldValue.serverTimestamp()
     }, SetOptions(merge: true));
@@ -322,12 +322,12 @@ class IbUserDbService {
 
   /// return -1 if timestamp is null or not found
   Future<int> lastLikedTimestampInMs(String userId) async {
-    if (userId == IbUtils.getCurrentUid()) {
+    if (userId == IbUtils().getCurrentUid()) {
       return -1;
     }
     try {
       final snapshot = await _collectionRef
-          .doc(IbUtils.getCurrentUid())
+          .doc(IbUtils().getCurrentUid())
           .collection(_kProfileLikesSubCollection)
           .doc(userId)
           .get();
@@ -343,17 +343,17 @@ class IbUserDbService {
   }
 
   Future<void> dislikeProfile(String userId) async {
-    if (userId == IbUtils.getCurrentUid()) {
+    if (userId == IbUtils().getCurrentUid()) {
       return;
     }
 
     await _collectionRef
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .collection(_kProfileLikesSubCollection)
         .doc(userId)
         .set({
       'isLiked': false,
-      'likerId': IbUtils.getCurrentUid(),
+      'likerId': IbUtils().getCurrentUid(),
       'likeId': userId,
       'timestamp': FieldValue.serverTimestamp()
     }, SetOptions(merge: true));
@@ -386,7 +386,7 @@ class IbUserDbService {
           .doc(recipientId)
           .collection(_kNotificationSubCollection)
           .where('type', isEqualTo: IbNotification.kProfileLiked)
-          .where('senderId', isEqualTo: IbUtils.getCurrentUid())
+          .where('senderId', isEqualTo: IbUtils().getCurrentUid())
           .get();
 
       if (snapshot.docs.isEmpty) {
@@ -418,7 +418,7 @@ class IbUserDbService {
       {DocumentSnapshot? lastDoc}) async {
     return _db
         .collectionGroup(_kProfileLikesSubCollection)
-        .where('likeId', isEqualTo: IbUtils.getCurrentUid())
+        .where('likeId', isEqualTo: IbUtils().getCurrentUid())
         .where('isLiked', isEqualTo: true)
         .orderBy('timestamp', descending: true)
         .limit(IbConfig.kPerPage)

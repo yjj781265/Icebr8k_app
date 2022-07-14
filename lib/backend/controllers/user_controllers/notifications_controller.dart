@@ -114,8 +114,8 @@ class NotificationController extends GetxController {
   Future<void> _handleRemoteMessage(RemoteMessage message) async {
     /// clear app badge
     FlutterAppBadger.updateBadgeCount(0);
-    if (IbUtils.getCurrentIbUser() != null &&
-        IbUtils.getCurrentIbUser()!.notificationCount != 0) {
+    if (IbUtils().getCurrentIbUser() != null &&
+        IbUtils().getCurrentIbUser()!.notificationCount != 0) {
       await IbUserDbService().updateIbUserNotificationCount(0);
     }
 
@@ -259,16 +259,16 @@ class NotificationController extends GetxController {
       await IbUserDbService().addFriend(ibNotification.senderId);
       await IbUserDbService().removeNotification(ibNotification);
       await IbUserDbService().sendAlertNotification(IbNotification(
-          id: IbUtils.getUniqueId(),
+          id: IbUtils().getUniqueId(),
           body: '',
           type: IbNotification.kFriendAccepted,
           timestamp: FieldValue.serverTimestamp(),
-          senderId: IbUtils.getCurrentUid()!,
+          senderId: IbUtils().getCurrentUid()!,
           recipientId: ibNotification.senderId));
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Request accepted', backgroundColor: IbColors.accentColor);
     } catch (e) {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Failed to accept request $e',
           backgroundColor: IbColors.errorRed);
     }
@@ -277,10 +277,10 @@ class NotificationController extends GetxController {
   Future<void> declineFr(IbNotification ibNotification) async {
     try {
       await IbUserDbService().removeNotification(ibNotification);
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Request declined', backgroundColor: IbColors.accentColor);
     } catch (e) {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Failed to decline request $e',
           backgroundColor: IbColors.accentColor);
     }
@@ -300,7 +300,7 @@ class NotificationController extends GetxController {
             user.id,
           )) {
         Get.back();
-        IbUtils.showSimpleSnackBar(
+        IbUtils().showSimpleSnackBar(
             msg: 'New circle member added',
             backgroundColor: IbColors.accentColor);
       } else {
@@ -310,7 +310,7 @@ class NotificationController extends GetxController {
                 uid: user.id,
                 role: IbChatMember.kRoleMember));
         await IbChatDbService().uploadMessage(IbMessage(
-            messageId: IbUtils.getUniqueId(),
+            messageId: IbUtils().getUniqueId(),
             content: '${user.username} joined the circle',
             senderUid: user.id,
             readUids: [user.id],
@@ -318,7 +318,7 @@ class NotificationController extends GetxController {
             chatRoomId: chat.chatId));
         await IbUserDbService().removeNotification(item.notification);
         Get.back();
-        IbUtils.showSimpleSnackBar(
+        IbUtils().showSimpleSnackBar(
             msg: 'New circle member added',
             backgroundColor: IbColors.accentColor);
       }

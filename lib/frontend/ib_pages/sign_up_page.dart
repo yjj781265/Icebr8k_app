@@ -20,7 +20,7 @@ class SignUpPage extends GetView<SignUpController> {
     return Scaffold(
       body: Center(
         child: GestureDetector(
-          onTap: () => IbUtils.hideKeyboard(),
+          onTap: () => IbUtils().hideKeyboard(),
           child: IbCard(
             child: Scrollbar(
               radius: const Radius.circular(IbConfig.kScrollbarCornerRadius),
@@ -33,7 +33,7 @@ class SignUpPage extends GetView<SignUpController> {
                         IconButton(
                           onPressed: () {
                             //hide keyboard
-                            IbUtils.hideKeyboard();
+                            IbUtils().hideKeyboard();
                             Get.back();
                           },
                           icon: const Icon(Icons.arrow_back_outlined),

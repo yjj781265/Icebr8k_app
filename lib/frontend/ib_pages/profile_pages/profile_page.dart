@@ -105,8 +105,8 @@ class ProfilePage extends StatelessWidget {
                           _userInfo(context),
                           _stats(),
                           _actions(),
-                          if (IbUtils.getCurrentIbUser() != null &&
-                              !IbUtils.isPremiumMember())
+                          if (IbUtils().getCurrentIbUser() != null &&
+                              !IbUtils().isPremiumMember())
                             SafeArea(
                               child: Padding(
                                 padding:
@@ -116,7 +116,7 @@ class ProfilePage extends StatelessWidget {
                                   child: IbAdWidget(Get.put(
                                       IbAdController(
                                           IbAdManager().getBanner1()),
-                                      tag: IbUtils.getUniqueId())),
+                                      tag: IbUtils().getUniqueId())),
                                 ),
                               ),
                             ),
@@ -198,7 +198,7 @@ class ProfilePage extends StatelessWidget {
                                     Align(
                                       alignment: Alignment.centerRight,
                                       child: Text(
-                                          IbUtils.getAgoDateTimeString(
+                                          IbUtils().getAgoDateTimeString(
                                             DateTime.fromMillisecondsSinceEpoch(
                                                 (_controller.frNotification!
                                                         .timestamp as Timestamp)
@@ -292,13 +292,13 @@ class ProfilePage extends StatelessWidget {
           color: IbColors.accentColor,
           iconData: Icons.person_add_alt_1,
           onPressed: () async {
-            if (IbUtils.getCurrentIbUser() == null ||
+            if (IbUtils().getCurrentIbUser() == null ||
                 (_controller.isFrSent.isTrue &&
                     _controller.frSentNotification != null)) {
               await IbUserDbService()
                   .removeNotification(_controller.frSentNotification!);
               _controller.isFrSent.value = false;
-              IbUtils.showSimpleSnackBar(
+              IbUtils().showSimpleSnackBar(
                   msg: 'Friend request canceled',
                   backgroundColor: Colors.orangeAccent);
               return;
@@ -474,12 +474,12 @@ class ProfilePage extends StatelessWidget {
         _controller.rxIbUser.value.geoPoint != null &&
         (_controller.rxIbUser.value.geoPoint as GeoPoint).latitude != 0 &&
         (_controller.rxIbUser.value.geoPoint as GeoPoint).longitude != 0 &&
-        IbUtils.getCurrentIbUser()!.geoPoint != null &&
-        (IbUtils.getCurrentIbUser()!.geoPoint as GeoPoint).latitude != 0 &&
-        (IbUtils.getCurrentIbUser()!.geoPoint as GeoPoint).longitude != 0 &&
+        IbUtils().getCurrentIbUser()!.geoPoint != null &&
+        (IbUtils().getCurrentIbUser()!.geoPoint as GeoPoint).latitude != 0 &&
+        (IbUtils().getCurrentIbUser()!.geoPoint as GeoPoint).longitude != 0 &&
         (Duration(
                     milliseconds: Timestamp.now().millisecondsSinceEpoch -
-                        IbUtils.getCurrentIbUser()!.lastLocationTimestampInMs)
+                        IbUtils().getCurrentIbUser()!.lastLocationTimestampInMs)
                 .inDays <=
             IbConfig.kValidNearbyLocationDurationInDays) &&
         (Duration(
@@ -487,7 +487,7 @@ class ProfilePage extends StatelessWidget {
                         _controller.rxIbUser.value.lastLocationTimestampInMs)
                 .inDays <=
             IbConfig.kValidNearbyLocationDurationInDays)) {
-      final myGeoPoint = IbUtils.getCurrentIbUser()!.geoPoint as GeoPoint;
+      final myGeoPoint = IbUtils().getCurrentIbUser()!.geoPoint as GeoPoint;
       final userGeoPoint = _controller.rxIbUser.value.geoPoint as GeoPoint;
 
       final double distanceInMeters = Geolocator.distanceBetween(
@@ -498,14 +498,14 @@ class ProfilePage extends StatelessWidget {
 
       return Tooltip(
         message:
-            'This user is ${IbUtils.getDistanceString(distanceInMeters)} away',
+            'This user is ${IbUtils().getDistanceString(distanceInMeters)} away',
         child: IbCard(
             elevation: 0,
             radius: 8,
             child: Padding(
               padding: const EdgeInsets.all(3.0),
               child: Text(
-                IbUtils.getDistanceString(distanceInMeters),
+                IbUtils().getDistanceString(distanceInMeters),
                 style: const TextStyle(fontSize: IbConfig.kDescriptionTextSize),
               ),
             )),
@@ -532,7 +532,7 @@ class ProfilePage extends StatelessWidget {
                     CompareController(
                       title: '👍 AGREE',
                       questionIds: _controller.commonAnswers,
-                      uids: [_controller.uid, IbUtils.getCurrentUid() ?? ''],
+                      uids: [_controller.uid, IbUtils().getCurrentUid() ?? ''],
                     ),
                   ),
                 ),
@@ -555,7 +555,10 @@ class ProfilePage extends StatelessWidget {
                       CompareController(
                         title: '👎 DISAGREE',
                         questionIds: _controller.uncommonAnswers,
-                        uids: [_controller.uid, IbUtils.getCurrentUid() ?? ''],
+                        uids: [
+                          _controller.uid,
+                          IbUtils().getCurrentUid() ?? ''
+                        ],
                       ),
                     ),
                   ),
@@ -573,7 +576,7 @@ class ProfilePage extends StatelessWidget {
               Get.to(
                 () => AskedPage(
                   Get.put(AskedQuestionsController(_controller.uid),
-                      tag: IbUtils.getUniqueId()),
+                      tag: IbUtils().getUniqueId()),
                 ),
               );
             },
@@ -668,7 +671,7 @@ class ProfilePage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
                     child: Text(
-                      'Age: ${IbUtils.calculateAge(_controller.rxIbUser.value.birthdateInMs!).toString()}',
+                      'Age: ${IbUtils().calculateAge(_controller.rxIbUser.value.birthdateInMs!).toString()}',
                       style:
                           const TextStyle(fontSize: IbConfig.kNormalTextSize),
                     ),
@@ -737,7 +740,7 @@ class ProfilePage extends StatelessWidget {
   Widget _askedTab() {
     final AskedQuestionsController askedQuestionsController = Get.put(
         AskedQuestionsController(_controller.uid),
-        tag: IbUtils.getUniqueId());
+        tag: IbUtils().getUniqueId());
     return Obx(() {
       if (askedQuestionsController.createdQuestions.isEmpty) {
         return SingleChildScrollView(
@@ -941,7 +944,7 @@ class ProfilePage extends StatelessWidget {
                   onPressed: () {
                     _controller.addFriend(editingController.text.trim());
                     Get.back();
-                    IbUtils.hideKeyboard();
+                    IbUtils().hideKeyboard();
                   },
                   textTrKey: 'send_friend_request',
                 ),

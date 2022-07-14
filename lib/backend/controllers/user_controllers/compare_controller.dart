@@ -37,8 +37,8 @@ class CompareController extends GetxController {
         continue;
       }
 
-      final List<IbAnswer> ibAnswers =
-          await IbUtils.getIbAnswersForDifferentUsers(
+      final List<IbAnswer> ibAnswers = await IbUtils()
+          .getIbAnswersForDifferentUsers(
               uids: uids, questionId: questionIds[i]);
 
       if (ibAnswers.length < uids.length) {
@@ -81,8 +81,8 @@ class CompareController extends GetxController {
         continue;
       }
 
-      final List<IbAnswer> ibAnswers =
-          await IbUtils.getIbAnswersForDifferentUsers(
+      final List<IbAnswer> ibAnswers = await IbUtils()
+          .getIbAnswersForDifferentUsers(
               uids: uids, questionId: questionIds[i]);
 
       if (ibAnswers.length < uids.length) {

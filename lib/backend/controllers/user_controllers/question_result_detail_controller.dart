@@ -43,7 +43,7 @@ class QuestionResultDetailPageController extends GetxController {
     results.clear();
     try {
       /// add friends answers first if Available
-      final unBlockedUids = IbUtils.getCurrentIbUserUnblockedFriendsId();
+      final unBlockedUids = IbUtils().getCurrentIbUserUnblockedFriendsId();
       final temp = <ResultItemUserModel>[];
       for (final uid in unBlockedUids) {
         final answers = IbCacheManager().getIbAnswers(uid) ?? [];
@@ -63,7 +63,7 @@ class QuestionResultDetailPageController extends GetxController {
           if (ibUser == null) {
             continue;
           }
-          final double compScore = await IbUtils.getCompScore(uid: uid);
+          final double compScore = await IbUtils().getCompScore(uid: uid);
           temp.add(ResultItemUserModel(
               user: ibUser,
               compScore: compScore,
@@ -77,7 +77,8 @@ class QuestionResultDetailPageController extends GetxController {
 
       for (final doc in snapshot.docs) {
         final IbAnswer ibAnswer = IbAnswer.fromJson(doc.data());
-        final double compScore = await IbUtils.getCompScore(uid: ibAnswer.uid);
+        final double compScore =
+            await IbUtils().getCompScore(uid: ibAnswer.uid);
         if (temp.indexWhere((element) => element.user.id == ibAnswer.uid) !=
             -1) {
           continue;
@@ -108,7 +109,7 @@ class QuestionResultDetailPageController extends GetxController {
       results.sort((a, b) => b.compScore.compareTo(a.compScore));
       results.insertAll(0, temp);
     } catch (e) {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: "Failed to load results $e", backgroundColor: IbColors.errorRed);
     } finally {
       isLoading.value = false;
@@ -135,7 +136,7 @@ class QuestionResultDetailPageController extends GetxController {
             continue;
           }
           final double compScore =
-              await IbUtils.getCompScore(uid: ibAnswer.uid);
+              await IbUtils().getCompScore(uid: ibAnswer.uid);
           late IbUser? ibUser;
           if (IbCacheManager().getIbUser(ibAnswer.uid) == null) {
             ibUser = await IbUserDbService().queryIbUser(ibAnswer.uid);

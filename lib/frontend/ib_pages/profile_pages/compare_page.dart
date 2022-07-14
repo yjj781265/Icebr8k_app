@@ -33,7 +33,7 @@ class ComparePage extends StatelessWidget {
             controller: _controller.refreshController,
             child: ListView.builder(
               itemBuilder: (context, index) {
-                return IbUtils.handleQuestionType(
+                return IbUtils().handleQuestionType(
                     _controller.items.keys.toList()[index],
                     ibAnswers: _controller
                             .items[_controller.items.keys.toList()[index]] ??

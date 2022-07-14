@@ -35,7 +35,7 @@ class IbProfileStats extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               AutoSizeText(
-                IbUtils.getStatsString(number),
+                IbUtils().getStatsString(number),
                 maxLines: 1,
                 style: const TextStyle(
                     overflow: TextOverflow.ellipsis,

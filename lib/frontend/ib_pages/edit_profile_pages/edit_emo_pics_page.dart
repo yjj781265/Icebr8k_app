@@ -49,7 +49,7 @@ class EditEmoPicsPage extends StatelessWidget {
                                   () => EditEmoPicDetailPage(
                                       IbEmoPic(
                                         url: '',
-                                        id: IbUtils.getUniqueId(),
+                                        id: IbUtils().getUniqueId(),
                                         emoji: '',
                                       ),
                                       _controller),
@@ -103,7 +103,7 @@ class EditEmoPicsPage extends StatelessWidget {
                           barrierDismissible: false);
                       await IbUserDbService().updateEmoPics(
                           emoPics: _controller.rxEmoPics,
-                          uid: IbUtils.getCurrentUid()!);
+                          uid: IbUtils().getCurrentUid()!);
                       Get.back();
                     },
                   ),

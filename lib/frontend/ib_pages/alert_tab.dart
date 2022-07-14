@@ -314,7 +314,7 @@ class AlertTab extends StatelessWidget {
                             Align(
                               alignment: Alignment.centerRight,
                               child: Text(
-                                  IbUtils.getAgoDateTimeString(
+                                  IbUtils().getAgoDateTimeString(
                                     DateTime.fromMillisecondsSinceEpoch((item
                                             .notification
                                             .timestamp as Timestamp)
@@ -418,7 +418,7 @@ class AlertTab extends StatelessWidget {
             }
             Get.to(
                 () => CircleInfo(Get.put(CircleInfoController(item.ibChat!.obs),
-                    tag: IbUtils.getUniqueId())),
+                    tag: IbUtils().getUniqueId())),
                 transition: Transition.downToUp,
                 fullscreenDialog: true);
           },
@@ -464,7 +464,7 @@ class AlertTab extends StatelessWidget {
                         child: Align(
                           alignment: Alignment.centerRight,
                           child: Text(
-                            IbUtils.getAgoDateTimeString(
+                            IbUtils().getAgoDateTimeString(
                                 DateTime.fromMillisecondsSinceEpoch(
                                     (item.notification.timestamp as Timestamp)
                                         .millisecondsSinceEpoch)),
@@ -602,7 +602,7 @@ class AlertTab extends StatelessWidget {
                       child: Align(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          IbUtils.getAgoDateTimeString(
+                          IbUtils().getAgoDateTimeString(
                               DateTime.fromMillisecondsSinceEpoch(
                                   (item.notification.timestamp as Timestamp)
                                       .millisecondsSinceEpoch)),
@@ -725,7 +725,7 @@ class AlertTab extends StatelessWidget {
                             rxIsSample: false.obs,
                             rxIbQuestion: item.ibQuestion!.obs,
                             rxIsExpanded: true.obs),
-                        tag: IbUtils.getUniqueId()),
+                        tag: IbUtils().getUniqueId()),
                   )),
                   toPage: ToPage.comment,
                 ));
@@ -749,7 +749,7 @@ class AlertTab extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Text(
-                  IbUtils.getAgoDateTimeString(
+                  IbUtils().getAgoDateTimeString(
                       DateTime.fromMillisecondsSinceEpoch(
                           (item.notification.timestamp as Timestamp)
                               .millisecondsSinceEpoch)),
@@ -789,7 +789,7 @@ class AlertTab extends StatelessWidget {
                             rxIsSample: false.obs,
                             rxIbQuestion: item.ibQuestion!.obs,
                             rxIsExpanded: true.obs),
-                        tag: IbUtils.getUniqueId()),
+                        tag: IbUtils().getUniqueId()),
                   )),
                 ));
           },
@@ -812,7 +812,7 @@ class AlertTab extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Text(
-                  IbUtils.getAgoDateTimeString(
+                  IbUtils().getAgoDateTimeString(
                       DateTime.fromMillisecondsSinceEpoch(
                           (item.notification.timestamp as Timestamp)
                               .millisecondsSinceEpoch)),
@@ -853,7 +853,7 @@ class AlertTab extends StatelessWidget {
                             rxIsSample: false.obs,
                             rxIbQuestion: item.ibQuestion!.obs,
                             rxIsExpanded: true.obs),
-                        tag: IbUtils.getUniqueId()),
+                        tag: IbUtils().getUniqueId()),
                   )),
                   toPage: ToPage.comment,
                 ));
@@ -877,7 +877,7 @@ class AlertTab extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Text(
-                  IbUtils.getAgoDateTimeString(
+                  IbUtils().getAgoDateTimeString(
                       DateTime.fromMillisecondsSinceEpoch(
                           (item.notification.timestamp as Timestamp)
                               .millisecondsSinceEpoch)),
@@ -918,7 +918,7 @@ class AlertTab extends StatelessWidget {
                             rxIsSample: false.obs,
                             rxIbQuestion: item.ibQuestion!.obs,
                             rxIsExpanded: true.obs),
-                        tag: IbUtils.getUniqueId()),
+                        tag: IbUtils().getUniqueId()),
                   )),
                   toPage: ToPage.reply,
                   commentId: item.ibComment!.parentId,
@@ -944,7 +944,7 @@ class AlertTab extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(left: 8),
                   child: Text(
-                    IbUtils.getAgoDateTimeString(
+                    IbUtils().getAgoDateTimeString(
                         DateTime.fromMillisecondsSinceEpoch(
                             (item.notification.timestamp as Timestamp)
                                 .millisecondsSinceEpoch)),
@@ -984,7 +984,7 @@ class AlertTab extends StatelessWidget {
                             rxIsSample: false.obs,
                             rxIbQuestion: item.ibQuestion!.obs,
                             rxIsExpanded: true.obs),
-                        tag: IbUtils.getUniqueId()),
+                        tag: IbUtils().getUniqueId()),
                   )),
                 ));
           },
@@ -1007,7 +1007,7 @@ class AlertTab extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Text(
-                  IbUtils.getAgoDateTimeString(
+                  IbUtils().getAgoDateTimeString(
                       DateTime.fromMillisecondsSinceEpoch(
                           (item.notification.timestamp as Timestamp)
                               .millisecondsSinceEpoch)),
@@ -1055,7 +1055,7 @@ class AlertTab extends StatelessWidget {
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
-            IbUtils.getAgoDateTimeString(DateTime.fromMillisecondsSinceEpoch(
+            IbUtils().getAgoDateTimeString(DateTime.fromMillisecondsSinceEpoch(
                 (item.notification.timestamp as Timestamp)
                     .millisecondsSinceEpoch)),
             style: const TextStyle(

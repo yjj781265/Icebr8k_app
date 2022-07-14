@@ -147,7 +147,7 @@ class _CreateQuestionTagPickerState extends State<CreateQuestionTagPicker> {
                                 if (widget._controller.createQuestionController
                                         .pickedTags.length >=
                                     IbConfig.kMaxTag) {
-                                  IbUtils.showSimpleSnackBar(
+                                  IbUtils().showSimpleSnackBar(
                                       msg: 'max_tag_info'.tr,
                                       backgroundColor: IbColors.primaryColor);
                                   return;
@@ -287,7 +287,7 @@ class _CreateQuestionTagPickerState extends State<CreateQuestionTagPicker> {
                             if (widget._controller.createQuestionController
                                     .pickedTags.length >=
                                 IbConfig.kMaxTag) {
-                              IbUtils.showSimpleSnackBar(
+                              IbUtils().showSimpleSnackBar(
                                   msg: 'max_tag_info'.tr,
                                   backgroundColor: IbColors.primaryColor);
                               return;

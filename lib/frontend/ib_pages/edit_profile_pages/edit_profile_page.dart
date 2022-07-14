@@ -215,7 +215,7 @@ class EditProfilePage extends StatelessWidget {
                             color: IbColors.primaryColor,
                           ),
                           controller: _controller.birthdateTeController,
-                          text: IbUtils.readableDateTime(
+                          text: IbUtils().readableDateTime(
                               DateTime.fromMillisecondsSinceEpoch(
                                   _controller.birthdateInMs.value)),
                           suffixIcon: const Icon(Icons.calendar_today_outlined),
@@ -371,8 +371,8 @@ class EditProfilePage extends StatelessWidget {
   }
 
   void _showDateTimePicker() {
-    IbUtils.hideKeyboard();
-    _controller.birthdateTeController.text = IbUtils.readableDateTime(
+    IbUtils().hideKeyboard();
+    _controller.birthdateTeController.text = IbUtils().readableDateTime(
         DateTime.fromMillisecondsSinceEpoch(_controller.birthdateInMs.value));
     Get.bottomSheet(
         SafeArea(
@@ -391,7 +391,7 @@ class EditProfilePage extends StatelessWidget {
                     onDateTimeChanged: (value) async {
                       await HapticFeedback.selectionClick();
                       _controller.birthdateTeController.text =
-                          IbUtils.readableDateTime(value);
+                          IbUtils().readableDateTime(value);
                       _controller.birthdateTeController.text;
                       _controller.birthdateInMs.value =
                           value.millisecondsSinceEpoch;
@@ -457,7 +457,7 @@ class EditProfilePage extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final file = await IbUtils.showImageCropper(pickedFile.path,
+              final file = await IbUtils().showImageCropper(pickedFile.path,
                   lockAspectRatio: true,
                   minimumAspectRatio: 16 / 9,
                   resetAspectRatioEnabled: false,
@@ -493,7 +493,7 @@ class EditProfilePage extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final file = await IbUtils.showImageCropper(pickedFile.path,
+              final file = await IbUtils().showImageCropper(pickedFile.path,
                   lockAspectRatio: true,
                   minimumAspectRatio: 16 / 9,
                   resetAspectRatioEnabled: false,
@@ -541,10 +541,8 @@ class EditProfilePage extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final croppedFile = await IbUtils.showImageCropper(
-                  pickedFile.path,
-                  width: 1600,
-                  height: 1600);
+              final croppedFile = await IbUtils()
+                  .showImageCropper(pickedFile.path, width: 1600, height: 1600);
               if (croppedFile != null) {
                 _controller.avatarUrl.value = croppedFile.path;
               }
@@ -569,7 +567,7 @@ class EditProfilePage extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final croppedFile = await IbUtils.showImageCropper(
+              final croppedFile = await IbUtils().showImageCropper(
                 pickedFile.path,
                 width: 1600,
                 height: 1600,

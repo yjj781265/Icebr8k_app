@@ -86,7 +86,7 @@ class SignInController extends GetxController {
 
   Future<void> signInViaEmail() async {
     final AuthController _authController = Get.find();
-    IbUtils.hideKeyboard();
+    IbUtils().hideKeyboard();
     validateEmail();
     validatePassword();
     if (isPasswordValid.isTrue && isEmailValid.isTrue) {

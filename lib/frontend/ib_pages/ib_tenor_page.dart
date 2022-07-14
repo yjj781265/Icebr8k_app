@@ -71,7 +71,7 @@ class IbTenorPage extends StatelessWidget {
       body: SafeArea(
         child: GestureDetector(
           onTap: () {
-            IbUtils.hideKeyboard();
+            IbUtils().hideKeyboard();
           },
           child: Obx(
             () => Column(
@@ -100,7 +100,7 @@ class IbTenorPage extends StatelessWidget {
                                     },
                                     child: Ink(
                                       decoration: BoxDecoration(
-                                          color: IbUtils.getRandomColor(),
+                                          color: IbUtils().getRandomColor(),
                                           borderRadius: const BorderRadius.all(
                                               Radius.circular(6))),
                                       padding: const EdgeInsets.all(8),

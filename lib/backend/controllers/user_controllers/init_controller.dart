@@ -24,7 +24,7 @@ class InitController extends GetxController {
         .onConnectivityChanged
         .listen((ConnectivityResult result) {
       if (result == ConnectivityResult.none) {
-        IbUtils.showSimpleSnackBar(
+        IbUtils().showSimpleSnackBar(
             msg: 'No Internet Connection',
             backgroundColor: IbColors.errorRed,
             isPersistent: true);

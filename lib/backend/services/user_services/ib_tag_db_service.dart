@@ -18,7 +18,7 @@ class IbTagDbService {
     final snapshot = await _db.collection(_kTagCollection).doc(tagText).get();
     if (!snapshot.exists) {
       final IbTag tag =
-          IbTag(text: tagText, creatorId: IbUtils.getCurrentUid()!);
+          IbTag(text: tagText, creatorId: IbUtils().getCurrentUid()!);
       tag.timestamp = FieldValue.serverTimestamp();
       await _db.collection(_kTagCollection).doc(tag.text).set(
             tag.toJson(),

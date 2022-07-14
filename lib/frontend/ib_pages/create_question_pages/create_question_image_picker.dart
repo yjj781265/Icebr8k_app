@@ -200,12 +200,12 @@ class CreateQuestionImagePicker extends StatelessWidget {
                   // ignore: parameter_assignments
                   list[index] = IbMedia(
                       url: gifUrl.toString(),
-                      id: IbUtils.getUniqueId(),
+                      id: IbUtils().getUniqueId(),
                       type: IbMedia.kPicType);
                 } else {
                   list.add(IbMedia(
                       url: gifUrl.toString(),
-                      id: IbUtils.getUniqueId(),
+                      id: IbUtils().getUniqueId(),
                       type: IbMedia.kPicType));
                 }
 
@@ -224,7 +224,7 @@ class CreateQuestionImagePicker extends StatelessWidget {
           ),
           ListTile(
             onTap: () async {
-              if (!IbUtils.isPremiumMember()) {
+              if (!IbUtils().isPremiumMember()) {
                 _showPremiumDialog();
                 return;
               }
@@ -240,13 +240,13 @@ class CreateQuestionImagePicker extends StatelessWidget {
                   // ignore: parameter_assignments
                   list[index] = IbMedia(
                       url: pickedFile.path,
-                      id: IbUtils.getUniqueId(),
+                      id: IbUtils().getUniqueId(),
                       type: IbMedia.kPicType);
                 } else {
                   // ignore: parameter_assignments
                   list.add(IbMedia(
                       url: pickedFile.path,
-                      id: IbUtils.getUniqueId(),
+                      id: IbUtils().getUniqueId(),
                       type: IbMedia.kPicType));
                 }
 
@@ -262,7 +262,7 @@ class CreateQuestionImagePicker extends StatelessWidget {
           ),
           ListTile(
             onTap: () async {
-              if (!IbUtils.isPremiumMember()) {
+              if (!IbUtils().isPremiumMember()) {
                 _showPremiumDialog();
                 return;
               }
@@ -277,7 +277,7 @@ class CreateQuestionImagePicker extends StatelessWidget {
                 if (pickedFiles != null) {
                   if (pickedFiles.length + _controller.picMediaList.length >
                       IbConfig.kMaxImagesCount) {
-                    IbUtils.showSimpleSnackBar(
+                    IbUtils().showSimpleSnackBar(
                         msg: '4 Pictures Max',
                         backgroundColor: IbColors.errorRed);
                     return;
@@ -286,7 +286,7 @@ class CreateQuestionImagePicker extends StatelessWidget {
                   for (final xFile in pickedFiles) {
                     list.add(IbMedia(
                         url: xFile.path,
-                        id: IbUtils.getUniqueId(),
+                        id: IbUtils().getUniqueId(),
                         type: IbMedia.kPicType));
                   }
                 }
@@ -301,7 +301,7 @@ class CreateQuestionImagePicker extends StatelessWidget {
               if (pickedFile != null) {
                 list[index] = IbMedia(
                     url: pickedFile.path,
-                    id: IbUtils.getUniqueId(),
+                    id: IbUtils().getUniqueId(),
                     type: IbMedia.kPicType);
 
                 list.refresh();
@@ -324,7 +324,7 @@ class CreateQuestionImagePicker extends StatelessWidget {
   }
 
   void _showPremiumDialog() {
-    if (!IbUtils.isPremiumMember()) {
+    if (!IbUtils().isPremiumMember()) {
       Get.dialog(IbDialog(
         title: 'Premium Only Feature',
         subtitle: 'Go premium to enjoy poll with your own pic',

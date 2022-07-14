@@ -40,7 +40,7 @@ class IbQuestionStats extends StatelessWidget {
                           choice: element.choice,
                           context: context,
                           isMe: element.users.indexWhere((element) =>
-                                  element.id == IbUtils.getCurrentUid()!) !=
+                                  element.id == IbUtils().getCurrentUid()!) !=
                               -1),
                     ],
                   ),

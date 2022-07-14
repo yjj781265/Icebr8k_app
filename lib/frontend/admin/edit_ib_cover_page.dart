@@ -78,7 +78,7 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
 
   @override
   Widget build(BuildContext context) {
-    items = IbUtils.getIbFonts(TextStyle(
+    items = IbUtils().getIbFonts(TextStyle(
         fontSize: IbConfig.kNormalTextSize,
         fontWeight: FontWeight.bold,
         fontStyle: fontStyle,
@@ -100,7 +100,7 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                     await IbAdminDbService()
                         .addIcebreakerCollection(newCollection);
                     Get.back();
-                    IbUtils.showSimpleSnackBar(
+                    IbUtils().showSimpleSnackBar(
                         msg: 'Collection Updated',
                         backgroundColor: IbColors.accentColor);
                   } catch (e) {
@@ -142,7 +142,7 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                               minFontSize: IbConfig.kNormalTextSize,
                               maxFontSize: IbConfig.kSloganSize,
                               maxLines: 4,
-                              style: IbUtils.getIbFonts(TextStyle(
+                              style: IbUtils().getIbFonts(TextStyle(
                                   color: Color(newCollection.textColor),
                                   fontWeight: FontWeight.bold,
                                   fontStyle: fontStyle,
@@ -202,7 +202,7 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                             fontStyle = FontStyle.italic;
                             newCollection.isItalic = true;
                           }
-                          items = IbUtils.getIbFonts(TextStyle(
+                          items = IbUtils().getIbFonts(TextStyle(
                               fontSize: IbConfig.kNormalTextSize,
                               fontWeight: FontWeight.bold,
                               fontStyle: fontStyle,
@@ -306,7 +306,7 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
   }
 
   void showColorPicker() {
-    IbUtils.hideKeyboard();
+    IbUtils().hideKeyboard();
     Get.dialog(IbDialog(
       title: 'Pick a color',
       subtitle: '',
@@ -327,7 +327,7 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
   }
 
   void showNameColorPicker() {
-    IbUtils.hideKeyboard();
+    IbUtils().hideKeyboard();
     Get.dialog(IbDialog(
       title: 'Pick a color for title',
       subtitle: '',

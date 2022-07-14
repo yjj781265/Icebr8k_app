@@ -32,7 +32,7 @@ class _ChatPickerPageState extends State<ChatPickerPage> {
         itemMap[item] = true;
       }
 
-      for (final item in IbUtils.getAllChatTabItems()) {
+      for (final item in IbUtils().getAllChatTabItems()) {
         if (!itemMap.containsKey(item)) {
           itemMap[item] = false;
         }
@@ -152,7 +152,7 @@ class _ChatPickerPageState extends State<ChatPickerPage> {
   Widget _buildChatAvatar(ChatTabItem item) {
     if (!item.ibChat.isCircle) {
       final user = item.avatars.firstWhereOrNull(
-          (element) => element.id != IbUtils.getCurrentUid()!);
+          (element) => element.id != IbUtils().getCurrentUid()!);
       return IbUserAvatar(
         avatarUrl: user == null ? '' : user.avatarUrl,
       );

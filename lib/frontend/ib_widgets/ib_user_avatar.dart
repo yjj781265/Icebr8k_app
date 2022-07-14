@@ -55,14 +55,15 @@ class IbUserAvatar extends StatelessWidget {
         if (compScore != null)
           TweenAnimationBuilder(
             tween: Tween<double>(
-                begin: 0, end: uid == IbUtils.getCurrentUid() ? 0 : compScore),
+                begin: 0,
+                end: uid == IbUtils().getCurrentUid() ? 0 : compScore),
             duration: const Duration(milliseconds: 888),
             builder: (BuildContext context, double value, Widget? child) {
               return SizedBox(
                   height: radius * 2 + 2,
                   width: radius * 2 + 2,
                   child: CircularProgressIndicator(
-                    color: IbUtils.handleIndicatorColor(value),
+                    color: IbUtils().handleIndicatorColor(value),
                     value: value,
                   ));
             },
@@ -71,14 +72,14 @@ class IbUserAvatar extends StatelessWidget {
             onTap: (disableOnTap || uid == null || uid!.isEmpty)
                 ? null
                 : () {
-                    if (IbUtils.checkFeatureIsLocked()) {
+                    if (IbUtils().checkFeatureIsLocked()) {
                       return;
                     }
-                    if (uid == IbUtils.getCurrentUid()!) {
+                    if (uid == IbUtils().getCurrentUid()!) {
                       Get.to(() => MyProfilePage());
                     } else {
                       Get.to(() => ProfilePage(Get.put(ProfileController(uid!),
-                          tag: IbUtils.getUniqueId())));
+                          tag: IbUtils().getUniqueId())));
                     }
                   },
             child: avatarUrl.contains('http')
@@ -110,13 +111,15 @@ class IbUserAvatar extends StatelessWidget {
                     radius: radius,
                     backgroundImage: FileImage(File(avatarUrl)),
                   )),
-        if (compScore != null && uid != IbUtils.getCurrentUid() && radius > 32)
+        if (compScore != null &&
+            uid != IbUtils().getCurrentUid() &&
+            radius > 32)
           Positioned(
             bottom: 0,
             child: Container(
               decoration: BoxDecoration(
                 color:
-                    IbUtils.handleIndicatorColor(compScore!).withOpacity(0.8),
+                    IbUtils().handleIndicatorColor(compScore!).withOpacity(0.8),
                 borderRadius: BorderRadius.circular(16),
               ),
               width: 40,

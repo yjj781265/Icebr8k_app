@@ -29,8 +29,8 @@ class PastPolls extends StatelessWidget {
             controller: _chatPageController.pastPollRefresh,
             child: ListView.builder(
               itemBuilder: (context, index) {
-                return IbUtils.handleQuestionType(
-                    _chatPageController.pastPolls[index]);
+                return IbUtils()
+                    .handleQuestionType(_chatPageController.pastPolls[index]);
               },
               itemCount: _chatPageController.pastPolls.length,
             ),

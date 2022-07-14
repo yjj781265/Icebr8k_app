@@ -142,7 +142,7 @@ class _PeopleNearbyCardState extends State<PeopleNearbyCard> {
               height: 2,
             ),
             AutoSizeText(
-              '${widget.item.user.fName} • ${widget.item.user.gender} • ${IbUtils.calculateAge(widget.item.user.birthdateInMs ?? -1)}',
+              '${widget.item.user.fName} • ${widget.item.user.gender} • ${IbUtils().calculateAge(widget.item.user.birthdateInMs ?? -1)}',
               maxLines: 1,
               textAlign: TextAlign.center,
               maxFontSize: IbConfig.kSecondaryTextSize,
@@ -168,7 +168,7 @@ class _PeopleNearbyCardState extends State<PeopleNearbyCard> {
             Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  IbUtils.getDistanceString(
+                  IbUtils().getDistanceString(
                       widget.item.distanceInMeter.toDouble()),
                   style: const TextStyle(
                     fontSize: IbConfig.kDescriptionTextSize,

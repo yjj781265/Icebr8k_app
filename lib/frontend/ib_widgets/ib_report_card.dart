@@ -77,7 +77,7 @@ class IbReportCard extends StatelessWidget {
                                 ibReportController.editingController.text
                                     .trim()
                                     .isEmpty) {
-                              IbUtils.showSimpleSnackBar(
+                              IbUtils().showSimpleSnackBar(
                                   msg: 'Pick at least one report category.',
                                   backgroundColor: IbColors.errorRed);
                               return;
@@ -87,7 +87,7 @@ class IbReportCard extends StatelessWidget {
                             showReceivedDialog();
                           } catch (e) {
                             Get.back();
-                            IbUtils.showSimpleSnackBar(
+                            IbUtils().showSimpleSnackBar(
                                 msg: 'Report failed',
                                 backgroundColor: IbColors.errorRed);
                           }
@@ -109,12 +109,12 @@ class IbReportCard extends StatelessWidget {
             try {
               await ibReportController.cancelReport();
               Get.back();
-              IbUtils.showSimpleSnackBar(
+              IbUtils().showSimpleSnackBar(
                   msg: 'Report canceled',
                   backgroundColor: IbColors.primaryColor);
             } catch (e) {
               Get.back();
-              IbUtils.showSimpleSnackBar(
+              IbUtils().showSimpleSnackBar(
                   msg: 'Report failed', backgroundColor: IbColors.errorRed);
             }
           },

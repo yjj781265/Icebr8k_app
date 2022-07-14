@@ -66,14 +66,16 @@ class EditIbCollectionMainPage extends StatelessWidget {
                                                 maxFontSize:
                                                     IbConfig.kSloganSize,
                                                 maxLines: 4,
-                                                style: IbUtils.getIbFonts(
+                                                style: IbUtils().getIbFonts(
                                                     TextStyle(
                                                         fontSize: IbConfig
                                                             .kNormalTextSize,
-                                                        fontStyle: e
-                                                                .isItalic
-                                                            ? FontStyle.italic
-                                                            : FontStyle.normal,
+                                                        fontStyle:
+                                                            e.isItalic
+                                                                ? FontStyle
+                                                                    .italic
+                                                                : FontStyle
+                                                                    .normal,
                                                         color:
                                                             Color(e.textColor),
                                                         fontWeight:
@@ -100,8 +102,8 @@ class EditIbCollectionMainPage extends StatelessWidget {
                 ),
               ),
             ),
-            if (IbUtils.getCurrentIbUser() != null &&
-                !IbUtils.isPremiumMember())
+            if (IbUtils().getCurrentIbUser() != null &&
+                !IbUtils().isPremiumMember())
               SafeArea(
                 child: SizedBox(
                   height: 56,
@@ -115,7 +117,7 @@ class EditIbCollectionMainPage extends StatelessWidget {
           ? FloatingActionButton(
               onPressed: () {
                 Get.to(() => EditIbCoverPage(IbCollection(
-                      id: IbUtils.getUniqueId(),
+                      id: IbUtils().getUniqueId(),
                       name: '',
                     )));
               },

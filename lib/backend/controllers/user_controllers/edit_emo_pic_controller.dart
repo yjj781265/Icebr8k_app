@@ -27,7 +27,7 @@ class EditEmoPicController extends GetxController {
           barrierDismissible: false);
       await IbStorageService().deleteFile(e.url);
       await IbUserDbService()
-          .updateEmoPics(emoPics: rxEmoPics, uid: IbUtils.getCurrentUid()!);
+          .updateEmoPics(emoPics: rxEmoPics, uid: IbUtils().getCurrentUid()!);
     } finally {
       Get.back();
     }
@@ -99,11 +99,11 @@ class EditEmoPicController extends GetxController {
 
       rxEmoPics.refresh();
       await IbUserDbService()
-          .updateEmoPics(emoPics: rxEmoPics, uid: IbUtils.getCurrentUid()!);
+          .updateEmoPics(emoPics: rxEmoPics, uid: IbUtils().getCurrentUid()!);
 
       Get.back(closeOverlays: true);
 
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'EmoPic uploaded', backgroundColor: IbColors.accentColor);
     } catch (e) {
       Get.back();
