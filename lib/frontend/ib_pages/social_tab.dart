@@ -626,7 +626,8 @@ class FriendListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
-        Get.to(() => ProfilePage(Get.put(ProfileController(item.user.id))));
+        Get.to(() => ProfilePage(
+            Get.put(ProfileController(item.user.id), tag: item.user.id)));
       },
       leading: IbUserAvatar(
         avatarUrl: item.user.avatarUrl,

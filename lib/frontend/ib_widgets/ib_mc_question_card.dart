@@ -9,6 +9,7 @@ import 'package:icebr8k/backend/controllers/user_controllers/ib_question_stats_c
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
+import 'package:icebr8k/frontend/ib_pages/ib_tenor_page.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_slide.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_buttons.dart';
@@ -16,11 +17,13 @@ import 'package:icebr8k/frontend/ib_widgets/ib_question_header.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_info.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_stats_bar.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_question_tags.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
 import '../ib_colors.dart';
 import '../ib_config.dart';
+import '../ib_pages/ib_premium_page.dart';
 import '../ib_utils.dart';
 import 'ib_card.dart';
 import 'ib_media_viewer.dart';
@@ -99,7 +102,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                   tag: widget._controller.rxIbQuestion.value.id))
             else
               LimitedBox(
-                maxHeight: 350,
+                maxHeight: 320,
                 child: Scrollbar(
                   thickness: 3,
                   radius: const Radius.circular(8),
@@ -230,10 +233,11 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
         .map((e) => IbQuestionMcItem(e, widget._controller))
         .toList());
 
-    // todo add support for mc pic in the future
     if (widget._controller.rxIbQuestion.value.isOpenEnded &&
-        widget._controller.rxIbQuestion.value.questionType ==
-            QuestionType.multipleChoice) {
+        (widget._controller.rxIbQuestion.value.questionType ==
+                QuestionType.multipleChoice ||
+            widget._controller.rxIbQuestion.value.questionType ==
+                QuestionType.multipleChoicePic)) {
       list.add(headerWidget());
     }
     return list;
@@ -242,6 +246,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
   void _showBottomSheet({required String strTrKey}) {
     IbUtils().hideKeyboard();
     final TextEditingController _txtController = TextEditingController();
+    _txtController.text = widget._controller.rxNewChoice.value.content ?? '';
     final Widget _widget = IbDialog(
       title: strTrKey.tr,
       content: TextField(
@@ -249,9 +254,22 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
         maxLength: IbConfig.kAnswerMaxLength,
         onSubmitted: (value) async {
           Get.back();
-          final choice =
-              IbChoice(choiceId: IbUtils().getUniqueId(), content: value);
-          await widget._controller.addChoice(choice);
+          if (widget._controller.rxNewChoice.value.choiceId.isEmpty) {
+            final choice = IbChoice(
+                choiceId: IbUtils().getUniqueId(),
+                content: _txtController.text.trim());
+            widget._controller.rxNewChoice = choice.obs;
+          } else {
+            widget._controller.rxNewChoice.value.content =
+                _txtController.text.trim();
+          }
+          widget._controller.rxNewChoice.refresh();
+
+          if (widget._controller.rxIbQuestion.value.questionType ==
+              QuestionType.multipleChoice) {
+            await widget._controller
+                .addChoice(widget._controller.rxNewChoice.value);
+          }
         },
         controller: _txtController,
         autofocus: true,
@@ -261,71 +279,378 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
       subtitle: '',
       onPositiveTap: () async {
         Get.back();
-        final choice = IbChoice(
-            choiceId: IbUtils().getUniqueId(), content: _txtController.text);
-        await widget._controller.addChoice(choice);
+        if (widget._controller.rxNewChoice.value.choiceId.isEmpty) {
+          final choice = IbChoice(
+              choiceId: IbUtils().getUniqueId(),
+              content: _txtController.text.trim());
+          widget._controller.rxNewChoice = choice.obs;
+        } else {
+          widget._controller.rxNewChoice.value.content =
+              _txtController.text.trim();
+        }
+        widget._controller.rxNewChoice.refresh();
+
+        if (widget._controller.rxIbQuestion.value.questionType ==
+            QuestionType.multipleChoice) {
+          await widget._controller
+              .addChoice(widget._controller.rxNewChoice.value);
+        }
       },
     );
     Get.bottomSheet(_widget, persistent: true, ignoreSafeArea: false);
   }
 
+  Widget _handlePic(
+      {required BuildContext context, required IbChoice ibChoice}) {
+    if (ibChoice.url == null || ibChoice.url!.isEmpty) {
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: IbColors.lightGrey,
+        ),
+        width: IbConfig.kMcPicSize,
+        height: IbConfig.kMcPicSize,
+        child: const Icon(Icons.add),
+      );
+    }
+
+    if (ibChoice.url!.contains('http')) {
+      return ClipRRect(
+        borderRadius: const BorderRadius.all(Radius.circular(8)),
+        child: CachedNetworkImage(
+          placeholder: (context, string) {
+            return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: IbColors.lightGrey,
+              ),
+              width: IbConfig.kMcPicSize,
+              height: IbConfig.kMcPicSize,
+            );
+          },
+          imageUrl: ibChoice.url!,
+          fit: BoxFit.cover,
+          width: IbConfig.kMcPicSize,
+          height: IbConfig.kMcPicSize,
+        ),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: const BorderRadius.all(Radius.circular(8)),
+      child: Image.file(
+        File(ibChoice.url!),
+        fit: BoxFit.cover,
+        width: IbConfig.kMcPicSize,
+        height: IbConfig.kMcPicSize,
+      ),
+    );
+  }
+
   Widget headerWidget() {
-    return Stack(
-      children: [
-        IbCard(
+    return Obx(() {
+      if (widget._controller.rxIbQuestion.value.questionType ==
+          QuestionType.multipleChoicePic) {
+        return IbCard(
           elevation: 0,
           radius: 8,
-          margin: const EdgeInsets.only(top: 4, bottom: 4),
+          margin: const EdgeInsets.only(top: 8),
           color: IbColors.lightBlue,
           child: SizedBox(
-            height: IbConfig.kMcTxtItemSize,
+            height: IbConfig.kMcPicItemSize,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'tap_to_add'.tr,
-                    style: const TextStyle(color: Colors.grey),
+                  child: Stack(
+                    children: [
+                      Obx(
+                        () => _handlePic(
+                            context: context,
+                            ibChoice: widget._controller.rxNewChoice.value),
+                      ),
+                      Positioned.fill(
+                          child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          customBorder: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
+                          onTap: () {
+                            showMediaBottomSheet();
+                          },
+                          onDoubleTap: () {
+                            if (widget._controller.rxNewChoice.value.url ==
+                                null) {
+                              return;
+                            }
+                            Get.to(
+                                () => IbMediaViewer(urls: [
+                                      widget._controller.rxNewChoice.value.url!
+                                    ], currentIndex: 0),
+                                transition: Transition.zoom);
+                          },
+                        ),
+                      ))
+                    ],
                   ),
                 ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.add,
-                    color: Colors.black,
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          height: IbConfig.kMcPicSize,
+                          alignment: Alignment.centerLeft,
+                          child: Obx(() {
+                            if (widget._controller.rxNewChoice.value.content ==
+                                    null ||
+                                widget._controller.rxNewChoice.value.content!
+                                    .isEmpty) {
+                              return Text('tap_to_add'.tr,
+                                  style: const TextStyle(
+                                      color: IbColors.lightGrey));
+                            }
+                            return Text(
+                              widget._controller.rxNewChoice.value.content!,
+                              style: const TextStyle(color: Colors.black),
+                            );
+                          }),
+                        ),
+                        Positioned.fill(
+                            child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            customBorder: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                            onTap: () {
+                              if (widget._controller.rxIsSample.isTrue) {
+                                return;
+                              }
+                              _showBottomSheet(strTrKey: 'add_choice');
+                            },
+                          ),
+                        )),
+                      ],
+                    ),
                   ),
-                  padding: EdgeInsets.zero,
                 ),
+                Obx(() {
+                  final choice = widget._controller.rxNewChoice.value;
+                  if (choice.url != null &&
+                      choice.url!.isNotEmpty &&
+                      choice.content != null &&
+                      choice.content!.isNotEmpty) {
+                    return IconButton(
+                        onPressed: () async {
+                          widget._controller
+                              .addChoice(widget._controller.rxNewChoice.value);
+                        },
+                        icon: const Icon(
+                          Icons.upload,
+                          color: Colors.black,
+                        ));
+                  }
+                  return const SizedBox();
+                })
               ],
             ),
           ),
-        ),
-        Positioned.fill(
-            child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            customBorder: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8))),
-            onTap: () {
-              if (widget._controller.rxIsSample.isTrue) {
-                return;
-              }
-
-              if (widget._controller.rxIbQuestion.value.choices.length >=
-                  IbConfig.kOpenEndedChoiceLimit) {
-                IbUtils().showSimpleSnackBar(
-                    msg: 'Failed to add a choice, poll reaches choice limit',
-                    backgroundColor: IbColors.errorRed);
-                return;
-              }
-
-              _showBottomSheet(strTrKey: 'add_choice');
-            },
+        );
+      }
+      return Stack(
+        children: [
+          IbCard(
+            elevation: 0,
+            radius: 8,
+            margin: const EdgeInsets.only(top: 4, bottom: 4),
+            color: IbColors.lightBlue,
+            child: SizedBox(
+              height: IbConfig.kMcTxtItemSize,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'tap_to_add'.tr,
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.add,
+                      color: Colors.black,
+                    ),
+                    padding: EdgeInsets.zero,
+                  ),
+                ],
+              ),
+            ),
           ),
-        ))
+          Positioned.fill(
+              child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              customBorder: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(8))),
+              onTap: () {
+                if (widget._controller.rxIsSample.isTrue) {
+                  return;
+                }
+
+                if (widget._controller.rxIbQuestion.value.choices.length >=
+                    IbConfig.kOpenEndedChoiceLimit) {
+                  IbUtils().showSimpleSnackBar(
+                      msg: 'Failed to add a choice, poll reaches choice limit',
+                      backgroundColor: IbColors.errorRed);
+                  return;
+                }
+
+                _showBottomSheet(strTrKey: 'add_choice');
+              },
+            ),
+          ))
+        ],
+      );
+    });
+  }
+
+  void showMediaBottomSheet() {
+    IbUtils().hideKeyboard();
+    final ibChoice = widget._controller.rxNewChoice.value;
+    final Widget options = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
+          onTap: () async {
+            Get.back();
+            final url = await Get.to(
+              () => IbTenorPage(),
+            );
+            if (url != null && url.toString().isNotEmpty) {
+              if (ibChoice.choiceId.isNotEmpty) {
+                // ignore: parameter_assignments
+                ibChoice.url = url.toString();
+              } else {
+                // ignore: parameter_assignments
+                widget._controller.rxNewChoice.value = IbChoice(
+                  choiceId: IbUtils().getUniqueId(),
+                  url: url.toString(),
+                );
+              }
+
+              widget._controller.rxNewChoice.refresh();
+            }
+          },
+          leading: const Icon(
+            Icons.gif,
+            color: IbColors.accentColor,
+            size: 24,
+          ),
+          title: const Text(
+            'Choose GIF from Tenor',
+            style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+          ),
+        ),
+        ListTile(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
+          onTap: () async {
+            if (!IbUtils().isPremiumMember()) {
+              _showPremiumDialog();
+              return;
+            }
+            Get.back();
+            final _picker = ImagePicker();
+            final XFile? pickedFile = await _picker.pickImage(
+              source: ImageSource.camera,
+              imageQuality: IbConfig.kImageQuality,
+            );
+
+            if (pickedFile != null) {
+              if (ibChoice.choiceId.isNotEmpty) {
+                // ignore: parameter_assignments
+                ibChoice.url = pickedFile.path;
+              } else {
+                // ignore: parameter_assignments
+                widget._controller.rxNewChoice.value = IbChoice(
+                    choiceId: IbUtils().getUniqueId(), url: pickedFile.path);
+                // ignore: parameter_assignments
+
+              }
+
+              widget._controller.rxNewChoice.refresh();
+            }
+          },
+          leading: const Icon(
+            Icons.camera_alt_outlined,
+            color: IbColors.primaryColor,
+          ),
+          title: const Text('Take a photo',
+              style: TextStyle(fontSize: IbConfig.kNormalTextSize)),
+        ),
+        ListTile(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
+          onTap: () async {
+            if (!IbUtils().isPremiumMember()) {
+              _showPremiumDialog();
+              return;
+            }
+            Get.back();
+            final _picker = ImagePicker();
+            final XFile? pickedFile = await _picker.pickImage(
+              source: ImageSource.gallery,
+              imageQuality: IbConfig.kImageQuality,
+            );
+
+            if (pickedFile != null) {
+              if (ibChoice.choiceId.isNotEmpty) {
+                // ignore: parameter_assignments
+                ibChoice.url = pickedFile.path;
+              } else {
+                // ignore: parameter_assignments
+                widget._controller.rxNewChoice.value = IbChoice(
+                  choiceId: IbUtils().getUniqueId(),
+                  url: pickedFile.path,
+                );
+              }
+              widget._controller.rxNewChoice.refresh();
+            }
+          },
+          leading: const Icon(
+            Icons.photo_album_outlined,
+            color: IbColors.errorRed,
+          ),
+          title: const Text(
+            'Choose from gallery',
+            style: TextStyle(fontSize: IbConfig.kNormalTextSize),
+          ),
+        ),
       ],
     );
+
+    Get.bottomSheet(IbCard(child: options), ignoreSafeArea: false);
+  }
+
+  void _showPremiumDialog() {
+    if (!IbUtils().isPremiumMember()) {
+      Get.dialog(IbDialog(
+        title: 'Premium Only Feature',
+        subtitle: 'Go premium to enjoy poll with your own pic',
+        positiveTextKey: 'Go Premium',
+        onPositiveTap: () {
+          Get.back();
+          Get.to(() => IbPremiumPage());
+        },
+      ));
+    }
   }
 
   @override
@@ -526,12 +851,12 @@ class IbQuestionMcItem extends StatelessWidget {
                                         child: !choice.url!.contains('http')
                                             ? Image.file(
                                                 File(choice.url!),
-                                                fit: BoxFit.fill,
+                                                fit: BoxFit.cover,
                                                 width: IbConfig.kMcPicSize,
                                                 height: IbConfig.kMcPicSize,
                                               )
                                             : CachedNetworkImage(
-                                                fit: BoxFit.fill,
+                                                fit: BoxFit.cover,
                                                 fadeInDuration: const Duration(
                                                     milliseconds: 300),
                                                 width: IbConfig.kMcPicSize,

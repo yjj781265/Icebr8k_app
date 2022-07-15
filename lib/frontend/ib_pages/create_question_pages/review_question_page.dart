@@ -139,8 +139,10 @@ class ReviewQuestionPage extends StatelessWidget {
                     ),
                   ),
                   Obx(() {
-                    if (itemController.rxIbQuestion.value.questionType ==
-                            QuestionType.multipleChoice &&
+                    if ((itemController.rxIbQuestion.value.questionType ==
+                                QuestionType.multipleChoice ||
+                            itemController.rxIbQuestion.value.questionType ==
+                                QuestionType.multipleChoicePic) &&
                         !itemController.rxIbQuestion.value.isQuiz) {
                       return SwitchListTile.adaptive(
                         tileColor: Theme.of(context).primaryColor,

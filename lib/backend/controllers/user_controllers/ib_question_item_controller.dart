@@ -8,6 +8,7 @@ import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
+import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
@@ -21,6 +22,7 @@ import '../../services/user_services/ib_user_db_service.dart';
 
 class IbQuestionItemController extends GetxController {
   final Rx<IbQuestion> rxIbQuestion;
+  Rx<IbChoice> rxNewChoice = IbChoice(choiceId: '', content: '').obs;
   Timer? _timer;
   final voted = false.obs;
   final isAnswering = false.obs;
@@ -142,13 +144,41 @@ class IbQuestionItemController extends GetxController {
       return;
     }
 
+    if (rxIbQuestion.value.questionType == QuestionType.multipleChoicePic) {
+      if (choice.url == null ||
+          choice.url!.isEmpty ||
+          choice.content == null ||
+          choice.content!.isEmpty) {
+        Get.dialog(IbDialog(
+            subtitle: 'mc_pic_question_not_valid'.tr,
+            showNegativeBtn: false,
+            title: 'Error',
+            positiveTextKey: 'ok'));
+        return;
+      }
+    }
+
     IbUtils().showSimpleSnackBar(
         msg: "Adding a new choice...", backgroundColor: IbColors.primaryColor);
+    if (choice.url != null && !choice.url!.contains('http')) {
+      final String? url = await IbStorageService()
+          .uploadAndRetrieveImgUrl(filePath: choice.url!);
+      if (url == null) {
+        IbUtils().showSimpleSnackBar(
+            msg: 'Failed to upload images...',
+            backgroundColor: IbColors.errorRed);
+        return;
+      } else {
+        choice.url = url;
+      }
+    }
 
     await IbQuestionDbService()
         .addChoice(questionId: rxIbQuestion.value.id, ibChoice: choice);
 
     await refreshStats();
+    rxNewChoice.value = IbChoice(choiceId: '', content: '');
+    rxNewChoice.refresh();
     IbUtils().showSimpleSnackBar(
         msg: "New choice added", backgroundColor: IbColors.accentColor);
   }

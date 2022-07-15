@@ -57,7 +57,7 @@ class SocialTabController extends GetxController {
         print('ChatTabController 1-1 ${docChange.type}');
         final IbChat ibChat = IbChat.fromJson(docChange.doc.data()!);
         if (docChange.type == DocumentChangeType.added) {
-          final item = await _buildItem(ibChat);
+          final item = await _buildChatTabItem(ibChat);
           if (item.avatars.isEmpty) {
             continue;
           }
@@ -66,7 +66,7 @@ class SocialTabController extends GetxController {
           final index = oneToOneChats
               .indexWhere((element) => element.ibChat.chatId == ibChat.chatId);
           if (index != -1) {
-            final item = await _buildItem(ibChat);
+            final item = await _buildChatTabItem(ibChat);
             _showChatNotification(oldItem: oneToOneChats[index], item: item);
             oneToOneChats[index] = item;
             calculateTotalUnread();
@@ -97,13 +97,13 @@ class SocialTabController extends GetxController {
         final IbChat ibChat = IbChat.fromJson(docChange.doc.data()!);
         print('ChatTabController circle ${docChange.type}');
         if (docChange.type == DocumentChangeType.added) {
-          final item = await _buildItem(ibChat);
+          final item = await _buildChatTabItem(ibChat);
           circles.add(item);
         } else if (docChange.type == DocumentChangeType.modified) {
           final index = circles
               .indexWhere((element) => element.ibChat.chatId == ibChat.chatId);
           if (index != -1) {
-            final item = await _buildItem(ibChat);
+            final item = await _buildChatTabItem(ibChat);
             _showChatNotification(oldItem: circles[index], item: item);
             circles[index] = item;
           }
@@ -205,7 +205,7 @@ class SocialTabController extends GetxController {
     return true;
   }
 
-  Future<ChatTabItem> _buildItem(IbChat ibChat) async {
+  Future<ChatTabItem> _buildChatTabItem(IbChat ibChat) async {
     final List<String> uids = ibChat.memberUids
         .where((element) => element != IbUtils().getCurrentUid())
         .toList();

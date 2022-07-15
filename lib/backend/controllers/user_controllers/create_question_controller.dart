@@ -174,7 +174,7 @@ class CreateQuestionController extends GetxController {
 
     if (questionType.value == QuestionType.multipleChoicePic &&
         picChoiceList.length < 2) {
-      Get.dialog(IbDialog(
+      IbUtils().showDialog(IbDialog(
           showNegativeBtn: false,
           subtitle: 'mc_question_not_valid'.tr,
           title: 'Error',

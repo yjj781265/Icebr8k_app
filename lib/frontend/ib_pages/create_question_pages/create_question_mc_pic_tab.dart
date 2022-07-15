@@ -83,12 +83,9 @@ class CreateQuestionMcPicTab extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 64.0),
-                            child: Text(
-                              'tap_to_add'.tr,
-                              style: const TextStyle(color: IbColors.lightGrey),
-                            ),
+                          Text(
+                            'tap_to_add'.tr,
+                            style: const TextStyle(color: IbColors.lightGrey),
                           ),
                           const Padding(
                             padding: EdgeInsets.only(right: 10),
@@ -165,7 +162,8 @@ class CreateQuestionMcPicTab extends StatelessWidget {
                 children: [
                   Container(
                     height: IbConfig.kMcPicSize,
-                    alignment: Alignment.center,
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.only(left: 8),
                     child: Text(
                       item.content == null ? 'tap_to_add'.tr : item.content!,
                       style: TextStyle(

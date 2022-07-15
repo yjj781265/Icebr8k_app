@@ -300,10 +300,10 @@ class IbQuestionDbService {
       int limit = IbConfig.kPerPage,
       required List<String> tags}) async {
     tags.shuffle();
-    final tenTags = tags.take(8).toList();
+    final eightTags = tags.take(8).toList();
     if (lastDoc != null) {
       return _collectionRef
-          .where('tags', arrayContainsAny: tenTags)
+          .where('tags', arrayContainsAny: eightTags)
           .where('isPublic', isEqualTo: true)
           .orderBy('askedTimeInMs', descending: true)
           .limit(limit)
@@ -312,7 +312,7 @@ class IbQuestionDbService {
     }
 
     return _collectionRef
-        .where('tags', arrayContainsAny: tenTags)
+        .where('tags', arrayContainsAny: eightTags)
         .where('isPublic', isEqualTo: true)
         .orderBy('askedTimeInMs', descending: true)
         .limit(limit)
@@ -361,6 +361,7 @@ class IbQuestionDbService {
         .collectionGroup(_kAnswerCollectionGroup)
         .where('uid', isEqualTo: uid)
         .where('isAnonymous', isEqualTo: false)
+        .limit(IbConfig.kUserAnswersQueryLimit)
         .get();
     for (final doc in _snapshot.docs) {
       try {
