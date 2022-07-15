@@ -17,7 +17,8 @@ import '../../backend/services/user_services/ib_local_data_service.dart';
 
 class SignInPage extends StatelessWidget {
   SignInPage({Key? key}) : super(key: key);
-  final SignInController _controller = Get.put(SignInController());
+  final SignInController _controller = Get.put(SignInController(
+      authController: Get.find<AuthController>(), utils: IbUtils()));
   final AuthController _authController = Get.find();
   final ResetPwdController _resetPwdController = Get.put(ResetPwdController());
   @override
