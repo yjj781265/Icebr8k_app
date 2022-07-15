@@ -145,6 +145,7 @@ class SocialTabController extends GetxController {
         }
 
         if (user == null) {
+          await IbUserDbService().removeFriend(id);
           continue;
         }
         final index = friends.indexWhere((element) => element.user.id == id);

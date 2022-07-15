@@ -8,13 +8,13 @@ import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 /// this controller control info of current IbUser, index current home page tab and api keys
 class MainPageController extends GetxController {
   final currentIndex = 0.obs;
-  final entitlement = 'premium';
-
+  final IbUserDbService userDbService;
   late StreamSubscription ibUserSub;
   final isNavBarVisible = true.obs;
   Rx<IbUser> rxCurrentIbUser;
 
-  MainPageController(this.rxCurrentIbUser);
+  MainPageController(
+      {required this.rxCurrentIbUser, required this.userDbService});
 
   @override
   Future<void> onInit() async {
