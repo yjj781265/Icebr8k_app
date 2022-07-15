@@ -225,20 +225,24 @@ class AdminMainController extends GetxController {
             Get.offAll(
                 () => SetupPageOne(
                       Get.put(
-                        SetupController(status: IbUser.kUserStatusRejected),
-                      ),
+                          SetupController(status: IbUser.kUserStatusRejected),
+                          tag: IbUtils().getUniqueId()),
                     ),
                 transition: Transition.circularReveal);
             break;
           case null:
             print('Go to Setup page');
-            Get.offAll(() => SetupPageOne(Get.put(SetupController())),
+            Get.offAll(
+                () => SetupPageOne(
+                    Get.put(SetupController(), tag: IbUtils().getUniqueId())),
                 transition: Transition.circularReveal);
             break;
 
           default:
             print('default Go to Setup page');
-            Get.offAll(() => SetupPageOne(Get.put(SetupController())),
+            Get.offAll(
+                () => SetupPageOne(
+                    Get.put(SetupController(), tag: IbUtils().getUniqueId())),
                 transition: Transition.circularReveal);
             break;
         }
