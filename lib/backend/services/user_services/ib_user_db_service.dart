@@ -145,6 +145,19 @@ class IbUserDbService {
     return snapshot.size > 0;
   }
 
+  Future<void> removeAllCircleInvites(
+      {required String chatId, required String recipientId}) async {
+    final snapshot = await _collectionRef
+        .doc(recipientId)
+        .collection(_kNotificationSubCollection)
+        .where('type', isEqualTo: IbNotification.kCircleInvite)
+        .where('url', isEqualTo: chatId)
+        .get();
+    for (final doc in snapshot.docs) {
+      await doc.reference.delete();
+    }
+  }
+
   Future<List<IbNotification>> isCircleRequestSent(
       {required String chatId}) async {
     final list = <IbNotification>[];

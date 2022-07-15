@@ -122,8 +122,17 @@ class CircleInfo extends StatelessWidget {
                         width: double.infinity,
                         height: 56,
                         margin: const EdgeInsets.all(16),
-                        child: Obx(
-                          () => IbElevatedButton(
+                        child: Obx(() {
+                          if (_controller.hasInvite.isTrue &&
+                              _controller.isMember.isFalse) {
+                            return IbElevatedButton(
+                                textTrKey: 'Join Circle',
+                                onPressed: () async {
+                                  _controller.joinCircle();
+                                });
+                          }
+
+                          return IbElevatedButton(
                               color: _controller.requests.isNotEmpty
                                   ? Colors.orange
                                   : IbColors.accentColor,
@@ -144,8 +153,8 @@ class CircleInfo extends StatelessWidget {
                                 } else if (_controller.requests.isNotEmpty) {
                                   await _controller.cancelCircleRequest();
                                 }
-                              }),
-                        ),
+                              });
+                        }),
                       )
                     else if (_controller.rxIbChat.value.memberUids.length >=
                         IbConfig.kCircleMaxMembers)

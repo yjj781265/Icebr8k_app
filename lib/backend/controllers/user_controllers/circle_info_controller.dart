@@ -85,7 +85,6 @@ class CircleInfoController extends GetxController {
 
     try {
       final chat = await IbChatDbService().queryChat(rxIbChat.value.chatId);
-
       if (chat != null &&
           chat.memberUids.contains(
             IbUtils().getCurrentUid(),
@@ -112,6 +111,8 @@ class CircleInfoController extends GetxController {
         Get.to(() =>
             ChatPage(Get.put(ChatPageController(ibChat: rxIbChat.value))));
       }
+      await IbUserDbService().removeAllCircleInvites(
+          chatId: chat.chatId, recipientId: IbUtils().getCurrentUid()!);
       await IbAnalyticsManager().logJoinGroup(chat.chatId);
     } catch (e) {
       Get.back();
