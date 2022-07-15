@@ -419,8 +419,9 @@ class CreateQuestionController extends GetxController {
         inAppReview.requestReview();
       } else {
         IbUtils().showSimpleSnackBar(
-            msg: 'inAppReview.isAvailable() is false',
-            backgroundColor: IbColors.errorRed);
+            msg:
+                'If you enjoy this app, please leave us a 5 star review in ${GetPlatform.isAndroid ? 'Google Play Store ' : 'AppStore'}',
+            backgroundColor: IbColors.primaryColor);
       }
     }
   }

@@ -258,7 +258,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
             final choice = IbChoice(
                 choiceId: IbUtils().getUniqueId(),
                 content: _txtController.text.trim());
-            widget._controller.rxNewChoice = choice.obs;
+            widget._controller.rxNewChoice.value = choice;
           } else {
             widget._controller.rxNewChoice.value.content =
                 _txtController.text.trim();
@@ -283,7 +283,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
           final choice = IbChoice(
               choiceId: IbUtils().getUniqueId(),
               content: _txtController.text.trim());
-          widget._controller.rxNewChoice = choice.obs;
+          widget._controller.rxNewChoice.value = choice;
         } else {
           widget._controller.rxNewChoice.value.content =
               _txtController.text.trim();
@@ -632,6 +632,9 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
             'Choose from gallery',
             style: TextStyle(fontSize: IbConfig.kNormalTextSize),
           ),
+        ),
+        const SizedBox(
+          height: 16,
         ),
       ],
     );

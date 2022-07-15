@@ -421,6 +421,9 @@ class CreateQuestionMcPicTab extends StatelessWidget {
             style: TextStyle(fontSize: IbConfig.kNormalTextSize),
           ),
         ),
+        const SizedBox(
+          height: 16,
+        ),
       ],
     );
 

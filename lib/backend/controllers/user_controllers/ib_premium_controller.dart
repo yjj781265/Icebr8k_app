@@ -80,6 +80,14 @@ class IbPremiumController extends GetxController {
     }
   }
 
+  Future<void> sync() async {
+    try {
+      await Purchases.syncPurchases();
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Future<void> _handlePurchaseInfo(PurchaserInfo purchaserInfo) async {
     if (purchaserInfo.entitlements.all[entitlement] == null) {
       entitlementInfo = null;

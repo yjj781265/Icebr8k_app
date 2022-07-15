@@ -316,6 +316,9 @@ class CreateQuestionImagePicker extends StatelessWidget {
               style: TextStyle(fontSize: IbConfig.kNormalTextSize),
             ),
           ),
+          const SizedBox(
+            height: 16,
+          ),
         ],
       ),
     );

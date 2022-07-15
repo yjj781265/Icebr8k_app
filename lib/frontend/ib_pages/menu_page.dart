@@ -15,10 +15,10 @@ import 'package:icebr8k/frontend/ib_themes.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../../backend/controllers/admin_controllers/feedback_chat_controller.dart';
 import '../../backend/controllers/user_controllers/auth_controller.dart';
+import '../../backend/controllers/user_controllers/ib_premium_controller.dart';
 import '../../backend/models/ib_user.dart';
 import '../../backend/services/user_services/ib_local_data_service.dart';
 import 'profile_pages/my_profile_page.dart';
@@ -192,8 +192,10 @@ class _MenuPageState extends State<MenuPage> {
                               msg: 'Loading info...',
                               backgroundColor: IbColors.primaryColor,
                               duration: const Duration(milliseconds: 1000));
-                          await Purchases.syncPurchases();
-                          Get.to(() => IbPremiumPage());
+                          final IbPremiumController _controller = Get.find();
+                          _controller
+                              .sync()
+                              .then((value) => Get.to(() => IbPremiumPage()));
                         },
                       ),
                       ListTile(

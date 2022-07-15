@@ -34,7 +34,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Allow access to camera to capture photos</string>
+	<string>Icebr8k requires access to the camera in order to update your avatar, cover photos, and polls.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Your location is required in order to see people nearby</string>
 	<key>NSLocationAlwaysUsageDescription</key>
@@ -44,7 +44,7 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow access to microphone</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Allow access to photo library</string>
+	<string>Icebr8k requires access to the photo library in order to update your avatar, cover photos, and polls.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
