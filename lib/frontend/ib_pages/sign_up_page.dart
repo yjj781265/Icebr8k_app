@@ -16,177 +16,180 @@ class SignUpPage extends GetView<SignUpController> {
   const SignUpPage({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    Get.put(SignUpController());
+    Get.put(SignUpController(IbUtils(), Get.find<AuthController>()));
     return Scaffold(
-      body: Center(
-        child: GestureDetector(
-          onTap: () => IbUtils().hideKeyboard(),
-          child: IbCard(
-            child: Scrollbar(
-              radius: const Radius.circular(IbConfig.kScrollbarCornerRadius),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            //hide keyboard
-                            IbUtils().hideKeyboard();
-                            Get.back();
-                          },
-                          icon: const Icon(Icons.arrow_back_outlined),
-                        ),
-                        Text(
-                          'sign_up'.tr,
-                          style: const TextStyle(
-                              fontSize: IbConfig.kPageTitleSize,
-                              fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 16,
-                    ),
-                    Obx(
-                      () => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: IbTextField(
-                          titleIcon: const Icon(
-                            Icons.email_outlined,
-                            color: IbColors.primaryColor,
+      body: SafeArea(
+        child: Center(
+          child: GestureDetector(
+            onTap: () => IbUtils().hideKeyboard(),
+            child: IbCard(
+              child: Scrollbar(
+                radius: const Radius.circular(IbConfig.kScrollbarCornerRadius),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              //hide keyboard
+                              IbUtils().hideKeyboard();
+                              Get.back();
+                            },
+                            icon: const Icon(Icons.arrow_back_outlined),
                           ),
-                          textInputType: TextInputType.emailAddress,
-                          titleTrKey: 'email_address',
-                          hintTrKey: 'email_address_hint',
-                          borderColor: controller.isEmailFirstTime.value
-                              ? IbColors.lightGrey
-                              : (controller.isEmailValid.value
-                                  ? IbColors.accentColor
-                                  : IbColors.errorRed),
-                          errorTrKey: controller.emailErrorTrKey.value,
-                          onChanged: (email) {
-                            controller.email.value = email.trim();
-                          },
+                          Text(
+                            'sign_up'.tr,
+                            style: const TextStyle(
+                                fontSize: IbConfig.kPageTitleSize,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      Obx(
+                        () => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: IbTextField(
+                            titleIcon: const Icon(
+                              Icons.email_outlined,
+                              color: IbColors.primaryColor,
+                            ),
+                            textInputType: TextInputType.emailAddress,
+                            titleTrKey: 'email_address',
+                            hintTrKey: 'email_address_hint',
+                            borderColor: controller.isEmailFirstTime.value
+                                ? IbColors.lightGrey
+                                : (controller.isEmailValid.value
+                                    ? IbColors.accentColor
+                                    : IbColors.errorRed),
+                            errorTrKey: controller.emailErrorTrKey.value,
+                            onChanged: (email) {
+                              controller.email.value = email.trim();
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                    Obx(
-                      () => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: IbTextField(
+                      Obx(
+                        () => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: IbTextField(
+                              titleIcon: const Icon(
+                                Icons.lock_outline,
+                                color: IbColors.primaryColor,
+                              ),
+                              textInputType: TextInputType.visiblePassword,
+                              titleTrKey: 'password',
+                              hintTrKey: 'password_hint',
+                              borderColor: controller.isPwdFirstTime.value
+                                  ? IbColors.lightGrey
+                                  : (controller.isPasswordValid.value
+                                      ? IbColors.accentColor
+                                      : IbColors.errorRed),
+                              errorTrKey: controller.pwdErrorTrKey.value,
+                              onChanged: (password) {
+                                controller.password.value = password;
+                              },
+                              obscureText: controller.isPwdObscured.value,
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  final bool isObscured =
+                                      controller.isPwdObscured.value;
+                                  controller.isPwdObscured.value = !isObscured;
+                                },
+                                icon: Icon(controller.isPwdObscured.value
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined),
+                              )),
+                        ),
+                      ),
+                      Obx(
+                        () => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: IbTextField(
                             titleIcon: const Icon(
                               Icons.lock_outline,
                               color: IbColors.primaryColor,
                             ),
                             textInputType: TextInputType.visiblePassword,
-                            titleTrKey: 'password',
-                            hintTrKey: 'password_hint',
-                            borderColor: controller.isPwdFirstTime.value
-                                ? IbColors.lightGrey
-                                : (controller.isPasswordValid.value
-                                    ? IbColors.accentColor
-                                    : IbColors.errorRed),
-                            errorTrKey: controller.pwdErrorTrKey.value,
-                            onChanged: (password) {
-                              controller.password.value = password;
-                            },
-                            obscureText: controller.isPwdObscured.value,
+                            obscureText: controller.isCfPwdObscured.value,
                             suffixIcon: IconButton(
                               onPressed: () {
                                 final bool isObscured =
-                                    controller.isPwdObscured.value;
-                                controller.isPwdObscured.value = !isObscured;
+                                    controller.isCfPwdObscured.value;
+                                controller.isCfPwdObscured.value = !isObscured;
                               },
-                              icon: Icon(controller.isPwdObscured.value
+                              icon: Icon(controller.isCfPwdObscured.value
                                   ? Icons.visibility_off_outlined
                                   : Icons.visibility_outlined),
-                            )),
-                      ),
-                    ),
-                    Obx(
-                      () => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: IbTextField(
-                          titleIcon: const Icon(
-                            Icons.lock_outline,
-                            color: IbColors.primaryColor,
-                          ),
-                          textInputType: TextInputType.visiblePassword,
-                          obscureText: controller.isCfPwdObscured.value,
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              final bool isObscured =
-                                  controller.isCfPwdObscured.value;
-                              controller.isCfPwdObscured.value = !isObscured;
+                            ),
+                            borderColor: controller.isCfPwdFirstTime.value
+                                ? IbColors.lightGrey
+                                : (controller.isCfPwdValid.value
+                                    ? IbColors.accentColor
+                                    : IbColors.errorRed),
+                            titleTrKey: 'confirm_password',
+                            hintTrKey: 'confirm_password_hint',
+                            errorTrKey: controller.confirmPwdErrorTrKey.value,
+                            onChanged: (cfPwd) {
+                              controller.confirmPassword.value = cfPwd;
                             },
-                            icon: Icon(controller.isCfPwdObscured.value
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined),
                           ),
-                          borderColor: controller.isCfPwdFirstTime.value
-                              ? IbColors.lightGrey
-                              : (controller.isCfPwdValid.value
-                                  ? IbColors.accentColor
-                                  : IbColors.errorRed),
-                          titleTrKey: 'confirm_password',
-                          hintTrKey: 'confirm_password_hint',
-                          errorTrKey: controller.confirmPwdErrorTrKey.value,
-                          onChanged: (cfPwd) {
-                            controller.confirmPassword.value = cfPwd;
-                          },
                         ),
                       ),
-                    ),
-                    Obx(
-                      () => ListTile(
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 16),
-                        leading: Checkbox(
-                          value: controller.isOver13.value,
-                          onChanged: (value) {
-                            controller.isOver13.value = value ?? false;
-                          },
-                        ),
-                        title: const Text(
-                          'I am at least 13 years old',
-                          style:
-                              TextStyle(fontSize: IbConfig.kSecondaryTextSize),
-                        ),
-                      ),
-                    ),
-                    Obx(
-                      () => ListTile(
-                        leading: Checkbox(
-                          value: controller.isTermRead.value,
-                          onChanged: (bool? value) {
-                            controller.isTermRead.value = value ?? false;
-                          },
-                        ),
-                        title: _termPrivacyString(context),
-                      ),
-                    ),
-                    Obx(
-                      () => Hero(
-                        tag: 'sign_up',
-                        child: Container(
-                          height: 80,
-                          width: Get.width,
-                          padding: const EdgeInsets.all(8),
-                          child: IbElevatedButton(
-                              icon: const Icon(Icons.person_add_alt_1),
-                              textTrKey:
-                                  Get.find<AuthController>().isSigningUp.isTrue
-                                      ? 'signing_up'
-                                      : 'sign_up',
-                              onPressed: () {
-                                controller.signUp();
-                              }),
+                      Obx(
+                        () => ListTile(
+                          contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 16),
+                          leading: Checkbox(
+                            value: controller.isOver13.value,
+                            onChanged: (value) {
+                              controller.isOver13.value = value ?? false;
+                            },
+                          ),
+                          title: const Text(
+                            'I am at least 13 years old',
+                            style: TextStyle(
+                                fontSize: IbConfig.kSecondaryTextSize),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                      Obx(
+                        () => ListTile(
+                          leading: Checkbox(
+                            value: controller.isTermRead.value,
+                            onChanged: (bool? value) {
+                              controller.isTermRead.value = value ?? false;
+                            },
+                          ),
+                          title: _termPrivacyString(context),
+                        ),
+                      ),
+                      Obx(
+                        () => Hero(
+                          tag: 'sign_up',
+                          child: Container(
+                            height: 80,
+                            width: Get.width,
+                            padding: const EdgeInsets.all(8),
+                            child: IbElevatedButton(
+                                icon: const Icon(Icons.person_add_alt_1),
+                                textTrKey: Get.find<AuthController>()
+                                        .isSigningUp
+                                        .isTrue
+                                    ? 'signing_up'
+                                    : 'sign_up',
+                                onPressed: () {
+                                  controller.signUp();
+                                }),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
