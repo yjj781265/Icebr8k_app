@@ -332,11 +332,11 @@ class AuthController extends GetxService {
             print('Go to Setup Page with note dialog');
             await IbAnalyticsManager().logScreenView(
                 className: "AuthController", screenName: "SetupPageOne");
-            ibUtils.offAll(
-                SetupPageOne(
-                  Get.put(SetupController(status: IbUser.kUserStatusRejected),
-                      tag: IbUtils().getUniqueId()),
-                ),
+            Get.back();
+            ibUtils.toPage(
+                SetupPageOne(Get.put(
+                    SetupController(status: IbUser.kUserStatusRejected),
+                    tag: IbUtils().getUniqueId())),
                 transition: Transition.circularReveal);
             break;
 
@@ -344,7 +344,8 @@ class AuthController extends GetxService {
             print('Go to Setup page');
             await IbAnalyticsManager().logScreenView(
                 className: "AuthController", screenName: "SetupPageOne");
-            ibUtils.offAll(
+            Get.back();
+            ibUtils.toPage(
                 SetupPageOne(
                     Get.put(SetupController(), tag: IbUtils().getUniqueId())),
                 transition: Transition.circularReveal);
@@ -355,7 +356,8 @@ class AuthController extends GetxService {
             print('default Go to Setup page');
             await IbAnalyticsManager().logScreenView(
                 className: "AuthController", screenName: "SetupPageOne");
-            ibUtils.offAll(
+            Get.back();
+            ibUtils.toPage(
                 SetupPageOne(
                     Get.put(SetupController(), tag: IbUtils().getUniqueId())),
                 transition: Transition.circularReveal);
