@@ -59,12 +59,12 @@ class FeedbackChatController extends GetxController {
       return;
     }
     final IbMessage message = IbMessage(
-        messageId: IbUtils.getUniqueId(),
+        messageId: IbUtils().getUniqueId(),
         content: textEditingController.text.trim(),
-        senderUid: IbUtils.getCurrentUid()!,
+        senderUid: IbUtils().getCurrentUid()!,
         messageType: IbMessage.kMessageTypeText,
         chatRoomId: chatId,
-        readUids: [IbUtils.getCurrentUid()!]);
+        readUids: [IbUtils().getCurrentUid()!]);
 
     await IbAdminDbService().addFeedback(message);
     textEditingController.clear();

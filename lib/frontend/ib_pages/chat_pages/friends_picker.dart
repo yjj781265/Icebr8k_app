@@ -51,7 +51,7 @@ class FriendsPicker extends StatelessWidget {
                     return TextButton(
                         onPressed: () {
                           if (result.length > limit && limit != -1) {
-                            IbUtils.showSimpleSnackBar(
+                            IbUtils().showSimpleSnackBar(
                                 msg: 'You can only pick up to $limit friend(s)',
                                 backgroundColor: IbColors.primaryColor);
                             return;
@@ -161,7 +161,7 @@ class FriendsPicker extends StatelessWidget {
                               if (pickedCount >= limit &&
                                   limit != -1 &&
                                   value == true) {
-                                IbUtils.showSimpleSnackBar(
+                                IbUtils().showSimpleSnackBar(
                                     msg:
                                         'You can only pick up to $limit friend(s)',
                                     backgroundColor: IbColors.primaryColor);

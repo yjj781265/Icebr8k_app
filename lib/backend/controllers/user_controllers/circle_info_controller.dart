@@ -36,13 +36,17 @@ class CircleInfoController extends GetxController {
       return;
     }
     rxIbChat.value = ibChat;
+    isMember.value =
+        rxIbChat.value.memberUids.contains(IbUtils().getCurrentUid());
+    if (isMember.isTrue) {
+      Get.off(() => ChatPage(Get.put(ChatPageController(ibChat: ibChat))));
+    }
     await initMemberScoreMap();
     hasInvite.value = await IbUserDbService().isCircleInviteSent(
-        chatId: ibChat.chatId, recipientId: IbUtils.getCurrentUid() ?? '');
+        chatId: ibChat.chatId, recipientId: IbUtils().getCurrentUid() ?? '');
     requests.value =
         await IbUserDbService().isCircleRequestSent(chatId: ibChat.chatId);
-    isMember.value =
-        rxIbChat.value.memberUids.contains(IbUtils.getCurrentUid());
+
     isLoading.value = false;
   }
 
@@ -70,7 +74,7 @@ class CircleInfoController extends GetxController {
       }
 
       if (user != null) {
-        final double compScore = await IbUtils.getCompScore(uid: user.id);
+        final double compScore = await IbUtils().getCompScore(uid: user.id);
         memberScoreMap[user] = compScore;
       }
     }
@@ -81,10 +85,9 @@ class CircleInfoController extends GetxController {
 
     try {
       final chat = await IbChatDbService().queryChat(rxIbChat.value.chatId);
-
       if (chat != null &&
           chat.memberUids.contains(
-            IbUtils.getCurrentUid(),
+            IbUtils().getCurrentUid(),
           )) {
         Get.back(closeOverlays: true);
         Get.to(() =>
@@ -93,14 +96,14 @@ class CircleInfoController extends GetxController {
         await IbChatDbService().addChatMember(
             member: IbChatMember(
                 chatId: rxIbChat.value.chatId,
-                uid: IbUtils.getCurrentUid()!,
+                uid: IbUtils().getCurrentUid()!,
                 role: IbChatMember.kRoleMember));
         await IbChatDbService().uploadMessage(IbMessage(
-            messageId: IbUtils.getUniqueId(),
+            messageId: IbUtils().getUniqueId(),
             content:
-                '${IbUtils.getCurrentIbUser()!.username} joined the circle',
-            senderUid: IbUtils.getCurrentUid()!,
-            readUids: [IbUtils.getCurrentUid()!],
+                '${IbUtils().getCurrentIbUser()!.username} joined the circle',
+            senderUid: IbUtils().getCurrentUid()!,
+            readUids: [IbUtils().getCurrentUid()!],
             messageType: IbMessage.kMessageTypeAnnouncement,
             chatRoomId: chat!.chatId));
 
@@ -108,6 +111,8 @@ class CircleInfoController extends GetxController {
         Get.to(() =>
             ChatPage(Get.put(ChatPageController(ibChat: rxIbChat.value))));
       }
+      await IbUserDbService().removeAllCircleInvites(
+          chatId: chat.chatId, recipientId: IbUtils().getCurrentUid()!);
       await IbAnalyticsManager().logJoinGroup(chat.chatId);
     } catch (e) {
       Get.back();
@@ -117,15 +122,15 @@ class CircleInfoController extends GetxController {
 
   Future<void> sendJoinCircleRequest() async {
     try {
-      if (IbUtils.getCurrentIbUser() == null) {
-        IbUtils.showSimpleSnackBar(
+      if (IbUtils().getCurrentIbUser() == null) {
+        IbUtils().showSimpleSnackBar(
             msg: 'Request failed, can not find current Icebr8k user',
             backgroundColor: IbColors.errorRed);
         return;
       }
 
       if (requests.isNotEmpty) {
-        IbUtils.showSimpleSnackBar(
+        IbUtils().showSimpleSnackBar(
             msg: 'Request Sent', backgroundColor: IbColors.accentColor);
         return;
       }
@@ -137,12 +142,12 @@ class CircleInfoController extends GetxController {
         if (member.role == IbChatMember.kRoleLeader ||
             member.role == IbChatMember.kRoleAssistant) {
           final IbNotification n = IbNotification(
-              id: IbUtils.getUniqueId(),
+              id: IbUtils().getUniqueId(),
               body: editingController.text,
               timestamp: FieldValue.serverTimestamp(),
               url: rxIbChat.value.chatId,
               type: IbNotification.kCircleRequest,
-              senderId: IbUtils.getCurrentIbUser()!.id,
+              senderId: IbUtils().getCurrentIbUser()!.id,
               recipientId: member.uid);
           await IbUserDbService().sendAlertNotification(n);
         }
@@ -151,7 +156,7 @@ class CircleInfoController extends GetxController {
       requests.value = await IbUserDbService()
           .isCircleRequestSent(chatId: rxIbChat.value.chatId);
 
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Request Sent', backgroundColor: IbColors.accentColor);
     } catch (e) {
       Get.dialog(IbDialog(
@@ -164,8 +169,8 @@ class CircleInfoController extends GetxController {
 
   Future<void> cancelCircleRequest() async {
     try {
-      if (IbUtils.getCurrentIbUser() == null) {
-        IbUtils.showSimpleSnackBar(
+      if (IbUtils().getCurrentIbUser() == null) {
+        IbUtils().showSimpleSnackBar(
             msg: 'Request failed, can not find current Icebr8k user',
             backgroundColor: IbColors.errorRed);
         return;
@@ -177,7 +182,7 @@ class CircleInfoController extends GetxController {
         }
         requests.clear();
       }
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Request Canceled', backgroundColor: IbColors.primaryColor);
     } catch (e) {
       Get.dialog(IbDialog(

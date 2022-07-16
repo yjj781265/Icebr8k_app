@@ -32,9 +32,9 @@ class IbReportController extends GetxController {
         .toList();
     reports.add(editingController.text.trim());
     final IbReport ibReport = IbReport(
-        id: IbUtils.getUniqueId(),
+        id: IbUtils().getUniqueId(),
         reporteeId: reporteeId,
-        reporterId: IbUtils.getCurrentUid()!,
+        reporterId: IbUtils().getCurrentUid()!,
         reports: reports,
         url: url,
         type: type,

@@ -81,7 +81,7 @@ class IbTypeSenseService extends GetConnect {
         '&sort_by=geoPoint(${position.latitude},${position.longitude}):asc'
         '&filter_by=lastLocationTimestampInMs:>$sevenDaysAgoTimestamp'
         '&&profilePrivacy:=${IbUser.kUserPrivacyPublic}'
-        '&&username:!=${IbUtils.getCurrentIbUser()!.username}'
+        '&&username:!=${IbUtils().getCurrentIbUser()!.username}'
         '&&birthdateInMs:[$maxAgeInMs..$minAgeInMs]'
         '&&gender:$genders'
         '&page=$page&per_page=$perPage&x-typesense-api-key=$_kApiKey';

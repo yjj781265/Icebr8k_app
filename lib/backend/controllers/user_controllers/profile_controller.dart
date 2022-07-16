@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/asked_questions_controller.dart';
 import 'package:icebr8k/backend/models/ib_chat_models/ib_chat.dart';
 import 'package:icebr8k/backend/models/ib_notification.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
@@ -33,14 +32,11 @@ class ProfileController extends GetxController {
   final compScore = 0.0.obs;
   late Rx<IbUser> rxIbUser;
   final double kAppBarCollapseHeight = 56;
-  late AskedQuestionsController askedQuestionsController;
   final RefreshController refreshController = RefreshController();
   final ScrollController scrollController = ScrollController();
   final commonAnswers = <String>[].obs;
   final uncommonAnswers = <String>[].obs;
-  ProfileController(this.uid) {
-    askedQuestionsController = Get.put(AskedQuestionsController(uid), tag: uid);
-  }
+  ProfileController(this.uid);
 
   @override
   Future<void> onInit() async {
@@ -48,11 +44,12 @@ class ProfileController extends GetxController {
     final IbUser? user = await IbUserDbService().queryIbUser(uid);
     if (user != null) {
       rxIbUser = user.obs;
-      commonAnswers.value = await IbUtils.getCommonAnswerQuestionIds(uid: uid);
+      commonAnswers.value =
+          await IbUtils().getCommonAnswerQuestionIds(uid: uid);
       uncommonAnswers.value =
-          await IbUtils.getUncommonAnswerQuestionIds(uid: uid);
-      compScore.value = await IbUtils.getCompScore(uid: uid);
-      isFriend.value = user.friendUids.contains(IbUtils.getCurrentUid());
+          await IbUtils().getUncommonAnswerQuestionIds(uid: uid);
+      compScore.value = await IbUtils().getCompScore(uid: uid);
+      isFriend.value = user.friendUids.contains(IbUtils().getCurrentUid());
       frSentNotification =
           await IbUserDbService().querySentFriendRequest(user.id);
       isFrSent.value = frSentNotification != null;
@@ -87,11 +84,11 @@ class ProfileController extends GetxController {
     if (user != null) {
       rxIbUser.value = user;
       commonAnswers.value =
-          await IbUtils.getCommonAnswerQuestionIds(uid: uid, isRefresh: true);
-      uncommonAnswers.value =
-          await IbUtils.getUncommonAnswerQuestionIds(uid: uid, isRefresh: true);
-      compScore.value = await IbUtils.getCompScore(uid: uid, isRefresh: true);
-      isFriend.value = user.friendUids.contains(IbUtils.getCurrentUid());
+          await IbUtils().getCommonAnswerQuestionIds(uid: uid, isRefresh: true);
+      uncommonAnswers.value = await IbUtils()
+          .getUncommonAnswerQuestionIds(uid: uid, isRefresh: true);
+      compScore.value = await IbUtils().getCompScore(uid: uid, isRefresh: true);
+      isFriend.value = user.friendUids.contains(IbUtils().getCurrentUid());
       frSentNotification =
           await IbUserDbService().querySentFriendRequest(user.id);
       isFrSent.value = frSentNotification != null;
@@ -123,20 +120,20 @@ class ProfileController extends GetxController {
   }
 
   Future<void> addFriend(String message) async {
-    final IbUser? currentUser = IbUtils.getCurrentIbUser();
+    final IbUser? currentUser = IbUtils().getCurrentIbUser();
     if (currentUser == null || isFrSent.isTrue) {
       return;
     }
 
     if (currentUser.friendUids.length >= IbConfig.kFriendsLimit) {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Failed to add friend, you have reach your '
               '${IbConfig.kFriendsLimit} friends limit',
           backgroundColor: IbColors.errorRed);
       return;
     }
     final IbNotification n = IbNotification(
-        id: IbUtils.getUniqueId(),
+        id: IbUtils().getUniqueId(),
         body: message,
         type: IbNotification.kFriendRequest,
         timestamp: FieldValue.serverTimestamp(),
@@ -146,16 +143,16 @@ class ProfileController extends GetxController {
       await IbUserDbService().sendAlertNotification(n);
       frSentNotification = n;
       isFrSent.value = frSentNotification != null;
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Friend request sent!', backgroundColor: IbColors.accentColor);
     } catch (e) {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Friend request failed $e', backgroundColor: IbColors.errorRed);
     }
   }
 
   Future<void> removeFriend() async {
-    final IbUser? currentUser = IbUtils.getCurrentIbUser();
+    final IbUser? currentUser = IbUtils().getCurrentIbUser();
     if (currentUser == null) {
       return;
     }
@@ -165,10 +162,10 @@ class ProfileController extends GetxController {
       isProfileVisible.value = isFriend.isTrue &&
               rxIbUser.value.profilePrivacy == IbUser.kUserPrivacyFrOnly ||
           rxIbUser.value.profilePrivacy == IbUser.kUserPrivacyPublic;
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Friend deleted!', backgroundColor: IbColors.errorRed);
     } catch (e) {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Delete friend failed $e', backgroundColor: IbColors.errorRed);
     }
   }

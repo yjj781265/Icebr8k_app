@@ -187,10 +187,10 @@ class AdminMainController extends GetxController {
     Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));
     await Future.delayed(const Duration(milliseconds: 500));
     try {
-      if (IbUtils.getCurrentFbUser() != null &&
-          IbUtils.getCurrentFbUser()!.emailVerified) {
+      if (IbUtils().getCurrentFbUser() != null &&
+          IbUtils().getCurrentFbUser()!.emailVerified) {
         final IbUser? ibUser = await IbUserDbService()
-            .queryIbUser(IbUtils.getCurrentFbUser()!.uid);
+            .queryIbUser(IbUtils().getCurrentFbUser()!.uid);
         String? status = '';
         if (ibUser == null) {
           status = null;
@@ -225,20 +225,24 @@ class AdminMainController extends GetxController {
             Get.offAll(
                 () => SetupPageOne(
                       Get.put(
-                        SetupController(status: IbUser.kUserStatusRejected),
-                      ),
+                          SetupController(status: IbUser.kUserStatusRejected),
+                          tag: IbUtils().getUniqueId()),
                     ),
                 transition: Transition.circularReveal);
             break;
           case null:
             print('Go to Setup page');
-            Get.offAll(() => SetupPageOne(Get.put(SetupController())),
+            Get.offAll(
+                () => SetupPageOne(
+                    Get.put(SetupController(), tag: IbUtils().getUniqueId())),
                 transition: Transition.circularReveal);
             break;
 
           default:
             print('default Go to Setup page');
-            Get.offAll(() => SetupPageOne(Get.put(SetupController())),
+            Get.offAll(
+                () => SetupPageOne(
+                    Get.put(SetupController(), tag: IbUtils().getUniqueId())),
                 transition: Transition.circularReveal);
             break;
         }
@@ -280,7 +284,7 @@ class AdminMainController extends GetxController {
           fName: user.fName,
           status: IbUser.kUserStatusApproved);
       Get.back(closeOverlays: true);
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Profile Approved!', backgroundColor: IbColors.accentColor);
     } catch (e) {
       Get.dialog(IbDialog(
@@ -324,7 +328,7 @@ class AdminMainController extends GetxController {
             await IbAdminDbService().deleteAvatarUrl(user);
             Get.back();
             Get.back();
-            IbUtils.showSimpleSnackBar(
+            IbUtils().showSimpleSnackBar(
                 msg: 'Profile rejected!', backgroundColor: IbColors.errorRed);
           },
         ),

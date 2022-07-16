@@ -17,8 +17,6 @@ class IbRichText extends StatelessWidget {
   final String string;
   final Color highlightColor;
   final TextStyle defaultTextStyle;
-  final String errorImageUrl =
-      'https://firebasestorage.googleapis.com/v0/b/icebr8k-flutter.appspot.com/o/admin_files%2Ferror.PNG?alt=media&token=04a4d688-7b4d-4c5a-8d8c-1fdbe4a28db1';
 
   const IbRichText(
       {required this.string,
@@ -66,6 +64,8 @@ class IbRichText extends StatelessWidget {
     final List<String> words = string.split(" ");
     final List<Widget> textSpanListWithStyle = [];
     final StringBuffer stringBuffer = StringBuffer();
+    const String errorImageUrl =
+        'https://firebasestorage.googleapis.com/v0/b/icebr8k-flutter.appspot.com/o/admin_files%2Ferror.PNG?alt=media&token=04a4d688-7b4d-4c5a-8d8c-1fdbe4a28db1';
     for (int i = 0; i < words.length; i++) {
       final String aWord = words[i];
       final highLightComponent = getHighlightComponent(aWord);
@@ -137,11 +137,11 @@ class IbRichText extends StatelessWidget {
                           final userId = await IbUserDbService()
                               .queryUserIdFromUserName(aWord.substring(1));
                           if (userId == null) {
-                            IbUtils.showSimpleSnackBar(
+                            IbUtils().showSimpleSnackBar(
                                 msg: 'Invalid User.',
                                 backgroundColor: IbColors.primaryColor);
                             return;
-                          } else if (userId == IbUtils.getCurrentUid()) {
+                          } else if (userId == IbUtils().getCurrentUid()) {
                             Get.to(() => MyProfilePage());
                           } else {
                             Get.to(() => ProfilePage(

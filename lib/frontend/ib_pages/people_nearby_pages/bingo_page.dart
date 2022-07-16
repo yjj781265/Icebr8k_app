@@ -50,7 +50,7 @@ class BingoPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         IbUserAvatar(
-                          avatarUrl: IbUtils.getCurrentIbUser()!.avatarUrl,
+                          avatarUrl: IbUtils().getCurrentIbUser()!.avatarUrl,
                           radius: 49,
                         ),
                         const SizedBox(
@@ -90,13 +90,13 @@ class BingoPage extends StatelessWidget {
   }
 
   Widget _commonTagsWidget(BuildContext context) {
-    if (user.tags.isEmpty || IbUtils.getCurrentIbUser()!.tags.isEmpty) {
+    if (user.tags.isEmpty || IbUtils().getCurrentIbUser()!.tags.isEmpty) {
       return const SizedBox();
     }
 
     final commonTags = user.tags
         .toSet()
-        .intersection(IbUtils.getCurrentIbUser()!.tags.toSet());
+        .intersection(IbUtils().getCurrentIbUser()!.tags.toSet());
     if (commonTags.isEmpty) {
       return const SizedBox();
     }
@@ -119,7 +119,7 @@ class BingoPage extends StatelessWidget {
             child: Row(
               children: user.tags
                   .toSet()
-                  .intersection(IbUtils.getCurrentIbUser()!.tags.toSet())
+                  .intersection(IbUtils().getCurrentIbUser()!.tags.toSet())
                   .take(4)
                   .map((element) => Stack(
                         children: [

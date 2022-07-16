@@ -31,8 +31,8 @@ class PendingAppMainPage extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text('${user.fName} ${user.lName}'),
-              trailing: Text(IbUtils.getChatTabDateString(
-                  (user.joinTime as Timestamp).toDate())),
+              trailing: Text(IbUtils()
+                  .getChatTabDateString((user.joinTime as Timestamp).toDate())),
             );
           },
           itemCount: _controller.pendingUsers.length,

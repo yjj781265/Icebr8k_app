@@ -40,19 +40,19 @@ class SetupController extends GetxController {
     emoPics.add(IbEmoPic(
         url: '',
         emoji: "😃",
-        id: IbUtils.getUniqueId(),
+        id: IbUtils().getUniqueId(),
         description: "Happy face"));
     emoPics.add(
       IbEmoPic(
           url: '',
           emoji: "😟",
-          id: IbUtils.getUniqueId(),
+          id: IbUtils().getUniqueId(),
           description: "Sad face"),
     );
     emoPics.add(IbEmoPic(
         url: '',
         emoji: "😱",
-        id: IbUtils.getUniqueId(),
+        id: IbUtils().getUniqueId(),
         description: 'Wow face'));
   }
 
@@ -61,7 +61,7 @@ class SetupController extends GetxController {
     super.onReady();
     if (status == IbUser.kUserStatusRejected) {
       final String note =
-          await IbUserDbService().queryUserNotes(IbUtils.getCurrentUid()!);
+          await IbUserDbService().queryUserNotes(IbUtils().getCurrentUid()!);
       if (note.isNotEmpty) {
         Get.dialog(IbDialog(
           title: 'Your profile was rejected',
@@ -137,8 +137,8 @@ class SetupController extends GetxController {
       return;
     }
 
-    if (!IbUtils.isOver13(
-        DateTime.fromMillisecondsSinceEpoch(birthdateInMs.value))) {
+    if (!IbUtils()
+        .isOver13(DateTime.fromMillisecondsSinceEpoch(birthdateInMs.value))) {
       Get.dialog(const IbDialog(
         title: 'Error',
         subtitle: "Age is not over 13",
@@ -259,7 +259,7 @@ class SetupController extends GetxController {
         uploadPercentage.value = 10;
         if (url == null) {
           Get.back();
-          IbUtils.showSimpleSnackBar(
+          IbUtils().showSimpleSnackBar(
               msg: 'Failed to upload avatar image',
               backgroundColor: IbColors.errorRed);
           return;
@@ -272,7 +272,7 @@ class SetupController extends GetxController {
 
           if (emoPicUrl == null) {
             Get.back();
-            IbUtils.showSimpleSnackBar(
+            IbUtils().showSimpleSnackBar(
                 msg: 'Failed to upload avatar image',
                 backgroundColor: IbColors.errorRed);
             return;
@@ -281,9 +281,9 @@ class SetupController extends GetxController {
         }
         uploadPercentage.value = uploadPercentage.value + 10;
         final IbUser user = IbUser(
-            id: IbUtils.getCurrentUid()!,
+            id: IbUtils().getCurrentUid()!,
             avatarUrl: url,
-            email: IbUtils.getCurrentFbUser()!.email ?? '',
+            email: IbUtils().getCurrentFbUser()!.email ?? '',
             status: IbUser.kUserStatusPending,
             fName: fNameTeController.text.trim(),
             lName: lNameTeController.text.trim(),

@@ -26,8 +26,10 @@ class IbChoice {
       identical(this, other) ||
       other is IbChoice &&
           runtimeType == other.runtimeType &&
+          content == other.content &&
+          url == other.url &&
           choiceId == other.choiceId;
 
   @override
-  int get hashCode => choiceId.hashCode;
+  int get hashCode => content.hashCode ^ url.hashCode ^ choiceId.hashCode;
 }

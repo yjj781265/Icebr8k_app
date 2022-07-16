@@ -51,7 +51,7 @@ class IbQuestionDbService {
     final int timestamp24HrAgoInMs = Timestamp.now().millisecondsSinceEpoch -
         const Duration(hours: 24).inMilliseconds;
     final snapshot = await _collectionRef
-        .where('creatorId', isEqualTo: IbUtils.getCurrentUid())
+        .where('creatorId', isEqualTo: IbUtils().getCurrentUid())
         .where(
           'askedTimeInMs',
           isGreaterThanOrEqualTo: timestamp24HrAgoInMs,
@@ -101,9 +101,9 @@ class IbQuestionDbService {
     int limit = IbConfig.kPerPage,
     bool publicOnly = true,
     required String uid,
-    DocumentSnapshot? lastDoc,
+    int? lastAskedTimeInMs,
   }) {
-    if (lastDoc == null && publicOnly) {
+    if (lastAskedTimeInMs == null && publicOnly) {
       return _collectionRef
           .orderBy('askedTimeInMs', descending: true)
           .where('isAnonymous', isEqualTo: false)
@@ -112,22 +112,22 @@ class IbQuestionDbService {
           .limit(limit)
           .get();
     }
-    if (lastDoc != null && publicOnly) {
+    if (lastAskedTimeInMs != null && publicOnly) {
       return _collectionRef
           .orderBy('askedTimeInMs', descending: true)
           .where('creatorId', isEqualTo: uid)
           .where('isAnonymous', isEqualTo: false)
           .where('isPublic', isEqualTo: true)
-          .startAfterDocument(lastDoc)
+          .where('askedTimeInMs', isLessThan: lastAskedTimeInMs)
           .limit(limit)
           .get();
     }
 
-    if (lastDoc != null && !publicOnly) {
+    if (lastAskedTimeInMs != null && !publicOnly) {
       return _collectionRef
           .orderBy('askedTimeInMs', descending: true)
           .where('creatorId', isEqualTo: uid)
-          .startAfterDocument(lastDoc)
+          .where('askedTimeInMs', isLessThan: lastAskedTimeInMs)
           .limit(limit)
           .get();
     }
@@ -198,9 +198,9 @@ class IbQuestionDbService {
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> listenToAskedQuestions(String uid,
-      {DocumentSnapshot? lastDoc}) {
+      {int? lastAskedTimeInMs}) {
     late Query<Map<String, dynamic>> query;
-    if (lastDoc == null) {
+    if (lastAskedTimeInMs == null) {
       query = _collectionRef
           .where('creatorId', isEqualTo: uid)
           .orderBy('askedTimeInMs', descending: true)
@@ -208,9 +208,9 @@ class IbQuestionDbService {
     } else {
       query = _collectionRef
           .where('creatorId', isEqualTo: uid)
+          .where('askedTimeInMs', isLessThan: lastAskedTimeInMs)
           .orderBy('askedTimeInMs', descending: true)
-          .limit(IbConfig.kPerPage)
-          .startAfterDocument(lastDoc);
+          .limit(IbConfig.kPerPage);
     }
 
     return query.snapshots();
@@ -255,12 +255,12 @@ class IbQuestionDbService {
     return _collectionRef
         .doc(questionId)
         .collection(_kCommentCollectionGroup)
-        .where('uid', isEqualTo: IbUtils.getCurrentUid())
+        .where('uid', isEqualTo: IbUtils().getCurrentUid())
         .get();
   }
 
   /// Icebr8k algorithm for loading trending question
-  /// - loading public questions order by points during last 72 hrs;
+  /// loading public questions order by points during last 72 hrs;
   /// then load the rest order by asc time;
   Future<QuerySnapshot<Map<String, dynamic>>> queryTrendingQuestions(
       {int limit = IbConfig.kPerPage}) async {
@@ -280,7 +280,7 @@ class IbQuestionDbService {
     if (lastDoc != null) {
       return _collectionRef
           .where('sharedFriendUids',
-              arrayContains: IbUtils.getCurrentUid() ?? '')
+              arrayContains: IbUtils().getCurrentUid() ?? '')
           .orderBy('askedTimeInMs', descending: true)
           .startAfterDocument(lastDoc)
           .limit(limit)
@@ -288,7 +288,8 @@ class IbQuestionDbService {
     }
 
     return _collectionRef
-        .where('sharedFriendUids', arrayContains: IbUtils.getCurrentUid() ?? '')
+        .where('sharedFriendUids',
+            arrayContains: IbUtils().getCurrentUid() ?? '')
         .orderBy('askedTimeInMs', descending: true)
         .limit(limit)
         .get();
@@ -299,10 +300,10 @@ class IbQuestionDbService {
       int limit = IbConfig.kPerPage,
       required List<String> tags}) async {
     tags.shuffle();
-    final tenTags = tags.take(8).toList();
+    final eightTags = tags.take(8).toList();
     if (lastDoc != null) {
       return _collectionRef
-          .where('tags', arrayContainsAny: tenTags)
+          .where('tags', arrayContainsAny: eightTags)
           .where('isPublic', isEqualTo: true)
           .orderBy('askedTimeInMs', descending: true)
           .limit(limit)
@@ -311,7 +312,7 @@ class IbQuestionDbService {
     }
 
     return _collectionRef
-        .where('tags', arrayContainsAny: tenTags)
+        .where('tags', arrayContainsAny: eightTags)
         .where('isPublic', isEqualTo: true)
         .orderBy('askedTimeInMs', descending: true)
         .limit(limit)
@@ -360,6 +361,7 @@ class IbQuestionDbService {
         .collectionGroup(_kAnswerCollectionGroup)
         .where('uid', isEqualTo: uid)
         .where('isAnonymous', isEqualTo: false)
+        .limit(IbConfig.kUserAnswersQueryLimit)
         .get();
     for (final doc in _snapshot.docs) {
       try {
@@ -425,8 +427,8 @@ class IbQuestionDbService {
         .doc(ibAnswer.uid)
         .set(ibAnswer.toJson(), SetOptions(merge: true));
 
-    IbCacheManager()
-        .cacheSingleIbAnswer(uid: IbUtils.getCurrentUid()!, ibAnswer: ibAnswer);
+    IbCacheManager().cacheSingleIbAnswer(
+        uid: IbUtils().getCurrentUid()!, ibAnswer: ibAnswer);
   }
 
   Future<int> querySpecificAnswerPollSize(
@@ -468,7 +470,7 @@ class IbQuestionDbService {
     final snapshot = await _collectionRef
         .doc(questionId)
         .collection(_kLikesCollectionGroup)
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .get();
 
     return snapshot.exists;
@@ -481,10 +483,10 @@ class IbQuestionDbService {
     await _collectionRef
         .doc(questionId)
         .collection(_kLikesCollectionGroup)
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .set(
       {
-        'uid': IbUtils.getCurrentUid(),
+        'uid': IbUtils().getCurrentUid(),
         'timestampInMs': DateTime.now().millisecondsSinceEpoch,
         'questionId': questionId,
       },
@@ -499,7 +501,7 @@ class IbQuestionDbService {
     await _collectionRef
         .doc(questionId)
         .collection(_kLikesCollectionGroup)
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .delete();
   }
 
@@ -530,9 +532,9 @@ class IbQuestionDbService {
         .collection(_kCommentCollectionGroup)
         .doc(comment.commentId)
         .collection(_kCommentLikesCollectionGroup)
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .set({
-      'uid': IbUtils.getCurrentUid(),
+      'uid': IbUtils().getCurrentUid(),
       'commentId': comment.commentId,
       'questionId': comment.questionId
     });
@@ -554,7 +556,7 @@ class IbQuestionDbService {
         .collection(_kCommentCollectionGroup)
         .doc(comment.commentId)
         .collection(_kCommentLikesCollectionGroup)
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .delete();
   }
 
@@ -564,7 +566,7 @@ class IbQuestionDbService {
         .collection(_kCommentCollectionGroup)
         .doc(ibComment.commentId)
         .collection(_kCommentLikesCollectionGroup)
-        .doc(IbUtils.getCurrentUid())
+        .doc(IbUtils().getCurrentUid())
         .get();
     return snapshot.exists;
   }
@@ -596,7 +598,7 @@ class IbQuestionDbService {
     final snapshot = await _collectionRef
         .doc(questionId)
         .collection(_kCommentCollectionGroup)
-        .where('uid', isEqualTo: IbUtils.getCurrentUid())
+        .where('uid', isEqualTo: IbUtils().getCurrentUid())
         .get();
 
     return snapshot.size >= 1;

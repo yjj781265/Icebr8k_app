@@ -129,8 +129,8 @@ class PeopleNearbyPage extends StatelessWidget {
                   );
                 }),
               ),
-              if (IbUtils.getCurrentIbUser() != null &&
-                  !IbUtils.isPremiumMember() &&
+              if (IbUtils().getCurrentIbUser() != null &&
+                  !IbUtils().isPremiumMember() &&
                   _controller.isLoading.isFalse)
                 SafeArea(
                   child: SizedBox(
@@ -326,14 +326,14 @@ class PeopleNearbyPage extends StatelessWidget {
         },
         onPositiveTap: () {
           if (!_controller.intentionSelection.contains(true)) {
-            IbUtils.showSimpleSnackBar(
+            IbUtils().showSimpleSnackBar(
                 msg: 'Pick at least one intention',
                 backgroundColor: IbColors.errorRed);
             return;
           }
 
           if (!_controller.genderSelections.contains(true)) {
-            IbUtils.showSimpleSnackBar(
+            IbUtils().showSimpleSnackBar(
                 msg: 'Pick at least one gender',
                 backgroundColor: IbColors.errorRed);
             return;

@@ -41,10 +41,10 @@ class IbPremiumController extends GetxController {
       await IbApiKeysManager().init();
       if (GetPlatform.isAndroid) {
         await Purchases.setup(IbApiKeysManager.kRevenueCatAndroidKey,
-            appUserId: IbUtils.getCurrentUid());
+            appUserId: IbUtils().getCurrentUid());
       } else if (GetPlatform.isIOS) {
         await Purchases.setup(IbApiKeysManager.kRevenueCatIosKey,
-            appUserId: IbUtils.getCurrentUid());
+            appUserId: IbUtils().getCurrentUid());
       }
       if (await Purchases.isConfigured) {
         /// load products
@@ -80,6 +80,14 @@ class IbPremiumController extends GetxController {
     }
   }
 
+  Future<void> sync() async {
+    try {
+      await Purchases.syncPurchases();
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Future<void> _handlePurchaseInfo(PurchaserInfo purchaserInfo) async {
     if (purchaserInfo.entitlements.all[entitlement] == null) {
       entitlementInfo = null;
@@ -95,7 +103,7 @@ class IbPremiumController extends GetxController {
 
   Future<void> purchasePremium(Product product) async {
     try {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: "Loading...", backgroundColor: IbColors.primaryColor);
       final PurchaserInfo info =
           await Purchases.purchaseProduct(product.identifier);
@@ -126,7 +134,7 @@ class IbPremiumController extends GetxController {
     try {
       final PurchaserInfo restoredInfo = await Purchases.restoreTransactions();
       if (restoredInfo.activeSubscriptions.isEmpty) {
-        IbUtils.showSimpleSnackBar(
+        IbUtils().showSimpleSnackBar(
             msg: 'No active subscriptions found',
             backgroundColor: IbColors.primaryColor);
         return;

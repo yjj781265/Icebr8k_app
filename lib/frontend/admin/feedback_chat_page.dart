@@ -43,18 +43,18 @@ class FeedBackChatPage extends StatelessWidget {
                   final item = _controller.feedbacks[index];
 
                   return Padding(
-                    padding: item.senderUid == IbUtils.getCurrentUid()
+                    padding: item.senderUid == IbUtils().getCurrentUid()
                         ? const EdgeInsets.only(left: 32.0)
                         : const EdgeInsets.only(right: 32.0),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment:
-                          item.senderUid == IbUtils.getCurrentUid()
+                          item.senderUid == IbUtils().getCurrentUid()
                               ? MainAxisAlignment.end
                               : MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (item.senderUid != IbUtils.getCurrentUid() &&
+                        if (item.senderUid != IbUtils().getCurrentUid() &&
                             !_controller.isAdmin)
                           const Padding(
                             padding: EdgeInsets.symmetric(vertical: 10.0),
@@ -64,7 +64,7 @@ class FeedBackChatPage extends StatelessWidget {
                               color: IbColors.accentColor,
                             ),
                           ),
-                        if (item.senderUid != IbUtils.getCurrentUid() &&
+                        if (item.senderUid != IbUtils().getCurrentUid() &&
                             _controller.isAdmin)
                           const Padding(
                             padding: EdgeInsets.symmetric(vertical: 10.0),
@@ -79,7 +79,7 @@ class FeedBackChatPage extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Column(
                               crossAxisAlignment:
-                                  item.senderUid == IbUtils.getCurrentUid()
+                                  item.senderUid == IbUtils().getCurrentUid()
                                       ? CrossAxisAlignment.end
                                       : CrossAxisAlignment.start,
                               children: [
@@ -95,7 +95,7 @@ class FeedBackChatPage extends StatelessWidget {
                                   ),
                                 )),
                                 Text(
-                                  IbUtils.readableDateTime(
+                                  IbUtils().readableDateTime(
                                       DateTime.fromMillisecondsSinceEpoch(
                                           (item.timestamp as Timestamp)
                                               .millisecondsSinceEpoch),

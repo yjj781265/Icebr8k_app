@@ -182,7 +182,7 @@ class IcebreakerMainPage extends StatelessWidget {
                       Get.to(() => EditIcebreakerPage(
                           Icebreaker(
                               text: '',
-                              id: IbUtils.getUniqueId(),
+                              id: IbUtils().getUniqueId(),
                               collectionId: controller.ibCollection.id,
                               timestamp: null),
                           controller.ibCollection));
@@ -239,7 +239,7 @@ class IcebreakerMainPage extends StatelessWidget {
                     Get.to(() => EditIcebreakerPage(
                         Icebreaker(
                             text: '',
-                            id: IbUtils.getUniqueId(),
+                            id: IbUtils().getUniqueId(),
                             collectionId: controller.ibCollection.id,
                             timestamp: null),
                         controller.ibCollection));

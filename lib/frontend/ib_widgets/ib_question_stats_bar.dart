@@ -64,7 +64,7 @@ class IbQuestionStatsBar extends StatelessWidget {
                     size: 16,
                   ),
                   label: Text(
-                    IbUtils.statsShortString(
+                    IbUtils().statsShortString(
                         _itemController.rxIbQuestion.value.comments),
                     style: TextStyle(
                         color: Theme.of(context).indicatorColor,
@@ -74,7 +74,7 @@ class IbQuestionStatsBar extends StatelessWidget {
               onPressed: _itemController.rxIsSample.isTrue ||
                       (_itemController.myAnswer != null &&
                           _itemController.myAnswer!.uid !=
-                              IbUtils.getCurrentUid())
+                              IbUtils().getCurrentUid())
                   ? null
                   : () {
                       _itemController.updateLike();
@@ -98,7 +98,7 @@ class IbQuestionStatsBar extends StatelessWidget {
                 onPressed: _itemController.rxIsSample.isTrue ||
                         (_itemController.myAnswer != null &&
                             _itemController.myAnswer!.uid !=
-                                IbUtils.getCurrentUid())
+                                IbUtils().getCurrentUid())
                     ? null
                     : () async {
                         await _handleOnShareTap();
@@ -126,7 +126,7 @@ class IbQuestionStatsBar extends StatelessWidget {
       return;
     }
     if (_itemController.voted.isFalse) {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'You need to answer the poll in order to see the result.',
           backgroundColor: IbColors.primaryColor);
       return;
@@ -147,16 +147,16 @@ class IbQuestionStatsBar extends StatelessWidget {
       try {
         for (final item in items) {
           final message = IbMessage(
-              messageId: IbUtils.getUniqueId(),
+              messageId: IbUtils().getUniqueId(),
               content: _itemController.rxIbQuestion.value.id,
-              senderUid: IbUtils.getCurrentUid()!,
+              senderUid: IbUtils().getCurrentUid()!,
               messageType: IbMessage.kMessageTypePoll,
               chatRoomId: item.ibChat.chatId,
-              readUids: [IbUtils.getCurrentUid()!]);
+              readUids: [IbUtils().getCurrentUid()!]);
           await IbChatDbService().uploadMessage(message);
         }
         Get.back();
-        IbUtils.showSimpleSnackBar(
+        IbUtils().showSimpleSnackBar(
             msg: 'Poll shared successfully',
             backgroundColor: IbColors.accentColor);
       } catch (e) {

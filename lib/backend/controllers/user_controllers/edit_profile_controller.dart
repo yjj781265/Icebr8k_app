@@ -11,7 +11,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_loading_dialog.dart';
 
 class EditProfileController extends GetxController {
-  final Rx<IbUser> rxIbUser = IbUtils.getCurrentIbUser()!.obs;
+  final Rx<IbUser> rxIbUser = IbUtils().getCurrentIbUser()!.obs;
   final coverPhotoUrl = ''.obs;
   final avatarUrl = ''.obs;
   final bio = ''.obs;
@@ -122,8 +122,8 @@ class EditProfileController extends GetxController {
       return;
     }
 
-    if (!IbUtils.isOver13(
-        DateTime.fromMillisecondsSinceEpoch(birthdateInMs.value))) {
+    if (!IbUtils()
+        .isOver13(DateTime.fromMillisecondsSinceEpoch(birthdateInMs.value))) {
       Get.dialog(const IbDialog(
         title: 'Age limit',
         subtitle: "You must be at least 13 to use Icebr8k",
@@ -216,7 +216,7 @@ class EditProfileController extends GetxController {
             .uploadAndRetrieveImgUrl(filePath: avatarUrl.value);
         if (url == null) {
           Get.back();
-          IbUtils.showSimpleSnackBar(
+          IbUtils().showSimpleSnackBar(
               msg: 'Failed to upload avatar image',
               backgroundColor: IbColors.errorRed);
           return;
@@ -231,7 +231,7 @@ class EditProfileController extends GetxController {
             .uploadAndRetrieveImgUrl(filePath: coverPhotoUrl.value);
         if (url == null) {
           Get.back();
-          IbUtils.showSimpleSnackBar(
+          IbUtils().showSimpleSnackBar(
               msg: 'Failed to upload cover photo',
               backgroundColor: IbColors.errorRed);
           return;
@@ -258,7 +258,7 @@ class EditProfileController extends GetxController {
       rxIbUser.value.isAgeHidden = isAgeHidden.value;
       await IbUserDbService().updateIbUser(rxIbUser.value);
       Get.back(closeOverlays: true);
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Profile Updated!', backgroundColor: IbColors.accentColor);
     } catch (e) {
       Get.back();

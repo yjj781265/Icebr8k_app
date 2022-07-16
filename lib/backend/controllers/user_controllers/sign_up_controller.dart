@@ -25,25 +25,29 @@ class SignUpController extends GetxController {
   final isNameValid = false.obs;
   final isOver13 = false.obs;
   final isTermRead = false.obs;
+  final IbUtils ibUtils;
+  final AuthController authController;
+
+  SignUpController(this.ibUtils, this.authController);
 
   @override
   void onInit() {
     super.onInit();
     debounce(password, (_) {
-      _validateCfPassword();
-      _validatePassword();
+      validateCfPassword();
+      validatePassword();
     }, time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis));
     debounce(
       email,
-      (_) => _validateEmail(),
+      (_) => validateEmail(),
       time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
     );
 
     debounce(
       confirmPassword,
       (_) {
-        _validateCfPassword();
-        _validatePassword();
+        validateCfPassword();
+        validatePassword();
       },
       time: const Duration(milliseconds: IbConfig.kEventTriggerDelayInMillis),
     );
@@ -56,24 +60,7 @@ class SignUpController extends GetxController {
     super.onReady();
   }
 
-  int calculateAge(DateTime birthDate) {
-    final DateTime currentDate = DateTime.now();
-    int age = currentDate.year - birthDate.year;
-    final int month1 = currentDate.month;
-    final int month2 = birthDate.month;
-    if (month2 > month1) {
-      age--;
-    } else if (month1 == month2) {
-      final int day1 = currentDate.day;
-      final int day2 = birthDate.day;
-      if (day2 > day1) {
-        age--;
-      }
-    }
-    return age;
-  }
-
-  void _validatePassword() {
+  void validatePassword() {
     isPwdFirstTime.value = false;
     isPasswordValid.value = password.value.isNotEmpty &&
         password.value.length >= IbConfig.kPasswordMinLength;
@@ -90,7 +77,7 @@ class SignUpController extends GetxController {
     pwdErrorTrKey.value = '';
   }
 
-  void _validateCfPassword() {
+  void validateCfPassword() {
     isCfPwdFirstTime.value = false;
     isCfPwdValid.value = confirmPassword.value.isNotEmpty &&
         confirmPassword.value.length >= IbConfig.kPasswordMinLength &&
@@ -112,7 +99,7 @@ class SignUpController extends GetxController {
     confirmPwdErrorTrKey.value = '';
   }
 
-  void _validateEmail() {
+  void validateEmail() {
     isEmailFirstTime.value = false;
     email.value = email.value.trim();
     isEmailValid.value = GetUtils.isEmail(email.value.trim());
@@ -128,9 +115,9 @@ class SignUpController extends GetxController {
     emailErrorTrKey.value = '';
   }
 
-  void _validateCheckBox() {
+  void validateCheckBox() {
     if (isOver13.isFalse) {
-      Get.dialog(const IbDialog(
+      ibUtils.showDialog(const IbDialog(
         showNegativeBtn: false,
         title: 'Age Check',
         subtitle:
@@ -141,7 +128,7 @@ class SignUpController extends GetxController {
     }
 
     if (isTermRead.isFalse) {
-      Get.dialog(const IbDialog(
+      ibUtils.showDialog(const IbDialog(
         showNegativeBtn: false,
         title: 'Terms of Service and Privacy Policy',
         subtitle:
@@ -156,10 +143,10 @@ class SignUpController extends GetxController {
   }
 
   void validateAllFields() {
-    _validateCfPassword();
-    _validateEmail();
-    _validatePassword();
-    _validateCheckBox();
+    validateCfPassword();
+    validateEmail();
+    validatePassword();
+    validateCheckBox();
   }
 
   bool isEverythingValid() {
@@ -171,11 +158,10 @@ class SignUpController extends GetxController {
   }
 
   Future<void> signUp() async {
-    IbUtils.hideKeyboard();
+    ibUtils.hideKeyboard();
     validateAllFields();
     if (isEverythingValid()) {
-      await Get.find<AuthController>()
-          .signUpViaEmail(email.value, password.value);
+      await authController.signUpViaEmail(email.value, password.value);
     }
   }
 }

@@ -224,7 +224,7 @@ class _SocialTabState extends State<SocialTab>
                 final users = await Get.to(
                   () => FriendsPicker(
                     Get.put(
-                      IbFriendsPickerController(IbUtils.getCurrentUid()!),
+                      IbFriendsPickerController(IbUtils().getCurrentUid()!),
                     ),
                     limit: 1,
                     buttonTxt: 'Add',
@@ -341,7 +341,7 @@ class _SocialTabState extends State<SocialTab>
                 ),
                 if (item.ibChat.lastMessage != null)
                   Text(
-                    IbUtils.readableDateTime(
+                    IbUtils().readableDateTime(
                         DateTime.fromMillisecondsSinceEpoch(
                             (item.ibChat.lastMessage!.timestamp as Timestamp)
                                 .millisecondsSinceEpoch),
@@ -477,7 +477,7 @@ class _SocialTabState extends State<SocialTab>
                 ),
                 if (item.ibChat.lastMessage != null)
                   Text(
-                    IbUtils.readableDateTime(
+                    IbUtils().readableDateTime(
                         DateTime.fromMillisecondsSinceEpoch(
                             (item.ibChat.lastMessage!.timestamp as Timestamp)
                                 .millisecondsSinceEpoch),
@@ -626,7 +626,8 @@ class FriendListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
-        Get.to(() => ProfilePage(Get.put(ProfileController(item.user.id))));
+        Get.to(() => ProfilePage(
+            Get.put(ProfileController(item.user.id), tag: item.user.id)));
       },
       leading: IbUserAvatar(
         avatarUrl: item.user.avatarUrl,

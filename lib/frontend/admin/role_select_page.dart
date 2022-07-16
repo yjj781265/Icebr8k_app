@@ -79,7 +79,7 @@ class RoleSelectPage extends StatelessWidget {
                 color: IbColors.errorRed,
                 iconData: FontAwesomeIcons.rightFromBracket,
                 onPressed: () {
-                  IbUtils.showSimpleSnackBar(
+                  IbUtils().showSimpleSnackBar(
                       msg: 'Long press to sign out',
                       backgroundColor: IbColors.primaryColor);
                 },

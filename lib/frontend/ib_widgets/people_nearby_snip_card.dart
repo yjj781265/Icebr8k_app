@@ -58,7 +58,7 @@ class PeopleNearbySnipCard extends StatelessWidget {
                     height: 2,
                   ),
                   AutoSizeText(
-                    '${item.user.fName} • ${item.user.gender} • ${IbUtils.calculateAge(item.user.birthdateInMs ?? -1)}',
+                    '${item.user.fName} • ${item.user.gender} • ${IbUtils().calculateAge(item.user.birthdateInMs ?? -1)}',
                     maxLines: 1,
                     textAlign: TextAlign.center,
                     maxFontSize: IbConfig.kSecondaryTextSize,
@@ -84,8 +84,8 @@ class PeopleNearbySnipCard extends StatelessWidget {
                   Align(
                       alignment: Alignment.centerRight,
                       child: Text(
-                        IbUtils.getDistanceString(
-                            item.distanceInMeter.toDouble()),
+                        IbUtils()
+                            .getDistanceString(item.distanceInMeter.toDouble()),
                         style: const TextStyle(
                           fontSize: IbConfig.kDescriptionTextSize,
                           color: Colors.white,

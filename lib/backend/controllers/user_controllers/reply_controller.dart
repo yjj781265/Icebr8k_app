@@ -130,10 +130,10 @@ class ReplyController extends GetxController {
     isAddingReply.value = true;
 
     final IbComment ibComment = IbComment(
-        commentId: IbUtils.getUniqueId(),
+        commentId: IbUtils().getUniqueId(),
         parentId: parentCommentId,
         notifyUid: notifyUid.isEmpty ? parentComment!.uid : notifyUid,
-        uid: IbUtils.getCurrentUid()!,
+        uid: IbUtils().getCurrentUid()!,
         questionId: parentComment!.questionId,
         content: text.trim(),
         type: type,
@@ -141,13 +141,13 @@ class ReplyController extends GetxController {
 
     try {
       await IbQuestionDbService().addReply(ibComment);
-      if (ibComment.notifyUid != IbUtils.getCurrentUid()!) {
+      if (ibComment.notifyUid != IbUtils().getCurrentUid()!) {
         await IbUserDbService().sendAlertNotification(IbNotification(
             id: ibComment.commentId,
             body: '',
             type: IbNotification.kPollCommentReply,
             timestamp: Timestamp.now(),
-            senderId: IbUtils.getCurrentUid()!,
+            senderId: IbUtils().getCurrentUid()!,
             recipientId: ibComment.notifyUid,
             url: ibComment.parentId ?? ""));
       }
@@ -163,12 +163,12 @@ class ReplyController extends GetxController {
       final newItem =
           CommentItem(ibComment: ibComment, user: user, ibAnswer: ibAnswer);
       comments.add(newItem);
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Reply added!', backgroundColor: IbColors.accentColor);
     } catch (e) {
       print(e);
     } finally {
-      IbUtils.hideKeyboard();
+      IbUtils().hideKeyboard();
       isAddingReply.value = false;
     }
   }
