@@ -19,6 +19,7 @@ class IbConfig {
   static const int kPicChoiceLimit = 9;
   static const int kScChoiceLimit = 2;
   static const int kMaxImagesCount = 4;
+  static const int kUserAnswersQueryLimit = 888;
   static const int kPasswordMinLength = 6;
   static const int kUsernameMinLength = 3;
   static const int kUsernameMaxLength = 20;
@@ -48,7 +49,7 @@ class IbConfig {
   static const int kVoteAgainInHours = 72;
   static const int kAdFrequency = 6;
   static const int kValidNearbyLocationDurationInDays = 7;
-  static const double kVersion = 1.0;
+  static const double kVersion = 0.2;
 
   IbConfig._();
 }

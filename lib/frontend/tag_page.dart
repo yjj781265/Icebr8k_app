@@ -64,8 +64,8 @@ class TagPage extends StatelessWidget {
                           Column(
                             children: [
                               Text.rich(TextSpan(
-                                  text: IbUtils.getStatsString(
-                                      _controller.total.value),
+                                  text: IbUtils()
+                                      .getStatsString(_controller.total.value),
                                   style: const TextStyle(
                                       fontSize: IbConfig.kNormalTextSize,
                                       fontWeight: FontWeight.bold),
@@ -128,7 +128,7 @@ class TagPage extends StatelessWidget {
                       );
                     }
                     index -= 1;
-                    return IbUtils.handleQuestionType(
+                    return IbUtils().handleQuestionType(
                         _controller.ibQuestions[index],
                         uniqueTag: true);
                   },

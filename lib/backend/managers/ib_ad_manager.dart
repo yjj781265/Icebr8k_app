@@ -30,11 +30,11 @@ class IbAdManager {
 
   Future<void> showRewardAd(Function func) async {
     RewardedAd myAd;
-    IbUtils.showSimpleSnackBar(
+    IbUtils().showSimpleSnackBar(
         msg: 'Loading Ad...', backgroundColor: IbColors.primaryColor);
-    final adRequest = IbUtils.getCurrentIbUser() == null
+    final adRequest = IbUtils().getCurrentIbUser() == null
         ? const AdRequest()
-        : AdRequest(keywords: IbUtils.getCurrentIbUser()!.tags);
+        : AdRequest(keywords: IbUtils().getCurrentIbUser()!.tags);
 
     await RewardedAd.load(
         adUnitId: kDebugMode
@@ -82,9 +82,9 @@ class IbAdManager {
 
   /// return banner 1
   BannerAd getBanner1() {
-    final adRequest = IbUtils.getCurrentIbUser() == null
+    final adRequest = IbUtils().getCurrentIbUser() == null
         ? const AdRequest()
-        : AdRequest(keywords: IbUtils.getCurrentIbUser()!.tags);
+        : AdRequest(keywords: IbUtils().getCurrentIbUser()!.tags);
     final BannerAdListener listener = BannerAdListener(
       // Called when an ad is successfully received.
       onAdLoaded: (Ad ad) => print('Ad loaded.'),
@@ -118,9 +118,9 @@ class IbAdManager {
 
   /// return  banner 2
   BannerAd getBanner2() {
-    final adRequest = IbUtils.getCurrentIbUser() == null
+    final adRequest = IbUtils().getCurrentIbUser() == null
         ? const AdRequest()
-        : AdRequest(keywords: IbUtils.getCurrentIbUser()!.tags);
+        : AdRequest(keywords: IbUtils().getCurrentIbUser()!.tags);
     final BannerAdListener listener = BannerAdListener(
       // Called when an ad is successfully received.
       onAdLoaded: (Ad ad) => print('Ad loaded.'),
@@ -154,9 +154,9 @@ class IbAdManager {
 
   /// return medium size banner, call load before use
   BannerAd getBanner3() {
-    final adRequest = IbUtils.getCurrentIbUser() == null
+    final adRequest = IbUtils().getCurrentIbUser() == null
         ? const AdRequest()
-        : AdRequest(keywords: IbUtils.getCurrentIbUser()!.tags);
+        : AdRequest(keywords: IbUtils().getCurrentIbUser()!.tags);
     final BannerAdListener listener = BannerAdListener(
       // Called when an ad is successfully received.
       onAdLoaded: (Ad ad) => print('Ad loaded.'),

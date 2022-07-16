@@ -124,6 +124,9 @@ class ChatPageController extends GetxController {
 
     // remove typing after 8s
     debounce(text, (value) async {
+      if (ibChat == null) {
+        return;
+      }
       await IbChatDbService().removeTypingUid(chatId: ibChat!.chatId);
       isTyping.value = false;
     }, time: const Duration(seconds: 8));
@@ -410,7 +413,7 @@ class ChatPageController extends GetxController {
                   .toList()
                   .contains(0) &&
               isLoading.isFalse &&
-              ibMessage.senderUid != IbUtils.getCurrentUid()) {
+              ibMessage.senderUid != IbUtils().getCurrentUid()) {
             showNewMsgAlert.value = true;
           }
         } else if (docChange.type == DocumentChangeType.modified) {
@@ -434,9 +437,9 @@ class ChatPageController extends GetxController {
 
       /// update readUids
       if (messages.isNotEmpty &&
-          messages.first.ibMessage.senderUid != IbUtils.getCurrentUid() &&
+          messages.first.ibMessage.senderUid != IbUtils().getCurrentUid() &&
           !messages.first.ibMessage.readUids
-              .contains(IbUtils.getCurrentUid())) {
+              .contains(IbUtils().getCurrentUid())) {
         final IbMessage lastMessage = messages.first.ibMessage;
         await IbChatDbService().updateReadUidArray(
             chatRoomId: ibChat!.chatId, messageId: lastMessage.messageId);
@@ -470,7 +473,8 @@ class ChatPageController extends GetxController {
           }
 
           if (ibUser != null) {
-            final double compScore = await IbUtils.getCompScore(uid: ibUser.id);
+            final double compScore =
+                await IbUtils().getCompScore(uid: ibUser.id);
             ibChatMembers.add(IbChatMemberModel(
                 member: ibChatMember, user: ibUser, compScore: compScore));
           }
@@ -479,7 +483,7 @@ class ChatPageController extends GetxController {
               .indexWhere((element) => element.member.uid == ibChatMember.uid);
           if (index != -1) {
             final double compScore =
-                await IbUtils.getCompScore(uid: ibChatMembers[index].user.id);
+                await IbUtils().getCompScore(uid: ibChatMembers[index].user.id);
             ibChatMembers[index].member = ibChatMember;
             ibChatMembers[index].compScore = compScore;
           }
@@ -488,6 +492,14 @@ class ChatPageController extends GetxController {
               .indexWhere((element) => element.member.uid == ibChatMember.uid);
           if (index != -1) {
             ibChatMembers.removeAt(index);
+          }
+          if (ibChatMembers.length == 1 &&
+              ibChatMembers.first.member.role != IbChatMember.kRoleLeader) {
+            ibChatMembers.first.member.role = IbChatMember.kRoleLeader;
+            await IbChatDbService()
+                .updateChatMember(member: ibChatMembers.first.member);
+            print(
+                'ChatPageController only 1 member left auto promote to leader');
           }
         }
       }
@@ -518,14 +530,6 @@ class ChatPageController extends GetxController {
         return a.user.username.compareTo(b.user.username);
       });
       ibChatMembers.refresh();
-
-      if (ibChatMembers.length == 1 &&
-          ibChatMembers.first.member.role != IbChatMember.kRoleLeader) {
-        ibChatMembers.first.member.role = IbChatMember.kRoleLeader;
-        await IbChatDbService()
-            .updateChatMember(member: ibChatMembers.first.member);
-        print('ChatPageController only 1 member left auto promote to leader');
-      }
 
       _showWelcomeMsg();
       setUpTypingUsers();
@@ -578,7 +582,7 @@ class ChatPageController extends GetxController {
     isTypingUsers.clear();
     if (ibChat != null) {
       for (final String uid in ibChat!.isTypingUids) {
-        if (uid == IbUtils.getCurrentUid()) {
+        if (uid == IbUtils().getCurrentUid()) {
           continue;
         }
         final item =
@@ -599,7 +603,7 @@ class ChatPageController extends GetxController {
         avatarUrl.value = ibChat!.photoUrl;
       }
 
-      isMuted.value = ibChat!.mutedUids.contains(IbUtils.getCurrentUid());
+      isMuted.value = ibChat!.mutedUids.contains(IbUtils().getCurrentUid());
       isCircle.value = ibChat!.isCircle;
       isPublicCircle.value = ibChat!.isPublicCircle;
     } else if (recipientId.isNotEmpty) {
@@ -715,10 +719,11 @@ class ChatPageController extends GetxController {
       return;
     }
 
-    if (ibChatMembers.indexWhere(
-            (element) => element.user.id == IbUtils.getCurrentUid()!) ==
-        -1) {
-      IbUtils.showSimpleSnackBar(
+    if (isCircle.isTrue &&
+        ibChatMembers.indexWhere(
+                (element) => element.user.id == IbUtils().getCurrentUid()!) ==
+            -1) {
+      IbUtils().showSimpleSnackBar(
           msg: 'You are not a member of this circle',
           backgroundColor: IbColors.errorRed);
       return;
@@ -737,16 +742,17 @@ class ChatPageController extends GetxController {
       } else {
         try {
           final List<String> sortedArr = [
-            IbUtils.getCurrentUid()!,
+            IbUtils().getCurrentUid()!,
             recipientId
           ];
           sortedArr.sort();
-          ibChat = IbChat(chatId: IbUtils.getUniqueId(), memberUids: sortedArr);
+          ibChat =
+              IbChat(chatId: IbUtils().getUniqueId(), memberUids: sortedArr);
           await IbChatDbService().addIbChat(ibChat!);
           await IbChatDbService().addChatMember(
               member: IbChatMember(
                   chatId: ibChat!.chatId,
-                  uid: IbUtils.getCurrentUid()!,
+                  uid: IbUtils().getCurrentUid()!,
                   role: IbChatMember.kRoleLeader));
           await IbChatDbService().addChatMember(
               member: IbChatMember(
@@ -758,7 +764,7 @@ class ChatPageController extends GetxController {
           await IbAnalyticsManager()
               .logCustomEvent(name: 'create_new_chat', data: {});
         } catch (e) {
-          IbUtils.showSimpleSnackBar(
+          IbUtils().showSimpleSnackBar(
               msg: 'Failed to create chat room $e',
               backgroundColor: IbColors.errorRed);
         }
@@ -766,15 +772,15 @@ class ChatPageController extends GetxController {
     }
     if (ibChatMembers.length == 2 && isCircle.isFalse) {
       final item = ibChatMembers.firstWhereOrNull(
-          (element) => element.user.id != IbUtils.getCurrentUid());
+          (element) => element.user.id != IbUtils().getCurrentUid());
       if (item != null) {
         final IbUser? user = await IbUserDbService().queryIbUser(item.user.id);
         if (user != null) {
           item.user = user;
           ibChatMembers.refresh();
 
-          if (user.blockedFriendUids.contains(IbUtils.getCurrentUid())) {
-            IbUtils.showSimpleSnackBar(
+          if (user.blockedFriendUids.contains(IbUtils().getCurrentUid())) {
+            IbUtils().showSimpleSnackBar(
                 msg: 'Sending message failed, message is blocked',
                 backgroundColor: IbColors.errorRed);
             isSending.value = false;
@@ -804,7 +810,7 @@ class ChatPageController extends GetxController {
         }
       }
     } catch (e) {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: "Failed to send message $e", backgroundColor: IbColors.errorRed);
     } finally {
       isSending.value = false;
@@ -822,12 +828,12 @@ class ChatPageController extends GetxController {
           try {
             await IbChatDbService().removeChatMember(member: model.member);
             await IbChatDbService().uploadMessage(IbMessage(
-                messageId: IbUtils.getUniqueId(),
+                messageId: IbUtils().getUniqueId(),
                 content:
-                    '${IbUtils.getCurrentIbUser()!.username} removed ${model.user.username} from the circle',
+                    '${IbUtils().getCurrentIbUser()!.username} removed ${model.user.username} from the circle',
                 messageType: IbMessage.kMessageTypeAnnouncement,
-                readUids: [IbUtils.getCurrentUid()!],
-                senderUid: IbUtils.getCurrentUid()!,
+                readUids: [IbUtils().getCurrentUid()!],
+                senderUid: IbUtils().getCurrentUid()!,
                 chatRoomId: ibChat!.chatId));
           } catch (e) {
             Get.dialog(IbDialog(
@@ -837,7 +843,7 @@ class ChatPageController extends GetxController {
             ));
           }
           ibChatMembers.refresh();
-          IbUtils.showSimpleSnackBar(
+          IbUtils().showSimpleSnackBar(
               msg: 'Member Removed', backgroundColor: IbColors.primaryColor);
         },
       ),
@@ -846,7 +852,7 @@ class ChatPageController extends GetxController {
 
   Future<void> transferLeadership(IbChatMemberModel model) async {
     final mChatModel = ibChatMembers.firstWhereOrNull(
-        (element) => element.user.id == IbUtils.getCurrentUid()!);
+        (element) => element.user.id == IbUtils().getCurrentUid()!);
     Get.dialog(
       IbDialog(
         title:
@@ -864,11 +870,11 @@ class ChatPageController extends GetxController {
             model.member.role = IbChatMember.kRoleLeader;
             await IbChatDbService().updateChatMember(member: model.member);
             await IbChatDbService().uploadMessage(IbMessage(
-                messageId: IbUtils.getUniqueId(),
+                messageId: IbUtils().getUniqueId(),
                 content: '${model.user.username} is now the new circle leader',
                 messageType: IbMessage.kMessageTypeAnnouncement,
-                senderUid: IbUtils.getCurrentUid()!,
-                readUids: [IbUtils.getCurrentUid()!],
+                senderUid: IbUtils().getCurrentUid()!,
+                readUids: [IbUtils().getCurrentUid()!],
                 chatRoomId: ibChat!.chatId));
           } catch (e) {
             Get.dialog(IbDialog(
@@ -878,7 +884,7 @@ class ChatPageController extends GetxController {
             ));
           }
           ibChatMembers.refresh();
-          IbUtils.showSimpleSnackBar(
+          IbUtils().showSimpleSnackBar(
               msg: 'Leadership Transferred',
               backgroundColor: IbColors.accentColor);
         },
@@ -891,12 +897,12 @@ class ChatPageController extends GetxController {
       model.member.role = IbChatMember.kRoleAssistant;
       await IbChatDbService().updateChatMember(member: model.member);
       await IbChatDbService().uploadMessage(IbMessage(
-          messageId: IbUtils.getUniqueId(),
-          readUids: [IbUtils.getCurrentUid()!],
+          messageId: IbUtils().getUniqueId(),
+          readUids: [IbUtils().getCurrentUid()!],
           content:
               '${model.user.username} is promoted to be a circle assistant',
           messageType: IbMessage.kMessageTypeAnnouncement,
-          senderUid: IbUtils.getCurrentUid()!,
+          senderUid: IbUtils().getCurrentUid()!,
           chatRoomId: ibChat!.chatId));
     } catch (e) {
       Get.dialog(IbDialog(
@@ -906,7 +912,7 @@ class ChatPageController extends GetxController {
       ));
     }
     ibChatMembers.refresh();
-    IbUtils.showSimpleSnackBar(
+    IbUtils().showSimpleSnackBar(
         msg: 'Member Promoted', backgroundColor: IbColors.accentColor);
   }
 
@@ -922,7 +928,7 @@ class ChatPageController extends GetxController {
       ));
     }
     ibChatMembers.refresh();
-    IbUtils.showSimpleSnackBar(
+    IbUtils().showSimpleSnackBar(
         msg: 'Member Demoted', backgroundColor: IbColors.primaryColor);
   }
 
@@ -944,7 +950,7 @@ class ChatPageController extends GetxController {
         );
       } else {
         final chatMember = ibChatMembers.firstWhereOrNull(
-            (element) => element.member.uid == IbUtils.getCurrentUid()!);
+            (element) => element.member.uid == IbUtils().getCurrentUid()!);
         if (chatMember == null) {
           return;
         }
@@ -973,10 +979,10 @@ class ChatPageController extends GetxController {
                 await IbChatDbService()
                     .removeChatMember(member: chatMember.member);
                 await IbChatDbService().uploadMessage(IbMessage(
-                    messageId: IbUtils.getUniqueId(),
-                    readUids: [IbUtils.getCurrentUid()!],
+                    messageId: IbUtils().getUniqueId(),
+                    readUids: [IbUtils().getCurrentUid()!],
                     content: '${chatMember.user.username} left the circle',
-                    senderUid: IbUtils.getCurrentUid()!,
+                    senderUid: IbUtils().getCurrentUid()!,
                     messageType: IbMessage.kMessageTypeAnnouncement,
                     chatRoomId: ibChat!.chatId));
               }
@@ -995,23 +1001,23 @@ class ChatPageController extends GetxController {
   Future<void> muteNotification() async {
     isMuted.value = true;
     await IbChatDbService().muteNotification(ibChat!);
-    IbUtils.showSimpleSnackBar(
+    IbUtils().showSimpleSnackBar(
         msg: "Notification OFF", backgroundColor: IbColors.primaryColor);
   }
 
   Future<void> unMuteNotification() async {
     isMuted.value = false;
     await IbChatDbService().unMuteNotification(ibChat!);
-    IbUtils.showSimpleSnackBar(
+    IbUtils().showSimpleSnackBar(
         msg: "Notification ON", backgroundColor: IbColors.primaryColor);
   }
 
   IbMessage buildTxtMessage() {
     return IbMessage(
-        messageId: IbUtils.getUniqueId(),
+        messageId: IbUtils().getUniqueId(),
         content: txtController.text.trim(),
-        senderUid: IbUtils.getCurrentUid()!,
-        readUids: [IbUtils.getCurrentUid()!],
+        senderUid: IbUtils().getCurrentUid()!,
+        readUids: [IbUtils().getCurrentUid()!],
         messageType: IbMessage.kMessageTypeText,
         mentionUids: _generateMentionIds(),
         chatRoomId: ibChat!.chatId);
@@ -1019,10 +1025,10 @@ class ChatPageController extends GetxController {
 
   IbMessage buildImgMessage(String url) {
     return IbMessage(
-        messageId: IbUtils.getUniqueId(),
+        messageId: IbUtils().getUniqueId(),
         content: url,
-        senderUid: IbUtils.getCurrentUid()!,
-        readUids: [IbUtils.getCurrentUid()!],
+        senderUid: IbUtils().getCurrentUid()!,
+        readUids: [IbUtils().getCurrentUid()!],
         messageType: IbMessage.kMessageTypePic,
         chatRoomId: ibChat!.chatId);
   }
@@ -1035,10 +1041,10 @@ class ChatPageController extends GetxController {
     try {
       for (final IbUser user in users) {
         final n = IbNotification(
-            id: IbUtils.getUniqueId(),
+            id: IbUtils().getUniqueId(),
             type: IbNotification.kCircleInvite,
             timestamp: FieldValue.serverTimestamp(),
-            senderId: IbUtils.getCurrentUid()!,
+            senderId: IbUtils().getCurrentUid()!,
             recipientId: user.id,
             url: ibChat!.chatId,
             body: '');
@@ -1051,7 +1057,7 @@ class ChatPageController extends GetxController {
         await IbUserDbService().sendAlertNotification(n);
       }
       Get.back();
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Invite(s) sent', backgroundColor: IbColors.accentColor);
     } catch (e) {
       Get.back();
@@ -1102,7 +1108,7 @@ class ChatPageController extends GetxController {
   }
 
   Future<void> blockUser(String uid) async {
-    final IbUser? currentUser = IbUtils.getCurrentIbUser();
+    final IbUser? currentUser = IbUtils().getCurrentIbUser();
     if (currentUser == null) {
       return;
     }
@@ -1115,16 +1121,16 @@ class ChatPageController extends GetxController {
         item.isBlocked = true;
       }
       _controller.oneToOneChats.refresh();
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'User blocked!', backgroundColor: IbColors.errorRed);
     } catch (e) {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Block user failed $e', backgroundColor: IbColors.errorRed);
     }
   }
 
   Future<void> unblockUser(String uid) async {
-    final IbUser? currentUser = IbUtils.getCurrentIbUser();
+    final IbUser? currentUser = IbUtils().getCurrentIbUser();
     if (currentUser == null) {
       return;
     }
@@ -1137,10 +1143,10 @@ class ChatPageController extends GetxController {
         item.isBlocked = false;
       }
       _controller.oneToOneChats.refresh();
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'User unblocked!', backgroundColor: IbColors.accentColor);
     } catch (e) {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Unblock user failed $e', backgroundColor: IbColors.errorRed);
     }
   }

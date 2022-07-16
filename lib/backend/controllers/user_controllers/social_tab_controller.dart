@@ -57,7 +57,7 @@ class SocialTabController extends GetxController {
         print('ChatTabController 1-1 ${docChange.type}');
         final IbChat ibChat = IbChat.fromJson(docChange.doc.data()!);
         if (docChange.type == DocumentChangeType.added) {
-          final item = await _buildItem(ibChat);
+          final item = await _buildChatTabItem(ibChat);
           if (item.avatars.isEmpty) {
             continue;
           }
@@ -66,7 +66,7 @@ class SocialTabController extends GetxController {
           final index = oneToOneChats
               .indexWhere((element) => element.ibChat.chatId == ibChat.chatId);
           if (index != -1) {
-            final item = await _buildItem(ibChat);
+            final item = await _buildChatTabItem(ibChat);
             _showChatNotification(oldItem: oneToOneChats[index], item: item);
             oneToOneChats[index] = item;
             calculateTotalUnread();
@@ -97,13 +97,13 @@ class SocialTabController extends GetxController {
         final IbChat ibChat = IbChat.fromJson(docChange.doc.data()!);
         print('ChatTabController circle ${docChange.type}');
         if (docChange.type == DocumentChangeType.added) {
-          final item = await _buildItem(ibChat);
+          final item = await _buildChatTabItem(ibChat);
           circles.add(item);
         } else if (docChange.type == DocumentChangeType.modified) {
           final index = circles
               .indexWhere((element) => element.ibChat.chatId == ibChat.chatId);
           if (index != -1) {
-            final item = await _buildItem(ibChat);
+            final item = await _buildChatTabItem(ibChat);
             _showChatNotification(oldItem: circles[index], item: item);
             circles[index] = item;
           }
@@ -129,7 +129,7 @@ class SocialTabController extends GetxController {
     });
 
     _ibUserSub = IbUserDbService()
-        .listenToIbUserChanges(IbUtils.getCurrentFbUser()!.uid)
+        .listenToIbUserChanges(IbUtils().getCurrentFbUser()!.uid)
         .listen((event) async {
       if (_listEquals(list1: lastFriendUids, list2: event.friendUids)) {
         return;
@@ -145,11 +145,12 @@ class SocialTabController extends GetxController {
         }
 
         if (user == null) {
+          await IbUserDbService().removeFriend(id);
           continue;
         }
         final index = friends.indexWhere((element) => element.user.id == id);
         if (index == -1) {
-          final compScore = await IbUtils.getCompScore(uid: id);
+          final compScore = await IbUtils().getCompScore(uid: id);
           friends.add(FriendItem(user: user, compScore: compScore));
         } else {
           friends[index].user = user;
@@ -162,21 +163,21 @@ class SocialTabController extends GetxController {
     });
 
     _ibPublicAnswerSub = IbQuestionDbService()
-        .listenToUserPublicAnsweredQuestionsChange(IbUtils.getCurrentUid()!)
+        .listenToUserPublicAnsweredQuestionsChange(IbUtils().getCurrentUid()!)
         .listen((event) async {
       for (final docChange in event.docChanges) {
         final IbAnswer ibAnswer = IbAnswer.fromJson(docChange.doc.data()!);
         if (docChange.type == DocumentChangeType.removed) {
           IbCacheManager().removeSingleIbAnswer(
-              uid: IbUtils.getCurrentUid()!, ibAnswer: ibAnswer);
+              uid: IbUtils().getCurrentUid()!, ibAnswer: ibAnswer);
         } else {
           IbCacheManager().cacheSingleIbAnswer(
-              uid: IbUtils.getCurrentUid()!, ibAnswer: ibAnswer);
+              uid: IbUtils().getCurrentUid()!, ibAnswer: ibAnswer);
         }
       }
       //refresh compScore
       for (final item in friends) {
-        final compScore = await IbUtils.getCompScore(uid: item.user.id);
+        final compScore = await IbUtils().getCompScore(uid: item.user.id);
         item.compScore = compScore;
       }
       friends.sort((a, b) => b.compScore.compareTo(a.compScore));
@@ -204,9 +205,9 @@ class SocialTabController extends GetxController {
     return true;
   }
 
-  Future<ChatTabItem> _buildItem(IbChat ibChat) async {
+  Future<ChatTabItem> _buildChatTabItem(IbChat ibChat) async {
     final List<String> uids = ibChat.memberUids
-        .where((element) => element != IbUtils.getCurrentUid())
+        .where((element) => element != IbUtils().getCurrentUid())
         .toList();
     final List<IbUser> avatarUsers = [];
     IbUser? lastMsgUser;
@@ -263,7 +264,7 @@ class SocialTabController extends GetxController {
         continue;
       }
       final compScore =
-          await IbUtils.getCompScore(uid: user.id, isRefresh: true);
+          await IbUtils().getCompScore(uid: user.id, isRefresh: true);
       item.user = user;
       item.compScore = compScore;
     }
@@ -287,7 +288,7 @@ class SocialTabController extends GetxController {
       {required ChatTabItem oldItem, required ChatTabItem item}) {
     /* // if (item.lastMessageUser == null ||
     //     item.ibChat.lastMessage == null ||
-    //     item.ibChat.lastMessage!.senderUid == IbUtils.getCurrentUid()) {
+    //     item.ibChat.lastMessage!.senderUid == IbUtils().getCurrentUid()) {
     //   return;
     // }
     //
@@ -336,7 +337,7 @@ class SocialTabController extends GetxController {
     //
     // if (Get.isRegistered<ChatPageController>(tag: item.ibChat.chatId) ||
     //     Get.isRegistered<ChatPageController>(tag: item.lastMessageUser!.id) ||
-    //     item.ibChat.mutedUids.contains(IbUtils.getCurrentUid())) {
+    //     item.ibChat.mutedUids.contains(IbUtils().getCurrentUid())) {
     //   return;
     // } else {
     //   Get.showSnackbar(notification);
@@ -374,8 +375,8 @@ class SocialTabController extends GetxController {
       return const SizedBox();
     }
     if (item.ibChat.isTypingUids.isNotEmpty &&
-        IbUtils.getCurrentIbUser() != null &&
-        IbUtils.isPremiumMember()) {
+        IbUtils().getCurrentIbUser() != null &&
+        IbUtils().isPremiumMember()) {
       return const Text(
         'someone is typing...',
         maxLines: 1,
@@ -492,14 +493,15 @@ class ChatTabItem {
     required this.title,
     required this.lastMessageUser,
   }) {
-    isMuted = ibChat.mutedUids.contains(IbUtils.getCurrentUid());
+    isMuted = ibChat.mutedUids.contains(IbUtils().getCurrentUid());
     if (!ibChat.isCircle) {
       final list =
-          avatars.where((element) => element.id != IbUtils.getCurrentUid());
+          avatars.where((element) => element.id != IbUtils().getCurrentUid());
       if (list.isEmpty) {
         isBlocked = false;
       } else {
-        isBlocked = IbUtils.getCurrentIbUser()!
+        isBlocked = IbUtils()
+            .getCurrentIbUser()!
             .blockedFriendUids
             .contains(list.first.id);
       }
