@@ -56,7 +56,7 @@ class IbQuestionButtons extends StatelessWidget {
                   shapeBorder: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(8))),
                   description:
-                      IbUtils.getCurrentUserSettings().voteAnonymousByDefault
+                      IbUtils().getCurrentUserSettings().voteAnonymousByDefault
                           ? 'Long press to vote Publicly 📢'
                           : 'Long press to vote Anonymously 🤫',
                   child: IbElevatedButton(
@@ -66,7 +66,8 @@ class IbQuestionButtons extends StatelessWidget {
                         return;
                       }
                       await _controller.onVote(
-                          isAnonymous: IbUtils.getCurrentUserSettings()
+                          isAnonymous: IbUtils()
+                              .getCurrentUserSettings()
                               .voteAnonymousByDefault);
                       if (!IbLocalDataService().retrieveBoolValue(
                           StorageKey.voteOptionsShowCaseBool)) {
@@ -83,7 +84,8 @@ class IbQuestionButtons extends StatelessWidget {
                       }
 
                       await _controller.onVote(
-                          isAnonymous: !IbUtils.getCurrentUserSettings()
+                          isAnonymous: !IbUtils()
+                              .getCurrentUserSettings()
                               .voteAnonymousByDefault);
                       if (!IbLocalDataService().retrieveBoolValue(
                           StorageKey.voteOptionsShowCaseBool)) {
@@ -121,7 +123,7 @@ class IbQuestionButtons extends StatelessWidget {
     return _controller.rxIsSample.isTrue ||
         _controller.selectedChoiceId.isEmpty ||
         (_controller.myAnswer != null &&
-            _controller.myAnswer!.uid != IbUtils.getCurrentUid()) ||
+            _controller.myAnswer!.uid != IbUtils().getCurrentUid()) ||
         _controller.isAnswering.isTrue ||
         _controller.voted.isTrue && _controller.rxIbQuestion.value.isQuiz;
   }
@@ -156,7 +158,7 @@ class IbQuestionButtons extends StatelessWidget {
     Get.dialog(IbDialog(
       title: 'Time Limit',
       subtitle:
-          "Sorry, you can't vote on this poll again until ${IbUtils.readableDateTime(voteAgainDate, showTime: true)}",
+          "Sorry, you can't vote on the same poll again until ${IbUtils().readableDateTime(voteAgainDate, showTime: true)}",
       showNegativeBtn: false,
     ));
     return false;

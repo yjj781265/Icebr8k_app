@@ -41,7 +41,7 @@ class CommentPage extends StatelessWidget {
                 style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
               ),
               Text(
-                '${IbUtils.statsShortString(_controller.itemController.rxIbQuestion.value.comments)} '
+                '${IbUtils().statsShortString(_controller.itemController.rxIbQuestion.value.comments)} '
                 '${_controller.itemController.rxIbQuestion.value.comments <= 1 ? 'comment' : 'comments'}',
                 style: const TextStyle(
                     fontSize: IbConfig.kDescriptionTextSize,
@@ -256,7 +256,7 @@ class CommentItemWidget extends StatelessWidget {
                             Text(
                               item.ibComment.timestamp == null
                                   ? 'Posting...'
-                                  : IbUtils.getAgoDateTimeString(
+                                  : IbUtils().getAgoDateTimeString(
                                       (item.ibComment.timestamp as Timestamp)
                                           .toDate()),
                               style: const TextStyle(
@@ -302,7 +302,7 @@ class CommentItemWidget extends StatelessWidget {
                               color: IbColors.lightGrey,
                             ),
                             label: Text(
-                              IbUtils.statsShortString(
+                              IbUtils().statsShortString(
                                   item.ibComment.replies.length),
                               style: TextStyle(
                                   fontSize: IbConfig.kSecondaryTextSize,
@@ -327,7 +327,8 @@ class CommentItemWidget extends StatelessWidget {
                               size: 16,
                             ),
                             label: Text(
-                                IbUtils.statsShortString(item.ibComment.likes),
+                                IbUtils()
+                                    .statsShortString(item.ibComment.likes),
                                 style: TextStyle(
                                     color: Theme.of(context).indicatorColor,
                                     fontSize: IbConfig.kSecondaryTextSize)),

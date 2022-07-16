@@ -26,6 +26,7 @@ class HomeTabController extends GetxController {
   late StreamSubscription first8Sub;
   final double hideShowNavBarSensitivity = 10;
   bool canHideNavBar = true;
+  final String kAdQuestionId = 'AD';
   final adPlaceHolder = IbQuestion(
       question: '',
       id: 'AD',
@@ -110,8 +111,8 @@ class HomeTabController extends GetxController {
     forYourList.clear();
     first8List.value = await IbQuestionDbService().queryFirst8();
     for (final q in first8List) {
-      final flag = await IbQuestionDbService()
-          .isQuestionAnswered(uid: IbUtils.getCurrentUid()!, questionId: q.id);
+      final flag = await IbQuestionDbService().isQuestionAnswered(
+          uid: IbUtils().getCurrentUid()!, questionId: q.id);
       first8Map[q.id] = flag;
       if (!flag) {
         forYourList.add(q);
@@ -120,7 +121,7 @@ class HomeTabController extends GetxController {
     isLocked.value = first8Map.length == 8 && first8Map.values.contains(false);
     if (isLocked.isTrue) {
       first8Sub = IbQuestionDbService()
-          .listenToUseAnsweredQuestionsChange(IbUtils.getCurrentUid()!)
+          .listenToUseAnsweredQuestionsChange(IbUtils().getCurrentUid()!)
           .listen((event) async {
         for (final docChange in event.docChanges) {
           if (docChange.type == DocumentChangeType.added) {
@@ -137,7 +138,7 @@ class HomeTabController extends GetxController {
             first8Map.length == 8 && first8Map.values.contains(false);
         print('determineFeatureIsLocked stream $isLocked');
         if (isLocked.isFalse) {
-          IbUtils.showSimpleSnackBar(
+          IbUtils().showSimpleSnackBar(
               msg: 'Features unlocked, now you are officially an Icebr8ker',
               backgroundColor: IbColors.accentColor);
           await Future.delayed(const Duration(seconds: 2), () {
@@ -158,25 +159,30 @@ class HomeTabController extends GetxController {
     trendingList.clear();
     try {
       isLoading.value = true;
+      final tempTrendList = <IbQuestion>[];
       final snapshot = await IbQuestionDbService().queryTrendingQuestions();
 
       for (final doc in snapshot.docs) {
-        trendingList.addIf(
+        tempTrendList.addIf(
             trendingList.indexWhere((element) => element.id == doc.id) == -1,
             IbQuestion.fromJson(doc.data()));
       }
-
+      tempTrendList.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
+      int lastQuestionTimestampInMs = Timestamp.now().millisecondsSinceEpoch;
+      if (tempTrendList.isNotEmpty) {
+        lastQuestionTimestampInMs = tempTrendList.last.askedTimeInMs;
+      }
+      trendingList.addAll(tempTrendList);
       trendingList.sort((a, b) => b.points.compareTo(a.points));
 
-      final snap = await IbQuestionDbService().queryIbQuestions(
-          askedTimeInMs: Timestamp.now().millisecondsSinceEpoch);
+      final snap = await IbQuestionDbService()
+          .queryIbQuestions(askedTimeInMs: lastQuestionTimestampInMs);
 
       final tempList = <IbQuestion>[];
       for (final doc in snap.docs) {
         tempList.addIf(
             trendingList.indexWhere((element) => element.id == doc.id) == -1,
             IbQuestion.fromJson(doc.data()));
-        lastTrendingDoc = doc;
       }
 
       tempList.sort((a, b) => b.points.compareTo(a.points));
@@ -203,21 +209,21 @@ class HomeTabController extends GetxController {
     lastTagDoc = null;
     isLoading.value = true;
     try {
-      if (IbUtils.getCurrentIbUser()!.tags.isNotEmpty) {
-        final snapshot = await IbQuestionDbService()
-            .queryFollowedTagsQuestions(tags: IbUtils.getCurrentIbUser()!.tags);
-        for (final doc in snapshot.docs) {
-          forYourList.add(IbQuestion.fromJson(doc.data()));
-          lastTagDoc = doc;
-        }
-      }
-
       final snapshot2 = await IbQuestionDbService().queryFriendsQuestions();
       for (final doc in snapshot2.docs) {
         forYourList.addIf(
             forYourList.indexWhere((element) => element.id == doc.id) == -1,
             IbQuestion.fromJson(doc.data()));
         lastFriendQuestionDoc = doc;
+      }
+
+      if (IbUtils().getCurrentIbUser()!.tags.isNotEmpty) {
+        final snapshot = await IbQuestionDbService().queryFollowedTagsQuestions(
+            tags: IbUtils().getCurrentIbUser()!.tags);
+        for (final doc in snapshot.docs) {
+          forYourList.add(IbQuestion.fromJson(doc.data()));
+          lastTagDoc = doc;
+        }
       }
 
       forYourList.shuffle();
@@ -257,6 +263,7 @@ class HomeTabController extends GetxController {
       }
       canHideNavBar = trendingList.length > 6;
     } catch (e) {
+      print(e);
       refreshController.loadFailed();
       print(e);
       isLoading.value = false;
@@ -287,34 +294,32 @@ class HomeTabController extends GetxController {
         await Get.find<IbQuestionItemController>(tag: q.id).refreshStats();
       }
     }
+    return;
   }
 
   Future<void> loadMore() async {
     if (selectedCategory.value == categories[0]) {
-      if (lastTrendingDoc == null) {
-        refreshController.loadNoData();
+      final tempList = <IbQuestion>[];
+      tempList.addAll(trendingList);
+      tempList.sort((a, b) => a.askedTimeInMs.compareTo(b.askedTimeInMs));
+      if (tempList.isEmpty) {
         return;
       }
-
-      final lastQuestion = trendingList
-          .firstWhereOrNull((element) => element.id == lastTrendingDoc!.id);
-      if (lastQuestion == null) {
-        refreshController.loadNoData();
-        return;
-      }
+      final firstNotAdQuestion =
+          tempList.firstWhere((element) => element.id != kAdQuestionId);
 
       try {
         final snap = await IbQuestionDbService()
-            .queryIbQuestions(askedTimeInMs: lastQuestion.askedTimeInMs);
+            .queryIbQuestions(askedTimeInMs: firstNotAdQuestion.askedTimeInMs);
         final tempList = <IbQuestion>[];
         if (snap.docs.isEmpty) {
+          print('no more trending questions');
           refreshController.loadNoData();
           return;
         }
 
         for (final doc in snap.docs) {
           tempList.add(IbQuestion.fromJson(doc.data()));
-          lastTrendingDoc = doc;
         }
         _addAds(tempList);
         trendingList.addAll(tempList);
@@ -332,9 +337,9 @@ class HomeTabController extends GetxController {
 
       try {
         final tempList = <IbQuestion>[];
-        if (IbUtils.getCurrentIbUser()!.tags.isNotEmpty) {
+        if (IbUtils().getCurrentIbUser()!.tags.isNotEmpty) {
           final snap = await IbQuestionDbService().queryFollowedTagsQuestions(
-              tags: IbUtils.getCurrentIbUser()!.tags);
+              tags: IbUtils().getCurrentIbUser()!.tags, lastDoc: lastTagDoc);
           for (final doc in snap.docs) {
             tempList.addIf(
                 forYourList.indexWhere((element) => element.id == doc.id) == -1,
@@ -344,13 +349,13 @@ class HomeTabController extends GetxController {
         }
 
         final snap2 = await IbQuestionDbService()
-            .queryFriendsQuestions(lastDoc: lastTagDoc);
+            .queryFriendsQuestions(lastDoc: lastFriendQuestionDoc);
 
         for (final doc in snap2.docs) {
           tempList.addIf(
               forYourList.indexWhere((element) => element.id == doc.id) == -1,
               IbQuestion.fromJson(doc.data()));
-          lastTagDoc = doc;
+          lastFriendQuestionDoc = doc;
         }
 
         if (tempList.isEmpty) {
@@ -400,6 +405,7 @@ class HomeTabController extends GetxController {
         newestList.addAll(tempList);
         refreshController.loadComplete();
       } catch (e) {
+        print(e);
         refreshController.loadFailed();
       }
     }
@@ -408,7 +414,7 @@ class HomeTabController extends GetxController {
   void _addAds(List<IbQuestion> list) {
     if (!IbLocalDataService()
             .retrieveBoolValue(StorageKey.pollExpandShowCaseBool) ||
-        IbUtils.isPremiumMember() ||
+        IbUtils().isPremiumMember() ||
         isLocked.isTrue) {
       return;
     }

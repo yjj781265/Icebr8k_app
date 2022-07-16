@@ -38,7 +38,8 @@ class AnsweredPage extends StatelessWidget {
             child: ListView.builder(
               controller: _scrollController,
               itemBuilder: (context, index) {
-                return IbUtils.handleQuestionType(_controller.answeredQs[index],
+                return IbUtils().handleQuestionType(
+                    _controller.answeredQs[index],
                     uniqueTag: true);
               },
               itemCount: _controller.answeredQs.length,

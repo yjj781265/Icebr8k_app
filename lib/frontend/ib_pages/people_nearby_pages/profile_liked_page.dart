@@ -63,7 +63,7 @@ class ProfileLikedPage extends StatelessWidget {
                         avatarUrl: item.user.avatarUrl,
                       ),
                       title: Text(
-                        '${item.user.username}, ${IbUtils.calculateAge(item.user.birthdateInMs ?? 0).toString()}',
+                        '${item.user.username}, ${IbUtils().calculateAge(item.user.birthdateInMs ?? 0).toString()}',
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: IbConfig.kNormalTextSize),
@@ -106,7 +106,7 @@ class ProfileLikedPage extends StatelessWidget {
                             ),
                           if (item.distanceInMeters != null)
                             Text(
-                              IbUtils.getDistanceString(
+                              IbUtils().getDistanceString(
                                   item.distanceInMeters!.toDouble()),
                               style: const TextStyle(
                                   fontSize: IbConfig.kDescriptionTextSize),

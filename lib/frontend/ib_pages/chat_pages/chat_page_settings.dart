@@ -44,7 +44,7 @@ class ChatPageSettings extends StatelessWidget {
   Widget _handleMemberAddBtn() {
     final IbChatMemberModel? currentUserChatMemberModel =
         _controller.ibChatMembers.firstWhereOrNull(
-            (element) => element.user.id == IbUtils.getCurrentUid());
+            (element) => element.user.id == IbUtils().getCurrentUid());
     if (_controller.isCircle.isFalse ||
         currentUserChatMemberModel == null ||
         currentUserChatMemberModel.member.role == IbChatMember.kRoleMember &&
@@ -54,7 +54,7 @@ class ChatPageSettings extends StatelessWidget {
     return IconButton(
         onPressed: () async {
           if (_controller.ibChatMembers.length >= IbConfig.kCircleMaxMembers) {
-            IbUtils.showSimpleSnackBar(
+            IbUtils().showSimpleSnackBar(
                 msg:
                     'Circle reached ${IbConfig.kCircleMaxMembers} members limit',
                 backgroundColor: IbColors.primaryColor);
@@ -64,7 +64,7 @@ class ChatPageSettings extends StatelessWidget {
             () => FriendsPicker(
               Get.put(
                 IbFriendsPickerController(
-                  IbUtils.getCurrentUid()!,
+                  IbUtils().getCurrentUid()!,
                   pickedUids: _controller.ibChatMembers
                       .map((element) => element.user.id)
                       .toList(),
@@ -171,7 +171,7 @@ class ChatPageSettings extends StatelessWidget {
 
   void _showMemberBtmSheet(IbChatMemberModel model) {
     final me = _controller.ibChatMembers.firstWhereOrNull(
-        (element) => element.user.id == IbUtils.getCurrentUid()!);
+        (element) => element.user.id == IbUtils().getCurrentUid()!);
     if (me == null) {
       return;
     }
@@ -184,7 +184,7 @@ class ChatPageSettings extends StatelessWidget {
           ListTile(
             onTap: () {
               Get.back();
-              if (model.user.id == IbUtils.getCurrentUid()) {
+              if (model.user.id == IbUtils().getCurrentUid()) {
                 Get.to(() => MyProfilePage());
                 return;
               }
@@ -217,7 +217,7 @@ class ChatPageSettings extends StatelessWidget {
               },
               title: const Text('Demote to Member'),
             ),
-          if (isLeader && model.user.id != IbUtils.getCurrentUid())
+          if (isLeader && model.user.id != IbUtils().getCurrentUid())
             ListTile(
               onTap: () async {
                 Get.back();
@@ -304,15 +304,16 @@ class ChatPageSettings extends StatelessWidget {
         Obx(() {
           if (_controller.isCircle.isFalse) {
             final member = _controller.ibChatMembers.firstWhereOrNull(
-                (element) => element.user.id != IbUtils.getCurrentUid());
+                (element) => element.user.id != IbUtils().getCurrentUid());
             if (member == null) {
               return const SizedBox();
             }
-            if (IbUtils.getCurrentIbUser() == null) {
+            if (IbUtils().getCurrentIbUser() == null) {
               return const SizedBox();
             }
 
-            if (IbUtils.getCurrentIbUser()!
+            if (IbUtils()
+                .getCurrentIbUser()!
                 .blockedFriendUids
                 .contains(member.user.id)) {
               return ListTile(
@@ -379,7 +380,7 @@ class ChatPageSettings extends StatelessWidget {
         }),
         Obx(() {
           final chatMember = _controller.ibChatMembers.firstWhereOrNull(
-              (element) => element.member.uid == IbUtils.getCurrentUid()!);
+              (element) => element.member.uid == IbUtils().getCurrentUid()!);
           if (chatMember != null &&
               _controller.isCircle.isTrue &&
               (chatMember.member.role == IbChatMember.kRoleLeader ||

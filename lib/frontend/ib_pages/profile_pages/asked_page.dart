@@ -11,7 +11,6 @@ import '../../ib_utils.dart';
 class AskedPage extends StatelessWidget {
   final AskedQuestionsController _controller;
   final ScrollController _scrollController = ScrollController();
-  final RefreshController _refreshController = RefreshController();
 
   AskedPage(this._controller);
 
@@ -30,18 +29,12 @@ class AskedPage extends StatelessWidget {
           }
 
           return SmartRefresher(
-            controller: _refreshController,
+            controller: _controller.askedRefreshController,
             scrollController: _scrollController,
             enablePullDown: false,
             enablePullUp: true,
             onLoading: () async {
-              if (_controller.lastDoc == null) {
-                _refreshController.loadNoData();
-                return;
-              }
-
               await _controller.loadMore();
-              _refreshController.loadComplete();
             },
             child: ListView.builder(
               controller: _scrollController,
@@ -61,7 +54,7 @@ class AskedPage extends StatelessWidget {
                   return const SizedBox();
                 }
                 index -= 1;
-                return IbUtils.handleQuestionType(
+                return IbUtils().handleQuestionType(
                     _controller.createdQuestions[index],
                     uniqueTag: true);
               },

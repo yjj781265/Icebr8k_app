@@ -34,7 +34,7 @@ class _QuestionMainPageState extends State<QuestionMainPage> {
           Get.to(CommentPage(Get.put(
               CommentController(
                   itemController: widget._controller.itemController),
-              tag: IbUtils.getUniqueId())));
+              tag: IbUtils().getUniqueId())));
           break;
         case ToPage.reply:
           if (widget.commentId == null) {
@@ -45,7 +45,7 @@ class _QuestionMainPageState extends State<QuestionMainPage> {
                   parentCommentId: widget.commentId!,
                   ibQuestion:
                       widget._controller.itemController.rxIbQuestion.value),
-              tag: IbUtils.getUniqueId())));
+              tag: IbUtils().getUniqueId())));
           break;
       }
     });
@@ -65,7 +65,7 @@ class _QuestionMainPageState extends State<QuestionMainPage> {
           refreshController.refreshCompleted();
         },
         child: SingleChildScrollView(
-            child: IbUtils.handleQuestionType(
+            child: IbUtils().handleQuestionType(
           widget._controller.itemController.rxIbQuestion.value,
           uniqueTag: true,
         )),
