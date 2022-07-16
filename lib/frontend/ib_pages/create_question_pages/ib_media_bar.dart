@@ -129,7 +129,7 @@ class IbMediaBar extends StatelessWidget {
                           size: 20,
                           fontSize: IbConfig.kDescriptionTextSize,
                           onPressed: () {
-                            IbUtils().hideKeyboard();
+                            IbUtils.hideKeyboard();
                             Get.to(() => CreateQuestionImagePicker(_controller),
                                 transition: Transition.zoom);
                           },

@@ -148,13 +148,6 @@ class MyProfilePage extends StatelessWidget {
                   : CachedNetworkImage(
                       imageUrl: _controller.rxCurrentIbUser.value.coverPhotoUrl,
                       fit: BoxFit.fill,
-                      progressIndicatorBuilder: (context, string, progress) {
-                        return Center(
-                          child: CircularProgressIndicator.adaptive(
-                            value: progress.progress,
-                          ),
-                        );
-                      },
                     ),
             ),
           ),
@@ -290,7 +283,7 @@ class MyProfilePage extends StatelessWidget {
                   return;
                 }
                 Get.to(() => AskedPage(Get.put(AskedQuestionsController(
-                    IbUtils().getCurrentUid()!,
+                    IbUtils.getCurrentUid()!,
                     showPublicOnly: false))));
               },
               subText: "✋ POLL(S)")),
@@ -349,7 +342,7 @@ class MyProfilePage extends StatelessWidget {
                 color: IbColors.errorRed,
                 iconData: Icons.collections_bookmark_outlined,
                 onPressed: () {
-                  IbUtils().showSimpleSnackBar(
+                  IbUtils.showSimpleSnackBar(
                       msg: 'This feature is coming soon..',
                       backgroundColor: IbColors.primaryColor);
                 },
@@ -395,7 +388,7 @@ class MyProfilePage extends StatelessWidget {
                       Get.to(() => EditEmoPicsPage(Get.put(
                           EditEmoPicController(
                               _controller.rxCurrentIbUser.value.emoPics.obs),
-                          tag: IbUtils().getUniqueId())));
+                          tag: IbUtils.getUniqueId())));
                     },
                     label: Text(
                       _controller.rxCurrentIbUser.value.emoPics.isEmpty
@@ -473,13 +466,14 @@ class MyProfilePage extends StatelessWidget {
         onLoading: () async {
           await _myProfileController.onLoadMore();
         },
-        child: Obx(
-          () => ListView(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            children: _myProfileController.asks
-                .map((element) => IbQuestionSnippetCard(element))
-                .toList(),
+        child: SingleChildScrollView(
+          child: Obx(
+            () => StaggeredGrid.count(
+              crossAxisCount: 3,
+              children: _myProfileController.asks
+                  .map((element) => IbQuestionSnippetCard(element))
+                  .toList(),
+            ),
           ),
         ),
       );
@@ -523,7 +517,7 @@ class MyProfilePage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
                     child: Text(
-                      'Age: ${IbUtils().calculateAge(_controller.rxCurrentIbUser.value.birthdateInMs!).toString()}',
+                      'Age: ${IbUtils.calculateAge(_controller.rxCurrentIbUser.value.birthdateInMs!).toString()}',
                       style:
                           const TextStyle(fontSize: IbConfig.kNormalTextSize),
                     ),

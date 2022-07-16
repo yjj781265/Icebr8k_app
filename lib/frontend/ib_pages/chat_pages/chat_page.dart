@@ -140,8 +140,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                             final currentMember = widget
                                 ._controller.ibChatMembers
                                 .firstWhereOrNull((element) =>
-                                    element.user.id ==
-                                    IbUtils().getCurrentUid());
+                                    element.user.id == IbUtils.getCurrentUid());
                             final isAbleToEdit = currentMember != null &&
                                 currentMember.member.role !=
                                     IbChatMember.kRoleMember;
@@ -197,7 +196,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                   child: Stack(
                     children: [
                       GestureDetector(
-                        onTap: () => IbUtils().hideKeyboard(),
+                        onTap: () => IbUtils.hideKeyboard(),
                         child: NotificationListener<ScrollNotification>(
                           child: ScrollablePositionedList.builder(
                             physics: const BouncingScrollPhysics(),
@@ -231,8 +230,8 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                   ),
                 ),
                 if (widget._controller.isTypingUsers.isNotEmpty &&
-                    IbUtils().getCurrentIbUser() != null &&
-                    IbUtils().isPremiumMember())
+                    IbUtils.getCurrentIbUser() != null &&
+                    IbUtils.isPremiumMember())
                   Align(
                       alignment: Alignment.bottomLeft,
                       child: _buildTypingIndicator(context)),
@@ -376,7 +375,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                             iconData: Icons.poll,
                             onPressed: () async {
                               widget._controller.showMsgOptions.value = false;
-                              if (await IbUtils().isOverDailyPollLimit()) {
+                              if (await IbUtils.isOverDailyPollLimit()) {
                                 Get.dialog(IbDialog(
                                   title:
                                       'You can only create maximum ${IbConfig.kDailyPollLimit} polls in 24 hrs',
@@ -403,7 +402,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                                   () => CreateQuestionPage(
                                                         controller: Get.put(
                                                             CreateQuestionController(),
-                                                            tag: IbUtils()
+                                                            tag: IbUtils
                                                                 .getUniqueId()),
                                                       ),
                                                   fullscreenDialog: true,
@@ -421,14 +420,13 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                 return;
                               }
 
-                              final chatTabItem = IbUtils()
-                                  .getAllChatTabItems()
+                              final chatTabItem = IbUtils.getAllChatTabItems()
                                   .firstWhereOrNull((element) =>
                                       element.ibChat.chatId ==
                                       widget._controller.ibChat!.chatId);
                               final createQuestionController = Get.put(
                                   CreateQuestionController(),
-                                  tag: IbUtils().getUniqueId());
+                                  tag: IbUtils.getUniqueId());
 
                               if (chatTabItem != null) {
                                 createQuestionController.pickedChats
@@ -445,7 +443,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                           iconData: Icons.gif,
                           onPressed: () async {
                             widget._controller.showMsgOptions.value = false;
-                            IbUtils().hideKeyboard();
+                            IbUtils.hideKeyboard();
                             final gifUrl = await Get.to(
                               () => IbTenorPage(),
                             );
@@ -643,7 +641,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                   onLongPress: () {
                     HapticFeedback.heavyImpact();
                     Clipboard.setData(ClipboardData(text: message.content));
-                    IbUtils().showSimpleSnackBar(
+                    IbUtils.showSimpleSnackBar(
                         msg: "Text copied to clipboard",
                         backgroundColor: IbColors.primaryColor);
                   },
@@ -672,7 +670,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
           Text(
             message.timestamp == null
                 ? 'Sending...'
-                : IbUtils().readableDateTime(
+                : IbUtils.readableDateTime(
                     DateTime.fromMillisecondsSinceEpoch(
                         (message.timestamp as Timestamp)
                             .millisecondsSinceEpoch),
@@ -727,7 +725,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                       onLongPress: () {
                         HapticFeedback.heavyImpact();
                         Clipboard.setData(ClipboardData(text: message.content));
-                        IbUtils().showSimpleSnackBar(
+                        IbUtils.showSimpleSnackBar(
                             msg: "Text copied to clipboard",
                             backgroundColor: IbColors.primaryColor);
                       },
@@ -762,7 +760,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                 Text(
                   message.timestamp == null
                       ? 'Sending...'
-                      : IbUtils().readableDateTime(
+                      : IbUtils.readableDateTime(
                           DateTime.fromMillisecondsSinceEpoch(
                               (message.timestamp as Timestamp)
                                   .millisecondsSinceEpoch),
@@ -824,7 +822,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
           Text(
             message.timestamp == null
                 ? 'Sending...'
-                : IbUtils().readableDateTime(
+                : IbUtils.readableDateTime(
                     DateTime.fromMillisecondsSinceEpoch(
                         (message.timestamp as Timestamp)
                             .millisecondsSinceEpoch),
@@ -915,7 +913,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                 Text(
                   message.timestamp == null
                       ? 'Sending...'
-                      : IbUtils().readableDateTime(
+                      : IbUtils.readableDateTime(
                           DateTime.fromMillisecondsSinceEpoch(
                               (message.timestamp as Timestamp)
                                   .millisecondsSinceEpoch),
@@ -954,7 +952,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
             Text(
               message.timestamp == null
                   ? 'Posting...'
-                  : IbUtils().readableDateTime(
+                  : IbUtils.readableDateTime(
                       DateTime.fromMillisecondsSinceEpoch(
                           (message.timestamp as Timestamp)
                               .millisecondsSinceEpoch),
@@ -983,7 +981,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
       }
 
       final Widget pollWidget =
-          IbUtils().handleQuestionType(question, uniqueTag: true);
+          IbUtils.handleQuestionType(question, uniqueTag: true);
 
       return Column(
         mainAxisSize: MainAxisSize.min,
@@ -996,7 +994,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
           Text(
             message.timestamp == null
                 ? 'Sending...'
-                : IbUtils().readableDateTime(
+                : IbUtils.readableDateTime(
                     DateTime.fromMillisecondsSinceEpoch(
                         (message.timestamp as Timestamp)
                             .millisecondsSinceEpoch),
@@ -1058,7 +1056,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
             Text(
               message.timestamp == null
                   ? 'Posting...'
-                  : IbUtils().readableDateTime(
+                  : IbUtils.readableDateTime(
                       DateTime.fromMillisecondsSinceEpoch(
                           (message.timestamp as Timestamp)
                               .millisecondsSinceEpoch),
@@ -1097,7 +1095,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
           Text(
             message.timestamp == null
                 ? 'Sending...'
-                : IbUtils().readableDateTime(
+                : IbUtils.readableDateTime(
                     DateTime.fromMillisecondsSinceEpoch(
                         (message.timestamp as Timestamp)
                             .millisecondsSinceEpoch),
@@ -1166,8 +1164,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
 
   Widget _buildAvatar(
       {required BuildContext context, required List<IbUser> avatarUsers}) {
-    avatarUsers
-        .removeWhere((element) => element.id == IbUtils().getCurrentUid());
+    avatarUsers.removeWhere((element) => element.id == IbUtils.getCurrentUid());
     final list = avatarUsers.take(4).toList();
     final double radius = avatarUsers.length > 1 ? 8 : 16;
     return CircleAvatar(
@@ -1193,7 +1190,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
 
   ///won't show sender and current User's avatar
   Widget _buildReadIndicator(IbMessage message) {
-    if (IbUtils().getCurrentIbUser() != null && !IbUtils().isPremiumMember()) {
+    if (IbUtils.getCurrentIbUser() != null && !IbUtils.isPremiumMember()) {
       return const SizedBox();
     }
     if (widget._controller.messages.indexWhere(
@@ -1207,7 +1204,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
             children: message.readUids
                 .where((element) =>
                     element != message.senderUid &&
-                    element != IbUtils().getCurrentUid())
+                    element != IbUtils.getCurrentUid())
                 .map((e) {
               final IbChatMemberModel? model = widget._controller.ibChatMembers
                   .firstWhereOrNull((item) => item.user.id == e);
@@ -1241,7 +1238,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
           .map((element) => element.user)
           .toList();
       avatarUsers
-          .removeWhere((element) => element.id == IbUtils().getCurrentUid());
+          .removeWhere((element) => element.id == IbUtils.getCurrentUid());
       for (final user in avatarUsers) {
         widget._controller.title.value =
             '${widget._controller.title.value}${user.username} ';
@@ -1256,7 +1253,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   Widget _handleMessageType(
       {required IbMessageModel model, required BuildContext context}) {
     final message = model.ibMessage;
-    final bool isMe = message.senderUid == IbUtils().getCurrentUid();
+    final bool isMe = message.senderUid == IbUtils.getCurrentUid();
     if (message.messageType == IbMessage.kMessageTypeText) {
       return isMe ? _meTextMsgItem(message) : _textMsgItem(message);
     }
@@ -1278,7 +1275,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                   Text(
                     message.timestamp == null
                         ? 'Sending...'
-                        : IbUtils().readableDateTime(
+                        : IbUtils.readableDateTime(
                             DateTime.fromMillisecondsSinceEpoch(
                                 (message.timestamp as Timestamp)
                                     .millisecondsSinceEpoch),

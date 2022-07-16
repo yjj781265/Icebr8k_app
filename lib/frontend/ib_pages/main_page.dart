@@ -63,8 +63,8 @@ class _MainPageViewState extends State<MainPageView>
     if (state == AppLifecycleState.resumed) {
       /// clear app badge
       FlutterAppBadger.updateBadgeCount(0);
-      if (IbUtils().getCurrentIbUser() != null &&
-          IbUtils().getCurrentIbUser()!.notificationCount != 0) {
+      if (IbUtils.getCurrentIbUser() != null &&
+          IbUtils.getCurrentIbUser()!.notificationCount != 0) {
         await IbUserDbService().updateIbUserNotificationCount(0);
       }
     }
@@ -74,7 +74,7 @@ class _MainPageViewState extends State<MainPageView>
   Widget build(BuildContext context) {
     IbAnalyticsManager()
         .logScreenView(className: "MainPage", screenName: "MainPage");
-    IbUtils().changeStatusBarColor();
+    IbUtils.changeStatusBarColor();
     return WillPopScope(
       onWillPop: () async {
         if (Platform.isAndroid) {
@@ -115,12 +115,12 @@ class _MainPageViewState extends State<MainPageView>
         containerHeight: _mainPageController.isNavBarVisible.isTrue ? 80 : 0,
         selectedIndex: _mainPageController.currentIndex.value,
         onItemSelected: (index) async {
-          if (index != 0 && index != 4 && IbUtils().checkFeatureIsLocked()) {
+          if (index != 0 && index != 4 && IbUtils.checkFeatureIsLocked()) {
             return;
           }
 
           if (index == 2) {
-            if (await IbUtils().isOverDailyPollLimit()) {
+            if (await IbUtils.isOverDailyPollLimit()) {
               Get.dialog(IbDialog(
                 title:
                     'You can only create maximum ${IbConfig.kDailyPollLimit} polls in 24 hrs',
@@ -146,7 +146,7 @@ class _MainPageViewState extends State<MainPageView>
                                 () => CreateQuestionPage(
                                       controller: Get.put(
                                           CreateQuestionController(),
-                                          tag: IbUtils().getUniqueId()),
+                                          tag: IbUtils.getUniqueId()),
                                     ),
                                 fullscreenDialog: true,
                                 popGesture: false,
@@ -165,7 +165,7 @@ class _MainPageViewState extends State<MainPageView>
             Get.to(
                 () => CreateQuestionPage(
                       controller: Get.put(CreateQuestionController(),
-                          tag: IbUtils().getUniqueId()),
+                          tag: IbUtils.getUniqueId()),
                     ),
                 fullscreenDialog: true,
                 popGesture: false,

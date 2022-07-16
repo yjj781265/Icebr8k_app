@@ -37,81 +37,70 @@ class AuthController extends GetxService {
   final isSigningUp = false.obs;
   bool isAnalyticsEnabled = false;
   User? firebaseUser;
-  final IbUtils ibUtils;
-  final IbDbStatusService ibDbStatusService;
-  final IbLocalDataService ibLocalDataService;
-  final IbAuthService ibAuthService;
-
-  AuthController(
-      {required this.ibUtils,
-      required this.ibAuthService,
-      required this.ibDbStatusService,
-      required this.ibLocalDataService});
+  final _ibAuthService = IbAuthService();
 
   @override
   void onInit() {
     super.onInit();
-    _dbStatusSub = ibDbStatusService.listenToStatus().listen((event) async {
-      await _handleDbStatus(event);
+    _dbStatusSub = IbDbStatusService().listenToStatus().listen((event) async {
+      final isRunning = event.data()!['isRunning'] as bool;
+      final note = event.data()!['note'] as String;
+      final minV = double.parse(event.data()!['min_v'].toString());
+      final isOutdated = IbConfig.kVersion < minV;
+      isAnalyticsEnabled = event.data()!['isAnalyticsEnabled'] as bool;
+
       setUpAnalytics();
+
+      if (isOutdated) {
+        await IbAnalyticsManager().logCustomEvent(
+            name: 'app_outdated',
+            data: {'note': 'app terminated due to lower version'});
+        Get.offAll(() => WelcomePage(), transition: Transition.noTransition);
+        Get.dialog(
+            const IbDialog(
+              title: 'App Outdated',
+              subtitle: 'Please update your app to the latest version',
+              showNegativeBtn: false,
+            ),
+            barrierDismissible: false);
+        return;
+      }
+
+      if (!isRunning) {
+        await IbAnalyticsManager().logCustomEvent(
+            name: 'server_down',
+            data: {'note': 'server is down, user got kicked out'});
+        Get.offAll(() => WelcomePage());
+        IbUtils.showSimpleSnackBar(
+            msg: note,
+            backgroundColor: IbColors.primaryColor,
+            isPersistent: true);
+        return;
+      } else {
+        Get.closeAllSnackbars();
+      }
     });
 
-    _fbAuthSub = ibAuthService.listenToAuthStateChanges().listen((user) async {
+    _fbAuthSub = _ibAuthService.listenToAuthStateChanges().listen((user) async {
       if (user == null) {
         firebaseUser = null;
         await IbAnalyticsManager()
             .logCustomEvent(name: 'user_log_out', data: {});
         print('User is signed out!');
         isInitializing.value = true;
-        ibUtils.offAll(WelcomePage(), transition: Transition.noTransition);
+        Get.offAll(() => WelcomePage(),
+            transition: Transition.circularReveal,
+            duration: const Duration(
+                milliseconds: IbConfig.kEventTriggerDelayInMillis));
         return;
       } else {
         firebaseUser = user;
         print('User is signed in!');
         await IbAnalyticsManager()
             .logCustomEvent(name: 'user_log_in', data: {});
-        navigateToCorrectPage();
+        _navigateToCorrectPage();
       }
     });
-  }
-
-  Future<bool> _handleDbStatus(
-      DocumentSnapshot<Map<String, dynamic>> snapshot) async {
-    final isRunning = snapshot.data()!['isRunning'] as bool;
-    final note = snapshot.data()!['note'] as String;
-    final minV = double.parse(snapshot.data()!['min_v'].toString());
-    final isOutdated = IbConfig.kVersion < minV;
-    isAnalyticsEnabled = snapshot.data()!['isAnalyticsEnabled'] as bool;
-
-    if (isOutdated) {
-      await IbAnalyticsManager().logCustomEvent(
-          name: 'app_outdated',
-          data: {'note': 'app terminated due to lower version'});
-      ibUtils.offAll(WelcomePage(), transition: Transition.noTransition);
-      ibUtils.showDialog(
-          const IbDialog(
-            title: 'App Outdated',
-            subtitle: 'Please update your app to the latest version',
-            showNegativeBtn: false,
-          ),
-          barrierDismissible: false);
-      return false;
-    }
-
-    if (!isRunning) {
-      await IbAnalyticsManager().logCustomEvent(
-          name: 'server_down',
-          data: {'note': 'server is down, user got kicked out'});
-      ibUtils.offAll(WelcomePage(), transition: Transition.noTransition);
-      ibUtils.showSimpleSnackBar(
-          msg: note,
-          backgroundColor: IbColors.primaryColor,
-          isPersistent: true);
-      return false;
-    } else {
-      ibUtils.closeAllSnackbars();
-    }
-    return true;
   }
 
   @override
@@ -129,33 +118,32 @@ class AuthController extends GetxService {
     await crashlytics.setCrashlyticsCollectionEnabled(isAnalyticsEnabled);
   }
 
-  Future<void> signInViaEmail(
+  Future signInViaEmail(
       {required String email,
       required String password,
       required bool rememberEmail}) async {
-    ibUtils.showDialog(
+    Get.dialog(
       const IbLoadingDialog(messageTrKey: 'signing_in'),
       barrierDismissible: false,
     );
-
     try {
       isSigningIn.value = true;
       await IbAnalyticsManager().logSignIn('signInViaEmail');
 
       if (rememberEmail) {
-        ibLocalDataService.updateStringValue(
-            key: StorageKey.loginEmailString, value: email);
+        IbLocalDataService()
+            .updateStringValue(key: StorageKey.loginEmailString, value: email);
       } else {
-        ibLocalDataService.removeKey(StorageKey.loginEmailString);
+        IbLocalDataService().removeKey(StorageKey.loginEmailString);
       }
 
       final UserCredential userCredential =
-          await ibAuthService.signInViaEmail(email, password);
+          await _ibAuthService.signInViaEmail(email, password);
       firebaseUser = userCredential.user;
 
       if (firebaseUser != null && !firebaseUser!.emailVerified) {
         Get.back();
-        ibUtils.showDialog(
+        Get.dialog(
           IbDialog(
             title: 'Email is not verified',
             subtitle: 'sign_in_email_verification'.tr,
@@ -166,22 +154,24 @@ class AuthController extends GetxService {
                 try {
                   await firebaseUser!.sendEmailVerification();
                   Get.back();
-                  ibUtils.showDialog(
+                  Get.dialog(
                     IbDialog(
                       title: 'Info',
                       subtitle: 'verification_email_sent'.tr,
                       positiveTextKey: 'ok',
                       showNegativeBtn: false,
+                      onPositiveTap: () => Get.back(),
                     ),
                   );
                 } on FirebaseException catch (e) {
                   Get.back();
-                  ibUtils.showDialog(
+                  Get.dialog(
                     IbDialog(
                       title: 'OOPS',
                       subtitle: e.message ?? 'Something is wrong...',
                       positiveTextKey: 'ok',
                       showNegativeBtn: false,
+                      onPositiveTap: () => Get.back(),
                     ),
                   );
                 }
@@ -192,11 +182,11 @@ class AuthController extends GetxService {
           barrierDismissible: false,
         );
       } else if (firebaseUser != null && firebaseUser!.emailVerified) {
-        navigateToCorrectPage();
+        _navigateToCorrectPage();
       }
     } on FirebaseAuthException catch (e) {
       Get.back();
-      ibUtils.showDialog(IbDialog(
+      Get.dialog(IbDialog(
         showNegativeBtn: false,
         onPositiveTap: () => Get.back(),
         title: 'OOPS!',
@@ -205,8 +195,9 @@ class AuthController extends GetxService {
       ));
     } catch (e) {
       Get.back();
-      ibUtils.showDialog(IbDialog(
+      Get.dialog(IbDialog(
         showNegativeBtn: false,
+        onPositiveTap: () => Get.back(),
         title: 'OOPS!',
         subtitle: e.toString(),
         positiveTextKey: 'ok',
@@ -217,19 +208,19 @@ class AuthController extends GetxService {
   }
 
   Future signUpViaEmail(String email, String password) async {
-    ibUtils.showDialog(const IbLoadingDialog(messageTrKey: 'signing_up'),
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_up'),
         barrierDismissible: false);
     try {
       isSigningUp.value = true;
       await IbAnalyticsManager().logSignUp('signUpViaEmail');
       final UserCredential userCredential =
-          await ibAuthService.signUpViaEmail(email.trim(), password);
+          await _ibAuthService.signUpViaEmail(email.trim(), password);
       final user = userCredential.user;
 
       if (user != null && !user.emailVerified) {
         await user.sendEmailVerification();
         Get.back();
-        ibUtils.showDialog(IbDialog(
+        Get.dialog(IbDialog(
           title: "Verify your email",
           subtitle: 'sign_up_email_verification'.tr,
           positiveTextKey: 'ok',
@@ -238,16 +229,18 @@ class AuthController extends GetxService {
       }
     } on FirebaseAuthException catch (e) {
       Get.back();
-      ibUtils.showDialog(IbDialog(
+      Get.dialog(IbDialog(
         showNegativeBtn: false,
+        onPositiveTap: () => Get.back(),
         title: 'OOPS!',
         subtitle: e.message ?? 'Something went wrong...',
         positiveTextKey: 'ok',
       ));
     } catch (e) {
       Get.back();
-      ibUtils.showDialog(IbDialog(
+      Get.dialog(IbDialog(
         showNegativeBtn: false,
+        onPositiveTap: () => Get.back(),
         title: 'OOPS!',
         subtitle: e.toString(),
         positiveTextKey: 'ok',
@@ -257,14 +250,50 @@ class AuthController extends GetxService {
     }
   }
 
-  Future<void> navigateToCorrectPage() async {
+  Future<void> _navigateToCorrectPage() async {
     try {
       final statusSnap = await IbDbStatusService().queryStatus();
-      final isOkay = await _handleDbStatus(statusSnap);
+      final isRunning = statusSnap.data()!['isRunning'] as bool;
+      final note = statusSnap.data()!['note'] as String;
+      final minV = double.parse(statusSnap.data()!['min_v'].toString());
+      final isOutdated = IbConfig.kVersion < minV;
+
+      if (isOutdated) {
+        await IbAnalyticsManager().logCustomEvent(
+            name: 'app_outdated',
+            data: {'note': 'app terminated due to lower version'});
+        Get.offAll(() => WelcomePage(), transition: Transition.noTransition);
+        await IbAnalyticsManager().logScreenView(
+            className: "AuthController", screenName: "WelcomePage");
+        Get.dialog(
+            const IbDialog(
+              title: 'App Outdated',
+              subtitle: 'Please update your app to the latest version',
+              showNegativeBtn: false,
+            ),
+            barrierDismissible: false);
+        return;
+      }
+
+      if (!isRunning) {
+        await IbAnalyticsManager().logCustomEvent(
+            name: 'server_down',
+            data: {'note': 'server is down, user got kicked out'});
+        Get.offAll(() => WelcomePage());
+        await IbAnalyticsManager().logScreenView(
+            className: "AuthController", screenName: "WelcomePage");
+        IbUtils.showSimpleSnackBar(
+            msg: note,
+            backgroundColor: IbColors.primaryColor,
+            isPersistent: true);
+        return;
+      } else {
+        Get.closeAllSnackbars();
+      }
 
       final result = await Connectivity().checkConnectivity();
       if (result == ConnectivityResult.none) {
-        ibUtils.showSimpleSnackBar(
+        IbUtils.showSimpleSnackBar(
             msg: 'No Internet Connection',
             backgroundColor: IbColors.errorRed,
             isPersistent: true);
@@ -273,11 +302,6 @@ class AuthController extends GetxService {
       if (firebaseUser != null && firebaseUser!.emailVerified) {
         final IbUser? ibUser =
             await IbUserDbService().queryIbUser(firebaseUser!.uid);
-        if (!isOkay &&
-            ibUser != null &&
-            !ibUser.roles.contains(IbUser.kAdminRole)) {
-          return;
-        }
 
         /// check roles of the user
         if (ibUser != null &&
@@ -285,12 +309,12 @@ class AuthController extends GetxService {
             ibUser.roles.contains(IbUser.kUserRole)) {
           await IbAnalyticsManager().logScreenView(
               className: "AuthController", screenName: "RoleSelectPage");
-          ibUtils.offAll(RoleSelectPage());
+          Get.offAll(() => RoleSelectPage());
           return;
         } else if (ibUser != null && ibUser.roles.contains(IbUser.kAdminRole)) {
           await IbAnalyticsManager().logScreenView(
               className: "AuthController", screenName: "AdminMainPage");
-          ibUtils.offAll(AdminMainPage());
+          Get.offAll(() => AdminMainPage());
         }
 
         String? status = '';
@@ -309,14 +333,14 @@ class AuthController extends GetxService {
           case IbUser.kUserStatusApproved:
             await IbAnalyticsManager().logScreenView(
                 className: "AuthController", screenName: "MainPage");
-            ibUtils.offAll(MainPage(),
+            Get.offAll(() => MainPage(),
                 binding: HomeBinding(ibUser!),
                 transition: Transition.circularReveal);
             break;
 
           case IbUser.kUserStatusBanned:
             print('Go to CounterDown Page');
-            ibUtils.offAll(BannedCountDownPage(ibUser!),
+            Get.offAll(() => BannedCountDownPage(ibUser!),
                 transition: Transition.circularReveal);
             break;
 
@@ -324,19 +348,17 @@ class AuthController extends GetxService {
             print('Go to InReview Page');
             await IbAnalyticsManager().logScreenView(
                 className: "AuthController", screenName: "ReviewPage");
-            ibUtils.offAll(ReviewPage(), transition: Transition.circularReveal);
-
+            Get.offAll(() => ReviewPage(),
+                transition: Transition.circularReveal);
             break;
 
           case IbUser.kUserStatusRejected:
             print('Go to Setup Page with note dialog');
             await IbAnalyticsManager().logScreenView(
                 className: "AuthController", screenName: "SetupPageOne");
-            ibUtils.offAll(
-                SetupPageOne(
-                  Get.put(SetupController(status: IbUser.kUserStatusRejected),
-                      tag: IbUtils().getUniqueId()),
-                ),
+            Get.offAll(
+                () => SetupPageOne(Get.put(
+                    SetupController(status: IbUser.kUserStatusRejected))),
                 transition: Transition.circularReveal);
             break;
 
@@ -344,39 +366,36 @@ class AuthController extends GetxService {
             print('Go to Setup page');
             await IbAnalyticsManager().logScreenView(
                 className: "AuthController", screenName: "SetupPageOne");
-            ibUtils.offAll(
-                SetupPageOne(
-                    Get.put(SetupController(), tag: IbUtils().getUniqueId())),
+            Get.offAll(() => SetupPageOne(Get.put(SetupController())),
                 transition: Transition.circularReveal);
-
             break;
 
           default:
             print('default Go to Setup page');
             await IbAnalyticsManager().logScreenView(
                 className: "AuthController", screenName: "SetupPageOne");
-            ibUtils.offAll(
-                SetupPageOne(
-                    Get.put(SetupController(), tag: IbUtils().getUniqueId())),
+            Get.offAll(() => SetupPageOne(Get.put(SetupController())),
                 transition: Transition.circularReveal);
             break;
         }
       } else if (firebaseUser != null && !firebaseUser!.emailVerified) {
-        ibUtils.showSimpleSnackBar(
+        IbUtils.showSimpleSnackBar(
             msg: 'User email is not verified yet',
             backgroundColor: IbColors.primaryColor);
-        ibUtils.offAll(WelcomePage());
+        Get.offAll(() => WelcomePage());
       }
     } on FirebaseAuthException catch (e) {
-      ibUtils.showDialog(IbDialog(
+      Get.dialog(IbDialog(
         showNegativeBtn: false,
+        onPositiveTap: () => Get.back(),
         title: 'OOPS!',
         subtitle: e.message ?? '',
         positiveTextKey: 'ok',
       ));
     } catch (e) {
-      ibUtils.showDialog(IbDialog(
+      Get.dialog(IbDialog(
         showNegativeBtn: false,
+        onPositiveTap: () => Get.back(),
         title: 'OOPS!',
         subtitle: e.toString(),
         positiveTextKey: 'ok',
@@ -387,13 +406,13 @@ class AuthController extends GetxService {
   }
 
   Future<void> resetPassword(String email) async {
-    ibUtils.showDialog(const IbLoadingDialog(messageTrKey: 'loading'));
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));
     try {
       await IbAnalyticsManager().logCustomEvent(name: "reset_pwd", data: {});
-      await ibAuthService.resetPassword(email);
+      await _ibAuthService.resetPassword(email);
       Get.back();
       final String msg = 'reset_email_msg'.trParams({'email': email});
-      ibUtils.showDialog(IbDialog(
+      Get.dialog(IbDialog(
         title: 'Reset Password',
         subtitle: msg,
         positiveTextKey: 'ok',
@@ -401,16 +420,18 @@ class AuthController extends GetxService {
       ));
     } on FirebaseAuthException catch (e) {
       Get.back();
-      ibUtils.showDialog(IbDialog(
+      Get.dialog(IbDialog(
         showNegativeBtn: false,
+        onPositiveTap: () => Get.back(),
         title: 'OOPS!',
         subtitle: e.message ?? 'Something went wrong...',
         positiveTextKey: 'ok',
       ));
     } catch (e) {
       Get.back();
-      ibUtils.showDialog(IbDialog(
+      Get.dialog(IbDialog(
         showNegativeBtn: false,
+        onPositiveTap: () => Get.back(),
         title: 'OOPS!',
         subtitle: e.toString(),
         positiveTextKey: 'ok',
@@ -419,10 +440,11 @@ class AuthController extends GetxService {
   }
 
   Future<void> signOut() async {
-    ibUtils.showDialog(const IbLoadingDialog(messageTrKey: 'signing_out'));
+    Get.dialog(const IbLoadingDialog(messageTrKey: 'signing_out'));
+
     if (firebaseUser != null) {
       await IbUserDbService().removeTokenFromDatabase();
     }
-    await ibAuthService.signOut();
+    await _ibAuthService.signOut();
   }
 }

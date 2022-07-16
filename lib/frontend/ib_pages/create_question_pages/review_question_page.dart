@@ -60,7 +60,7 @@ class ReviewQuestionPage extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Obx(
-                    () => IbUtils().handleQuestionType(
+                    () => IbUtils.handleQuestionType(
                         itemController.rxIbQuestion.value,
                         itemController: itemController),
                   ),
@@ -87,7 +87,7 @@ class ReviewQuestionPage extends StatelessWidget {
                       if (itemController.rxIbQuestion.value.endTimeInMs == -1) {
                         return const Text('No Time Limit');
                       }
-                      return IbUtils().leftTimeText(
+                      return IbUtils.leftTimeText(
                           itemController.rxIbQuestion.value.endTimeInMs);
                     }),
                   ),
@@ -139,10 +139,8 @@ class ReviewQuestionPage extends StatelessWidget {
                     ),
                   ),
                   Obx(() {
-                    if ((itemController.rxIbQuestion.value.questionType ==
-                                QuestionType.multipleChoice ||
-                            itemController.rxIbQuestion.value.questionType ==
-                                QuestionType.multipleChoicePic) &&
+                    if (itemController.rxIbQuestion.value.questionType ==
+                            QuestionType.multipleChoice &&
                         !itemController.rxIbQuestion.value.isQuiz) {
                       return SwitchListTile.adaptive(
                         tileColor: Theme.of(context).primaryColor,
@@ -362,7 +360,7 @@ class ReviewQuestionPage extends StatelessWidget {
                       onTap: () async {
                         final users = await Get.to(() => FriendsPicker(
                               Get.put(IbFriendsPickerController(
-                                IbUtils().getCurrentUid()!,
+                                IbUtils.getCurrentUid()!,
                                 allowEdit: true,
                                 pickedUids: createQuestionController
                                     .pickedFriends

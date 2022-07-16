@@ -112,7 +112,7 @@ class IbQuestionHeader extends StatelessWidget {
     return Obx(() {
       return Row(children: [
         Text(
-          IbUtils().getAgoDateTimeString(
+          IbUtils.getAgoDateTimeString(
             DateTime.fromMillisecondsSinceEpoch(
                 _itemController.rxIbQuestion.value.askedTimeInMs),
           ),
@@ -126,7 +126,7 @@ class IbQuestionHeader extends StatelessWidget {
             style: TextStyle(color: IbColors.lightGrey),
           ),
         if (_itemController.rxIbQuestion.value.endTimeInMs != -1)
-          IbUtils().leftTimeText(_itemController.rxIbQuestion.value.endTimeInMs)
+          IbUtils.leftTimeText(_itemController.rxIbQuestion.value.endTimeInMs)
       ]);
     });
   }
@@ -135,7 +135,7 @@ class IbQuestionHeader extends StatelessWidget {
     final options = Column(
       children: [
         if (_itemController.rxIbQuestion.value.creatorId ==
-                IbUtils().getCurrentUid() &&
+                IbUtils.getCurrentUid() &&
             _itemController.rxIbQuestion.value.pollSize == 0)
           ListTile(
             onTap: () {
@@ -143,7 +143,7 @@ class IbQuestionHeader extends StatelessWidget {
               Get.to(() => CreateQuestionPage(
                   controller: Get.put(
                       CreateQuestionController(itemController: _itemController),
-                      tag: IbUtils().getUniqueId())));
+                      tag: IbUtils.getUniqueId())));
             },
             leading: const Icon(
               Icons.edit,
@@ -152,7 +152,7 @@ class IbQuestionHeader extends StatelessWidget {
             title: const Text("Edit"),
           ),
         if (_itemController.rxIbQuestion.value.creatorId ==
-            IbUtils().getCurrentUid())
+            IbUtils.getCurrentUid())
           ListTile(
             onTap: () async {
               Get.back();

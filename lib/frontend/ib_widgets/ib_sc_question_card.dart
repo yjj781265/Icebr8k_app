@@ -17,7 +17,6 @@ import 'ib_media_slide.dart';
 import 'ib_question_header.dart';
 import 'ib_question_info.dart';
 import 'ib_question_stats_bar.dart';
-import 'ib_question_voted_txt.dart';
 
 class IbScQuestionCard extends StatefulWidget {
   final IbQuestionItemController _controller;
@@ -62,12 +61,6 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
       parent: expandController,
       curve: Curves.linear,
     );
-  }
-
-  @override
-  void didChangeDependencies() {
-    _runExpandCheck();
-    super.didChangeDependencies();
   }
 
   void _runExpandCheck() {
@@ -121,11 +114,8 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
               height: 1,
               thickness: 1,
             ),
-            const SizedBox(
-              height: 8,
-            ),
             if (!widget._controller.showComparison.value)
-              Center(child: IbQuestionButtons(widget._controller)),
+              Center(child: IbQuestionButtons(widget._controller))
           ],
         ),
       ),
@@ -148,51 +138,51 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
               ),
               IbQuestionMediaSlide(widget._controller),
               IbQuestionInfo(widget._controller),
+              const SizedBox(
+                height: 8,
+              ),
               SizeTransition(
                 sizeFactor: animation,
                 child: expandableInfo,
               ),
-              const SizedBox(
-                height: 16,
-              ),
-              IbQuestionVotedText(widget._controller),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
                       flex: 6, child: IbQuestionStatsBar(widget._controller)),
-                  Obx(
-                    () => Showcase(
-                      key: widget._controller.expandShowCaseKey,
-                      shapeBorder: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(8))),
-                      overlayOpacity: 0.3,
-                      description: widget._controller.rxIsExpanded.isTrue
-                          ? 'Click here to minimize'
-                          : 'Click here to see vote options',
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          widget._controller.rxIsExpanded.value =
-                              !widget._controller.rxIsExpanded.value;
-                          _runExpandCheck();
-                        },
-                        icon: CircleAvatar(
+                  Obx(() => Showcase(
+                        key: widget._controller.expandShowCaseKey,
+                        shapeBorder: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8))),
+                        overlayOpacity: 0.3,
+                        description: widget._controller.rxIsExpanded.isTrue
+                            ? 'Click here to minimize'
+                            : 'Click here to see vote options',
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            widget._controller.rxIsExpanded.value =
+                                !widget._controller.rxIsExpanded.value;
+                          },
+                          icon: CircleAvatar(
                             radius: 18,
                             backgroundColor:
                                 Theme.of(context).primaryColor.withOpacity(0.5),
-                            child: widget._controller.rxIsExpanded.isTrue
-                                ? Icon(
-                                    Icons.expand_less_rounded,
-                                    color: Theme.of(context).indicatorColor,
-                                  )
-                                : Icon(
-                                    Icons.expand_more_outlined,
-                                    color: Theme.of(context).indicatorColor,
-                                  )),
-                      ),
-                    ),
-                  ),
+                            child: Obx(() {
+                              _runExpandCheck();
+                              return widget._controller.rxIsExpanded.isTrue
+                                  ? Icon(
+                                      Icons.expand_less_rounded,
+                                      color: Theme.of(context).indicatorColor,
+                                    )
+                                  : Icon(
+                                      Icons.expand_more_outlined,
+                                      color: Theme.of(context).indicatorColor,
+                                    );
+                            }),
+                          ),
+                        ),
+                      )),
                 ],
               ),
             ],

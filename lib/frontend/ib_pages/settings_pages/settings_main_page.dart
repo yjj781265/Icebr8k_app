@@ -138,12 +138,12 @@ class SettingsMainPage extends StatelessWidget {
                       if (result) {
                         await IbAuthService().signOut();
                         Get.offAll(() => WelcomePage());
-                        IbUtils().showSimpleSnackBar(
+                        IbUtils.showSimpleSnackBar(
                             msg: 'Account deleted, we will miss you 🥺',
                             backgroundColor: IbColors.accentColor);
                       } else {
                         Get.back();
-                        IbUtils().showSimpleSnackBar(
+                        IbUtils.showSimpleSnackBar(
                             msg:
                                 'Delete account failed, please contact support',
                             backgroundColor: IbColors.errorRed);

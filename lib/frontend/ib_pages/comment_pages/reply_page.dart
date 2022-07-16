@@ -156,10 +156,8 @@ class ReplyPage extends StatelessWidget {
                                           Text(
                                             item.ibComment.timestamp == null
                                                 ? 'Posting...'
-                                                : IbUtils()
-                                                    .getAgoDateTimeString((item
-                                                                .ibComment
-                                                                .timestamp
+                                                : IbUtils.getAgoDateTimeString(
+                                                    (item.ibComment.timestamp
                                                             as Timestamp)
                                                         .toDate()),
                                             style: const TextStyle(

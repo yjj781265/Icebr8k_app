@@ -31,39 +31,17 @@ import '../backend/services/user_services/ib_question_db_service.dart';
 import 'ib_config.dart';
 
 class IbUtils {
-  static final IbUtils utils = IbUtils._();
-  factory IbUtils() {
-    return utils;
-  }
   IbUtils._();
 
-  void offAll(Widget page,
-      {Transition transition = Transition.native, Bindings? binding}) {
-    Get.offAll(() => page, transition: transition, binding: binding);
-  }
+  static void hideKeyboard() => FocusManager.instance.primaryFocus?.unfocus();
 
-  void toPage(Widget page,
-      {Transition transition = Transition.native, Bindings? binding}) {
-    Get.to(() => page, transition: transition, binding: binding);
-  }
-
-  void showDialog(Widget dialog, {bool barrierDismissible = true}) {
-    Get.dialog(dialog, barrierDismissible: barrierDismissible);
-  }
-
-  void closeAllSnackbars() {
-    Get.closeAllSnackbars();
-  }
-
-  void hideKeyboard() => FocusManager.instance.primaryFocus?.unfocus();
-
-  bool isOver13(DateTime dateTime) {
+  static bool isOver13(DateTime dateTime) {
     final bool isOver13 =
         DateTime.now().difference(dateTime).inDays > IbConfig.kAgeLimitInDays;
     return isOver13;
   }
 
-  void changeStatusBarColor() {
+  static void changeStatusBarColor() {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
 
@@ -85,7 +63,7 @@ class IbUtils {
     );
   }
 
-  int calculateAge(int timestampInMs) {
+  static int calculateAge(int timestampInMs) {
     final DateTime currentDate = DateTime.now();
     final DateTime birthDate =
         DateTime.fromMillisecondsSinceEpoch(timestampInMs);
@@ -104,7 +82,7 @@ class IbUtils {
     return age;
   }
 
-  Future<CroppedFile?> showImageCropper(String filePath,
+  static Future<CroppedFile?> showImageCropper(String filePath,
       {CropStyle cropStyle = CropStyle.circle,
       List<CropAspectRatioPreset> ratios = const [
         CropAspectRatioPreset.original,
@@ -135,11 +113,11 @@ class IbUtils {
     );
   }
 
-  String getUniqueId() {
+  static String getUniqueId() {
     return const Uuid().v4();
   }
 
-  String readableDateTime(DateTime _dateTime, {bool showTime = false}) {
+  static String readableDateTime(DateTime _dateTime, {bool showTime = false}) {
     if (showTime) {
       return '${DateFormat('hh:mm aa').format(_dateTime.toLocal())} ${getSuffixDateTimeString(_dateTime)}';
     }
@@ -147,7 +125,7 @@ class IbUtils {
     return f.format(_dateTime.toLocal());
   }
 
-  String getAgoDateTimeString(DateTime _dateTime) {
+  static String getAgoDateTimeString(DateTime _dateTime) {
     final Duration diffDt = DateTime.now().difference(_dateTime);
     if (diffDt.inSeconds <= 0) {
       return 'now';
@@ -186,7 +164,8 @@ class IbUtils {
     return '${diffDt.inDays} days ago';
   }
 
-  String getDistanceString(double distanceInMeter, {bool isMetric = false}) {
+  static String getDistanceString(double distanceInMeter,
+      {bool isMetric = false}) {
     final double foot = 3.28084 * distanceInMeter;
     if (foot < 528) {
       return '0.1 mi';
@@ -195,12 +174,12 @@ class IbUtils {
   }
 
   /// Returns the difference (in full days) between the provided date and today.
-  int _calculateDifference(DateTime date) {
+  static int _calculateDifference(DateTime date) {
     final DateTime now = DateTime.now();
     return date.difference(now).inDays;
   }
 
-  String getStatsString(int num) {
+  static String getStatsString(int num) {
     if (num < 10000) {
       return num.toString();
     }
@@ -209,7 +188,7 @@ class IbUtils {
     return '${d}k';
   }
 
-  String getSuffixDateTimeString(DateTime _dateTime) {
+  static String getSuffixDateTimeString(DateTime _dateTime) {
     if (_calculateDifference(_dateTime.toLocal()) == 0) {
       return '';
     }
@@ -235,7 +214,7 @@ class IbUtils {
     }
   }
 
-  Future<bool> isOverDailyPollLimit() async {
+  static Future<bool> isOverDailyPollLimit() async {
     if (isPremiumMember()) {
       return false;
     }
@@ -245,7 +224,7 @@ class IbUtils {
     return count >= IbConfig.kDailyPollLimit;
   }
 
-  String getChatTabDateString(DateTime _dateTime) {
+  static String getChatTabDateString(DateTime _dateTime) {
     final Duration diffDt = DateTime.now().difference(_dateTime);
     if (diffDt.inSeconds == 0) {
       return 'now';
@@ -289,14 +268,14 @@ class IbUtils {
     return formatted;
   }
 
-  String? getCurrentUid() {
+  static String? getCurrentUid() {
     if (Get.find<AuthController>().firebaseUser == null) {
       return null;
     }
     return Get.find<AuthController>().firebaseUser!.uid;
   }
 
-  IbUser? getCurrentIbUser() {
+  static IbUser? getCurrentIbUser() {
     if (!Get.isRegistered<MainPageController>()) {
       return null;
     }
@@ -304,7 +283,7 @@ class IbUtils {
   }
 
   /// return current IbUser friend ids what are not in block list
-  List<String> getCurrentIbUserUnblockedFriendsId() {
+  static List<String> getCurrentIbUserUnblockedFriendsId() {
     if (getCurrentIbUser() == null) {
       return [];
     }
@@ -316,7 +295,7 @@ class IbUtils {
   }
 
   /// return current IbUser circle chat items
-  List<ChatTabItem> getCircleItems() {
+  static List<ChatTabItem> getCircleItems() {
     if (!Get.isRegistered<SocialTabController>()) {
       return [];
     }
@@ -326,7 +305,7 @@ class IbUtils {
   }
 
   /// return current IbUser all chat items
-  List<ChatTabItem> getAllChatTabItems() {
+  static List<ChatTabItem> getAllChatTabItems() {
     if (!Get.isRegistered<SocialTabController>()) {
       return [];
     }
@@ -341,7 +320,7 @@ class IbUtils {
   }
 
   /// return current ib google fonts
-  List<TextStyle> getIbFonts(TextStyle style) {
+  static List<TextStyle> getIbFonts(TextStyle style) {
     return [
       GoogleFonts.openSans(textStyle: style),
       GoogleFonts.robotoSlab(textStyle: style),
@@ -356,16 +335,16 @@ class IbUtils {
     ];
   }
 
-  User? getCurrentFbUser() {
+  static User? getCurrentFbUser() {
     if (Get.find<AuthController>().firebaseUser == null) {
       return null;
     }
     return Get.find<AuthController>().firebaseUser;
   }
 
-  void showPersistentSnackBar() {}
+  static void showPersistentSnackBar() {}
 
-  void showSimpleSnackBar(
+  static void showSimpleSnackBar(
       {required String msg,
       required Color backgroundColor,
       Duration duration = const Duration(seconds: 2),
@@ -406,7 +385,7 @@ class IbUtils {
     ));
   }
 
-  Future<double> getCompScore(
+  static Future<double> getCompScore(
       {required String uid, bool isRefresh = false}) async {
     final List<IbAnswer> uid1QuestionAnswers = [];
     final List<IbAnswer> uid2QuestionAnswers = [];
@@ -473,7 +452,7 @@ class IbUtils {
     return _score;
   }
 
-  Future<List<String>> getCommonAnswerQuestionIds(
+  static Future<List<String>> getCommonAnswerQuestionIds(
       {required String uid, bool isRefresh = false}) async {
     /// query each user answered questions then intersect
     final List<IbAnswer> uid1QuestionAnswers = [];
@@ -520,7 +499,7 @@ class IbUtils {
     return commonAnswers.map((e) => e.questionId).toList();
   }
 
-  Future<List<String>> getUncommonAnswerQuestionIds(
+  static Future<List<String>> getUncommonAnswerQuestionIds(
       {required String uid, bool isRefresh = false}) async {
     /// query each user answered questions then find the difference
     final List<IbAnswer> uid1QuestionAnswers = [];
@@ -568,7 +547,7 @@ class IbUtils {
     return uncommonAnswers.map((e) => e.questionId).toList();
   }
 
-  Future<List<IbAnswer>> getIbAnswersForDifferentUsers(
+  static Future<List<IbAnswer>> getIbAnswersForDifferentUsers(
       {required List<String> uids,
       required String questionId,
       bool isRefresh = false}) async {
@@ -605,7 +584,7 @@ class IbUtils {
     return theAnswers;
   }
 
-  Color getRandomColor() {
+  static Color getRandomColor() {
     final Random random = Random();
     final List<Color> _colors = [
       IbColors.primaryColor,
@@ -619,7 +598,7 @@ class IbUtils {
     return _colors[random.nextInt(_colors.length)];
   }
 
-  Widget leftTimeText(int millsSinceEpoch) {
+  static Widget leftTimeText(int millsSinceEpoch) {
     final futureDateTime = DateTime.fromMillisecondsSinceEpoch(millsSinceEpoch);
     final diff = futureDateTime.difference(DateTime.now());
 
@@ -668,7 +647,7 @@ class IbUtils {
     );
   }
 
-  Color handleIndicatorColor(double percentageInDecimal) {
+  static Color handleIndicatorColor(double percentageInDecimal) {
     if (percentageInDecimal > 0 && percentageInDecimal <= 0.2) {
       return const Color(0xFFFF0000);
     }
@@ -695,7 +674,7 @@ class IbUtils {
     return IbColors.errorRed;
   }
 
-  void showInteractiveViewer(
+  static void showInteractiveViewer(
       List<String> urls, Widget widget, BuildContext context) {
     /// show image preview
     Navigator.of(context).push(
@@ -733,7 +712,7 @@ class IbUtils {
     );
   }
 
-  IbSettings getCurrentUserSettings() {
+  static IbSettings getCurrentUserSettings() {
     if (getCurrentIbUser() == null || getCurrentIbUser()!.settings == null) {
       return IbSettings();
     } else {
@@ -741,7 +720,7 @@ class IbUtils {
     }
   }
 
-  String statsShortString(int number) {
+  static String statsShortString(int number) {
     if (number < 1000) {
       return number.toString();
     }
@@ -764,13 +743,17 @@ class IbUtils {
     return '10B+';
   }
 
-  Widget handleQuestionType(IbQuestion question,
+  static Widget handleQuestionType(IbQuestion question,
       {bool uniqueTag = false,
       List<IbAnswer> ibAnswers = const [],
       bool expanded = false,
       bool isSample = false,
       bool isShowCase = false,
       IbQuestionItemController? itemController}) {
+    if (question.question.trim().isEmpty) {
+      return const SizedBox();
+    }
+
     if (itemController == null) {
       final tag = uniqueTag ? getUniqueId() : question.id;
       final IbQuestionItemController controller = Get.put(
@@ -799,7 +782,7 @@ class IbUtils {
     return IbScQuestionCard(itemController);
   }
 
-  void masterDeleteSingleQuestion(IbQuestion ibQuestion) {
+  static void masterDeleteSingleQuestion(IbQuestion ibQuestion) {
     if (Get.isRegistered<HomeTabController>()) {
       Get.find<HomeTabController>()
           .forYourList
@@ -833,7 +816,7 @@ class IbUtils {
     }
   }
 
-  bool checkFeatureIsLocked() {
+  static bool checkFeatureIsLocked() {
     final bool isLocked = Get.find<HomeTabController>().isLocked.value;
     print(isLocked);
     if (isLocked) {
@@ -859,7 +842,7 @@ class IbUtils {
     return isLocked;
   }
 
-  bool isPremiumMember() {
+  static bool isPremiumMember() {
     if (getCurrentIbUser() == null) {
       return false;
     }

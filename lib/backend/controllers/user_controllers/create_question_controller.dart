@@ -15,7 +15,6 @@ import 'package:icebr8k/backend/services/user_services/ib_tag_db_service.dart';
 import 'package:icebr8k/frontend/ib_pages/create_question_pages/review_question_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
-import 'package:in_app_review/in_app_review.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../../frontend/ib_colors.dart';
@@ -80,7 +79,7 @@ class CreateQuestionController extends GetxController {
     for (final id in ibQuestion.sharedChatIds) {
       final ibChat = await IbChatDbService().queryChat(id);
       if (ibChat != null) {
-        final item = IbUtils().getAllChatTabItems().firstWhereOrNull(
+        final item = IbUtils.getAllChatTabItems().firstWhereOrNull(
             (element) => element.ibChat.chatId == ibChat.chatId);
         if (item != null) {
           pickedChats.add(item);
@@ -151,7 +150,7 @@ class CreateQuestionController extends GetxController {
         showNegativeBtn: false,
         onPositiveTap: () {
           Get.back();
-          IbUtils().hideKeyboard();
+          IbUtils.hideKeyboard();
           if (!IbLocalDataService()
               .retrieveBoolValue(StorageKey.pickTagForQuestionShowCaseBool)) {
             ShowCaseWidget.of(
@@ -174,7 +173,7 @@ class CreateQuestionController extends GetxController {
 
     if (questionType.value == QuestionType.multipleChoicePic &&
         picChoiceList.length < 2) {
-      IbUtils().showDialog(IbDialog(
+      Get.dialog(IbDialog(
           showNegativeBtn: false,
           subtitle: 'mc_question_not_valid'.tr,
           title: 'Error',
@@ -198,19 +197,19 @@ class CreateQuestionController extends GetxController {
       }
     }
 
-    IbUtils().hideKeyboard();
+    IbUtils.hideKeyboard();
     final q = IbQuestion(
         question: questionEditController.text.trim(),
         description: descriptionEditController.text.trim(),
         id: itemController == null
-            ? IbUtils().getUniqueId()
+            ? IbUtils.getUniqueId()
             : itemController!.rxIbQuestion.value.id,
         sharedFriendUids: pickedFriends.map((element) => element.id).toList(),
         sharedChatIds:
             pickedChats.map((element) => element.ibChat.chatId).toList(),
         isPublic: isPublic,
         tags: pickedTags.map((element) => element.text).toList(),
-        creatorId: IbUtils().getCurrentUid()!,
+        creatorId: IbUtils.getCurrentUid()!,
         medias: picMediaList.toSet().union(videoMediaList.toSet()).toList(),
         choices: _getIbChoices(),
         questionType: questionType.value,
@@ -257,7 +256,7 @@ class CreateQuestionController extends GetxController {
     final List<IbChoice> choices = [];
     for (int i = 1; i < 6; i++) {
       choices.add(
-          IbChoice(content: i.toString(), choiceId: IbUtils().getUniqueId()));
+          IbChoice(content: i.toString(), choiceId: IbUtils.getUniqueId()));
     }
     return choices;
   }
@@ -305,7 +304,7 @@ class CreateQuestionController extends GetxController {
         pickedFriends.map((element) => element.id).toSet().toList();
     if (ibQuestion.isPublic) {
       ibQuestion.sharedFriendUids
-          .addAll(IbUtils().getCurrentIbUserUnblockedFriendsId());
+          .addAll(IbUtils.getCurrentIbUserUnblockedFriendsId());
     }
 
     if (ibQuestion.id.isEmpty ||
@@ -353,7 +352,7 @@ class CreateQuestionController extends GetxController {
       final String? url = await IbStorageService()
           .uploadAndRetrieveImgUrl(filePath: choice.url!);
       if (url == null) {
-        IbUtils().showSimpleSnackBar(
+        IbUtils.showSimpleSnackBar(
             msg: 'Failed to upload images...',
             backgroundColor: IbColors.errorRed);
         break;
@@ -372,7 +371,7 @@ class CreateQuestionController extends GetxController {
         filePath: media.url,
       );
       if (url == null) {
-        IbUtils().showSimpleSnackBar(
+        IbUtils.showSimpleSnackBar(
             msg: 'Failed to upload images, check internet connections',
             backgroundColor: IbColors.errorRed);
         return;
@@ -390,10 +389,10 @@ class CreateQuestionController extends GetxController {
     /// add IbMessage to selected circles
     for (final item in ibQuestion.sharedChatIds) {
       await IbChatDbService().uploadMessage(IbMessage(
-          messageId: IbUtils().getUniqueId(),
+          messageId: IbUtils.getUniqueId(),
           content: ibQuestion.id,
-          readUids: [IbUtils().getCurrentUid()!],
-          senderUid: IbUtils().getCurrentUid()!,
+          readUids: [IbUtils.getCurrentUid()!],
+          senderUid: IbUtils.getCurrentUid()!,
           messageType: IbMessage.kMessageTypePoll,
           chatRoomId: item));
     }
@@ -404,26 +403,13 @@ class CreateQuestionController extends GetxController {
     Get.close(3);
 
     /// DO NOT ERASE THIS LINE BELOW
-    /// update question in home page
     itemController!.rxIsSample.value = false;
     itemController!.rxIbQuestion.value = ibQuestion;
     itemController!.rxIbQuestion.refresh();
     print(itemController!.rxIbQuestion.value.medias);
-    IbUtils().showSimpleSnackBar(
+    IbUtils.showSimpleSnackBar(
         msg: 'Question submitted successfully',
         backgroundColor: IbColors.accentColor);
-
-    if (IbUtils().getCurrentIbUser()!.askedCount % 7 == 0) {
-      final InAppReview inAppReview = InAppReview.instance;
-      if (await inAppReview.isAvailable()) {
-        inAppReview.requestReview();
-      } else {
-        IbUtils().showSimpleSnackBar(
-            msg:
-                'If you enjoy this app, please leave us a 5 star review in ${GetPlatform.isAndroid ? 'Google Play Store ' : 'AppStore'}',
-            backgroundColor: IbColors.primaryColor);
-      }
-    }
   }
 }
 

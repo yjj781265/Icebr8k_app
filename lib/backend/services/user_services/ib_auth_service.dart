@@ -38,16 +38,16 @@ class IbAuthService {
   }
 
   Future<bool> deleteAccount() async {
-    if (IbUtils().getCurrentIbUser() == null) {
+    if (IbUtils.getCurrentIbUser() == null) {
       return false;
     }
     try {
-      await IbAdminDbService().deleteAllEmoPics(IbUtils().getCurrentIbUser()!);
-      await IbAdminDbService().deleteAvatarUrl(IbUtils().getCurrentIbUser()!);
-      await IbAdminDbService().deleteCoverPhoto(IbUtils().getCurrentIbUser()!);
+      await IbAdminDbService().deleteAllEmoPics(IbUtils.getCurrentIbUser()!);
+      await IbAdminDbService().deleteAvatarUrl(IbUtils.getCurrentIbUser()!);
+      await IbAdminDbService().deleteCoverPhoto(IbUtils.getCurrentIbUser()!);
       await FirebaseFunctions.instance.httpsCallable('deleteAccount').call({
         'dbSuffix': DbConfig.dbSuffix,
-        'uid': IbUtils().getCurrentUid() ?? ''
+        'uid': IbUtils.getCurrentUid() ?? ''
       });
       return true;
     } on FirebaseFunctionsException catch (error) {

@@ -96,7 +96,7 @@ class HomeTab extends StatelessWidget {
                       color: IbColors.primaryColor,
                     ),
                     onPressed: () {
-                      if (IbUtils().checkFeatureIsLocked()) {
+                      if (IbUtils.checkFeatureIsLocked()) {
                         return;
                       }
                       Get.to(() => EditIbCollectionMainPage());
@@ -106,7 +106,7 @@ class HomeTab extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: () async {
-                    if (IbUtils().checkFeatureIsLocked()) {
+                    if (IbUtils.checkFeatureIsLocked()) {
                       return;
                     }
                     Get.to(() => SearchPage());
@@ -211,17 +211,16 @@ class HomeTab extends StatelessWidget {
 
                         if (item.question.isEmpty &&
                             item.id == 'AD' &&
-                            !IbUtils().getCurrentIbUser()!.isPremium) {
+                            !IbUtils.getCurrentIbUser()!.isPremium) {
                           return IbAdWidget(Get.put(
                               IbAdController(_controller.myBanner),
-                              tag: IbUtils().getUniqueId()));
+                              tag: IbUtils.getUniqueId()));
                         }
 
-                        return IbUtils().handleQuestionType(
+                        return IbUtils.handleQuestionType(
                             _controller.forYourList[index],
                             isShowCase: index == 0,
-                            expanded: IbUtils()
-                                .getCurrentUserSettings()
+                            expanded: IbUtils.getCurrentUserSettings()
                                 .pollExpandedByDefault);
                       }
 
@@ -231,17 +230,16 @@ class HomeTab extends StatelessWidget {
 
                         if (item.question.isEmpty &&
                             item.id == 'AD' &&
-                            !IbUtils().getCurrentIbUser()!.isPremium) {
+                            !IbUtils.getCurrentIbUser()!.isPremium) {
                           return IbAdWidget(Get.put(
                               IbAdController(_controller.myBanner),
-                              tag: IbUtils().getUniqueId()));
+                              tag: IbUtils.getUniqueId()));
                         }
 
-                        return IbUtils().handleQuestionType(
+                        return IbUtils.handleQuestionType(
                             _controller.newestList[index],
                             isShowCase: index == 0,
-                            expanded: IbUtils()
-                                .getCurrentUserSettings()
+                            expanded: IbUtils.getCurrentUserSettings()
                                 .pollExpandedByDefault);
                       }
 
@@ -249,17 +247,16 @@ class HomeTab extends StatelessWidget {
 
                       if (item.question.isEmpty &&
                           item.id == 'AD' &&
-                          !IbUtils().getCurrentIbUser()!.isPremium) {
+                          !IbUtils.getCurrentIbUser()!.isPremium) {
                         return IbAdWidget(Get.put(
                             IbAdController(_controller.myBanner),
-                            tag: IbUtils().getUniqueId()));
+                            tag: IbUtils.getUniqueId()));
                       }
 
-                      return IbUtils().handleQuestionType(
+                      return IbUtils.handleQuestionType(
                           _controller.trendingList[index],
                           isShowCase: index == 0,
-                          expanded: IbUtils()
-                              .getCurrentUserSettings()
+                          expanded: IbUtils.getCurrentUserSettings()
                               .pollExpandedByDefault);
                     },
                     itemCount: _handleItemCount()),

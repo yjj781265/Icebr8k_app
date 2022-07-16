@@ -306,21 +306,21 @@ class IbPremiumPage extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    'Member since ${IbUtils().readableDateTime(DateTime.parse(_controller.entitlementInfo!.originalPurchaseDate), showTime: true)}',
+                    'Member since ${IbUtils.readableDateTime(DateTime.parse(_controller.entitlementInfo!.originalPurchaseDate), showTime: true)}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(
                     height: 8,
                   ),
                   Text(
-                    'Last purchase at ${IbUtils().readableDateTime(DateTime.parse(_controller.entitlementInfo!.latestPurchaseDate), showTime: true)} from ${_controller.entitlementInfo!.store.name.capitalize}',
+                    'Last purchase at ${IbUtils.readableDateTime(DateTime.parse(_controller.entitlementInfo!.latestPurchaseDate), showTime: true)} from ${_controller.entitlementInfo!.store.name.capitalize}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(
                     height: 8,
                   ),
                   Text(
-                    'Expires at ${IbUtils().readableDateTime(DateTime.parse(_controller.entitlementInfo!.expirationDate ?? ''), showTime: true)}',
+                    'Expires at ${IbUtils.readableDateTime(DateTime.parse(_controller.entitlementInfo!.expirationDate ?? ''), showTime: true)}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(

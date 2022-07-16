@@ -8,7 +8,6 @@ import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_choice.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
-import 'package:icebr8k/backend/services/user_services/ib_storage_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
@@ -22,7 +21,6 @@ import '../../services/user_services/ib_user_db_service.dart';
 
 class IbQuestionItemController extends GetxController {
   final Rx<IbQuestion> rxIbQuestion;
-  Rx<IbChoice> rxNewChoice = IbChoice(choiceId: '', content: '').obs;
   Timer? _timer;
   final voted = false.obs;
   final isAnswering = false.obs;
@@ -50,7 +48,6 @@ class IbQuestionItemController extends GetxController {
   // variables for poll stat main page
   final RxMap<IbChoice, Set<IbUser>> choiceUserMap =
       <IbChoice, Set<IbUser>>{}.obs;
-  final RxList<IbUser> friendVotedList = <IbUser>[].obs;
   //end
 
   /// vote count for each choice id
@@ -108,7 +105,7 @@ class IbQuestionItemController extends GetxController {
     if (creatorUser != null) {
       title.value = creatorUser!.username;
       avatarUrl.value = creatorUser!.avatarUrl;
-      compScore.value = await IbUtils().getCompScore(uid: creatorUser!.id);
+      compScore.value = await IbUtils.getCompScore(uid: creatorUser!.id);
     }
     if (rxIsSample.isFalse) {
       commented.value =
@@ -117,20 +114,24 @@ class IbQuestionItemController extends GetxController {
       await _getMyAnswerAndDeterminedPollCloseStatus();
       await _generatePollStats();
       await _generateChoiceUserMap();
-      await _getFriendVotedList();
       _setUpCountDownTimer();
     }
   }
 
   /// refresh poll result, comments, likes,
   Future<void> refreshStats() async {
+    final q =
+        await IbQuestionDbService().querySingleQuestion(rxIbQuestion.value.id);
+    if (q != null) {
+      rxIbQuestion.value = q;
+      rxIbQuestion.refresh();
+    }
     commented.value =
         await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
     liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
     await _generatePollStats();
     await _generateChoiceUserMap();
     await _getMyAnswerAndDeterminedPollCloseStatus();
-    await _getFriendVotedList();
   }
 
   Future<void> addChoice(IbChoice choice) async {
@@ -138,48 +139,27 @@ class IbQuestionItemController extends GetxController {
         .where((element) => element.content == choice.content)
         .isNotEmpty;
     if (isDuplicated) {
-      IbUtils().showSimpleSnackBar(
+      IbUtils.showSimpleSnackBar(
           msg: "This choice already exists.",
           backgroundColor: IbColors.primaryColor);
       return;
     }
 
-    if (rxIbQuestion.value.questionType == QuestionType.multipleChoicePic) {
-      if (choice.url == null ||
-          choice.url!.isEmpty ||
-          choice.content == null ||
-          choice.content!.isEmpty) {
-        Get.dialog(IbDialog(
-            subtitle: 'mc_pic_question_not_valid'.tr,
-            showNegativeBtn: false,
-            title: 'Error',
-            positiveTextKey: 'ok'));
-        return;
-      }
-    }
-
-    IbUtils().showSimpleSnackBar(
+    IbUtils.showSimpleSnackBar(
         msg: "Adding a new choice...", backgroundColor: IbColors.primaryColor);
-    if (choice.url != null && !choice.url!.contains('http')) {
-      final String? url = await IbStorageService()
-          .uploadAndRetrieveImgUrl(filePath: choice.url!);
-      if (url == null) {
-        IbUtils().showSimpleSnackBar(
-            msg: 'Failed to upload images...',
-            backgroundColor: IbColors.errorRed);
-        return;
-      } else {
-        choice.url = url;
-      }
-    }
 
     await IbQuestionDbService()
         .addChoice(questionId: rxIbQuestion.value.id, ibChoice: choice);
 
-    await refreshStats();
-    rxNewChoice.value = IbChoice(choiceId: '', content: '');
-    rxNewChoice.refresh();
-    IbUtils().showSimpleSnackBar(
+    final newQ =
+        await IbQuestionDbService().querySingleQuestion(rxIbQuestion.value.id);
+
+    if (newQ != null) {
+      rxIbQuestion.value = newQ;
+      rxIbQuestion.refresh();
+    }
+    await _generatePollStats();
+    IbUtils.showSimpleSnackBar(
         msg: "New choice added", backgroundColor: IbColors.accentColor);
   }
 
@@ -217,7 +197,7 @@ class IbQuestionItemController extends GetxController {
 
   Future<void> _getMyAnswerAndDeterminedPollCloseStatus() async {
     myAnswer = await IbQuestionDbService()
-        .querySingleIbAnswer(IbUtils().getCurrentUid()!, rxIbQuestion.value.id);
+        .querySingleIbAnswer(IbUtils.getCurrentUid()!, rxIbQuestion.value.id);
     if (myAnswer != null) {
       selectedChoiceId.value = myAnswer!.choiceId;
     } else {
@@ -234,9 +214,7 @@ class IbQuestionItemController extends GetxController {
 
   Future<void> _generatePollStats() async {
     countMap.clear();
-    final q =
-        await IbQuestionDbService().querySingleQuestion(rxIbQuestion.value.id);
-    if (q == null) {
+    if (rxIbQuestion.value.pollSize == 0) {
       return;
     }
 
@@ -244,77 +222,37 @@ class IbQuestionItemController extends GetxController {
       countMap.value = await _getChoiceCountMap();
     }
 
-    for (final IbChoice ibChoice in q.choices) {
-      resultMap[ibChoice] =
-          (countMap[ibChoice.choiceId] ?? 0).toDouble() / q.pollSize.toDouble();
+    for (final IbChoice ibChoice in rxIbQuestion.value.choices) {
+      resultMap[ibChoice] = (countMap[ibChoice.choiceId] ?? 0).toDouble() /
+          rxIbQuestion.value.pollSize.toDouble();
     }
     // put the popular vote on top
-    q.choices.sort((a, b) =>
+    rxIbQuestion.value.choices.sort((a, b) =>
         (countMap[b.choiceId] ?? 0).compareTo(countMap[a.choiceId] ?? 0));
-    rxIbQuestion.value = q;
     rxIbQuestion.refresh();
-  }
-
-  Future<void> _getFriendVotedList() async {
-    friendVotedList.clear();
-    final unBlockedUids = IbUtils().getCurrentIbUserUnblockedFriendsId();
-    for (final uid in unBlockedUids) {
-      final answers = IbCacheManager().getIbAnswers(uid) ?? [];
-      if (answers.indexWhere(
-              (element) => element.questionId == rxIbQuestion.value.id) !=
-          -1) {
-        final user = await retrieveUser(uid);
-        if (user != null) {
-          friendVotedList.add(user);
-        }
-      }
-    }
   }
 
   Future<void> _generateChoiceUserMap() async {
     choiceUserMap.clear();
-    const int kLimit = 4;
-    final unBlockedUids = IbUtils().getCurrentIbUserUnblockedFriendsId();
     for (final IbChoice choice in rxIbQuestion.value.choices) {
+      final snapshot = await IbQuestionDbService().queryIbAnswers(
+          choiceId: choice.choiceId,
+          questionId: rxIbQuestion.value.id,
+          limit: 4);
+      final List<IbAnswer> ibAnswers = [];
+      for (final doc in snapshot.docs) {
+        ibAnswers.add(IbAnswer.fromJson(doc.data()));
+      }
+
       final Set<IbUser> users = {};
 
-      /// add friends answers first if Available
-      for (final uid in unBlockedUids) {
-        final answers = IbCacheManager().getIbAnswers(uid) ?? [];
-        final answer = answers
-            .firstWhereOrNull((element) => element.choiceId == choice.choiceId);
-        if (answer == null) {
-          continue;
-        } else {
-          if (users.length >= kLimit) {
-            break;
-          }
-          final user = await retrieveUser(answer.uid);
-          if (user != null) {
-            users.add(user);
-          }
+      for (final IbAnswer answer in ibAnswers) {
+        final user = await retrieveUser(answer.uid);
+        if (user != null) {
+          users.add(user);
         }
       }
-      if (users.length >= kLimit) {
-        choiceUserMap[choice] = users;
-      } else {
-        final snapshot = await IbQuestionDbService().queryIbAnswers(
-            choiceId: choice.choiceId,
-            questionId: rxIbQuestion.value.id,
-            limit: kLimit - users.length);
-        final List<IbAnswer> ibAnswers = [];
-        for (final doc in snapshot.docs) {
-          ibAnswers.add(IbAnswer.fromJson(doc.data()));
-        }
-
-        for (final IbAnswer answer in ibAnswers) {
-          final user = await retrieveUser(answer.uid);
-          if (user != null) {
-            users.add(user);
-          }
-        }
-        choiceUserMap[choice] = users;
-      }
+      choiceUserMap[choice] = users;
     }
   }
 
@@ -350,7 +288,7 @@ class IbQuestionItemController extends GetxController {
           edited: myAnswer != null,
           answeredTimeInMs: DateTime.now().millisecondsSinceEpoch,
           askedTimeInMs: rxIbQuestion.value.askedTimeInMs,
-          uid: IbUtils().getCurrentUid()!,
+          uid: IbUtils.getCurrentUid()!,
           questionId: rxIbQuestion.value.id,
           questionType: rxIbQuestion.value.questionType);
       await IbQuestionDbService().answerQuestion(ibAnswer);
@@ -358,12 +296,12 @@ class IbQuestionItemController extends GetxController {
       if (!isAnonymous) {
         await IbAnalyticsManager()
             .logCustomEvent(name: 'vote', data: {'type': 'public'});
-        IbUtils().showSimpleSnackBar(
+        IbUtils.showSimpleSnackBar(
             msg: 'Voted Publicly 📢', backgroundColor: IbColors.primaryColor);
       } else {
         await IbAnalyticsManager()
             .logCustomEvent(name: 'vote', data: {'type': 'anonymous'});
-        IbUtils().showSimpleSnackBar(
+        IbUtils.showSimpleSnackBar(
             msg: 'Voted Anonymously 🤫', backgroundColor: Colors.black);
       }
 
@@ -394,11 +332,11 @@ class IbQuestionItemController extends GetxController {
       voted.value = true;
     } catch (e) {
       voted.value = false;
-      IbUtils().showSimpleSnackBar(
+      IbUtils.showSimpleSnackBar(
           msg: "Failed to vote $e", backgroundColor: IbColors.errorRed);
     } finally {
       if (creatorUser != null) {
-        compScore.value = await IbUtils().getCompScore(uid: creatorUser!.id);
+        compScore.value = await IbUtils.getCompScore(uid: creatorUser!.id);
       }
       isAnswering.value = false;
       rxIbQuestion.refresh();
@@ -433,7 +371,7 @@ class IbQuestionItemController extends GetxController {
   }
 
   Future<void> deleteQuestion() async {
-    if (rxIbQuestion.value.creatorId != IbUtils().getCurrentUid()) {
+    if (rxIbQuestion.value.creatorId != IbUtils.getCurrentUid()) {
       return;
     }
     try {
@@ -446,9 +384,9 @@ class IbQuestionItemController extends GetxController {
               Get.dialog(const IbLoadingDialog(messageTrKey: 'Deleting...'),
                   barrierDismissible: false);
               await IbQuestionDbService().deleteQuestion(rxIbQuestion.value.id);
-              IbUtils().masterDeleteSingleQuestion(rxIbQuestion.value);
+              IbUtils.masterDeleteSingleQuestion(rxIbQuestion.value);
               Get.back();
-              IbUtils().showSimpleSnackBar(
+              IbUtils.showSimpleSnackBar(
                   msg: 'Question Deleted', backgroundColor: IbColors.errorRed);
             }),
       );

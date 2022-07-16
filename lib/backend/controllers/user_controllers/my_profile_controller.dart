@@ -58,7 +58,7 @@ class MyProfileController extends GetxController {
       }
     });
     asksSub = IbQuestionDbService()
-        .listenToAskedQuestions(IbUtils().getCurrentUid()!)
+        .listenToAskedQuestions(IbUtils.getCurrentUid()!)
         .listen((event) {
       for (final docChange in event.docChanges) {
         if (docChange.doc.data() == null) {
@@ -69,6 +69,7 @@ class MyProfileController extends GetxController {
         switch (docChange.type) {
           case DocumentChangeType.added:
             asks.add(q);
+            lastAskDoc = docChange.doc;
             break;
 
           case DocumentChangeType.modified:
@@ -92,25 +93,22 @@ class MyProfileController extends GetxController {
   }
 
   Future<void> onLoadMore() async {
-    if (asks.isEmpty) {
+    if (lastAskDoc == null) {
       askedRefreshController.loadNoData();
       return;
     }
+
     final snapshot = await IbQuestionDbService().queryAskedQuestions(
-        uid: IbUtils().getCurrentUid()!,
-        lastAskedTimeInMs: asks.last.askedTimeInMs,
-        publicOnly: false);
+        uid: IbUtils.getCurrentUid()!, lastDoc: lastAskDoc, publicOnly: false);
+
+    asks.addAll(
+        snapshot.docs.map((e) => IbQuestion.fromJson(e.data())).toList());
+    asks.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
+    asks.refresh();
     if (snapshot.docs.isEmpty) {
       askedRefreshController.loadNoData();
       return;
     }
-
-    asks.addAll(
-        snapshot.docs.map((e) => IbQuestion.fromJson(e.data())).toList());
-
-    asks.sort((a, b) => b.askedTimeInMs.compareTo(a.askedTimeInMs));
-    asks.refresh();
-
     askedRefreshController.loadComplete();
   }
 
