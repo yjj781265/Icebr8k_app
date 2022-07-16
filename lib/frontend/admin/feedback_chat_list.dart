@@ -48,7 +48,7 @@ class FeedBackChatList extends StatelessWidget {
                           fontSize: IbConfig.kSecondaryTextSize),
                     ),
                     trailing: Text(
-                      IbUtils.getChatTabDateString(
+                      IbUtils().getChatTabDateString(
                         DateTime.fromMillisecondsSinceEpoch(
                             (item.lastMessage.timestamp as Timestamp)
                                 .millisecondsSinceEpoch),

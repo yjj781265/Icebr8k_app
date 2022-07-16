@@ -10,7 +10,8 @@ import 'auth_controller.dart';
 class SignInController extends GetxController {
   final TextEditingController emailTxtC = TextEditingController();
   final TextEditingController passwordTxtC = TextEditingController();
-
+  final AuthController authController;
+  final IbUtils utils;
   final email = ''.obs;
   final isEmailFirstTime = true.obs;
   final isPasswordFirstTime = true.obs;
@@ -21,6 +22,8 @@ class SignInController extends GetxController {
   final emailErrorTrKey = ''.obs;
   final passwordErrorTrKey = ''.obs;
   final rememberLoginEmail = false.obs;
+
+  SignInController({required this.authController, required this.utils});
 
   @override
   void onInit() {
@@ -85,12 +88,11 @@ class SignInController extends GetxController {
   }
 
   Future<void> signInViaEmail() async {
-    final AuthController _authController = Get.find();
-    IbUtils.hideKeyboard();
+    utils.hideKeyboard();
     validateEmail();
     validatePassword();
     if (isPasswordValid.isTrue && isEmailValid.isTrue) {
-      await _authController.signInViaEmail(
+      await authController.signInViaEmail(
           email: email.value,
           password: password.value,
           rememberEmail: rememberLoginEmail.value);

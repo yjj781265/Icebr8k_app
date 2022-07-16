@@ -29,7 +29,7 @@ Future<void> main() async {
 
   /// prevent blinking for cached images
   PaintingBinding.instance.imageCache.maximumSizeBytes = 1000 << 20; //1GB
-  IbUtils.changeStatusBarColor();
+  IbUtils().changeStatusBarColor();
   debugRepaintRainbowEnabled = false;
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -61,7 +61,7 @@ class MainApp extends StatelessWidget {
       return RefreshConfiguration(
         headerBuilder: () => const ClassicHeader(),
         child: GetMaterialApp(
-          defaultTransition: Transition.cupertino,
+          defaultTransition: Transition.native,
           debugShowCheckedModeBanner: false,
           initialRoute: './',
           routes: {

@@ -98,7 +98,7 @@ class IbChatDbService {
           .collection(_kMessageSubCollection)
           .doc(messageId)
           .update({
-        'readUids': FieldValue.arrayUnion([IbUtils.getCurrentUid()])
+        'readUids': FieldValue.arrayUnion([IbUtils().getCurrentUid()])
       });
     }
   }
@@ -107,7 +107,7 @@ class IbChatDbService {
     final snapshot = await _collectionRef.doc(chatId).get();
     if (snapshot.exists) {
       return _collectionRef.doc(chatId).update({
-        'isTypingUids': FieldValue.arrayUnion([IbUtils.getCurrentUid()])
+        'isTypingUids': FieldValue.arrayUnion([IbUtils().getCurrentUid()])
       });
     }
   }
@@ -116,7 +116,7 @@ class IbChatDbService {
     final snapshot = await _collectionRef.doc(chatId).get();
     if (snapshot.exists) {
       return _collectionRef.doc(chatId).update({
-        'isTypingUids': FieldValue.arrayRemove([IbUtils.getCurrentUid()])
+        'isTypingUids': FieldValue.arrayRemove([IbUtils().getCurrentUid()])
       });
     }
   }
@@ -150,14 +150,14 @@ class IbChatDbService {
         .where('memberCount', isEqualTo: 2)
         .where('isCircle', isEqualTo: false)
         .where('messageCount', isGreaterThan: 0)
-        .where('memberUids', arrayContains: IbUtils.getCurrentUid())
+        .where('memberUids', arrayContains: IbUtils().getCurrentUid())
         .snapshots();
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> listenToCircles() {
     return _collectionRef
         .where('isCircle', isEqualTo: true)
-        .where('memberUids', arrayContains: IbUtils.getCurrentUid())
+        .where('memberUids', arrayContains: IbUtils().getCurrentUid())
         .snapshots();
   }
 
@@ -166,7 +166,7 @@ class IbChatDbService {
         .doc(ibChat.chatId)
         .collection(_kMessageSubCollection)
         .orderBy('timestamp')
-        .where('readUids', arrayContains: IbUtils.getCurrentUid())
+        .where('readUids', arrayContains: IbUtils().getCurrentUid())
         .limitToLast(1)
         .get();
 
@@ -267,14 +267,14 @@ class IbChatDbService {
   Future<void> muteNotification(IbChat ibChat) async {
     ibChat.createdAtTimestamp = FieldValue.serverTimestamp();
     await _collectionRef.doc(ibChat.chatId).update({
-      'mutedUids': FieldValue.arrayUnion([IbUtils.getCurrentUid()])
+      'mutedUids': FieldValue.arrayUnion([IbUtils().getCurrentUid()])
     });
   }
 
   Future<void> unMuteNotification(IbChat ibChat) async {
     ibChat.createdAtTimestamp = FieldValue.serverTimestamp();
     await _collectionRef.doc(ibChat.chatId).update({
-      'mutedUids': FieldValue.arrayRemove([IbUtils.getCurrentUid()])
+      'mutedUids': FieldValue.arrayRemove([IbUtils().getCurrentUid()])
     });
   }
 
@@ -322,7 +322,7 @@ class IbChatDbService {
   }
 
   Future<IbChat?> queryOneToOneIbChat(String uid) async {
-    final List<String> uids = [IbUtils.getCurrentUid()!, uid];
+    final List<String> uids = [IbUtils().getCurrentUid()!, uid];
     uids.sort();
     final snapshot = await _collectionRef
         .where('isCircle', isEqualTo: false)

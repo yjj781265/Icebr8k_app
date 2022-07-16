@@ -21,9 +21,9 @@ class IbQuestionTags extends StatelessWidget {
   }
 
   Widget tagList(BuildContext context) {
-    final List<String> followedTagList = IbUtils.getCurrentIbUser() == null
+    final List<String> followedTagList = IbUtils().getCurrentIbUser() == null
         ? []
-        : IbUtils.getCurrentIbUser()!.tags;
+        : IbUtils().getCurrentIbUser()!.tags;
     return Obx(() {
       if (_itemController.rxIsSample.isTrue) {
         return Row(
@@ -80,7 +80,7 @@ class IbQuestionTags extends StatelessWidget {
                       customBorder: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16)),
                       onTap: () {
-                        if (IbUtils.checkFeatureIsLocked()) {
+                        if (IbUtils().checkFeatureIsLocked()) {
                           return;
                         }
 

@@ -34,7 +34,7 @@ class CircleSettings extends StatelessWidget {
       body: SafeArea(
         child: GestureDetector(
           onTap: () {
-            IbUtils.hideKeyboard();
+            IbUtils().hideKeyboard();
           },
           child: AbsorbPointer(
             absorbing: !_controller.isAbleToEdit,
@@ -241,12 +241,12 @@ class CircleSettings extends StatelessWidget {
                                         color: IbColors.primaryColor,
                                         iconData: Icons.add,
                                         onPressed: () async {
-                                          IbUtils.hideKeyboard();
+                                          IbUtils().hideKeyboard();
                                           final list = await Get.to(
                                               () => FriendsPicker(
                                                     Get.put(
                                                         IbFriendsPickerController(
-                                                            IbUtils
+                                                            IbUtils()
                                                                 .getCurrentUid()!,
                                                             pickedUids:
                                                                 _controller
@@ -371,7 +371,7 @@ class CircleSettings extends StatelessWidget {
 
             if (pickedFile != null) {
               final croppedFile =
-                  await IbUtils.showImageCropper(pickedFile.path);
+                  await IbUtils().showImageCropper(pickedFile.path);
               if (croppedFile != null) {
                 _controller.photoUrl.value = croppedFile.path;
               }
@@ -395,7 +395,7 @@ class CircleSettings extends StatelessWidget {
 
             if (pickedFile != null) {
               final croppedFile =
-                  await IbUtils.showImageCropper(pickedFile.path);
+                  await IbUtils().showImageCropper(pickedFile.path);
               if (croppedFile != null) {
                 _controller.photoUrl.value = croppedFile.path;
               }

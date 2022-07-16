@@ -24,7 +24,7 @@ class SetupPageOne extends StatelessWidget {
       body: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: IbUtils.hideKeyboard,
+          onTap: IbUtils().hideKeyboard,
           child: SafeArea(
               child: Container(
             color: Theme.of(context).primaryColor,
@@ -220,8 +220,8 @@ class SetupPageOne extends StatelessWidget {
   }
 
   void _showDateTimePicker() {
-    IbUtils.hideKeyboard();
-    _controller.birthdateTeController.text = IbUtils.readableDateTime(
+    IbUtils().hideKeyboard();
+    _controller.birthdateTeController.text = IbUtils().readableDateTime(
         DateTime.fromMillisecondsSinceEpoch(_controller.birthdateInMs.value));
     Get.bottomSheet(
         IbCard(
@@ -239,7 +239,7 @@ class SetupPageOne extends StatelessWidget {
                   onDateTimeChanged: (value) async {
                     await HapticFeedback.selectionClick();
                     _controller.birthdateTeController.text =
-                        IbUtils.readableDateTime(value);
+                        IbUtils().readableDateTime(value);
                     _controller.birthdateTeController.text;
                     _controller.birthdateInMs.value =
                         value.millisecondsSinceEpoch;

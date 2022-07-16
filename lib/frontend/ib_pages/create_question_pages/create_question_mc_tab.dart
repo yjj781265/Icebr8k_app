@@ -125,7 +125,7 @@ class CreateQuestionMcTab extends StatelessWidget {
       _controller.choiceList.refresh();
     } else {
       _controller.choiceList.add(IbChoice(
-        choiceId: IbUtils.getUniqueId(),
+        choiceId: IbUtils().getUniqueId(),
         content: value.trim(),
       ));
     }
@@ -133,7 +133,7 @@ class CreateQuestionMcTab extends StatelessWidget {
   }
 
   void _showBottomSheet({required String strTrKey, int? index}) {
-    IbUtils.hideKeyboard();
+    IbUtils().hideKeyboard();
     final TextEditingController _txtController = TextEditingController();
     if (index != null) {
       _txtController.text = _controller.choiceList[index].content.toString();

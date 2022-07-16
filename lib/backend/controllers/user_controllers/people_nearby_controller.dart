@@ -49,10 +49,12 @@ class PeopleNearbyController extends GetxController {
     await IbAnalyticsManager().logScreenView(
         className: 'PeopleNearbyController', screenName: 'PeopleNearby');
     intentionSelection.value = [
-      IbUtils.getCurrentIbUser()!
+      IbUtils()
+          .getCurrentIbUser()!
           .intentions
           .contains(IbUser.kUserIntentionDating),
-      IbUtils.getCurrentIbUser()!
+      IbUtils()
+          .getCurrentIbUser()!
           .intentions
           .contains(IbUser.kUserIntentionFriendship)
     ];
@@ -115,7 +117,7 @@ class PeopleNearbyController extends GetxController {
   /// When the location services are not enabled or permissions
   /// are denied the `Future` will return an error.
   Future<void> _determinePosition() async {
-    final currentUser = IbUtils.getCurrentIbUser();
+    final currentUser = IbUtils().getCurrentIbUser();
     if (currentUser == null) {
       print('user is null');
       return;
@@ -205,7 +207,7 @@ class PeopleNearbyController extends GetxController {
   }
 
   Future<void> loadItem() async {
-    final currentUser = IbUtils.getCurrentIbUser();
+    final currentUser = IbUtils().getCurrentIbUser();
     loadedCount = 0;
     page = 1;
     refreshController.resetNoData();
@@ -299,13 +301,14 @@ class PeopleNearbyController extends GetxController {
         }
         final int distanceInMeter =
             item['geo_distance_meters']['geoPoint'] as int;
-        final commonTags = IbUtils.getCurrentIbUser()!
+        final commonTags = IbUtils()
+            .getCurrentIbUser()!
             .tags
             .toSet()
             .intersection(user.tags.toSet());
-        final compScore = await IbUtils.getCompScore(uid: id);
+        final compScore = await IbUtils().getCompScore(uid: id);
         final liked = await IbUserDbService().isProfileLiked(
-            user1Id: IbUtils.getCurrentUid()!, user2Id: user.id);
+            user1Id: IbUtils().getCurrentUid()!, user2Id: user.id);
         final lastLikedTimestampInMs =
             await IbUserDbService().lastLikedTimestampInMs(user.id);
         final nearbyItem = NearbyItem(
@@ -390,13 +393,14 @@ class PeopleNearbyController extends GetxController {
 
         final int distanceInMeter =
             item['geo_distance_meters']['geoPoint'] as int;
-        final commonTags = IbUtils.getCurrentIbUser()!
+        final commonTags = IbUtils()
+            .getCurrentIbUser()!
             .tags
             .toSet()
             .intersection(user.tags.toSet());
-        final compScore = await IbUtils.getCompScore(uid: id);
+        final compScore = await IbUtils().getCompScore(uid: id);
         final liked = await IbUserDbService().isProfileLiked(
-            user1Id: IbUtils.getCurrentUid()!, user2Id: user.id);
+            user1Id: IbUtils().getCurrentUid()!, user2Id: user.id);
         final lastLikedTimestampInMs =
             await IbUserDbService().lastLikedTimestampInMs(user.id);
         final nearbyItem = NearbyItem(
@@ -430,9 +434,9 @@ class PeopleNearbyController extends GetxController {
         item.lastLikedTimestampInMs + const Duration(days: 1).inMilliseconds;
     if (item.lastLikedTimestampInMs != -1 &&
         DateTime.now().millisecondsSinceEpoch < likedEndTimestampInMs) {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'You cannot like this profile again until '
-              '${IbUtils.readableDateTime(DateTime.fromMillisecondsSinceEpoch(likedEndTimestampInMs), showTime: true)}',
+              '${IbUtils().readableDateTime(DateTime.fromMillisecondsSinceEpoch(likedEndTimestampInMs), showTime: true)}',
           backgroundColor: IbColors.primaryColor);
       return;
     }
@@ -446,16 +450,16 @@ class PeopleNearbyController extends GetxController {
     if (!await IbUserDbService()
         .isProfileLikedNotificationSent(recipientId: item.user.id)) {
       await IbUserDbService().sendAlertNotification(IbNotification(
-          id: IbUtils.getUniqueId(),
+          id: IbUtils().getUniqueId(),
           body: '',
           type: IbNotification.kProfileLiked,
           timestamp: FieldValue.serverTimestamp(),
-          senderId: IbUtils.getCurrentUid()!,
+          senderId: IbUtils().getCurrentUid()!,
           recipientId: item.user.id));
     }
 
     if (await IbUserDbService().isProfileBingo(
-        user1Id: IbUtils.getCurrentUid()!, user2Id: item.user.id)) {
+        user1Id: IbUtils().getCurrentUid()!, user2Id: item.user.id)) {
       await HapticFeedback.mediumImpact();
       Get.to(() => BingoPage(user: item.user),
           fullscreenDialog: true, transition: Transition.zoom);
@@ -493,8 +497,8 @@ class PeopleNearbyController extends GetxController {
 
       final likedTimestampInMs =
           (timestamp as Timestamp).millisecondsSinceEpoch;
-      final isBingo = await IbUserDbService()
-          .isProfileBingo(user1Id: IbUtils.getCurrentUid()!, user2Id: user.id);
+      final isBingo = await IbUserDbService().isProfileBingo(
+          user1Id: IbUtils().getCurrentUid()!, user2Id: user.id);
       final geoPoint = user.geoPoint;
 
       int? distanceInMeter;
@@ -546,8 +550,8 @@ class PeopleNearbyController extends GetxController {
 
       final likedTimestampInMs =
           (timestamp as Timestamp).millisecondsSinceEpoch;
-      final isBingo = await IbUserDbService()
-          .isProfileBingo(user1Id: IbUtils.getCurrentUid()!, user2Id: user.id);
+      final isBingo = await IbUserDbService().isProfileBingo(
+          user1Id: IbUtils().getCurrentUid()!, user2Id: user.id);
       final geoPoint = user.geoPoint;
       int? distanceInMeter;
       if (geoPoint != null &&

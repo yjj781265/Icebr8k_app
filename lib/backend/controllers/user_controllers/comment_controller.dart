@@ -211,9 +211,9 @@ class CommentController extends GetxController {
     }
     isAddingComment.value = true;
     final IbComment ibComment = IbComment(
-        commentId: IbUtils.getUniqueId(),
+        commentId: IbUtils().getUniqueId(),
         notifyUid: itemController.rxIbQuestion.value.creatorId,
-        uid: IbUtils.getCurrentUid()!,
+        uid: IbUtils().getCurrentUid()!,
         questionId: itemController.rxIbQuestion.value.id,
         content: text.trim(),
         type: type,
@@ -225,19 +225,19 @@ class CommentController extends GetxController {
           0,
           CommentItem(
               ibComment: ibComment,
-              user: IbUtils.getCurrentIbUser()!,
+              user: IbUtils().getCurrentIbUser()!,
               ibAnswer: ibAnswer));
       _updateParentQuestionCommentCount();
       editingController.clear();
       await IbAnalyticsManager().logCustomEvent(name: 'new_comment', data: {});
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Comment added!', backgroundColor: IbColors.accentColor);
     } catch (e) {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Adding a comment failed $e',
           backgroundColor: IbColors.errorRed);
     } finally {
-      IbUtils.hideKeyboard();
+      IbUtils().hideKeyboard();
       isAddingComment.value = false;
       commentItems.refresh();
     }
@@ -259,7 +259,7 @@ class CommentController extends GetxController {
       commentItem.ibComment.likes++;
       commentItem.isLiked = true;
     } catch (e) {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Failed to like a comment, $e',
           backgroundColor: IbColors.errorRed);
     } finally {
@@ -278,7 +278,7 @@ class CommentController extends GetxController {
           commentItem.ibComment.likes <= 0 ? 0 : commentItem.ibComment.likes;
       commentItem.isLiked = false;
     } catch (e) {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Failed to remove like on a comment, $e',
           backgroundColor: IbColors.errorRed);
     } finally {

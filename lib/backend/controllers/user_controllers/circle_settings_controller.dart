@@ -98,23 +98,23 @@ class CircleSettingsController extends GetxController {
         await IbChatDbService().addIbChat(ibChat!, isEdit: ibChat != null);
         if (circleUpdateInfo.isNotEmpty) {
           await IbChatDbService().uploadMessage(IbMessage(
-              messageId: IbUtils.getUniqueId(),
-              readUids: [IbUtils.getCurrentUid()!],
+              messageId: IbUtils().getUniqueId(),
+              readUids: [IbUtils().getCurrentUid()!],
               content:
-                  '${IbUtils.getCurrentIbUser()!.username} updated following circle info $circleUpdateInfo',
+                  '${IbUtils().getCurrentIbUser()!.username} updated following circle info $circleUpdateInfo',
               messageType: IbMessage.kMessageTypeAnnouncement,
-              senderUid: IbUtils.getCurrentUid()!,
+              senderUid: IbUtils().getCurrentUid()!,
               chatRoomId: ibChat!.chatId));
         }
 
         Get.back(closeOverlays: true);
-        IbUtils.showSimpleSnackBar(
+        IbUtils().showSimpleSnackBar(
             msg: 'Circle info updated', backgroundColor: IbColors.accentColor);
 
         ///create new circle
       } else {
         final IbChat ibChat2 = IbChat(
-            chatId: IbUtils.getUniqueId(),
+            chatId: IbUtils().getUniqueId(),
             photoUrl: photoUrl.value,
             name: titleTxtController.text.trim(),
             description: descriptionController.text.trim(),
@@ -126,16 +126,16 @@ class CircleSettingsController extends GetxController {
         await IbChatDbService().addChatMember(
           member: IbChatMember(
               chatId: ibChat2.chatId,
-              uid: IbUtils.getCurrentUid()!,
+              uid: IbUtils().getCurrentUid()!,
               role: IbChatMember.kRoleLeader),
         );
         for (final IbUser user in invitees) {
           final n = IbNotification(
-              id: IbUtils.getUniqueId(),
+              id: IbUtils().getUniqueId(),
               body: '',
               type: IbNotification.kCircleInvite,
               timestamp: FieldValue.serverTimestamp(),
-              senderId: IbUtils.getCurrentUid()!,
+              senderId: IbUtils().getCurrentUid()!,
               recipientId: user.id,
               url: ibChat2.chatId);
           final bool isSent = await IbUserDbService()
@@ -147,7 +147,7 @@ class CircleSettingsController extends GetxController {
           await IbUserDbService().sendAlertNotification(n);
         }
         Get.back(closeOverlays: true);
-        IbUtils.showSimpleSnackBar(
+        IbUtils().showSimpleSnackBar(
             msg: 'Circle created', backgroundColor: IbColors.accentColor);
       }
     } catch (e) {

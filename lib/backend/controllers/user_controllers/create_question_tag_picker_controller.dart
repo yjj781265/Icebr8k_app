@@ -61,7 +61,7 @@ class CreateQuestionTagPickerController extends GetxController {
   Future<void> addNewTag(String text) async {
     Get.dialog(const IbLoadingDialog(messageTrKey: 'loading'));
     createQuestionController.pickedTags
-        .add(IbTag(text: text.trim(), creatorId: IbUtils.getCurrentUid()!));
+        .add(IbTag(text: text.trim(), creatorId: IbUtils().getCurrentUid()!));
     createQuestionController.pickedTags.value =
         createQuestionController.pickedTags.toSet().toList();
     Get.back();
@@ -90,7 +90,7 @@ class CreateQuestionTagPickerController extends GetxController {
       searchResults.value = await IbTypeSenseService()
           .searchIbTags(textEditingController.text.trim());
     } catch (e) {
-      IbUtils.showSimpleSnackBar(
+      IbUtils().showSimpleSnackBar(
           msg: 'Failed to search', backgroundColor: IbColors.errorRed);
       print(e);
     }

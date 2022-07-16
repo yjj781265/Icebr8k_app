@@ -21,7 +21,7 @@ class IbLinearIndicator extends StatelessWidget {
               borderRadius: const BorderRadius.all(
                   Radius.circular(IbConfig.kScrollbarCornerRadius)),
               child: LinearProgressIndicator(
-                color: IbUtils.handleIndicatorColor(endValue),
+                color: IbUtils().handleIndicatorColor(endValue),
                 backgroundColor: IbColors.lightGrey,
                 minHeight: 8,
                 value: endValue,
@@ -34,8 +34,8 @@ class IbLinearIndicator extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Text(
                   '${(endValue * 100).toInt()}%',
-                  style:
-                      TextStyle(color: IbUtils.handleIndicatorColor(endValue)),
+                  style: TextStyle(
+                      color: IbUtils().handleIndicatorColor(endValue)),
                 )),
           )
         ],
@@ -56,7 +56,7 @@ class IbLinearIndicator extends StatelessWidget {
                   borderRadius: const BorderRadius.all(
                       Radius.circular(IbConfig.kScrollbarCornerRadius)),
                   child: LinearProgressIndicator(
-                    color: IbUtils.handleIndicatorColor(value),
+                    color: IbUtils().handleIndicatorColor(value),
                     backgroundColor: IbColors.lightGrey,
                     minHeight: 8,
                     value: value,
@@ -70,7 +70,7 @@ class IbLinearIndicator extends StatelessWidget {
                   child: Text(
                     '${(value * 100).toInt()}%',
                     style:
-                        TextStyle(color: IbUtils.handleIndicatorColor(value)),
+                        TextStyle(color: IbUtils().handleIndicatorColor(value)),
                   ),
                 ),
               )

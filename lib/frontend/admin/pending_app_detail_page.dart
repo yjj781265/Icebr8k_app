@@ -52,7 +52,7 @@ class PendingAppDetailPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                'Birthdate: ${IbUtils.readableDateTime(DateTime.fromMillisecondsSinceEpoch(user.birthdateInMs!))}',
+                'Birthdate: ${IbUtils().readableDateTime(DateTime.fromMillisecondsSinceEpoch(user.birthdateInMs!))}',
                 style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
               ),
             ),
@@ -88,7 +88,7 @@ class PendingAppDetailPage extends StatelessWidget {
                     await _controller.approveApplication(user);
                   },
                   onPressed: () {
-                    IbUtils.showSimpleSnackBar(
+                    IbUtils().showSimpleSnackBar(
                         msg: 'Long press to approve',
                         backgroundColor: IbColors.accentColor);
                   },
@@ -108,7 +108,7 @@ class PendingAppDetailPage extends StatelessWidget {
                     await _controller.rejectApplication(user);
                   },
                   onPressed: () {
-                    IbUtils.showSimpleSnackBar(
+                    IbUtils().showSimpleSnackBar(
                         msg: 'Long press to reject',
                         backgroundColor: IbColors.errorRed);
                   },

@@ -69,7 +69,7 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
 
   @override
   Widget build(BuildContext context) {
-    items = IbUtils.getIbFonts(TextStyle(
+    items = IbUtils().getIbFonts(TextStyle(
         fontSize: IbConfig.kNormalTextSize,
         fontWeight: FontWeight.bold,
         fontStyle: fontStyle,
@@ -118,7 +118,7 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
                     await IbAdminDbService()
                         .addIcebreakerCollection(widget.ibCollection);
                     Get.back();
-                    IbUtils.showSimpleSnackBar(
+                    IbUtils().showSimpleSnackBar(
                         msg: 'Icebreaker Updated',
                         backgroundColor: IbColors.accentColor);
                   } catch (e) {
@@ -129,7 +129,7 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
                     ));
                   }
                 } else {
-                  IbUtils.showSimpleSnackBar(
+                  IbUtils().showSimpleSnackBar(
                       msg: 'Question already exists',
                       backgroundColor: IbColors.errorRed);
                 }
@@ -169,7 +169,7 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
                                     minFontSize: IbConfig.kNormalTextSize,
                                     maxFontSize: IbConfig.kSloganSize,
                                     maxLines: IbConfig.kIbCardMaxLine,
-                                    style: IbUtils.getIbFonts(TextStyle(
+                                    style: IbUtils().getIbFonts(TextStyle(
                                         color: Color(newIcebreaker.textColor),
                                         fontWeight: FontWeight.bold,
                                         fontStyle: fontStyle,
@@ -194,7 +194,7 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
                           widget.ibCollection.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: IbUtils.getIbFonts(TextStyle(
+                          style: IbUtils().getIbFonts(TextStyle(
                                   fontSize: IbConfig.kDescriptionTextSize,
                                   color: Color(widget.ibCollection.textColor),
                                   fontWeight: FontWeight.bold,
@@ -232,7 +232,7 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
                             fontStyle = FontStyle.italic;
                             newIcebreaker.isItalic = true;
                           }
-                          items = IbUtils.getIbFonts(TextStyle(
+                          items = IbUtils().getIbFonts(TextStyle(
                               fontSize: IbConfig.kNormalTextSize,
                               fontWeight: FontWeight.bold,
                               fontStyle: fontStyle,
@@ -327,7 +327,7 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
   }
 
   void showColorPicker() {
-    IbUtils.hideKeyboard();
+    IbUtils().hideKeyboard();
     Get.dialog(IbDialog(
       title: 'Pick a color',
       subtitle: '',
@@ -348,7 +348,7 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
   }
 
   void showNameColorPicker() {
-    IbUtils.hideKeyboard();
+    IbUtils().hideKeyboard();
     Get.dialog(IbDialog(
       title: 'Pick a color for title',
       subtitle: '',

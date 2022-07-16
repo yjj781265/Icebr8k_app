@@ -24,7 +24,7 @@ class SetupPageTwo extends StatelessWidget {
       body: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: IbUtils.hideKeyboard,
+          onTap: IbUtils().hideKeyboard,
           child: SafeArea(
               child: Container(
             color: Theme.of(context).primaryColor,
@@ -274,9 +274,12 @@ class SetupPageTwo extends StatelessWidget {
             ),
           ),
         ),
+        const SizedBox(
+          height: 16,
+        ),
       ],
     );
 
-    Get.bottomSheet(SafeArea(child: IbCard(child: options)));
+    Get.bottomSheet(IbCard(child: options), ignoreSafeArea: false);
   }
 }

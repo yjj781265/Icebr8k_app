@@ -73,7 +73,7 @@ Map<String, dynamic> _$IbQuestionToJson(IbQuestion instance) =>
       'askedTimeInMs': instance.askedTimeInMs,
       'endTimeInMs': instance.endTimeInMs,
       'choices': instance.choices.map((e) => e.toJson()).toList(),
-      'questionType': _$QuestionTypeEnumMap[instance.questionType],
+      'questionType': _$QuestionTypeEnumMap[instance.questionType]!,
     };
 
 const _$QuestionTypeEnumMap = {

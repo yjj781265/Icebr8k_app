@@ -5,10 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/edit_emo_pic_controller.dart';
 import 'package:icebr8k/backend/models/ib_emo_pic.dart';
-import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_card.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_elevated_button.dart';
-import 'package:icebr8k/frontend/ib_widgets/ib_emoji_keyboard.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_text_field.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -283,10 +281,5 @@ class _EditEmoPicDetailPageState extends State<EditEmoPicDetailPage> {
       ],
     );
     Get.bottomSheet(IbCard(child: options), ignoreSafeArea: false);
-  }
-
-  void _showEmojiKeyBoard(BuildContext context) {
-    IbUtils.hideKeyboard();
-    Get.bottomSheet(IbEmojiKeyboard(), ignoreSafeArea: false);
   }
 }

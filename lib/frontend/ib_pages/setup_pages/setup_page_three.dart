@@ -24,7 +24,7 @@ class SetupPageThree extends StatelessWidget {
       body: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: IbUtils.hideKeyboard,
+          onTap: IbUtils().hideKeyboard,
           child: SafeArea(
               child: Container(
             color: Theme.of(context).primaryColor,
@@ -64,7 +64,7 @@ class SetupPageThree extends StatelessWidget {
                               color: IbColors.primaryColor,
                               textTrKey: 'Next',
                               onPressed: () async {
-                                IbUtils.hideKeyboard();
+                                IbUtils().hideKeyboard();
                                 await _controller.validatePageThree();
                               },
                               icon: const Icon(Icons.arrow_back_ios),
@@ -223,10 +223,8 @@ class SetupPageThree extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final croppedFile = await IbUtils.showImageCropper(
-                  pickedFile.path,
-                  height: 1600,
-                  width: 1600);
+              final croppedFile = await IbUtils()
+                  .showImageCropper(pickedFile.path, height: 1600, width: 1600);
               if (croppedFile != null) {
                 _controller.avatarUrl.value = croppedFile.path;
               }
@@ -262,10 +260,8 @@ class SetupPageThree extends StatelessWidget {
             );
 
             if (pickedFile != null) {
-              final croppedFile = await IbUtils.showImageCropper(
-                  pickedFile.path,
-                  height: 1600,
-                  width: 1600);
+              final croppedFile = await IbUtils()
+                  .showImageCropper(pickedFile.path, height: 1600, width: 1600);
               if (croppedFile != null) {
                 _controller.avatarUrl.value = croppedFile.path;
               }
@@ -294,9 +290,12 @@ class SetupPageThree extends StatelessWidget {
             ),
           ),
         ),
+        const SizedBox(
+          height: 16,
+        ),
       ],
     );
 
-    Get.bottomSheet(SafeArea(child: IbCard(child: options)));
+    Get.bottomSheet(IbCard(child: options), ignoreSafeArea: false);
   }
 }

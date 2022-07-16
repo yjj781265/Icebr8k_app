@@ -64,7 +64,7 @@ class QuestionResultDetailPage extends StatelessWidget {
                 final item = _controller.results[index];
                 return ListTile(
                   onTap: () {
-                    if (item.user.id == IbUtils.getCurrentUid()) {
+                    if (item.user.id == IbUtils().getCurrentUid()) {
                       Get.to(() => MyProfilePage());
                       return;
                     }

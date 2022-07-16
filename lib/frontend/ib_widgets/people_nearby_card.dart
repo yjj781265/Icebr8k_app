@@ -34,14 +34,13 @@ class _PeopleNearbyCardState extends State<PeopleNearbyCard> {
   @override
   Widget build(BuildContext context) {
     return IbCard(
-        elevation: 0,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _cardStack(),
-            _actions(),
-          ],
-        ));
+      children: [
+        _cardStack(),
+        _pageIndicator(),
+        _actions(),
+      ],
+    ));
   }
 
   Widget _actions() {
@@ -90,6 +89,37 @@ class _PeopleNearbyCardState extends State<PeopleNearbyCard> {
     );
   }
 
+  Widget _pageIndicator() {
+    return Container(
+      alignment: Alignment.center,
+      width: 50,
+      height: 20,
+      child: IbCard(
+        elevation: 0,
+        color: Theme.of(context).backgroundColor.withOpacity(0.8),
+        child: ListView.builder(
+          shrinkWrap: true,
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () => _controller.animateToPage(currentIndex),
+              child: Container(
+                width: 8.8,
+                height: 8.8,
+                margin: const EdgeInsets.symmetric(horizontal: 2),
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: IbColors.accentColor
+                        .withOpacity(currentIndex == index ? 1.0 : 0.4)),
+              ),
+            );
+          },
+          itemCount: 2,
+        ),
+      ),
+    );
+  }
+
   Widget _userinfo() {
     return Container(
       decoration: BoxDecoration(
@@ -112,7 +142,7 @@ class _PeopleNearbyCardState extends State<PeopleNearbyCard> {
               height: 2,
             ),
             AutoSizeText(
-              '${widget.item.user.fName} • ${widget.item.user.gender} • ${IbUtils.calculateAge(widget.item.user.birthdateInMs ?? -1)}',
+              '${widget.item.user.fName} • ${widget.item.user.gender} • ${IbUtils().calculateAge(widget.item.user.birthdateInMs ?? -1)}',
               maxLines: 1,
               textAlign: TextAlign.center,
               maxFontSize: IbConfig.kSecondaryTextSize,
@@ -138,7 +168,7 @@ class _PeopleNearbyCardState extends State<PeopleNearbyCard> {
             Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  IbUtils.getDistanceString(
+                  IbUtils().getDistanceString(
                       widget.item.distanceInMeter.toDouble()),
                   style: const TextStyle(
                     fontSize: IbConfig.kDescriptionTextSize,
@@ -153,101 +183,69 @@ class _PeopleNearbyCardState extends State<PeopleNearbyCard> {
   }
 
   Widget _cardStack() {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        ClipRRect(
-          borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(16), topRight: Radius.circular(16)),
-          child: CarouselSlider(
-            carouselController: _controller,
-            items: [
-              Stack(
-                alignment: Alignment.bottomLeft,
-                children: [
-                  CachedNetworkImage(
-                    fit: BoxFit.cover,
-                    width: Get.width,
-                    height: Get.width / 0.7,
-                    imageUrl: widget.item.user.avatarUrl,
-                  ),
-                  _userinfo(),
-                  Positioned(top: 32, child: _commonTagsWidget(context))
-                ],
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+      child: CarouselSlider(
+        carouselController: _controller,
+        items: [
+          Stack(
+            alignment: Alignment.bottomLeft,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Get.to(
+                      () => IbMediaViewer(
+                          urls: [widget.item.user.avatarUrl], currentIndex: 0),
+                      transition: Transition.zoom);
+                },
+                child: CachedNetworkImage(
+                  fit: BoxFit.cover,
+                  width: Get.width,
+                  height: Get.width / 0.7,
+                  imageUrl: widget.item.user.avatarUrl,
+                ),
               ),
-              Column(
-                children: [
-                  Expanded(
-                    child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 32, right: 16, left: 16, bottom: 8),
-                        child: AutoSizeText(
-                          widget.item.user.bio,
-                          maxLines: 10,
-                          overflow: TextOverflow.ellipsis,
-                          maxFontSize: IbConfig.kNormalTextSize,
-                          style: const TextStyle(
-                              fontSize: IbConfig.kNormalTextSize),
-                        )),
-                  ),
-                  const Divider(
-                    thickness: 2,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: _emoPics(context),
-                  ),
-                ],
-              )
+              _userinfo(),
+              Positioned(top: 32, child: _commonTagsWidget(context))
             ],
-            options: CarouselOptions(
-                initialPage: currentIndex,
-                viewportFraction: 1.0,
-                aspectRatio: 0.7,
-                onPageChanged: (index, reason) {
-                  setState(() {
-                    currentIndex = index;
-                  });
-                },
-                enableInfiniteScroll: false),
           ),
-        ),
-
-        /// tab indicator
-        Positioned(
-          top: 8,
-          right: 0,
-          left: 0,
-          child: Container(
-            alignment: Alignment.center,
-            width: 50,
-            height: 20,
-            child: IbCard(
-              elevation: 0,
-              color: Theme.of(context).backgroundColor.withOpacity(0.8),
-              child: ListView.builder(
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () => _controller.animateToPage(currentIndex),
-                    child: Container(
-                      width: 8.0,
-                      height: 8.0,
-                      margin: const EdgeInsets.symmetric(horizontal: 2),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: IbColors.primaryColor
-                              .withOpacity(currentIndex == index ? 1.0 : 0.4)),
-                    ),
-                  );
-                },
-                itemCount: 2,
+          Column(
+            children: [
+              Expanded(
+                child: Padding(
+                    padding: const EdgeInsets.only(
+                        top: 32, right: 16, left: 16, bottom: 8),
+                    child: AutoSizeText(
+                      widget.item.user.bio,
+                      maxLines: 10,
+                      overflow: TextOverflow.ellipsis,
+                      maxFontSize: IbConfig.kNormalTextSize,
+                      style:
+                          const TextStyle(fontSize: IbConfig.kNormalTextSize),
+                    )),
               ),
-            ),
-          ),
-        ),
-      ],
+              const Divider(
+                thickness: 2,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: _emoPics(context),
+              ),
+            ],
+          )
+        ],
+        options: CarouselOptions(
+            initialPage: currentIndex,
+            viewportFraction: 1.0,
+            aspectRatio: 0.7,
+            onPageChanged: (index, reason) {
+              setState(() {
+                currentIndex = index;
+              });
+            },
+            enableInfiniteScroll: false),
+      ),
     );
   }
 
