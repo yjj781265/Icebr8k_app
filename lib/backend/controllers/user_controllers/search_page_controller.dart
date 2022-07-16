@@ -35,10 +35,11 @@ class SearchPageController extends GetxController {
     await ad.load();
     isLoadingAd.value = false;
     textEtController.addListener(() {
-      if (searchText.value == textEtController.text) {
+      if (searchText.value.trim() == textEtController.text.trim()) {
+        isSearching.value = false;
         return;
       }
-      searchText.value = textEtController.text;
+      searchText.value = textEtController.text.trim();
       isSearching.value = searchText.trim().isNotEmpty;
     });
 
@@ -127,8 +128,11 @@ class SearchPageController extends GetxController {
         for (final item in allIcebreakers) {
           final list = item.text.split(' ');
           for (final String str in list) {
-            if (str.toLowerCase().startsWith(searchText.value.toLowerCase()) ||
+            if (str
+                    .toLowerCase()
+                    .startsWith(searchText.value.trim().toLowerCase()) ||
                 searchText.value
+                    .trim()
                     .toLowerCase()
                     .split(' ')
                     .contains(str.toLowerCase())) {

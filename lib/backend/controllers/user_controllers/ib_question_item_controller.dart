@@ -292,6 +292,8 @@ class IbQuestionItemController extends GetxController {
           final user = await retrieveUser(answer.uid);
           if (user != null) {
             users.add(user);
+          }else{
+            await IbQuestionDbService().deleteSingleIbAnswer(answer);
           }
         }
       }
@@ -311,6 +313,8 @@ class IbQuestionItemController extends GetxController {
           final user = await retrieveUser(answer.uid);
           if (user != null) {
             users.add(user);
+          }else{
+            await IbQuestionDbService().deleteSingleIbAnswer(answer);
           }
         }
         choiceUserMap[choice] = users;

@@ -335,6 +335,11 @@ class CommentItemWidget extends StatelessWidget {
                           ),
                         ],
                       ),
+                      if (item.ibComment.replies.isNotEmpty)
+                        TextButton(
+                            onPressed: () {},
+                            child: Text(
+                                'View ${item.ibComment.replies.length} Replie(s)'))
                     ],
                   ),
                 ),
