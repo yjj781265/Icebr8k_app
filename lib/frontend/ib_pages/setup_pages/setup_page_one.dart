@@ -251,7 +251,7 @@ class SetupPageOne extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: SizedBox(
                   width: Get.width,
-                  height: 32,
+                  height: 48,
                   child: IbElevatedButton(
                     onPressed: () {
                       Get.back();
@@ -259,6 +259,9 @@ class SetupPageOne extends StatelessWidget {
                     textTrKey: 'ok',
                   ),
                 ),
+              ),
+              const SizedBox(
+                height: 16,
               ),
             ],
           ),
