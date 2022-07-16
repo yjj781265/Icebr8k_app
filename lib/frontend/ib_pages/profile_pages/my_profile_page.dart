@@ -148,6 +148,13 @@ class MyProfilePage extends StatelessWidget {
                   : CachedNetworkImage(
                       imageUrl: _controller.rxCurrentIbUser.value.coverPhotoUrl,
                       fit: BoxFit.fill,
+                      progressIndicatorBuilder: (context, string, progress) {
+                        return Center(
+                          child: CircularProgressIndicator.adaptive(
+                            value: progress.progress,
+                          ),
+                        );
+                      },
                     ),
             ),
           ),
