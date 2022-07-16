@@ -75,7 +75,7 @@ class AuthController extends GetxService {
     });
   }
 
-  Future<void> _handleDbStatus(
+  Future<bool> _handleDbStatus(
       DocumentSnapshot<Map<String, dynamic>> snapshot) async {
     final isRunning = snapshot.data()!['isRunning'] as bool;
     final note = snapshot.data()!['note'] as String;
@@ -95,7 +95,7 @@ class AuthController extends GetxService {
             showNegativeBtn: false,
           ),
           barrierDismissible: false);
-      return;
+      return false;
     }
 
     if (!isRunning) {
@@ -107,10 +107,11 @@ class AuthController extends GetxService {
           msg: note,
           backgroundColor: IbColors.primaryColor,
           isPersistent: true);
-      return;
+      return false;
     } else {
       ibUtils.closeAllSnackbars();
     }
+    return true;
   }
 
   @override
@@ -259,7 +260,7 @@ class AuthController extends GetxService {
   Future<void> navigateToCorrectPage() async {
     try {
       final statusSnap = await IbDbStatusService().queryStatus();
-      await _handleDbStatus(statusSnap);
+      final isOkay = await _handleDbStatus(statusSnap);
 
       final result = await Connectivity().checkConnectivity();
       if (result == ConnectivityResult.none) {
@@ -272,6 +273,11 @@ class AuthController extends GetxService {
       if (firebaseUser != null && firebaseUser!.emailVerified) {
         final IbUser? ibUser =
             await IbUserDbService().queryIbUser(firebaseUser!.uid);
+        if (!isOkay &&
+            ibUser != null &&
+            !ibUser.roles.contains(IbUser.kAdminRole)) {
+          return;
+        }
 
         /// check roles of the user
         if (ibUser != null &&
@@ -326,11 +332,11 @@ class AuthController extends GetxService {
             print('Go to Setup Page with note dialog');
             await IbAnalyticsManager().logScreenView(
                 className: "AuthController", screenName: "SetupPageOne");
-            ibUtils.offAll(
-                SetupPageOne(
-                  Get.put(SetupController(status: IbUser.kUserStatusRejected),
-                      tag: IbUtils().getUniqueId()),
-                ),
+            Get.back();
+            ibUtils.toPage(
+                SetupPageOne(Get.put(
+                    SetupController(status: IbUser.kUserStatusRejected),
+                    tag: IbUtils().getUniqueId())),
                 transition: Transition.circularReveal);
             break;
 
@@ -338,7 +344,8 @@ class AuthController extends GetxService {
             print('Go to Setup page');
             await IbAnalyticsManager().logScreenView(
                 className: "AuthController", screenName: "SetupPageOne");
-            ibUtils.offAll(
+            Get.back();
+            ibUtils.toPage(
                 SetupPageOne(
                     Get.put(SetupController(), tag: IbUtils().getUniqueId())),
                 transition: Transition.circularReveal);
@@ -349,7 +356,8 @@ class AuthController extends GetxService {
             print('default Go to Setup page');
             await IbAnalyticsManager().logScreenView(
                 className: "AuthController", screenName: "SetupPageOne");
-            ibUtils.offAll(
+            Get.back();
+            ibUtils.toPage(
                 SetupPageOne(
                     Get.put(SetupController(), tag: IbUtils().getUniqueId())),
                 transition: Transition.circularReveal);

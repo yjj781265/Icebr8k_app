@@ -290,9 +290,12 @@ class SetupPageThree extends StatelessWidget {
             ),
           ),
         ),
+        const SizedBox(
+          height: 16,
+        ),
       ],
     );
 
-    Get.bottomSheet(SafeArea(child: IbCard(child: options)));
+    Get.bottomSheet(IbCard(child: options), ignoreSafeArea: false);
   }
 }
