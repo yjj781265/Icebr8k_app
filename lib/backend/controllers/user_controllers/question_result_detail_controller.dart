@@ -61,6 +61,7 @@ class QuestionResultDetailPageController extends GetxController {
           }
 
           if (ibUser == null) {
+            await IbQuestionDbService().deleteSingleIbAnswer(answer);
             continue;
           }
           final double compScore = await IbUtils().getCompScore(uid: uid);
@@ -93,6 +94,7 @@ class QuestionResultDetailPageController extends GetxController {
         }
 
         if (ibUser == null) {
+          await IbQuestionDbService().deleteSingleIbAnswer(ibAnswer);
           continue;
         }
 

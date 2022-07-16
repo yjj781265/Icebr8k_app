@@ -621,6 +621,18 @@ class IbQuestionDbService {
     }
   }
 
+  Future<void> deleteSingleIbAnswer(IbAnswer ibAnswer) async {
+    try {
+      await _collectionRef
+          .doc(ibAnswer.questionId)
+          .collection(_kAnswerCollectionGroup)
+          .doc(ibAnswer.uid)
+          .delete();
+    } catch (e) {
+      print('deleteSingleIbAnswer $e');
+    }
+  }
+
   Future<void> deleteQuestion(String questionId) async {
     final snapshot1 = await _collectionRef
         .doc(questionId)

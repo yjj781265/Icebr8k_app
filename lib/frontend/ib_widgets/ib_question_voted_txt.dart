@@ -18,32 +18,35 @@ class IbQuestionVotedText extends StatelessWidget {
     return Obx(() {
       if (_controller.friendVotedList.isNotEmpty) {
         return Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 8),
+          padding: const EdgeInsets.only(left: 12.0),
           child: InkWell(
             onTap: () {
               _showBtmSheet();
             },
-            child: AutoSizeText.rich(
-              TextSpan(
-                  text: _controller.friendVotedList.first.username,
-                  children: [
-                    if (_controller.friendVotedList.length > 1)
-                      const TextSpan(
-                          text: ' and ',
-                          style: TextStyle(fontWeight: FontWeight.normal)),
-                    if (_controller.friendVotedList.length > 1)
-                      TextSpan(
-                          text: '${_controller.friendVotedList.length - 1} '
-                              'other friend(s) voted'),
-                    if (_controller.friendVotedList.length == 1)
-                      const TextSpan(text: ' voted'),
-                  ]),
-              style: const TextStyle(
-                  color: IbColors.lightGrey,
-                  fontWeight: FontWeight.normal,
-                  fontSize: IbConfig.kSecondaryTextSize),
-              maxLines: 1,
-              maxFontSize: IbConfig.kSecondaryTextSize,
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: AutoSizeText.rich(
+                TextSpan(
+                    text: _controller.friendVotedList.first.username,
+                    children: [
+                      if (_controller.friendVotedList.length > 1)
+                        const TextSpan(
+                            text: ' and ',
+                            style: TextStyle(fontWeight: FontWeight.normal)),
+                      if (_controller.friendVotedList.length > 1)
+                        TextSpan(
+                            text: '${_controller.friendVotedList.length - 1} '
+                                'other friend(s) voted'),
+                      if (_controller.friendVotedList.length == 1)
+                        const TextSpan(text: ' voted'),
+                    ]),
+                style: const TextStyle(
+                    color: IbColors.lightGrey,
+                    fontWeight: FontWeight.normal,
+                    fontSize: IbConfig.kSecondaryTextSize),
+                maxLines: 1,
+                maxFontSize: IbConfig.kSecondaryTextSize,
+              ),
             ),
           ),
         );

@@ -70,7 +70,7 @@ class QuestionResultMainPage extends StatelessWidget {
                 children: [
                   _handleIbChoiceUI(choice),
                   Text(
-                    '${_itemController.countMap[choice.choiceId]} vote(s)',
+                    ' ${_itemController.countMap[choice.choiceId]} vote(s)',
                     style: const TextStyle(color: IbColors.lightGrey),
                   ),
                 ],
@@ -78,8 +78,12 @@ class QuestionResultMainPage extends StatelessWidget {
             ),
             Row(
                 children: ibUsers.map((e) {
-              if (ibUsers.toList().indexOf(e) == ibUsers.length - 1 &&
-                  ibUsers.toList().indexOf(e) != 0) {
+              final int index =
+                  ibUsers.toList().indexWhere((element) => element.id == e.id);
+              if (index == -1) {
+                return const SizedBox();
+              }
+              if (index == ibUsers.length - 1 && index != 0) {
                 return Align(
                   widthFactor: 0.8,
                   child: CircleAvatar(
@@ -219,15 +223,12 @@ class QuestionResultMainPage extends StatelessWidget {
           ),
         if (choice.content != null)
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: AutoSizeText(
-                choice.content!,
-                maxLines: 2,
-                maxFontSize: IbConfig.kSecondaryTextSize,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
-              ),
+            child: AutoSizeText(
+              choice.content!,
+              maxLines: 2,
+              maxFontSize: IbConfig.kSecondaryTextSize,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: IbConfig.kSecondaryTextSize),
             ),
           )
       ],
