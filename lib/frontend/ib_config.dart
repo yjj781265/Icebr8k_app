@@ -49,7 +49,7 @@ class IbConfig {
   static const int kVoteAgainInHours = 72;
   static const int kAdFrequency = 6;
   static const int kValidNearbyLocationDurationInDays = 7;
-  static const double kVersion = 0.2;
+  static const double kVersion = 1.0;
 
   IbConfig._();
 }
