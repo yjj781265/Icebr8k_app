@@ -337,9 +337,14 @@ class CommentItemWidget extends StatelessWidget {
                       ),
                       if (item.ibComment.replies.isNotEmpty)
                         TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Get.to(() => ReplyPage(Get.put(ReplyController(
+                                  parentCommentId: item.ibComment.commentId,
+                                  ibQuestion: controller
+                                      .itemController.rxIbQuestion.value))));
+                            },
                             child: Text(
-                                'View ${item.ibComment.replies.length} Replie(s)'))
+                                'View ${item.ibComment.replies.length} Reply)'))
                     ],
                   ),
                 ),

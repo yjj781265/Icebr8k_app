@@ -25,6 +25,7 @@ class IbQuestionItemController extends GetxController {
   Rx<IbChoice> rxNewChoice = IbChoice(choiceId: '', content: '').obs;
   Timer? _timer;
   final voted = false.obs;
+  final isRefreshing = false.obs;
   final isAnswering = false.obs;
   final RxBool rxIsSample;
 
@@ -41,7 +42,6 @@ class IbQuestionItemController extends GetxController {
   final selectedChoiceId = ''.obs;
   final title = ''.obs;
   final avatarUrl = ''.obs;
-  final compScore = 0.0.obs;
   final resultMap = <IbChoice, double>{}.obs;
   final sharedCircles = <ChatTabItem>[].obs;
   final RxBool isShowCase;
@@ -108,29 +108,30 @@ class IbQuestionItemController extends GetxController {
     if (creatorUser != null) {
       title.value = creatorUser!.username;
       avatarUrl.value = creatorUser!.avatarUrl;
-      compScore.value = await IbUtils().getCompScore(uid: creatorUser!.id);
     }
+
     if (rxIsSample.isFalse) {
-      commented.value =
-          await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
-      liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
-      await _getMyAnswerAndDeterminedPollCloseStatus();
-      await _generatePollStats();
-      await _generateChoiceUserMap();
-      await _getFriendVotedList();
+      refreshStats();
       _setUpCountDownTimer();
     }
   }
 
   /// refresh poll result, comments, likes,
   Future<void> refreshStats() async {
-    commented.value =
-        await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
-    liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
-    await _generatePollStats();
-    await _generateChoiceUserMap();
-    await _getMyAnswerAndDeterminedPollCloseStatus();
-    await _getFriendVotedList();
+    isRefreshing.value = true;
+    try {
+      commented.value =
+          await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
+      liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
+      await _generatePollStats();
+      await _generateChoiceUserMap();
+      await _getMyAnswerAndDeterminedPollCloseStatus();
+      await _getFriendVotedList();
+    } catch (e) {
+      print(e);
+    } finally {
+      isRefreshing.value = false;
+    }
   }
 
   Future<void> addChoice(IbChoice choice) async {
@@ -292,7 +293,7 @@ class IbQuestionItemController extends GetxController {
           final user = await retrieveUser(answer.uid);
           if (user != null) {
             users.add(user);
-          }else{
+          } else {
             await IbQuestionDbService().deleteSingleIbAnswer(answer);
           }
         }
@@ -313,7 +314,7 @@ class IbQuestionItemController extends GetxController {
           final user = await retrieveUser(answer.uid);
           if (user != null) {
             users.add(user);
-          }else{
+          } else {
             await IbQuestionDbService().deleteSingleIbAnswer(answer);
           }
         }
@@ -401,9 +402,6 @@ class IbQuestionItemController extends GetxController {
       IbUtils().showSimpleSnackBar(
           msg: "Failed to vote $e", backgroundColor: IbColors.errorRed);
     } finally {
-      if (creatorUser != null) {
-        compScore.value = await IbUtils().getCompScore(uid: creatorUser!.id);
-      }
       isAnswering.value = false;
       rxIbQuestion.refresh();
       choiceUserMap.refresh();

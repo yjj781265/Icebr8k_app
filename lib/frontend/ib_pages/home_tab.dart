@@ -212,8 +212,7 @@ class HomeTab extends StatelessWidget {
                         if (item.question.isEmpty &&
                             item.id == 'AD' &&
                             !IbUtils().getCurrentIbUser()!.isPremium) {
-                          return IbAdWidget(Get.put(
-                              IbAdController(_controller.myBanner),
+                          return IbAdWidget(Get.put(IbAdController(),
                               tag: IbUtils().getUniqueId()));
                         }
 
@@ -232,8 +231,7 @@ class HomeTab extends StatelessWidget {
                         if (item.question.isEmpty &&
                             item.id == 'AD' &&
                             !IbUtils().getCurrentIbUser()!.isPremium) {
-                          return IbAdWidget(Get.put(
-                              IbAdController(_controller.myBanner),
+                          return IbAdWidget(Get.put(IbAdController(),
                               tag: IbUtils().getUniqueId()));
                         }
 
@@ -250,8 +248,7 @@ class HomeTab extends StatelessWidget {
                       if (item.question.isEmpty &&
                           item.id == 'AD' &&
                           !IbUtils().getCurrentIbUser()!.isPremium) {
-                        return IbAdWidget(Get.put(
-                            IbAdController(_controller.myBanner),
+                        return IbAdWidget(Get.put(IbAdController(),
                             tag: IbUtils().getUniqueId()));
                       }
 

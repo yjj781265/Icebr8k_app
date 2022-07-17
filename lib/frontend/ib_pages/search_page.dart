@@ -181,6 +181,7 @@ class SearchPage extends StatelessWidget {
   Widget topWidget(BuildContext context) {
     return Obx(
       () => SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: Column(
           children: [
             if (_controller.users.isNotEmpty)
@@ -454,6 +455,7 @@ class SearchPage extends StatelessWidget {
     return Obx(() {
       if (_controller.users.isNotEmpty) {
         return ListView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           children: _controller.users
               .take(IbConfig.kPerPage)
               .map(
@@ -505,6 +507,7 @@ class SearchPage extends StatelessWidget {
     return Obx(() {
       if (_controller.circles.isNotEmpty) {
         return SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: StaggeredGrid.count(
             crossAxisCount: 3,
             children: _controller.circles
@@ -523,6 +526,7 @@ class SearchPage extends StatelessWidget {
     return Obx(() {
       if (_controller.icebreakers.isNotEmpty) {
         return ListView.builder(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           itemBuilder: (context, index) {
             final item = _controller.icebreakers[index];
             final collection =
@@ -584,6 +588,7 @@ class SearchPage extends StatelessWidget {
     return Obx(() {
       if (_controller.questions.isNotEmpty) {
         return ListView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           children: _controller.questions.map((element) {
             return IbQuestionSnippetCard(element);
           }).toList(),
@@ -596,54 +601,59 @@ class SearchPage extends StatelessWidget {
   Widget tagWidget(BuildContext context) {
     return Obx(() {
       if (_controller.tags.isNotEmpty) {
-        return Wrap(
-          children: _controller.tags.map((element) {
-            return Stack(
-              children: [
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).backgroundColor,
-                      border:
-                          Border.all(color: Theme.of(context).indicatorColor),
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(16))),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(element.text,
-                        style: TextStyle(
-                            fontWeight: IbUtils().getCurrentIbUser() != null &&
-                                    IbUtils()
-                                        .getCurrentIbUser()!
-                                        .tags
-                                        .contains(element.text)
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            fontSize: IbConfig.kDescriptionTextSize)),
+        return SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: Wrap(
+            children: _controller.tags.map((element) {
+              return Stack(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).backgroundColor,
+                        border:
+                            Border.all(color: Theme.of(context).indicatorColor),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(16))),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(element.text,
+                          style: TextStyle(
+                              fontWeight:
+                                  IbUtils().getCurrentIbUser() != null &&
+                                          IbUtils()
+                                              .getCurrentIbUser()!
+                                              .tags
+                                              .contains(element.text)
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                              fontSize: IbConfig.kDescriptionTextSize)),
+                    ),
                   ),
-                ),
-                Positioned.fill(
-                    child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    customBorder: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                    onTap: () {
-                      if (Get.isRegistered<TagPageController>(
-                          tag: element.text)) {
-                        return;
-                      }
+                  Positioned.fill(
+                      child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      customBorder: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      onTap: () {
+                        if (Get.isRegistered<TagPageController>(
+                            tag: element.text)) {
+                          return;
+                        }
 
-                      Get.to(
-                          () => TagPage(Get.put(TagPageController(element.text),
-                              tag: element.text)),
-                          preventDuplicates: false);
-                    },
-                  ),
-                ))
-              ],
-            );
-          }).toList(),
+                        Get.to(
+                            () => TagPage(Get.put(
+                                TagPageController(element.text),
+                                tag: element.text)),
+                            preventDuplicates: false);
+                      },
+                    ),
+                  ))
+                ],
+              );
+            }).toList(),
+          ),
         );
       }
       return const SizedBox();

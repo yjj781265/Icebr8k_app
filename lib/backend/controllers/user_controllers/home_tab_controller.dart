@@ -3,10 +3,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
-import 'package:icebr8k/backend/managers/ib_ad_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
@@ -34,8 +32,6 @@ class HomeTabController extends GetxController {
       choices: [],
       questionType: QuestionType.multipleChoice,
       askedTimeInMs: -1);
-  final BannerAd myBanner = IbAdManager().getBanner3();
-
   final newestList = <IbQuestion>[].obs;
   final trendingList = <IbQuestion>[].obs;
   final forYourList = <IbQuestion>[].obs;
@@ -72,8 +68,6 @@ class HomeTabController extends GetxController {
       _lastOffset = scrollController.offset;
     });
 
-    /// load ad;
-    await myBanner.load();
     _determineFeatureIsLocked().then((value) async => {await onRefresh()});
   }
 
@@ -82,11 +76,6 @@ class HomeTabController extends GetxController {
     super.onReady();
     await IbAnalyticsManager()
         .logScreenView(className: 'HomeTabController', screenName: 'HomeTab');
-  }
-
-  @override
-  Future<void> onClose() async {
-    await myBanner.dispose();
   }
 
   Future<void> onRefresh({bool refreshStats = false}) async {

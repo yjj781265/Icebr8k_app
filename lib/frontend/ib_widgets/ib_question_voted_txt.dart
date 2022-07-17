@@ -18,7 +18,7 @@ class IbQuestionVotedText extends StatelessWidget {
     return Obx(() {
       if (_controller.friendVotedList.isNotEmpty) {
         return Padding(
-          padding: const EdgeInsets.only(left: 12.0),
+          padding: const EdgeInsets.only(left: 12.0, top: 8),
           child: InkWell(
             onTap: () {
               _showBtmSheet();

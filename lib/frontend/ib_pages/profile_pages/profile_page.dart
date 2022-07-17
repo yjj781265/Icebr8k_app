@@ -16,7 +16,6 @@ import 'package:icebr8k/backend/controllers/user_controllers/ib_ad_controller.da
 import 'package:icebr8k/backend/controllers/user_controllers/ib_report_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/profile_controller.dart';
-import 'package:icebr8k/backend/managers/ib_ad_manager.dart';
 import 'package:icebr8k/backend/models/ib_report.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -113,9 +112,7 @@ class ProfilePage extends StatelessWidget {
                                     const EdgeInsets.symmetric(vertical: 8.0),
                                 child: LimitedBox(
                                   maxHeight: 88,
-                                  child: IbAdWidget(Get.put(
-                                      IbAdController(
-                                          IbAdManager().getBanner1()),
+                                  child: IbAdWidget(Get.put(IbAdController(),
                                       tag: IbUtils().getUniqueId())),
                                 ),
                               ),
