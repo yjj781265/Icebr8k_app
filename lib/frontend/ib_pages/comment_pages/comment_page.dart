@@ -344,7 +344,10 @@ class CommentItemWidget extends StatelessWidget {
                                       .itemController.rxIbQuestion.value))));
                             },
                             child: Text(
-                                'View ${item.ibComment.replies.length} Reply)'))
+                              'View ${item.ibComment.replies.length} Reply',
+                              style:
+                                  const TextStyle(color: IbColors.primaryColor),
+                            ))
                     ],
                   ),
                 ),
