@@ -331,6 +331,13 @@ class IbQuestionItemController extends GetxController {
       return;
     }
 
+    if (isRefreshing.isTrue) {
+      IbUtils().showSimpleSnackBar(
+          msg: "Don't vote until the poll finishes loading.",
+          backgroundColor: IbColors.errorRed);
+      return;
+    }
+
     if (selectedChoiceId.value.isEmpty) {
       return;
     }
