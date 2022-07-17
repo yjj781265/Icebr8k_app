@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
 import 'package:icebr8k/backend/managers/ib_cache_manager.dart';
@@ -417,6 +418,7 @@ class IbQuestionItemController extends GetxController {
   }
 
   Future<void> updateLike() async {
+    await HapticFeedback.selectionClick();
     liked.value = !liked.value;
     if (liked.isTrue) {
       rxIbQuestion.value.likes++;

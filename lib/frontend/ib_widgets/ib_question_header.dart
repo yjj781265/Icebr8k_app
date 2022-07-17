@@ -142,7 +142,8 @@ class IbQuestionHeader extends StatelessWidget {
               Get.back();
               Get.to(() => CreateQuestionPage(
                   controller: Get.put(
-                      CreateQuestionController(itemController: _itemController),
+                      CreateQuestionController(
+                          oldItemController: _itemController),
                       tag: IbUtils().getUniqueId())));
             },
             leading: const Icon(

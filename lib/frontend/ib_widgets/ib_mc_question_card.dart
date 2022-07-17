@@ -255,7 +255,8 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
         .map((e) => IbQuestionMcItem(e, widget._controller))
         .toList());
 
-    if (widget._controller.rxIbQuestion.value.isOpenEnded &&
+    if (!widget._controller.rxIbQuestion.value.isQuiz &&
+        widget._controller.rxIbQuestion.value.isOpenEnded &&
         (widget._controller.rxIbQuestion.value.questionType ==
                 QuestionType.multipleChoice ||
             widget._controller.rxIbQuestion.value.questionType ==
