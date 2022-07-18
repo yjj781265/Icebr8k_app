@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
 import 'package:icebr8k/backend/managers/ib_show_case_keys.dart';
+import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/admin/edit_ib_collection_main_page.dart';
 import 'package:icebr8k/frontend/ib_config.dart';
@@ -209,55 +210,62 @@ class HomeTab extends StatelessWidget {
                           _controller.categories[1]) {
                         final item = _controller.forYourList[index];
 
-                        if (item.question.isEmpty &&
-                            item.id == 'AD' &&
+                        if (item.questionType == QuestionType.ad &&
                             !IbUtils().getCurrentIbUser()!.isPremium) {
                           return IbAdWidget(Get.put(IbAdController(),
                               tag: IbUtils().getUniqueId()));
                         }
 
-                        return IbUtils().handleQuestionType(
-                            _controller.forYourList[index],
-                            isShowCase: index == 0,
-                            expanded: IbUtils()
-                                .getCurrentUserSettings()
-                                .pollExpandedByDefault);
+                        if (item.questionType != QuestionType.ad) {
+                          return IbUtils().handleQuestionType(
+                              _controller.forYourList[index],
+                              isShowCase: index == 0,
+                              expanded: IbUtils()
+                                  .getCurrentUserSettings()
+                                  .pollExpandedByDefault);
+                        }
+                        return const SizedBox();
                       }
 
                       if (_controller.selectedCategory.value ==
                           _controller.categories[2]) {
                         final item = _controller.newestList[index];
 
-                        if (item.question.isEmpty &&
-                            item.id == 'AD' &&
+                        if (item.questionType == QuestionType.ad &&
                             !IbUtils().getCurrentIbUser()!.isPremium) {
                           return IbAdWidget(Get.put(IbAdController(),
                               tag: IbUtils().getUniqueId()));
                         }
 
+                        if (item.questionType != QuestionType.ad) {
+                          return IbUtils().handleQuestionType(
+                              _controller.newestList[index],
+                              isShowCase: index == 0,
+                              expanded: IbUtils()
+                                  .getCurrentUserSettings()
+                                  .pollExpandedByDefault);
+                        }
+                        return const SizedBox();
+                      }
+
+                      final item = _controller.trendingList[index];
+
+                      if (item.questionType == QuestionType.ad &&
+                          !IbUtils().getCurrentIbUser()!.isPremium) {
+                        return IbAdWidget(Get.put(IbAdController(),
+                            tag: IbUtils().getUniqueId()));
+                      }
+
+                      if (item.questionType != QuestionType.ad) {
                         return IbUtils().handleQuestionType(
-                            _controller.newestList[index],
+                            _controller.trendingList[index],
                             isShowCase: index == 0,
                             expanded: IbUtils()
                                 .getCurrentUserSettings()
                                 .pollExpandedByDefault);
                       }
 
-                      final item = _controller.trendingList[index];
-
-                      if (item.question.isEmpty &&
-                          item.id == 'AD' &&
-                          !IbUtils().getCurrentIbUser()!.isPremium) {
-                        return IbAdWidget(Get.put(IbAdController(),
-                            tag: IbUtils().getUniqueId()));
-                      }
-
-                      return IbUtils().handleQuestionType(
-                          _controller.trendingList[index],
-                          isShowCase: index == 0,
-                          expanded: IbUtils()
-                              .getCurrentUserSettings()
-                              .pollExpandedByDefault);
+                      return const SizedBox();
                     },
                     itemCount: _handleItemCount()),
               );

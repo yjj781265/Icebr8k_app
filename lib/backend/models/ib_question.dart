@@ -136,7 +136,9 @@ enum QuestionType {
   @JsonValue('sc_2')
   scaleTwo('sc_2'),
   @JsonValue('sc_3')
-  scaleThree('sc_3');
+  scaleThree('sc_3'),
+  @JsonValue('ad')
+  ad('ad');
 
   final String type;
   const QuestionType(this.type);

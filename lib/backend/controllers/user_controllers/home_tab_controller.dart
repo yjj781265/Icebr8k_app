@@ -25,12 +25,12 @@ class HomeTabController extends GetxController {
   final double hideShowNavBarSensitivity = 10;
   bool canHideNavBar = true;
   final String kAdQuestionId = 'AD';
-  final adPlaceHolder = IbQuestion(
+  final ad = IbQuestion(
       question: '',
       id: 'AD',
       creatorId: '',
       choices: [],
-      questionType: QuestionType.multipleChoice,
+      questionType: QuestionType.ad,
       askedTimeInMs: -1);
   final newestList = <IbQuestion>[].obs;
   final trendingList = <IbQuestion>[].obs;
@@ -417,13 +417,13 @@ class HomeTabController extends GetxController {
       return;
     }
     if (list.length <= IbConfig.kAdFrequency && list.isNotEmpty) {
-      list.add(adPlaceHolder);
+      list.add(ad);
       return;
     }
 
     for (int i = 0; i < list.length; i++) {
       if (i != 0 && i % IbConfig.kAdFrequency == 0) {
-        list.insert(i, adPlaceHolder);
+        list.insert(i, ad);
       }
     }
   }

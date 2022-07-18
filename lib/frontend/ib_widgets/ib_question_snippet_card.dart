@@ -58,7 +58,7 @@ class IbQuestionSnippetCard extends StatelessWidget {
     ));
   }
 
-  Icon _getQuestionIcon() {
+  Widget _getQuestionIcon() {
     switch (question.questionType) {
       case QuestionType.multipleChoice:
         return const Icon(
@@ -73,6 +73,8 @@ class IbQuestionSnippetCard extends StatelessWidget {
       case QuestionType.scaleThree:
         return const Icon(FontAwesomeIcons.star,
             size: 16, color: IbColors.primaryColor);
+      case QuestionType.ad:
+        return const SizedBox();
     }
   }
 }
