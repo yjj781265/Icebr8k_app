@@ -24,7 +24,6 @@ import '../../services/user_services/ib_user_db_service.dart';
 class IbQuestionItemController extends GetxController {
   final Rx<IbQuestion> rxIbQuestion;
   Rx<IbChoice> rxNewChoice = IbChoice(choiceId: '', content: '').obs;
-  Timer? _timer;
   final voted = false.obs;
   final isRefreshing = false.obs;
   final isAnswering = false.obs;
@@ -91,15 +90,6 @@ class IbQuestionItemController extends GetxController {
     super.onReady();
   }
 
-  @override
-  void onClose() {
-    super.onClose();
-    if (_timer != null) {
-      _timer!.cancel();
-      _timer = null;
-    }
-  }
-
   Future<void> initData() async {
     countMap.clear();
     resultMap.clear();
@@ -117,7 +107,6 @@ class IbQuestionItemController extends GetxController {
 
     if (rxIsSample.isFalse) {
       await refreshStats();
-      _setUpCountDownTimer();
     }
   }
 
@@ -187,28 +176,6 @@ class IbQuestionItemController extends GetxController {
     rxNewChoice.refresh();
     IbUtils().showSimpleSnackBar(
         msg: "New choice added", backgroundColor: IbColors.accentColor);
-  }
-
-  void _setUpCountDownTimer() {
-    if (_timer == null &&
-        rxIbQuestion.value.endTimeInMs >=
-            DateTime.now().millisecondsSinceEpoch &&
-        DateTime.fromMillisecondsSinceEpoch(rxIbQuestion.value.endTimeInMs)
-                .difference(DateTime.now())
-                .inMinutes <=
-            5) {
-      Timer.periodic(const Duration(seconds: 1), (timer) {
-        if (rxIbQuestion.value.endTimeInMs <
-            DateTime.now().millisecondsSinceEpoch) {
-          isPollClosed.value = DateTime.now().millisecondsSinceEpoch >
-                  rxIbQuestion.value.endTimeInMs &&
-              rxIbQuestion.value.endTimeInMs > 0;
-          timer.cancel();
-        }
-        print('${rxIbQuestion.value.question} tick tok');
-        rxIbQuestion.refresh();
-      });
-    }
   }
 
   Future<Map<String, int>> _getChoiceCountMap() async {

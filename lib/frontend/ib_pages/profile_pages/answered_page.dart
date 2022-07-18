@@ -40,6 +40,8 @@ class AnsweredPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 return IbUtils().handleQuestionType(
                     _controller.answeredQs[index],
+                    customTag:
+                        'voted-${IbUtils().getCurrentUid()}${_controller.answeredQs[index].id}',
                     uniqueTag: true);
               },
               itemCount: _controller.answeredQs.length,

@@ -56,6 +56,8 @@ class AskedPage extends StatelessWidget {
                 index -= 1;
                 return IbUtils().handleQuestionType(
                     _controller.createdQuestions[index],
+                    customTag:
+                        'polled-${IbUtils().getCurrentUid()}${_controller.createdQuestions[index].id}',
                     uniqueTag: true);
               },
               itemCount: _controller.createdQuestions.length + 1,
