@@ -157,7 +157,7 @@ class IbQuestionHeader extends StatelessWidget {
           ListTile(
             onTap: () async {
               Get.back();
-              _itemController.deleteQuestion();
+              await _itemController.deleteQuestion();
             },
             leading: const Icon(
               Icons.delete,

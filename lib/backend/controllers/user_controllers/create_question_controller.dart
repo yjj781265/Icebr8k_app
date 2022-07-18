@@ -216,11 +216,14 @@ class CreateQuestionController extends GetxController {
             oldItemController!.rxIbQuestion.value.isOpenEnded &&
             !questionType.value.name.contains('sc'),
         sharedFriendUids: pickedFriends.map((element) => element.id).toList(),
-        isCommentEnabled: oldItemController != null &&
+        isCommentEnabled: oldItemController == null ||
             oldItemController!.rxIbQuestion.value.isCommentEnabled,
         sharedChatIds:
             pickedChats.map((element) => element.ibChat.chatId).toList(),
         isPublic: isPublic,
+        endTimeInMs: oldItemController == null
+            ? -1
+            : oldItemController!.rxIbQuestion.value.endTimeInMs,
         isAnonymous: oldItemController != null &&
             oldItemController!.rxIbQuestion.value.isAnonymous,
         tags: pickedTags.map((element) => element.text).toList(),
@@ -414,11 +417,14 @@ class CreateQuestionController extends GetxController {
 
       /// DO NOT ERASE THIS LINE BELOW
       /// update question in home page
-      oldItemController!.rxIsSample.value = false;
-      oldItemController!.rxIbQuestion.value = ibQuestion;
-      oldItemController!.rxIbQuestion.value.questionType = questionType.value;
-      oldItemController!.rxIbQuestion.refresh();
-      oldItemController!.rxIsSample.refresh();
+
+      if (oldItemController != null) {
+        oldItemController!.rxIsSample.value = false;
+        oldItemController!.rxIbQuestion.value = ibQuestion;
+        oldItemController!.rxIbQuestion.value.questionType = questionType.value;
+        oldItemController!.rxIbQuestion.refresh();
+        oldItemController!.rxIsSample.refresh();
+      }
 
       /// END
 

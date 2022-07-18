@@ -90,6 +90,8 @@ class _CreateQuestionTagPickerState extends State<CreateQuestionTagPicker> {
             : Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SingleChildScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
