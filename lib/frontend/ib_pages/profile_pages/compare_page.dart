@@ -38,6 +38,8 @@ class ComparePage extends StatelessWidget {
                     ibAnswers: _controller
                             .items[_controller.items.keys.toList()[index]] ??
                         [],
+                    customTag:
+                        'compare-${IbUtils().getCurrentUid()}${_controller.items.keys.toList()[index].id}',
                     uniqueTag: true);
               },
               itemCount: _controller.items.keys.toList().length,
