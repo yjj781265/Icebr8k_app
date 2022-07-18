@@ -982,8 +982,9 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
         );
       }
 
-      final Widget pollWidget =
-          IbUtils().handleQuestionType(question, uniqueTag: true);
+      final Widget pollWidget = IbUtils().handleQuestionType(question,
+          uniqueTag: true,
+          customTag: '${widget._controller.title.value}${question.id}');
 
       return Column(
         mainAxisSize: MainAxisSize.min,
@@ -1012,13 +1013,16 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                 avatarUrl: avatarUrl,
                 radius: 11,
               ),
-              Text(' $username shared a poll')
+              Text(
+                ' $username shared a poll',
+                style: const TextStyle(fontSize: IbConfig.kNormalTextSize),
+              )
             ],
           ),
           Padding(
             padding: const EdgeInsets.only(
-              left: 16,
-              right: 16,
+              left: 8,
+              right: 8,
             ),
             child: pollWidget,
           ),
