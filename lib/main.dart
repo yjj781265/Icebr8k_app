@@ -68,6 +68,7 @@ class MainApp extends StatelessWidget {
             './': (context) => SplashPage(),
             './home': (context) => MainPage()
           },
+          enableLog: false,
           translations: IbStrings(),
           locale: const Locale('en', 'US'),
           themeMode: ThemeMode.light,
