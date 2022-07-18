@@ -29,7 +29,7 @@ IbUser _$IbUserFromJson(Map<String, dynamic> json) => IbUser(
           json['lastLocationTimestampInMs'] as int? ?? -1,
       gender: json['gender'] as String? ?? '',
       status: json['status'] as String? ?? '',
-      isAgeHidden: json['isAgeHidden'] as bool? ?? true,
+      isAgeHidden: json['isAgeHidden'] as bool? ?? false,
       isMasterPremium: json['isMasterPremium'] as bool? ?? false,
       voiceMemoUrl: json['voiceMemoUrl'] as String? ?? '',
       joinTime: json['joinTime'],

@@ -274,6 +274,7 @@ class MockIbUtils extends _i1.Mock implements _i6.IbUtils {
   _i3.Widget handleQuestionType(_i14.IbQuestion? question,
           {bool? uniqueTag = false,
           List<_i13.IbAnswer>? ibAnswers = const [],
+          String? customTag,
           bool? expanded = false,
           bool? isSample = false,
           bool? isShowCase = false,
@@ -284,6 +285,7 @@ class MockIbUtils extends _i1.Mock implements _i6.IbUtils {
           ], {
             #uniqueTag: uniqueTag,
             #ibAnswers: ibAnswers,
+            #customTag: customTag,
             #expanded: expanded,
             #isSample: isSample,
             #isShowCase: isShowCase,
