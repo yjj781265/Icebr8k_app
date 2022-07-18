@@ -26,7 +26,7 @@ Map<String, dynamic> _$IbAnswerToJson(IbAnswer instance) => <String, dynamic>{
       'uid': instance.uid,
       'askedTimeInMs': instance.askedTimeInMs,
       'questionId': instance.questionId,
-      'questionType': _$QuestionTypeEnumMap[instance.questionType]!,
+      'questionType': _$QuestionTypeEnumMap[instance.questionType],
       'edited': instance.edited,
     };
 

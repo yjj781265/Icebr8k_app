@@ -21,6 +21,7 @@ class IbPremiumPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _controller.restorePurchase();
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,

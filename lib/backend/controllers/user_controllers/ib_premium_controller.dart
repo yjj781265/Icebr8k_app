@@ -67,7 +67,6 @@ class IbPremiumController extends GetxController {
       ///query purchase Info
       final PurchaserInfo purchaserInfo = await Purchases.getPurchaserInfo();
       await _handlePurchaseInfo(purchaserInfo);
-      isLoading.value = false;
 
       ///listen to  purchase Info changes
       Purchases.addPurchaserInfoUpdateListener((info) {
@@ -77,6 +76,11 @@ class IbPremiumController extends GetxController {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);
       await IbAnalyticsManager().logCustomEvent(
           name: 'error_load_products', data: {'errorCode': errorCode});
+    } catch (e) {
+      await IbAnalyticsManager()
+          .logCustomEvent(name: 'error_load_products', data: {'error': e});
+      print(e);
+    } finally {
       isLoading.value = false;
     }
   }
