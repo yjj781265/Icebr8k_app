@@ -21,6 +21,7 @@ class IbPremiumController extends GetxController {
   final offerings = <Offering>[].obs;
   final isPremium = false.obs;
   final isLoading = true.obs;
+  final isRestoring = false.obs;
   EntitlementInfo? entitlementInfo;
 
   @override
@@ -132,6 +133,8 @@ class IbPremiumController extends GetxController {
 
   Future<void> restorePurchase() async {
     try {
+      isRestoring.value = true;
+      await sync();
       final PurchaserInfo restoredInfo = await Purchases.restoreTransactions();
       if (restoredInfo.activeSubscriptions.isEmpty) {
         IbUtils().showSimpleSnackBar(
@@ -147,6 +150,8 @@ class IbPremiumController extends GetxController {
         subtitle: e.message ?? 'Oops, something went wrong',
         showNegativeBtn: false,
       ));
+    } finally {
+      isRestoring.value = false;
     }
   }
 }

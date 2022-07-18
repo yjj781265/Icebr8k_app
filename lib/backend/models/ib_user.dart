@@ -76,7 +76,7 @@ class IbUser {
     this.lastLocationTimestampInMs = -1,
     this.gender = '',
     this.status = '',
-    this.isAgeHidden = true,
+    this.isAgeHidden = false,
     this.isMasterPremium = false,
     this.voiceMemoUrl = '',
     this.joinTime,
