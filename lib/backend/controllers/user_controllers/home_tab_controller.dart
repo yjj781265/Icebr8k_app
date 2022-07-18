@@ -261,28 +261,37 @@ class HomeTabController extends GetxController {
 
   Future<void> _refreshQuestionItemControllers() async {
     if (selectedCategory.value == categories[0]) {
+      final List<Future> futures = [];
       for (final q in trendingList) {
         if (Get.isRegistered<IbQuestionItemController>(tag: q.id)) {
-          await Get.find<IbQuestionItemController>(tag: q.id).refreshStats();
+          futures.add(
+              Get.find<IbQuestionItemController>(tag: q.id).refreshStats());
         }
       }
+      await Future.wait(futures);
       return;
     }
 
     if (selectedCategory.value == categories[1]) {
+      final List<Future> futures = [];
       for (final q in forYourList) {
         if (Get.isRegistered<IbQuestionItemController>(tag: q.id)) {
-          await Get.find<IbQuestionItemController>(tag: q.id).refreshStats();
+          futures.add(
+              Get.find<IbQuestionItemController>(tag: q.id).refreshStats());
         }
       }
+      await Future.wait(futures);
       return;
     }
 
+    final List<Future> futures = [];
     for (final q in newestList) {
       if (Get.isRegistered<IbQuestionItemController>(tag: q.id)) {
-        await Get.find<IbQuestionItemController>(tag: q.id).refreshStats();
+        futures
+            .add(Get.find<IbQuestionItemController>(tag: q.id).refreshStats());
       }
     }
+    await Future.wait(futures);
     return;
   }
 

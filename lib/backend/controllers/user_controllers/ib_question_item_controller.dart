@@ -74,10 +74,14 @@ class IbQuestionItemController extends GetxController {
     required this.isShowCase,
     this.ibAnswers = const [],
   });
+  @override
+  Future<void> onInit() async {
+    super.onInit();
+    await initData();
+  }
 
   @override
   Future<void> onReady() async {
-    await initData();
     if (isShowCase.isTrue &&
         !IbLocalDataService()
             .retrieveBoolValue(StorageKey.pollExpandShowCaseBool)) {
@@ -112,7 +116,7 @@ class IbQuestionItemController extends GetxController {
     }
 
     if (rxIsSample.isFalse) {
-      refreshStats();
+      await refreshStats();
       _setUpCountDownTimer();
     }
   }
@@ -121,13 +125,13 @@ class IbQuestionItemController extends GetxController {
   Future<void> refreshStats() async {
     isRefreshing.value = true;
     try {
+      await _getFriendVotedList();
       commented.value =
           await IbQuestionDbService().isCommented(rxIbQuestion.value.id);
       liked.value = await IbQuestionDbService().isLiked(rxIbQuestion.value.id);
       await _generatePollStats();
       await _generateChoiceUserMap();
       await _getMyAnswerAndDeterminedPollCloseStatus();
-      await _getFriendVotedList();
     } catch (e) {
       print(e);
     } finally {
