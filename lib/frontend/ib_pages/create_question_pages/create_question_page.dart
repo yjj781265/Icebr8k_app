@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:icebr8k/backend/managers/ib_ad_manager.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
@@ -53,6 +52,25 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
         _controller.title.value = 'Scale';
       }
     });
+    if (_controller.oldItemController != null) {
+      switch (_controller.oldItemController!.rxIbQuestion.value.questionType) {
+        case QuestionType.multipleChoice:
+          _controller.tabController.index = 0;
+          break;
+        case QuestionType.multipleChoicePic:
+          _controller.tabController.index = 1;
+          break;
+        case QuestionType.scaleOne:
+
+        case QuestionType.scaleTwo:
+
+        case QuestionType.scaleThree:
+          _controller.tabController.index = 2;
+          break;
+        default:
+          _controller.tabController.index = 0;
+      }
+    }
   }
 
   @override
@@ -134,7 +152,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage>
                 if (!IbUtils().isPremiumMember())
                   SliverToBoxAdapter(
                     child: IbAdWidget(
-                        Get.put(IbAdController(IbAdManager().getBanner1()))),
+                        Get.put(IbAdController(isMediumSizeBannerAd: false))),
                   ),
                 SliverToBoxAdapter(
                   child: IbCard(

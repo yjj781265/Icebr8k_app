@@ -25,7 +25,7 @@ Map<String, dynamic> _$IbReportToJson(IbReport instance) => <String, dynamic>{
       'reports': instance.reports,
       'url': instance.url,
       'versionCode': instance.versionCode,
-      'type': _$ReportTypeEnumMap[instance.type]!,
+      'type': _$ReportTypeEnumMap[instance.type],
       'timestamp': instance.timestamp,
     };
 

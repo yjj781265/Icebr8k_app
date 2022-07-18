@@ -83,7 +83,9 @@ class QuestionResultMainPage extends StatelessWidget {
               if (index == -1) {
                 return const SizedBox();
               }
-              if (index == ibUsers.length - 1 && index != 0) {
+              if (index == ibUsers.length - 1 &&
+                  index != 0 &&
+                  (votes - (ibUsers.length - 1)) > 0) {
                 return Align(
                   widthFactor: 0.8,
                   child: CircleAvatar(

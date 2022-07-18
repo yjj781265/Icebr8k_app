@@ -21,6 +21,7 @@ class IbPremiumController extends GetxController {
   final offerings = <Offering>[].obs;
   final isPremium = false.obs;
   final isLoading = true.obs;
+  final isRestoring = false.obs;
   EntitlementInfo? entitlementInfo;
 
   @override
@@ -66,7 +67,6 @@ class IbPremiumController extends GetxController {
       ///query purchase Info
       final PurchaserInfo purchaserInfo = await Purchases.getPurchaserInfo();
       await _handlePurchaseInfo(purchaserInfo);
-      isLoading.value = false;
 
       ///listen to  purchase Info changes
       Purchases.addPurchaserInfoUpdateListener((info) {
@@ -76,6 +76,11 @@ class IbPremiumController extends GetxController {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);
       await IbAnalyticsManager().logCustomEvent(
           name: 'error_load_products', data: {'errorCode': errorCode});
+    } catch (e) {
+      await IbAnalyticsManager()
+          .logCustomEvent(name: 'error_load_products', data: {'error': e});
+      print(e);
+    } finally {
       isLoading.value = false;
     }
   }
@@ -132,6 +137,8 @@ class IbPremiumController extends GetxController {
 
   Future<void> restorePurchase() async {
     try {
+      isRestoring.value = true;
+      await sync();
       final PurchaserInfo restoredInfo = await Purchases.restoreTransactions();
       if (restoredInfo.activeSubscriptions.isEmpty) {
         IbUtils().showSimpleSnackBar(
@@ -147,6 +154,8 @@ class IbPremiumController extends GetxController {
         subtitle: e.message ?? 'Oops, something went wrong',
         showNegativeBtn: false,
       ));
+    } finally {
+      isRestoring.value = false;
     }
   }
 }

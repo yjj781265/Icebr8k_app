@@ -81,11 +81,11 @@ class IbAdManager {
   }
 
   /// return banner 1
-  BannerAd getBanner1() {
+  BannerAd getBanner1({BannerAdListener? bannerAdListener}) {
     final adRequest = IbUtils().getCurrentIbUser() == null
         ? const AdRequest()
         : AdRequest(keywords: IbUtils().getCurrentIbUser()!.tags);
-    final BannerAdListener listener = BannerAdListener(
+    bannerAdListener ??= BannerAdListener(
       // Called when an ad is successfully received.
       onAdLoaded: (Ad ad) => print('Ad loaded.'),
       // Called when an ad request failed.
@@ -101,6 +101,7 @@ class IbAdManager {
       // Called when an impression occurs on the ad.
       onAdImpression: (Ad ad) => print('Ad impression.'),
     );
+
     final BannerAd myBanner = BannerAd(
       adUnitId: kDebugMode
           ? GetPlatform.isAndroid
@@ -111,17 +112,17 @@ class IbAdManager {
               : kBanner1IdiOS,
       size: AdSize(height: 50, width: Get.width.toInt()),
       request: adRequest,
-      listener: listener,
+      listener: bannerAdListener,
     );
     return myBanner;
   }
 
   /// return  banner 2
-  BannerAd getBanner2() {
+  BannerAd getBanner2({BannerAdListener? bannerAdListener}) {
     final adRequest = IbUtils().getCurrentIbUser() == null
         ? const AdRequest()
         : AdRequest(keywords: IbUtils().getCurrentIbUser()!.tags);
-    final BannerAdListener listener = BannerAdListener(
+    bannerAdListener ??= BannerAdListener(
       // Called when an ad is successfully received.
       onAdLoaded: (Ad ad) => print('Ad loaded.'),
       // Called when an ad request failed.
@@ -147,17 +148,17 @@ class IbAdManager {
               : kBanner2IdiOS,
       size: AdSize(height: 50, width: Get.width.toInt()),
       request: adRequest,
-      listener: listener,
+      listener: bannerAdListener,
     );
     return myBanner;
   }
 
   /// return medium size banner, call load before use
-  BannerAd getBanner3() {
+  BannerAd getBanner3({BannerAdListener? bannerAdListener}) {
     final adRequest = IbUtils().getCurrentIbUser() == null
         ? const AdRequest()
         : AdRequest(keywords: IbUtils().getCurrentIbUser()!.tags);
-    final BannerAdListener listener = BannerAdListener(
+    bannerAdListener ??= BannerAdListener(
       // Called when an ad is successfully received.
       onAdLoaded: (Ad ad) => print('Ad loaded.'),
       // Called when an ad request failed.
@@ -183,7 +184,7 @@ class IbAdManager {
               : kBanner3IdiOS,
       size: AdSize.mediumRectangle,
       request: adRequest,
-      listener: listener,
+      listener: bannerAdListener,
     );
     return myBanner;
   }

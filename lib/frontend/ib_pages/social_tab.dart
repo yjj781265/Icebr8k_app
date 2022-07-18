@@ -415,7 +415,7 @@ class _SocialTabState extends State<SocialTab>
             SizedBox(
                 height: 200,
                 width: 200,
-                child: Lottie.asset('assets/images/friendship.json')),
+                child: Lottie.asset('assets/images/friends.json')),
             TextButton(
                 onPressed: () {
                   Get.to(() => SearchPage());

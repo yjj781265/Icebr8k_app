@@ -3,10 +3,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/ib_question_item_controller.dart';
 import 'package:icebr8k/backend/managers/Ib_analytics_manager.dart';
-import 'package:icebr8k/backend/managers/ib_ad_manager.dart';
 import 'package:icebr8k/backend/models/ib_answer.dart';
 import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dart';
@@ -27,15 +25,13 @@ class HomeTabController extends GetxController {
   final double hideShowNavBarSensitivity = 10;
   bool canHideNavBar = true;
   final String kAdQuestionId = 'AD';
-  final adPlaceHolder = IbQuestion(
+  final ad = IbQuestion(
       question: '',
       id: 'AD',
       creatorId: '',
       choices: [],
-      questionType: QuestionType.multipleChoice,
+      questionType: QuestionType.ad,
       askedTimeInMs: -1);
-  final BannerAd myBanner = IbAdManager().getBanner3();
-
   final newestList = <IbQuestion>[].obs;
   final trendingList = <IbQuestion>[].obs;
   final forYourList = <IbQuestion>[].obs;
@@ -72,8 +68,6 @@ class HomeTabController extends GetxController {
       _lastOffset = scrollController.offset;
     });
 
-    /// load ad;
-    await myBanner.load();
     _determineFeatureIsLocked().then((value) async => {await onRefresh()});
   }
 
@@ -82,11 +76,6 @@ class HomeTabController extends GetxController {
     super.onReady();
     await IbAnalyticsManager()
         .logScreenView(className: 'HomeTabController', screenName: 'HomeTab');
-  }
-
-  @override
-  Future<void> onClose() async {
-    await myBanner.dispose();
   }
 
   Future<void> onRefresh({bool refreshStats = false}) async {
@@ -272,28 +261,37 @@ class HomeTabController extends GetxController {
 
   Future<void> _refreshQuestionItemControllers() async {
     if (selectedCategory.value == categories[0]) {
+      final List<Future> futures = [];
       for (final q in trendingList) {
         if (Get.isRegistered<IbQuestionItemController>(tag: q.id)) {
-          await Get.find<IbQuestionItemController>(tag: q.id).refreshStats();
+          futures.add(
+              Get.find<IbQuestionItemController>(tag: q.id).refreshStats());
         }
       }
+      await Future.wait(futures);
       return;
     }
 
     if (selectedCategory.value == categories[1]) {
+      final List<Future> futures = [];
       for (final q in forYourList) {
         if (Get.isRegistered<IbQuestionItemController>(tag: q.id)) {
-          await Get.find<IbQuestionItemController>(tag: q.id).refreshStats();
+          futures.add(
+              Get.find<IbQuestionItemController>(tag: q.id).refreshStats());
         }
       }
+      await Future.wait(futures);
       return;
     }
 
+    final List<Future> futures = [];
     for (final q in newestList) {
       if (Get.isRegistered<IbQuestionItemController>(tag: q.id)) {
-        await Get.find<IbQuestionItemController>(tag: q.id).refreshStats();
+        futures
+            .add(Get.find<IbQuestionItemController>(tag: q.id).refreshStats());
       }
     }
+    await Future.wait(futures);
     return;
   }
 
@@ -419,13 +417,13 @@ class HomeTabController extends GetxController {
       return;
     }
     if (list.length <= IbConfig.kAdFrequency && list.isNotEmpty) {
-      list.add(adPlaceHolder);
+      list.add(ad);
       return;
     }
 
     for (int i = 0; i < list.length; i++) {
       if (i != 0 && i % IbConfig.kAdFrequency == 0) {
-        list.insert(i, adPlaceHolder);
+        list.insert(i, ad);
       }
     }
   }

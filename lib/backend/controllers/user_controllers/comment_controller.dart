@@ -230,6 +230,7 @@ class CommentController extends GetxController {
       _updateParentQuestionCommentCount();
       editingController.clear();
       await IbAnalyticsManager().logCustomEvent(name: 'new_comment', data: {});
+      itemController.commented.value = true;
       IbUtils().showSimpleSnackBar(
           msg: 'Comment added!', backgroundColor: IbColors.accentColor);
     } catch (e) {

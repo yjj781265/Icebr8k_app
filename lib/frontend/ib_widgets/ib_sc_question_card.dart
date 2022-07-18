@@ -12,6 +12,7 @@ import 'package:icebr8k/frontend/ib_widgets/ib_question_tags.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../backend/controllers/user_controllers/ib_question_item_controller.dart';
+import '../ib_colors.dart';
 import '../ib_config.dart';
 import 'ib_media_slide.dart';
 import 'ib_question_header.dart';
@@ -139,59 +140,80 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
       },
       builder: Builder(builder: (context) {
         return IbCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Stack(
             children: [
-              IbQuestionHeader(widget._controller),
-              const SizedBox(
-                height: 8,
-              ),
-              IbQuestionMediaSlide(widget._controller),
-              IbQuestionInfo(widget._controller),
-              SizeTransition(
-                sizeFactor: animation,
-                child: expandableInfo,
-              ),
-              const SizedBox(
-                height: 16,
-              ),
-              IbQuestionVotedText(widget._controller),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                      flex: 6, child: IbQuestionStatsBar(widget._controller)),
-                  Obx(
-                    () => Showcase(
-                      key: widget._controller.expandShowCaseKey,
-                      shapeBorder: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(8))),
-                      overlayOpacity: 0.3,
-                      description: widget._controller.rxIsExpanded.isTrue
-                          ? 'Click here to minimize'
-                          : 'Click here to see vote options',
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          widget._controller.rxIsExpanded.value =
-                              !widget._controller.rxIsExpanded.value;
-                          _runExpandCheck();
-                        },
-                        icon: CircleAvatar(
-                            radius: 18,
-                            backgroundColor:
-                                Theme.of(context).primaryColor.withOpacity(0.5),
-                            child: widget._controller.rxIsExpanded.isTrue
-                                ? Icon(
-                                    Icons.expand_less_rounded,
-                                    color: Theme.of(context).indicatorColor,
-                                  )
-                                : Icon(
-                                    Icons.expand_more_outlined,
-                                    color: Theme.of(context).indicatorColor,
-                                  )),
+              Obx(() {
+                if (widget._controller.isRefreshing.isTrue) {
+                  return Container(
+                    padding:
+                        const EdgeInsets.only(top: 8.0, left: 16, right: 16),
+                    child: const ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      child: LinearProgressIndicator(
+                        color: IbColors.errorRed,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(IbColors.accentColor),
                       ),
                     ),
+                  );
+                }
+                return const SizedBox();
+              }),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  IbQuestionHeader(widget._controller),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  IbQuestionMediaSlide(widget._controller),
+                  IbQuestionInfo(widget._controller),
+                  SizeTransition(
+                    sizeFactor: animation,
+                    child: expandableInfo,
+                  ),
+                  IbQuestionVotedText(widget._controller),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                          flex: 6,
+                          child: IbQuestionStatsBar(widget._controller)),
+                      Obx(
+                        () => Showcase(
+                          key: widget._controller.expandShowCaseKey,
+                          shapeBorder: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8))),
+                          overlayOpacity: 0.3,
+                          description: widget._controller.rxIsExpanded.isTrue
+                              ? 'Click here to minimize'
+                              : 'Click here to see vote options',
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              widget._controller.rxIsExpanded.value =
+                                  !widget._controller.rxIsExpanded.value;
+                              _runExpandCheck();
+                            },
+                            icon: CircleAvatar(
+                                radius: 18,
+                                backgroundColor: Theme.of(context)
+                                    .primaryColor
+                                    .withOpacity(0.5),
+                                child: widget._controller.rxIsExpanded.isTrue
+                                    ? Icon(
+                                        Icons.expand_less_rounded,
+                                        color: Theme.of(context).indicatorColor,
+                                      )
+                                    : Icon(
+                                        Icons.expand_more_outlined,
+                                        color: Theme.of(context).indicatorColor,
+                                      )),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

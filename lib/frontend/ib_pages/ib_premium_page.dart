@@ -21,6 +21,7 @@ class IbPremiumPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _controller.restorePurchase();
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -29,6 +30,10 @@ class IbPremiumPage extends StatelessWidget {
           Obx(() {
             if (_controller.isPremium.isTrue) {
               return const SizedBox();
+            }
+            if (_controller.isRestoring.isTrue) {
+              return const SizedBox(
+                  width: 100, child: CircularProgressIndicator.adaptive());
             }
             return TextButton(
                 onPressed: () async {

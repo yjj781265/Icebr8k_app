@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -19,36 +20,30 @@ class IbQuestionStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LimitedBox(
-      maxHeight: 300,
-      child: SingleChildScrollView(
-        child: Obx(
-          () => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _controller.stats.map((element) {
-              return Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _handleAvatars(element.users),
-                      const SizedBox(
-                        width: 16,
-                      ),
-                      _handleIbChoice(
-                          choice: element.choice,
-                          context: context,
-                          isMe: element.users.indexWhere((element) =>
-                                  element.id == IbUtils().getCurrentUid()!) !=
-                              -1),
-                    ],
-                  ),
+    return Obx(
+      () => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: _controller.stats.map((element) {
+          return Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _handleAvatars(element.users),
+                const SizedBox(
+                  height: 3,
                 ),
-              );
-            }).toList(),
-          ),
-        ),
+                _handleIbChoice(
+                    choice: element.choice,
+                    context: context,
+                    isMe: element.users.indexWhere((element) =>
+                            element.id == IbUtils().getCurrentUid()!) !=
+                        -1),
+              ],
+            ),
+          );
+        }).toList(),
       ),
     );
   }
@@ -142,7 +137,6 @@ class IbQuestionStats extends StatelessWidget {
       required BuildContext context,
       required bool isMe}) {
     return Row(
-      mainAxisSize: MainAxisSize.min,
       children: [
         if (_controller.ibQuestion.questionType.toString().contains('sc'))
           _handleScType(choice),
@@ -175,16 +169,20 @@ class IbQuestionStats extends StatelessWidget {
               ),
             ),
           ),
-        const SizedBox(
-          width: 4,
-        ),
+        if (_controller.ibQuestion.questionType != QuestionType.multipleChoice)
+          const SizedBox(
+            width: 8,
+          ),
         if (choice.content != null)
-          Text(
-            choice.content!,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-                fontSize: IbConfig.kNormalTextSize,
-                fontWeight: isMe ? FontWeight.bold : FontWeight.normal),
+          Expanded(
+            child: AutoSizeText(
+              choice.content!,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  fontSize: IbConfig.kNormalTextSize,
+                  fontWeight: isMe ? FontWeight.bold : FontWeight.normal),
+            ),
           )
       ],
     );

@@ -26,7 +26,7 @@ import '../../services/user_services/ib_storage_service.dart';
 
 class CreateQuestionController extends GetxController {
   final questionType = QuestionType.multipleChoice.obs;
-  IbQuestionItemController? itemController;
+  IbQuestionItemController? oldItemController;
   final TextEditingController questionEditController = TextEditingController();
   final TextEditingController descriptionEditController =
       TextEditingController();
@@ -50,7 +50,7 @@ class CreateQuestionController extends GetxController {
   bool isPublic;
 
   /// use .. operator to update pickedChats  pickedFriends list or set it separately
-  CreateQuestionController({this.itemController, this.isPublic = true});
+  CreateQuestionController({this.oldItemController, this.isPublic = true});
 
   @override
   Future<void> onReady() async {
@@ -62,10 +62,10 @@ class CreateQuestionController extends GetxController {
   }
 
   Future<void> preFillInfo() async {
-    if (itemController == null) {
+    if (oldItemController == null) {
       return;
     }
-    final ibQuestion = itemController!.rxIbQuestion.value;
+    final ibQuestion = oldItemController!.rxIbQuestion.value;
     picMediaList.value = ibQuestion.medias;
     questionEditController.text = ibQuestion.question;
     descriptionEditController.text = ibQuestion.description;
@@ -202,13 +202,27 @@ class CreateQuestionController extends GetxController {
     final q = IbQuestion(
         question: questionEditController.text.trim(),
         description: descriptionEditController.text.trim(),
-        id: itemController == null
+        id: oldItemController == null
             ? IbUtils().getUniqueId()
-            : itemController!.rxIbQuestion.value.id,
+            : oldItemController!.rxIbQuestion.value.id,
+        isQuiz: oldItemController != null &&
+            oldItemController!.rxIbQuestion.value.isQuiz &&
+            !questionType.value.name.contains('sc'),
+        correctChoiceId: (oldItemController != null &&
+                oldItemController!.rxIbQuestion.value.isQuiz)
+            ? oldItemController!.rxIbQuestion.value.correctChoiceId
+            : '',
+        isOpenEnded: oldItemController != null &&
+            oldItemController!.rxIbQuestion.value.isOpenEnded &&
+            !questionType.value.name.contains('sc'),
         sharedFriendUids: pickedFriends.map((element) => element.id).toList(),
+        isCommentEnabled: oldItemController != null &&
+            oldItemController!.rxIbQuestion.value.isCommentEnabled,
         sharedChatIds:
             pickedChats.map((element) => element.ibChat.chatId).toList(),
         isPublic: isPublic,
+        isAnonymous: oldItemController != null &&
+            oldItemController!.rxIbQuestion.value.isAnonymous,
         tags: pickedTags.map((element) => element.text).toList(),
         creatorId: IbUtils().getCurrentUid()!,
         medias: picMediaList.toSet().union(videoMediaList.toSet()).toList(),
@@ -216,25 +230,18 @@ class CreateQuestionController extends GetxController {
         questionType: questionType.value,
         askedTimeInMs: DateTime.now().millisecondsSinceEpoch);
 
-    if (itemController != null) {
-      itemController!.rxIbQuestion.value = q;
-    } else {
-      itemController = Get.put(IbQuestionItemController(
-          isShowCase: false.obs,
-          rxIsSample: true.obs,
-          rxIbQuestion: q.obs,
-          rxIsExpanded: true.obs));
-    }
-
-    ///IMPORTANT DO NOT CHANGE CODE BELOW UNTILL YOU UNDERSTAND
-    itemController!.rxIsExpanded.value = true;
-    itemController!.selectedChoiceId.value = '';
-    itemController!.rxIsSample.value = true;
+    final itemController = Get.put(
+        IbQuestionItemController(
+            isShowCase: false.obs,
+            rxIsSample: true.obs,
+            rxIbQuestion: q.obs,
+            rxIsExpanded: true.obs),
+        tag: IbUtils().getUniqueId());
 
     Get.to(
       () => ReviewQuestionPage(
         createQuestionController: this,
-        itemController: itemController!,
+        itemController: itemController,
       ),
     );
   }
@@ -286,143 +293,158 @@ class CreateQuestionController extends GetxController {
   }
 
   Future<void> submitQuestion(IbQuestion ibQuestion) async {
-    if (ibQuestion.pollSize != 0) {
-      Get.dialog(IbDialog(
-        title: 'Error',
-        subtitle: "You can't edit a question with votes",
-        onPositiveTap: () {
-          Navigator.of(Get.context!).popUntil((route) => route.isFirst);
-        },
-        showNegativeBtn: false,
-      ));
-      return;
-    }
-
-    //use toSet to ensure uniqueness
-    ibQuestion.sharedChatIds =
-        pickedChats.map((element) => element.ibChat.chatId).toSet().toList();
-    ibQuestion.sharedFriendUids =
-        pickedFriends.map((element) => element.id).toSet().toList();
-    if (ibQuestion.isPublic) {
-      ibQuestion.sharedFriendUids
-          .addAll(IbUtils().getCurrentIbUserUnblockedFriendsId());
-    }
-
-    if (ibQuestion.id.isEmpty ||
-        ibQuestion.tags.isEmpty ||
-        ibQuestion.question.isEmpty ||
-        ibQuestion.choices.isEmpty) {
-      Get.dialog(const IbDialog(
-        title: 'Error',
-        subtitle:
-            'Question is not valid, make sure all required field are filled',
-        showNegativeBtn: false,
-      ));
-      return;
-    }
-
-    if (ibQuestion.isQuiz && ibQuestion.correctChoiceId.isEmpty) {
-      Get.dialog(const IbDialog(
-        title: 'Error',
-        subtitle: 'Quiz question needs to have a correct choice picked',
-        showNegativeBtn: false,
-      ));
-      return;
-    }
-
-    if (ibQuestion.sharedChatIds.isEmpty &&
-        ibQuestion.sharedFriendUids.isEmpty &&
-        !ibQuestion.isPublic) {
-      Get.dialog(const IbDialog(
-        title: 'Error',
-        subtitle: 'Privacy Bounds are empty',
-        showNegativeBtn: false,
-      ));
-      return;
-    }
-
-    Get.dialog(const IbLoadingDialog(messageTrKey: 'Uploading...'),
-        barrierDismissible: false);
-
-    /// upload all url in choices
-    for (final choice in ibQuestion.choices) {
-      if (choice.url == null || choice.url!.contains('http')) {
-        continue;
-      }
-
-      final String? url = await IbStorageService()
-          .uploadAndRetrieveImgUrl(filePath: choice.url!);
-      if (url == null) {
-        IbUtils().showSimpleSnackBar(
-            msg: 'Failed to upload images...',
-            backgroundColor: IbColors.errorRed);
-        break;
-      } else {
-        choice.url = url;
-      }
-    }
-
-    /// upload all url in medias
-    for (final media in ibQuestion.medias) {
-      if (media.url.contains('http')) {
-        continue;
-      }
-
-      final String? url = await IbStorageService().uploadAndRetrieveImgUrl(
-        filePath: media.url,
-      );
-      if (url == null) {
-        IbUtils().showSimpleSnackBar(
-            msg: 'Failed to upload images, check internet connections',
-            backgroundColor: IbColors.errorRed);
+    try {
+      if (ibQuestion.pollSize != 0) {
+        Get.dialog(IbDialog(
+          title: 'Error',
+          subtitle: "You can't edit a poll with votes",
+          onPositiveTap: () {
+            Navigator.of(Get.context!).popUntil((route) => route.isFirst);
+          },
+          showNegativeBtn: false,
+        ));
         return;
-      } else {
-        media.url = url;
       }
-    }
 
-    /// upload all the string in tagIds
-    for (final String text in ibQuestion.tags) {
-      await IbTagDbService().uploadTag(text);
-    }
-    await IbQuestionDbService().uploadQuestion(ibQuestion);
-
-    /// add IbMessage to selected circles
-    for (final item in ibQuestion.sharedChatIds) {
-      await IbChatDbService().uploadMessage(IbMessage(
-          messageId: IbUtils().getUniqueId(),
-          content: ibQuestion.id,
-          readUids: [IbUtils().getCurrentUid()!],
-          senderUid: IbUtils().getCurrentUid()!,
-          messageType: IbMessage.kMessageTypePoll,
-          chatRoomId: item));
-    }
-
-    await IbAnalyticsManager()
-        .logCustomEvent(name: 'create_question', data: {});
-
-    Get.close(3);
-
-    /// DO NOT ERASE THIS LINE BELOW
-    /// update question in home page
-    itemController!.rxIsSample.value = false;
-    itemController!.rxIbQuestion.value = ibQuestion;
-    itemController!.rxIbQuestion.refresh();
-    print(itemController!.rxIbQuestion.value.medias);
-    IbUtils().showSimpleSnackBar(
-        msg: 'Question submitted successfully',
-        backgroundColor: IbColors.accentColor);
-
-    if (IbUtils().getCurrentIbUser()!.askedCount % 7 == 0) {
-      final InAppReview inAppReview = InAppReview.instance;
-      if (await inAppReview.isAvailable()) {
-        inAppReview.requestReview();
-      } else {
-        IbUtils().showSimpleSnackBar(
-            msg:
-                'If you enjoy this app, please leave us a 5 star review in ${GetPlatform.isAndroid ? 'Google Play Store ' : 'AppStore'}',
-            backgroundColor: IbColors.primaryColor);
+      //use toSet to ensure uniqueness
+      ibQuestion.sharedChatIds =
+          pickedChats.map((element) => element.ibChat.chatId).toSet().toList();
+      ibQuestion.sharedFriendUids =
+          pickedFriends.map((element) => element.id).toSet().toList();
+      if (ibQuestion.isPublic) {
+        ibQuestion.sharedFriendUids
+            .addAll(IbUtils().getCurrentIbUserUnblockedFriendsId());
       }
+
+      if (ibQuestion.id.isEmpty ||
+          ibQuestion.tags.isEmpty ||
+          ibQuestion.question.isEmpty ||
+          ibQuestion.choices.isEmpty) {
+        Get.dialog(const IbDialog(
+          title: 'Error',
+          subtitle:
+              'Question is not valid, make sure all required field are filled',
+          showNegativeBtn: false,
+        ));
+        return;
+      }
+
+      if (ibQuestion.isQuiz && ibQuestion.correctChoiceId.isEmpty) {
+        Get.dialog(const IbDialog(
+          title: 'Error',
+          subtitle: 'Quiz question needs to have a correct choice picked',
+          showNegativeBtn: false,
+        ));
+        return;
+      }
+
+      if (ibQuestion.sharedChatIds.isEmpty &&
+          ibQuestion.sharedFriendUids.isEmpty &&
+          !ibQuestion.isPublic) {
+        Get.dialog(const IbDialog(
+          title: 'Error',
+          subtitle: 'Privacy Bounds are empty',
+          showNegativeBtn: false,
+        ));
+        return;
+      }
+
+      Get.dialog(const IbLoadingDialog(messageTrKey: 'Uploading...'),
+          barrierDismissible: false);
+
+      /// upload all url in choices
+      for (final choice in ibQuestion.choices) {
+        if (choice.url == null || choice.url!.contains('http')) {
+          continue;
+        }
+
+        final String? url = await IbStorageService()
+            .uploadAndRetrieveImgUrl(filePath: choice.url!);
+        if (url == null) {
+          IbUtils().showSimpleSnackBar(
+              msg: 'Failed to upload images...',
+              backgroundColor: IbColors.errorRed);
+          break;
+        } else {
+          choice.url = url;
+        }
+      }
+
+      /// upload all url in medias
+      for (final media in ibQuestion.medias) {
+        if (media.url.contains('http')) {
+          continue;
+        }
+
+        final String? url = await IbStorageService().uploadAndRetrieveImgUrl(
+          filePath: media.url,
+        );
+        if (url == null) {
+          IbUtils().showSimpleSnackBar(
+              msg: 'Failed to upload images, check internet connections',
+              backgroundColor: IbColors.errorRed);
+          return;
+        } else {
+          media.url = url;
+        }
+      }
+
+      /// upload all the string in tagIds
+      for (final String text in ibQuestion.tags) {
+        await IbTagDbService().uploadTag(text);
+      }
+
+      await IbQuestionDbService().uploadQuestion(ibQuestion);
+
+      /// add IbMessage to selected circles
+      for (final item in ibQuestion.sharedChatIds) {
+        await IbChatDbService().uploadMessage(IbMessage(
+            messageId: IbUtils().getUniqueId(),
+            content: ibQuestion.id,
+            readUids: [IbUtils().getCurrentUid()!],
+            senderUid: IbUtils().getCurrentUid()!,
+            messageType: IbMessage.kMessageTypePoll,
+            chatRoomId: item));
+      }
+
+      await IbAnalyticsManager()
+          .logCustomEvent(name: 'create_question', data: {});
+
+      Get.close(3);
+
+      /// DO NOT ERASE THIS LINE BELOW
+      /// update question in home page
+      oldItemController!.rxIsSample.value = false;
+      oldItemController!.rxIbQuestion.value = ibQuestion;
+      oldItemController!.rxIbQuestion.value.questionType = questionType.value;
+      oldItemController!.rxIbQuestion.refresh();
+      oldItemController!.rxIsSample.refresh();
+
+      /// END
+
+      IbUtils().showSimpleSnackBar(
+          msg: 'Poll submitted successfully',
+          backgroundColor: IbColors.accentColor);
+
+      if (IbUtils().getCurrentIbUser()!.askedCount % 7 == 0) {
+        final InAppReview inAppReview = InAppReview.instance;
+        if (await inAppReview.isAvailable()) {
+          inAppReview.requestReview();
+        } else {
+          IbUtils().showSimpleSnackBar(
+              msg:
+                  'If you enjoy this app, please leave us a 5 star review in ${GetPlatform.isAndroid ? 'Google Play Store ' : 'AppStore'}',
+              backgroundColor: IbColors.primaryColor);
+        }
+      }
+    } catch (e) {
+      print(e);
+      Get.back();
+      Get.dialog(const IbDialog(
+        title: 'Error',
+        subtitle: 'Failed to submit poll ',
+        showNegativeBtn: false,
+      ));
     }
   }
 }
