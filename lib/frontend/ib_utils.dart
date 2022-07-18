@@ -767,12 +767,13 @@ class IbUtils {
   Widget handleQuestionType(IbQuestion question,
       {bool uniqueTag = false,
       List<IbAnswer> ibAnswers = const [],
+      String? customTag,
       bool expanded = false,
       bool isSample = false,
       bool isShowCase = false,
       IbQuestionItemController? itemController}) {
     if (itemController == null) {
-      final tag = uniqueTag ? getUniqueId() : question.id;
+      final tag = uniqueTag ? (customTag ?? getUniqueId()) : question.id;
       final IbQuestionItemController controller = Get.put(
           IbQuestionItemController(
               ibAnswers: ibAnswers,
