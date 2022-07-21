@@ -48,7 +48,7 @@ class ProfileController extends GetxController {
           await IbUtils().getCommonAnswerQuestionIds(uid: uid);
       uncommonAnswers.value =
           await IbUtils().getUncommonAnswerQuestionIds(uid: uid);
-      compScore.value = await IbUtils().getCompScore(uid: uid);
+      compScore.value = await IbUtils().getCompScore(uid: uid, isRefresh: true);
       isFriend.value = user.friendUids.contains(IbUtils().getCurrentUid());
       frSentNotification =
           await IbUserDbService().querySentFriendRequest(user.id);

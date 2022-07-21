@@ -610,8 +610,9 @@ class IbUtils {
     final List<Color> _colors = [
       IbColors.primaryColor,
       IbColors.accentColor,
+      IbColors.lightGrey,
       Colors.redAccent,
-      Colors.yellowAccent,
+      Colors.deepOrange,
       Colors.cyanAccent,
       Colors.lightBlueAccent,
       Colors.purpleAccent,

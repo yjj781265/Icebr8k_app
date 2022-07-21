@@ -43,8 +43,9 @@ class IbUserAvatar extends StatelessWidget {
         height: radius * 2,
         width: radius * 2,
         child: Icon(
-          Icons.no_accounts_sharp,
+          Icons.person,
           size: radius,
+          color: Colors.grey,
         ),
       );
     }
