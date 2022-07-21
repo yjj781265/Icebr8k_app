@@ -128,7 +128,8 @@ class SettingsMainPage extends StatelessWidget {
                     title: 'Delete Account',
                     subtitle: 'Are you sure you want to delete your account?'
                         ' If you delete your account, you will permanently '
-                        'lose your profile, messages, polls, and photos.',
+                        'lose your profile, messages, polls, and photos. '
+                        'If you are a premium member, do not forget to cancel your subscription.',
                     onPositiveTap: () async {
                       Get.back();
                       Get.dialog(const IbLoadingDialog(

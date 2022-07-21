@@ -58,17 +58,19 @@ class _QuestionMainPageState extends State<QuestionMainPage> {
         title:
             Text(widget._controller.itemController.rxIbQuestion.value.question),
       ),
-      body: SmartRefresher(
-        controller: refreshController,
-        onRefresh: () async {
-          await widget._controller.itemController.refreshStats();
-          refreshController.refreshCompleted();
-        },
-        child: SingleChildScrollView(
-            child: IbUtils().handleQuestionType(
-          widget._controller.itemController.rxIbQuestion.value,
-          uniqueTag: true,
-        )),
+      body: SafeArea(
+        child: SmartRefresher(
+          controller: refreshController,
+          onRefresh: () async {
+            await widget._controller.itemController.refreshStats();
+            refreshController.refreshCompleted();
+          },
+          child: SingleChildScrollView(
+              child: IbUtils().handleQuestionType(
+            widget._controller.itemController.rxIbQuestion.value,
+            uniqueTag: true,
+          )),
+        ),
       ),
     );
   }

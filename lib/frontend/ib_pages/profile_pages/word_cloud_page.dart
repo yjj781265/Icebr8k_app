@@ -61,10 +61,11 @@ class _WordCloudPageState extends State<WordCloudPage> {
               .compareTo(widget._controller.userIbTagMap[a] ?? 0));
           return Center(
             child: FittedBox(
+              fit: BoxFit.cover,
               child: InteractiveViewer(
                 child: Scatter(
                   fillGaps: true,
-                  clipBehavior: Clip.hardEdge,
+                  clipBehavior: Clip.none,
                   delegate: ArchimedeanSpiralScatterDelegate(),
                   children: tags
                       .take(16)

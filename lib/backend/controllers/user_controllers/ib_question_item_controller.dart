@@ -91,6 +91,7 @@ class IbQuestionItemController extends GetxController {
   }
 
   Future<void> initData() async {
+    isRefreshing.value = true;
     countMap.clear();
     resultMap.clear();
     choiceUserMap.clear();
@@ -108,6 +109,7 @@ class IbQuestionItemController extends GetxController {
     if (rxIsSample.isFalse) {
       await refreshStats();
     }
+    isRefreshing.value = false;
   }
 
   /// refresh poll result, comments, likes,
