@@ -31,6 +31,13 @@ class IbPremiumController extends GetxController {
   }
 
   @override
+  Future<void> onReady() async {
+    super.onReady();
+    await IbAnalyticsManager().logScreenView(
+        className: 'IbPremiumController', screenName: 'IbPremiumPage');
+  }
+
+  @override
   Future<void> onClose() async {
     super.onClose();
   }

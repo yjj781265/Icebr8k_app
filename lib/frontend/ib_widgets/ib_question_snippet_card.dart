@@ -25,15 +25,17 @@ class IbQuestionSnippetCard extends StatelessWidget {
       child: ListTile(
         onTap: () {
           Get.to(() => QuestionMainPage(
-                Get.put(QuestionMainController(
-                  Get.put(
-                      IbQuestionItemController(
-                          isShowCase: false.obs,
-                          rxIsSample: false.obs,
-                          rxIbQuestion: question.obs,
-                          rxIsExpanded: true.obs),
-                      tag: IbUtils().getUniqueId()),
-                )),
+                Get.put(
+                    QuestionMainController(
+                      Get.put(
+                          IbQuestionItemController(
+                              isShowCase: false.obs,
+                              rxIsSample: false.obs,
+                              rxIbQuestion: question.obs,
+                              rxIsExpanded: true.obs),
+                          tag: IbUtils().getUniqueId()),
+                    ),
+                    tag: question.id),
               ));
         },
         title: AutoSizeText(

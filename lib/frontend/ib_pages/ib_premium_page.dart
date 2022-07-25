@@ -32,8 +32,14 @@ class IbPremiumPage extends StatelessWidget {
               return const SizedBox();
             }
             if (_controller.isRestoring.isTrue) {
-              return const SizedBox(
-                  width: 100, child: CircularProgressIndicator.adaptive());
+              return Container(
+                  width: 100,
+                  height: 40,
+                  alignment: Alignment.center,
+                  child: const Center(
+                      child: CircularProgressIndicator.adaptive(
+                    strokeWidth: 2,
+                  )));
             }
             return TextButton(
                 onPressed: () async {

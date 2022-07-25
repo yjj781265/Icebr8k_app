@@ -9,6 +9,7 @@ import 'package:icebr8k/backend/models/ib_question.dart';
 import 'package:icebr8k/backend/models/ib_user.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_pages/question_pages/question_result_detail_page.dart';
+import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_media_viewer.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
 
@@ -54,9 +55,12 @@ class QuestionResultMainPage extends StatelessWidget {
     }
     return InkWell(
       onTap: () {
-        Get.to(() => QuestionResultDetailPage(Get.put(
-            QuestionResultDetailPageController(
-                itemController: _itemController, ibChoice: choice))));
+        Get.to(
+            () => QuestionResultDetailPage(Get.put(
+                QuestionResultDetailPageController(
+                    itemController: _itemController, ibChoice: choice),
+                tag: IbUtils().getUniqueId())),
+            preventDuplicates: false);
       },
       child: Ink(
         color: Theme.of(Get.context!).backgroundColor,
