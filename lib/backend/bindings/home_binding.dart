@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:icebr8k/backend/controllers/admin_controllers/admin_main_controller.dart';
-import 'package:icebr8k/backend/controllers/user_controllers/ib_premium_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/main_page_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/notifications_controller.dart';
 import 'package:icebr8k/backend/controllers/user_controllers/social_tab_controller.dart';
@@ -27,6 +26,5 @@ class HomeBinding implements Bindings {
     Get.lazyPut(() => NotificationController(), fenix: true);
     Get.lazyPut(() => PeopleNearbyController(), fenix: true);
     Get.put(AdminMainController());
-    Get.put(IbPremiumController());
   }
 }

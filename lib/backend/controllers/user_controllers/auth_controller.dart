@@ -41,6 +41,7 @@ class AuthController extends GetxService {
   final IbDbStatusService ibDbStatusService;
   final IbLocalDataService ibLocalDataService;
   final IbAuthService ibAuthService;
+  late StreamSubscription networkSub;
 
   AuthController(
       {required this.ibUtils,
@@ -51,6 +52,19 @@ class AuthController extends GetxService {
   @override
   void onInit() {
     super.onInit();
+    networkSub = Connectivity().onConnectivityChanged.listen(
+        (ConnectivityResult result) {
+      if (result == ConnectivityResult.none) {
+        IbUtils().showSimpleSnackBar(
+            msg: 'No Internet Connection',
+            backgroundColor: IbColors.errorRed,
+            isPersistent: true);
+      } else if (result != ConnectivityResult.bluetooth) {
+        Get.closeAllSnackbars();
+      }
+    }, onError: (e) {
+      print(e);
+    });
     _dbStatusSub = ibDbStatusService.listenToStatus().listen((event) async {
       await _handleDbStatus(event);
       setUpAnalytics();
@@ -115,10 +129,11 @@ class AuthController extends GetxService {
   }
 
   @override
-  void onClose() {
+  Future<void> onClose() async {
     super.onClose();
-    _fbAuthSub.cancel();
-    _dbStatusSub.cancel();
+    await _fbAuthSub.cancel();
+    await _dbStatusSub.cancel();
+    await networkSub.cancel();
     print('auth controller onClose');
   }
 

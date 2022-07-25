@@ -13,12 +13,12 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 
 class IbPremiumController extends GetxController {
   final List<String> _productIds = [
-    'ib_premium_monthly_old',
-    'ib_premium_weekly_old',
-    'ib_premium_yearly_old'
+    'ib_weekly_premium',
+    'ib_monthly_premium',
+    'ib_yearly_premium'
   ];
   final entitlement = 'premium';
-  final offerings = <Offering>[].obs;
+  final products = <Product>[].obs;
   final isPremium = false.obs;
   final isLoading = true.obs;
   final isRestoring = false.obs;
@@ -37,39 +37,24 @@ class IbPremiumController extends GetxController {
         className: 'IbPremiumController', screenName: 'IbPremiumPage');
   }
 
-  @override
-  Future<void> onClose() async {
-    super.onClose();
-  }
-
   Future<void> _initPlatformState() async {
     isLoading.value = true;
     await Purchases.setDebugLogsEnabled(kDebugMode);
     try {
-      await IbApiKeysManager().init();
-      if (GetPlatform.isAndroid) {
-        await Purchases.setup(IbApiKeysManager.kRevenueCatAndroidKey,
-            appUserId: IbUtils().getCurrentUid());
-      } else if (GetPlatform.isIOS) {
-        await Purchases.setup(IbApiKeysManager.kRevenueCatIosKey,
-            appUserId: IbUtils().getCurrentUid());
-      }
-      if (await Purchases.isConfigured) {
-        /// load products
-        final offers = await Purchases.getOfferings();
-        for (final id in _productIds) {
-          final offer = offers.getOffering(id);
-          if (offer != null) {
-            offerings.add(offer);
-          }
+      if (!await Purchases.isConfigured) {
+        await IbApiKeysManager().init();
+        if (GetPlatform.isAndroid) {
+          await Purchases.setup(IbApiKeysManager.kRevenueCatAndroidKey,
+              appUserId: IbUtils().getCurrentUid());
+        } else if (GetPlatform.isIOS) {
+          await Purchases.setup(IbApiKeysManager.kRevenueCatIosKey,
+              appUserId: IbUtils().getCurrentUid());
         }
-        offerings.sort((a, b) => (a.availablePackages.first.product.price)
-            .compareTo(b.availablePackages.first.product.price));
-      } else {
-        await IbAnalyticsManager().logCustomEvent(name: 'error_load_products');
-        isLoading.value = false;
-        return;
       }
+
+      /// load products
+      products.value = await Purchases.getProducts(_productIds);
+      products.sort((a, b) => a.price.compareTo(b.price));
 
       ///query purchase Info
       final PurchaserInfo purchaserInfo = await Purchases.getPurchaserInfo();
@@ -92,6 +77,14 @@ class IbPremiumController extends GetxController {
     }
   }
 
+  @override
+  void onClose() {
+    print('IbPremiumController onClose');
+    Purchases.removePurchaserInfoUpdateListener((purchaserInfo) {
+      print('IbPremiumController onClose $purchaserInfo');
+    });
+  }
+
   Future<void> sync() async {
     try {
       await Purchases.syncPurchases();
@@ -109,7 +102,7 @@ class IbPremiumController extends GetxController {
       isPremium.value = entitlementInfo!.isActive;
     }
     print('User has premium $isPremium');
-    await Purchases.syncPurchases();
+    await sync();
     await IbUserDbService().updateCurrentIbUserPremium(isPremium.value);
   }
 
@@ -134,8 +127,10 @@ class IbPremiumController extends GetxController {
       }
     } on PlatformException catch (e) {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);
+      await IbAnalyticsManager().logCustomEvent(
+          name: 'purchase_premium_error', data: {'error_code': errorCode});
       Get.dialog(IbDialog(
-        title: 'Error(${errorCode.name})',
+        title: 'Info',
         subtitle: e.message ?? 'Oops, something went wrong',
         showNegativeBtn: false,
       ));

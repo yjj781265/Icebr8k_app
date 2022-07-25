@@ -17,11 +17,10 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 
 class IbPremiumPage extends StatelessWidget {
   IbPremiumPage({Key? key}) : super(key: key);
-  final IbPremiumController _controller = Get.find();
+  final IbPremiumController _controller = Get.put(IbPremiumController());
 
   @override
   Widget build(BuildContext context) {
-    _controller.restorePurchase();
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -224,30 +223,27 @@ class IbPremiumPage extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: _controller.offerings
-                .map((element) => Container(
+            children: _controller.products
+                .map((product) => Container(
                       margin: const EdgeInsets.all(4),
                       child: ListTile(
                         onTap: () async {
                           Get.back();
                           if (GetPlatform.isIOS) {
-                            _showDisclosure(element);
+                            _showDisclosure(product);
                             return;
                           }
-                          await _controller.purchasePremium(
-                              element.availablePackages.first.product);
+                          await _controller.purchasePremium(product);
                         },
                         title: Text(
-                          element.availablePackages.first.product.title,
+                          product.title,
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: IbConfig.kNormalTextSize),
                         ),
-                        subtitle: Text(element.availablePackages.first.product
-                                .description.capitalizeFirst ??
-                            ''),
-                        trailing: Text(
-                            element.availablePackages.first.product.priceString,
+                        subtitle:
+                            Text(product.description.capitalizeFirst ?? ''),
+                        trailing: Text(product.priceString,
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: IbConfig.kPageTitleSize)),
@@ -261,12 +257,12 @@ class IbPremiumPage extends StatelessWidget {
     Get.bottomSheet(payWall, ignoreSafeArea: true);
   }
 
-  void _showDisclosure(Offering offering) {
+  void _showDisclosure(Product product) {
     Get.dialog(IbDialog(
       title: 'Info',
       content: Text.rich(TextSpan(text: 'A ', children: [
         TextSpan(
-          text: offering.availablePackages.first.product.priceString,
+          text: product.priceString,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         const TextSpan(
@@ -295,8 +291,7 @@ class IbPremiumPage extends StatelessWidget {
       ])),
       onPositiveTap: () async {
         Get.back();
-        await _controller
-            .purchasePremium(offering.availablePackages.first.product);
+        await _controller.purchasePremium(product);
       },
       subtitle: '',
     ));

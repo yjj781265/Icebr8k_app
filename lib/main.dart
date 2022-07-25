@@ -103,7 +103,9 @@ class MainApp extends StatelessWidget {
 
   Widget _somethingWrong() {
     return Container(
-      color: IbColors.lightBlue,
+      color: IbLocalDataService().retrieveBoolValue(StorageKey.isDarkModeBool)
+          ? Colors.black
+          : IbColors.lightBlue,
       child: Center(
         child: Lottie.asset('assets/images/error.json'),
       ),
