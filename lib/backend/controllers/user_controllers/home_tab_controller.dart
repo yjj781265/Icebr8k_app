@@ -210,7 +210,9 @@ class HomeTabController extends GetxController {
         final snapshot = await IbQuestionDbService().queryFollowedTagsQuestions(
             tags: IbUtils().getCurrentIbUser()!.tags);
         for (final doc in snapshot.docs) {
-          forYourList.add(IbQuestion.fromJson(doc.data()));
+          forYourList.addIf(
+              forYourList.indexWhere((element) => element.id == doc.id) == -1,
+              IbQuestion.fromJson(doc.data()));
           lastTagDoc = doc;
         }
       }
@@ -316,7 +318,9 @@ class HomeTabController extends GetxController {
         }
 
         for (final doc in snap.docs) {
-          tempList.add(IbQuestion.fromJson(doc.data()));
+          final index =
+              trendingList.indexWhere((element) => element.id == doc.id);
+          tempList.addIf(index == -1, IbQuestion.fromJson(doc.data()));
         }
         _addAds(tempList);
         trendingList.addAll(tempList);
@@ -395,7 +399,9 @@ class HomeTabController extends GetxController {
         }
 
         for (final doc in snap.docs) {
-          tempList.add(IbQuestion.fromJson(doc.data()));
+          final index =
+              newestList.indexWhere((element) => element.id == doc.id);
+          tempList.addIf(index == 1, IbQuestion.fromJson(doc.data()));
           lastNewestDoc = doc;
         }
         _addAds(tempList);
