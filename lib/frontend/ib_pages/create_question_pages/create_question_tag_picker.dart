@@ -332,6 +332,11 @@ class _CreateQuestionTagPickerState extends State<CreateQuestionTagPicker> {
       title: 'tag_picker_dialog_title'.tr,
       subtitle: '',
       onPositiveTap: () {
+        if (controller.text.trim().isEmpty) {
+          IbUtils().showSimpleSnackBar(
+              msg: 'Tag is empty', backgroundColor: IbColors.errorRed);
+          return;
+        }
         Get.back();
         widget._controller.addNewTag(controller.text);
       },

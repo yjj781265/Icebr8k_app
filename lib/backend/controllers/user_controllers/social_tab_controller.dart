@@ -58,7 +58,10 @@ class SocialTabController extends GetxController {
         final IbChat ibChat = IbChat.fromJson(docChange.doc.data()!);
         if (docChange.type == DocumentChangeType.added) {
           final item = await _buildChatTabItem(ibChat);
-          if (item.avatars.isEmpty) {
+          if (item.avatars.isEmpty ||
+              oneToOneChats.indexWhere((element) =>
+                      element.ibChat.chatId == item.ibChat.chatId) !=
+                  -1) {
             continue;
           }
           oneToOneChats.add(item);
@@ -97,8 +100,10 @@ class SocialTabController extends GetxController {
         final IbChat ibChat = IbChat.fromJson(docChange.doc.data()!);
         print('ChatTabController circle ${docChange.type}');
         if (docChange.type == DocumentChangeType.added) {
+          final index = circles
+              .indexWhere((element) => element.ibChat.chatId == ibChat.chatId);
           final item = await _buildChatTabItem(ibChat);
-          circles.add(item);
+          circles.addIf(index == -1, item);
         } else if (docChange.type == DocumentChangeType.modified) {
           final index = circles
               .indexWhere((element) => element.ibChat.chatId == ibChat.chatId);

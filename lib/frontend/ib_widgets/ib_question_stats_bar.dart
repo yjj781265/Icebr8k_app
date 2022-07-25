@@ -53,8 +53,10 @@ class IbQuestionStatsBar extends StatelessWidget {
                   onPressed: _itemController.rxIsSample.isTrue
                       ? null
                       : () {
-                          Get.to(() => CommentPage(Get.put(CommentController(
-                              itemController: _itemController))));
+                          Get.to(() => CommentPage(Get.put(
+                              CommentController(
+                                  itemController: _itemController),
+                              tag: IbUtils().getUniqueId())));
                         },
                   icon: FaIcon(
                     FontAwesomeIcons.comments,
@@ -132,7 +134,8 @@ class IbQuestionStatsBar extends StatelessWidget {
       return;
     }
 
-    Get.to(() => QuestionResultMainPage(_itemController));
+    Get.to(() => QuestionResultMainPage(_itemController),
+        preventDuplicates: false);
   }
 
   Future<void> _handleOnShareTap() async {

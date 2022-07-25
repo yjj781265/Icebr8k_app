@@ -344,7 +344,7 @@ class CommentItemWidget extends StatelessWidget {
                                       .itemController.rxIbQuestion.value))));
                             },
                             child: Text(
-                              'View ${item.ibComment.replies.length} Reply',
+                              'View ${item.ibComment.replies.length} ${item.ibComment.replies.length > 1 ? 'Replies' : 'Reply'}',
                               style:
                                   const TextStyle(color: IbColors.primaryColor),
                             ))
@@ -375,6 +375,7 @@ class CommentItemWidget extends StatelessWidget {
               QuestionType.multipleChoicePic) {
         return Text(
           ibChoice.content ?? '',
+          textAlign: TextAlign.right,
           style: const TextStyle(
             fontSize: IbConfig.kDescriptionTextSize,
             fontWeight: FontWeight.bold,
@@ -453,6 +454,7 @@ class CommentItemWidget extends StatelessWidget {
 
       if (ibChoice.content != null) {
         return Text(
+          textAlign: TextAlign.right,
           controller.itemController.rxIbQuestion.value.choices
               .firstWhere(
                   (element) => element.choiceId == item.ibAnswer!.choiceId)

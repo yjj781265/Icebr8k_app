@@ -35,8 +35,8 @@ class IbQuestionButtons extends StatelessWidget {
                   disabled: _controller.rxIsSample.isTrue,
                   onPressed: () {
                     Get.to(() => CommentPage(Get.put(
-                          CommentController(itemController: _controller),
-                        )));
+                        CommentController(itemController: _controller),
+                        tag: IbUtils().getUniqueId())));
                   },
                   textTrKey: 'comment',
                 ),

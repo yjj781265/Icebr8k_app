@@ -215,7 +215,6 @@ class HomeTabController extends GetxController {
         }
       }
 
-      forYourList.shuffle();
       _addAds(forYourList);
       refreshController.refreshCompleted();
       isLoading.value = false;

@@ -277,8 +277,10 @@ class MyProfilePage extends StatelessWidget {
                 if (_controller.rxCurrentIbUser.value.answeredCount == 0) {
                   return;
                 }
-                Get.to(() => AnsweredPage(Get.put(AnsweredQuestionController(
-                    _controller.rxCurrentIbUser.value.id))));
+                Get.to(() => AnsweredPage(Get.put(
+                    AnsweredQuestionController(
+                        _controller.rxCurrentIbUser.value.id),
+                    tag: IbUtils().getUniqueId())));
               },
               subText: '✅ VOTE(S)',
             ),

@@ -291,6 +291,7 @@ class ReplyPage extends StatelessWidget {
         _controller.ibQuestion.questionType == QuestionType.multipleChoicePic) {
       return Text(
         ibChoice.content ?? '',
+        textAlign: TextAlign.right,
         style: const TextStyle(
           fontSize: IbConfig.kDescriptionTextSize,
           fontWeight: FontWeight.bold,
@@ -366,6 +367,7 @@ class ReplyPage extends StatelessWidget {
 
     if (ibChoice.content != null) {
       return Text(
+        textAlign: TextAlign.right,
         _controller.ibQuestion.choices
             .firstWhere(
                 (element) => element.choiceId == item.ibAnswer!.choiceId)
