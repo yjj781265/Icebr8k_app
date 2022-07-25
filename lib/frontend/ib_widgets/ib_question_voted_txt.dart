@@ -67,7 +67,10 @@ class IbQuestionVotedText extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: IbUserAvatar(avatarUrl: element.avatarUrl),
+                        child: IbUserAvatar(
+                          avatarUrl: element.avatarUrl,
+                          uid: element.id,
+                        ),
                       ),
                       Text(
                         element.username,
