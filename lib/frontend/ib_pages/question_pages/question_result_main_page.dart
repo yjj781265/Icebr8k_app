@@ -80,6 +80,9 @@ class QuestionResultMainPage extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(
+              width: 4,
+            ),
             Row(
                 children: ibUsers.map((e) {
               final int index =

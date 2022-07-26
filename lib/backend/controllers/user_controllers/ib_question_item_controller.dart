@@ -287,7 +287,7 @@ class IbQuestionItemController extends GetxController {
         for (final IbAnswer answer in ibAnswers) {
           final user = await retrieveUser(answer.uid);
           if (user != null) {
-            users.add(user);
+            users.addIf(!users.contains(user), user);
           } else {
             await IbQuestionDbService().deleteSingleIbAnswer(answer);
           }
