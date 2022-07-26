@@ -216,45 +216,62 @@ class IbPremiumPage extends StatelessWidget {
         ));
   }
 
-  void _showPayWall() {
+  Future<void> _showPayWall() async {
     final Widget payWall = Obx(
       () => IbCard(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: _controller.products
-                .map((product) => Container(
-                      margin: const EdgeInsets.all(4),
-                      child: ListTile(
-                        onTap: () async {
-                          Get.back();
-                          if (GetPlatform.isIOS) {
-                            _showDisclosure(product);
-                            return;
-                          }
-                          await _controller.purchasePremium(product);
-                        },
-                        title: Text(
-                          product.title,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: IbConfig.kNormalTextSize),
-                        ),
-                        subtitle:
-                            Text(product.description.capitalizeFirst ?? ''),
-                        trailing: Text(product.priceString,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: IbConfig.kPageTitleSize)),
-                      ),
-                    ))
-                .toList(),
-          ),
+        child: SizedBox(
+          height: 250,
+          child: _controller.isLoadingProduct.isTrue
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      IbProgressIndicator(),
+                      Text('Fetching Products...')
+                    ],
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: _controller.products
+                          .map((product) => Container(
+                                margin: const EdgeInsets.all(4),
+                                child: ListTile(
+                                  onTap: () async {
+                                    Get.back();
+                                    if (GetPlatform.isIOS) {
+                                      _showDisclosure(product);
+                                      return;
+                                    }
+                                    await _controller.purchasePremium(product);
+                                  },
+                                  title: Text(
+                                    product.title,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: IbConfig.kNormalTextSize),
+                                  ),
+                                  subtitle: Text(
+                                      product.description.capitalizeFirst ??
+                                          ''),
+                                  trailing: Text(product.priceString,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: IbConfig.kPageTitleSize)),
+                                ),
+                              ))
+                          .toList(),
+                    ),
+                  ),
+                ),
         ),
       ),
     );
     Get.bottomSheet(payWall, ignoreSafeArea: true);
+    await _controller.loadProducts();
   }
 
   void _showDisclosure(Product product) {

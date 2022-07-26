@@ -21,6 +21,7 @@ class IbPremiumController extends GetxController {
   final products = <Product>[].obs;
   final isPremium = false.obs;
   final isLoading = true.obs;
+  final isLoadingProduct = true.obs;
   final isRestoring = false.obs;
   EntitlementInfo? entitlementInfo;
 
@@ -51,10 +52,6 @@ class IbPremiumController extends GetxController {
               appUserId: IbUtils().getCurrentUid());
         }
       }
-
-      /// load products
-      products.value = await Purchases.getProducts(_productIds);
-      products.sort((a, b) => a.price.compareTo(b.price));
 
       ///query purchase Info
       final PurchaserInfo purchaserInfo = await Purchases.getPurchaserInfo();
@@ -90,6 +87,17 @@ class IbPremiumController extends GetxController {
       await Purchases.syncPurchases();
     } catch (e) {
       print(e);
+    }
+  }
+
+  Future<void> loadProducts() async {
+    /// load products
+    try {
+      isLoadingProduct.value = true;
+      products.value = await Purchases.getProducts(_productIds);
+      products.sort((a, b) => a.price.compareTo(b.price));
+    } finally {
+      isLoadingProduct.value = false;
     }
   }
 
