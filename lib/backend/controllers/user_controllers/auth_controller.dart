@@ -67,7 +67,7 @@ class AuthController extends GetxService {
     });
     _dbStatusSub = ibDbStatusService.listenToStatus().listen((event) async {
       await _handleDbStatus(event);
-      setUpAnalytics();
+      await setUpAnalytics();
     });
 
     _fbAuthSub = ibAuthService.listenToAuthStateChanges().listen((user) async {

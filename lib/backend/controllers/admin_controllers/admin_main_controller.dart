@@ -59,7 +59,6 @@ class AdminMainController extends GetxController {
   @override
   Future<void> dispose() async {
     await ad.dispose();
-
     await applicationSub.cancel();
     await ibCollectionsSub.cancel();
     super.dispose();
