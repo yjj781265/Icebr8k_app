@@ -10,6 +10,7 @@ import 'package:icebr8k/frontend/ib_colors.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class IbPremiumController extends GetxController {
   final List<String> _productIds = [
@@ -58,6 +59,7 @@ class IbPremiumController extends GetxController {
 
       ///query purchase Info
       final PurchaserInfo purchaserInfo = await Purchases.getPurchaserInfo();
+
       await _handlePurchaseInfo(purchaserInfo);
 
       ///listen to  purchase Info changes
@@ -90,6 +92,14 @@ class IbPremiumController extends GetxController {
       await Purchases.syncPurchases();
     } catch (e) {
       print(e);
+    }
+  }
+
+  Future<void> manageSubscription() async {
+    ///query purchase Info
+    final PurchaserInfo purchaserInfo = await Purchases.getPurchaserInfo();
+    if (await canLaunchUrlString(purchaserInfo.managementURL ?? '')) {
+      launchUrlString(purchaserInfo.managementURL!);
     }
   }
 
