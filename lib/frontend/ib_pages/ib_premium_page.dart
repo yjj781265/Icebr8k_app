@@ -372,6 +372,11 @@ class IbPremiumPage extends StatelessWidget {
                         fontStyle: FontStyle.italic,
                         color: IbColors.lightGrey),
                   ),
+                  TextButton(
+                      onPressed: () async {
+                        await _controller.manageSubscription();
+                      },
+                      child: const Text('Manage Subscription'))
                 ],
               ))
         ],
