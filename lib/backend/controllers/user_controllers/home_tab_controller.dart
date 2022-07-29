@@ -401,7 +401,7 @@ class HomeTabController extends GetxController {
         for (final doc in snap.docs) {
           final index =
               newestList.indexWhere((element) => element.id == doc.id);
-          tempList.addIf(index == 1, IbQuestion.fromJson(doc.data()));
+          tempList.addIf(index == -1, IbQuestion.fromJson(doc.data()));
           lastNewestDoc = doc;
         }
         _addAds(tempList);
