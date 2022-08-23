@@ -12,6 +12,7 @@ import 'package:icebr8k/backend/services/user_services/ib_local_data_service.dar
 import 'package:icebr8k/backend/services/user_services/ib_typesense_service.dart';
 import 'package:icebr8k/backend/services/user_services/ib_user_db_service.dart';
 import 'package:icebr8k/frontend/ib_colors.dart';
+import 'package:icebr8k/frontend/ib_config.dart';
 import 'package:icebr8k/frontend/ib_pages/edit_profile_pages/edit_profile_page.dart';
 import 'package:icebr8k/frontend/ib_pages/people_nearby_pages/bingo_page.dart';
 import 'package:icebr8k/frontend/ib_utils.dart';
@@ -67,7 +68,7 @@ class PeopleNearbyController extends GetxController {
       showNegativeBtn: false,
       onPositiveTap: () async {
         Get.back();
-        await _determinePosition();
+       showFilterDialog(Get.context!);
       },
     ));
   }
@@ -580,6 +581,196 @@ class PeopleNearbyController extends GetxController {
       return;
     }
     likeRefreshController.loadComplete();
+  }
+  void showFilterDialog(BuildContext context) {
+    final oldDistance = rangeInMi.value;
+    final oldGenderSelection = genderSelections.toList();
+    final oldIntentionSelection = intentionSelection.toList();
+    final oldRange = rangeValue.value;
+
+    const TextStyle headerStyle = TextStyle(
+        fontWeight: FontWeight.bold, fontSize: IbConfig.kNormalTextSize);
+    final Widget _content = Obx(
+          () => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text('distance'.tr, style: headerStyle),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Slider(
+                  value: rangeInMi.value,
+                  onChanged: (value) {
+                    rangeInMi.value = value;
+                  },
+                  min: 1,
+                  max: IbConfig.kMaxRangeInMi,
+                ),
+                Text(
+                  '${rangeInMi.value.toInt()}mi',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text('age'.tr, style: headerStyle),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RangeSlider(
+                  onChanged: (value) {
+                 rangeValue.value = value;
+                  rangeValue.refresh();
+                  },
+                  min: 13,
+                  max: 120,
+                  values: rangeValue.value,
+                ),
+                Text(
+                  '${rangeValue.value.start.toInt()}-${rangeValue.value.end.toInt()}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text('gender'.tr, style: headerStyle),
+          ),
+          Obx(
+                () => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ToggleButtons(
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  borderColor: IbColors.lightGrey,
+                  selectedColor: IbColors.primaryColor,
+                  selectedBorderColor: IbColors.accentColor,
+                  borderWidth: 2,
+                  onPressed: (index) {
+                    genderSelections[index] =
+                    !genderSelections[index];
+                    genderSelections.refresh();
+                  },
+                  isSelected: genderSelections.toList(),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        IbUser.kGenders[0],
+                        style:
+                        TextStyle(color: Theme.of(context).indicatorColor),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        IbUser.kGenders[1],
+                        style:
+                        TextStyle(color: Theme.of(context).indicatorColor),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        IbUser.kGenders[2],
+                        style:
+                        TextStyle(color: Theme.of(context).indicatorColor),
+                      ),
+                    )
+                  ]),
+            ),
+          ),
+          const SizedBox(
+            height: 4,
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text('Intention', style: headerStyle),
+          ),
+          Obx(
+                () => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ToggleButtons(
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  borderColor: IbColors.lightGrey,
+                  selectedColor: IbColors.primaryColor,
+                  selectedBorderColor: IbColors.accentColor,
+                  borderWidth: 2,
+                  onPressed: (index) {
+                    intentionSelection[index] =
+                    !intentionSelection[index];
+                    intentionSelection.refresh();
+                  },
+                  isSelected: intentionSelection.toList(),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        IbUser.kIntentions[0],
+                        style:
+                        TextStyle(color: Theme.of(context).indicatorColor),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        IbUser.kIntentions[1],
+                        style:
+                        TextStyle(color: Theme.of(context).indicatorColor),
+                      ),
+                    ),
+                  ]),
+            ),
+          ),
+        ],
+      ),
+    );
+    Get.dialog(Center(
+      child: IbDialog(
+        title: 'Preference',
+        subtitle: '',
+        content: _content,
+        onNegativeTap: () {
+         rangeValue.value = oldRange;
+         genderSelections.value = oldGenderSelection.toList();
+         rangeInMi.value = oldDistance;
+         intentionSelection.value = oldIntentionSelection.toList();
+         intentionSelection.refresh();
+         genderSelections.refresh();
+          Get.closeAllSnackbars();
+          Get.back();
+        },
+        onPositiveTap: () {
+          if (!intentionSelection.contains(true)) {
+            IbUtils().showSimpleSnackBar(
+                msg: 'Pick at least one intention',
+                backgroundColor: IbColors.errorRed);
+            return;
+          }
+
+          if (!genderSelections.contains(true)) {
+            IbUtils().showSimpleSnackBar(
+                msg: 'Pick at least one gender',
+                backgroundColor: IbColors.errorRed);
+            return;
+          }
+          Get.back();
+          loadItem();
+        },
+      ),
+    ));
   }
 }
 
