@@ -68,7 +68,7 @@ class PeopleNearbyController extends GetxController {
       showNegativeBtn: false,
       onPositiveTap: () async {
         Get.back();
-       showFilterDialog(Get.context!);
+        showFilterDialog(Get.context!);
       },
     ));
   }
@@ -204,7 +204,7 @@ class PeopleNearbyController extends GetxController {
       return;
     }
 
-    loadItem();
+    await loadItem();
   }
 
   Future<void> loadItem() async {
@@ -582,6 +582,7 @@ class PeopleNearbyController extends GetxController {
     }
     likeRefreshController.loadComplete();
   }
+
   void showFilterDialog(BuildContext context) {
     final oldDistance = rangeInMi.value;
     final oldGenderSelection = genderSelections.toList();
@@ -591,7 +592,7 @@ class PeopleNearbyController extends GetxController {
     const TextStyle headerStyle = TextStyle(
         fontWeight: FontWeight.bold, fontSize: IbConfig.kNormalTextSize);
     final Widget _content = Obx(
-          () => Column(
+      () => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
@@ -631,8 +632,8 @@ class PeopleNearbyController extends GetxController {
               children: [
                 RangeSlider(
                   onChanged: (value) {
-                 rangeValue.value = value;
-                  rangeValue.refresh();
+                    rangeValue.value = value;
+                    rangeValue.refresh();
                   },
                   min: 13,
                   max: 120,
@@ -650,7 +651,7 @@ class PeopleNearbyController extends GetxController {
             child: Text('gender'.tr, style: headerStyle),
           ),
           Obx(
-                () => Padding(
+            () => Padding(
               padding: const EdgeInsets.all(8.0),
               child: ToggleButtons(
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -659,8 +660,7 @@ class PeopleNearbyController extends GetxController {
                   selectedBorderColor: IbColors.accentColor,
                   borderWidth: 2,
                   onPressed: (index) {
-                    genderSelections[index] =
-                    !genderSelections[index];
+                    genderSelections[index] = !genderSelections[index];
                     genderSelections.refresh();
                   },
                   isSelected: genderSelections.toList(),
@@ -670,7 +670,7 @@ class PeopleNearbyController extends GetxController {
                       child: Text(
                         IbUser.kGenders[0],
                         style:
-                        TextStyle(color: Theme.of(context).indicatorColor),
+                            TextStyle(color: Theme.of(context).indicatorColor),
                       ),
                     ),
                     Padding(
@@ -678,7 +678,7 @@ class PeopleNearbyController extends GetxController {
                       child: Text(
                         IbUser.kGenders[1],
                         style:
-                        TextStyle(color: Theme.of(context).indicatorColor),
+                            TextStyle(color: Theme.of(context).indicatorColor),
                       ),
                     ),
                     Padding(
@@ -686,7 +686,7 @@ class PeopleNearbyController extends GetxController {
                       child: Text(
                         IbUser.kGenders[2],
                         style:
-                        TextStyle(color: Theme.of(context).indicatorColor),
+                            TextStyle(color: Theme.of(context).indicatorColor),
                       ),
                     )
                   ]),
@@ -700,7 +700,7 @@ class PeopleNearbyController extends GetxController {
             child: Text('Intention', style: headerStyle),
           ),
           Obx(
-                () => Padding(
+            () => Padding(
               padding: const EdgeInsets.all(8.0),
               child: ToggleButtons(
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -709,8 +709,7 @@ class PeopleNearbyController extends GetxController {
                   selectedBorderColor: IbColors.accentColor,
                   borderWidth: 2,
                   onPressed: (index) {
-                    intentionSelection[index] =
-                    !intentionSelection[index];
+                    intentionSelection[index] = !intentionSelection[index];
                     intentionSelection.refresh();
                   },
                   isSelected: intentionSelection.toList(),
@@ -720,7 +719,7 @@ class PeopleNearbyController extends GetxController {
                       child: Text(
                         IbUser.kIntentions[0],
                         style:
-                        TextStyle(color: Theme.of(context).indicatorColor),
+                            TextStyle(color: Theme.of(context).indicatorColor),
                       ),
                     ),
                     Padding(
@@ -728,7 +727,7 @@ class PeopleNearbyController extends GetxController {
                       child: Text(
                         IbUser.kIntentions[1],
                         style:
-                        TextStyle(color: Theme.of(context).indicatorColor),
+                            TextStyle(color: Theme.of(context).indicatorColor),
                       ),
                     ),
                   ]),
@@ -743,16 +742,16 @@ class PeopleNearbyController extends GetxController {
         subtitle: '',
         content: _content,
         onNegativeTap: () {
-         rangeValue.value = oldRange;
-         genderSelections.value = oldGenderSelection.toList();
-         rangeInMi.value = oldDistance;
-         intentionSelection.value = oldIntentionSelection.toList();
-         intentionSelection.refresh();
-         genderSelections.refresh();
+          rangeValue.value = oldRange;
+          genderSelections.value = oldGenderSelection.toList();
+          rangeInMi.value = oldDistance;
+          intentionSelection.value = oldIntentionSelection.toList();
+          intentionSelection.refresh();
+          genderSelections.refresh();
           Get.closeAllSnackbars();
           Get.back();
         },
-        onPositiveTap: () {
+        onPositiveTap: () async {
           if (!intentionSelection.contains(true)) {
             IbUtils().showSimpleSnackBar(
                 msg: 'Pick at least one intention',
@@ -767,7 +766,7 @@ class PeopleNearbyController extends GetxController {
             return;
           }
           Get.back();
-          loadItem();
+          await _determinePosition();
         },
       ),
     ));
