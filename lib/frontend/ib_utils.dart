@@ -141,7 +141,7 @@ class IbUtils {
 
   String readableDateTime(DateTime _dateTime, {bool showTime = false}) {
     if (showTime) {
-      return '${DateFormat('hh:mm aa').format(_dateTime.toLocal())} ${getSuffixDateTimeString(_dateTime)}';
+      return '${DateFormat('hh:mm aa').format(_dateTime.toLocal())} ${getSuffixDateTimeString(_dateTime.toLocal())}';
     }
     final f = DateFormat('MM/dd/yyyy');
     return f.format(_dateTime.toLocal());
@@ -196,7 +196,7 @@ class IbUtils {
 
   /// Returns the difference (in full days) between the provided date and today.
   int _calculateDifference(DateTime date) {
-    final DateTime now = DateTime.now();
+    final DateTime now = DateTime.now().toLocal();
     return date.difference(now).inDays;
   }
 
