@@ -28,7 +28,7 @@ class IbAnimatedBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = backgroundColor ?? Theme.of(context).bottomAppBarColor;
+    final bgColor = backgroundColor ?? Theme.of(context).canvasColor;
 
     return AnimatedContainer(
       height: containerHeight,

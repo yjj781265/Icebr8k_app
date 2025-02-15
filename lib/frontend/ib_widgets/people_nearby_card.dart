@@ -29,7 +29,7 @@ class PeopleNearbyCard extends StatefulWidget {
 
 class _PeopleNearbyCardState extends State<PeopleNearbyCard> {
   int currentIndex = 0;
-  final CarouselController _controller = CarouselController();
+  final CarouselSliderController _controller = CarouselSliderController();
   final PeopleNearbyController _peopleNearbyController = Get.find();
   @override
   Widget build(BuildContext context) {
@@ -96,13 +96,13 @@ class _PeopleNearbyCardState extends State<PeopleNearbyCard> {
       height: 20,
       child: IbCard(
         elevation: 0,
-        color: Theme.of(context).backgroundColor.withOpacity(0.8),
+        color: Theme.of(context).colorScheme.background.withOpacity(0.8),
         child: ListView.builder(
           shrinkWrap: true,
           scrollDirection: Axis.horizontal,
           itemBuilder: (context, index) {
             return GestureDetector(
-              onTap: () => _controller.animateToPage(currentIndex),
+              onTap: () => _controller.animateToPage(5,curve: Curves.linear, duration: Duration(microseconds: 500)),
               child: Container(
                 width: 8.8,
                 height: 8.8,
@@ -266,7 +266,7 @@ class _PeopleNearbyCardState extends State<PeopleNearbyCard> {
                       margin: const EdgeInsets.symmetric(horizontal: 3),
                       decoration: BoxDecoration(
                           color: Theme.of(context)
-                              .backgroundColor
+                              .colorScheme.background
                               .withOpacity(0.7),
                           border: Border.all(
                               color: Theme.of(context).indicatorColor),

@@ -279,7 +279,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
       child: IbCard(
         radius: 24,
         margin: EdgeInsets.zero,
-        color: Theme.of(context).backgroundColor,
+        color: Theme.of(context).colorScheme.background,
         child: AnimatedSize(
           alignment: Alignment.topCenter,
           duration:
@@ -568,7 +568,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                     right: 0,
                     child: CircleAvatar(
                       radius: 12,
-                      backgroundColor: Theme.of(context).backgroundColor,
+                      backgroundColor: Theme.of(context).colorScheme.background,
                       child: IconButton(
                         padding: EdgeInsets.zero,
                         icon: const Icon(
@@ -596,7 +596,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
           AnimatedContainer(
             alignment: Alignment.center,
             decoration: BoxDecoration(
-                color: Theme.of(context).backgroundColor,
+                color: Theme.of(context).colorScheme.background,
                 borderRadius: const BorderRadius.all(Radius.circular(8))),
             duration: const Duration(milliseconds: 300),
             height: widget._controller.showNewMsgAlert.isTrue ? 49 : 0,
@@ -1273,7 +1273,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
         child: Container(
             margin: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-                color: Theme.of(context).backgroundColor,
+                color: Theme.of(context).colorScheme.background,
                 borderRadius: const BorderRadius.all(Radius.circular(8))),
             child: Padding(
               padding: const EdgeInsets.all(4.0),

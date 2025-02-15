@@ -16,7 +16,6 @@ import 'package:icebr8k/frontend/ib_utils.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_animated_bottom_bar.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_dialog.dart';
 import 'package:icebr8k/frontend/ib_widgets/ib_user_avatar.dart';
-import 'package:move_to_background/move_to_background.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../backend/controllers/user_controllers/social_tab_controller.dart';
@@ -78,7 +77,7 @@ class _MainPageViewState extends State<MainPageView>
     return WillPopScope(
       onWillPop: () async {
         if (Platform.isAndroid) {
-          MoveToBackground.moveTaskToBack();
+         // MoveToBackground.moveTaskToBack();
         }
         return false;
       },

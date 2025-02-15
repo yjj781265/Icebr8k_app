@@ -30,7 +30,7 @@ class IbMediaBar extends StatelessWidget {
               key: StorageKey.pickTagForQuestionShowCaseBool, value: true);
         }
       },
-      builder: Builder(builder: (context) {
+      builder: (context) {
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -38,7 +38,7 @@ class IbMediaBar extends StatelessWidget {
               Obx(() {
                 return Showcase(
                   key: IbShowCaseKeys.kPickTagForQuestionKey,
-                  shapeBorder: const RoundedRectangleBorder(
+                  targetShapeBorder: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(8))),
                   description: 'show_case_tag'.tr,
                   child: Stack(
@@ -55,12 +55,11 @@ class IbMediaBar extends StatelessWidget {
                             onPressed: () {
                               Get.to(
                                   () => ShowCaseWidget(
-                                        builder: Builder(builder: (context) {
+                                        builder: (context) {
                                           return CreateQuestionTagPicker(Get.put(
                                               CreateQuestionTagPickerController(
                                                   _controller)));
                                         }),
-                                      ),
                                   transition: Transition.zoom);
                             },
                             text: 'Add Tags'),
@@ -194,7 +193,6 @@ class IbMediaBar extends StatelessWidget {
             ],
           ),
         );
-      }),
-    );
+      });
   }
 }

@@ -60,7 +60,7 @@ class _SocialTabState extends State<SocialTab>
               key: StorageKey.peopleNearbyShowCaseBool, value: true);
         }
       },
-      builder: Builder(builder: (context) {
+      builder: (context) {
         return Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: false,
@@ -167,7 +167,7 @@ class _SocialTabState extends State<SocialTab>
             actions: [
               Showcase(
                 overlayOpacity: 0.3,
-                shapeBorder: const CircleBorder(),
+                targetShapeBorder: const CircleBorder(),
                 key: IbShowCaseKeys.kPeopleNearbyKey,
                 description: 'Click here to see people nearby',
                 child: IconButton(
@@ -243,7 +243,7 @@ class _SocialTabState extends State<SocialTab>
             },
           ),
         );
-      }),
+      }
     );
   }
 
@@ -270,7 +270,7 @@ class _SocialTabState extends State<SocialTab>
         itemBuilder: (context, index) {
           final ChatTabItem item = _controller.oneToOneChats[index];
           return ListTile(
-            tileColor: Theme.of(context).backgroundColor,
+            tileColor: Theme.of(context).colorScheme.background,
             leading: Stack(
               children: [
                 if (item.ibChat.photoUrl.isEmpty)
@@ -283,7 +283,7 @@ class _SocialTabState extends State<SocialTab>
                     right: 0,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).backgroundColor,
+                        color: Theme.of(context).colorScheme.background,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -298,7 +298,7 @@ class _SocialTabState extends State<SocialTab>
                     right: 0,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).backgroundColor,
+                        color: Theme.of(context).colorScheme.background,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -429,7 +429,7 @@ class _SocialTabState extends State<SocialTab>
         itemBuilder: (context, index) {
           final ChatTabItem item = _controller.circles[index];
           return ListTile(
-            tileColor: Theme.of(context).backgroundColor,
+            tileColor: Theme.of(context).colorScheme.background,
             leading: Stack(
               children: [
                 _controller.buildCircleAvatar(item),
@@ -439,7 +439,7 @@ class _SocialTabState extends State<SocialTab>
                     right: 0,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).backgroundColor,
+                        color: Theme.of(context).colorScheme.background,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -598,7 +598,7 @@ class _SocialTabState extends State<SocialTab>
   Widget _buildAvatar(List<IbUser> avatarUsers) {
     final double radius = avatarUsers.length > 1 ? 10 : 24;
     return CircleAvatar(
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       radius: 26,
       child: Wrap(
         spacing: 1,

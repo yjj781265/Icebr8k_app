@@ -89,7 +89,7 @@ class _ChatPickerPageState extends State<ChatPickerPage> {
             Container(
               margin: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                  color: Theme.of(context).backgroundColor,
+                  color: Theme.of(context).colorScheme.background,
                   borderRadius: const BorderRadius.all(Radius.circular(8))),
               child: TextField(
                   decoration: const InputDecoration(

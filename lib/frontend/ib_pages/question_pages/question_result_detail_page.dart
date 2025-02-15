@@ -71,7 +71,7 @@ class QuestionResultDetailPage extends StatelessWidget {
                     Get.to(() =>
                         ProfilePage(Get.put(ProfileController(item.user.id))));
                   },
-                  tileColor: Theme.of(context).backgroundColor,
+                  tileColor: Theme.of(context).colorScheme.background,
                   leading: IbUserAvatar(
                     uid: item.user.id,
                     avatarUrl: item.user.avatarUrl,

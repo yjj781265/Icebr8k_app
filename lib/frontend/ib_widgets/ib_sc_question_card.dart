@@ -138,7 +138,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
               key: StorageKey.pollExpandShowCaseBool, value: true);
         }
       },
-      builder: Builder(builder: (context) {
+      builder:(context) {
         return IbCard(
           child: Stack(
             children: [
@@ -182,7 +182,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
                       Obx(
                         () => Showcase(
                           key: widget._controller.expandShowCaseKey,
-                          shapeBorder: const RoundedRectangleBorder(
+                          targetShapeBorder: const RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(8))),
                           overlayOpacity: 0.3,
@@ -220,8 +220,7 @@ class _IbScQuestionCardState extends State<IbScQuestionCard>
             ],
           ),
         );
-      }),
-    );
+      });
   }
 
   Widget _handleScType() {

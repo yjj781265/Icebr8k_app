@@ -115,7 +115,7 @@ class SetupPageOne extends StatelessWidget {
                         decoration: BoxDecoration(
                           borderRadius:
                               const BorderRadius.all(Radius.circular(16)),
-                          color: Theme.of(context).backgroundColor,
+                          color: Theme.of(context).colorScheme.background,
                         ),
                         child: const Text(
                           'Step 1/3',

@@ -21,58 +21,52 @@ environment:
   sdk: ">=2.17.0 <3.0.0"
 
 dependencies:
-  animations: ^2.0.3
-  any_link_preview: ^2.0.9
+  animations: ^2.0.11
+  any_link_preview: ^3.0.3
   auto_size_text: ^3.0.0
   cached_network_image: ^3.2.1
-  carousel_slider: ^4.1.1
-  cloud_firestore: ^3.2.1
-  cloud_functions: ^3.3.1
+  carousel_slider: ^5.0.0
+  cloud_firestore: ^5.6.3
+  cloud_functions: ^5.3.2
   connectivity_plus: ^2.3.5
   cupertino_icons: ^1.0.5
-  dropdown_button2: ^1.6.3
-  extended_nested_scroll_view: ^5.1.3
-  firebase_analytics: ^9.2.0
-  firebase_auth: ^3.4.1
-  firebase_core: ^1.19.1
-  firebase_crashlytics: ^2.8.4
-  firebase_messaging: ^11.4.4
-  firebase_performance: ^0.8.1+1
-  firebase_storage: ^10.3.1
+  dropdown_button2: ^2.3.9
+  extended_nested_scroll_view: ^6.2.1
+  firebase_analytics: ^11.4.2
+  firebase_auth: ^5.4.2
+  firebase_core: ^3.11.0
+  firebase_crashlytics: ^4.3.2
+  firebase_messaging: ^15.2.2
+  firebase_performance: ^0.10.1+2
+  firebase_storage: ^12.4.2
   flutter:
     sdk: flutter
   flutter_app_badger: ^1.4.0
   flutter_colorpicker: ^1.0.3
-  flutter_html: ^2.2.1
   flutter_launcher_icons: ^0.9.3
-  flutter_linkify: ^5.0.2
+  flutter_linkify: ^6.0.0
   flutter_rating_bar: ^4.0.1
   flutter_scatter: ^0.2.0
   flutter_staggered_grid_view: ^0.6.2
   font_awesome_flutter: ^10.1.0
-  geolocator: ^9.0.1
+  geolocator: ^13.0.2
   get: ^4.6.5
   get_storage: ^2.0.3
-  google_fonts: ^3.0.1
-  google_mobile_ads:
-    git:
-      url: https://github.com/googleads/googleads-mobile-flutter
-      ref: 356875362ddb2ac2e0056385d2729c093722fb8d
-      path: packages/google_mobile_ads
-  image_cropper: ^2.0.3
+  google_fonts: ^6.2.1
+  google_mobile_ads: ^5.3.1
+  image_cropper: ^9.0.0
   image_picker: ^0.8.5+3
-  in_app_review: ^2.0.4
+  in_app_review: ^2.0.10
   intl: ^0.17.0
   json_annotation: ^4.6.0
   lottie: ^1.3.0
-  move_to_background: ^1.0.2
   pull_to_refresh: ^2.0.0
-  purchases_flutter: ^3.10.0
+  purchases_flutter: ^8.4.6
   reorderables: ^0.5.0
   scrollable_positioned_list: ^0.3.2
-  showcaseview: ^1.1.7
-  url_launcher: 6.1.4
-  uuid: ^3.0.6
+  showcaseview: ^4.0.1
+  url_launcher: 6.3.1
+  uuid: ^4.4.2
 
 
 

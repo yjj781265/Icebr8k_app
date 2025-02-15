@@ -19,7 +19,7 @@ class IbPremiumController extends GetxController {
     'ib_yearly_premium'
   ];
   final entitlement = 'premium';
-  final products = <Product>[].obs;
+  // final products = <Product>[].obs;
   final isPremium = false.obs;
   final isLoading = true.obs;
   final isRestoring = false.obs;
@@ -41,7 +41,7 @@ class IbPremiumController extends GetxController {
   Future<void> _initPlatformState() async {
     isLoading.value = true;
     await Purchases.setDebugLogsEnabled(kDebugMode);
-    try {
+    /*try {
       if (!await Purchases.isConfigured) {
         await IbApiKeysManager().init();
         if (GetPlatform.isAndroid) {
@@ -51,40 +51,39 @@ class IbPremiumController extends GetxController {
           await Purchases.setup(IbApiKeysManager.kRevenueCatIosKey,
               appUserId: IbUtils().getCurrentUid());
         }
-      }
-
+      }*/
       /// load products
-      products.value = await Purchases.getProducts(_productIds);
-      products.sort((a, b) => a.price.compareTo(b.price));
+      //products.value = await Purchases.getProducts(_productIds);
+      //products.sort((a, b) => a.price.compareTo(b.price));
 
       ///query purchase Info
-      final PurchaserInfo purchaserInfo = await Purchases.getPurchaserInfo();
+      //final PurchaserInfo purchaserInfo = await Purchases.getPurchaserInfo();
 
-      await _handlePurchaseInfo(purchaserInfo);
+//await _handlePurchaseInfo(purchaserInfo);
 
       ///listen to  purchase Info changes
-      Purchases.addPurchaserInfoUpdateListener((info) {
-        _handlePurchaseInfo(info);
-      });
-    } on PlatformException catch (e) {
-      final errorCode = PurchasesErrorHelper.getErrorCode(e);
-      await IbAnalyticsManager().logCustomEvent(
-          name: 'error_load_products', data: {'errorCode': errorCode});
-    } catch (e) {
-      await IbAnalyticsManager()
-          .logCustomEvent(name: 'error_load_products', data: {'error': e});
-      print(e);
-    } finally {
-      isLoading.value = false;
-    }
+      //Purchases.addPurchaserInfoUpdateListener((info) {
+      //  _handlePurchaseInfo(info);
+     // });
+    // } on PlatformException catch (e) {
+    //   final errorCode = PurchasesErrorHelper.getErrorCode(e);
+    //   await IbAnalyticsManager().logCustomEvent(
+    //       name: 'error_load_products', data: {'errorCode': errorCode});
+    // } catch (e) {
+    //   await IbAnalyticsManager()
+    //       .logCustomEvent(name: 'error_load_products', data: {'error': e});
+    //   print(e);
+    // } finally {
+    //   isLoading.value = false;
+    // }
   }
 
   @override
   void onClose() {
-    print('IbPremiumController onClose');
+   /* print('IbPremiumController onClose');
     Purchases.removePurchaserInfoUpdateListener((purchaserInfo) {
       print('IbPremiumController onClose $purchaserInfo');
-    });
+    });*/
   }
 
   Future<void> sync() async {
@@ -97,13 +96,13 @@ class IbPremiumController extends GetxController {
 
   Future<void> manageSubscription() async {
     ///query purchase Info
-    final PurchaserInfo purchaserInfo = await Purchases.getPurchaserInfo();
+    /*final PurchaserInfo purchaserInfo = await Purchases.getPurchaserInfo();
     if (await canLaunchUrlString(purchaserInfo.managementURL ?? '')) {
       launchUrlString(purchaserInfo.managementURL!);
-    }
+    }*/
   }
 
-  Future<void> _handlePurchaseInfo(PurchaserInfo purchaserInfo) async {
+  /*Future<void> _handlePurchaseInfo(PurchaserInfo purchaserInfo) async {
     if (purchaserInfo.entitlements.all[entitlement] == null) {
       entitlementInfo = null;
       isPremium.value = false;
@@ -145,10 +144,10 @@ class IbPremiumController extends GetxController {
         showNegativeBtn: false,
       ));
     }
-  }
+  }*/
 
   Future<void> restorePurchase() async {
-    try {
+   /* try {
       isRestoring.value = true;
       await sync();
       final PurchaserInfo restoredInfo = await Purchases.restoreTransactions();
@@ -168,6 +167,6 @@ class IbPremiumController extends GetxController {
       ));
     } finally {
       isRestoring.value = false;
-    }
+    }*/
   }
 }

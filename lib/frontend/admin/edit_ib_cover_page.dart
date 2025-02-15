@@ -161,7 +161,7 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                       right: 16,
                       child: CircleAvatar(
                         backgroundColor:
-                            Theme.of(context).backgroundColor.withOpacity(0.8),
+                            Theme.of(context).colorScheme.background.withOpacity(0.8),
                         child: IconButton(
                           icon: Icon(
                             Icons.link,
@@ -226,9 +226,6 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                         ),
                       ]),
                   DropdownButton2(
-                    buttonWidth: 120,
-                    dropdownWidth: 100,
-                    itemHeight: 40,
                     hint: const Text(
                       'Select Font',
                       style: TextStyle(
@@ -275,7 +272,7 @@ class _EditIbCoverPageState extends State<EditIbCoverPage> {
                     maxLines: 6,
                     controller: nameEtController,
                     suffixIcon: CircleAvatar(
-                      backgroundColor: Theme.of(context).backgroundColor,
+                      backgroundColor: Theme.of(context).colorScheme.background,
                       child: IconButton(
                         icon: Icon(
                           Icons.color_lens_outlined,

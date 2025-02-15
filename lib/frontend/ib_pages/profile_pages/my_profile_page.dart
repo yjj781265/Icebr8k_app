@@ -58,7 +58,7 @@ class MyProfilePage extends StatelessWidget {
                 key: StorageKey.wordCloudShowCaseBool, value: true);
           }
         },
-        builder: Builder(builder: (context) {
+        builder:  (context) {
           return SafeArea(
             child: DefaultTabController(
               length: 2,
@@ -112,7 +112,6 @@ class MyProfilePage extends StatelessWidget {
             ),
           );
         }),
-      ),
     );
   }
 
@@ -173,7 +172,7 @@ class MyProfilePage extends StatelessWidget {
                   if (showBackButton)
                     CircleAvatar(
                       backgroundColor:
-                          Theme.of(context).backgroundColor.withOpacity(0.8),
+                          Theme.of(context).colorScheme.background.withOpacity(0.8),
                       child: IconButton(
                         padding: EdgeInsets.zero,
                         icon: Icon(
@@ -200,7 +199,7 @@ class MyProfilePage extends StatelessWidget {
                         overlayOpacity: 0.3,
                         child: CircleAvatar(
                             backgroundColor: Theme.of(context)
-                                .backgroundColor
+                                .colorScheme.background
                                 .withOpacity(0.8),
                             child: IconButton(
                                 onPressed: () {

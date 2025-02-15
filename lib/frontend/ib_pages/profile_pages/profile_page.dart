@@ -361,7 +361,7 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     backgroundColor:
-                        Theme.of(context).backgroundColor.withOpacity(0.8),
+                        Theme.of(context).colorScheme.background.withOpacity(0.8),
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       icon: Icon(
@@ -382,7 +382,7 @@ class ProfilePage extends StatelessWidget {
                     children: [
                       CircleAvatar(
                           backgroundColor: Theme.of(context)
-                              .backgroundColor
+                              .colorScheme.background
                               .withOpacity(0.8),
                           child: IconButton(
                               onPressed: () {
@@ -397,7 +397,7 @@ class ProfilePage extends StatelessWidget {
                       ),
                       CircleAvatar(
                         backgroundColor:
-                            Theme.of(context).backgroundColor.withOpacity(0.8),
+                            Theme.of(context).colorScheme.background.withOpacity(0.8),
                         child: IconButton(
                           padding: EdgeInsets.zero,
                           onPressed: () {

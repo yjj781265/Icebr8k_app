@@ -78,7 +78,7 @@ class EditEmoPicsPage extends StatelessWidget {
                                     child: CircleAvatar(
                                       radius: 16,
                                       backgroundColor:
-                                          Theme.of(context).backgroundColor,
+                                          Theme.of(context).colorScheme.background,
                                       child: IconButton(
                                         padding: EdgeInsets.zero,
                                         icon: const Icon(

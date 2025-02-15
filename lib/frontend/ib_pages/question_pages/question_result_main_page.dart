@@ -63,7 +63,7 @@ class QuestionResultMainPage extends StatelessWidget {
             preventDuplicates: false);
       },
       child: Ink(
-        color: Theme.of(Get.context!).backgroundColor,
+        color: Theme.of(Get.context!).colorScheme.background,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
           child: Row(children: [

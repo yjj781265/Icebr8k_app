@@ -46,14 +46,11 @@ class HomeTab extends StatelessWidget {
                 key: StorageKey.icebreakerShowCaseBool, value: true);
           }
         },
-        builder: Builder(
-          builder: (context) => Scaffold(
+        builder: (context) => Scaffold(
             appBar: AppBar(
               title: DropdownButtonHideUnderline(
                 child: Obx(
                   () => DropdownButton2(
-                    buttonPadding: EdgeInsets.zero,
-                    buttonWidth: 120,
                     value: _controller.selectedCategory.value,
                     onChanged: (value) {
                       if (value != null &&
@@ -90,7 +87,7 @@ class HomeTab extends StatelessWidget {
                   key: IbShowCaseKeys.kIcebreakerKey,
                   overlayOpacity: 0.3,
                   description: 'Click to view our awesome Icebreakers',
-                  shapeBorder: const CircleBorder(),
+                  targetShapeBorder: const CircleBorder(),
                   child: IconButton(
                     icon: const Icon(
                       FontAwesomeIcons.eight,
@@ -271,7 +268,7 @@ class HomeTab extends StatelessWidget {
               );
             }),
           ),
-        ));
+        );
   }
 
   int _handleItemCount() {

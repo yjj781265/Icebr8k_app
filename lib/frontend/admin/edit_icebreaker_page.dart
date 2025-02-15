@@ -256,9 +256,7 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
                         ),
                       ]),
                   DropdownButton2(
-                    buttonWidth: 120,
-                    dropdownWidth: 100,
-                    itemHeight: 40,
+
                     hint: const Text(
                       'Select Font',
                       style: TextStyle(
@@ -305,7 +303,7 @@ class _EditIcebreakerPageState extends State<EditIcebreakerPage> {
                     maxLines: 10,
                     controller: nameEtController,
                     suffixIcon: CircleAvatar(
-                      backgroundColor: Theme.of(context).backgroundColor,
+                      backgroundColor: Theme.of(context).colorScheme.background,
                       child: IconButton(
                         icon: Icon(
                           Icons.color_lens_outlined,

@@ -347,9 +347,9 @@ class ChatPageController extends GetxController {
                 Container(
                     decoration: BoxDecoration(
                         border: Border.all(
-                            color: Theme.of(Get.context!).backgroundColor,
+                            color: Theme.of(Get.context!).colorScheme.background,
                             width: 3),
-                        color: Theme.of(Get.context!).backgroundColor,
+                        color: Theme.of(Get.context!).colorScheme.background,
                         shape: BoxShape.circle),
                     child: IbUserAvatar(
                       avatarUrl: leader.user.avatarUrl,

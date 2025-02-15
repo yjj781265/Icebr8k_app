@@ -162,7 +162,7 @@ class CreateQuestionImagePicker extends StatelessWidget {
               right: -8,
               child: CircleAvatar(
                 radius: 14,
-                backgroundColor: Theme.of(context).backgroundColor,
+                backgroundColor: Theme.of(context).colorScheme.background,
                 child: Center(
                   child: IconButton(
                     padding: EdgeInsets.zero,

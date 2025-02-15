@@ -52,7 +52,7 @@ class FollowedTagsPage extends StatelessWidget {
                           Container(
                             margin: const EdgeInsets.symmetric(horizontal: 3),
                             decoration: BoxDecoration(
-                                color: Theme.of(context).backgroundColor,
+                                color: Theme.of(context).colorScheme.background,
                                 border: Border.all(
                                     color: Theme.of(context).indicatorColor),
                                 borderRadius: const BorderRadius.all(

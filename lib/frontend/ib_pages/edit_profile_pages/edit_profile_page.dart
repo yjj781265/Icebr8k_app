@@ -42,7 +42,6 @@ class EditProfilePage extends StatelessWidget {
                 ),
                 DropdownButtonHideUnderline(
                   child: DropdownButton2(
-                    offset: const Offset(-8, 0),
                     items: _controller.privacyItems
                         .map((item) => DropdownMenuItem<String>(
                               value: item,
@@ -309,7 +308,7 @@ class EditProfilePage extends StatelessWidget {
                 bottom: 8,
                 right: 8,
                 child: CircleAvatar(
-                    backgroundColor: Theme.of(context).backgroundColor,
+                    backgroundColor: Theme.of(context).colorScheme.background,
                     child: Icon(
                       Icons.image,
                       color: Theme.of(context).indicatorColor,
@@ -354,7 +353,7 @@ class EditProfilePage extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Theme.of(context).backgroundColor,
+                color: Theme.of(context).colorScheme.background,
               ),
               child: const Padding(
                 padding: EdgeInsets.all(3.0),

@@ -25,7 +25,7 @@ class IbProfileStats extends StatelessWidget {
         margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           borderRadius: const BorderRadius.all(Radius.circular(8)),
-          color: Theme.of(context).backgroundColor,
+          color: Theme.of(context).colorScheme.background,
         ),
         height: 56,
         child: Padding(

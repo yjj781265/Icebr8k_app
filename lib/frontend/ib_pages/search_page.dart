@@ -152,7 +152,7 @@ class SearchPage extends StatelessWidget {
       margin: const EdgeInsets.only(right: 16),
       decoration: BoxDecoration(
           borderRadius: const BorderRadius.all(Radius.circular(8)),
-          color: Theme.of(context).backgroundColor),
+          color: Theme.of(context).colorScheme.background),
       child: TextField(
         autofocus: true,
         controller: _controller.textEtController,
@@ -318,7 +318,7 @@ class SearchPage extends StatelessWidget {
                           Container(
                             margin: const EdgeInsets.symmetric(horizontal: 3),
                             decoration: BoxDecoration(
-                                color: Theme.of(context).backgroundColor,
+                                color: Theme.of(context).colorScheme.background,
                                 border: Border.all(
                                     color: Theme.of(context).indicatorColor),
                                 borderRadius: const BorderRadius.all(
@@ -610,7 +610,7 @@ class SearchPage extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 3),
                     decoration: BoxDecoration(
-                        color: Theme.of(context).backgroundColor,
+                        color: Theme.of(context).colorScheme.background,
                         border:
                             Border.all(color: Theme.of(context).indicatorColor),
                         borderRadius:

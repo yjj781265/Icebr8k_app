@@ -85,7 +85,7 @@ class ReplyPage extends StatelessWidget {
                     final item = _controller.comments[index];
                     return Ink(
                       color: index == 0
-                          ? Theme.of(context).backgroundColor
+                          ? Theme.of(context).colorScheme.background
                           : Theme.of(context).primaryColor,
                       child: InkWell(
                         onTap: () async => _onReplyTap(item),

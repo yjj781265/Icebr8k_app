@@ -52,7 +52,7 @@ class IcebreakerMainPage extends StatelessWidget {
         ],
       ),
       body: ShowCaseWidget(
-        builder: Builder(builder: (context) {
+        builder:  (context) {
           return Obx(() {
             if (controller.isLoading.isTrue) {
               return const Center(
@@ -227,7 +227,6 @@ class IcebreakerMainPage extends StatelessWidget {
             );
           });
         }),
-      ),
       floatingActionButton: Obx(
         () {
           if (controller.isEditing.isTrue) {

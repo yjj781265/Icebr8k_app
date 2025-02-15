@@ -79,7 +79,7 @@ class CircleSettings extends StatelessWidget {
                                       right: 0,
                                       child: CircleAvatar(
                                         backgroundColor: Theme.of(context)
-                                            .backgroundColor
+                                            .colorScheme.background
                                             .withOpacity(0.8),
                                         radius: 16,
                                         child: Icon(
@@ -100,7 +100,7 @@ class CircleSettings extends StatelessWidget {
                           Container(
                               margin: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                  color: Theme.of(context).backgroundColor,
+                                  color: Theme.of(context).colorScheme.background,
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(8))),
                               child: TextField(
@@ -124,7 +124,7 @@ class CircleSettings extends StatelessWidget {
                           Container(
                               margin: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                  color: Theme.of(context).backgroundColor,
+                                  color: Theme.of(context).colorScheme.background,
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(8))),
                               child: TextField(
@@ -147,7 +147,7 @@ class CircleSettings extends StatelessWidget {
                           Container(
                             margin: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                                color: Theme.of(context).backgroundColor,
+                                color: Theme.of(context).colorScheme.background,
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8))),
                             child: TextField(
@@ -293,7 +293,7 @@ class CircleSettings extends StatelessWidget {
                                                     radius: 12,
                                                     backgroundColor:
                                                         Theme.of(context)
-                                                            .backgroundColor,
+                                                            .colorScheme.background,
                                                     child: const Icon(
                                                       Icons.cancel,
                                                       color: IbColors.errorRed,

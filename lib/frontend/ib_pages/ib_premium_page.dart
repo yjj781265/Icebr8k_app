@@ -217,7 +217,7 @@ class IbPremiumPage extends StatelessWidget {
   }
 
   void _showPayWall() {
-    final Widget payWall = Obx(
+    /*final Widget payWall = Obx(
       () => IbCard(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -254,10 +254,10 @@ class IbPremiumPage extends StatelessWidget {
         ),
       ),
     );
-    Get.bottomSheet(payWall, ignoreSafeArea: true);
+    Get.bottomSheet(payWall, ignoreSafeArea: true);*/
   }
 
-  void _showDisclosure(Product product) {
+  /*void _showDisclosure(Product product) {
     Get.dialog(IbDialog(
       title: 'Info',
       content: Text.rich(TextSpan(text: 'A ', children: [
@@ -295,7 +295,7 @@ class IbPremiumPage extends StatelessWidget {
       },
       subtitle: '',
     ));
-  }
+  }*/
 
   Widget _premiumBody() {
     return SizedBox.expand(

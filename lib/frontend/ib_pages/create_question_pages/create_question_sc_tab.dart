@@ -24,7 +24,6 @@ class CreateQuestionScTab extends StatelessWidget {
             child: DropdownButtonHideUnderline(
               child: Obx(
                 () => DropdownButton2(
-                    itemHeight: IbConfig.kScItemHeight + 18,
                     isExpanded: true,
                     value: <QuestionType>[
                       QuestionType.scaleOne,

@@ -20,7 +20,7 @@ class IbQuestionMediaSlide extends StatefulWidget {
 }
 
 class _IbQuestionMediaSlideState extends State<IbQuestionMediaSlide> {
-  final CarouselController _controller = CarouselController();
+  final CarouselSliderController _controller = CarouselSliderController();
   int _current = 0;
 
   @override

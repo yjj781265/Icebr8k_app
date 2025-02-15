@@ -376,9 +376,6 @@ class MockAuthController extends _i1.Mock implements _i16.AuthController {
   void onInit() => super.noSuchMethod(Invocation.method(#onInit, []),
       returnValueForMissingStub: null);
   @override
-  void onClose() => super.noSuchMethod(Invocation.method(#onClose, []),
-      returnValueForMissingStub: null);
-  @override
   _i10.Future<void> setUpAnalytics() => (super.noSuchMethod(
       Invocation.method(#setUpAnalytics, []),
       returnValue: Future<void>.value(),

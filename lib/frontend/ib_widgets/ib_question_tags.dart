@@ -32,7 +32,7 @@ class IbQuestionTags extends StatelessWidget {
                   (e) => Container(
                     margin: const EdgeInsets.symmetric(horizontal: 3),
                     decoration: BoxDecoration(
-                        color: Theme.of(context).backgroundColor,
+                        color: Theme.of(context).colorScheme.background,
                         border:
                             Border.all(color: Theme.of(context).indicatorColor),
                         borderRadius:
@@ -58,7 +58,7 @@ class IbQuestionTags extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 3),
                     decoration: BoxDecoration(
-                        color: Theme.of(context).backgroundColor,
+                        color: Theme.of(context).colorScheme.background,
                         border:
                             Border.all(color: Theme.of(context).indicatorColor),
                         borderRadius:

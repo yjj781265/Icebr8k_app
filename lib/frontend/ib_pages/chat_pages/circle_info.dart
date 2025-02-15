@@ -181,7 +181,7 @@ class CircleInfo extends StatelessWidget {
           borderRadius: const BorderRadius.all(
             Radius.circular(16),
           ),
-          color: Theme.of(context).backgroundColor,
+          color: Theme.of(context).colorScheme.background,
         ),
         child: TextField(
           controller: _controller.editingController,

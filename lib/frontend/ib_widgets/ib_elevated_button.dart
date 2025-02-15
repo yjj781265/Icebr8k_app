@@ -36,12 +36,11 @@ class IbElevatedButton extends StatelessWidget {
   Widget _regularButton() {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.all(3),
+          padding: const EdgeInsets.all(3), backgroundColor: disabled ? IbColors.lightGrey : color,
           shape: RoundedRectangleBorder(
             //to set border radius to button
             borderRadius: BorderRadius.circular(IbConfig.kButtonCornerRadius),
-          ),
-          primary: disabled ? IbColors.lightGrey : color),
+          )),
       onPressed: disabled ? () {} : () => onPressed(),
       onHover: (flag) {
         print(flag);
@@ -62,12 +61,11 @@ class IbElevatedButton extends StatelessWidget {
   Widget _iconButton() {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.all(3),
+          padding: const EdgeInsets.all(3), backgroundColor: disabled ? IbColors.lightGrey : color,
           shape: RoundedRectangleBorder(
             //to set border radius to button
             borderRadius: BorderRadius.circular(IbConfig.kButtonCornerRadius),
-          ),
-          primary: disabled ? IbColors.lightGrey : color),
+          )),
       onPressed: disabled ? () {} : () => onPressed(),
       onLongPress: disabled
           ? null

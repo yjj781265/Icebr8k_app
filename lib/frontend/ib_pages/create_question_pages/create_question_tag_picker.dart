@@ -49,7 +49,7 @@ class _CreateQuestionTagPickerState extends State<CreateQuestionTagPicker> {
           margin: const EdgeInsets.symmetric(horizontal: 8),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: Theme.of(context).backgroundColor,
+            color: Theme.of(context).colorScheme.background,
             borderRadius: const BorderRadius.all(Radius.circular(8)),
           ),
           child: TextField(
@@ -133,7 +133,7 @@ class _CreateQuestionTagPickerState extends State<CreateQuestionTagPicker> {
                           padding: const EdgeInsets.symmetric(horizontal: 4.0),
                           child: FilterChip(
                             pressElevation: 0,
-                            backgroundColor: Theme.of(context).backgroundColor,
+                            backgroundColor: Theme.of(context).colorScheme.background,
                             avatar: widget._controller.createQuestionController
                                     .pickedTags
                                     .contains(element)
@@ -213,7 +213,6 @@ class _CreateQuestionTagPickerState extends State<CreateQuestionTagPicker> {
                         IbConfig.kMaxTag
                     ? Showcase(
                         key: showcaseKey,
-                        shapeBorder: const CircleBorder(),
                         description: 'Click here to create a new tag',
                         child: InkWell(
                           onTap: () {
@@ -235,7 +234,7 @@ class _CreateQuestionTagPickerState extends State<CreateQuestionTagPicker> {
                     : null,
             children: widget._controller.createQuestionController.pickedTags
                 .map((element) => Chip(
-                      backgroundColor: Theme.of(context).backgroundColor,
+                      backgroundColor: Theme.of(context).colorScheme.background,
                       label: Text(element.text),
                       onDeleted: () {
                         widget._controller.createQuestionController.pickedTags
@@ -273,7 +272,7 @@ class _CreateQuestionTagPickerState extends State<CreateQuestionTagPicker> {
               children: widget._controller.trendingTags
                   .map((element) => FilterChip(
                         pressElevation: 0,
-                        backgroundColor: Theme.of(context).backgroundColor,
+                        backgroundColor: Theme.of(context).colorScheme.background,
                         avatar: widget
                                 ._controller.createQuestionController.pickedTags
                                 .contains(element)

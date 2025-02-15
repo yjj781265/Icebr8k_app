@@ -117,7 +117,7 @@ class _IcebreakerCardState extends State<IcebreakerCard> {
                 right: 8,
                 child: CircleAvatar(
                   backgroundColor:
-                      Theme.of(context).backgroundColor.withOpacity(0.8),
+                      Theme.of(context).colorScheme.background.withOpacity(0.8),
                   child: IconButton(
                       onPressed: () async {
                         final list = await Get.to(() => const ChatPickerPage());

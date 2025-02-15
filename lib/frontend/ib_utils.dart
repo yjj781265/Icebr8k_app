@@ -118,8 +118,6 @@ class IbUtils {
     return ImageCropper().cropImage(
       compressFormat: ImageCompressFormat.png,
       sourcePath: filePath,
-      cropStyle: cropStyle,
-      aspectRatioPresets: ratios,
       uiSettings: [
         AndroidUiSettings(
             toolbarColor: IbColors.darkPrimaryColor,
@@ -398,7 +396,7 @@ class IbUtils {
       duration: isPersistent ? const Duration(days: 999) : duration,
       backgroundColor: Get.context == null
           ? IbColors.lightBlue
-          : Theme.of(Get.context!).backgroundColor,
+          : Theme.of(Get.context!).colorScheme.background,
       messageText: Text(
         msg,
         style: const TextStyle(fontSize: IbConfig.kNormalTextSize),

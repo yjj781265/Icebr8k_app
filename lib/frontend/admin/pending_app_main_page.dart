@@ -19,7 +19,7 @@ class PendingAppMainPage extends StatelessWidget {
           itemBuilder: (context, index) {
             final user = _controller.pendingUsers[index];
             return ListTile(
-              tileColor: Theme.of(context).backgroundColor,
+              tileColor: Theme.of(context).colorScheme.background,
               onTap: () {
                 Get.to(() => PendingAppDetailPage(user));
               },

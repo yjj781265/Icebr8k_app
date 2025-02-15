@@ -196,7 +196,7 @@ class CommentItemWidget extends StatelessWidget {
               ibQuestion: controller.itemController.rxIbQuestion.value))));
         },
         child: Ink(
-          color: Theme.of(context).backgroundColor,
+          color: Theme.of(context).colorScheme.background,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(

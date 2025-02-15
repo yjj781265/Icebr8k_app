@@ -162,7 +162,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
               key: StorageKey.pickAnswerForQuizShowCaseBool, value: true);
         }
       },
-      builder: Builder(builder: (context) {
+      builder: (context) {
         return IbCard(
           child: Stack(
             children: [
@@ -206,7 +206,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
                           child: IbQuestionStatsBar(widget._controller)),
                       Obx(() => Showcase(
                             key: widget._controller.expandShowCaseKey,
-                            shapeBorder: const RoundedRectangleBorder(
+                            targetShapeBorder: const RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(8))),
                             overlayOpacity: 0.3,
@@ -245,7 +245,7 @@ class _IbMcQuestionCardState extends State<IbMcQuestionCard>
             ],
           ),
         );
-      }),
+      }
     );
   }
 
@@ -993,7 +993,7 @@ class IbQuestionMcItem extends StatelessWidget {
       return Expanded(
         child: Showcase(
           overlayColor: Colors.transparent,
-          shapeBorder: const CircleBorder(),
+          targetShapeBorder: const CircleBorder(),
           key: _controller.quizShowCaseKey,
           description: 'show_case_quiz'.tr,
           child: radio,

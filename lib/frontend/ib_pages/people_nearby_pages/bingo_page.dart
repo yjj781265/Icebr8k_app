@@ -127,7 +127,7 @@ class BingoPage extends StatelessWidget {
                             margin: const EdgeInsets.symmetric(horizontal: 3),
                             decoration: BoxDecoration(
                                 color: Theme.of(context)
-                                    .backgroundColor
+                                    .colorScheme.background
                                     .withOpacity(0.7),
                                 border: Border.all(
                                     color: Theme.of(context).indicatorColor),

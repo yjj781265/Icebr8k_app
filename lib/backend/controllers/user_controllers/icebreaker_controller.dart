@@ -21,7 +21,7 @@ class IcebreakerController extends GetxController {
   final ScrollController scrollController = ScrollController();
 
   late StreamSubscription icebreakerSub;
-  CarouselController carouselController = CarouselController();
+  CarouselSliderController carouselController = CarouselSliderController();
 
   IcebreakerController(this.ibCollection, {required this.isEdit});
 

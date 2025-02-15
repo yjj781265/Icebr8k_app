@@ -74,7 +74,7 @@ class IbCoverPage extends StatelessWidget {
                             right: 16,
                             child: CircleAvatar(
                               backgroundColor: Theme.of(context)
-                                  .backgroundColor
+                                  .colorScheme.background
                                   .withOpacity(0.8),
                               child: IconButton(
                                 icon: Icon(

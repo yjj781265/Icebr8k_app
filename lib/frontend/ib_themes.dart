@@ -24,7 +24,6 @@ class IbThemes {
         primaryColor: Colors.black,
         indicatorColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.white),
-        toggleableActiveColor: IbColors.primaryColor,
         tabBarTheme: const TabBarTheme(
           indicatorSize: TabBarIndicatorSize.tab,
           indicator: BoxDecoration(
@@ -54,7 +53,30 @@ class IbThemes {
           Theme.of(context).textTheme,
         ).apply(bodyColor: Colors.white, displayColor: Colors.white),
         colorScheme: ColorScheme.fromSwatch()
-            .copyWith(secondary: IbColors.primaryColor));
+            .copyWith(secondary: IbColors.primaryColor), checkboxTheme: CheckboxThemeData(
+ fillColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+ if (states.contains(MaterialState.disabled)) { return null; }
+ if (states.contains(MaterialState.selected)) { return IbColors.primaryColor; }
+ return null;
+ }),
+ ), radioTheme: RadioThemeData(
+ fillColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+ if (states.contains(MaterialState.disabled)) { return null; }
+ if (states.contains(MaterialState.selected)) { return IbColors.primaryColor; }
+ return null;
+ }),
+ ), switchTheme: SwitchThemeData(
+ thumbColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+ if (states.contains(MaterialState.disabled)) { return null; }
+ if (states.contains(MaterialState.selected)) { return IbColors.primaryColor; }
+ return null;
+ }),
+ trackColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+ if (states.contains(MaterialState.disabled)) { return null; }
+ if (states.contains(MaterialState.selected)) { return IbColors.primaryColor; }
+ return null;
+ }),
+ ));
     return dark;
   }
 
@@ -68,10 +90,8 @@ class IbThemes {
             ),
           ),
         ),
-        toggleableActiveColor: IbColors.primaryColor,
         primaryColor: IbColors.lightBlue,
         indicatorColor: Colors.black,
-        backgroundColor: IbColors.creamYellow,
         iconTheme: const IconThemeData(color: Colors.black),
         appBarTheme: AppBarTheme(
             iconTheme: const IconThemeData(color: Colors.black),
@@ -96,11 +116,32 @@ class IbThemes {
         ),
         scaffoldBackgroundColor: IbColors.lightBlue,
         brightness: Brightness.light,
-        colorScheme:
-            ColorScheme.fromSwatch().copyWith(secondary: IbColors.primaryColor),
         textTheme: GoogleFonts.oxygenTextTheme(
           Theme.of(context).textTheme,
-        ).apply(bodyColor: Colors.black, displayColor: Colors.black));
+        ).apply(bodyColor: Colors.black, displayColor: Colors.black), checkboxTheme: CheckboxThemeData(
+ fillColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+ if (states.contains(MaterialState.disabled)) { return null; }
+ if (states.contains(MaterialState.selected)) { return IbColors.primaryColor; }
+ return null;
+ }),
+ ), radioTheme: RadioThemeData(
+ fillColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+ if (states.contains(MaterialState.disabled)) { return null; }
+ if (states.contains(MaterialState.selected)) { return IbColors.primaryColor; }
+ return null;
+ }),
+ ), switchTheme: SwitchThemeData(
+ thumbColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+ if (states.contains(MaterialState.disabled)) { return null; }
+ if (states.contains(MaterialState.selected)) { return IbColors.primaryColor; }
+ return null;
+ }),
+ trackColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+ if (states.contains(MaterialState.disabled)) { return null; }
+ if (states.contains(MaterialState.selected)) { return IbColors.primaryColor; }
+ return null;
+ }),
+ ), colorScheme: ColorScheme.fromSwatch().copyWith(secondary: IbColors.primaryColor).copyWith(background: IbColors.creamYellow));
     return light;
   }
 }

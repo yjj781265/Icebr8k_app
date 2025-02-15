@@ -25,7 +25,7 @@ class IbQuestionButtons extends StatelessWidget {
             key: StorageKey.voteOptionsShowCaseBool, value: true);
         _controller.isShowCase.value = false;
       }
-    }, builder: Builder(builder: (context) {
+    }, builder: (context) {
       return Obx(() {
         return Row(
           children: [
@@ -53,7 +53,7 @@ class IbQuestionButtons extends StatelessWidget {
                 child: Showcase(
                   key: _controller.voteOptionsShowCaseKey,
                   overlayOpacity: 0.3,
-                  shapeBorder: const RoundedRectangleBorder(
+                  targetShapeBorder: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(8))),
                   description:
                       IbUtils().getCurrentUserSettings().voteAnonymousByDefault
@@ -104,7 +104,7 @@ class IbQuestionButtons extends StatelessWidget {
           ],
         );
       });
-    }));
+    });
   }
 
   String _handleVoteButtonText() {
