@@ -1,0 +1,15 @@
+R_DEF: Internal format may change without notice
+local
+color lightBlue
+color primaryColor
+drawable launch_background
+drawable logo_96
+drawable notification_icon
+mipmap ic_launcher
+raw water_drop
+string custom_notification_channel_id
+string default_notification_channel_description
+string default_notification_channel_id
+string default_notification_channel_name
+style LaunchTheme
+style NormalTheme

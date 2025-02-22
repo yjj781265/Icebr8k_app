@@ -1,0 +1,38 @@
+[
+    {
+        "merged": "com.icebr8k.android.app-debug-87:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.icebr8k.android.app-main-89:/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.icebr8k.android.app-debug-87:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.icebr8k.android.app-main-89:/mipmap-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.icebr8k.android.app-debug-87:/drawable_logo_96.png.flat",
+        "source": "com.icebr8k.android.app-main-89:/drawable/logo_96.png"
+    },
+    {
+        "merged": "com.icebr8k.android.app-debug-87:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.icebr8k.android.app-main-89:/mipmap-xxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.icebr8k.android.app-debug-87:/drawable-v21_launch_background.xml.flat",
+        "source": "com.icebr8k.android.app-main-89:/drawable-v21/launch_background.xml"
+    },
+    {
+        "merged": "com.icebr8k.android.app-debug-87:/drawable_notification_icon.png.flat",
+        "source": "com.icebr8k.android.app-main-89:/drawable/notification_icon.png"
+    },
+    {
+        "merged": "com.icebr8k.android.app-debug-87:/raw_water_drop.mp3.flat",
+        "source": "com.icebr8k.android.app-main-89:/raw/water_drop.mp3"
+    },
+    {
+        "merged": "com.icebr8k.android.app-debug-87:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.icebr8k.android.app-main-89:/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.icebr8k.android.app-debug-87:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.icebr8k.android.app-main-89:/mipmap-xhdpi/ic_launcher.png"
+    }
+]

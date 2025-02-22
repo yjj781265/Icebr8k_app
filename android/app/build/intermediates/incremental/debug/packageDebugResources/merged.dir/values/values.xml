@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="lightBlue">#d5edff</color>
+    <color name="primaryColor">#ff23b6e4</color>
+    <string name="custom_notification_channel_id" translatable="false">icebr8k_custom_channel</string>
+    <string name="default_notification_channel_description" translatable="false">icebr8k_channel_description</string>
+    <string name="default_notification_channel_id" translatable="false">icebr8k_channel</string>
+    <string name="default_notification_channel_name" translatable="false">icebr8k_channel_name</string>
+    <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        
+        <item name="android:windowBackground">@drawable/launch_background</item>
+    </style>
+    <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="android:windowBackground">@drawable/launch_background</item>
+    </style>
+</resources>

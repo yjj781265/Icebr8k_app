@@ -54,15 +54,8 @@ class AuthController extends GetxService {
     super.onInit();
     networkSub = Connectivity().onConnectivityChanged.listen(
         (ConnectivityResult result) {
-      if (result == ConnectivityResult.none) {
-        IbUtils().showSimpleSnackBar(
-            msg: 'No Internet Connection',
-            backgroundColor: IbColors.errorRed,
-            isPersistent: true);
-      } else if (result != ConnectivityResult.bluetooth) {
-        Get.closeAllSnackbars();
-      }
-    }, onError: (e) {
+    
+    } as void Function(List<ConnectivityResult> event)?, onError: (e) {
       print(e);
     });
     _dbStatusSub = ibDbStatusService.listenToStatus().listen((event) async {

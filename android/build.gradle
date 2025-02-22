@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        agp_version = '7.4.2'
+        agp_version = '8.7'
     }
 }
 
@@ -13,8 +13,15 @@ allprojects {
 
 rootProject.buildDir = '../build'
 subprojects {
-    project.buildDir = "${rootProject.buildDir}/${project.name}"
-    project.evaluationDependsOn(':app')
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android {
+                if (namespace == null) {
+                    namespace project.group
+                }
+            }
+        }
+    }
 }
 
 tasks.register("clean", Delete) {
